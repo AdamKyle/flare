@@ -18,7 +18,6 @@ export default class Chat extends React.Component {
     this.privateMessages = Echo.private('private-message-' + this.props.userId);
 
     // this.globalMessages = Echo.join('global-messages');
-    // this.refreshForBanned = Echo.private('refresh-banned-' + this.props.userId);
     // this.dropMessage = Echo.private('drop-message-' + this.props.userId);
   }
 
@@ -95,11 +94,6 @@ export default class Chat extends React.Component {
     //     messages: messages
     //   });
     // });
-    //
-    // this.refreshForBanned.listen('RefreshForBanned', (event) => {
-    //   // If the user has been banned refresh their window.
-    //   window.location.reload();
-    // })
   }
 
   componentWillUnMount() {

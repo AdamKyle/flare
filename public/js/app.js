@@ -84706,7 +84706,6 @@ function (_React$Component) {
     _this.echo = Echo.join('chat');
     _this.serverMessages = Echo["private"]('server-message-' + _this.props.userId);
     _this.privateMessages = Echo["private"]('private-message-' + _this.props.userId); // this.globalMessages = Echo.join('global-messages');
-    // this.refreshForBanned = Echo.private('refresh-banned-' + this.props.userId);
     // this.dropMessage = Echo.private('drop-message-' + this.props.userId);
 
     return _this;
@@ -84783,11 +84782,6 @@ function (_React$Component) {
       //     messages: messages
       //   });
       // });
-      //
-      // this.refreshForBanned.listen('RefreshForBanned', (event) => {
-      //   // If the user has been banned refresh their window.
-      //   window.location.reload();
-      // })
     }
   }, {
     key: "componentWillUnMount",
