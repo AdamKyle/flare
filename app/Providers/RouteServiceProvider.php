@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        $this->mapGameRoutes();
     }
 
     /**
@@ -69,5 +69,12 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapGameRoutes()
+    {
+        Route::middleware('web')
+             ->namespace('App\Game\Controllers')
+             ->group(base_path('routes/game/web.php'));
     }
 }

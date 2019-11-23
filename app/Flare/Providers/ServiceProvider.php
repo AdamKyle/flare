@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
+use App\Flare\Console\Commands\CreateAdminAccount;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {
@@ -32,7 +33,11 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function boot()
     {
-        //
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CreateAdminAccount::class,
+            ]);
+        }
     }
 
     public function provides()

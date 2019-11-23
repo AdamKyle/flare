@@ -12,12 +12,12 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->user()->hasRole('Admin')) {
+        return redirect()->route('home');
+    }
+
+    return redirect()->route('game');
 });
-
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
 
 Auth::routes();
 

@@ -15,7 +15,7 @@ class CreateCharacters extends Migration
     {
         Schema::create('characters', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('user_id');
+            $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('game_race_id')->unsigned();
             $table->bigInteger('game_class_id')->unsigned();
             $table->foreign('game_race_id')

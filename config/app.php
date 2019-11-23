@@ -180,6 +180,12 @@ return [
          */
 
        App\Flare\Providers\ServiceProvider::class,
+       App\Flare\Providers\EventsProvider::class,
+
+       /**
+        * Game Related
+        */
+      App\Game\Providers\ServiceProvider::class,
     ],
 
     /*

@@ -10,7 +10,6 @@ use App\Flare\Values\BaseStatValue;
 
 class BaseStatValueTest extends TestCase
 {
-
     use RefreshDatabase,
         CreateRace,
         CreateClass;
