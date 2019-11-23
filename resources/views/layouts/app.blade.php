@@ -7,6 +7,12 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @guest
+    @else
+        <meta name="game_key" content="{{ auth()->user()->private_game_key }}">
+        <meta name="player" content="{{ auth()->user()->id }}">
+    @endguest
+
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->

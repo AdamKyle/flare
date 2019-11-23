@@ -185,7 +185,7 @@ return [
        /**
         * Game Related
         */
-      App\Game\Providers\ServiceProvider::class,
+      App\Game\Core\Providers\ServiceProvider::class,
     ],
 
     /*

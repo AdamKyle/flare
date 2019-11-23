@@ -9,6 +9,7 @@
 
                 <div class="card-body">
                     Hello! {{$user->character->name}}
+                    <div id="game"></div>
                 </div>
             </div>
         </div>

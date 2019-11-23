@@ -44,7 +44,9 @@ return [
         'api' => [
             'driver' => 'token',
             'provider' => 'users',
-            'hash' => false,
+            'hash' => true,
+            'input_key' => 'private_game_key',
+            'storage_key' => 'game_key',
         ],
     ],
 

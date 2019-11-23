@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Flare\Models\Character;
+use App\Game\Messages\Models\Message;
 
 class User extends Authenticatable
 {
@@ -19,6 +20,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'email', 'password',
+        'game_key', 'private_game_key'
     ];
 
     /**
@@ -41,5 +43,9 @@ class User extends Authenticatable
 
     public function character() {
         return $this->hasOne(Character::class);
+    }
+
+    public function messages() {
+        return $this->hasMany(Message::class);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -65,9 +66,13 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $token = Str::random(80);
+
         return User::create([
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'email'            => $data['email'],
+            'password'         => Hash::make($data['password']),
+            'game_key'         => hash('sha256', $token),
+            'private_game_key' => $token,
         ]);
     }
 

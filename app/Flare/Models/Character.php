@@ -5,6 +5,7 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
+use App\User;
 
 class Character extends Model
 {
@@ -52,5 +53,9 @@ class Character extends Model
 
     public function class() {
         return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 }
