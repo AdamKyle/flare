@@ -12,13 +12,10 @@ class Game extends React.Component {
   render() {
     return (
       <div>
+        <hr />
         <div className="row">
-          <div className="col-md-9">
-            <hr />
-            <hr />
+          <div className="col-md-12">
             <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
-          </div>
-          <div className="col-md-3">
           </div>
         </div>
         <hr />

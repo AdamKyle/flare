@@ -241,27 +241,31 @@ export default class Chat extends React.Component {
 
   render() {
     return (
-      <div className="chat">
-        <div className="row">
-          <div className="col-lg-11 col-10">
-            <input
-              type="text"
-              className="form-control input-sm"
-              value={this.state.message}
-              onChange={this.handleOnChange.bind(this)}
-              onKeyPress={this.handleKeyPress.bind(this)}
-            />
-          </div>
+      <div class="card p-2 pr-4">
+        <div class="card-body">
+          <div className="chat">
+            <div className="row">
+              <div className="col-11">
+                <input
+                  type="text"
+                  className="form-control input-sm"
+                  value={this.state.message}
+                  onChange={this.handleOnChange.bind(this)}
+                  onKeyPress={this.handleKeyPress.bind(this)}
+                />
+              </div>
 
-          <div className="col-lg-1 col-2">
-            <button className="btn btn-primary" onClick={this.handleOnClick.bind(this)}>Send</button>
-          </div>
-        </div>
+              <div className="col-1">
+                <button className="btn btn-primary" onClick={this.handleOnClick.bind(this)}>Send</button>
+              </div>
+            </div>
 
-        <div className="row">
-          <div className="col-md-12">
-            <div className="chat-box mt-3 pt-3 pl-3">
-              <ul> { this.rendermessages() }</ul>
+            <div className="row">
+              <div className="col-md-12">
+                <div className="chat-box mt-3 pt-3 pl-3">
+                  <ul> { this.rendermessages() }</ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>

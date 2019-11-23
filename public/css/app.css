@@ -11100,3 +11100,25 @@ a.text-dark:focus {
   }
 }
 
+.chat-box {
+  background: #333;
+  color: #fff;
+  max-height: 300px;
+  overflow-y: scroll;
+  border-radius: 4px;
+}
+
+.chat-box ul {
+  list-style: none;
+}
+
+.chat-box ul .private-message {
+  color: #8b5696;
+  font-style: italic;
+}
+
+.chat-box ul .server-message {
+  color: #ec7b7b;
+  font-weight: bold;
+}
+

@@ -84623,16 +84623,14 @@ function (_React$Component) {
   _createClass(Game, [{
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-md-9"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_messages_chat__WEBPACK_IMPORTED_MODULE_2__["default"], {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_messages_chat__WEBPACK_IMPORTED_MODULE_2__["default"], {
         apiUrl: this.apiUrl,
         userId: this.props.userId
-      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-md-3"
-      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null));
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null));
     }
   }]);
 
@@ -84947,11 +84945,15 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        "class": "card p-2 pr-4"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        "class": "card-body"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "chat"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-lg-11 col-10"
+        className: "col-11"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "text",
         className: "form-control input-sm",
@@ -84959,7 +84961,7 @@ function (_React$Component) {
         onChange: this.handleOnChange.bind(this),
         onKeyPress: this.handleKeyPress.bind(this)
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-lg-1 col-2"
+        className: "col-1"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         onClick: this.handleOnClick.bind(this)
@@ -84969,7 +84971,7 @@ function (_React$Component) {
         className: "col-md-12"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "chat-box mt-3 pt-3 pl-3"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, " ", this.rendermessages())))));
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, " ", this.rendermessages())))))));
       return null;
     }
   }]);

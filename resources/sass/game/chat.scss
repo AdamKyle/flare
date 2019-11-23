@@ -1,0 +1,21 @@
+.chat-box {
+  background: #333;
+  color: #fff;
+  max-height: 300px;
+  overflow-y: scroll;
+  border-radius: 4px;
+
+  ul {
+    list-style: none;
+
+    .private-message {
+      color: #8b5696;
+      font-style: italic;
+    }
+
+    .server-message {
+      color: #ec7b7b;
+      font-weight: bold;
+    }
+  }
+}
