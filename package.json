@@ -23,5 +23,9 @@
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.20.1",
         "sass-loader": "7.*"
+    },
+    "dependencies": {
+        "laravel-echo": "^1.6.1",
+        "pusher-js": "^5.0.3"
     }
 }

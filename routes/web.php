@@ -12,6 +12,10 @@
 */
 
 Route::get('/', function () {
+    if (!Auth::check()) {
+        return view('welcome');
+    }
+    
     if (auth()->user()->hasRole('Admin')) {
         return redirect()->route('home');
     }
