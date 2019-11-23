@@ -84881,7 +84881,7 @@ function (_React$Component) {
     value: function postPrivateMessage() {
       var _this5 = this;
 
-      var messageData = this.state.message.match(/^\/m\s+(\w+):\s*(.*)/);
+      var messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/);
 
       if (messageData == null) {
         this.getServerMessage('invalid_command');

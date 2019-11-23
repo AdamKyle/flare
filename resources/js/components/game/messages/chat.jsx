@@ -184,7 +184,7 @@ export default class Chat extends React.Component {
   }
 
   postPrivateMessage() {
-    const messageData = this.state.message.match(/^\/m\s+(\w+):\s*(.*)/)
+    const messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/)
 
     if (messageData == null) {
       this.getServerMessage('invalid_command');
