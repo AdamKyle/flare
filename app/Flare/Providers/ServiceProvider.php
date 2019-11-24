@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Console\Commands\CreateAdminAccount;
+use App\Flare\Transformers\CharacterAttackTransformer;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {
@@ -23,6 +25,14 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
 
         $this->app->singleton(CharacterBuilder::class, function ($app) {
             return new CharacterBuilder();
+        });
+
+        $this->app->singleton(CharacterInformationBuilder::class, function($app) {
+            return new CharacterInformationBuilder();
+        });
+
+        $this->app->bind(CharacterAttackTransformer::class, function($app) {
+            return new CharacterAttackTransformer();
         });
     }
 
@@ -45,6 +55,8 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
         return [
             BaseStatValue::class,
             CharacterBuilder::class,
+            CharacterInformationBuilder::class,
+            CharacterAttackTransformer::class,
         ];
     }
 }

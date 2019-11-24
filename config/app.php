@@ -178,7 +178,6 @@ return [
         /**
          * Flare Related
          */
-
        App\Flare\Providers\ServiceProvider::class,
        App\Flare\Providers\EventsProvider::class,
 
@@ -186,6 +185,7 @@ return [
         * Game Related
         */
       App\Game\Core\Providers\ServiceProvider::class,
+      App\Game\Battle\Providers\ServiceProvider::class,
     ],
 
     /*

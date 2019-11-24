@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Game\Core\Providers;
+namespace App\Game\Battle\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {
@@ -14,6 +15,9 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function register()
     {
+        $this->app->bind(Manager::class, function ($app) {
+            return new Manager();
+        });
     }
 
     /**
@@ -27,6 +31,8 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
 
     public function provides()
     {
-        return [];
+        return [
+            Manager::class,
+        ];
     }
 }
