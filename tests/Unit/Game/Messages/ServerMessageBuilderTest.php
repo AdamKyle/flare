@@ -45,4 +45,11 @@ class ServerMessageBuilderTest extends TestCase
         $this->assertEquals('Command not recognized.', $message);
     }
 
+    public function testGetMessageForNoMonster()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('no_monster');
+
+        $this->assertEquals('No monster selected. Please select one.', $message);
+    }
+
 }

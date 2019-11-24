@@ -1,0 +1,16 @@
+.health-meters {
+  max-width: 300px;
+  margin: 0 auto;
+
+  .character {
+    .character-bar {
+      background-color: #41840f;
+    }
+  }
+
+  .monster {
+    .monster-bar {
+      background-color: #840f15;
+    }
+  }
+}

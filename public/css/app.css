@@ -11122,3 +11122,16 @@ a.text-dark:focus {
   font-weight: bold;
 }
 
+.health-meters {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.health-meters .character .character-bar {
+  background-color: #41840f;
+}
+
+.health-meters .monster .monster-bar {
+  background-color: #840f15;
+}
+

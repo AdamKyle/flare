@@ -14,6 +14,8 @@ class ServerMessageBuilder {
                 return 'Command not recognized.';
             case 'no_matching_user':
                 return 'Could not find a user with that name to private message.';
+            case 'no_monster':
+                return 'No monster selected. Please select one.';
             default:
                 return '';
         }

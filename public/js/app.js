@@ -84569,20 +84569,20 @@ window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
 
 /***/ }),
 
-/***/ "./resources/js/components/game/game.jsx":
-/*!***********************************************!*\
-  !*** ./resources/js/components/game/game.jsx ***!
-  \***********************************************/
-/*! no exports provided */
+/***/ "./resources/js/components/game/battle/actions.jsx":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/game/battle/actions.jsx ***!
+  \*********************************************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Actions; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _messages_chat__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./messages/chat */ "./resources/js/components/game/messages/chat.jsx");
+/* harmony import */ var _monster_monster__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./monster/monster */ "./resources/js/components/game/battle/monster/monster.js");
+/* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -84600,6 +84600,244 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+var Actions =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Actions, _React$Component);
+
+  function Actions(props) {
+    var _this;
+
+    _classCallCheck(this, Actions);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Actions).call(this, props));
+    _this.state = {
+      character: null,
+      monster: null,
+      monsters: null,
+      characterMaxHealth: 0,
+      characterCurrentHealth: 0,
+      monsterMaxHealth: 0,
+      monsterCurrentHealth: 0,
+      battleMessages: [],
+      isLoading: true
+    };
+    return _this;
+  }
+
+  _createClass(Actions, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      axios.get('/api/actions', {
+        params: {
+          user_id: this.props.userId
+        }
+      }).then(function (result) {
+        _this2.setState({
+          character: result.data.character.data,
+          monsters: result.data.monsters,
+          characterMaxHealth: result.data.character.data.health,
+          characterCurrentHealth: result.data.character.data.health,
+          isLoading: false
+        });
+      });
+    }
+  }, {
+    key: "monsterOptions",
+    value: function monsterOptions() {
+      return this.state.monsters.map(function (monster) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+          value: monster.id,
+          key: monster.id
+        }, monster.name);
+      });
+    }
+  }, {
+    key: "updateActions",
+    value: function updateActions(event) {
+      var monster = this.state.monsters.filter(function (monster) {
+        return monster.id === parseInt(event.target.value);
+      })[0];
+      var monsterInfo = new _monster_monster__WEBPACK_IMPORTED_MODULE_1__["default"](monster);
+      var health = monsterInfo.health();
+      this.setState({
+        monster: monster,
+        monsterMaxHealth: health,
+        monsterCurrentHealth: health
+      });
+    }
+  }, {
+    key: "attack",
+    value: function attack() {
+      if (this.state.monster === null) {
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('no_monster');
+      }
+    }
+  }, {
+    key: "healthMeters",
+    value: function healthMeters() {
+      if (this.state.monster === null) {
+        return null;
+      }
+
+      var characterCurrentHealth = this.state.characterCurrentHealth / this.state.characterMaxHealth * 100;
+      var monsterCurrentHealth = this.state.monsterCurrentHealth / this.state.monsterMaxHealth * 100;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "health-meters mb-2 mt-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        "class": "progress character mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        "class": "progress-bar character-bar w-" + characterCurrentHealth,
+        role: "progressbar",
+        "aria-valuenow": this.state.characterCurrentHealth,
+        "aria-valuemin": "0",
+        "aria-valuemax": this.state.characterMaxHealth
+      }, this.state.character.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress monster mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress-bar monster-bar w-" + monsterCurrentHealth,
+        role: "progressbar",
+        "aria-valuenow": this.state.monsterCurrentHealth,
+        "aria-valuemin": "0",
+        "aria-valuemax": this.state.monsterMaxHealth
+      }, this.state.monster.name)));
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body"
+      }, this.state.isLoading ? 'Loading please wait ..' : this.renderActions()));
+    }
+  }, {
+    key: "renderActions",
+    value: function renderActions() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row justify-content-center"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "form-group row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        htmlFor: "monsters",
+        className: "col-md-4 col-form-label text-md-right"
+      }, "Choose a monster"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+        className: "form-control",
+        id: "monsters",
+        name: "monsters",
+        onChange: this.updateActions.bind(this)
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+        value: "",
+        key: "0"
+      }, "Please select a monster"), this.monsterOptions()))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "battle-section text-center"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary",
+        onClick: this.attack.bind(this)
+      }, "Attack"), this.healthMeters(), this.battleMessages)));
+    }
+  }]);
+
+  return Actions;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/game/battle/monster/monster.js":
+/*!****************************************************************!*\
+  !*** ./resources/js/components/game/battle/monster/monster.js ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Monster; });
+/* harmony import */ var _helpers_random_number__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../helpers/random_number */ "./resources/js/components/game/helpers/random_number.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var Monster =
+/*#__PURE__*/
+function () {
+  function Monster(monster) {
+    _classCallCheck(this, Monster);
+
+    this.monster = monster;
+  }
+
+  _createClass(Monster, [{
+    key: "health",
+    value: function health() {
+      var healthRange = this.monster.health_range.split('-');
+      return Object(_helpers_random_number__WEBPACK_IMPORTED_MODULE_0__["randomNumber"])(healthRange[0], healthRange[1]) + 10;
+    }
+  }, {
+    key: "attack",
+    value: function attack() {
+      var attackRange = this.monster.attack_range.split('-');
+      return Object(_helpers_random_number__WEBPACK_IMPORTED_MODULE_0__["randomNumber"])(attackRange[0], attackRange[1]) + this.monster[this.monster.damage_stat];
+    }
+  }]);
+
+  return Monster;
+}();
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/game/game.jsx":
+/*!***********************************************!*\
+  !*** ./resources/js/components/game/game.jsx ***!
+  \***********************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _messages_chat__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./messages/chat */ "./resources/js/components/game/messages/chat.jsx");
+/* harmony import */ var _battle_actions_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./battle/actions.jsx */ "./resources/js/components/game/battle/actions.jsx");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -84624,6 +84862,15 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row mb-4"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-8"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_battle_actions_jsx__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        apiUrl: this.apiUrl,
+        userId: this.props.userId
+      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-4"
+      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-12"
@@ -84649,6 +84896,46 @@ if (game !== null) {
 
 /***/ }),
 
+/***/ "./resources/js/components/game/helpers/random_number.js":
+/*!***************************************************************!*\
+  !*** ./resources/js/components/game/helpers/random_number.js ***!
+  \***************************************************************/
+/*! exports provided: randomNumber */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "randomNumber", function() { return randomNumber; });
+var randomNumber = function randomNumber(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+/***/ }),
+
+/***/ "./resources/js/components/game/helpers/server_message.js":
+/*!****************************************************************!*\
+  !*** ./resources/js/components/game/helpers/server_message.js ***!
+  \****************************************************************/
+/*! exports provided: getServerMessage */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getServerMessage", function() { return getServerMessage; });
+var getServerMessage = function getServerMessage(type) {
+  axios.get('/api/server-message', {
+    params: {
+      type: type
+    }
+  })["catch"](function (error) {
+    console.log(error);
+  });
+};
+
+/***/ }),
+
 /***/ "./resources/js/components/game/messages/chat.jsx":
 /*!********************************************************!*\
   !*** ./resources/js/components/game/messages/chat.jsx ***!
@@ -84665,6 +84952,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_cloneDeep__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_cloneDeep__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var lodash_uniqBy__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/uniqBy */ "./node_modules/lodash/uniqBy.js");
 /* harmony import */ var lodash_uniqBy__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqBy__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -84682,6 +84970,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -84878,7 +85167,7 @@ function (_React$Component) {
       var messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/);
 
       if (messageData == null) {
-        this.getServerMessage('invalid_command');
+        Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('invalid_command');
         return;
       }
 
@@ -84894,26 +85183,15 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "getServerMessage",
-    value: function getServerMessage(type) {
-      axios.get('/api/server-message', {
-        params: {
-          type: type
-        }
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    }
-  }, {
     key: "handleKeyPress",
     value: function handleKeyPress(e) {
       if (e.key === 'Enter') {
         e.target.value = '';
 
         if (this.state.message.length < 1) {
-          this.getServerMessage('message_length_0');
+          Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('message_length_0');
         } else if (this.state.message.length > 140) {
-          this.getServerMessage('message_length_max');
+          Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('message_length_max');
         } else {
           if (this.state.message.includes('/m')) {
             this.postPrivateMessage();
@@ -84939,9 +85217,9 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        "class": "card p-2 pr-4"
+        className: "card p-2 pr-4"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        "class": "card-body"
+        className: "card-body"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "chat"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {

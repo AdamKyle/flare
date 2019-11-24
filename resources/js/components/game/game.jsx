@@ -1,6 +1,7 @@
-import React from 'react';
+import React    from 'react';
 import ReactDOM from 'react-dom';
-import Chat from './messages/chat';
+import Chat     from './messages/chat';
+import Actions  from './battle/actions.jsx';
 
 class Game extends React.Component {
   constructor(props) {
@@ -13,6 +14,14 @@ class Game extends React.Component {
     return (
       <div>
         <hr />
+        <div className="row mb-4">
+          <div className="col-md-8">
+            <Actions apiUrl={this.apiUrl} userId={this.props.userId} />
+          </div>
+          <div className="col-md-4">
+
+          </div>
+        </div>
         <div className="row">
           <div className="col-md-12">
             <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>

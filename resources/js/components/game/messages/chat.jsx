@@ -1,6 +1,7 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqBy from 'lodash/uniqBy';
+import {getServerMessage} from '../helpers/server_message'
 
 export default class Chat extends React.Component {
 
@@ -181,7 +182,7 @@ export default class Chat extends React.Component {
     const messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/)
 
     if (messageData == null) {
-      this.getServerMessage('invalid_command');
+      getServerMessage('invalid_command');
       return;
     }
 
@@ -197,22 +198,14 @@ export default class Chat extends React.Component {
     });
   }
 
-  getServerMessage(type) {
-    axios.get('/api/server-message', {
-      params: {type: type}
-    }).catch((error) => {
-      console.log(error);
-    });
-  }
-
   handleKeyPress(e) {
     if (e.key === 'Enter') {
       e.target.value = '';
 
       if (this.state.message.length < 1) {
-        this.getServerMessage('message_length_0');
+        getServerMessage('message_length_0');
       } else if (this.state.message.length > 140) {
-        this.getServerMessage('message_length_max');
+        getServerMessage('message_length_max');
       } else {
         if (this.state.message.includes('/m')) {
           this.postPrivateMessage()
@@ -235,8 +228,8 @@ export default class Chat extends React.Component {
 
   render() {
     return (
-      <div class="card p-2 pr-4">
-        <div class="card-body">
+      <div className="card p-2 pr-4">
+        <div className="card-body">
           <div className="chat">
             <div className="row">
               <div className="col-11">
