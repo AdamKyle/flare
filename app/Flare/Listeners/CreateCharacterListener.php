@@ -24,6 +24,7 @@ class CreateCharacterListener
     {
         $this->characterBuilder->setRace($event->race)
                                ->setClass($event->class)
-                               ->createCharacter($event->user, $event->characterName);
+                               ->createCharacter($event->user, $event->characterName)
+                               ->assignSkills();
     }
 }

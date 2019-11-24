@@ -23,7 +23,7 @@ class CreateClasses extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 2,
                 'dodge_mod'    => 2,
-                'deffense_mod' => 3,
+                'deffense_mod' => 1,
             ],
             [
                 'name'         => 'Vampire',

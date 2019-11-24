@@ -22,7 +22,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 1,
                 'accuracy_mod' => 1,
                 'dodge_mod'    => 2,
-                'deffense_mod' => 1,
+                'deffense_mod' => 0,
             ],
             [
                 'name'         => 'High Elf',
@@ -44,7 +44,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 5,
+                'deffense_mod' => 2,
             ],
             [
                 'name'         => 'Centaur',
@@ -55,7 +55,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 3,
                 'dodge_mod'    => 5,
-                'deffense_mod' => 1,
+                'deffense_mod' => 0,
             ],
             [
                 'name'         => 'Dryad',
@@ -77,7 +77,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 2,
                 'dodge_mod'    => 2,
-                'deffense_mod' => 1,
+                'deffense_mod' => 0,
             ]
         ]);
     }

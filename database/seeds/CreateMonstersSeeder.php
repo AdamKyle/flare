@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use App\Flare\Models\Monster;
+use App\Flare\Models\Skill;
+use App\Flare\Values\BaseSkillValue;
 
 class CreateMonstersSeeder extends Seeder
 {
@@ -27,5 +29,15 @@ class CreateMonstersSeeder extends Seeder
                 'attack_range' => '1-6',
             ]
         ]);
+
+        $skills     = [];
+
+        foreach(Monster::all() as $monster) {
+            foreach(config('game.skill_names') as $name) {
+                $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $name);
+            }
+
+            $monster->skills()->insert($skills);
+        }
     }
 }

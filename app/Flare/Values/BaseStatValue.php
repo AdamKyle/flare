@@ -42,4 +42,8 @@ class BaseStatValue {
     public function int() {
         return ($this->race->int_mod + $this->class->int_mod) + 5;
     }
+
+    public function ac() {
+        return ($this->race->deffense_mod + $this->class->deffense_mod) + 10;
+    }
 }

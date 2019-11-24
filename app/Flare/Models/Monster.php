@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Flare\Models\Skill;
 
 class Monster extends Model
 {
@@ -40,4 +41,8 @@ class Monster extends Model
         'int'      => 'integer',
         'ac'       => 'integer',
     ];
+
+    public function skills() {
+        return $this->hasMany(Skill::class);
+    }
 }

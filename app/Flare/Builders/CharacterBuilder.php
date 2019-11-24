@@ -7,12 +7,15 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Character;
 use App\Flare\Values\BaseStatValue;
+use App\Flare\Values\BaseSkillValue;
 
 class CharacterBuilder {
 
     private $race;
 
     private $class;
+
+    private $character;
 
     public function setRace(GameRace $race): CharacterBuilder {
         $this->race = $race;
@@ -26,10 +29,10 @@ class CharacterBuilder {
         return $this;
     }
 
-    public function createCharacter(User $user, string $name): Character {
+    public function createCharacter(User $user, string $name): CharacterBuilder {
         $baseStat = resolve(BaseStatValue::class)->setRace($this->race)->setClass($this->class);
 
-        return Character::create([
+        $this->character = Character::create([
             'user_id'       => $user->id,
             'game_race_id'  => $this->race->id,
             'game_class_id' => $this->class->id,
@@ -42,7 +45,23 @@ class CharacterBuilder {
             'dex'           => $baseStat->dex(),
             'chr'           => $baseStat->chr(),
             'int'           => $baseStat->int(),
-            'ac'            => 10
+            'ac'            => $baseStat->ac(),
         ]);
+
+        return $this;
+    }
+
+    public function assignSkills(): CharacterBuilder {
+        foreach (config('game.skill_names') as $name) {
+            $this->character->skills()->create(
+                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $name)
+            );
+        }
+
+        return $this;
+    }
+
+    public function character(): Character {
+        return $this->character;
     }
 }

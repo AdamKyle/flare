@@ -11,6 +11,7 @@ use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateSkill;
 
 class BattleControllerApiTest extends TestCase
 {
@@ -20,7 +21,8 @@ class BattleControllerApiTest extends TestCase
         CreateRace,
         CreateClass,
         CreateCharacter,
-        CreateMonster;
+        CreateMonster,
+        CreateSkill;
 
     public function setUp(): void {
         parent::setUp();
@@ -43,7 +45,11 @@ class BattleControllerApiTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $this->createMonster();
+        $monster = $this->createMonster();
+
+        $this->createSkill([
+            'monster_id' => $monster->id,
+        ]);
 
         $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/actions', [
@@ -56,6 +62,7 @@ class BattleControllerApiTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertNotEmpty($content->monsters);
+        $this->assertNotEmpty($content->monsters[0]->skills);
         $this->assertEquals($character->name, $content->character->data->name);
     }
 

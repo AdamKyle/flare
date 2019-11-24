@@ -9,6 +9,7 @@ use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Values\BaseSkillValue;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {
@@ -34,6 +35,10 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
         $this->app->bind(CharacterAttackTransformer::class, function($app) {
             return new CharacterAttackTransformer();
         });
+
+        $this->app->bind(BaseSkillValue::class, function($app) {
+            return new BaseSkillValue();
+        });
     }
 
     /**
@@ -54,6 +59,7 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
     {
         return [
             BaseStatValue::class,
+            BaseSkillValue::class,
             CharacterBuilder::class,
             CharacterInformationBuilder::class,
             CharacterAttackTransformer::class,

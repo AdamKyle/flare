@@ -33,7 +33,7 @@ class BattleController extends Controller {
         $character = new Item($character, $this->character);
 
         return response()->json([
-            'monsters'  => Monster::all(),
+            'monsters'  => Monster::with('skills')->get(),
             'character' => $this->manager->createData($character)->toArray()
         ], 200);
     }
