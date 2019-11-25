@@ -66,7 +66,7 @@ export default class Chat extends React.Component {
       };
 
       messages.unshift(message);
-      console.log(messages);
+
       this.setState({
         messages: messages
       });

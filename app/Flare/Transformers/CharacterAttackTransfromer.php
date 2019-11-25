@@ -17,7 +17,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'name'   => $character->name,
             'attack' => $characterInformation->buildAttack(),
             'health' => $characterInformation->buildHealth(),
-            'skills' => $character->skills->pluck('name', 'skill_bonus')->toArray(),
+            'skills' => $character->skills,
         ];
     }
 }

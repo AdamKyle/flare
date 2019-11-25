@@ -25,8 +25,8 @@ class CreateMonstersSeeder extends Seeder
                 'chr'          => 8,
                 'int'          => 8,
                 'ac'           => 6,
-                'health_range' => '1-8',
-                'attack_range' => '1-6',
+                'health_range' => '8-20',
+                'attack_range' => '2-8',
             ]
         ]);
 

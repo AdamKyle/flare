@@ -84582,7 +84582,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _monster_monster__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./monster/monster */ "./resources/js/components/game/battle/monster/monster.js");
-/* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
+/* harmony import */ var _attack_attack__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./attack/attack */ "./resources/js/components/game/battle/attack/attack.js");
+/* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -84600,6 +84601,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -84650,16 +84652,6 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "monsterOptions",
-    value: function monsterOptions() {
-      return this.state.monsters.map(function (monster) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
-          value: monster.id,
-          key: monster.id
-        }, monster.name);
-      });
-    }
-  }, {
     key: "updateActions",
     value: function updateActions(event) {
       var monster = this.state.monsters.filter(function (monster) {
@@ -84677,8 +84669,27 @@ function (_React$Component) {
     key: "attack",
     value: function attack() {
       if (this.state.monster === null) {
-        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('no_monster');
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('no_monster');
       }
+
+      var attack = new _attack_attack__WEBPACK_IMPORTED_MODULE_2__["default"](this.state.character, this.state.monster, this.state.characterCurrentHealth, this.state.monsterCurrentHealth);
+      var state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
+
+      if (state.monsterCurrentHealth <= 0) {
+        console.log('you win!');
+      }
+
+      this.setState(state);
+    }
+  }, {
+    key: "monsterOptions",
+    value: function monsterOptions() {
+      return this.state.monsters.map(function (monster) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+          value: monster.id,
+          key: monster.id
+        }, monster.name);
+      });
     }
   }, {
     key: "healthMeters",
@@ -84692,22 +84703,39 @@ function (_React$Component) {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "health-meters mb-2 mt-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        "class": "progress character mb-2"
+        className: "progress character mb-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        "class": "progress-bar character-bar w-" + characterCurrentHealth,
+        className: "progress-bar character-bar",
         role: "progressbar",
+        style: {
+          width: characterCurrentHealth + '%'
+        },
         "aria-valuenow": this.state.characterCurrentHealth,
         "aria-valuemin": "0",
         "aria-valuemax": this.state.characterMaxHealth
       }, this.state.character.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "progress monster mb-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "progress-bar monster-bar w-" + monsterCurrentHealth,
+        className: "progress-bar monster-bar",
         role: "progressbar",
+        style: {
+          width: monsterCurrentHealth + '%'
+        },
         "aria-valuenow": this.state.monsterCurrentHealth,
         "aria-valuemin": "0",
         "aria-valuemax": this.state.monsterMaxHealth
       }, this.state.monster.name)));
+    }
+  }, {
+    key: "battleMessages",
+    value: function battleMessages() {
+      return this.state.battleMessages.map(function (message) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: message.message
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "battle-message"
+        }, message.message), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null));
+      });
     }
   }, {
     key: "render",
@@ -84745,12 +84773,162 @@ function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         onClick: this.attack.bind(this)
-      }, "Attack"), this.healthMeters(), this.battleMessages)));
+      }, "Attack"), this.healthMeters(), this.battleMessages())));
     }
   }]);
 
   return Actions;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/game/battle/attack/attack.js":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/game/battle/attack/attack.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Attack; });
+/* harmony import */ var _monster_monster__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../monster/monster */ "./resources/js/components/game/battle/monster/monster.js");
+/* harmony import */ var _helpers_random_number__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../helpers/random_number */ "./resources/js/components/game/helpers/random_number.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var Attack =
+/*#__PURE__*/
+function () {
+  function Attack(attacker, defender, characterCurrenthealth, monsterCurrenthealth) {
+    _classCallCheck(this, Attack);
+
+    this.attacker = attacker;
+    this.defender = defender;
+    this.characterCurrentHealth = characterCurrenthealth;
+    this.monsterCurrentHealth = monsterCurrenthealth;
+    this.battleMessages = [];
+    this.attackerName = '';
+  }
+
+  _createClass(Attack, [{
+    key: "attack",
+    value: function attack(attacker, defender, attackAgain, type) {
+      this.attackerName = attacker.name;
+
+      if (this.isMonsterDead()) {
+        this.battleMessages.push({
+          message: this.defender.name + ' has been defeated!'
+        });
+        this.monsterCurrentHealth = 0;
+        return this;
+      }
+
+      if (this.isCharacterDead()) {
+        this.battleMessages.push({
+          message: 'You must ressurect first!'
+        });
+        this.characterCurrentHealth = 0;
+        return this;
+      }
+
+      if (!this.canHit(attacker, defender)) {
+        this.battleMessages.push({
+          message: this.attackerName + ' missed!'
+        });
+
+        if (attackAgain) {
+          return this.attack(defender, attacker, false, 'monster');
+        }
+      } else {
+        if (this.blockedAttack(defender, attacker)) {
+          this.battleMessages.push({
+            message: defender.name + ' blocked the attack!'
+          });
+
+          if (attackAgain) {
+            return this.attack(defender, attacker, false, 'monster');
+          }
+        } else {
+          this.doAttack(attacker, type);
+
+          if (attackAgain) {
+            return this.attack(defender, attacker, false, 'monster');
+          }
+        }
+      }
+
+      return this;
+    }
+  }, {
+    key: "getState",
+    value: function getState() {
+      return {
+        characterCurrentHealth: this.characterCurrentHealth,
+        monsterCurrentHealth: this.monsterCurrentHealth,
+        battleMessages: this.battleMessages
+      };
+    }
+  }, {
+    key: "canHit",
+    value: function canHit(attacker, defender) {
+      var attackerAccuracy = attacker.skills.filter(function (s) {
+        return s.name === 'Accuracy';
+      })[0].skill_bonus;
+      var defenderDodge = defender.skills.filter(function (s) {
+        return s.name === 'Dodge';
+      })[0].skill_bonus;
+      return Object(_helpers_random_number__WEBPACK_IMPORTED_MODULE_1__["randomNumber"])(1, 20) + attackerAccuracy > 10 + defenderDodge;
+    }
+  }, {
+    key: "blockedAttack",
+    value: function blockedAttack(defender, attacker) {
+      var attackerAccuracy = attacker.skills.filter(function (s) {
+        return s.name === 'Accuracy';
+      })[0].skill_bonus;
+      return Object(_helpers_random_number__WEBPACK_IMPORTED_MODULE_1__["randomNumber"])(1, 20) + attackerAccuracy < defender.ac;
+    }
+  }, {
+    key: "isMonsterDead",
+    value: function isMonsterDead() {
+      return this.monsterCurrentHealth <= 0;
+    }
+  }, {
+    key: "isCharacterDead",
+    value: function isCharacterDead() {
+      return this.characterCurrentHealth <= 0;
+    }
+  }, {
+    key: "doAttack",
+    value: function doAttack(attacker, type) {
+      if (type === 'player') {
+        this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.attack;
+        this.battleMessages.push({
+          message: attacker.name + ' hit for ' + attacker.attack
+        });
+      }
+
+      if (type === 'monster') {
+        var monster = new _monster_monster__WEBPACK_IMPORTED_MODULE_0__["default"](attacker);
+        var attack = monster.attack();
+        this.characterCurrentHealth = this.characterCurrentHealth - attack;
+        this.battleMessages.push({
+          message: attacker.name + ' hit for ' + attack
+        });
+      }
+    }
+  }]);
+
+  return Attack;
+}();
 
 
 
@@ -85042,7 +85220,6 @@ function (_React$Component) {
           id: Math.random().toString(36).substring(7)
         };
         messages.unshift(message);
-        console.log(messages);
 
         _this2.setState({
           messages: messages
