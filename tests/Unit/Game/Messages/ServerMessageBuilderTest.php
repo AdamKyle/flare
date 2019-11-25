@@ -52,4 +52,11 @@ class ServerMessageBuilderTest extends TestCase
         $this->assertEquals('No monster selected. Please select one.', $message);
     }
 
+    public function testGetMessageForDeadCharacter()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('dead_character');
+
+        $this->assertEquals('You are dead. Please revive your self by clicking revive.', $message);
+    }
+
 }

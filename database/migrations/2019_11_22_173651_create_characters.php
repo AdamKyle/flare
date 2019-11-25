@@ -26,6 +26,7 @@ class CreateCharacters extends Migration
                 ->references('id')->on('users');
             $table->string('name');
             $table->string('damage_stat');
+            $table->bigInteger('level')->nullable()->default(1);
             $table->bigInteger('xp');
             $table->bigInteger('xp_next');
             $table->bigInteger('str');

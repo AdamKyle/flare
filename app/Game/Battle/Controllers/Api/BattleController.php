@@ -6,13 +6,11 @@ use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Http\Controllers\Controller;
-use App\Game\Messages\Events\MessageSentEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Messages\Events\PrivateMessageEvent;
-use App\Game\Messages\Builders\ServerMessageBuilder;
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\User;
 
 class BattleController extends Controller {
@@ -36,5 +34,31 @@ class BattleController extends Controller {
             'monsters'  => Monster::with('skills')->get(),
             'character' => $this->manager->createData($character)->toArray()
         ], 200);
+    }
+
+    public function battleResults(Request $request, Character $character) {
+        if ($request->is_character_dead) {
+            event(new ServerMessageEvent($character->user, 'dead_character'));
+
+            return response()->json([], 200);
+        }
+
+        if ($request->is_defender_dead) {
+
+            switch ($request->defender_type) {
+                case 'monster':
+                    event(new UpdateCharacterEvent($character, Monster::find($request->monster_id)));
+                    break;
+                case 'beast':
+                    break;
+                case 'player':
+                    break;
+                default:
+                    return response()->json([
+                        'message' => 'Could not find type of defender.'
+                    ], 422);
+            }
+
+        }
     }
 }

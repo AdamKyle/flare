@@ -22,6 +22,7 @@ class Character extends Model
         'damage_stat',
         'game_race_id',
         'game_class_id',
+        'level',
         'xp',
         'xp_next',
         'str',
@@ -38,6 +39,7 @@ class Character extends Model
      * @var array
      */
     protected $casts = [
+        'level'    => 'integer',
         'xp'       => 'integer',
         'xp_next'  => 'integer',
         'str'      => 'integer',

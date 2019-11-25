@@ -16,6 +16,8 @@ class ServerMessageBuilder {
                 return 'Could not find a user with that name to private message.';
             case 'no_monster':
                 return 'No monster selected. Please select one.';
+            case 'dead_character':
+                return 'You are dead. Please revive your self by clicking revive.';
             default:
                 return '';
         }
