@@ -35,6 +35,8 @@ class CreateCharacters extends Migration
             $table->bigInteger('chr');
             $table->bigInteger('int');
             $table->bigInteger('ac');
+            $table->bigInteger('gold')->nullable()->default(250);
+            $table->integer('inventory_max')->nullable()->default(75);
             $table->timestamps();
         });
     }

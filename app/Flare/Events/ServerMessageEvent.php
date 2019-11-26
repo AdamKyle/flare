@@ -15,16 +15,23 @@ class ServerMessageEvent
     /**
      * Type of server messsage.
      *
-     * @var string
+     * @var string $type
      */
     public $type;
 
     /**
      * User
      *
-     * @var \App\User;
+     * @var \App\User $user
      */
     public $user;
+
+    /**
+     * mixed string
+     *
+     * @var mixed $forMessage
+     */
+    public $forMessage;
 
     /**
      * Create a new event instance.
@@ -32,9 +39,10 @@ class ServerMessageEvent
      * @param  \App\User $user
      * @return void
      */
-    public function __construct(User $user, string $type)
+    public function __construct(User $user, string $type, $forMessage = null)
     {
-        $this->type = $type;
-        $this->user = $user;
+        $this->type        = $type;
+        $this->user        = $user;
+        $this->forMessage = $forMessage;
     }
 }

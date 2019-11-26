@@ -24,6 +24,8 @@ class CreateMonsters extends Migration
             $table->bigInteger('ac');
             $table->string('damage_stat');
             $table->integer('xp');
+            $table->integer('drop_check');
+            $table->integer('gold')->nullable()->default(10);
             $table->string('health_range');
             $table->string('attack_range');
             $table->timestamps();

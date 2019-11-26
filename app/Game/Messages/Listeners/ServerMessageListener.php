@@ -23,6 +23,18 @@ class ServerMessageListener
      */
     public function handle(ServerMessageEvent $event)
     {
-        broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
+        switch($event->type) {
+            case 'level_up':
+                $message = 'You are now level: ' . $user->character->level;
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'gold_rush':
+                $message = 'Gold Rush! You gained: ' . $event->$forMessage . ' Gold!';
+                
+                return broadcast(new ServerMessage($event->user, $message));
+            default:
+                return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
+        }
+
     }
 }

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissions::class,
             CreateRaces::class,
             CreateClasses::class,
+            CreateItemsSeeder::class,
             CreateMonstersSeeder::class,
         ]);
     }

@@ -4,6 +4,7 @@ namespace App\Game\Battle\Listeners;
 
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Services\CharacterService;
+use App\Flare\Events\ServerMessageEvent;
 
 class UpdateCharacterListener
 {
@@ -26,10 +27,13 @@ class UpdateCharacterListener
 
         if ($xp >= $event->character->xp_next) {
             $this->characterService->levelUpCharacter($event->character);
+
+            event(new ServerMessageEvent($event->character->user, 'level_up'));
         }
 
-        // Implemenet drop mechanics
-
-        // Implement Message for server - Action/Updates
+        // If not assign the xp and gold to the character:
+        $event->character->xp    = $xp;
+        $event->character->gold += $event->monster->gold;
+        $event->character->save();
     }
 }

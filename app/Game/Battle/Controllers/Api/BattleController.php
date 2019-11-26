@@ -11,6 +11,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Battle\Events\UpdateCharacterEvent;
+use App\Game\Battle\Events\DropsCheckEvent;
+use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\User;
 
 class BattleController extends Controller {
@@ -47,7 +49,11 @@ class BattleController extends Controller {
 
             switch ($request->defender_type) {
                 case 'monster':
-                    event(new UpdateCharacterEvent($character, Monster::find($request->monster_id)));
+                    $monster = Monster::find($request->monster_id);
+
+                    event(new UpdateCharacterEvent($character, $monster));
+                    event(new DropsCheckEvent($character, $monster));
+                    event(new GoldRushCheckEvent($character, $monster));
                     break;
                 case 'beast':
                     break;

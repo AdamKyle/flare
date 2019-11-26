@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Skill;
+use App\Flare\Models\Inventory;
 use App\User;
 
 class Character extends Model
@@ -22,6 +23,7 @@ class Character extends Model
         'damage_stat',
         'game_race_id',
         'game_class_id',
+        'inventory_max',
         'level',
         'xp',
         'xp_next',
@@ -31,6 +33,7 @@ class Character extends Model
         'chr',
         'int',
         'ac',
+        'gold',
     ];
 
     /**
@@ -39,15 +42,17 @@ class Character extends Model
      * @var array
      */
     protected $casts = [
-        'level'    => 'integer',
-        'xp'       => 'integer',
-        'xp_next'  => 'integer',
-        'str'      => 'integer',
-        'dur'      => 'integer',
-        'dex'      => 'integer',
-        'chr'      => 'integer',
-        'int'      => 'integer',
-        'ac'       => 'integer',
+        'inventory_max' => 'integer',
+        'level'         => 'integer',
+        'xp'            => 'integer',
+        'xp_next'       => 'integer',
+        'str'           => 'integer',
+        'dur'           => 'integer',
+        'dex'           => 'integer',
+        'chr'           => 'integer',
+        'int'           => 'integer',
+        'ac'            => 'integer',
+        'gold'          => 'integer',
     ];
 
     public function race() {
@@ -64,5 +69,9 @@ class Character extends Model
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function inventory() {
+        return $this->hasOne(Inventory::class, 'character_id', 'id');
     }
 }

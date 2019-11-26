@@ -4,6 +4,7 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\Skill;
+use App\Flare\Models\Drop;
 
 class Monster extends Model
 {
@@ -23,8 +24,10 @@ class Monster extends Model
         'chr',
         'int',
         'ac',
+        'gold',
         'health_range',
         'attack_range',
+        'drop_check',
     ];
 
     /**
@@ -33,16 +36,22 @@ class Monster extends Model
      * @var array
      */
     protected $casts = [
-        'xp'       => 'integer',
-        'str'      => 'integer',
-        'dur'      => 'integer',
-        'dex'      => 'integer',
-        'chr'      => 'integer',
-        'int'      => 'integer',
-        'ac'       => 'integer',
+        'xp'         => 'integer',
+        'str'        => 'integer',
+        'dur'        => 'integer',
+        'dex'        => 'integer',
+        'chr'        => 'integer',
+        'int'        => 'integer',
+        'ac'         => 'integer',
+        'gold'       => 'integer',
+        'drop_check' => 'integer',
     ];
 
     public function skills() {
         return $this->hasMany(Skill::class);
+    }
+
+    public function drops() {
+        return $this->hasMany(Drop::class);
     }
 }

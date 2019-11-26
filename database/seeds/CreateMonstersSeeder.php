@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
+use App\Flare\Models\Item;
 use App\Flare\Values\BaseSkillValue;
 
 class CreateMonstersSeeder extends Seeder
@@ -27,6 +28,8 @@ class CreateMonstersSeeder extends Seeder
                 'ac'           => 6,
                 'health_range' => '8-20',
                 'attack_range' => '2-8',
+                'gold'         => 25,
+                'drop_check'   => 5,
             ]
         ]);
 
@@ -38,6 +41,13 @@ class CreateMonstersSeeder extends Seeder
             }
 
             $monster->skills()->insert($skills);
+
+            if ($monster->name === 'Goblin') {
+                $monster->drops()->create([
+                    'monster_id' => $monster->id,
+                    'item_id'    => Item::where('name', '=', 'Rusty Dagger')->first()->id,
+                ]);
+            }
         }
     }
 }

@@ -8,5 +8,6 @@ return [
      'skill_names' => [
          'Accuracy',
          'Dodge',
+         'Looting'
      ],
 ];

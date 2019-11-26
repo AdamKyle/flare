@@ -22,5 +22,6 @@ $factory->define(Character::class, function (Faker $faker) {
         'chr' => 1,
         'int' => 1,
         'ac' => 1,
+        'gold' => 0,
     ];
 });

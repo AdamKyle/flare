@@ -59,4 +59,11 @@ class ServerMessageBuilderTest extends TestCase
         $this->assertEquals('You are dead. Please revive your self by clicking revive.', $message);
     }
 
+    public function testGetMessageFullInventory()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('inventory_full');
+
+        $this->assertEquals('Your inventory is full, you cannot pick up this drop!', $message);
+    }
+
 }

@@ -18,6 +18,8 @@ class ServerMessageBuilder {
                 return 'No monster selected. Please select one.';
             case 'dead_character':
                 return 'You are dead. Please revive your self by clicking revive.';
+            case 'inventory_full':
+                return 'Your inventory is full, you cannot pick up this drop!';
             default:
                 return '';
         }
