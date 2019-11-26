@@ -26,6 +26,6 @@ class Drop extends Model
     protected $casts = [];
 
     public function item() {
-        return $this->hasOne(Item::class);
+        return $this->hasOne(Item::class, 'id', 'item_id');
     }
 }

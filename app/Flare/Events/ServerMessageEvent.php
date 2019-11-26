@@ -43,6 +43,6 @@ class ServerMessageEvent
     {
         $this->type        = $type;
         $this->user        = $user;
-        $this->forMessage = $forMessage;
+        $this->forMessage  = $forMessage;
     }
 }

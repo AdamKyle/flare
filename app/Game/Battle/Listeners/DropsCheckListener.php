@@ -26,7 +26,7 @@ class DropsCheckListener
     public function handle(DropsCheckEvent $event)
     {
         $lootingChance = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        $canGetDrop    = (rand(1, 20) + $lootingChance) > $event->monster->drop_check;
+        $canGetDrop    = (rand(1, 100) + $lootingChance) > $event->monster->drop_check * 10;
 
         if ($canGetDrop) {
             $drops = $event->monster->drops;
@@ -56,7 +56,7 @@ class DropsCheckListener
                 'inventory_id' => $event->character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($event->character->user, 'gained_item'));
+            event(new ServerMessageEvent($event->character->user, 'gained_item', $drop->item->name));
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));
         }

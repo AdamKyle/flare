@@ -187,6 +187,7 @@ return [
       App\Game\Core\Providers\ServiceProvider::class,
       App\Game\Battle\Providers\ServiceProvider::class,
       App\Game\Battle\Providers\EventsProvider::class,
+      App\Game\Messages\Providers\EventsProvider::class,
     ],
 
     /*

@@ -48,6 +48,10 @@ class CharacterBuilder {
             'ac'            => $baseStat->ac(),
         ]);
 
+        $this->character->inventory()->create([
+            'character_id' => $this->character->id
+        ]);
+
         return $this;
     }
 

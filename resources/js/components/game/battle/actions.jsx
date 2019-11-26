@@ -10,7 +10,7 @@ export default class Actions extends React.Component {
 
     this.state = {
       character: null,
-      monster: null,
+      monster: 0,
       monsters: null,
       characterMaxHealth: 0,
       characterCurrentHealth: 0,
@@ -64,7 +64,17 @@ export default class Actions extends React.Component {
     const state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
 
     if (state.monsterCurrentHealth <= 0) {
-      console.log('you win!');
+      axios.post('/api/battle-results/' + this.state.character.id, {
+        is_character_dead: this.characterCurrentHealth === 0 ? true : false,
+        is_defender_dead: true,
+        defender_type: 'monster',
+        monster_id: this.state.monster.id,
+      }).then((result) => {
+        this.setState({
+          monster: 0,
+          characterCurrentHealth: this.state.characterMaxHealth,
+        });
+      });
     }
 
     this.setState(state);
@@ -129,6 +139,7 @@ export default class Actions extends React.Component {
 
               <div className="col-md-6">
                   <select className="form-control" id="monsters" name="monsters"
+                    value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
                     onChange={this.updateActions.bind(this)}>
                       <option value="" key="0">Please select a monster</option>
                       {this.monsterOptions()}
@@ -136,11 +147,15 @@ export default class Actions extends React.Component {
               </div>
           </div>
           <hr />
-          <div className="battle-section text-center">
-            <button className="btn btn-primary" onClick={this.attack.bind(this)}>Attack</button>
-            {this.healthMeters()}
-            {this.battleMessages()}
-          </div>
+          {this.state.monster !== 0
+            ?
+            <div className="battle-section text-center">
+              <button className="btn btn-primary" onClick={this.attack.bind(this)}>Attack</button>
+              {this.healthMeters()}
+              {this.battleMessages()}
+            </div>
+            : null
+          }
         </div>
       </div>
     )

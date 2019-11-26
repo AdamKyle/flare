@@ -84620,7 +84620,7 @@ function (_React$Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Actions).call(this, props));
     _this.state = {
       character: null,
-      monster: null,
+      monster: 0,
       monsters: null,
       characterMaxHealth: 0,
       characterCurrentHealth: 0,
@@ -84668,6 +84668,8 @@ function (_React$Component) {
   }, {
     key: "attack",
     value: function attack() {
+      var _this3 = this;
+
       if (this.state.monster === null) {
         return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('no_monster');
       }
@@ -84676,7 +84678,17 @@ function (_React$Component) {
       var state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
 
       if (state.monsterCurrentHealth <= 0) {
-        console.log('you win!');
+        axios.post('/api/battle-results/' + this.state.character.id, {
+          is_character_dead: this.characterCurrentHealth === 0 ? true : false,
+          is_defender_dead: true,
+          defender_type: 'monster',
+          monster_id: this.state.monster.id
+        }).then(function (result) {
+          _this3.setState({
+            monster: 0,
+            characterCurrentHealth: _this3.state.characterMaxHealth
+          });
+        });
       }
 
       this.setState(state);
@@ -84764,16 +84776,17 @@ function (_React$Component) {
         className: "form-control",
         id: "monsters",
         name: "monsters",
+        value: this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0,
         onChange: this.updateActions.bind(this)
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
         value: "",
         key: "0"
-      }, "Please select a monster"), this.monsterOptions()))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, "Please select a monster"), this.monsterOptions()))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), this.state.monster !== 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "battle-section text-center"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         onClick: this.attack.bind(this)
-      }, "Attack"), this.healthMeters(), this.battleMessages())));
+      }, "Attack"), this.healthMeters(), this.battleMessages()) : null));
     }
   }]);
 

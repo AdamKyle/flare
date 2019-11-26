@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
+use App\Game\Battle\Events\DropCheckEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -90,6 +91,7 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDead() {
+        Event::fake([ServerMessageEvent::class, DropsCheckEvent::class, GoldRushCheckEvent::class]);
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
@@ -108,7 +110,7 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterLevelUp() {
-        Event::fake([ServerMessageEvent::class, GoldRushCheckEvent::class]);
+        Event::fake([ServerMessageEvent::class, DropCheckEvent::class, GoldRushCheckEvent::class]);
 
         $this->setUpCharacter([
             'xp' => 90,
@@ -136,8 +138,8 @@ class BattleControllerApiTest extends TestCase
         Event::fake([ServerMessageEvent::class, GoldRushCheckEvent::class]);
 
         $this->setUpCharacter([
-            'looting_level' => 10,
-            'looting_bonus' => 10,
+            'looting_level' => 100,
+            'looting_bonus' => 100,
             'create_drop'   => true,
         ]);
 
@@ -158,11 +160,11 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {
-        Event::fake([ServerMessageEvent::class]);
+        Event::fake([ServerMessageEvent::class, DropCheckEvent::class]);
 
         $this->setUpCharacter([
-            'looting_level' => 10,
-            'looting_bonus' => 10,
+            'looting_level' => 100,
+            'looting_bonus' => 100,
             'create_drop'   => true,
         ]);
 

@@ -4,6 +4,7 @@ namespace App\Game\Messages\Listeners;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 
 class ServerMessageListener
 {
@@ -29,8 +30,12 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gold_rush':
-                $message = 'Gold Rush! You gained: ' . $event->$forMessage . ' Gold!';
-                
+                $message = 'Gold Rush! You gained: ' . $event->forMessage . ' Gold!';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'gained_item':
+                $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse';
+
                 return broadcast(new ServerMessage($event->user, $message));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
