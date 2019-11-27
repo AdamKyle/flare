@@ -31,9 +31,11 @@ class UpdateCharacterListener
             event(new ServerMessageEvent($event->character->user, 'level_up'));
         }
 
-        // If not assign the xp and gold to the character:
+        // If not assign the xp and gold to the character as well as the time out.
+
         $event->character->xp    = $xp;
         $event->character->gold += $event->monster->gold;
+
         $event->character->save();
     }
 }

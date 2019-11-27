@@ -26,6 +26,7 @@
     },
     "dependencies": {
         "laravel-echo": "^1.6.1",
-        "pusher-js": "^5.0.3"
+        "pusher-js": "^5.0.3",
+        "react-countdown-circle-timer": "^1.0.3"
     }
 }

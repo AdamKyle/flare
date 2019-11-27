@@ -6,9 +6,11 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
+use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Listeners\UpdateCharacterListener;
 use App\Game\Battle\Listeners\DropsCheckListener;
 use App\Game\Battle\Listeners\GoldRushCheckListener;
+use App\Game\Battle\Listeners\AttackTimeOutListener;
 
 class EventsProvider extends ServiceProvider {
 
@@ -28,7 +30,12 @@ class EventsProvider extends ServiceProvider {
         // When a battle is over, check if we got a gold rush.
         GoldRushCheckEvent::class => [
             GoldRushCheckListener::class,
-        ]
+        ],
+
+        // When the battle is over, set the attack time out.
+        AttackTimeOutEvent::class => [
+            AttackTimeOutListener::class,
+        ],
     ];
 
     /**

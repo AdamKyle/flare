@@ -13,6 +13,8 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
+use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\Battle\Jobs\AttackTimeOut;
 use App\User;
 
 class BattleController extends Controller {
@@ -54,6 +56,8 @@ class BattleController extends Controller {
                     event(new UpdateCharacterEvent($character, $monster));
                     event(new DropsCheckEvent($character, $monster));
                     event(new GoldRushCheckEvent($character, $monster));
+                    event(new AttackTimeOutEvent($character, $monster));
+
                     break;
                 case 'beast':
                     break;
@@ -64,7 +68,6 @@ class BattleController extends Controller {
                         'message' => 'Could not find type of defender.'
                     ], 422);
             }
-
         }
     }
 }

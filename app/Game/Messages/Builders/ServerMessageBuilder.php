@@ -20,6 +20,8 @@ class ServerMessageBuilder {
                 return 'You are dead. Please revive your self by clicking revive.';
             case 'inventory_full':
                 return 'Your inventory is full, you cannot pick up this drop!';
+            case 'cant_attack':
+                return 'Please wait for the timer (beside Again!) to state: Ready!';
             default:
                 return '';
         }

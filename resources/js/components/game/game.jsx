@@ -1,7 +1,8 @@
-import React    from 'react';
-import ReactDOM from 'react-dom';
-import Chat     from './messages/chat';
-import Actions  from './battle/actions.jsx';
+import React      from 'react';
+import ReactDOM   from 'react-dom';
+import Chat       from './messages/chat';
+import Actions    from './battle/actions';
+import TimeOutBar from './timeout/timeout-bar';
 
 class Game extends React.Component {
   constructor(props) {
@@ -17,9 +18,6 @@ class Game extends React.Component {
         <div className="row mb-4">
           <div className="col-md-8">
             <Actions apiUrl={this.apiUrl} userId={this.props.userId} />
-          </div>
-          <div className="col-md-4">
-
           </div>
         </div>
         <div className="row">

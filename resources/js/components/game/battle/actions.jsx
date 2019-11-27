@@ -1,6 +1,7 @@
 import React from 'react';
 import Monster from './monster/monster';
 import Attack from './attack/attack';
+import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
 
 export default class Actions extends React.Component {
@@ -18,7 +19,10 @@ export default class Actions extends React.Component {
       monsterCurrentHealth: 0,
       battleMessages: [],
       isLoading: true,
+      canAttack: true,
     }
+
+    this.echo = Echo.private('show-timeout-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -35,6 +39,12 @@ export default class Actions extends React.Component {
         isLoading: false,
       })
     });
+
+    this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', (event) => {
+      this.setState({
+        canAttack: event.canAttack
+      });
+    });
   }
 
   updateActions(event) {
@@ -46,12 +56,27 @@ export default class Actions extends React.Component {
       monster: monster,
       monsterMaxHealth: health,
       monsterCurrentHealth: health,
+      battleMessages: [],
+    });
+  }
+
+  fightAgain() {
+    this.setState({
+      monster: this.state.monster,
+      monsterMaxHealth: this.state.monsterMaxHealth,
+      monsterCurrentHealth: this.state.monsterMaxHealth,
+      battleMessages: [],
     });
   }
 
   attack() {
+
     if (this.state.monster === null) {
       return getServerMessage('no_monster');
+    }
+
+    if (!this.state.canAttack) {
+      return getServerMessage('cant_attack');
     }
 
     const attack = new Attack(
@@ -63,6 +88,8 @@ export default class Actions extends React.Component {
 
     const state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
 
+    this.setState(state);
+
     if (state.monsterCurrentHealth <= 0) {
       axios.post('/api/battle-results/' + this.state.character.id, {
         is_character_dead: this.characterCurrentHealth === 0 ? true : false,
@@ -71,13 +98,10 @@ export default class Actions extends React.Component {
         monster_id: this.state.monster.id,
       }).then((result) => {
         this.setState({
-          monster: 0,
           characterCurrentHealth: this.state.characterMaxHealth,
         });
       });
     }
-
-    this.setState(state);
   }
 
   monsterOptions() {
@@ -87,7 +111,7 @@ export default class Actions extends React.Component {
   }
 
   healthMeters() {
-    if (this.state.monster === null) {
+    if (this.state.monsterCurrentHealth <= 0) {
       return null;
     }
 
@@ -133,10 +157,8 @@ export default class Actions extends React.Component {
       <div className="row justify-content-center">
         <div className="col-md-12">
           <div className="form-group row">
-              <label htmlFor="monsters" className="col-md-4 col-form-label text-md-right">
-                Choose a monster
-              </label>
-
+              <div className="col-md-2">
+              </div>
               <div className="col-md-6">
                   <select className="form-control" id="monsters" name="monsters"
                     value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
@@ -145,17 +167,33 @@ export default class Actions extends React.Component {
                       {this.monsterOptions()}
                   </select>
               </div>
+
+              <div className="col-md-1">
+                <button className="btn btn-primary"
+                  type="button"
+                  disabled={this.state.monster !== 0 ? false : true}
+                  onClick={this.fightAgain.bind(this)}
+                  >Again!</button>
+              </div>
+
+              <div className="col-md-1">
+                <div className="ml-4">
+                  <TimeOutBar userId={this.props.userId}/>
+                </div>
+              </div>
           </div>
           <hr />
-          {this.state.monster !== 0
-            ?
-            <div className="battle-section text-center">
-              <button className="btn btn-primary" onClick={this.attack.bind(this)}>Attack</button>
-              {this.healthMeters()}
-              {this.battleMessages()}
-            </div>
-            : null
-          }
+          <div className="battle-section text-center">
+            {this.state.monsterCurrentHealth !== 0
+              ?
+              <>
+                <button className="btn btn-primary" onClick={this.attack.bind(this)}>Attack</button>
+                {this.healthMeters()}
+              </>
+              : null
+            }
+            {this.battleMessages()}
+          </div>
         </div>
       </div>
     )

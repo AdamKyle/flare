@@ -26,7 +26,7 @@ class ServerMessageListener
     {
         switch($event->type) {
             case 'level_up':
-                $message = 'You are now level: ' . $user->character->level;
+                $message = 'You are now level: ' . $event->user->character->level;
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gold_rush':

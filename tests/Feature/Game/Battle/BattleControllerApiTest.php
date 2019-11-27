@@ -4,9 +4,14 @@ namespace Tests\Feature\Game\Battle;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;
+use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\ShowTimeOutEvent;
+use App\Game\Battle\Events\UpdateCharacterEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -77,6 +82,8 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsCharacterIsDead() {
+        Queue::Fake();
+
         Event::fake([ServerMessageEvent::class]);
 
         $this->setUpCharacter();
@@ -91,7 +98,15 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDead() {
-        Event::fake([ServerMessageEvent::class, DropsCheckEvent::class, GoldRushCheckEvent::class]);
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropsCheckEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+        ]);
+
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
@@ -110,7 +125,14 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterLevelUp() {
-        Event::fake([ServerMessageEvent::class, DropCheckEvent::class, GoldRushCheckEvent::class]);
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropCheckEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+        ]);
 
         $this->setUpCharacter([
             'xp' => 90,
@@ -135,7 +157,13 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedItem() {
-        Event::fake([ServerMessageEvent::class, GoldRushCheckEvent::class]);
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+        ]);
 
         $this->setUpCharacter([
             'looting_level' => 100,
@@ -160,7 +188,13 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {
-        Event::fake([ServerMessageEvent::class, DropCheckEvent::class]);
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropCheckEvent::class,
+            AttackTimeOutEvent::class,
+        ]);
 
         $this->setUpCharacter([
             'looting_level' => 100,
@@ -182,7 +216,35 @@ class BattleControllerApiTest extends TestCase
         $this->assertNotEquals(0, $this->character->gold);
     }
 
+    public function testBattleResultsMonsterIsDeadCannotAttackAgain() {
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropsCheckEvent::class,
+            GoldRushCheckEvent::class,
+            ShowTimeOutEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        $this->assertFalse($this->character->can_attack);
+    }
+
     public function testWhenNotLoggedInCannotAccessBattleResults() {
+
         $response = $this->json('POST', '/api/battle-results/1')
                          ->response;
 
@@ -205,7 +267,8 @@ class BattleControllerApiTest extends TestCase
             'name' => 'Sample',
             'user_id' => $this->user->id,
             'level' => isset($options['level']) ? $options['level'] : 1,
-            'xp' => isset($options['xp']) ? $options['xp'] : 0
+            'xp' => isset($options['xp']) ? $options['xp'] : 0,
+            'can_attack' => true,
         ]);
 
         $this->character->inventory()->create([

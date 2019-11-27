@@ -66,4 +66,11 @@ class ServerMessageBuilderTest extends TestCase
         $this->assertEquals('Your inventory is full, you cannot pick up this drop!', $message);
     }
 
+    public function testGetMessageCantAttack()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cant_attack');
+
+        $this->assertEquals('Please wait for the timer (beside Again!) to state: Ready!', $message);
+    }
+
 }
