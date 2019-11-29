@@ -68,7 +68,7 @@ class MapBuilder {
             ->setColorScheme(new MapColorSheme(new DetailShader(), $this->land, $this->water))
             ->setWidth($this->width)
             ->setHeight($this->height)
-            ->setWaterLevel(60);
+            ->setWaterLevel(30);
 
         $landMapGenerator = new LandMapGenerator($settings, $this->seed);
         $map              = $landMapGenerator->generateMap();

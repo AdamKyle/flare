@@ -3,6 +3,7 @@ import ReactDOM   from 'react-dom';
 import Chat       from './messages/chat';
 import Actions    from './battle/actions';
 import TimeOutBar from './timeout/timeout-bar';
+import Map        from './map/map';
 
 class Game extends React.Component {
   constructor(props) {
@@ -16,7 +17,10 @@ class Game extends React.Component {
       <div>
         <hr />
         <div className="row mb-4">
-          <div className="col-md-8">
+          <div className="col-md-10">
+            <Map apiUrl={this.apiUrl} userId={this.props.userId} />
+          </div>
+          <div className="col-md-10">
             <Actions apiUrl={this.apiUrl} userId={this.props.userId} />
           </div>
         </div>

@@ -10,3 +10,14 @@
 // Game
 @import 'game/chat';
 @import 'game/actions';
+@import 'game/map';
+
+.temp {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  right: 0;
+  background: #000;
+  color: #fff;
+  padding: 26px;
+}

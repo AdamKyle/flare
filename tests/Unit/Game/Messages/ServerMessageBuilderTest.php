@@ -73,4 +73,32 @@ class ServerMessageBuilderTest extends TestCase
         $this->assertEquals('Please wait for the timer (beside Again!) to state: Ready!', $message);
     }
 
+    public function testGetMessageCannotMoveUp()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cannot_move_up');
+
+        $this->assertEquals('You cannot go that way.', $message);
+    }
+
+    public function testGetMessageCannotMoveLeft()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cannot_move_left');
+
+        $this->assertEquals('You cannot go that way.', $message);
+    }
+
+    public function testGetMessageCannotMoveDown()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cannot_move_down');
+
+        $this->assertEquals('You cannot go that way.', $message);
+    }
+
+    public function testGetMessageCannotMoveRight()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cannot_move_right');
+
+        $this->assertEquals('You cannot go that way.', $message);
+    }
+
 }

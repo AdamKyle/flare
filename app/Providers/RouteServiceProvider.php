@@ -42,6 +42,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapGameRoutes();
         $this->mapGameMessageApiRoutes();
         $this->mapGameBattleApiRoutes();
+        $this->mapGameAdventureMapApiRoutes();
     }
 
     /**
@@ -94,5 +95,13 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace('App\Game\Battle\Controllers')
              ->group(base_path('routes/game/battle/api.php'));
+    }
+
+    protected function mapGameAdventureMapApiRoutes()
+    {
+        Route::prefix('api')
+             ->middleware('api')
+             ->namespace('App\Game\Maps\Adventure\Controllers')
+             ->group(base_path('routes/game/maps/adventure/api.php'));
     }
 }

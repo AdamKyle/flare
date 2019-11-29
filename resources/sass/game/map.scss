@@ -1,0 +1,27 @@
+.map-body {
+  overflow: hidden;
+  max-height: 350px;
+
+  .game-map {
+    .map-x-pin, .map-port-pin {
+      background-color: black; /* So we can see where the pixel is */
+      height: 1px;
+      position: absolute;
+      width: 1px;
+
+      &:after {
+        bottom: 100%;
+        content: '\f3c5';
+        font-family: 'Font Awesome\ 5 Free';
+        display: block;
+        left: -10px; /* Half of the width, give or take a pixel */
+        position: absolute;
+        height: 40px;
+        width: 20px;
+        font-weight: 900;
+        font-size: 32px;
+        color: #d69c44;
+      }
+    }
+  }
+}

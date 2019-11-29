@@ -51,9 +51,9 @@ class CreateMap extends Command
 
         resolve(MapBuilder::class)->setLandColor($land)
                                   ->setWaterColor($water)
-                                  ->setMapHeight(500)
-                                  ->setMapWidth(1200)
-                                  ->setMapSeed('random_map')
+                                  ->setMapHeight(1250)
+                                  ->setMapWidth(1250)
+                                  ->setMapSeed(Str::random(80))
                                   ->buildMap('surface');
     }
 }
