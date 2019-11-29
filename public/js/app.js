@@ -85299,6 +85299,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -85341,7 +85343,9 @@ function (_React$Component) {
       },
       mapUrl: null,
       bottomBounds: 0,
-      rightBounds: 0
+      rightBounds: 0,
+      isLoading: true,
+      characterId: 0
     };
     return _this;
   }
@@ -85351,9 +85355,19 @@ function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      axios.get('/api/map').then(function (result) {
+      axios.get('/api/map/' + this.props.userId).then(function (result) {
         _this2.setState({
-          mapUrl: result.data.map_url
+          mapUrl: result.data.map_url,
+          controlledPosition: {
+            x: result.data.character_map.position_x,
+            y: result.data.character_map.position_y
+          },
+          characterPosition: {
+            x: result.data.character_map.character_position_x,
+            y: result.data.character_map.character_position_y
+          },
+          characterId: resule.data.character_id,
+          isLoading: false
         });
       });
     }
@@ -85398,6 +85412,8 @@ function (_React$Component) {
   }, {
     key: "move",
     value: function move(e) {
+      var _this3 = this;
+
       var movement = e.target.getAttribute('data-direction');
       var x = this.state.characterPosition.x;
       var y = this.state.characterPosition.y;
@@ -85466,11 +85482,21 @@ function (_React$Component) {
           x: mapX,
           y: mapY
         }
+      }, function () {
+        axios.post('/api/move/' + _this3.state.characterId, _defineProperty({
+          position_x: _this3.state.controlledPosition.x,
+          position_y: _this3.state.controlledPosition.y,
+          character_position_x: _this3.state.characterPosition.x
+        }, "character_position_x", _this3.sate.characterPosition.y));
       });
     }
   }, {
     key: "render",
     value: function render() {
+      if (this.state.isLoading) {
+        return 'Please wait ...';
+      }
+
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card mb-4"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {

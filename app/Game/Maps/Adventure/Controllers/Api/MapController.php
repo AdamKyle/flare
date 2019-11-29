@@ -3,18 +3,10 @@
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
 use Illuminate\Http\Request;
-use League\Fractal\Resource\Item;
-use League\Fractal\Manager;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Game\Battle\Events\UpdateCharacterEvent;
-use App\Game\Battle\Events\DropsCheckEvent;
-use App\Game\Battle\Events\GoldRushCheckEvent;
-use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Jobs\AttackTimeOut;
+use App\Flare\Models\Map;
 use App\User;
 
 class MapController extends Controller {
@@ -23,9 +15,22 @@ class MapController extends Controller {
         $this->middleware('auth:api');
     }
 
-    public function index() {
+    public function index(Request $request, User $user) {
         return response()->json([
             'map_url' => asset('/storage/surface.png'),
+            'character_map' => $user->character->map,
+            'character_id'  => $user->character->id,
         ]);
+    }
+
+    public function move(Request $request, Character $character) {
+        $character->map->update([
+            'character_position_x' => $request->character_x,
+            'character_position_y' => $request->character_y,
+            'position_x'           => $request->position_x,
+            'position_y'           => $request->position_y,
+        ]);
+
+        return response()->json([], 200);
     }
 }

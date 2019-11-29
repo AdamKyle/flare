@@ -17,13 +17,25 @@ export default class Map extends React.Component {
       mapUrl: null,
       bottomBounds: 0,
       rightBounds: 0,
+      isLoading: true,
+      characterId: 0,
     }
   }
 
   componentDidMount() {
-    axios.get('/api/map').then((result) => {
+    axios.get('/api/map/' + this.props.userId).then((result) => {
       this.setState({
         mapUrl: result.data.map_url,
+        controlledPosition: {
+          x: result.data.character_map.position_x,
+          y: result.data.character_map.position_y
+        },
+        characterPosition: {
+          x: result.data.character_map.character_position_x,
+          y: result.data.character_map.character_position_y,
+        },
+        characterId: resule.data.character_id,
+        isLoading: false,
       });
     });
   }
@@ -119,10 +131,21 @@ export default class Map extends React.Component {
     this.setState({
       characterPosition: {x, y},
       controlledPosition: {x: mapX, y: mapY},
+    }, () => {
+      axios.post('/api/move/' + this.state.characterId, {
+        position_x: this.state.controlledPosition.x,
+        position_y: this.state.controlledPosition.y,
+        character_position_x: this.state.characterPosition.x,
+        character_position_x: this.sate.characterPosition.y,
+      });
     });
   }
 
   render() {
+    if (this.state.isLoading) {
+      return 'Please wait ...';
+    }
+
     return (
       <div className="card mb-4">
         <div className="card-body">

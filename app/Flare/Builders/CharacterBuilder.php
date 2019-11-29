@@ -52,6 +52,10 @@ class CharacterBuilder {
             'character_id' => $this->character->id
         ]);
 
+        $this->character->map()->create([
+            'character_id' => $this->character->id
+        ]);
+
         return $this;
     }
 

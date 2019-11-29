@@ -76,4 +76,8 @@ class Character extends Model
     public function inventory() {
         return $this->hasOne(Inventory::class, 'character_id', 'id');
     }
+
+    public function map() {
+        return $this->hasOne(Map::class);
+    }
 }
