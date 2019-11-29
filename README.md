@@ -25,3 +25,10 @@ PUSHER_APP_KEY=test
 PUSHER_APP_SECRET=test
 PUSHER_APP_CLUSTER=mt1
 ```
+
+## Testing
+
+We exclude the `App/Flare/MapGenerator` from the tests because this module takes way too much memory and
+would also slow the testing down. We do have a command (see above) `php artisan create:map` that is guaranteed to work.
+
+We also do not test Commands or Mail as neither are used, accept the create admin account command.

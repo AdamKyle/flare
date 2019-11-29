@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afb7f92c6df0a2a5be8fcaf852005dff",
+    "content-hash": "1c5599ea5e925518e20da5ee3c7088f1",
     "packages": [
         {
             "name": "beyondcode/laravel-websockets",
@@ -136,6 +136,47 @@
                 "websocket"
             ],
             "time": "2017-12-12T00:49:31+00:00"
+        },
+        {
+            "name": "christianessl/landmap-generation",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/IndyIndyIndy/landmap-generation.git",
+                "reference": "527189906fe0f4674a2b7d123dc06b274a5f3f5d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/IndyIndyIndy/landmap-generation/zipball/527189906fe0f4674a2b7d123dc06b274a5f3f5d",
+                "reference": "527189906fe0f4674a2b7d123dc06b274a5f3f5d",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ChristianEssl\\LandmapGeneration\\": "Classes"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Essl",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Generate pixelated, random world maps in PHP.",
+            "homepage": "https://christianessl.at",
+            "keywords": [
+                "generation",
+                "generator",
+                "landmap",
+                "map",
+                "world"
+            ],
+            "time": "2019-02-26T19:28:44+00:00"
         },
         {
             "name": "clue/buzz-react",
@@ -1812,16 +1853,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.9.10",
+            "version": "v0.9.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "5442009e4ac8ad01ed7e06823350bd75e692257a"
+                "reference": "75d9ac1c16db676de27ab554a4152b594be4748e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/5442009e4ac8ad01ed7e06823350bd75e692257a",
-                "reference": "5442009e4ac8ad01ed7e06823350bd75e692257a",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/75d9ac1c16db676de27ab554a4152b594be4748e",
+                "reference": "75d9ac1c16db676de27ab554a4152b594be4748e",
                 "shasum": ""
             },
             "require": {
@@ -1882,7 +1923,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2019-11-27T19:51:19+00:00"
+            "time": "2019-11-27T22:44:29+00:00"
         },
         {
             "name": "pusher/pusher-php-server",
