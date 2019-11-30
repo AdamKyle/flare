@@ -1,6 +1,7 @@
 import React              from 'react';
 import Draggable          from 'react-draggable';
 import {getServerMessage} from '../helpers/server_message';
+import CharacterInfoModal from '../components/character-info-modal';
 
 export default class Map extends React.Component {
 
@@ -19,6 +20,7 @@ export default class Map extends React.Component {
       rightBounds: 0,
       isLoading: true,
       characterId: 0,
+      showCharacterInfo: false,
     }
   }
 
@@ -34,7 +36,7 @@ export default class Map extends React.Component {
           x: result.data.character_map.character_position_x,
           y: result.data.character_map.character_position_y,
         },
-        characterId: resule.data.character_id,
+        characterId: result.data.character_id,
         isLoading: false,
       });
     });
@@ -136,8 +138,20 @@ export default class Map extends React.Component {
         position_x: this.state.controlledPosition.x,
         position_y: this.state.controlledPosition.y,
         character_position_x: this.state.characterPosition.x,
-        character_position_x: this.sate.characterPosition.y,
+        character_position_y: this.state.characterPosition.y,
       });
+    });
+  }
+
+  showCharacterInfo() {
+    this.setState({
+      showCharacterInfo: true,
+    });
+  }
+
+  hideCharacterInfo() {
+    this.setState({
+      showCharacterInfo: false,
     });
   }
 
@@ -163,7 +177,7 @@ export default class Map extends React.Component {
             >
             <div>
               <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 1250, height: 1250}}>
-                <div className="map-x-pin" style={this.playerIcon()}></div>
+                <div className="map-x-pin" style={this.playerIcon()} onClick={this.showCharacterInfo.bind(this)}></div>
               </div>
             </div>
            </Draggable>
@@ -174,6 +188,8 @@ export default class Map extends React.Component {
          <button type="button" className="btn btn-primary mr-2" data-direction="east" onClick={this.move.bind(this)}>East</button>
          <button type="button" className="btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
         </div>
+
+        <CharacterInfoModal show={this.state.showCharacterInfo} onClose={this.hideCharacterInfo.bind(this)} characterId={this.state.characterId} />
       </div>
     )
   }

@@ -12,12 +12,29 @@
 @import 'game/actions';
 @import 'game/map';
 
-.temp {
-  width: 100px;
-  height: 100px;
+dl {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0;
+  margin-bottom: -10px;
+}
+
+dt {
+  margin-left: auto;
+  width: 50%;
+  text-align: left;
+}
+
+dd {
+  margin-left: auto;
+  width: 50%;
+}
+
+.force-left {
   position: absolute;
-  right: 0;
-  background: #000;
-  color: #fff;
-  padding: 26px;
+  left: 20px;
+}
+
+.modal-title {
+  cursor: crosshair;
 }

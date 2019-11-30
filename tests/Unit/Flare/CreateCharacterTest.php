@@ -7,6 +7,7 @@ use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
+use Tests\Traits\CreateItem;
 use App\Flare\Builders\CharacterBuilder;
 
 class CreateCharacterTest extends TestCase
@@ -15,7 +16,16 @@ class CreateCharacterTest extends TestCase
     use RefreshDatabase,
         CreateRace,
         CreateClass,
+        CreateItem,
         CreateUser;
+
+    public function setUp(): void {
+        parent::setup();
+
+        $this->createItem([
+            'name' => 'Rusty Dagger',
+        ]);
+    }
 
     public function testCreateCharacter()
     {

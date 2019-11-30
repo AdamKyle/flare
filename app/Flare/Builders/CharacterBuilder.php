@@ -6,6 +6,7 @@ use App\User;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
 
@@ -50,6 +51,11 @@ class CharacterBuilder {
 
         $this->character->inventory()->create([
             'character_id' => $this->character->id
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => Item::where('name', '=', 'Rusty Dagger')->first()->id,
         ]);
 
         $this->character->map()->create([

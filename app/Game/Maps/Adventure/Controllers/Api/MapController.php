@@ -25,8 +25,8 @@ class MapController extends Controller {
 
     public function move(Request $request, Character $character) {
         $character->map->update([
-            'character_position_x' => $request->character_x,
-            'character_position_y' => $request->character_y,
+            'character_position_x' => $request->character_position_x,
+            'character_position_y' => $request->character_position_y,
             'position_x'           => $request->position_x,
             'position_y'           => $request->position_y,
         ]);

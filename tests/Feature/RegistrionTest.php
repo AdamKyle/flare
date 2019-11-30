@@ -8,6 +8,7 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
+use Tests\Traits\CreateItem;
 use App\User;
 
 class RegistrationTest extends TestCase
@@ -16,7 +17,16 @@ class RegistrationTest extends TestCase
         CreateRace,
         CreateClass,
         CreateUser,
+        CreateItem,
         CreateCharacter;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->createItem([
+            'name' => 'Rusty Dagger',
+        ]);
+    }
 
     public function testCanSeeRegistation() {
         $this->visit('/login')

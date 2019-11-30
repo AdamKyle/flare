@@ -52,10 +52,10 @@ class MapControllerApiTest extends TestCase
 
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/move/' . $this->character->id, [
-                             'character_x' => 48,
-                             'character_y' => 48,
-                             'position_x' => 0,
-                             'position_y' => 0,
+                             'character_position_x' => 48,
+                             'character_position_y' => 48,
+                             'position_x'           => 0,
+                             'position_y'           => 0,
                          ])
                          ->response;
 
