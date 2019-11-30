@@ -21,6 +21,8 @@ class MapController extends Controller {
             'map_url' => asset('/storage/surface.png'),
             'character_map' => $user->character->map,
             'character_id'  => $user->character->id,
+            'can_move'      => $user->character->can_move,
+            'show_message'  => $user->character->can_move ? false : true,
         ]);
     }
 

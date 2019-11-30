@@ -107318,7 +107318,8 @@ function (_React$Component) {
       monsterCurrentHealth: 0,
       battleMessages: [],
       isLoading: true,
-      canAttack: true
+      canAttack: true,
+      showMessage: false
     };
     _this.echo = Echo["private"]('show-timeout-bar-' + _this.props.userId);
     return _this;
@@ -107339,12 +107340,15 @@ function (_React$Component) {
           monsters: result.data.monsters,
           characterMaxHealth: result.data.character.data.health,
           characterCurrentHealth: result.data.character.data.health,
-          isLoading: false
+          isLoading: false,
+          canAttack: result.data.character.data.can_attack,
+          showMessage: result.data.character.data.show_message
         });
       });
       this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', function (event) {
         _this2.setState({
-          canAttack: event.canAttack
+          canAttack: event.canAttack,
+          showMessage: false
         });
       });
     }
@@ -107501,7 +107505,7 @@ function (_React$Component) {
         className: "col-md-3"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "ml-2 mt-2"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      }, this.state.showMessage ? 'Almost Ready!' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_3__["default"], {
         userId: this.props.userId,
         eventName: "Game.Battle.Events.ShowTimeOutEvent",
         channel: 'show-timeout-bar-',
@@ -108647,7 +108651,8 @@ function (_React$Component) {
       isLoading: true,
       characterId: 0,
       showCharacterInfo: false,
-      canMove: true
+      canMove: true,
+      showMessage: false
     };
     _this.echo = Echo["private"]('show-timeout-move-' + _this.props.userId);
     return _this;
@@ -108659,6 +108664,8 @@ function (_React$Component) {
       var _this2 = this;
 
       axios.get('/api/map/' + this.props.userId).then(function (result) {
+        console.log(result.data);
+
         _this2.setState({
           mapUrl: result.data.map_url,
           controlledPosition: {
@@ -108670,12 +108677,15 @@ function (_React$Component) {
             y: result.data.character_map.character_position_y
           },
           characterId: result.data.character_id,
-          isLoading: false
+          isLoading: false,
+          canMove: result.data.can_move,
+          showMessage: result.data.show_message
         });
       });
       this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', function (event) {
         _this2.setState({
-          canMove: event.canMove
+          canMove: event.canMove,
+          showMessage: false
         });
       });
     }
@@ -108865,7 +108875,7 @@ function (_React$Component) {
         className: "float-left btn btn-primary mr-2",
         "data-direction": "west",
         onClick: this.move.bind(this)
-      }, "West"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      }, "West"), this.state.showMessage ? 'Almost Ready!' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_5__["default"], {
         userId: this.props.userId,
         eventName: "Game.Maps.Adventure.Events.ShowTimeOutEvent",
         channel: 'show-timeout-move-',

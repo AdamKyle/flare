@@ -24,6 +24,7 @@ export default class Map extends React.Component {
       characterId: 0,
       showCharacterInfo: false,
       canMove: true,
+      showMessage: false,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -31,6 +32,7 @@ export default class Map extends React.Component {
 
   componentDidMount() {
     axios.get('/api/map/' + this.props.userId).then((result) => {
+      console.log(result.data);
       this.setState({
         mapUrl: result.data.map_url,
         controlledPosition: {
@@ -43,12 +45,15 @@ export default class Map extends React.Component {
         },
         characterId: result.data.character_id,
         isLoading: false,
+        canMove: result.data.can_move,
+        showMessage: result.data.show_message,
       });
     });
 
     this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
       this.setState({
-        canMove: event.canMove
+        canMove: event.canMove,
+        showMessage: false,
       });
     });
   }
@@ -188,7 +193,10 @@ export default class Map extends React.Component {
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" onClick={this.move.bind(this)}>South</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" onClick={this.move.bind(this)}>East</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
-           <TimeOutBar userId={this.props.userId} eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent' channel={'show-timeout-move-'} cssClass={'character-map-timeout'}/>
+           {this.state.showMessage
+            ? 'Almost Ready!'
+            : <TimeOutBar userId={this.props.userId} eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent' channel={'show-timeout-move-'} cssClass={'character-map-timeout'}/>
+           }
          </div>
         </div>
 

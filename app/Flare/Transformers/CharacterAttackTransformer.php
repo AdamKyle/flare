@@ -12,12 +12,14 @@ class CharacterAttackTransformer extends TransformerAbstract {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 
         return [
-            'id'     => $character->id,
-            'ac'     => $character->ac,
-            'name'   => $character->name,
-            'attack' => $characterInformation->buildAttack(),
-            'health' => $characterInformation->buildHealth(),
-            'skills' => $character->skills,
+            'id'           => $character->id,
+            'ac'           => $character->ac,
+            'name'         => $character->name,
+            'attack'       => $characterInformation->buildAttack(),
+            'health'       => $characterInformation->buildHealth(),
+            'skills'       => $character->skills,
+            'can_attack'   => $character->can_attack,
+            'show_message' => $character->can_attack ? false : true,
         ];
     }
 }

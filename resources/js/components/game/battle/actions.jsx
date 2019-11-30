@@ -20,6 +20,7 @@ export default class Actions extends React.Component {
       battleMessages: [],
       isLoading: true,
       canAttack: true,
+      showMessage: false,
     }
 
     this.echo = Echo.private('show-timeout-bar-' + this.props.userId);
@@ -37,12 +38,15 @@ export default class Actions extends React.Component {
         characterMaxHealth: result.data.character.data.health,
         characterCurrentHealth: result.data.character.data.health,
         isLoading: false,
-      })
+        canAttack: result.data.character.data.can_attack,
+        showMessage: result.data.character.data.show_message,
+      });
     });
 
     this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', (event) => {
       this.setState({
-        canAttack: event.canAttack
+        canAttack:   event.canAttack,
+        showMessage: false,
       });
     });
   }
@@ -70,7 +74,6 @@ export default class Actions extends React.Component {
   }
 
   attack() {
-
     if (this.state.monster === null) {
       return getServerMessage('no_monster');
     }
@@ -178,7 +181,10 @@ export default class Actions extends React.Component {
 
               <div className="col-md-3">
                 <div className="ml-2 mt-2">
-                  <TimeOutBar userId={this.props.userId} eventName='Game.Battle.Events.ShowTimeOutEvent' channel={'show-timeout-bar-'} cssClass={'character-timeout'}/>
+                  {this.state.showMessage
+                   ? 'Almost Ready!'
+                   : <TimeOutBar userId={this.props.userId} eventName='Game.Battle.Events.ShowTimeOutEvent' channel={'show-timeout-bar-'} cssClass={'character-timeout'}/>
+                  }
                 </div>
               </div>
           </div>
