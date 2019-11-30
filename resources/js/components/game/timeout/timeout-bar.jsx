@@ -23,11 +23,11 @@ export default class TimeOutBar extends React.Component {
       active: false,
     }
 
-    this.echo = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.echo = Echo.private(this.props.channel + this.props.userId);
   }
 
   componentDidMount() {
-    this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', (event) => {
+    this.echo.listen(this.props.eventName , (event) => {
       this.setState({
         maxTimeOut: event.activatebar ? 10 : 0,
         active: event.activatebar,
@@ -38,13 +38,13 @@ export default class TimeOutBar extends React.Component {
   render() {
     if (this.state.maxTimeOut === 0) {
       return (
-        <div className="character-timeout">
+        <div className="character-ready">
           Ready!
         </div>
       )
     }
     return(
-      <div className="character-timeout">
+      <div className={this.props.cssClass}>
         <CountdownCircleTimer
           isPlaying={this.state.active}
           durationSeconds={this.state.maxTimeOut}

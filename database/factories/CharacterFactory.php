@@ -24,5 +24,6 @@ $factory->define(Character::class, function (Faker $faker) {
         'ac' => 1,
         'gold' => 0,
         'can_attack' => true,
+        'can_move'   => true,
     ];
 });

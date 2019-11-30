@@ -176,9 +176,9 @@ export default class Actions extends React.Component {
                   >Again!</button>
               </div>
 
-              <div className="col-md-1">
-                <div className="ml-4">
-                  <TimeOutBar userId={this.props.userId}/>
+              <div className="col-md-3">
+                <div className="ml-2 mt-2">
+                  <TimeOutBar userId={this.props.userId} eventName='Game.Battle.Events.ShowTimeOutEvent' channel={'show-timeout-bar-'} cssClass={'character-timeout'}/>
                 </div>
               </div>
           </div>

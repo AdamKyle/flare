@@ -17,6 +17,15 @@
 
 .character-timeout {
   float: left;
+  margin-top: -10px;
+
+  .timer {
+    font-size: 12px;
+  }
+}
+
+.character-map-timeout {
+  float: left;
   margin-top: -2px;
 
   .timer {

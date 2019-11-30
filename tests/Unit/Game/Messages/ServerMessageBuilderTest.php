@@ -101,4 +101,10 @@ class ServerMessageBuilderTest extends TestCase
         $this->assertEquals('You cannot go that way.', $message);
     }
 
+    public function testGetMessageCannotMove()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cant_move');
+
+        $this->assertEquals('Please wait for the timer (beside movement options) to state: Ready!', $message);
+    }
 }

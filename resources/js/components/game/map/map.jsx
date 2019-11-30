@@ -1,7 +1,9 @@
-import React              from 'react';
-import Draggable          from 'react-draggable';
-import {getServerMessage} from '../helpers/server_message';
-import CharacterInfoModal from '../components/character-info-modal';
+import React                              from 'react';
+import Draggable                          from 'react-draggable';
+import {getServerMessage}                 from '../helpers/server_message';
+import {getNewXPosition, getNewYPosition} from './helpers/map_position';
+import CharacterInfoModal                 from '../components/character-info-modal';
+import TimeOutBar                         from '../timeout/timeout-bar';
 
 export default class Map extends React.Component {
 
@@ -13,7 +15,7 @@ export default class Map extends React.Component {
         x: 0, y: 0
       },
       characterPosition: {
-        x: 32, y: 32
+        x: 16, y: 32
       },
       mapUrl: null,
       bottomBounds: 0,
@@ -21,7 +23,10 @@ export default class Map extends React.Component {
       isLoading: true,
       characterId: 0,
       showCharacterInfo: false,
+      canMove: true,
     }
+
+    this.echo = Echo.private('show-timeout-move-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -38,6 +43,12 @@ export default class Map extends React.Component {
         },
         characterId: result.data.character_id,
         isLoading: false,
+      });
+    });
+
+    this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
+      this.setState({
+        canMove: event.canMove
       });
     });
   }
@@ -75,6 +86,11 @@ export default class Map extends React.Component {
   }
 
   move(e) {
+
+    if (!this.state.canMove) {
+      return getServerMessage('cant_move');
+    }
+
     const movement  = e.target.getAttribute('data-direction');
     let x           = this.state.characterPosition.x;
     let y           = this.state.characterPosition.y;
@@ -102,37 +118,21 @@ export default class Map extends React.Component {
       return getServerMessage('cannot_move_up');
     }
 
-    if (x < 32) {
+    if (x < 16) {
       return getServerMessage('cannot_move_left');
     }
 
-    if (y > 1248) {
+    if (y > 1984) {
       return getServerMessage('cannot_move_down');
     }
 
-    if (x > 1216) {
+    if (x > 1984) {
       return getServerMessage('cannot_move_right');
-    }
-
-    if (y >= 336) {
-      mapY = -304;
-    }
-
-    if (x >= 848) {
-      mapX = -368;
-    }
-
-    if (y >= 640) {
-      mapY = -608;
-    }
-
-    if (y >= 944) {
-      mapY = -900;
     }
 
     this.setState({
       characterPosition: {x, y},
-      controlledPosition: {x: mapX, y: mapY},
+      controlledPosition: {x: getNewXPosition(x, this.state.controlledPosition.x), y: getNewYPosition(y, this.state.controlledPosition.y)},
     }, () => {
       axios.post('/api/move/' + this.state.characterId, {
         position_x: this.state.controlledPosition.x,
@@ -166,7 +166,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
                position={this.state.controlledPosition}
-               bounds={{top: -900, left: -368, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+               bounds={{top: -1648, left: -1120, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
                handle=".handle"
                defaultPosition={{x: 0, y: 0}}
                grid={[16, 16]}
@@ -176,17 +176,20 @@ export default class Map extends React.Component {
                onStop={this.handleStop}
             >
             <div>
-              <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 1250, height: 1250}}>
+              <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 2000, height: 2000}}>
                 <div className="map-x-pin" style={this.playerIcon()} onClick={this.showCharacterInfo.bind(this)}></div>
               </div>
             </div>
            </Draggable>
          </div>
          <hr />
-         <button type="button" className="btn btn-primary mr-2" data-direction="north" onClick={this.move.bind(this)}>North</button>
-         <button type="button" className="btn btn-primary mr-2" data-direction="south" onClick={this.move.bind(this)}>South</button>
-         <button type="button" className="btn btn-primary mr-2" data-direction="east" onClick={this.move.bind(this)}>East</button>
-         <button type="button" className="btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
+         <div className="clear-fix">
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="north" onClick={this.move.bind(this)}>North</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" onClick={this.move.bind(this)}>South</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" onClick={this.move.bind(this)}>East</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
+           <TimeOutBar userId={this.props.userId} eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent' channel={'show-timeout-move-'} cssClass={'character-map-timeout'}/>
+         </div>
         </div>
 
         <CharacterInfoModal show={this.state.showCharacterInfo} onClose={this.hideCharacterInfo.bind(this)} characterId={this.state.characterId} />

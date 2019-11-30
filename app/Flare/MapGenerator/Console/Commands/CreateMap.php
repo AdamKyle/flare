@@ -47,12 +47,12 @@ class CreateMap extends Command
         $water = new Color(66, 129, 178);
         $land  = new Color(23, 132, 72);
 
-         ini_set('memory_limit','1G');
+         ini_set('memory_limit','3G');
 
         resolve(MapBuilder::class)->setLandColor($land)
                                   ->setWaterColor($water)
-                                  ->setMapHeight(1250)
-                                  ->setMapWidth(1250)
+                                  ->setMapHeight(2000)
+                                  ->setMapWidth(2000)
                                   ->setMapSeed(Str::random(80))
                                   ->buildMap('surface');
     }

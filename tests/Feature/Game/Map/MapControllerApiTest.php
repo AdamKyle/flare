@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Map;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -23,6 +24,8 @@ class MapControllerApiTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
+
+        Queue::fake();
     }
 
     public function tearDown(): void {

@@ -22,6 +22,8 @@ class ServerMessageBuilder {
                 return 'Your inventory is full, you cannot pick up this drop!';
             case 'cant_attack':
                 return 'Please wait for the timer (beside Again!) to state: Ready!';
+            case 'cant_move':
+                return 'Please wait for the timer (beside movement options) to state: Ready!';
             case 'cannot_move_up':
                 return 'You cannot go that way.';
             case 'cannot_move_left':

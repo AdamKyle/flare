@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Map;
+use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\User;
 
 class MapController extends Controller {
@@ -30,6 +31,10 @@ class MapController extends Controller {
             'position_x'           => $request->position_x,
             'position_y'           => $request->position_y,
         ]);
+
+        $character->update(['can_move' => false]);
+
+        event(new MoveTimeOutEvent($character));
 
         return response()->json([], 200);
     }

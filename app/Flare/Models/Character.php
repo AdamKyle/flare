@@ -25,6 +25,7 @@ class Character extends Model
         'game_class_id',
         'inventory_max',
         'can_attack',
+        'can_move',
         'level',
         'xp',
         'xp_next',
@@ -45,6 +46,7 @@ class Character extends Model
     protected $casts = [
         'inventory_max' => 'integer',
         'can_attack'    => 'boolean',
+        'can_move'      => 'boolean',
         'level'         => 'integer',
         'xp'            => 'integer',
         'xp_next'       => 'integer',

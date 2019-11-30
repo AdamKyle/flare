@@ -11393,10 +11393,19 @@ a.text-dark:focus {
 
 .character-timeout {
   float: left;
-  margin-top: -2px;
+  margin-top: -10px;
 }
 
 .character-timeout .timer {
+  font-size: 12px;
+}
+
+.character-map-timeout {
+  float: left;
+  margin-top: -2px;
+}
+
+.character-map-timeout .timer {
   font-size: 12px;
 }
 

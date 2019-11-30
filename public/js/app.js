@@ -107498,11 +107498,14 @@ function (_React$Component) {
         disabled: this.state.monster !== 0 ? false : true,
         onClick: this.fightAgain.bind(this)
       }, "Again!")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-md-1"
+        className: "col-md-3"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "ml-4"
+        className: "ml-2 mt-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_3__["default"], {
-        userId: this.props.userId
+        userId: this.props.userId,
+        eventName: "Game.Battle.Events.ShowTimeOutEvent",
+        channel: 'show-timeout-bar-',
+        cssClass: 'character-timeout'
       })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "battle-section text-center"
       }, this.state.monsterCurrentHealth !== 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -108491,6 +108494,90 @@ var getServerMessage = function getServerMessage(type) {
 
 /***/ }),
 
+/***/ "./resources/js/components/game/map/helpers/map_position.js":
+/*!******************************************************************!*\
+  !*** ./resources/js/components/game/map/helpers/map_position.js ***!
+  \******************************************************************/
+/*! exports provided: getNewYPosition, getNewXPosition */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewYPosition", function() { return getNewYPosition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewXPosition", function() { return getNewXPosition; });
+var getNewYPosition = function getNewYPosition(characterY, mapPositionY) {
+  if (characterY < 336) {
+    return 0;
+  }
+
+  if (characterY === 336) {
+    return -304;
+  }
+
+  if (characterY < 640) {
+    return -304;
+  }
+
+  if (characterY === 640) {
+    return -608;
+  }
+
+  if (characterY < 928) {
+    return -608;
+  }
+
+  if (characterY === 944) {
+    return -900;
+  }
+
+  if (characterY < 1248) {
+    return -900;
+  }
+
+  if (characterY === 1248) {
+    return -1212;
+  }
+
+  if (characterY < 1552) {
+    return -1212;
+  }
+
+  if (characterY === 1552) {
+    return -1520;
+  }
+
+  if (characterY < 1856) {
+    return -1520;
+  }
+
+  if (characterY === 1856) {
+    return -1648;
+  }
+
+  return mapPositionY;
+};
+var getNewXPosition = function getNewXPosition(characterX, mapPositionX) {
+  if (characterX < 848) {
+    return 0;
+  }
+
+  if (characterX === 848) {
+    return -816;
+  }
+
+  if (characterX < 1136) {
+    return -816;
+  }
+
+  if (characterX === 1680) {
+    return -1120;
+  }
+
+  return mapPositionX;
+};
+
+/***/ }),
+
 /***/ "./resources/js/components/game/map/map.jsx":
 /*!**************************************************!*\
   !*** ./resources/js/components/game/map/map.jsx ***!
@@ -108506,7 +108593,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-draggable */ "./node_modules/react-draggable/build/web/react-draggable.min.js");
 /* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_draggable__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
-/* harmony import */ var _components_character_info_modal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/character-info-modal */ "./resources/js/components/game/components/character-info-modal.jsx");
+/* harmony import */ var _helpers_map_position__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers/map_position */ "./resources/js/components/game/map/helpers/map_position.js");
+/* harmony import */ var _components_character_info_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/character-info-modal */ "./resources/js/components/game/components/character-info-modal.jsx");
+/* harmony import */ var _timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../timeout/timeout-bar */ "./resources/js/components/game/timeout/timeout-bar.jsx");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -108530,6 +108619,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
 var Map =
 /*#__PURE__*/
 function (_React$Component) {
@@ -108547,7 +108638,7 @@ function (_React$Component) {
         y: 0
       },
       characterPosition: {
-        x: 32,
+        x: 16,
         y: 32
       },
       mapUrl: null,
@@ -108555,8 +108646,10 @@ function (_React$Component) {
       rightBounds: 0,
       isLoading: true,
       characterId: 0,
-      showCharacterInfo: false
+      showCharacterInfo: false,
+      canMove: true
     };
+    _this.echo = Echo["private"]('show-timeout-move-' + _this.props.userId);
     return _this;
   }
 
@@ -108578,6 +108671,11 @@ function (_React$Component) {
           },
           characterId: result.data.character_id,
           isLoading: false
+        });
+      });
+      this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', function (event) {
+        _this2.setState({
+          canMove: event.canMove
         });
       });
     }
@@ -108624,6 +108722,10 @@ function (_React$Component) {
     value: function move(e) {
       var _this3 = this;
 
+      if (!this.state.canMove) {
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cant_move');
+      }
+
       var movement = e.target.getAttribute('data-direction');
       var x = this.state.characterPosition.x;
       var y = this.state.characterPosition.y;
@@ -108655,32 +108757,16 @@ function (_React$Component) {
         return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_up');
       }
 
-      if (x < 32) {
+      if (x < 16) {
         return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_left');
       }
 
-      if (y > 1248) {
+      if (y > 1984) {
         return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_down');
       }
 
-      if (x > 1216) {
+      if (x > 1984) {
         return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_right');
-      }
-
-      if (y >= 336) {
-        mapY = -304;
-      }
-
-      if (x >= 848) {
-        mapX = -368;
-      }
-
-      if (y >= 640) {
-        mapY = -608;
-      }
-
-      if (y >= 944) {
-        mapY = -900;
       }
 
       this.setState({
@@ -108689,8 +108775,8 @@ function (_React$Component) {
           y: y
         },
         controlledPosition: {
-          x: mapX,
-          y: mapY
+          x: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_3__["getNewXPosition"])(x, this.state.controlledPosition.x),
+          y: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_3__["getNewYPosition"])(y, this.state.controlledPosition.y)
         }
       }, function () {
         axios.post('/api/move/' + _this3.state.characterId, {
@@ -108731,8 +108817,8 @@ function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_draggable__WEBPACK_IMPORTED_MODULE_1___default.a, {
         position: this.state.controlledPosition,
         bounds: {
-          top: -900,
-          left: -368,
+          top: -1648,
+          left: -1120,
           right: this.state.rightBounds,
           bottom: this.state.bottomBounds
         },
@@ -108750,34 +108836,41 @@ function (_React$Component) {
         className: "handle game-map",
         style: {
           backgroundImage: "url(".concat(this.state.mapUrl, ")"),
-          width: 1250,
-          height: 1250
+          width: 2000,
+          height: 2000
         }
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "map-x-pin",
         style: this.playerIcon(),
         onClick: this.showCharacterInfo.bind(this)
-      }))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "clear-fix"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
-        className: "btn btn-primary mr-2",
+        className: "float-left btn btn-primary mr-2",
         "data-direction": "north",
         onClick: this.move.bind(this)
       }, "North"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
-        className: "btn btn-primary mr-2",
+        className: "float-left btn btn-primary mr-2",
         "data-direction": "south",
         onClick: this.move.bind(this)
       }, "South"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
-        className: "btn btn-primary mr-2",
+        className: "float-left btn btn-primary mr-2",
         "data-direction": "east",
         onClick: this.move.bind(this)
       }, "East"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "button",
-        className: "btn btn-primary mr-2",
+        className: "float-left btn btn-primary mr-2",
         "data-direction": "west",
         onClick: this.move.bind(this)
-      }, "West")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_modal__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      }, "West"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_5__["default"], {
+        userId: this.props.userId,
+        eventName: "Game.Maps.Adventure.Events.ShowTimeOutEvent",
+        channel: 'show-timeout-move-',
+        cssClass: 'character-map-timeout'
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_modal__WEBPACK_IMPORTED_MODULE_4__["default"], {
         show: this.state.showCharacterInfo,
         onClose: this.hideCharacterInfo.bind(this),
         characterId: this.state.characterId
@@ -109174,7 +109267,7 @@ function (_React$Component) {
       maxTimeOut: 0,
       active: false
     };
-    _this.echo = Echo["private"]('show-timeout-bar-' + _this.props.userId);
+    _this.echo = Echo["private"](_this.props.channel + _this.props.userId);
     return _this;
   }
 
@@ -109183,7 +109276,7 @@ function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', function (event) {
+      this.echo.listen(this.props.eventName, function (event) {
         _this2.setState({
           maxTimeOut: event.activatebar ? 10 : 0,
           active: event.activatebar
@@ -109195,12 +109288,12 @@ function (_React$Component) {
     value: function render() {
       if (this.state.maxTimeOut === 0) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "character-timeout"
+          className: "character-ready"
         }, "Ready!");
       }
 
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "character-timeout"
+        className: this.props.cssClass
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_countdown_circle_timer__WEBPACK_IMPORTED_MODULE_1__["CountdownCircleTimer"], {
         isPlaying: this.state.active,
         durationSeconds: this.state.maxTimeOut,
