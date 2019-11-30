@@ -180,6 +180,7 @@ return [
          */
        App\Flare\Providers\ServiceProvider::class,
        App\Flare\Providers\EventsProvider::class,
+       App\Flare\Providers\QueueProvider::class,
        App\Flare\MapGenerator\Providers\ServiceProvider::class,
 
        /**

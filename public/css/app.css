@@ -11431,6 +11431,15 @@ a.text-dark:focus {
   color: #d69c44;
 }
 
+.xp-bar .value {
+  display: inline-block;
+}
+
+.xp-bar .value .level-bar {
+  width: 200px;
+  margin-left: 10px;
+}
+
 dl {
   display: -webkit-box;
   display: flex;

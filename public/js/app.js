@@ -107868,6 +107868,187 @@ function (_React$Component2) {
 
 /***/ }),
 
+/***/ "./resources/js/components/game/components/character-info-top-bar.jsx":
+/*!****************************************************************************!*\
+  !*** ./resources/js/components/game/components/character-info-top-bar.jsx ***!
+  \****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CharacterInfoTopBar; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var CharacterInfoTopBar =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(CharacterInfoTopBar, _React$Component);
+
+  function CharacterInfoTopBar(props) {
+    var _this;
+
+    _classCallCheck(this, CharacterInfoTopBar);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(CharacterInfoTopBar).call(this, props));
+    _this.state = {
+      characterSheet: null,
+      isLoading: true
+    };
+    return _this;
+  }
+
+  _createClass(CharacterInfoTopBar, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      axios.get('/api/character-sheet/' + this.props.characterId).then(function (result) {
+        _this2.setState({
+          characterSheet: result.data.sheet.data,
+          isLoading: false
+        });
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      if (this.state.isLoading) {
+        return 'Please wait ...';
+      }
+
+      var sheet = this.state.characterSheet;
+      var xpValue = sheet.xp / sheet.xp_next * 100;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card character-top-bar mb-4"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-4"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Name:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-4"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Race:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.race)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-4"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Class:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet["class"]))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Level:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.level)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "AC:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.ac)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Health:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.health)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Attack:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.attack)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-4 xp-bar"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Xp:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress level-bar mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress-bar skill-bar",
+        role: "progressbar",
+        style: {
+          width: xpValue + '%'
+        },
+        "aria-valuenow": sheet.xp,
+        "aria-valuemin": "0",
+        "aria-valuemax": sheet.xp_next
+      }, sheet.xp))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Strength:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.str)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Durabillity:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.dur)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Dexterity:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.dex)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Intelligence:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet["int"])), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "title"
+      }, "Charisma:"), " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "value"
+      }, sheet.chr)))));
+    }
+  }]);
+
+  return CharacterInfoTopBar;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/game/components/character-inventory-modal.jsx":
 /*!*******************************************************************************!*\
   !*** ./resources/js/components/game/components/character-inventory-modal.jsx ***!
@@ -108170,6 +108351,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _battle_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./battle/actions */ "./resources/js/components/game/battle/actions.jsx");
 /* harmony import */ var _timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./timeout/timeout-bar */ "./resources/js/components/game/timeout/timeout-bar.jsx");
 /* harmony import */ var _map_map__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./map/map */ "./resources/js/components/game/map/map.jsx");
+/* harmony import */ var _components_character_info_top_bar__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/character-info-top-bar */ "./resources/js/components/game/components/character-info-top-bar.jsx");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -108187,6 +108369,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 
 
 
@@ -108217,15 +108400,30 @@ function (_React$Component) {
         className: "row mb-4"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-10"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_top_bar__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        apiUrl: this.apiUrl,
+        characterId: this.props.characterId
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_map_map__WEBPACK_IMPORTED_MODULE_5__["default"], {
         apiUrl: this.apiUrl,
         userId: this.props.userId
-      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-md-10"
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_battle_actions__WEBPACK_IMPORTED_MODULE_3__["default"], {
         apiUrl: this.apiUrl,
         userId: this.props.userId
-      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-2"
+      }, "sidebar ...")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-12"
@@ -108242,10 +108440,12 @@ function (_React$Component) {
 
 var game = document.getElementById('game');
 var player = document.head.querySelector('meta[name="player"]');
+var character = document.head.querySelector('meta[name="character"]');
 
 if (game !== null) {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Game, {
-    userId: parseInt(player.content)
+    userId: parseInt(player.content),
+    characterId: character.content
   }), game);
 }
 

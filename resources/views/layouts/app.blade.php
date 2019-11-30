@@ -11,6 +11,10 @@
     @else
         <meta name="game_key" content="{{ auth()->user()->private_game_key }}">
         <meta name="player" content="{{ auth()->user()->id }}">
+
+        @if (!auth()->user()->hasRole('Admin'))
+            <meta name="character" content="{{ auth()->user()->character->id}}">
+        @endif
     @endguest
 
     <title>{{ config('app.name', 'Laravel') }}</title>
