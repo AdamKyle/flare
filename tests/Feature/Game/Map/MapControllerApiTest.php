@@ -84,7 +84,8 @@ class MapControllerApiTest extends TestCase
                              'character_position_y' => 304,
                          ])
                          ->response;
-                         
+
+        dd($response->content());
         $this->assertEquals(422, $response->status());
 
         Storage::disk('public')->delete($path);
