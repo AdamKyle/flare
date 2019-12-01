@@ -1,6 +1,6 @@
 # Flare
 
-![badge](https://action-badges.now.sh/AdamKyle/flare?action=test)
+![badge](https://action-badges.now.sh/AdamKyle/flare)
 
 Flare is intended to be a simple, old school game where you can chat, fight monsters and rule kingdoms.
 
