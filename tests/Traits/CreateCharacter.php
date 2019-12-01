@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 
 trait CreateCharacter {
 
-    public function createCharacter(array $options = []) {
+    public function createCharacter(array $options = []): Character {
         return factory(Character::class)->create($options);
     }
 }

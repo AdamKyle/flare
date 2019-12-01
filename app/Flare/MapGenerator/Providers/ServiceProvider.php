@@ -9,6 +9,7 @@ use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
 use App\Flare\MapGenerator\Builders\MapBuilder;
 use App\Flare\MapGenerator\Builders\ImageBuilder;
 use App\Flare\MapGenerator\Console\Commands\CreateMap;
+use App\Flare\Console\Commands\CreateAdminAccount;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {

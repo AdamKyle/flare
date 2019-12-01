@@ -6,7 +6,7 @@ use App\Flare\Models\Inventory;
 
 trait CreateInventory {
 
-    public function createInventory(array $options = []) {
+    public function createInventory(array $options = []): Inventory {
         return factory(Inventory::class)->create($options);
     }
 }

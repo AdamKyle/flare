@@ -6,7 +6,7 @@ use App\Flare\Models\Item;
 
 trait CreateItem {
 
-    public function createItem(array $options = []) {
+    public function createItem(array $options = []): Item {
         return factory(Item::class)->create($options);
     }
 }

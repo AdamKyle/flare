@@ -6,7 +6,7 @@ use App\Flare\Models\InventorySlot;
 
 trait CreateInventorySlot {
 
-    public function createInventorySlot(array $options = []) {
+    public function createInventorySlot(array $options = []): InventorySlot {
         return factory(InventorySlot::class)->create($options);
     }
 }

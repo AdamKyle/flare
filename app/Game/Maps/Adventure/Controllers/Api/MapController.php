@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Map;
+use App\Flare\Models\Location;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\User;
 
@@ -21,6 +22,7 @@ class MapController extends Controller {
             'map_url' => asset('/storage/surface.png'),
             'character_map' => $user->character->map,
             'character_id'  => $user->character->id,
+            'locations'     => Location::all(),
             'can_move'      => $user->character->can_move,
             'show_message'  => $user->character->can_move ? false : true,
         ]);

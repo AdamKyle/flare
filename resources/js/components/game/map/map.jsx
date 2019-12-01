@@ -1,8 +1,13 @@
 import React                              from 'react';
 import Draggable                          from 'react-draggable';
+import {
+  OverlayTrigger,
+  Tooltip
+}                                         from 'react-bootstrap';
 import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
 import CharacterInfoModal                 from '../components/character-info-modal';
+import LocationInfoModal                  from '../components/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
 
 export default class Map extends React.Component {
@@ -23,8 +28,11 @@ export default class Map extends React.Component {
       isLoading: true,
       characterId: 0,
       showCharacterInfo: false,
+      showLocationInfo: false,
       canMove: true,
       showMessage: false,
+      locations: null,
+      location: null,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -32,7 +40,6 @@ export default class Map extends React.Component {
 
   componentDidMount() {
     axios.get('/api/map/' + this.props.userId).then((result) => {
-      console.log(result.data);
       this.setState({
         mapUrl: result.data.map_url,
         controlledPosition: {
@@ -47,6 +54,7 @@ export default class Map extends React.Component {
         isLoading: false,
         canMove: result.data.can_move,
         showMessage: result.data.show_message,
+        locations: result.data.locations,
       });
     });
 
@@ -160,6 +168,36 @@ export default class Map extends React.Component {
     });
   }
 
+  openLocationDetails(e) {
+    const location = this.state.locations.filter(l => l.id === parseInt(event.target.getAttribute('data-location-id')))[0];
+
+    this.setState({
+      showLocationInfo: true,
+      location: location,
+    });
+  }
+
+  closeLocationDetails() {
+    this.setState({
+      showLocationInfo: false,
+      location: null,
+    });
+  }
+
+  renderLocations() {
+    return this.state.locations.map((location) => {
+      return (
+        <div
+          key={location.id}
+          data-location-id={location.id}
+          className="location-x-pin"
+          style={{top: location.y, left: location.x}}
+          onClick={this.openLocationDetails.bind(this)}>
+        </div>
+      );
+    });
+  }
+
   render() {
     if (this.state.isLoading) {
       return 'Please wait ...';
@@ -182,6 +220,7 @@ export default class Map extends React.Component {
             >
             <div>
               <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 2000, height: 2000}}>
+                {this.renderLocations()}
                 <div className="map-x-pin" style={this.playerIcon()} onClick={this.showCharacterInfo.bind(this)}></div>
               </div>
             </div>
@@ -201,6 +240,7 @@ export default class Map extends React.Component {
         </div>
 
         <CharacterInfoModal show={this.state.showCharacterInfo} onClose={this.hideCharacterInfo.bind(this)} characterId={this.state.characterId} />
+        <LocationInfoModal show={this.state.showLocationInfo} onClose={this.closeLocationDetails.bind(this)} location={this.state.location} />
       </div>
     )
   }

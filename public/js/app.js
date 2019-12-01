@@ -108341,6 +108341,183 @@ function (_React$Component) {
 
 /***/ }),
 
+/***/ "./resources/js/components/game/components/location-info-modal.jsx":
+/*!*************************************************************************!*\
+  !*** ./resources/js/components/game/components/location-info-modal.jsx ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CharacterInfoModal; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-draggable */ "./node_modules/react-draggable/build/web/react-draggable.min.js");
+/* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_draggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_bootstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-bootstrap */ "./node_modules/react-bootstrap/esm/index.js");
+/* harmony import */ var _location_info__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./location-info */ "./resources/js/components/game/components/location-info.jsx");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+
+var DraggableModalDialog =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(DraggableModalDialog, _React$Component);
+
+  function DraggableModalDialog() {
+    _classCallCheck(this, DraggableModalDialog);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DraggableModalDialog).apply(this, arguments));
+  }
+
+  _createClass(DraggableModalDialog, [{
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_draggable__WEBPACK_IMPORTED_MODULE_1___default.a, {
+        handle: ".location-info"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["ModalDialog"], this.props));
+    }
+  }]);
+
+  return DraggableModalDialog;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+var CharacterInfoModal =
+/*#__PURE__*/
+function (_React$Component2) {
+  _inherits(CharacterInfoModal, _React$Component2);
+
+  function CharacterInfoModal(props) {
+    _classCallCheck(this, CharacterInfoModal);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(CharacterInfoModal).call(this, props));
+  }
+
+  _createClass(CharacterInfoModal, [{
+    key: "render",
+    value: function render() {
+      var location = this.props.location;
+
+      if (location === null) {
+        return null;
+      }
+
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"], {
+        backdrop: 'static',
+        dialogAs: DraggableModalDialog,
+        show: this.props.show,
+        onHide: this.props.onClose,
+        animation: true,
+        size: "lg",
+        "aria-labelledby": "contained-modal-title-vcenter",
+        centered: true
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Header, {
+        closeButton: true
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Title, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "location-info"
+      }, location.name))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Body, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_location_info__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        location: location
+      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary",
+        type: "button",
+        onClick: this.props.onClose
+      }, "Close")));
+    }
+  }]);
+
+  return CharacterInfoModal;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/game/components/location-info.jsx":
+/*!*******************************************************************!*\
+  !*** ./resources/js/components/game/components/location-info.jsx ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return LocationInfo; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var LocationInfo =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(LocationInfo, _React$Component);
+
+  function LocationInfo(props) {
+    _classCallCheck(this, LocationInfo);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(LocationInfo).call(this, props));
+  }
+
+  _createClass(LocationInfo, [{
+    key: "render",
+    value: function render() {
+      var location = this.props.location;
+
+      if (location == null) {
+        return null;
+      }
+
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, 'Coordinates: ' + location.x + '/' + location.y), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "text-center mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, location.description)));
+    }
+  }]);
+
+  return LocationInfo;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/game/game.jsx":
 /*!***********************************************!*\
   !*** ./resources/js/components/game/game.jsx ***!
@@ -108596,10 +108773,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-draggable */ "./node_modules/react-draggable/build/web/react-draggable.min.js");
 /* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_draggable__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
-/* harmony import */ var _helpers_map_position__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers/map_position */ "./resources/js/components/game/map/helpers/map_position.js");
-/* harmony import */ var _components_character_info_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/character-info-modal */ "./resources/js/components/game/components/character-info-modal.jsx");
-/* harmony import */ var _timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../timeout/timeout-bar */ "./resources/js/components/game/timeout/timeout-bar.jsx");
+/* harmony import */ var react_bootstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-bootstrap */ "./node_modules/react-bootstrap/esm/index.js");
+/* harmony import */ var _helpers_server_message__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../helpers/server_message */ "./resources/js/components/game/helpers/server_message.js");
+/* harmony import */ var _helpers_map_position__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helpers/map_position */ "./resources/js/components/game/map/helpers/map_position.js");
+/* harmony import */ var _components_character_info_modal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/character-info-modal */ "./resources/js/components/game/components/character-info-modal.jsx");
+/* harmony import */ var _components_location_info_modal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../components/location-info-modal */ "./resources/js/components/game/components/location-info-modal.jsx");
+/* harmony import */ var _timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../timeout/timeout-bar */ "./resources/js/components/game/timeout/timeout-bar.jsx");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -108617,6 +108796,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
 
 
 
@@ -108651,8 +108832,11 @@ function (_React$Component) {
       isLoading: true,
       characterId: 0,
       showCharacterInfo: false,
+      showLocationInfo: false,
       canMove: true,
-      showMessage: false
+      showMessage: false,
+      locations: null,
+      location: null
     };
     _this.echo = Echo["private"]('show-timeout-move-' + _this.props.userId);
     return _this;
@@ -108664,8 +108848,6 @@ function (_React$Component) {
       var _this2 = this;
 
       axios.get('/api/map/' + this.props.userId).then(function (result) {
-        console.log(result.data);
-
         _this2.setState({
           mapUrl: result.data.map_url,
           controlledPosition: {
@@ -108679,7 +108861,8 @@ function (_React$Component) {
           characterId: result.data.character_id,
           isLoading: false,
           canMove: result.data.can_move,
-          showMessage: result.data.show_message
+          showMessage: result.data.show_message,
+          locations: result.data.locations
         });
       });
       this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', function (event) {
@@ -108733,7 +108916,7 @@ function (_React$Component) {
       var _this3 = this;
 
       if (!this.state.canMove) {
-        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cant_move');
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cant_move');
       }
 
       var movement = e.target.getAttribute('data-direction');
@@ -108764,19 +108947,19 @@ function (_React$Component) {
       }
 
       if (y < 32) {
-        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_up');
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cannot_move_up');
       }
 
       if (x < 16) {
-        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_left');
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cannot_move_left');
       }
 
       if (y > 1984) {
-        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_down');
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cannot_move_down');
       }
 
       if (x > 1984) {
-        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_2__["getServerMessage"])('cannot_move_right');
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cannot_move_right');
       }
 
       this.setState({
@@ -108785,8 +108968,8 @@ function (_React$Component) {
           y: y
         },
         controlledPosition: {
-          x: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_3__["getNewXPosition"])(x, this.state.controlledPosition.x),
-          y: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_3__["getNewYPosition"])(y, this.state.controlledPosition.y)
+          x: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_4__["getNewXPosition"])(x, this.state.controlledPosition.x),
+          y: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_4__["getNewYPosition"])(y, this.state.controlledPosition.y)
         }
       }, function () {
         axios.post('/api/move/' + _this3.state.characterId, {
@@ -108809,6 +108992,43 @@ function (_React$Component) {
     value: function hideCharacterInfo() {
       this.setState({
         showCharacterInfo: false
+      });
+    }
+  }, {
+    key: "openLocationDetails",
+    value: function openLocationDetails(e) {
+      var location = this.state.locations.filter(function (l) {
+        return l.id === parseInt(event.target.getAttribute('data-location-id'));
+      })[0];
+      this.setState({
+        showLocationInfo: true,
+        location: location
+      });
+    }
+  }, {
+    key: "closeLocationDetails",
+    value: function closeLocationDetails() {
+      this.setState({
+        showLocationInfo: false,
+        location: null
+      });
+    }
+  }, {
+    key: "renderLocations",
+    value: function renderLocations() {
+      var _this4 = this;
+
+      return this.state.locations.map(function (location) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: location.id,
+          "data-location-id": location.id,
+          className: "location-x-pin",
+          style: {
+            top: location.y,
+            left: location.x
+          },
+          onClick: _this4.openLocationDetails.bind(_this4)
+        });
       });
     }
   }, {
@@ -108849,7 +109069,7 @@ function (_React$Component) {
           width: 2000,
           height: 2000
         }
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, this.renderLocations(), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "map-x-pin",
         style: this.playerIcon(),
         onClick: this.showCharacterInfo.bind(this)
@@ -108875,15 +109095,19 @@ function (_React$Component) {
         className: "float-left btn btn-primary mr-2",
         "data-direction": "west",
         onClick: this.move.bind(this)
-      }, "West"), this.state.showMessage ? 'Almost Ready!' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_5__["default"], {
+      }, "West"), this.state.showMessage ? 'Almost Ready!' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_timeout_timeout_bar__WEBPACK_IMPORTED_MODULE_7__["default"], {
         userId: this.props.userId,
         eventName: "Game.Maps.Adventure.Events.ShowTimeOutEvent",
         channel: 'show-timeout-move-',
         cssClass: 'character-map-timeout'
-      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_modal__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_modal__WEBPACK_IMPORTED_MODULE_5__["default"], {
         show: this.state.showCharacterInfo,
         onClose: this.hideCharacterInfo.bind(this),
         characterId: this.state.characterId
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_location_info_modal__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        show: this.state.showLocationInfo,
+        onClose: this.closeLocationDetails.bind(this),
+        location: this.state.location
       }));
     }
   }]);

@@ -3,7 +3,7 @@
   max-height: 350px;
 
   .game-map {
-    .map-x-pin, .map-port-pin {
+    .map-x-pin, .location-x-pin {
       background-color: black; /* So we can see where the pixel is */
       height: 1px;
       position: absolute;
@@ -22,6 +22,15 @@
         font-weight: 900;
         font-size: 32px;
         color: #d69c44;
+      }
+    }
+
+    .location-x-pin {
+      &:after {
+        content: '\F21A';
+        font-size: 16px;
+        color: #2d74de;
+        top: -10px;
       }
     }
   }
