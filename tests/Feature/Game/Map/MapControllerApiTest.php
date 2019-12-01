@@ -3,8 +3,8 @@
 namespace Tests\Feature\Game\Map;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
@@ -74,8 +74,8 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testIsWater() {
-        $path = Storage::disk('public')->put('public', new File(resource_path('tests/surface.png')));
-        
+        File::copy(resource_path('tests/surface.png'), Storage::disk('public')->path('/') . 'surface.png');
+
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
@@ -87,11 +87,11 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(422, $response->status());
 
-        Storage::disk('public')->delete($path);
+        unlink(Storage::disk('public')->path('/') . 'surface.png');
     }
 
     public function testIsNotWater() {
-        $path = Storage::disk('public')->put('public', new File(resource_path('tests/surface.png')));
+        File::copy(resource_path('tests/surface.png'), Storage::disk('public')->path('/') . 'surface.png');
 
         $this->setUpCharacter();
 
@@ -104,7 +104,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        Storage::disk('public')->delete($path);
+        unlink(Storage::disk('public')->path('/') . 'surface.png');
     }
 
     protected function setUpCharacter(array $options = []) {
