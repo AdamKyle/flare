@@ -13,6 +13,8 @@ jobs:
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
     - name: Generate key
       run: php artisan key:generate
+    - name: Link Storage
+      run: php artisan storage:link
     - name: Create Database
       run: |
         mkdir -p database
