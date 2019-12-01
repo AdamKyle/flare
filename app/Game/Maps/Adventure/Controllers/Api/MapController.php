@@ -38,9 +38,9 @@ class MapController extends Controller {
             'position_y'           => $request->position_y,
         ]);
 
-        // $character->update(['can_move' => false]);
-        //
-        // event(new MoveTimeOutEvent($character));
+        $character->update(['can_move' => false]);
+
+        event(new MoveTimeOutEvent($character));
 
         return response()->json([], 200);
     }
