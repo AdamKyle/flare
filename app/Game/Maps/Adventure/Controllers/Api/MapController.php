@@ -57,7 +57,7 @@ class MapController extends Controller {
         $b = $rgb & 0xFF;
 
         $color = $r.$g.$b;
-        dump((int) $color);
+
         if ((int) $color === $waterRgb) {
             // TODO: Implement loic to check for a relic called: 'flask of fresh air'.
             return response()->json([], 422);
