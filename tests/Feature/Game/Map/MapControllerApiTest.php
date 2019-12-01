@@ -75,7 +75,7 @@ class MapControllerApiTest extends TestCase
 
     public function testIsWater() {
         $path = Storage::disk('public')->put('public', new File(resource_path('tests/surface.png')));
-        var_dump(new File(resource_path('tests/surface.png'))); die();
+        var_dump($path); die();
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
