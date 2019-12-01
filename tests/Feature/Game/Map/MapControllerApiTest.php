@@ -85,7 +85,7 @@ class MapControllerApiTest extends TestCase
                          ])
                          ->response;
 
-        dd($response->content());
+        var_dump($response->content()); die();
         $this->assertEquals(422, $response->status());
 
         Storage::disk('public')->delete($path);
