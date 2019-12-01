@@ -32,6 +32,8 @@ class ServerMessageBuilder {
                 return 'You cannot go that way.';
             case 'cannot_move_right':
                 return 'You cannot go that way.';
+            case 'cannot_walk_on_water':
+                return 'You cannot walk on water without a Flask of Fresh Air.';
             default:
                 return '';
         }

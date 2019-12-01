@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
+use Storage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
@@ -29,6 +30,7 @@ class MapController extends Controller {
     }
 
     public function move(Request $request, Character $character) {
+
         $character->map->update([
             'character_position_x' => $request->character_position_x,
             'character_position_y' => $request->character_position_y,
@@ -36,9 +38,30 @@ class MapController extends Controller {
             'position_y'           => $request->position_y,
         ]);
 
-        $character->update(['can_move' => false]);
+        // $character->update(['can_move' => false]);
+        //
+        // event(new MoveTimeOutEvent($character));
 
-        event(new MoveTimeOutEvent($character));
+        return response()->json([], 200);
+    }
+
+    public function isWater(Request $request, Character $character) {
+        $contents            = Storage::disk('public')->get('surface.png');
+        $this->imageResource = imagecreatefromstring($contents);
+
+        $waterRgb = 112219255;
+        $rgb      = imagecolorat($this->imageResource, $request->character_position_x, $request->character_position_y);
+
+        $r = ($rgb >> 16) & 0xFF;
+        $g = ($rgb >> 8) & 0xFF;
+        $b = $rgb & 0xFF;
+
+        $color = $r.$g.$b;
+        dump((int) $color);
+        if ((int) $color === $waterRgb) {
+            // TODO: Implement loic to check for a relic called: 'flask of fresh air'.
+            return response()->json([], 422);
+        }
 
         return response()->json([], 200);
     }

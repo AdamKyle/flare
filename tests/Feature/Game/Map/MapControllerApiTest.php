@@ -3,6 +3,8 @@
 namespace Tests\Feature\Game\Map;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
@@ -69,6 +71,40 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals(0, $this->character->map->position_x);
         $this->assertEquals(48, $this->character->map->character_position_x);
         $this->assertEquals(48, $this->character->map->character_position_y);
+    }
+
+    public function testIsWater() {
+        $path = Storage::disk('public')->put('public', new File(resource_path('tests/surface.png')));
+
+        $this->setUpCharacter();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('GET', '/api/is-water/' . $this->character->id, [
+                             'character_position_x' => 336,
+                             'character_position_y' => 304,
+                         ])
+                         ->response;
+
+        $this->assertEquals(422, $response->status());
+
+        Storage::disk('public')->delete($path);
+    }
+
+    public function testIsNotWater() {
+        $path = Storage::disk('public')->put('public', new File(resource_path('tests/surface.png')));
+
+        $this->setUpCharacter();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('GET', '/api/is-water/' . $this->character->id, [
+                             'character_position_x' => 336,
+                             'character_position_y' => 288,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        Storage::disk('public')->delete($path);
     }
 
     protected function setUpCharacter(array $options = []) {

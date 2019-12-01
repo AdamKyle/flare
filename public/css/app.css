@@ -11415,7 +11415,8 @@ a.text-dark:focus {
 }
 
 .map-body .game-map .map-x-pin,
-.map-body .game-map .location-x-pin {
+.map-body .game-map .location-x-pin,
+.map-body .game-map .port-x-pin {
   background-color: black;
   /* So we can see where the pixel is */
   height: 1px;
@@ -11425,7 +11426,8 @@ a.text-dark:focus {
 }
 
 .map-body .game-map .map-x-pin:after,
-.map-body .game-map .location-x-pin:after {
+.map-body .game-map .location-x-pin:after,
+.map-body .game-map .port-x-pin:after {
   bottom: 100%;
   content: "\F3C5";
   font-family: "Font Awesome 5 Free";
@@ -11441,10 +11443,21 @@ a.text-dark:focus {
 }
 
 .map-body .game-map .location-x-pin:after {
+  content: "\F6D9";
+  font-size: 16px;
+  color: #d9a29e;
+  top: -10px;
+}
+
+.map-body .game-map .port-x-pin:after {
   content: "\F21A";
   font-size: 16px;
   color: #2d74de;
   top: -10px;
+}
+
+.character-map-ready {
+  margin-top: 5px;
 }
 
 .xp-bar .value {

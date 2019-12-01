@@ -107509,7 +107509,8 @@ function (_React$Component) {
         userId: this.props.userId,
         eventName: "Game.Battle.Events.ShowTimeOutEvent",
         channel: 'show-timeout-bar-',
-        cssClass: 'character-timeout'
+        cssClass: 'character-timeout',
+        readyCssClass: 'character-ready'
       })))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "battle-section text-center"
       }, this.state.monsterCurrentHealth !== 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
@@ -108962,22 +108963,40 @@ function (_React$Component) {
         return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cannot_move_right');
       }
 
-      this.setState({
-        characterPosition: {
-          x: x,
-          y: y
-        },
-        controlledPosition: {
-          x: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_4__["getNewXPosition"])(x, this.state.controlledPosition.x),
-          y: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_4__["getNewYPosition"])(y, this.state.controlledPosition.y)
+      axios.get('/api/is-water/' + this.state.characterId, {
+        params: {
+          character_position_x: x,
+          character_position_y: y
         }
-      }, function () {
-        axios.post('/api/move/' + _this3.state.characterId, {
-          position_x: _this3.state.controlledPosition.x,
-          position_y: _this3.state.controlledPosition.y,
-          character_position_x: _this3.state.characterPosition.x,
-          character_position_y: _this3.state.characterPosition.y
+      }).then(function (result) {
+        // If we're not water:
+        _this3.setState({
+          characterPosition: {
+            x: x,
+            y: y
+          },
+          controlledPosition: {
+            x: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_4__["getNewXPosition"])(x, _this3.state.controlledPosition.x),
+            y: Object(_helpers_map_position__WEBPACK_IMPORTED_MODULE_4__["getNewYPosition"])(y, _this3.state.controlledPosition.y)
+          }
+        }, function () {
+          axios.post('/api/move/' + _this3.state.characterId, {
+            position_x: _this3.state.controlledPosition.x,
+            position_y: _this3.state.controlledPosition.y,
+            character_position_x: _this3.state.characterPosition.x,
+            character_position_y: _this3.state.characterPosition.y
+          });
         });
+      })["catch"](function (error) {
+        _this3.setState({
+          characterPosition: {
+            x: _this3.state.characterPosition.x,
+            y: _this3.state.characterPosition.y
+          }
+        }); // If we are:
+
+
+        return Object(_helpers_server_message__WEBPACK_IMPORTED_MODULE_3__["getServerMessage"])('cannot_walk_on_water');
       });
     }
   }, {
@@ -109019,16 +109038,29 @@ function (_React$Component) {
       var _this4 = this;
 
       return this.state.locations.map(function (location) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          key: location.id,
-          "data-location-id": location.id,
-          className: "location-x-pin",
-          style: {
-            top: location.y,
-            left: location.x
-          },
-          onClick: _this4.openLocationDetails.bind(_this4)
-        });
+        if (location.is_port) {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            key: location.id,
+            "data-location-id": location.id,
+            className: "port-x-pin",
+            style: {
+              top: location.y,
+              left: location.x
+            },
+            onClick: _this4.openLocationDetails.bind(_this4)
+          });
+        } else {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            key: location.id,
+            "data-location-id": location.id,
+            className: "location-x-pin",
+            style: {
+              top: location.y,
+              left: location.x
+            },
+            onClick: _this4.openLocationDetails.bind(_this4)
+          });
+        }
       });
     }
   }, {
@@ -109099,7 +109131,8 @@ function (_React$Component) {
         userId: this.props.userId,
         eventName: "Game.Maps.Adventure.Events.ShowTimeOutEvent",
         channel: 'show-timeout-move-',
-        cssClass: 'character-map-timeout'
+        cssClass: 'character-map-timeout',
+        readyCssClass: 'character-map-ready float-left'
       }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_modal__WEBPACK_IMPORTED_MODULE_5__["default"], {
         show: this.state.showCharacterInfo,
         onClose: this.hideCharacterInfo.bind(this),
@@ -109522,7 +109555,7 @@ function (_React$Component) {
     value: function render() {
       if (this.state.maxTimeOut === 0) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "character-ready"
+          className: this.props.readyCssClass
         }, "Ready!");
       }
 

@@ -107,4 +107,11 @@ class ServerMessageBuilderTest extends TestCase
 
         $this->assertEquals('Please wait for the timer (beside movement options) to state: Ready!', $message);
     }
+
+    public function testGetMessageCannotWalkOnWater()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cannot_walk_on_water');
+
+        $this->assertEquals('You cannot walk on water without a Flask of Fresh Air.', $message);
+    }
 }

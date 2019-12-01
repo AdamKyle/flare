@@ -20,6 +20,7 @@ class CreateLocations extends Migration
             $table->string('name');
             $table->string('asset_path')->nullable();
             $table->text('description');
+            $table->boolean('is_port')->nullable()->default(false);
             $table->timestamps();
         });
     }

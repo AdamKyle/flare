@@ -38,7 +38,7 @@ export default class TimeOutBar extends React.Component {
   render() {
     if (this.state.maxTimeOut === 0) {
       return (
-        <div className="character-ready">
+        <div className={this.props.readyCssClass}>
           Ready!
         </div>
       )

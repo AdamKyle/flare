@@ -22,6 +22,7 @@ $factory->define(Item::class, function (Faker $faker) {
         'name' => null,
         'description' => null,
         'asset_path' => null,
+        'is_port' => null,
         'x' => null,
         'y' => null,
     ];

@@ -16,6 +16,7 @@ class Location extends Model
         'name',
         'description',
         'asset_path',
+        'is_port',
         'x',
         'y',
     ];
@@ -26,7 +27,8 @@ class Location extends Model
      * @var array
      */
     protected $casts = [
-        'y' => 'integer',
-        'x' => 'integer',
+        'y'       => 'integer',
+        'x'       => 'integer',
+        'is_port' => 'boolean',
     ];
 }

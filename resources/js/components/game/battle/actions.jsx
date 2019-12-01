@@ -183,7 +183,13 @@ export default class Actions extends React.Component {
                 <div className="ml-2 mt-2">
                   {this.state.showMessage
                    ? 'Almost Ready!'
-                   : <TimeOutBar userId={this.props.userId} eventName='Game.Battle.Events.ShowTimeOutEvent' channel={'show-timeout-bar-'} cssClass={'character-timeout'}/>
+                   : <TimeOutBar 
+                        userId={this.props.userId}
+                        eventName='Game.Battle.Events.ShowTimeOutEvent'
+                        channel={'show-timeout-bar-'}
+                        cssClass={'character-timeout'}
+                        readyCssClass={'character-ready'}
+                     />
                   }
                 </div>
               </div>

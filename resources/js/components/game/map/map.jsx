@@ -143,17 +143,34 @@ export default class Map extends React.Component {
       return getServerMessage('cannot_move_right');
     }
 
-    this.setState({
-      characterPosition: {x, y},
-      controlledPosition: {x: getNewXPosition(x, this.state.controlledPosition.x), y: getNewYPosition(y, this.state.controlledPosition.y)},
-    }, () => {
-      axios.post('/api/move/' + this.state.characterId, {
-        position_x: this.state.controlledPosition.x,
-        position_y: this.state.controlledPosition.y,
-        character_position_x: this.state.characterPosition.x,
-        character_position_y: this.state.characterPosition.y,
-      });
-    });
+    axios.get('/api/is-water/' + this.state.characterId, {
+      params: {
+        character_position_x: x,
+        character_position_y: y,
+      }
+    })
+      .then((result) => {
+        // If we're not water:
+        this.setState({
+          characterPosition: {x, y},
+          controlledPosition: {x: getNewXPosition(x, this.state.controlledPosition.x), y: getNewYPosition(y, this.state.controlledPosition.y)},
+        }, () => {
+          axios.post('/api/move/' + this.state.characterId, {
+            position_x: this.state.controlledPosition.x,
+            position_y: this.state.controlledPosition.y,
+            character_position_x: this.state.characterPosition.x,
+            character_position_y: this.state.characterPosition.y,
+          });
+        });
+      })
+     .catch((error) => {
+       this.setState({
+         characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
+       });
+
+       // If we are:
+       return getServerMessage('cannot_walk_on_water');
+     });
   }
 
   showCharacterInfo() {
@@ -186,15 +203,28 @@ export default class Map extends React.Component {
 
   renderLocations() {
     return this.state.locations.map((location) => {
-      return (
-        <div
-          key={location.id}
-          data-location-id={location.id}
-          className="location-x-pin"
-          style={{top: location.y, left: location.x}}
-          onClick={this.openLocationDetails.bind(this)}>
-        </div>
-      );
+      if (location.is_port) {
+        return (
+          <div
+            key={location.id}
+            data-location-id={location.id}
+            className="port-x-pin"
+            style={{top: location.y, left: location.x}}
+            onClick={this.openLocationDetails.bind(this)}>
+          </div>
+        );
+      } else {
+        return (
+          <div
+            key={location.id}
+            data-location-id={location.id}
+            className="location-x-pin"
+            style={{top: location.y, left: location.x}}
+            onClick={this.openLocationDetails.bind(this)}>
+          </div>
+        );
+      }
+
     });
   }
 
@@ -234,7 +264,13 @@ export default class Map extends React.Component {
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
            {this.state.showMessage
             ? 'Almost Ready!'
-            : <TimeOutBar userId={this.props.userId} eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent' channel={'show-timeout-move-'} cssClass={'character-map-timeout'}/>
+            : <TimeOutBar
+                 userId={this.props.userId}
+                 eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent'
+                 channel={'show-timeout-move-'}
+                 cssClass={'character-map-timeout'}
+                 readyCssClass={'character-map-ready float-left'}
+              />
            }
          </div>
         </div>
