@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInventorySlots extends Migration
+class CreateEquippedItems extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,15 @@ class CreateInventorySlots extends Migration
      */
     public function up()
     {
-        Schema::create('inventory_slots', function (Blueprint $table) {
+        Schema::create('equipped_items', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('inventory_id')->unsigned();
-            $table->foreign('inventory_id')
-                ->references('id')->on('inventories');
+            $table->bigInteger('character_id')->unsigned();
+            $table->foreign('character_id')
+                ->references('id')->on('characters');
             $table->bigInteger('item_id')->unsigned();
             $table->foreign('item_id')
                 ->references('id')->on('items');
-            $table->boolean('equipped')->nullable()->default(false);
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ class CreateInventorySlots extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('inventory_slots');
+        Schema::dropIfExists('equipped_items');
     }
 }

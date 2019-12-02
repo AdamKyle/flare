@@ -7,6 +7,7 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Skill;
 use App\Flare\Models\Inventory;
+use App\Flare\Models\EquippedItem;
 use App\User;
 
 class Character extends Model
@@ -81,5 +82,9 @@ class Character extends Model
 
     public function map() {
         return $this->hasOne(Map::class);
+    }
+
+    public function equippedItems() {
+        return $this->hasMany(EquippedItem::class);
     }
 }

@@ -3,7 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
-use App\Flare\Models\InventorySlot;
+use App\Flare\Models\EquippedItem;
 
 
 /*
@@ -17,10 +17,10 @@ use App\Flare\Models\InventorySlot;
 |
 */
 
-$factory->define(InventorySlot::class, function (Faker $faker) {
+$factory->define(EquippedItem::class, function (Faker $faker) {
     return [
-        'inventory_id' => null,
+        'character_id' => null,
         'item_id' => null,
-        'equipped' => false,
+        'type'    => null,
     ];
 });

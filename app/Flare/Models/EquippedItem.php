@@ -5,7 +5,7 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\Item;
 
-class InventorySlot extends Model
+class EquippedItem extends Model
 {
 
     /**
@@ -14,9 +14,9 @@ class InventorySlot extends Model
      * @var array
      */
     protected $fillable = [
-        'inventory_id',
         'item_id',
-        'equipped',
+        'character_id',
+        'type',
     ];
 
     /**
@@ -24,11 +24,5 @@ class InventorySlot extends Model
      *
      * @var array
      */
-    protected $casts = [
-        'equipped' => 'boolean',
-    ];
-
-    public function item() {
-        return $this->hasOne(Item::class, 'id', 'item_id');
-    }
+    protected $casts = [];
 }
