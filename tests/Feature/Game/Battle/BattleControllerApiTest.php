@@ -12,6 +12,7 @@ use App\Game\Battle\Events\DropCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\ShowTimeOutEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
+use App\Game\Battle\Events\UpdateTopBarEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -84,7 +85,7 @@ class BattleControllerApiTest extends TestCase
     public function testBattleResultsCharacterIsDead() {
         Queue::Fake();
 
-        Event::fake([ServerMessageEvent::class]);
+        Event::fake([ServerMessageEvent::class, UpdateTopBarEvent::class]);
 
         $this->setUpCharacter();
 
@@ -105,6 +106,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
+            UpdateTopBarEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -132,6 +134,7 @@ class BattleControllerApiTest extends TestCase
             DropCheckEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
+            UpdateTopBarEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -163,6 +166,7 @@ class BattleControllerApiTest extends TestCase
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
+            UpdateTopBarEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -194,6 +198,7 @@ class BattleControllerApiTest extends TestCase
             ServerMessageEvent::class,
             DropCheckEvent::class,
             AttackTimeOutEvent::class,
+            UpdateTopBarEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -224,6 +229,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
+            UpdateTopBarEvent::class,
         ]);
 
         $this->setUpCharacter();

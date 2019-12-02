@@ -107322,6 +107322,7 @@ function (_React$Component) {
       showMessage: false
     };
     _this.echo = Echo["private"]('show-timeout-bar-' + _this.props.userId);
+    _this.topBar = Echo["private"]('update-top-bar-' + _this.props.userId);
     return _this;
   }
 
@@ -107349,6 +107350,20 @@ function (_React$Component) {
         _this2.setState({
           canAttack: event.canAttack,
           showMessage: false
+        });
+      });
+      this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', function (event) {
+        _this2.setState({
+          character: {
+            ac: event.characterSheet.data.ac,
+            attack: event.characterSheet.data.attack,
+            health: event.characterSheet.data.health,
+            can_attack: _this2.state.character.can_attack,
+            id: _this2.state.character.id,
+            name: _this2.state.character.name,
+            show_message: _this2.state.character.show_message,
+            skills: _this2.state.character.skills
+          }
         });
       });
     }
@@ -107923,6 +107938,7 @@ function (_React$Component) {
       characterSheet: null,
       isLoading: true
     };
+    _this.topBar = Echo["private"]('update-top-bar-' + _this.props.userId);
     return _this;
   }
 
@@ -107935,6 +107951,11 @@ function (_React$Component) {
         _this2.setState({
           characterSheet: result.data.sheet.data,
           isLoading: false
+        });
+      });
+      this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', function (event) {
+        _this2.setState({
+          characterSheet: event.characterSheet.data
         });
       });
     }
@@ -108591,7 +108612,8 @@ function (_React$Component) {
         className: "col-md-12"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_top_bar__WEBPACK_IMPORTED_MODULE_6__["default"], {
         apiUrl: this.apiUrl,
-        characterId: this.props.characterId
+        characterId: this.props.characterId,
+        userId: this.props.userId
       }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {

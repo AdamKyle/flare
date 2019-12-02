@@ -21,7 +21,7 @@ class Game extends React.Component {
           <div className="col-md-10">
             <div className="row">
               <div className="col-md-12">
-                <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} />
+                <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
               </div>
             </div>
             <div className="row">

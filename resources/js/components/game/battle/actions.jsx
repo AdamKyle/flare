@@ -23,7 +23,8 @@ export default class Actions extends React.Component {
       showMessage: false,
     }
 
-    this.echo = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.echo   = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -47,6 +48,21 @@ export default class Actions extends React.Component {
       this.setState({
         canAttack:   event.canAttack,
         showMessage: false,
+      });
+    });
+
+    this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', (event) => {
+      this.setState({
+        character: {
+          ac: event.characterSheet.data.ac,
+          attack: event.characterSheet.data.attack,
+          health: event.characterSheet.data.health,
+          can_attack: this.state.character.can_attack,
+          id: this.state.character.id,
+          name: this.state.character.name,
+          show_message: this.state.character.show_message,
+          skills: this.state.character.skills,
+        }
       });
     });
   }
@@ -183,7 +199,7 @@ export default class Actions extends React.Component {
                 <div className="ml-2 mt-2">
                   {this.state.showMessage
                    ? 'Almost Ready!'
-                   : <TimeOutBar 
+                   : <TimeOutBar
                         userId={this.props.userId}
                         eventName='Game.Battle.Events.ShowTimeOutEvent'
                         channel={'show-timeout-bar-'}

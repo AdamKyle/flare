@@ -9,6 +9,8 @@ export default class CharacterInfoTopBar extends React.Component {
       characterSheet: null,
       isLoading: true,
     }
+
+    this.topBar  = Echo.private('update-top-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -19,6 +21,12 @@ export default class CharacterInfoTopBar extends React.Component {
           isLoading: false,
         });
       });
+
+    this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', (event) => {
+      this.setState({
+        characterSheet: event.characterSheet.data,
+      });
+    });
   }
 
   render() {
