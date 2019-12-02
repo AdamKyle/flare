@@ -62,4 +62,84 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $this->assertFalse(empty($content->inventory->data->items));
         $this->assertEquals(Item::first()->name, $content->inventory->data->items[0]->name);
     }
+
+    public function testCanEquipItem() {
+        $item = $this->createItem([
+            'name' => 'Rusty Dagger',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'iventory_id' => $this->character->inventory->id,
+            'item_id'     => $item->id,
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => $item->id,
+                             'type'    => 'right-hand',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+
+       $this->assertEquals("Equipped: Rusty Dagger to: Right Hand", $content->message);
+    }
+
+    public function testCannotEquipSameItemMissingType() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => 1,
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("The type field is required.", $content->errors->type[0]);
+    }
+
+    public function testCannotEquipItemThatDoesntExistInInventory() {
+        $item = $this->createItem([
+            'name' => 'Rusty Dagger',
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => $item->id,
+                             'type'    => 'right-hand',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Cannot equip Rusty Dagger. You do not currently have this in yor inventory.", $content->message);
+    }
+
+    public function testCannotEquipSameItemToSameHand() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => 1,
+                             'type'    => 'left-hand',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Cannot equip Rusty Dagger to the same hand.", $content->message);
+    }
+
+    public function testMoveItemFromOneHandToTheOther() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => 1,
+                             'type'    => 'right-hand',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Switched: Rusty Dagger to: Right Hand.", $content->message);
+       $this->assertNull($this->character->equippedItems->where('type', '=', 'left-hand')->first());
+       $this->assertNotNull($this->character->equippedItems->where('type', '=', 'right-hand')->first());
+    }
 }
