@@ -156,7 +156,7 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertEquals(2, $this->character->level);
-        $this->assertEquals(25, $this->character->gold);
+        $this->assertEquals(0, $this->character->xp);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedItem() {
