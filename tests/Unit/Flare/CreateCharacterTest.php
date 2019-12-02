@@ -50,6 +50,8 @@ class CreateCharacterTest extends TestCase
         $this->assertEquals('dex', $character->damage_stat);
         $this->assertEquals($race->name, $character->race->name);
         $this->assertEquals($class->name, $character->class->name);
+        $this->assertFalse($character->inventory->slots->isEmpty());
+        $this->assertFalse($character->equippedItems->isEmpty());
     }
 
     public function testCreateCharacterWithSkills() {
