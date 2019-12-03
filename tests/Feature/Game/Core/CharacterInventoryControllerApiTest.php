@@ -35,6 +35,8 @@ class CharacterInventoryControllerApiTest extends TestCase {
 
         $this->createItem([
             'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
         ]);
 
         $this->character = resolve(CharacterBuilder::class)
@@ -66,6 +68,8 @@ class CharacterInventoryControllerApiTest extends TestCase {
     public function testCanEquipItem() {
         $item = $this->createItem([
             'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
         ]);
 
         $this->character->inventory->slots()->create([
@@ -101,6 +105,8 @@ class CharacterInventoryControllerApiTest extends TestCase {
     public function testCannotEquipItemThatDoesntExistInInventory() {
         $item = $this->createItem([
             'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')

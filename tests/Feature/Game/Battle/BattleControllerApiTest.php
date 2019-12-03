@@ -277,8 +277,19 @@ class BattleControllerApiTest extends TestCase
             'can_attack' => true,
         ]);
 
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+        ]);
+
         $this->character->inventory()->create([
             'character_id' => $this->character->id,
+        ]);
+
+        $this->character->equippedItems()->create([
+            'character_id' => $this->character->id,
+            'item_id'      => $item->id,
+            'type'         => 'left-hand',
         ]);
 
         $this->monster = $this->createMonster();
@@ -289,10 +300,6 @@ class BattleControllerApiTest extends TestCase
 
         $this->createSkill([
             'monster_id' => $this->monster->id,
-        ]);
-
-        $item = $this->createItem([
-            'name' => 'Rusty Dagger',
         ]);
 
         if (isset($options['create_drop']) && $options['create_drop']) {

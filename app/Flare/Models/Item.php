@@ -14,6 +14,8 @@ class Item extends Model
      */
     protected $fillable = [
         'name',
+        'type',
+        'base_damage',
     ];
 
     /**
@@ -22,5 +24,6 @@ class Item extends Model
      * @var array
      */
     protected $casts = [
+        'base_damage' => 'integer',
     ];
 }

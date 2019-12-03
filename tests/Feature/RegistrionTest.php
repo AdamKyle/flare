@@ -25,6 +25,8 @@ class RegistrationTest extends TestCase
 
         $this->createItem([
             'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
         ]);
     }
 

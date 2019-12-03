@@ -34,6 +34,8 @@ class CharacterSheetControllerApiTest extends TestCase {
 
         $this->createItem([
             'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
         ]);
 
         $this->character = resolve(CharacterBuilder::class)

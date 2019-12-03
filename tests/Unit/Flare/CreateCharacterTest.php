@@ -24,6 +24,7 @@ class CreateCharacterTest extends TestCase
 
         $this->createItem([
             'name' => 'Rusty Dagger',
+            'type' => 'weapon',
         ]);
     }
 
