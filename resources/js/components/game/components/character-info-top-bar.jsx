@@ -23,6 +23,7 @@ export default class CharacterInfoTopBar extends React.Component {
       });
 
     this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', (event) => {
+      console.log(event);
       this.setState({
         characterSheet: event.characterSheet.data,
       });

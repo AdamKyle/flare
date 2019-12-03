@@ -8,10 +8,10 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\User;
 
-class UpdateTopBarBroadcastEvent implements ShouldBroadcast
+class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -47,6 +47,6 @@ class UpdateTopBarBroadcastEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        new PrivateChannel('update-top-bar-' . $this->user->id);
+        return new PrivateChannel('update-top-bar-' . $this->user->id);
     }
 }

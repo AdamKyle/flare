@@ -107954,6 +107954,8 @@ function (_React$Component) {
         });
       });
       this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', function (event) {
+        console.log(event);
+
         _this2.setState({
           characterSheet: event.characterSheet.data
         });

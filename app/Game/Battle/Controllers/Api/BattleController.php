@@ -14,6 +14,7 @@ use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\UpdateTopBarEvent;
 use App\Game\Battle\Jobs\AttackTimeOut;
 use App\User;
 

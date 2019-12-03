@@ -31,6 +31,6 @@ class UpdateTopBarListener
         $character = new Item($event->character, $this->characterSheetTransformer);
         $character = $this->manager->createData($character)->toArray();
 
-        return broadcast(new UpdateTopBarBroadcastEvent($character, $event->character->user));
+        broadcast(new UpdateTopBarBroadcastEvent($character, $event->character->user));
     }
 }

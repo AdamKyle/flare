@@ -2,10 +2,10 @@
 
 namespace App\Game\Battle\Listeners;
 
+use App\Flare\Events\ServerMessageEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\UpdateTopBarEvent;
 use App\Game\Battle\Services\CharacterService;
-use App\Flare\Events\ServerMessageEvent;
 
 class UpdateCharacterListener
 {
