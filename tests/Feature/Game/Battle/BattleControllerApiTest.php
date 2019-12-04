@@ -64,13 +64,13 @@ class BattleControllerApiTest extends TestCase
                          ])
                          ->response;
 
-        $this->assertEquals(200, $response->status());
-
         $content = json_decode($response->content());
 
+        $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
         $this->assertEquals($this->character->name, $content->character->data->name);
+        $this->assertEquals(17, $content->character->data->attack);
     }
 
     public function testWhenNotLoggedInCannotGetActions() {
@@ -280,6 +280,7 @@ class BattleControllerApiTest extends TestCase
         $item = $this->createItem([
             'name'        => 'Rusty Dagger',
             'type'        => 'weapon',
+            'base_damage' => '6'
         ]);
 
         $this->character->inventory()->create([

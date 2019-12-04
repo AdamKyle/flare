@@ -16,6 +16,7 @@ export default class CharacterInventoryModal extends React.Component {
 
     this.state = {
       characaterInventory: null,
+      equipment: null,
       isLoading: true,
     }
   }
@@ -23,8 +24,10 @@ export default class CharacterInventoryModal extends React.Component {
   componentDidMount() {
     axios.get('/api/character-inventory/' + this.props.characterId)
       .then((result) => {
+        console.log(result);
         this.setState({
           characaterInventory: result.data.inventory.data,
+          equipment: result.data.equipment,
           isLoading: false,
         });
       });
@@ -46,7 +49,7 @@ export default class CharacterInventoryModal extends React.Component {
           <Modal.Title><span className="character-inventory">Character Inventory</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {this.state.isLoading ? 'Please wait ...' : <CharacterInventory inventory={this.state.characaterInventory} />}
+          {this.state.isLoading ? 'Please wait ...' : <CharacterInventory inventory={this.state.characaterInventory} equipment={this.state.equipment}/>}
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-primary" type="button" onClick={this.props.onClose}>

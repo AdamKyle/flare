@@ -3,11 +3,11 @@ namespace App\Game\Battle\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Events\UpdateTopBarEvent;
 use App\Game\Battle\Listeners\UpdateCharacterListener;
 use App\Game\Battle\Listeners\DropsCheckListener;
 use App\Game\Battle\Listeners\GoldRushCheckListener;

@@ -14,7 +14,9 @@ class CreateItemsSeeder extends Seeder
     {
         Item::insert([
             [
-                'name' => 'Rusty Dagger',
+                'name'        => 'Rusty Dagger',
+                'type'        => 'weapon',
+                'base_damage' => 3,
             ],
         ]);
     }

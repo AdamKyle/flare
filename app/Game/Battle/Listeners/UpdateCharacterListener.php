@@ -3,8 +3,9 @@
 namespace App\Game\Battle\Listeners;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
-use App\Game\Battle\Events\UpdateTopBarEvent;
 use App\Game\Battle\Services\CharacterService;
 
 class UpdateCharacterListener
@@ -31,6 +32,8 @@ class UpdateCharacterListener
 
             event(new ServerMessageEvent($event->character->user, 'level_up'));
             event(new UpdateTopBarEvent($event->character));
+            event(new UpdateCharacterSheetEvent($event->character));
+
         } else {
             // If not assign the xp and gold to the character as well as the time out.
 
@@ -40,6 +43,7 @@ class UpdateCharacterListener
             $event->character->save();
 
             event(new UpdateTopBarEvent($event->character));
+            event(new UpdateCharacterSheetEvent($event->character));
         }
     }
 }

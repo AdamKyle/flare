@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Game\Battle\Events;
+namespace App\Flare\Events;
 
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Http\Request;
-use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
 
-class UpdateTopBarEvent
+class UpdateCharacterSheetEvent
 {
     use SerializesModels;
 

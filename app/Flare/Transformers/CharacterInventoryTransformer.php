@@ -16,6 +16,9 @@ class CharacterInventoryTransformer extends TransformerAbstract {
 
         foreach ($inventory->slots as $slot) {
             if (!is_null($slot->item)) {
+                $slot->item->equipped = $slot->equipped;
+                $slot->item->actions  = null;
+
                 $items['items'][] = $slot->item;
             }
         }

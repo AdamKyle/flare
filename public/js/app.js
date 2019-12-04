@@ -107741,6 +107741,275 @@ function () {
 
 /***/ }),
 
+/***/ "./resources/js/components/game/components/character-equip-options-modal.jsx":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/components/game/components/character-equip-options-modal.jsx ***!
+  \***********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CharacterEquipOptionsModal; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-draggable */ "./node_modules/react-draggable/build/web/react-draggable.min.js");
+/* harmony import */ var react_draggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_draggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_bootstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-bootstrap */ "./node_modules/react-bootstrap/esm/index.js");
+/* harmony import */ var _character_equip_options__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./character-equip-options */ "./resources/js/components/game/components/character-equip-options.jsx");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+
+
+var DraggableModalDialog =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(DraggableModalDialog, _React$Component);
+
+  function DraggableModalDialog() {
+    _classCallCheck(this, DraggableModalDialog);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DraggableModalDialog).apply(this, arguments));
+  }
+
+  _createClass(DraggableModalDialog, [{
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_draggable__WEBPACK_IMPORTED_MODULE_1___default.a, {
+        handle: ".character-sheet"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["ModalDialog"], this.props));
+    }
+  }]);
+
+  return DraggableModalDialog;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+var CharacterEquipOptionsModal =
+/*#__PURE__*/
+function (_React$Component2) {
+  _inherits(CharacterEquipOptionsModal, _React$Component2);
+
+  function CharacterEquipOptionsModal(props) {
+    _classCallCheck(this, CharacterEquipOptionsModal);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(CharacterEquipOptionsModal).call(this, props));
+  }
+
+  _createClass(CharacterEquipOptionsModal, [{
+    key: "callHome",
+    value: function callHome(message) {
+      this.props.onEquip(message);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"], {
+        backdrop: 'static',
+        dialogAs: DraggableModalDialog,
+        show: this.props.show,
+        onHide: this.props.onClose,
+        animation: true,
+        size: "lg",
+        "aria-labelledby": "contained-modal-title-vcenter",
+        centered: true
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Header, {
+        closeButton: true
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Title, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "character-sheet"
+      }, "Equip Options"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Body, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        itemToEquip: this.props.itemToEquip,
+        equippedItems: this.props.equippedItems,
+        callHome: this.callHome.bind(this)
+      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-primary",
+        type: "button",
+        onClick: this.props.onClose
+      }, "Close")));
+    }
+  }]);
+
+  return CharacterEquipOptionsModal;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/game/components/character-equip-options.jsx":
+/*!*****************************************************************************!*\
+  !*** ./resources/js/components/game/components/character-equip-options.jsx ***!
+  \*****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return EquipOptions; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var EquipOptions =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(EquipOptions, _React$Component);
+
+  function EquipOptions(props) {
+    var _this;
+
+    _classCallCheck(this, EquipOptions);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EquipOptions).call(this, props));
+    _this.state = {
+      itemToEquip: _this.props.itemToEquip,
+      equippedItems: _this.props.equippedItems,
+      errorMessage: null
+    };
+    return _this;
+  }
+
+  _createClass(EquipOptions, [{
+    key: "fetchIncrease",
+    value: function fetchIncrease(item) {
+      var allEquippedWeaponsDamage = 0;
+      this.state.equippedItems.forEach(function (equipment) {
+        if (item.base_damage > equipment.item.base_damage) {
+          allEquippedWeaponsDamage = item.base_damage;
+        }
+      });
+      return allEquippedWeaponsDamage;
+    }
+  }, {
+    key: "equip",
+    value: function equip(event) {
+      var _this2 = this;
+
+      var equipmentPosition = event.target.getAttribute('data-type');
+      this.setState({
+        errorMessage: null
+      });
+      axios.post('/api/equip-item/' + this.state.equippedItems[0].character_id, {
+        item_id: this.state.itemToEquip.id,
+        type: equipmentPosition,
+        equip_type: this.state.itemToEquip.type
+      }).then(function (result) {
+        _this2.props.callHome(result.data.message);
+      })["catch"](function (error) {
+        _this2.setState({
+          errorMessage: error.response.data.message
+        });
+      });
+    }
+  }, {
+    key: "fetchEquippedItems",
+    value: function fetchEquippedItems() {
+      return this.state.equippedItems.map(function (equipment) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "card"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "card-header"
+        }, equipment.item.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "card-body"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Equip Slot:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.type))));
+      });
+    }
+  }, {
+    key: "renderButtons",
+    value: function renderButtons(item) {
+      switch (item.type) {
+        case 'weapon':
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            className: "btn btn-primary",
+            onClick: this.equip.bind(this),
+            "data-type": "left-hand"
+          }, "Left Hand"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            className: "btn btn-primary ml-2",
+            onClick: this.equip.bind(this),
+            "data-type": "right-hand"
+          }, "Right Hand"));
+
+        default:
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            className: "btn btn-primary",
+            onClick: this.equip.bind(this),
+            "data-type": item.type
+          }, "Confirm");
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var item = this.state.itemToEquip;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, this.state.errorMessage !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "alert alert-danger"
+      }, this.state.errorMessage))) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-header"
+      }, item.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Increases attack by:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + this.fetchIncrease(item)))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, this.fetchEquippedItems())), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, this.renderButtons(item))));
+    }
+  }]);
+
+  return EquipOptions;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/game/components/character-info-modal.jsx":
 /*!**************************************************************************!*\
   !*** ./resources/js/components/game/components/character-info-modal.jsx ***!
@@ -108155,6 +108424,7 @@ function (_React$Component2) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(CharacterInventoryModal).call(this, props));
     _this.state = {
       characaterInventory: null,
+      equipment: null,
       isLoading: true
     };
     return _this;
@@ -108166,8 +108436,11 @@ function (_React$Component2) {
       var _this2 = this;
 
       axios.get('/api/character-inventory/' + this.props.characterId).then(function (result) {
+        console.log(result);
+
         _this2.setState({
           characaterInventory: result.data.inventory.data,
+          equipment: result.data.equipment,
           isLoading: false
         });
       });
@@ -108189,7 +108462,8 @@ function (_React$Component2) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Title, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
         className: "character-inventory"
       }, "Character Inventory"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Body, null, this.state.isLoading ? 'Please wait ...' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_inventory__WEBPACK_IMPORTED_MODULE_3__["default"], {
-        inventory: this.state.characaterInventory
+        inventory: this.state.characaterInventory,
+        equipment: this.state.equipment
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         type: "button",
@@ -108219,8 +108493,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-bootstrap-table-next */ "./node_modules/react-bootstrap-table-next/lib/index.js");
 /* harmony import */ var react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-bootstrap-table-next/dist/react-bootstrap-table2.min.css */ "./node_modules/react-bootstrap-table-next/dist/react-bootstrap-table2.min.css");
-/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_bootstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-bootstrap */ "./node_modules/react-bootstrap/esm/index.js");
+/* harmony import */ var _character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./character-equip-options-modal */ "./resources/js/components/game/components/character-equip-options-modal.jsx");
+/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-bootstrap-table-next/dist/react-bootstrap-table2.min.css */ "./node_modules/react-bootstrap-table-next/dist/react-bootstrap-table2.min.css");
+/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_4__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -108243,29 +108519,109 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
 var CharacterInventory =
 /*#__PURE__*/
 function (_React$Component) {
   _inherits(CharacterInventory, _React$Component);
 
   function CharacterInventory(props) {
+    var _this;
+
     _classCallCheck(this, CharacterInventory);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(CharacterInventory).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(CharacterInventory).call(this, props));
+    _this.state = {
+      showEquipOptions: false,
+      inventory: _this.props.inventory.items,
+      equipment: _this.props.equipment,
+      itemToEquip: null,
+      equippedItems: null,
+      message: null
+    };
+    return _this;
   }
 
   _createClass(CharacterInventory, [{
+    key: "equip",
+    value: function equip() {
+      var foundItem = this.state.inventory.filter(function (i) {
+        return i.id === parseInt(event.target.getAttribute('data-item-id'));
+      })[0];
+      this.setState({
+        showEquipOptions: true,
+        itemToEquip: foundItem,
+        equippedItems: this.state.equipment.filter(function (e) {
+          return e.item.type === foundItem.type;
+        })
+      });
+    }
+  }, {
+    key: "closeEquiOptions",
+    value: function closeEquiOptions() {
+      this.setState({
+        showEquipOptions: false,
+        itemToEquip: false,
+        message: null
+      });
+    }
+  }, {
+    key: "closeEquiOptionsWithMessage",
+    value: function closeEquiOptionsWithMessage(message) {
+      this.setState({
+        showEquipOptions: false,
+        itemToEquip: false,
+        message: message
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var inventory = this.props.inventory;
+      var _this2 = this;
+
+      var inventory = this.state.inventory; // Set up the actions.
+
+      equipAction = this.equip.bind(this);
       var columns = [{
         dataField: 'name',
         text: 'Item Name'
+      }, {
+        dataField: 'type',
+        text: 'Item Type'
+      }, {
+        dataField: 'base_damage',
+        text: 'Base Damage'
+      }, {
+        dataField: 'equipped',
+        text: 'Is Equipped'
+      }, {
+        dataField: 'actions',
+        text: 'Actions',
+        formatter: actionsFormatter
       }];
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.message !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Alert"], {
+        variant: "success",
+        onClose: function onClose() {
+          return _this2.setState({
+            message: null
+          });
+        },
+        dismissible: true
+      }, this.state.message) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
         keyField: "id",
-        data: inventory.items,
+        data: inventory,
         columns: columns
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        show: this.state.showEquipOptions,
+        onClose: this.closeEquiOptions.bind(this),
+        equippedItems: this.state.equippedItems,
+        itemToEquip: this.state.itemToEquip,
+        onEquip: this.closeEquiOptionsWithMessage.bind(this)
       }));
     }
   }]);
@@ -108274,6 +108630,23 @@ function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 
+var equipAction = null;
+
+var actionsFormatter = function actionsFormatter(cell, row) {
+  if (row.hasOwnProperty('actions')) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Toggle, {
+      variant: "primary",
+      id: "dropdown-basic"
+    }, "Actions"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Menu, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
+      "data-item-id": row.id,
+      onClick: equipAction
+    }, "Equip"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
+      href: "#/action-3"
+    }, "Sell"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
+      href: "#/action-2"
+    }, "Destroy"))));
+  }
+};
 
 /***/ }),
 

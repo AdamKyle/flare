@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Game\Battle\Listeners;
+namespace App\Flare\Listeners;
 
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetTransformer;
-use App\Flare\Events\UpdateTopBarEvent;
-use App\Game\Battle\Events\UpdateTopBarBroadcastEvent;
+use App\Flare\Events\UpdateCharacterSheetEvent;
+use App\Flare\Events\UpdateCharacterSheetBroadcastEvent;
 
-class UpdateTopBarListener
+class UpdateCharacterSheetListener
 {
 
     private $manager;
@@ -23,14 +23,14 @@ class UpdateTopBarListener
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Battle\UpdateCharacterEvent  $event
+     * @param  \App\Flare\Events\UpdateCharacterSheetEvent $event
      * @return void
      */
-    public function handle(UpdateTopBarEvent $event)
+    public function handle(UpdateCharacterSheetEvent $event)
     {
         $character = new Item($event->character, $this->characterSheetTransformer);
         $character = $this->manager->createData($character)->toArray();
 
-        broadcast(new UpdateTopBarBroadcastEvent($character, $event->character->user));
+        broadcast(new UpdateCharacterSheetBroadcastEvent($character, $event->character->user));
     }
 }

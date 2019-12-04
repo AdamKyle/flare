@@ -25,4 +25,8 @@ class EquippedItem extends Model
      * @var array
      */
     protected $casts = [];
+
+    public function item() {
+        return $this->belongsTo(Item::class);
+    }
 }

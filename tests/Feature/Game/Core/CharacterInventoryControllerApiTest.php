@@ -81,11 +81,11 @@ class CharacterInventoryControllerApiTest extends TestCase {
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => $item->id,
                              'type'    => 'right-hand',
+                             'equip_type' => 'weapon',
                          ])
                          ->response;
 
        $content = json_decode($response->content());
-
 
        $this->assertEquals("Equipped: Rusty Dagger to: Right Hand", $content->message);
     }
@@ -113,6 +113,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => $item->id,
                              'type'    => 'right-hand',
+                             'equip_type' => 'weapon',
                          ])
                          ->response;
 
@@ -126,6 +127,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => 1,
                              'type'    => 'left-hand',
+                             'equip_type' => 'weapon',
                          ])
                          ->response;
 
@@ -137,8 +139,9 @@ class CharacterInventoryControllerApiTest extends TestCase {
     public function testMoveItemFromOneHandToTheOther() {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
-                             'item_id' => 1,
-                             'type'    => 'right-hand',
+                             'item_id'    => 1,
+                             'type'       => 'right-hand',
+                             'equip_type' => 'weapon',
                          ])
                          ->response;
 
@@ -147,5 +150,31 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $this->assertEquals("Switched: Rusty Dagger to: Right Hand.", $content->message);
        $this->assertNull($this->character->equippedItems->where('type', '=', 'left-hand')->first());
        $this->assertNotNull($this->character->equippedItems->where('type', '=', 'right-hand')->first());
+    }
+
+    public function testCannotEquipItemWhenTypeDoesntMatch() {
+        $item = $this->createItem([
+            'name' => 'Something else',
+            'type' => 'armor',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id'    => $item->id,
+                             'type'       => 'right-hand',
+                             'equip_type' => 'weapon',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Cannot equip Something else as it is not of type: weapon", $content->message);
+       $this->assertNotNull($this->character->equippedItems->where('type', '=', 'left-hand')->first());
+       $this->assertNull($this->character->equippedItems->where('type', '=', 'right-hand')->first());
     }
 }

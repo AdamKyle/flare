@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Messages\Events;
+namespace App\Flare\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -9,45 +9,35 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+Use App\User;
 
-use App\User;
-use App\Game\Messages\Models\Message;
-
-class MessageSentEvent implements ShouldBroadcastNow
+class UpdateCharacterSheetBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
+     * the character sheet
      *
-     * @var \App\User $user
+     * @var array
+     */
+    public $characterSheet;
+
+    /**
+     * The user
+     *
+     * @var \App\User $users
      */
     public $user;
-
-    /**
-     * Message details
-     *
-     * @var \App\Game\Messages\Models\Message $message
-     */
-    public $message;
-
-    /**
-     * Character name
-     *
-     * @var string $name
-     */
-    public $name;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(User $user, Message $message)
+    public function __construct(array $characterSheet, User $user)
     {
-        $this->user    = $user;
-        $this->message = $message;
-        $this->name    = $user->character->name;
+        $this->characterSheet = $characterSheet;
+        $this->user           = $user;
     }
 
     /**
@@ -57,6 +47,6 @@ class MessageSentEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PresenceChannel('chat');
+        return new PrivateChannel('update-character-sheet-' . $this->user->id);
     }
 }
