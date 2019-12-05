@@ -19,8 +19,8 @@ use App\Flare\Models\Item;
 
 $factory->define(Item::class, function (Faker $faker) {
     return [
-        'name'        => null,
-        'type'        => null,
-        'base_damage' => null,
+        'name'                => null,
+        'type'                => null,
+        'base_damage'         => null,
     ];
 });

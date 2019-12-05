@@ -18,8 +18,9 @@ class CharacterInventoryTransformer extends TransformerAbstract {
             if (!is_null($slot->item)) {
                 $slot->item->equipped = $slot->equipped;
                 $slot->item->actions  = null;
+                $slot->item->slot_id  = $slot->id;
 
-                $items['items'][] = $slot->item;
+                $items['items'][] = $slot->item->load(['itemAffixes', 'artifactProperty']);
             }
         }
 

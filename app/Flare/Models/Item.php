@@ -3,6 +3,8 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Flare\Models\ArtifactProperty;
+use App\Flare\Models\ItemAffix;
 
 class Item extends Model
 {
@@ -26,4 +28,12 @@ class Item extends Model
     protected $casts = [
         'base_damage' => 'integer',
     ];
+
+    public function artifactProperty() {
+        return $this->hasOne(ArtifactProperty::class);
+    }
+
+    public function itemAffixes() {
+        return $this->hasMany(ItemAffix::class);
+    }
 }

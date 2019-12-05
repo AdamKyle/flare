@@ -107908,18 +107908,65 @@ function (_React$Component) {
   _createClass(EquipOptions, [{
     key: "fetchIncrease",
     value: function fetchIncrease(item) {
-      var allEquippedWeaponsDamage = 0;
+      var _this2 = this;
+
+      var increasesDamageBy = 0;
+      var replacesWeapon = 'None';
       this.state.equippedItems.forEach(function (equipment) {
-        if (item.base_damage > equipment.item.base_damage) {
-          allEquippedWeaponsDamage = item.base_damage;
+        var equippedItemDamage = _this2.fetchItemDamage(equipment.item);
+
+        var itemDamage = _this2.fetchItemDamage(item);
+
+        if (itemDamage > equippedItemDamage) {
+          increasesDamageBy = Math.abs(equippedItemDamage - itemDamage);
+          replacesWeapon = _this2.determineItemName(equipment.item);
         }
       });
-      return allEquippedWeaponsDamage;
+      return {
+        increasesDamageBy: increasesDamageBy,
+        replacesWeapon: replacesWeapon
+      };
+    }
+  }, {
+    key: "fetchItemDamage",
+    value: function fetchItemDamage(item) {
+      var damage = item.base_damage;
+
+      if (item.artifact_property !== null) {
+        damage += item.artifact_property.base_damage_mod;
+      }
+
+      if (item.item_affixes.length > 0) {
+        item.item_affixes.forEach(function (affix) {
+          damage += affix.base_damage_mod;
+        });
+      }
+
+      return damage;
+    }
+  }, {
+    key: "determineItemName",
+    value: function determineItemName(item) {
+      var name = item.name;
+
+      if (item.item_affixes.length > 0) {
+        item.item_affixes.forEach(function (affix) {
+          if (affix.type === 'suffix') {
+            name = name + ' *' + affix.name + '*';
+          }
+
+          if (affix.type === 'prefix') {
+            name = '*' + affix.name + '* ' + name;
+          }
+        });
+      }
+
+      return name;
     }
   }, {
     key: "equip",
     value: function equip(event) {
-      var _this2 = this;
+      var _this3 = this;
 
       var equipmentPosition = event.target.getAttribute('data-type');
       this.setState({
@@ -107930,9 +107977,9 @@ function (_React$Component) {
         type: equipmentPosition,
         equip_type: this.state.itemToEquip.type
       }).then(function (result) {
-        _this2.props.callHome(result.data.message);
+        _this3.props.callHome(result.data.message);
       })["catch"](function (error) {
-        _this2.setState({
+        _this3.setState({
           errorMessage: error.response.data.message
         });
       });
@@ -107940,14 +107987,25 @@ function (_React$Component) {
   }, {
     key: "fetchEquippedItems",
     value: function fetchEquippedItems() {
+      var _this4 = this;
+
       return this.state.equippedItems.map(function (equipment) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "card"
+          className: "card mb-2"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "card-header"
-        }, equipment.item.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        }, _this4.determineItemName(equipment.item)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "card-body"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Equip Slot:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.type))));
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, _this4.fetchItemDamage(equipment.item))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Equip Slot:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, equipment.type))));
+      });
+    }
+  }, {
+    key: "renderAffixes",
+    value: function renderAffixes(item) {
+      return item.item_affixes.map(function (affix) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "mt-2 mb-2 text-center"
+        }, item.artifact_property.description));
       });
     }
   }, {
@@ -107993,7 +108051,9 @@ function (_React$Component) {
         className: "card-header"
       }, item.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Increases attack by:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + this.fetchIncrease(item)))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "mt-2 mb-2 text-center"
+      }, item.artifact_property.description), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, item.item_affixes.length > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Item Affixes"), this.renderAffixes(item), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Increases attack by:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + this.fetchIncrease(item).increasesDamageBy)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Replaces weapon:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, this.fetchIncrease(item).replacesWeapon))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
       }, this.fetchEquippedItems())), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
@@ -108436,8 +108496,6 @@ function (_React$Component2) {
       var _this2 = this;
 
       axios.get('/api/character-inventory/' + this.props.characterId).then(function (result) {
-        console.log(result);
-
         _this2.setState({
           characaterInventory: result.data.inventory.data,
           equipment: result.data.equipment,
@@ -108585,7 +108643,8 @@ function (_React$Component) {
       equipAction = this.equip.bind(this);
       var columns = [{
         dataField: 'name',
-        text: 'Item Name'
+        text: 'Item Name',
+        formatter: itemNameFormatter
       }, {
         dataField: 'type',
         text: 'Item Type'
@@ -108613,7 +108672,7 @@ function (_React$Component) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-12"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
-        keyField: "id",
+        keyField: "slot_id",
         data: inventory,
         columns: columns
       }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__["default"], {
@@ -108645,6 +108704,26 @@ var actionsFormatter = function actionsFormatter(cell, row) {
     }, "Sell"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
       href: "#/action-2"
     }, "Destroy"))));
+  }
+};
+
+var itemNameFormatter = function itemNameFormatter(cell, row) {
+  var name = row.name;
+
+  if (row.item_affixes.length > 0) {
+    row.item_affixes.forEach(function (affix) {
+      if (affix.type === 'suffix') {
+        name = name + ' *' + affix.name + '*';
+      }
+
+      if (affix.type === 'prefix') {
+        name = '*' + affix.name + '* ' + name;
+      }
+    });
+  }
+
+  if (row.hasOwnProperty('name')) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, name);
   }
 };
 

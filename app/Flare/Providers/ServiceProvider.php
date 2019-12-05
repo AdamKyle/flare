@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
@@ -32,6 +33,10 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
 
         $this->app->singleton(CharacterInformationBuilder::class, function($app) {
             return new CharacterInformationBuilder();
+        });
+
+        $this->app->singleton(RandomItemDropBuilder::class, function($app) {
+            return new RandomItemDropBuilder();
         });
 
         $this->app->bind(CharacterAttackTransformer::class, function($app) {

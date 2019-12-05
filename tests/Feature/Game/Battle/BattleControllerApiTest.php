@@ -20,7 +20,6 @@ use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
-use Tests\Traits\CreateDrops;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateSkill;
 
@@ -34,7 +33,6 @@ class BattleControllerApiTest extends TestCase
         CreateCharacter,
         CreateMonster,
         CreateItem,
-        CreateDrops,
         CreateSkill;
 
     private $user;
@@ -172,7 +170,6 @@ class BattleControllerApiTest extends TestCase
         $this->setUpCharacter([
             'looting_level' => 100,
             'looting_bonus' => 100,
-            'create_drop'   => true,
         ]);
 
         $response = $this->actingAs($this->user, 'api')
@@ -204,7 +201,6 @@ class BattleControllerApiTest extends TestCase
         $this->setUpCharacter([
             'looting_level' => 100,
             'looting_bonus' => 100,
-            'create_drop'   => true,
         ]);
 
         $response = $this->actingAs($this->user, 'api')
@@ -302,18 +298,6 @@ class BattleControllerApiTest extends TestCase
         $this->createSkill([
             'monster_id' => $this->monster->id,
         ]);
-
-        if (isset($options['create_drop']) && $options['create_drop']) {
-            $this->createDrops([
-                'monster_id' => $this->monster->id,
-                'item_id'    => $item->id
-            ]);
-
-            $this->createDrops([
-                'monster_id' => $this->monster->id,
-                'item_id'    => $item->id
-            ]);
-        }
 
         $this->createSkill([
             'character_id' => $this->character->id,

@@ -29,11 +29,9 @@ class CreateMonstersSeeder extends Seeder
                 'health_range' => '8-20',
                 'attack_range' => '2-8',
                 'gold'         => 25,
-                'drop_check'   => 7,
+                'drop_check'   => 10,
             ]
         ]);
-
-        $skills     = [];
 
         foreach(Monster::all() as $monster) {
             foreach(config('game.skill_names') as $name) {
@@ -41,13 +39,6 @@ class CreateMonstersSeeder extends Seeder
             }
 
             $monster->skills()->insert($skills);
-
-            if ($monster->name === 'Goblin') {
-                $monster->drops()->create([
-                    'monster_id' => $monster->id,
-                    'item_id'    => Item::where('name', '=', 'Rusty Dagger')->first()->id,
-                ]);
-            }
         }
     }
 }

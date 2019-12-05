@@ -54,7 +54,8 @@ export default class CharacterInventory extends React.Component {
 
     const columns   = [{
       dataField: 'name',
-      text: 'Item Name'
+      text: 'Item Name',
+      formatter: itemNameFormatter,
     }, {
       dataField: 'type',
       text: 'Item Type'
@@ -82,7 +83,7 @@ export default class CharacterInventory extends React.Component {
 
         <div className="row">
           <div className="col-md-12">
-            <BootstrapTable keyField='id' data={ inventory } columns={ columns } />
+            <BootstrapTable keyField='slot_id' data={ inventory } columns={ columns } />
           </div>
         </div>
 
@@ -115,6 +116,31 @@ const actionsFormatter = (cell, row) => {
             <Dropdown.Item href="#/action-2">Destroy</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+      </span>
+    );
+  }
+}
+
+const itemNameFormatter = (cell, row) => {
+
+  let name = row.name;
+
+  if (row.item_affixes.length > 0) {
+    row.item_affixes.forEach((affix) => {
+      if (affix.type === 'suffix') {
+        name = name + ' *' + affix.name + '*';
+      }
+
+      if (affix.type === 'prefix') {
+        name = '*' + affix.name + '* ' + name;
+      }
+    });
+  }
+
+  if (row.hasOwnProperty('name')) {
+    return (
+      <span>
+        {name}
       </span>
     );
   }

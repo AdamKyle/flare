@@ -13,15 +13,58 @@ export default class EquipOptions extends React.Component {
   }
 
   fetchIncrease(item) {
-    let allEquippedWeaponsDamage = 0;
+    let increasesDamageBy = 0;
+    let replacesWeapon    = 'None';
 
     this.state.equippedItems.forEach((equipment) => {
-      if (item.base_damage > equipment.item.base_damage) {
-        allEquippedWeaponsDamage = item.base_damage;
+
+      const equippedItemDamage = this.fetchItemDamage(equipment.item);
+      const itemDamage         = this.fetchItemDamage(item)
+
+      if (itemDamage > equippedItemDamage) {
+        increasesDamageBy = Math.abs(equippedItemDamage - itemDamage);
+        replacesWeapon           = this.determineItemName(equipment.item);
       }
     });
 
-    return allEquippedWeaponsDamage;
+    return {
+      increasesDamageBy: increasesDamageBy,
+      replacesWeapon:    replacesWeapon,
+    };
+  }
+
+  fetchItemDamage(item) {
+    let damage = item.base_damage;
+
+    if (item.artifact_property !== null) {
+      damage += item.artifact_property.base_damage_mod;
+    }
+
+    if (item.item_affixes.length > 0) {
+      item.item_affixes.forEach((affix) => {
+        damage += affix.base_damage_mod;
+      });
+    }
+
+    return damage;
+  }
+
+  determineItemName(item) {
+    let name = item.name;
+
+    if (item.item_affixes.length > 0) {
+      item.item_affixes.forEach((affix) => {
+        if (affix.type === 'suffix') {
+          name = name + ' *' + affix.name + '*';
+        }
+
+        if (affix.type === 'prefix') {
+          name = '*' + affix.name + '* ' + name;
+        }
+      });
+    }
+
+    return name;
   }
 
   equip(event) {
@@ -46,15 +89,17 @@ export default class EquipOptions extends React.Component {
 
   fetchEquippedItems() {
     return this.state.equippedItems.map((equipment) => {
+
+
       return (
-        <div className="card">
+        <div className="card mb-2">
           <div className="card-header">
-            {equipment.item.name}
+            {this.determineItemName(equipment.item)}
           </div>
           <div className="card-body">
             <dl>
-              <dt>Base Damage:</dt>
-              <dd>{equipment.item.base_damage}</dd>
+              <dt>Damage:</dt>
+              <dd>{this.fetchItemDamage(equipment.item)}</dd>
             </dl>
             <dl>
               <dt>Type:</dt>
@@ -67,6 +112,24 @@ export default class EquipOptions extends React.Component {
           </div>
         </div>
       );
+    })
+  }
+
+  renderAffixes(item) {
+    return item.item_affixes.map((affix) => {
+      return (
+        <>
+          <dl>
+            <dt>Name:</dt>
+            <dd>{affix.name}</dd>
+          </dl>
+          <dl>
+            <dt>Base Damage Mod:</dt>
+            <dd>{'+' + affix.base_damage_mod}</dd>
+          </dl>
+          <span className="mt-2 mb-2 text-center">{item.artifact_property.description}</span>
+        </>
+      )
     })
   }
 
@@ -86,6 +149,7 @@ export default class EquipOptions extends React.Component {
 
   render() {
     const item = this.state.itemToEquip;
+
     return (
       <>
         {this.state.errorMessage !== null
@@ -113,9 +177,39 @@ export default class EquipOptions extends React.Component {
                   <dd>{item.type}</dd>
                 </dl>
                 <hr />
+                {item.artifact_property !== null
+                 ?
+                  <>
+                   <h5>Artifact Details</h5>
+                   <dl>
+                     <dt>Name:</dt>
+                     <dd>{item.artifact_property.name}</dd>
+                   </dl>
+                   <dl>
+                     <dt>Base Damage Mod:</dt>
+                     <dd>{'+' + item.artifact_property.base_damage_mod}</dd>
+                   </dl>
+                   <span className="mt-2 mb-2 text-center">{item.artifact_property.description}</span>
+                   <hr />
+                  </>
+                 : null
+                }
+                {item.item_affixes.length > 0
+                 ?
+                  <>
+                   <h5>Item Affixes</h5>
+                   {this.renderAffixes(item)}
+                   <hr />
+                  </>
+                 : null
+                }
                 <dl>
                   <dt>Increases attack by:</dt>
-                  <dd>{'+' + this.fetchIncrease(item)}</dd>
+                  <dd>{'+' + this.fetchIncrease(item).increasesDamageBy}</dd>
+                </dl>
+                <dl>
+                  <dt>Replaces weapon:</dt>
+                  <dd>{this.fetchIncrease(item).replacesWeapon}</dd>
                 </dl>
               </div>
             </div>

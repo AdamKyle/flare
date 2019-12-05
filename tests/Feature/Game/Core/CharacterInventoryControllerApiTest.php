@@ -90,6 +90,94 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $this->assertEquals("Equipped: Rusty Dagger to: Right Hand", $content->message);
     }
 
+    public function testCanEquipNewItemIntoSameSlot() {
+        $item = $this->createItem([
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $newItem = $this->createItem([
+            'name' => 'Rusty Dagger 2',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'     => $item->id,
+            ],
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'     => $newItem->id,
+            ],
+        ]);
+
+        $this->character->equippedItems()->create([
+            'iventory_id' => $this->character->inventory->id,
+            'item_id'     => $item->id,
+            'type'        => 'left-hand'
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => $newItem->id,
+                             'type'    => 'left-hand',
+                             'equip_type' => 'weapon',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Equipped: Rusty Dagger 2 to: Left Hand", $content->message);
+    }
+
+    public function testCanEquipNewItemIntoSameSlotWithSuffix() {
+        $item = $this->createItem([
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $newItem = $this->createItem([
+            'name' => 'Rusty Dagger 2',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $newItem->itemAffixes()->create(config('game.item_affixes')[0]);
+
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'     => $item->id,
+            ],
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'     => $newItem->id,
+            ],
+        ]);
+
+        $this->character->equippedItems()->create([
+            'iventory_id' => $this->character->inventory->id,
+            'item_id'     => $item->id,
+            'type'        => 'left-hand'
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => $newItem->id,
+                             'type'    => 'left-hand',
+                             'equip_type' => 'weapon',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Equipped: Rusty Dagger 2 *Krawls Claw* to: Left Hand", $content->message);
+    }
+
     public function testCannotEquipSameItemMissingType() {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [

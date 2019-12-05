@@ -28,7 +28,7 @@ class CharacterInventoryController extends Controller {
 
         return response()->json([
             'inventory' => $this->manager->createData($inventory)->toArray(),
-            'equipment' => $character->equippedItems->load('item'),
+            'equipment' => $character->equippedItems->load(['item', 'item.itemAffixes', 'item.artifactProperty']),
         ], 200);
     }
 

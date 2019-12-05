@@ -50,8 +50,4 @@ class Monster extends Model
     public function skills() {
         return $this->hasMany(Skill::class);
     }
-
-    public function drops() {
-        return $this->hasMany(Drop::class);
-    }
 }

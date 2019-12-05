@@ -24,7 +24,6 @@ export default class CharacterInventoryModal extends React.Component {
   componentDidMount() {
     axios.get('/api/character-inventory/' + this.props.characterId)
       .then((result) => {
-        console.log(result);
         this.setState({
           characaterInventory: result.data.inventory.data,
           equipment: result.data.equipment,

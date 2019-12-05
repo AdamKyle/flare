@@ -10,6 +10,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
+use App\Flare\Models\EquippedItem;
 
 class EquipItemService {
 
@@ -38,7 +39,7 @@ class EquipItemService {
 
         if (is_null($characterItem)) {
             return response()->json([
-                'message' => 'Cannot equip ' . $item->name . '. You do not currently have this in yor inventory.',
+                'message' => 'Cannot equip ' . $this->fetchItemName($item) . '. You do not currently have this in yor inventory.',
             ], 422);
         }
 
@@ -47,14 +48,27 @@ class EquipItemService {
 
             if (!is_null($equippedItem)) {
                 return response()->json([
-                    'message' => 'Cannot equip ' . $characterItem->item->name . ' to the same hand.',
+                    'message' => 'Cannot equip ' . $this->fetchItemName($characterItem->item) . ' to the same hand.',
                 ], 422);
             }
 
             return $this->switchItemPosition($characterItem);
-        }
+        } else {
 
-        return $this->attachItem($characterItem);
+            $itemAlreadyEquipped = $this->getEquippedItemOfType();
+
+            if (!is_null($itemAlreadyEquipped)) {
+                return $this->updateEquipmentSlot($characterItem, $itemAlreadyEquipped);
+            }
+
+            return $this->attachItem($characterItem);
+        }
+    }
+
+    public function getEquippedItemOfType() {
+        return $this->character->equippedItems
+                               ->where('type', '=', $this->request->type)
+                               ->first();
     }
 
     protected function getEquippedItem(InventorySlot $characterItem) {
@@ -80,14 +94,14 @@ class EquipItemService {
         event(new UpdateCharacterSheetEvent($this->character));
 
         return response()->json([
-            'message' => 'Switched: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)) . '.',
+            'message' => 'Switched: ' . $this->fetchItemName($characterItem->item) . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)) . '.',
         ], 200);
     }
 
     protected function attachItem(InventorySlot $characterItem): JsonResponse {
         if ($characterItem->item->type !== $this->request->equip_type) {
             return response()->json([
-                'message' => 'Cannot equip ' . $characterItem->item->name . ' as it is not of type: ' . $this->request->equip_type,
+                'message' => 'Cannot equip ' . $this->fetchItemName($characterItem->item) . ' as it is not of type: ' . $this->request->equip_type,
             ], 422);
         }
 
@@ -100,7 +114,46 @@ class EquipItemService {
         event(new UpdateCharacterSheetEvent($this->character));
 
         return response()->json([
-            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
+            'message' => 'Equipped: ' . $this->fetchItemName($characterItem->item) . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
         ], 200);
+    }
+
+    protected function updateEquipmentSlot(InventorySlot $characterItem, EquippedItem $equippedItem): JsonResponse {
+        if ($characterItem->item->type !== $this->request->equip_type) {
+            return response()->json([
+                'message' => 'Cannot equip ' . $this->fetchItemName($characterItem->item) . ' as it is not of type: ' . $this->request->equip_type,
+            ], 422);
+        }
+
+        $equippedItem->update([
+            'item_id' => $characterItem->item->id,
+            'type'    => $this->request->type,
+        ]);
+
+        event(new UpdateTopBarEvent($this->character));
+        event(new UpdateCharacterSheetEvent($this->character));
+
+        return response()->json([
+            'message' => 'Equipped: ' . $this->fetchItemName($characterItem->item) . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
+        ], 200);
+    }
+
+    private function fetchItemName(Item $item): string {
+        $name    = $item->name;
+        $affixes = $item->itemAffixes;
+
+        if ($affixes->isNotEmpty()) {
+            foreach($affixes as $affix) {
+                if ($affix->type === 'suffix') {
+                    $name = $name . ' *' . $affix->name . '*';
+                }
+
+                if ($affix->type === 'prefix') {
+                    $name = '*'.$affix->name . '* ' . $name;
+                }
+            }
+        }
+
+        return $name;
     }
 }
