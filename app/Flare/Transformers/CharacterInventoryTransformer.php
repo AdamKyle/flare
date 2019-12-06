@@ -4,6 +4,8 @@ namespace App\Flare\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Inventory;
+use App\Flare\Models\Item;
+use App\Flare\Values\MaxDamageForItemValue;
 
 class CharacterInventoryTransformer extends TransformerAbstract {
 
@@ -20,10 +22,18 @@ class CharacterInventoryTransformer extends TransformerAbstract {
                 $slot->item->actions  = null;
                 $slot->item->slot_id  = $slot->id;
 
-                $items['items'][] = $slot->item->load(['itemAffixes', 'artifactProperty']);
+                $items['items'][] = $this->transformItem($slot->item->load(['itemAffixes', 'artifactProperty']));
             }
         }
 
         return $items;
     }
+
+    protected function transformItem(Item $item): Item {
+        $item->max_damage = resolve(MaxDamageForItemValue::class)->fetchMaxDamage($item);
+
+        return $item;
+    }
+
+
 }

@@ -23,7 +23,7 @@ export default class EquipOptions extends React.Component {
 
       if (itemDamage > equippedItemDamage) {
         increasesDamageBy = Math.abs(equippedItemDamage - itemDamage);
-        replacesWeapon           = this.determineItemName(equipment.item);
+        replacesWeapon    = this.determineItemName(equipment.item);
       }
     });
 
@@ -74,7 +74,7 @@ export default class EquipOptions extends React.Component {
       errorMessage: null,
     });
 
-    axios.post('/api/equip-item/' + this.state.equippedItems[0].character_id, {
+    axios.post('/api/equip-item/' + this.props.characterId, {
       item_id   : this.state.itemToEquip.id,
       type      : equipmentPosition,
       equip_type: this.state.itemToEquip.type,
@@ -89,10 +89,8 @@ export default class EquipOptions extends React.Component {
 
   fetchEquippedItems() {
     return this.state.equippedItems.map((equipment) => {
-
-
       return (
-        <div className="card mb-2">
+        <div className="card mb-2" key={equipment.id}>
           <div className="card-header">
             {this.determineItemName(equipment.item)}
           </div>
@@ -118,7 +116,7 @@ export default class EquipOptions extends React.Component {
   renderAffixes(item) {
     return item.item_affixes.map((affix) => {
       return (
-        <>
+        <div key ={affix.id}>
           <dl>
             <dt>Name:</dt>
             <dd>{affix.name}</dd>
@@ -128,7 +126,7 @@ export default class EquipOptions extends React.Component {
             <dd>{'+' + affix.base_damage_mod}</dd>
           </dl>
           <span className="mt-2 mb-2 text-center">{item.artifact_property.description}</span>
-        </>
+        </div>
       )
     })
   }

@@ -35,7 +35,7 @@ export default class CharacterEquipOptionsModal extends React.Component {
           <Modal.Title><span className="character-sheet">Equip Options</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <CharacterEquipOptions itemToEquip={this.props.itemToEquip} equippedItems={this.props.equippedItems} callHome={this.callHome.bind(this)}/>
+          <CharacterEquipOptions itemToEquip={this.props.itemToEquip} equippedItems={this.props.equippedItems} callHome={this.callHome.bind(this)} characterId={this.props.characterId}/>
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-primary" type="button" onClick={this.props.onClose}>

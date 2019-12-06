@@ -144,7 +144,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
         ]);
 
         $newItem = $this->createItem([
-            'name' => 'Rusty Dagger 2',
+            'name' => 'Rusty Dagger 2 *Krawls Claw*',
             'type' => 'weapon',
             'base_damage' => 3,
         ]);
@@ -267,5 +267,41 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $this->assertEquals("Cannot equip Something else as it is not of type: weapon", $content->message);
        $this->assertNotNull($this->character->equippedItems->where('type', '=', 'left-hand')->first());
        $this->assertNull($this->character->equippedItems->where('type', '=', 'right-hand')->first());
+    }
+
+    public function testCanUnEquipItem() {
+        $itemName = $this->character->equippedItems->first()->item->name;
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('DELETE', '/api/unequip-item/' . $this->character->id, [
+                             'equipment_id' => 1,
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals('Unequipped ' . $itemName, $content->message);
+
+       $character = $this->character->refresh();
+
+       $this->assertTrue($character->equippedItems->isEmpty());
+    }
+
+    public function testCannotUnEquipItem() {
+        $itemName = $this->character->equippedItems->first()->item->name;
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('DELETE', '/api/unequip-item/' . $this->character->id, [
+                             'equipment_id' => 4,
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals('Could not find a matching equipped item.', $content->message);
+
+       $character = $this->character->refresh();
+
+       $this->assertFalse($character->equippedItems->isEmpty());
     }
 }

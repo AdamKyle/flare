@@ -20,6 +20,8 @@ export default class CharacterInfoModal extends React.Component {
       isLoading: true,
       showInventory: false,
     }
+
+    this.characterSheet = Echo.private('update-character-sheet-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -30,6 +32,12 @@ export default class CharacterInfoModal extends React.Component {
           isLoading: false,
         });
       });
+
+    this.characterSheet.listen('Flare.Events.UpdateCharacterSheetBroadcastEvent', (event) => {
+      this.setState({
+        characterSheet: event.characterSheet.data,
+      });
+    });
   }
 
   openInventory() {
@@ -47,7 +55,7 @@ export default class CharacterInfoModal extends React.Component {
   render() {
     return(
       <Modal
-        backdrop={'static'} 
+        backdrop={'static'}
         dialogAs={DraggableModalDialog}
         show={this.props.show}
         onHide={this.props.onClose}
@@ -71,7 +79,7 @@ export default class CharacterInfoModal extends React.Component {
           </button>
         </Modal.Footer>
 
-        <CharacterInventoryModal show={this.state.showInventory} onClose={this.closeInventory.bind(this)} characterId={this.props.characterId}/>
+        <CharacterInventoryModal show={this.state.showInventory} onClose={this.closeInventory.bind(this)} characterId={this.props.characterId} userId={this.props.userId} />
       </Modal>
     );
   }

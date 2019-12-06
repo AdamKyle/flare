@@ -21,6 +21,5 @@ $factory->define(InventorySlot::class, function (Faker $faker) {
     return [
         'inventory_id' => null,
         'item_id' => null,
-        'equipped' => false,
     ];
 });

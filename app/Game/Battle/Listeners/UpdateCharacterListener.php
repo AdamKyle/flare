@@ -30,6 +30,8 @@ class UpdateCharacterListener
         if ($xp >= $event->character->xp_next) {
             $this->characterService->levelUpCharacter($event->character);
 
+            $event->character->refresh();
+
             event(new ServerMessageEvent($event->character->user, 'level_up'));
             event(new UpdateTopBarEvent($event->character));
             event(new UpdateCharacterSheetEvent($event->character));
@@ -41,6 +43,8 @@ class UpdateCharacterListener
             $event->character->gold += $event->monster->gold;
 
             $event->character->save();
+
+            $event->character->refresh();
 
             event(new UpdateTopBarEvent($event->character));
             event(new UpdateCharacterSheetEvent($event->character));

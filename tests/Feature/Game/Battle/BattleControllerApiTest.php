@@ -185,7 +185,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertEquals(1, $this->character->level);
         $this->assertEquals(25, $this->character->gold);
-        $this->assertEquals('Rusty Dagger', $this->character->inventory->slots->first()->item->name);
+        $this->assertEquals('Rusty Dagger *Krawls Claw*', $this->character->inventory->slots->first()->item->name);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {

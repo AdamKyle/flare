@@ -61,13 +61,15 @@ class RandomItemDropBuilder {
             }
         }
 
-        if (is_null($duplicateItem->artifactProperty) && is_null($duplicateItem->itemAffix)) {
+        if (is_null($duplicateItem->artifactProperty) && $duplicateItem->itemAffixes->isEmpty()) {
             $duplicateItem->delete();
 
             return $item;
         }
 
-        return $duplicateItem->load(['itemAffixes', 'artifactProperty']);
+        $duplicateItem = $this->setItemName($duplicateItem->load(['itemAffixes', 'artifactProperty']));
+
+        return $duplicateItem;
     }
 
     protected function shouldHaveArtifactAttached(Character $character): bool {
@@ -88,5 +90,27 @@ class RandomItemDropBuilder {
 
     protected function fetchRandomItemAffix() {
         return $this->itemAffixes[rand(0, count($this->itemAffixes) - 1)];
+    }
+
+    private function setItemName(Item $item): Item {
+        $name    = $item->name;
+        $affixes = $item->itemAffixes;
+
+        if ($affixes->isNotEmpty()) {
+            foreach($affixes as $affix) {
+                if ($affix->type === 'suffix') {
+                    $name = $name . ' *' . $affix->name . '*';
+                }
+
+                if ($affix->type === 'prefix') {
+                    $name = '*'.$affix->name . '* ' . $name;
+                }
+            }
+        }
+
+        $item->name = $name;
+        $item->save();
+
+        return $item;
     }
 }

@@ -8,6 +8,10 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterInventoryTransformer;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Events\UpdateCharacterSheetEvent;
+use App\Flare\Events\UpdateCharacterInventoryEvent;
+use App\Flare\Values\MaxDamageForItemValue;
 use App\Game\Core\Services\EquipItemService;
 
 class CharacterInventoryController extends Controller {
@@ -26,9 +30,19 @@ class CharacterInventoryController extends Controller {
     public function inventory(Character $character) {
         $inventory = new Item($character->inventory, $this->characterInventoryTransformer);
 
+        $equipment = $character->equippedItems->load([
+                'item', 'item.itemAffixes', 'item.artifactProperty'
+            ])->transform(function($equippedItem) {
+                $equippedItem->actions          = null;
+                $equippedItem->item->max_damage = resolve(MaxDamageForItemValue::class)
+                                                    ->fetchMaxDamage($equippedItem->item);
+
+                return $equippedItem;
+            });
+
         return response()->json([
             'inventory' => $this->manager->createData($inventory)->toArray(),
-            'equipment' => $character->equippedItems->load(['item', 'item.itemAffixes', 'item.artifactProperty']),
+            'equipment' => $equipment,
         ], 200);
     }
 
@@ -43,5 +57,29 @@ class CharacterInventoryController extends Controller {
         return $equipItemService->setRequest($request)
                                 ->setCharacter($character)
                                 ->equipItem();
+    }
+
+    public function unequipItem(Request $request, Character $character) {
+        $item = $character->equippedItems->where('id', '=', $request->equipment_id)->first();
+
+        if (is_null($item)) {
+            return response()->json([
+                'message' => 'Could not find a matching equipped item.',
+            ]);
+        }
+
+        $name = $item->item->name;
+
+        $item->delete();
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterSheetEvent($character));
+        event(new UpdateCharacterInventoryEvent($character));
+
+        return response()->json([
+            'message' => 'Unequipped ' . $name,
+        ]);
     }
 }

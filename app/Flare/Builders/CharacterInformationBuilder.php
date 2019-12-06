@@ -3,6 +3,7 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\MaxDamageForItemValue;
 
 class CharacterInformationBuilder {
 
@@ -25,15 +26,16 @@ class CharacterInformationBuilder {
         $rightHand = $this->character->equippedItems->where('type', '=', 'right-hand')->first();
 
         if (!is_null($leftHand) && !is_null($rightHand)) {
-            return $leftHand->item->base_damage + $rightHand->item->base_damage;
+            return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($leftHand->item) +
+                   resolve(MaxDamageForItemValue::class)->fetchMaxDamage($rightHand->item);
         }
 
         if (!is_null($leftHand)) {
-            return $leftHand->item->base_damage;
+            return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($leftHand->item);
         }
 
         if (!is_null($rightHand)) {
-            return $rightHand->item->base_damage;
+            return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($rightHand->item);
         }
 
         return 0;

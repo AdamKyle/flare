@@ -19,6 +19,8 @@ export default class CharacterInventoryModal extends React.Component {
       equipment: null,
       isLoading: true,
     }
+
+    this.inventory = Echo.private('update-character-inventory-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -30,6 +32,13 @@ export default class CharacterInventoryModal extends React.Component {
           isLoading: false,
         });
       });
+
+    this.inventory.listen('Flare.Events.UpdateCharacterInventoryBroadcastEvent', (event) => {
+      this.setState({
+        characaterInventory: event.inventory.inventory.data,
+        equipment: event.inventory.equipment,
+      });
+    });
   }
 
   render() {
@@ -48,7 +57,7 @@ export default class CharacterInventoryModal extends React.Component {
           <Modal.Title><span className="character-inventory">Character Inventory</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {this.state.isLoading ? 'Please wait ...' : <CharacterInventory inventory={this.state.characaterInventory} equipment={this.state.equipment}/>}
+          {this.state.isLoading ? 'Please wait ...' : <CharacterInventory inventory={this.state.characaterInventory} equipment={this.state.equipment} characterId={this.props.characterId} />}
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-primary" type="button" onClick={this.props.onClose}>

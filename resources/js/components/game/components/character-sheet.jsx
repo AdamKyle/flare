@@ -33,6 +33,8 @@ export default class CharacterSheet extends React.Component {
   render() {
     const characterSheet = this.props.sheet;
 
+    const xp = (characterSheet.xp / characterSheet.xp_next) * 100;
+
     return (
       <div>
         <div className="row">
@@ -52,30 +54,6 @@ export default class CharacterSheet extends React.Component {
             <dl>
               <dt>Level:</dt>
               <dd>{characterSheet.level}</dd>
-            </dl>
-            <dl>
-              <dt>Max Health:</dt>
-              <dd>{characterSheet.health}</dd>
-            </dl>
-            <dl>
-              <dt>Armour Class:</dt>
-              <dd>{characterSheet.ac}</dd>
-            </dl>
-            <dl>
-              <dt>Damage Stat:</dt>
-              <dd>{characterSheet.damage_stat}</dd>
-            </dl>
-            <dl>
-              <dt>Max Attack:</dt>
-              <dd>{characterSheet.attack}</dd>
-            </dl>
-            <dl>
-              <dt>Inventory Max:</dt>
-              <dd>{characterSheet.inventory_max}</dd>
-            </dl>
-            <dl>
-              <dt>Gold:</dt>
-              <dd>{characterSheet.gold}</dd>
             </dl>
           </div>
           <div className="col-md-4">
@@ -102,6 +80,48 @@ export default class CharacterSheet extends React.Component {
           </div>
           <div className="col-md-4">
             {this.characterSkills(characterSheet.skills)}
+          </div>
+        </div>
+        <hr />
+        <div className="row mb-2">
+          <div className="col-md-6">
+            <dl>
+              <dt>Max Health:</dt>
+              <dd>{characterSheet.health}</dd>
+            </dl>
+            <dl>
+              <dt>Armour Class:</dt>
+              <dd>{characterSheet.ac}</dd>
+            </dl>
+            <dl>
+              <dt>Damage Stat:</dt>
+              <dd>{characterSheet.damage_stat}</dd>
+            </dl>
+            <dl>
+              <dt>Max Attack:</dt>
+              <dd>{characterSheet.attack}</dd>
+            </dl>
+          </div>
+          <div className="col-md-6">
+            <dl>
+              <dt>Inventory Max:</dt>
+              <dd>{characterSheet.inventory_max}</dd>
+            </dl>
+            <dl>
+              <dt>Gold:</dt>
+              <dd>{characterSheet.gold}</dd>
+            </dl>
+            <dl>
+              <dt>XP:</dt>
+              <dd>
+                <div className="progress skill-training mb-2">
+                  <div className="progress-bar skill-bar" role="progressbar"
+                    style={{width: xp + '%'}}
+                    aria-valuenow={characterSheet.xp} aria-valuemin="0"
+                    aria-valuemax={CharacterSheet.xp_next}>{characterSheet.xp}</div>
+                </div>
+              </dd>
+            </dl>
           </div>
         </div>
       </div>

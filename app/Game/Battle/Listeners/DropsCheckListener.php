@@ -34,7 +34,7 @@ class DropsCheckListener
                         ->setItemAffixes(config('game.item_affixes'))
                         ->setArtifactProperties(config('game.artifact_properties'))
                         ->generateItem($event->character);
-
+            dump($drop);
             $this->attemptToPickUpItem($event, $drop);
         }
     }
@@ -46,19 +46,7 @@ class DropsCheckListener
                 'inventory_id' => $event->character->inventory->id,
             ]);
 
-            $itemName = $item->name;
-
-            if (!is_null($item->itemAffix)) {
-                if ($item->itemAffix->type === 'suffix') {
-                    $itemName = $item->name . ' *'.$item->itemAffix->name.'*';
-                }
-
-                if ($item->itemAffix->type === 'prefix') {
-                    $itemName = '*'.$item->itemAffix->name.'* ' . $item->name;
-                }
-            }
-
-            event(new ServerMessageEvent($event->character->user, 'gained_item', $itemName));
+            event(new ServerMessageEvent($event->character->user, 'gained_item', $item->name));
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));
         }

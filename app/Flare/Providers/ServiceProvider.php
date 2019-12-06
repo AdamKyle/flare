@@ -13,6 +13,7 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\CharacterInventoryTransformer;
 use App\Flare\Values\BaseSkillValue;
+use App\Flare\Values\MaxDamageForItemValue;
 
 class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
 {
@@ -25,6 +26,10 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
     {
         $this->app->singleton(BaseStatValue::class, function ($app) {
             return new BaseStatValue();
+        });
+
+        $this->app->bind(MaxDamageForItemValue::class, function($app) {
+            return new MaxDamageForItemValue();
         });
 
         $this->app->singleton(CharacterBuilder::class, function ($app) {

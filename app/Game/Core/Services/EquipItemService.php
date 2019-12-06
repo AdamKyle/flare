@@ -10,6 +10,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
+use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Models\EquippedItem;
 
 class EquipItemService {
@@ -39,33 +40,40 @@ class EquipItemService {
 
         if (is_null($characterItem)) {
             return response()->json([
-                'message' => 'Cannot equip ' . $this->fetchItemName($item) . '. You do not currently have this in yor inventory.',
+                'message' => 'Cannot equip ' . $item->name . '. You do not currently have this in yor inventory.',
             ], 422);
         }
 
-        if ($characterItem->equipped) {
-            $equippedItem = $this->getEquippedItem($characterItem);
+        $equippedItem = $this->getEquippedItem($characterItem);
 
-            if (!is_null($equippedItem)) {
-                return response()->json([
-                    'message' => 'Cannot equip ' . $this->fetchItemName($characterItem->item) . ' to the same hand.',
-                ], 422);
+        if (!is_null($equippedItem)) {
+            return response()->json([
+                'message' => 'Cannot equip ' . $characterItem->item->name . ' to the same hand.',
+            ], 422);
+        } else {
+            $equippedItemToSwitch = $this->getEquippedItemFromId($characterItem);
+
+            if (!is_null($equippedItemToSwitch)) {
+                return $this->switchItemPosition($equippedItemToSwitch, $characterItem);
             }
 
-            return $this->switchItemPosition($characterItem);
-        } else {
+            $equippedItemInPosition = $this->getItemForPosition();
 
-            $itemAlreadyEquipped = $this->getEquippedItemOfType();
-
-            if (!is_null($itemAlreadyEquipped)) {
-                return $this->updateEquipmentSlot($characterItem, $itemAlreadyEquipped);
+            if (!is_null($equippedItemInPosition)) {
+                return $this->updateEquipmentSlot($characterItem, $equippedItemInPosition);
             }
 
             return $this->attachItem($characterItem);
         }
     }
 
-    public function getEquippedItemOfType() {
+    public function getEquippedItemFromId(InventorySlot $characterItem) {
+        return $this->character->equippedItems
+                               ->where('item_id', '=', $characterItem->id)
+                               ->first();
+    }
+
+    public function getItemForPosition() {
         return $this->character->equippedItems
                                ->where('type', '=', $this->request->type)
                                ->first();
@@ -78,30 +86,26 @@ class EquipItemService {
                                ->first();
     }
 
-    protected function switchItemPosition(InventorySlot $characterItem): JsonResponse {
-        $this->character->equippedItems()->create([
-            'item_id' => $characterItem->item->id,
-            'type'    => $this->request->type,
+    protected function switchItemPosition(EquippedItem $item, InventorySlot $characterItem): JsonResponse {
+        $item->update([
+            'type' => $this->request->type,
         ]);
 
-        $this->character->equippedItems
-                        ->where('item_id', '=', $characterItem->item->id)
-                        ->where('type', '!=', $this->request->type)
-                        ->first()
-                        ->delete();
+        $this->character->refresh();
 
         event(new UpdateTopBarEvent($this->character));
         event(new UpdateCharacterSheetEvent($this->character));
+        event(new UpdateCharacterInventoryEvent($this->character));
 
         return response()->json([
-            'message' => 'Switched: ' . $this->fetchItemName($characterItem->item) . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)) . '.',
+            'message' => 'Switched: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)) . '.',
         ], 200);
     }
 
     protected function attachItem(InventorySlot $characterItem): JsonResponse {
         if ($characterItem->item->type !== $this->request->equip_type) {
             return response()->json([
-                'message' => 'Cannot equip ' . $this->fetchItemName($characterItem->item) . ' as it is not of type: ' . $this->request->equip_type,
+                'message' => 'Cannot equip ' . $characterItem->item->name . ' as it is not of type: ' . $this->request->equip_type,
             ], 422);
         }
 
@@ -110,18 +114,21 @@ class EquipItemService {
             'type'    => $this->request->type,
         ]);
 
+        $this->character->refresh();
+
         event(new UpdateTopBarEvent($this->character));
         event(new UpdateCharacterSheetEvent($this->character));
+        event(new UpdateCharacterInventoryEvent($this->character));
 
         return response()->json([
-            'message' => 'Equipped: ' . $this->fetchItemName($characterItem->item) . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
+            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
         ], 200);
     }
 
     protected function updateEquipmentSlot(InventorySlot $characterItem, EquippedItem $equippedItem): JsonResponse {
         if ($characterItem->item->type !== $this->request->equip_type) {
             return response()->json([
-                'message' => 'Cannot equip ' . $this->fetchItemName($characterItem->item) . ' as it is not of type: ' . $this->request->equip_type,
+                'message' => 'Cannot equip ' . $characterItem->item->name . ' as it is not of type: ' . $this->request->equip_type,
             ], 422);
         }
 
@@ -130,11 +137,14 @@ class EquipItemService {
             'type'    => $this->request->type,
         ]);
 
+        $this->character->refresh();
+
         event(new UpdateTopBarEvent($this->character));
         event(new UpdateCharacterSheetEvent($this->character));
+        event(new UpdateCharacterInventoryEvent($this->character));
 
         return response()->json([
-            'message' => 'Equipped: ' . $this->fetchItemName($characterItem->item) . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
+            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
         ], 200);
     }
 

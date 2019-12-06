@@ -16,17 +16,57 @@ export default class CharacterInventory extends React.Component {
       itemToEquip:      null,
       equippedItems:    null,
       message:          null,
+      error:            null,
     }
   }
 
-  equip() {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.equipment !== this.props.equipment) {
+      this.setState({
+        equipment: this.props.equipment,
+        inventory: this.props.inventory.items,
+      });
+    }
+  }
 
+  equip(event) {
     const foundItem = this.state.inventory.filter(i => i.id === parseInt(event.target.getAttribute('data-item-id')))[0];
 
     this.setState({
       showEquipOptions: true,
       itemToEquip:      foundItem,
-      equippedItems:     this.state.equipment.filter(e => e.item.type === foundItem.type)
+      equippedItems:    this.state.equipment.filter(e => e.item.type === foundItem.type)
+    });
+  }
+
+  unEquip(event) {
+    const foundItem = this.state.equipment.filter(e => e.id === parseInt(event.target.getAttribute('data-equipment-id')))[0];
+
+    this.setState({
+      message: null,
+      error: null,
+    });
+
+    if (typeof foundItem === 'undefined') {
+      return this.setState({
+        error: 'Could not unequip item.',
+      });
+    }
+
+    axios.delete('/api/unequip-item/' + this.props.characterId, {
+      data: {
+        equipment_id: foundItem.id
+      }
+    }).then((result) => {
+      this.setState({
+        message: result.data.message
+      });
+    }).catch((error) => {
+      const result = error.response;
+
+      this.setState({
+        error: result.data.message
+      });
     });
   }
 
@@ -46,16 +86,23 @@ export default class CharacterInventory extends React.Component {
     });
   }
 
+  fetchEquippedIds() {
+    return this.state.equipment.map((item) => {
+      return item.item.id;
+    });
+  }
+
   render() {
-    const inventory = this.state.inventory;
+    const equippedIds = this.fetchEquippedIds();
+    const inventory   = this.state.inventory.filter(i => !equippedIds.includes(i.id));
 
     // Set up the actions.
     equipAction     = this.equip.bind(this);
+    unEquipAction   = this.unEquip.bind(this);
 
     const columns   = [{
       dataField: 'name',
       text: 'Item Name',
-      formatter: itemNameFormatter,
     }, {
       dataField: 'type',
       text: 'Item Type'
@@ -63,12 +110,33 @@ export default class CharacterInventory extends React.Component {
       dataField: 'base_damage',
       text: 'Base Damage'
     }, {
-      dataField: 'equipped',
-      text: 'Is Equipped'
+      dataField: 'max_damage',
+      text: 'Max Damage'
     }, {
       dataField: 'actions',
       text: 'Actions',
       formatter: actionsFormatter,
+    }];
+
+    const equipmentColumns   = [{
+      dataField: 'item.name',
+      text: 'Item Name',
+    }, {
+      dataField: 'item.type',
+      text: 'Item Type'
+    }, {
+      dataField: 'item.base_damage',
+      text: 'Base Damage'
+    }, {
+      dataField: 'item.max_damage',
+      text: 'Max Damage'
+    }, {
+      dataField: 'type',
+      text: 'Equipped Position'
+    }, {
+      dataField: 'actions',
+      text: 'Actions',
+      formatter: equipmentActionsFormatter,
     }];
 
     return (
@@ -81,9 +149,24 @@ export default class CharacterInventory extends React.Component {
          : null
         }
 
+        {this.state.error !== null
+         ?
+         <Alert variant="danger" onClose={() => this.setState({error: null})} dismissible>
+            {this.state.error}
+         </Alert>
+         : null
+        }
+
         <div className="row">
           <div className="col-md-12">
             <BootstrapTable keyField='slot_id' data={ inventory } columns={ columns } />
+          </div>
+        </div>
+        <hr />
+        <h5>Equipped</h5>
+        <div className="row">
+          <div className="col-md-12">
+            <BootstrapTable keyField='id' data={ this.state.equipment } columns={ equipmentColumns } />
           </div>
         </div>
 
@@ -93,13 +176,15 @@ export default class CharacterInventory extends React.Component {
           equippedItems={this.state.equippedItems}
           itemToEquip={this.state.itemToEquip}
           onEquip={this.closeEquiOptionsWithMessage.bind(this)}
+          characterId={this.props.characterId}
         />
       </div>
     );
   }
 }
 
-let equipAction = null;
+let equipAction   = null;
+let unEquipAction = null;
 
 const actionsFormatter = (cell, row) => {
   if (row.hasOwnProperty('actions')) {
@@ -121,26 +206,19 @@ const actionsFormatter = (cell, row) => {
   }
 }
 
-const itemNameFormatter = (cell, row) => {
-
-  let name = row.name;
-
-  if (row.item_affixes.length > 0) {
-    row.item_affixes.forEach((affix) => {
-      if (affix.type === 'suffix') {
-        name = name + ' *' + affix.name + '*';
-      }
-
-      if (affix.type === 'prefix') {
-        name = '*' + affix.name + '* ' + name;
-      }
-    });
-  }
-
-  if (row.hasOwnProperty('name')) {
+const equipmentActionsFormatter = (cell, row) => {
+  if (row.hasOwnProperty('actions')) {
     return (
       <span>
-        {name}
+        <Dropdown>
+          <Dropdown.Toggle variant="primary" id="dropdown-basic">
+            Actions
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            <Dropdown.Item data-equipment-id={row.id} onClick={unEquipAction}>Unequip</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </span>
     );
   }

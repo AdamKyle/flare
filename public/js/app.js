@@ -107838,7 +107838,8 @@ function (_React$Component2) {
       }, "Equip Options"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Body, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options__WEBPACK_IMPORTED_MODULE_3__["default"], {
         itemToEquip: this.props.itemToEquip,
         equippedItems: this.props.equippedItems,
-        callHome: this.callHome.bind(this)
+        callHome: this.callHome.bind(this),
+        characterId: this.props.characterId
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         type: "button",
@@ -107972,7 +107973,7 @@ function (_React$Component) {
       this.setState({
         errorMessage: null
       });
-      axios.post('/api/equip-item/' + this.state.equippedItems[0].character_id, {
+      axios.post('/api/equip-item/' + this.props.characterId, {
         item_id: this.state.itemToEquip.id,
         type: equipmentPosition,
         equip_type: this.state.itemToEquip.type
@@ -107991,7 +107992,8 @@ function (_React$Component) {
 
       return this.state.equippedItems.map(function (equipment) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "card mb-2"
+          className: "card mb-2",
+          key: equipment.id
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "card-header"
         }, _this4.determineItemName(equipment.item)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -108003,7 +108005,9 @@ function (_React$Component) {
     key: "renderAffixes",
     value: function renderAffixes(item) {
       return item.item_affixes.map(function (affix) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: affix.id
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "mt-2 mb-2 text-center"
         }, item.artifact_property.description));
       });
@@ -108150,6 +108154,7 @@ function (_React$Component2) {
       isLoading: true,
       showInventory: false
     };
+    _this.characterSheet = Echo["private"]('update-character-sheet-' + _this.props.userId);
     return _this;
   }
 
@@ -108162,6 +108167,11 @@ function (_React$Component2) {
         _this2.setState({
           characterSheet: result.data.sheet.data,
           isLoading: false
+        });
+      });
+      this.characterSheet.listen('Flare.Events.UpdateCharacterSheetBroadcastEvent', function (event) {
+        _this2.setState({
+          characterSheet: event.characterSheet.data
         });
       });
     }
@@ -108208,7 +108218,8 @@ function (_React$Component2) {
       }, "Close")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_inventory_modal__WEBPACK_IMPORTED_MODULE_4__["default"], {
         show: this.state.showInventory,
         onClose: this.closeInventory.bind(this),
-        characterId: this.props.characterId
+        characterId: this.props.characterId,
+        userId: this.props.userId
       }));
     }
   }]);
@@ -108283,8 +108294,6 @@ function (_React$Component) {
         });
       });
       this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', function (event) {
-        console.log(event);
-
         _this2.setState({
           characterSheet: event.characterSheet.data
         });
@@ -108487,6 +108496,7 @@ function (_React$Component2) {
       equipment: null,
       isLoading: true
     };
+    _this.inventory = Echo["private"]('update-character-inventory-' + _this.props.userId);
     return _this;
   }
 
@@ -108500,6 +108510,12 @@ function (_React$Component2) {
           characaterInventory: result.data.inventory.data,
           equipment: result.data.equipment,
           isLoading: false
+        });
+      });
+      this.inventory.listen('Flare.Events.UpdateCharacterInventoryBroadcastEvent', function (event) {
+        _this2.setState({
+          characaterInventory: event.inventory.inventory.data,
+          equipment: event.inventory.equipment
         });
       });
     }
@@ -108521,7 +108537,8 @@ function (_React$Component2) {
         className: "character-inventory"
       }, "Character Inventory"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Body, null, this.state.isLoading ? 'Please wait ...' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_inventory__WEBPACK_IMPORTED_MODULE_3__["default"], {
         inventory: this.state.characaterInventory,
-        equipment: this.state.equipment
+        equipment: this.state.equipment,
+        characterId: this.props.characterId
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         type: "button",
@@ -108596,14 +108613,25 @@ function (_React$Component) {
       equipment: _this.props.equipment,
       itemToEquip: null,
       equippedItems: null,
-      message: null
+      message: null,
+      error: null
     };
     return _this;
   }
 
   _createClass(CharacterInventory, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (prevProps.equipment !== this.props.equipment) {
+        this.setState({
+          equipment: this.props.equipment,
+          inventory: this.props.inventory.items
+        });
+      }
+    }
+  }, {
     key: "equip",
-    value: function equip() {
+    value: function equip(event) {
       var foundItem = this.state.inventory.filter(function (i) {
         return i.id === parseInt(event.target.getAttribute('data-item-id'));
       })[0];
@@ -108613,6 +108641,41 @@ function (_React$Component) {
         equippedItems: this.state.equipment.filter(function (e) {
           return e.item.type === foundItem.type;
         })
+      });
+    }
+  }, {
+    key: "unEquip",
+    value: function unEquip(event) {
+      var _this2 = this;
+
+      var foundItem = this.state.equipment.filter(function (e) {
+        return e.id === parseInt(event.target.getAttribute('data-equipment-id'));
+      })[0];
+      this.setState({
+        message: null,
+        error: null
+      });
+
+      if (typeof foundItem === 'undefined') {
+        return this.setState({
+          error: 'Could not unequip item.'
+        });
+      }
+
+      axios["delete"]('/api/unequip-item/' + this.props.characterId, {
+        data: {
+          equipment_id: foundItem.id
+        }
+      }).then(function (result) {
+        _this2.setState({
+          message: result.data.message
+        });
+      })["catch"](function (error) {
+        var result = error.response;
+
+        _this2.setState({
+          error: result.data.message
+        });
       });
     }
   }, {
@@ -108634,17 +108697,27 @@ function (_React$Component) {
       });
     }
   }, {
+    key: "fetchEquippedIds",
+    value: function fetchEquippedIds() {
+      return this.state.equipment.map(function (item) {
+        return item.item.id;
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
-      var inventory = this.state.inventory; // Set up the actions.
+      var equippedIds = this.fetchEquippedIds();
+      var inventory = this.state.inventory.filter(function (i) {
+        return !equippedIds.includes(i.id);
+      }); // Set up the actions.
 
       equipAction = this.equip.bind(this);
+      unEquipAction = this.unEquip.bind(this);
       var columns = [{
         dataField: 'name',
-        text: 'Item Name',
-        formatter: itemNameFormatter
+        text: 'Item Name'
       }, {
         dataField: 'type',
         text: 'Item Type'
@@ -108652,22 +108725,50 @@ function (_React$Component) {
         dataField: 'base_damage',
         text: 'Base Damage'
       }, {
-        dataField: 'equipped',
-        text: 'Is Equipped'
+        dataField: 'max_damage',
+        text: 'Max Damage'
       }, {
         dataField: 'actions',
         text: 'Actions',
         formatter: actionsFormatter
       }];
+      var equipmentColumns = [{
+        dataField: 'item.name',
+        text: 'Item Name'
+      }, {
+        dataField: 'item.type',
+        text: 'Item Type'
+      }, {
+        dataField: 'item.base_damage',
+        text: 'Base Damage'
+      }, {
+        dataField: 'item.max_damage',
+        text: 'Max Damage'
+      }, {
+        dataField: 'type',
+        text: 'Equipped Position'
+      }, {
+        dataField: 'actions',
+        text: 'Actions',
+        formatter: equipmentActionsFormatter
+      }];
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.message !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Alert"], {
         variant: "success",
         onClose: function onClose() {
-          return _this2.setState({
+          return _this3.setState({
             message: null
           });
         },
         dismissible: true
-      }, this.state.message) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, this.state.message) : null, this.state.error !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Alert"], {
+        variant: "danger",
+        onClose: function onClose() {
+          return _this3.setState({
+            error: null
+          });
+        },
+        dismissible: true
+      }, this.state.error) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-12"
@@ -108675,12 +108776,21 @@ function (_React$Component) {
         keyField: "slot_id",
         data: inventory,
         columns: columns
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Equipped"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
+        keyField: "id",
+        data: this.state.equipment,
+        columns: equipmentColumns
       }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__["default"], {
         show: this.state.showEquipOptions,
         onClose: this.closeEquiOptions.bind(this),
         equippedItems: this.state.equippedItems,
         itemToEquip: this.state.itemToEquip,
-        onEquip: this.closeEquiOptionsWithMessage.bind(this)
+        onEquip: this.closeEquiOptionsWithMessage.bind(this),
+        characterId: this.props.characterId
       }));
     }
   }]);
@@ -108690,6 +108800,7 @@ function (_React$Component) {
 
 
 var equipAction = null;
+var unEquipAction = null;
 
 var actionsFormatter = function actionsFormatter(cell, row) {
   if (row.hasOwnProperty('actions')) {
@@ -108707,23 +108818,15 @@ var actionsFormatter = function actionsFormatter(cell, row) {
   }
 };
 
-var itemNameFormatter = function itemNameFormatter(cell, row) {
-  var name = row.name;
-
-  if (row.item_affixes.length > 0) {
-    row.item_affixes.forEach(function (affix) {
-      if (affix.type === 'suffix') {
-        name = name + ' *' + affix.name + '*';
-      }
-
-      if (affix.type === 'prefix') {
-        name = '*' + affix.name + '* ' + name;
-      }
-    });
-  }
-
-  if (row.hasOwnProperty('name')) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, name);
+var equipmentActionsFormatter = function equipmentActionsFormatter(cell, row) {
+  if (row.hasOwnProperty('actions')) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Toggle, {
+      variant: "primary",
+      id: "dropdown-basic"
+    }, "Actions"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Menu, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
+      "data-equipment-id": row.id,
+      onClick: unEquipAction
+    }, "Unequip"))));
   }
 };
 
@@ -108798,15 +108901,33 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       var characterSheet = this.props.sheet;
+      var xp = characterSheet.xp / characterSheet.xp_next * 100;
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-4"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Race:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.race)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Class:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet["class"])), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Level:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.level)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Max Health:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.health)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Armour Class:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.ac)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Damage Stat:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.damage_stat)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Max Attack:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.attack)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Inventory Max:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.inventory_max)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Gold:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.gold))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Race:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.race)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Class:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet["class"])), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Level:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.level))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-4"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Strength:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.str)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Dexterity:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.dex)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Durabillity:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.dur)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Charisma:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.chr)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Intelligence:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet["int"]))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-4"
-      }, this.characterSkills(characterSheet.skills))));
+      }, this.characterSkills(characterSheet.skills))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Max Health:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.health)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Armour Class:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.ac)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Damage Stat:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.damage_stat)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Max Attack:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.attack))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Inventory Max:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.inventory_max)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Gold:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, characterSheet.gold)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "XP:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress skill-training mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress-bar skill-bar",
+        role: "progressbar",
+        style: {
+          width: xp + '%'
+        },
+        "aria-valuenow": characterSheet.xp,
+        "aria-valuemin": "0",
+        "aria-valuemax": CharacterSheet.xp_next
+      }, characterSheet.xp)))))));
     }
   }]);
 
@@ -109612,7 +109733,8 @@ function (_React$Component) {
       }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_character_info_modal__WEBPACK_IMPORTED_MODULE_5__["default"], {
         show: this.state.showCharacterInfo,
         onClose: this.hideCharacterInfo.bind(this),
-        characterId: this.state.characterId
+        characterId: this.state.characterId,
+        userId: this.props.userId
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_location_info_modal__WEBPACK_IMPORTED_MODULE_6__["default"], {
         show: this.state.showLocationInfo,
         onClose: this.closeLocationDetails.bind(this),
