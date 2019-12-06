@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Core;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -45,6 +46,8 @@ class CharacterInventoryControllerApiTest extends TestCase {
                                 ->createCharacter($user, 'Sample')
                                 ->assignSkills()
                                 ->character();
+
+       Event::fake();
     }
 
     public function tearDown(): void {
