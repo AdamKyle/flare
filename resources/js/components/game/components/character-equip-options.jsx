@@ -125,7 +125,7 @@ export default class EquipOptions extends React.Component {
             <dt>Base Damage Mod:</dt>
             <dd>{'+' + affix.base_damage_mod}</dd>
           </dl>
-          <span className="mt-2 mb-2 text-center">{item.artifact_property.description}</span>
+          <div className="mt-2 mb-2 text-center"><i>{item.artifact_property.description}</i></div>
         </div>
       )
     })
@@ -187,7 +187,7 @@ export default class EquipOptions extends React.Component {
                      <dt>Base Damage Mod:</dt>
                      <dd>{'+' + item.artifact_property.base_damage_mod}</dd>
                    </dl>
-                   <span className="mt-2 mb-2 text-center">{item.artifact_property.description}</span>
+                   <div className="mt-2 mb-2 text-center"><i>{item.artifact_property.description}</i></div>
                    <hr />
                   </>
                  : null

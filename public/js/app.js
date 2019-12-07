@@ -55926,7 +55926,7 @@ var BootstrapTable = function (_PropsBaseResolver) {
 
       var tableCaption = caption && _react2.default.createElement(
         _caption2.default,
-        null,
+        { bootstrap4: bootstrap4 },
         caption
       );
 
@@ -55943,6 +55943,7 @@ var BootstrapTable = function (_PropsBaseResolver) {
             sortField: this.props.sortField,
             sortOrder: this.props.sortOrder,
             onSort: this.props.onSort,
+            globalSortCaret: this.props.sort && this.props.sort.sortCaret,
             onFilter: this.props.onFilter,
             currFilters: this.props.currFilters,
             onExternalFilter: this.props.onExternalFilter,
@@ -56059,6 +56060,12 @@ BootstrapTable.propTypes = {
     dataField: _propTypes2.default.string.isRequired,
     order: _propTypes2.default.oneOf([_const2.default.SORT_DESC, _const2.default.SORT_ASC]).isRequired
   })),
+  sort: _propTypes2.default.shape({
+    dataField: _propTypes2.default.string,
+    order: _propTypes2.default.oneOf([_const2.default.SORT_DESC, _const2.default.SORT_ASC]),
+    sortFunc: _propTypes2.default.func,
+    sortCaret: _propTypes2.default.func
+  }),
   defaultSortDirection: _propTypes2.default.oneOf([_const2.default.SORT_DESC, _const2.default.SORT_ASC]),
   overlay: _propTypes2.default.func,
   onTableChange: _propTypes2.default.func,
@@ -56130,15 +56137,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint react/require-default-props: 0 */
 var Caption = function Caption(props) {
   if (!props.children) return null;
-  return _react2.default.createElement(
+
+  var caption = props.bootstrap4 ? _react2.default.createElement(
+    'caption',
+    { style: { captionSide: 'top' } },
+    props.children
+  ) : _react2.default.createElement(
     'caption',
     null,
     props.children
   );
+
+  return caption;
 };
 
 Caption.propTypes = {
-  children: _propTypes2.default.oneOfType([_propTypes2.default.node, _propTypes2.default.string])
+  children: _propTypes2.default.oneOfType([_propTypes2.default.node, _propTypes2.default.string]),
+  bootstrap4: _propTypes2.default.bool
 };
 
 exports.default = Caption;
@@ -56902,6 +56917,7 @@ var withContext = function withContext(Base) {
               },
               defaultSorted: _this7.props.defaultSorted,
               defaultSortDirection: _this7.props.defaultSortDirection,
+              sort: _this7.props.sort,
               data: rootProps.getData(filterProps, searchProps)
             }),
             _react2.default.createElement(
@@ -57463,6 +57479,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
@@ -57483,7 +57501,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint react/require-default-props: 0 */
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint camelcase: 0 */
+/* eslint react/require-default-props: 0 */
 
 
 exports.default = function (dataOperator, isRemoteSort, handleSortChange) {
@@ -57501,24 +57520,17 @@ exports.default = function (dataOperator, isRemoteSort, handleSortChange) {
 
       var sortOrder = void 0;
       var sortColumn = void 0;
-      var columns = props.columns,
-          defaultSorted = props.defaultSorted,
-          defaultSortDirection = props.defaultSortDirection;
+      var defaultSorted = props.defaultSorted,
+          defaultSortDirection = props.defaultSortDirection,
+          sort = props.sort;
 
 
       if (defaultSorted && defaultSorted.length > 0) {
-        var sortField = defaultSorted[0].dataField;
         sortOrder = defaultSorted[0].order || defaultSortDirection;
-        var sortColumns = columns.filter(function (col) {
-          return col.dataField === sortField;
-        });
-        if (sortColumns.length > 0) {
-          sortColumn = sortColumns[0];
-
-          if (sortColumn.onSort) {
-            sortColumn.onSort(sortField, sortOrder);
-          }
-        }
+        sortColumn = _this.initSort(defaultSorted[0].dataField, sortOrder);
+      } else if (sort && sort.dataField && sort.order) {
+        sortOrder = sort.order;
+        sortColumn = _this.initSort(sort.dataField, sortOrder);
       }
       _this.state = { sortOrder: sortOrder, sortColumn: sortColumn };
       return _this;
@@ -57536,15 +57548,50 @@ exports.default = function (dataOperator, isRemoteSort, handleSortChange) {
         }
       }
     }, {
+      key: 'UNSAFE_componentWillReceiveProps',
+      value: function UNSAFE_componentWillReceiveProps(nextProps) {
+        var sort = nextProps.sort,
+            columns = nextProps.columns;
+
+        if (sort && sort.dataField && sort.order) {
+          this.setState({
+            sortOrder: sort.order,
+            sortColumn: columns.find(function (col) {
+              return col.dataField === sort.dataField;
+            })
+          });
+        }
+      }
+    }, {
+      key: 'initSort',
+      value: function initSort(sortField, sortOrder) {
+        var sortColumn = void 0;
+        var columns = this.props.columns;
+
+        var sortColumns = columns.filter(function (col) {
+          return col.dataField === sortField;
+        });
+        if (sortColumns.length > 0) {
+          sortColumn = sortColumns[0];
+
+          if (sortColumn.onSort) {
+            sortColumn.onSort(sortField, sortOrder);
+          }
+        }
+        return sortColumn;
+      }
+    }, {
       key: 'render',
       value: function render() {
         var data = this.props.data;
+        var sort = this.props.sort;
         var _state2 = this.state,
             sortOrder = _state2.sortOrder,
             sortColumn = _state2.sortColumn;
 
         if (!isRemoteSort() && sortColumn) {
-          data = dataOperator.sort(data, sortOrder, sortColumn);
+          var sortFunc = sortColumn.sortFunc ? sortColumn.sortFunc : sort && sort.sortFunc;
+          data = dataOperator.sort(data, sortOrder, _extends({}, sortColumn, { sortFunc: sortFunc }));
         }
 
         return _react2.default.createElement(
@@ -57573,6 +57620,11 @@ exports.default = function (dataOperator, isRemoteSort, handleSortChange) {
       dataField: _propTypes2.default.string.isRequired,
       order: _propTypes2.default.oneOf([_const2.default.SORT_DESC, _const2.default.SORT_ASC]).isRequired
     })),
+    sort: _propTypes2.default.shape({
+      dataField: _propTypes2.default.string,
+      order: _propTypes2.default.oneOf([_const2.default.SORT_DESC, _const2.default.SORT_ASC]),
+      sortFunc: _propTypes2.default.func
+    }),
     defaultSortDirection: _propTypes2.default.oneOf([_const2.default.SORT_DESC, _const2.default.SORT_ASC])
   };
 
@@ -58078,7 +58130,8 @@ var HeaderCell = function (_eventDelegater) {
           onFilter = _props.onFilter,
           currFilters = _props.currFilters,
           filterPosition = _props.filterPosition,
-          onExternalFilter = _props.onExternalFilter;
+          onExternalFilter = _props.onExternalFilter,
+          globalSortCaret = _props.globalSortCaret;
       var text = column.text,
           sort = column.sort,
           sortCaret = column.sortCaret,
@@ -58094,6 +58147,8 @@ var HeaderCell = function (_eventDelegater) {
           headerSortingClasses = column.headerSortingClasses,
           headerSortingStyle = column.headerSortingStyle;
 
+
+      var sortCaretfunc = sortCaret || globalSortCaret;
 
       var delegateEvents = this.delegate(headerEvents);
 
@@ -58130,14 +58185,14 @@ var HeaderCell = function (_eventDelegater) {
         cellAttrs.className = (0, _classnames2.default)(cellAttrs.className, 'sortable');
 
         if (sorting) {
-          sortSymbol = sortCaret ? sortCaret(sortOrder, column) : _react2.default.createElement(_caret2.default, { order: sortOrder });
+          sortSymbol = sortCaretfunc ? sortCaretfunc(sortOrder, column) : _react2.default.createElement(_caret2.default, { order: sortOrder });
 
           // append customized classes or style if table was sorting based on the current column.
           cellClasses = (0, _classnames2.default)(cellClasses, _utils2.default.isFunction(headerSortingClasses) ? headerSortingClasses(column, sortOrder, isLastSorting, index) : headerSortingClasses);
 
           cellStyle = _extends({}, cellStyle, _utils2.default.isFunction(headerSortingStyle) ? headerSortingStyle(column, sortOrder, isLastSorting, index) : headerSortingStyle);
         } else {
-          sortSymbol = sortCaret ? sortCaret(undefined, column) : _react2.default.createElement(_symbol2.default, null);
+          sortSymbol = sortCaretfunc ? sortCaretfunc(undefined, column) : _react2.default.createElement(_symbol2.default, null);
         }
       }
 
@@ -58284,7 +58339,8 @@ var Header = function Header(props) {
       expandRow = props.expandRow,
       currFilters = props.currFilters,
       onExternalFilter = props.onExternalFilter,
-      filterPosition = props.filterPosition;
+      filterPosition = props.filterPosition,
+      globalSortCaret = props.globalSortCaret;
 
 
   var SelectionHeaderCellComp = function SelectionHeaderCellComp() {
@@ -58318,6 +58374,7 @@ var Header = function Header(props) {
       onSort: onSort,
       sorting: currSort,
       sortOrder: sortOrder,
+      globalSortCaret: globalSortCaret,
       isLastSorting: isLastSorting,
       onFilter: onFilter,
       currFilters: currFilters,
@@ -58362,6 +58419,7 @@ Header.propTypes = {
   selectRow: _propTypes2.default.object,
   currFilters: _propTypes2.default.object,
   onExternalFilter: _propTypes2.default.func,
+  globalSortCaret: _propTypes2.default.func,
   className: _propTypes2.default.string,
   expandRow: _propTypes2.default.object,
   filterPosition: _propTypes2.default.oneOf([_const2.default.FILTERS_POSITION_TOP, _const2.default.FILTERS_POSITION_INLINE, _const2.default.FILTERS_POSITION_BOTTOM])
@@ -107920,7 +107978,7 @@ function (_React$Component2) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(CharacterDestroyWarningModal).call(this, props));
     _this.state = {
-      errorMessage: null
+      error: null
     };
     return _this;
   }
@@ -107931,9 +107989,9 @@ function (_React$Component2) {
       var _this2 = this;
 
       this.setState({
-        errorMessage: null
+        error: null
       });
-      axios["delete"]('/api/destroy-item/'["this"].props.character.id, {
+      axios["delete"]('/api/destroy-item/' + this.props.characterId, {
         data: {
           item_id: this.props.itemToDestroy.id
         }
@@ -107941,7 +107999,7 @@ function (_React$Component2) {
         _this2.props.onDestroyed(result.data.message);
       })["catch"](function (error) {
         _this2.setState({
-          error: error.response.data.message
+          error: error.response.message
         });
       });
     }
@@ -107954,7 +108012,7 @@ function (_React$Component2) {
         show: this.props.show,
         onHide: this.props.onClose,
         animation: true,
-        size: "lg",
+        size: "md",
         "aria-labelledby": "contained-modal-title-vcenter",
         centered: true
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Header, {
@@ -107972,7 +108030,8 @@ function (_React$Component2) {
         characterId: this.props.characterId
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-danger",
-        type: "button"
+        type: "button",
+        onClick: this.destroy.bind(this)
       }, "Destroy"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
         type: "button",
@@ -108075,16 +108134,10 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       var item = this.state.itemToDestroy;
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, this.state.errorMessage !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "row mb-2"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-md-12"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "alert alert-danger"
-      }, this.state.errorMessage))) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "col-md-6"
+        className: "col-md-12"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "alert alert-warning mb-2"
       }, "This will destroy the item from your inventory. Are you sure?"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -108093,9 +108146,9 @@ function (_React$Component) {
         className: "card-header"
       }, item.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "mt-2 mb-2 text-center"
-      }, item.artifact_property.description), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null)))));
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, item.artifact_property.description)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, item.item_affixes.length > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Item Affixes"), this.renderAffixes(item), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null)))));
     }
   }]);
 
@@ -108372,9 +108425,9 @@ function (_React$Component) {
       return item.item_affixes.map(function (affix) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           key: affix.id
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "mt-2 mb-2 text-center"
-        }, item.artifact_property.description));
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, item.artifact_property.description)));
       });
     }
   }, {
@@ -108420,9 +108473,9 @@ function (_React$Component) {
         className: "card-header"
       }, item.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "mt-2 mb-2 text-center"
-      }, item.artifact_property.description), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, item.item_affixes.length > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Item Affixes"), this.renderAffixes(item), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Increases attack by:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + this.fetchIncrease(item).increasesDamageBy)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Replaces weapon:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, this.fetchIncrease(item).replacesWeapon))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, item.artifact_property.description)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, item.item_affixes.length > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Item Affixes"), this.renderAffixes(item), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Increases attack by:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + this.fetchIncrease(item).increasesDamageBy)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Replaces weapon:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, this.fetchIncrease(item).replacesWeapon))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
       }, this.fetchEquippedItems())), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
@@ -109019,7 +109072,7 @@ function (_React$Component) {
         return i.id === parseInt(event.target.getAttribute('data-item-id'));
       })[0];
 
-      if (fountItem.type === 'quest') {
+      if (foundItem.type === 'quest') {
         return this.setState({
           'error': 'Cannot detroy quest items.'
         });
@@ -109100,10 +109153,10 @@ function (_React$Component) {
   }, {
     key: "closeDestroyWarningWithMesage",
     value: function closeDestroyWarningWithMesage(message) {
-      this.stetState({
+      this.setState({
         showWarning: false,
         message: message,
-        error: false,
+        error: null,
         itemToDestroy: null
       });
     }
@@ -109233,10 +109286,9 @@ var actionsFormatter = function actionsFormatter(cell, row) {
       href: "#/action-3"
     }, "Sell"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
       "data-item-id": row.id,
-      onClick: destroyAction
-    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+      onClick: destroyAction,
       className: "text-danger"
-    }, "Destroy")))));
+    }, "Destroy"))));
   }
 };
 

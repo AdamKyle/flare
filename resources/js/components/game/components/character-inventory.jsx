@@ -45,7 +45,7 @@ export default class CharacterInventory extends React.Component {
   destroyItem(event) {
     const foundItem = this.state.inventory.filter(i => i.id === parseInt(event.target.getAttribute('data-item-id')))[0];
 
-    if (fountItem.type === 'quest') {
+    if (foundItem.type === 'quest') {
       return this.setState({
         'error': 'Cannot detroy quest items.',
       });
@@ -118,10 +118,10 @@ export default class CharacterInventory extends React.Component {
   }
 
   closeDestroyWarningWithMesage(message) {
-    this.stetState({
+    this.setState({
       showWarning: false,
       message: message,
-      error: false,
+      error: null,
       itemToDestroy: null,
     });
   }
@@ -248,8 +248,8 @@ const actionsFormatter = (cell, row) => {
           <Dropdown.Menu>
             <Dropdown.Item data-item-id={row.id} onClick={equipAction}>Equip</Dropdown.Item>
             <Dropdown.Item href="#/action-3">Sell</Dropdown.Item>
-            <Dropdown.Item data-item-id={row.id} onClick={destroyAction}>
-              <span className="text-danger">Destroy</span>
+            <Dropdown.Item data-item-id={row.id} onClick={destroyAction} className="text-danger">
+              Destroy
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>

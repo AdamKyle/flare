@@ -15,16 +15,16 @@ export default class CharacterDestroyWarningModal extends React.Component {
     super(props);
 
     this.state = {
-      errorMessage: null,
+      error: null,
     };
   }
 
   destroy() {
     this.setState({
-      errorMessage: null,
+      error: null,
     });
 
-    axios.delete('/api/destroy-item/' . this.props.character.id, {
+    axios.delete('/api/destroy-item/' + this.props.characterId, {
       data: {
         item_id: this.props.itemToDestroy.id,
       }
@@ -32,7 +32,7 @@ export default class CharacterDestroyWarningModal extends React.Component {
       this.props.onDestroyed(result.data.message);
     }).catch((error) => {
       this.setState({
-        error: error.response.data.message,
+        error: error.response.message,
       });
     });
   }
@@ -45,7 +45,7 @@ export default class CharacterDestroyWarningModal extends React.Component {
         show={this.props.show}
         onHide={this.props.onClose}
         animation={true}
-        size="lg"
+        size="md"
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
@@ -65,7 +65,7 @@ export default class CharacterDestroyWarningModal extends React.Component {
           <CharacterDetroyWarning itemToDestroy={this.props.itemToDestroy} characterId={this.props.characterId} />
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-danger" type="button">
+          <button className="btn btn-danger" type="button" onClick={this.destroy.bind(this)}>
             Destroy
           </button>
           <button className="btn btn-primary" type="button" onClick={this.props.onClose}>

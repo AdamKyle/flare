@@ -47,17 +47,8 @@ export default class CharacterDestroyWarning extends React.Component {
 
     return (
       <>
-        {this.state.errorMessage !== null
-         ?
-         <div className="row mb-2">
-            <div className="col-md-12">
-              <div className="alert alert-danger">{this.state.errorMessage}</div>
-            </div>
-         </div>
-         : null
-        }
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-12">
             <div className="alert alert-warning mb-2">
               This will destroy the item from your inventory. Are you sure?
             </div>
@@ -87,7 +78,16 @@ export default class CharacterDestroyWarning extends React.Component {
                      <dt>Base Damage Mod:</dt>
                      <dd>{'+' + item.artifact_property.base_damage_mod}</dd>
                    </dl>
-                   <span className="mt-2 mb-2 text-center">{item.artifact_property.description}</span>
+                   <div className="mt-2 mb-2 text-center"><i>{item.artifact_property.description}</i></div>
+                   <hr />
+                  </>
+                 : null
+                }
+                {item.item_affixes.length > 0
+                 ?
+                  <>
+                   <h5>Item Affixes</h5>
+                   {this.renderAffixes(item)}
                    <hr />
                   </>
                  : null
