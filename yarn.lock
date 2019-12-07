@@ -5521,9 +5521,9 @@ rc@^1.2.7:
     strip-json-comments "~2.0.1"
 
 react-bootstrap-table-next@^3.3.1:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/react-bootstrap-table-next/-/react-bootstrap-table-next-3.3.2.tgz#b0db19b66cbc6d4ab2bfd9b2e851defd89170771"
-  integrity sha512-es25+UH0foM1FxMz+8zaWfaAdtuWfKbY0yq8OaLpk5F8Suls7ItvYTk7FFhDsvV3+KLjj6ynARPed1IUTt2/Eg==
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-table-next/-/react-bootstrap-table-next-3.3.3.tgz#ea55a4ec7dab749d777aadc0c3ad362ce3efa3f6"
+  integrity sha512-oea2jLLh6VmGZ3uAqf1f0naI550ZE8BAyaMeSOThVJelk+09NDt1Gv6Udfeo+Deu7ts3CLirQnNlkH93BIb1Yw==
   dependencies:
     classnames "2.2.5"
     react-transition-group "2.5.3"
