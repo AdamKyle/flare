@@ -21,6 +21,24 @@ class CharacterInformationBuilder {
         return $this->character->dur + 10;
     }
 
+    public function hasArtifacts(): bool {
+        return $this->character->equippedItems->filter(function ($equippedItem) {
+            return $equippedItem->item->type === 'artifact' || !is_null($equippedItem->item->artifactProperty);
+        })->isEmpty();
+    }
+
+    public function hasAffixes(): bool {
+        return $this->character->equippedItems->filter(function ($equippedItem) {
+            return $equippedItem->item->itemAffixes->isNotEmpty();
+        })->isEmpty();
+    }
+
+    public function hasSpells(): bool {
+        return $this->character->equippedItems->filter(function ($equippedItem) {
+            return $equippedItem->item->type === 'spell';
+        })->isEmpty();
+    }
+
     protected function getWeaponDamage(): int {
         $leftHand  = $this->character->equippedItems->where('type', '=', 'left-hand')->first();
         $rightHand = $this->character->equippedItems->where('type', '=', 'right-hand')->first();

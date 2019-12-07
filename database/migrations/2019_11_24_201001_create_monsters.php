@@ -16,12 +16,13 @@ class CreateMonsters extends Migration
         Schema::create('monsters', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->bigInteger('str');
-            $table->bigInteger('dur');
-            $table->bigInteger('dex');
-            $table->bigInteger('chr');
-            $table->bigInteger('int');
-            $table->bigInteger('ac');
+            $table->Integer('str');
+            $table->Integer('dur');
+            $table->Integer('dex');
+            $table->Integer('chr');
+            $table->Integer('int');
+            $table->Integer('ac');
+            $table->Integer('max_level')->nullable()->default(0);
             $table->string('damage_stat');
             $table->integer('xp');
             $table->integer('drop_check');

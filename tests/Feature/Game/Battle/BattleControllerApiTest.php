@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
@@ -226,6 +227,7 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -243,6 +245,103 @@ class BattleControllerApiTest extends TestCase
         $this->character->refresh();
 
         $this->assertFalse($this->character->can_attack);
+    }
+
+    public function testCharacterGetsFullXPWhenMonsterMaxLevelIsZero() {
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropsCheckEvent::class,
+            GoldRushCheckEvent::class,
+            ShowTimeOutEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $this->monster->max_level = 0;
+        $this->monster->save();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        $this->assertEquals(10, $this->character->xp);
+
+    }
+
+    public function testCharacterGetsFullXPWhenMonsterMaxLevelIsHigherThenCharacterLevel() {
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropsCheckEvent::class,
+            GoldRushCheckEvent::class,
+            ShowTimeOutEvent::class,
+            UpdateTopBarEvent::class,
+            UpdateCharacterAttackEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $this->monster->max_level = 5;
+        $this->monster->save();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        $this->assertEquals(10, $this->character->xp);
+    }
+
+    public function testCharacterGetsOneThirdXPWhenMonsterMaxLevelIsLowerThenCharacterLevel() {
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropsCheckEvent::class,
+            GoldRushCheckEvent::class,
+            ShowTimeOutEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->setUpCharacter([
+            'level' => 100,
+        ]);
+
+        $this->monster->max_level = 5;
+        $this->monster->save();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        $this->assertEquals(3, $this->character->xp);
     }
 
     public function testWhenNotLoggedInCannotAccessBattleResults() {

@@ -11,6 +11,7 @@ use App\Flare\Transformers\CharacterInventoryTransformer;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
+use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Values\MaxDamageForItemValue;
 use App\Game\Core\Services\EquipItemService;
 
@@ -65,7 +66,7 @@ class CharacterInventoryController extends Controller {
         if (is_null($item)) {
             return response()->json([
                 'message' => 'Could not find a matching equipped item.',
-            ]);
+            ], 422);
         }
 
         $name = $item->item->name;
@@ -80,6 +81,28 @@ class CharacterInventoryController extends Controller {
 
         return response()->json([
             'message' => 'Unequipped ' . $name,
-        ]);
+        ], 200);
+    }
+
+    public function destroyItem(Request $request, Character $character) {
+        $item = $character->inventory->slots->where('item_id', '=', $request->item_id)->first();
+
+        if (is_null($item)) {
+            return response()->json([
+                'message' => 'Could not find a matching item.',
+            ], 422);
+        }
+
+        $name = $item->item->name;
+
+        $item->delete();
+
+        $character = $character->refresh();
+
+        event(new UpdateCharacterInventoryEvent($character));
+
+        return response()->json([
+            'message' => 'Destroyed ' . $name,
+        ], 200);
     }
 }

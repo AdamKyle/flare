@@ -5,7 +5,7 @@ import CharacterEquipOptions from './character-equip-options';
 
 class DraggableModalDialog extends React.Component {
   render() {
-    return <Draggable handle=".character-sheet"><ModalDialog {...this.props} /></Draggable>
+    return <Draggable handle=".equip-options"><ModalDialog {...this.props} /></Draggable>
   }
 }
 
@@ -32,7 +32,7 @@ export default class CharacterEquipOptionsModal extends React.Component {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title><span className="character-sheet">Equip Options</span></Modal.Title>
+          <Modal.Title><span className="equip-options">Equip Options</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <CharacterEquipOptions itemToEquip={this.props.itemToEquip} equippedItems={this.props.equippedItems} callHome={this.callHome.bind(this)} characterId={this.props.characterId}/>

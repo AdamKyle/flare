@@ -304,4 +304,40 @@ class CharacterInventoryControllerApiTest extends TestCase {
 
        $this->assertFalse($character->equippedItems->isEmpty());
     }
+
+    public function testCanDestroyItem() {
+        $itemName = $this->character->inventory->slots->first()->item->name;
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('DELETE', '/api/destroy-item/' . $this->character->id, [
+                             'item_id' => 1,
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals('Destroyed ' . $itemName, $content->message);
+
+       $character = $this->character->refresh();
+
+       $this->assertTrue($character->inventory->slots->isEmpty());
+    }
+
+    public function testCannotDestroyItem() {
+        $itemName = $this->character->equippedItems->first()->item->name;
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('DELETE', '/api/destroy-item/' . $this->character->id, [
+                             'item_id' => 4,
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals('Could not find a matching item.', $content->message);
+
+       $character = $this->character->refresh();
+
+       $this->assertFalse($character->inventory->slots->isEmpty());
+    }
 }

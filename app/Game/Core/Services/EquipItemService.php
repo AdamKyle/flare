@@ -11,6 +11,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
+use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\EquippedItem;
 
 class EquipItemService {
@@ -96,6 +97,7 @@ class EquipItemService {
         event(new UpdateTopBarEvent($this->character));
         event(new UpdateCharacterSheetEvent($this->character));
         event(new UpdateCharacterInventoryEvent($this->character));
+        event(new UpdateCharacterAttackEvent($this->character));
 
         return response()->json([
             'message' => 'Switched: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)) . '.',
@@ -119,6 +121,7 @@ class EquipItemService {
         event(new UpdateTopBarEvent($this->character));
         event(new UpdateCharacterSheetEvent($this->character));
         event(new UpdateCharacterInventoryEvent($this->character));
+        event(new UpdateCharacterAttackEvent($this->character));
 
         return response()->json([
             'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
@@ -142,6 +145,7 @@ class EquipItemService {
         event(new UpdateTopBarEvent($this->character));
         event(new UpdateCharacterSheetEvent($this->character));
         event(new UpdateCharacterInventoryEvent($this->character));
+        event(new UpdateCharacterAttackEvent($this->character));
 
         return response()->json([
             'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),

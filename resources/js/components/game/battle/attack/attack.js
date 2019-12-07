@@ -97,6 +97,24 @@ export default class Attack {
     if (type === 'player') {
       this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.attack;
 
+      if (attacker.has_artifacts) {
+        this.battleMessages.push({
+          message: 'Your artifacts glow before the enemy!'
+        });
+      }
+
+      if (attacker.has_affixes) {
+        this.battleMessages.push({
+          message: 'The enchantments on your equipment lash out at the enemy!'
+        });
+      }
+
+      if (attacker.has_spells) {
+        this.battleMessages.push({
+          message: 'Your spells burst forward towards the enemy!'
+        });
+      }
+
       this.battleMessages.push({
         message: attacker.name + ' hit for ' + attacker.attack
       });

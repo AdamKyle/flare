@@ -1,7 +1,8 @@
-import React                      from 'react';
-import BootstrapTable             from 'react-bootstrap-table-next';
-import {Dropdown, Alert}          from 'react-bootstrap';
-import CharacterEquipOptionsModal from './character-equip-options-modal';
+import React                        from 'react';
+import BootstrapTable               from 'react-bootstrap-table-next';
+import {Dropdown, Alert}            from 'react-bootstrap';
+import CharacterEquipOptionsModal   from './character-equip-options-modal';
+import CharacterDestroyWarningModal from './character-destroy-warning-modal';
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 
@@ -11,9 +12,11 @@ export default class CharacterInventory extends React.Component {
 
     this.state = {
       showEquipOptions: false,
+      showWarning:      false,
       inventory:        this.props.inventory.items,
       equipment:        this.props.equipment,
       itemToEquip:      null,
+      itemToDestroy:    null,
       equippedItems:    null,
       message:          null,
       error:            null,
@@ -36,6 +39,32 @@ export default class CharacterInventory extends React.Component {
       showEquipOptions: true,
       itemToEquip:      foundItem,
       equippedItems:    this.state.equipment.filter(e => e.item.type === foundItem.type)
+    });
+  }
+
+  destroyItem(event) {
+    const foundItem = this.state.inventory.filter(i => i.id === parseInt(event.target.getAttribute('data-item-id')))[0];
+
+    if (fountItem.type === 'quest') {
+      return this.setState({
+        'error': 'Cannot detroy quest items.',
+      });
+    }
+
+    this.setState({
+      error: null,
+      message: null,
+      showWarning: true,
+      itemToDestroy: foundItem,
+    });
+  }
+
+  closeDestroyWarning() {
+    this.setState({
+      error: null,
+      message: null,
+      showWarning: false,
+      itemToDestroy: null,
     });
   }
 
@@ -75,6 +104,7 @@ export default class CharacterInventory extends React.Component {
       showEquipOptions: false,
       itemToEquip:      false,
       message:          null,
+      error:            null,
     });
   }
 
@@ -83,6 +113,16 @@ export default class CharacterInventory extends React.Component {
       showEquipOptions: false,
       itemToEquip:      false,
       message:          message,
+      error:            null,
+    });
+  }
+
+  closeDestroyWarningWithMesage(message) {
+    this.stetState({
+      showWarning: false,
+      message: message,
+      error: false,
+      itemToDestroy: null,
     });
   }
 
@@ -99,6 +139,7 @@ export default class CharacterInventory extends React.Component {
     // Set up the actions.
     equipAction     = this.equip.bind(this);
     unEquipAction   = this.unEquip.bind(this);
+    destroyAction   = this.destroyItem.bind(this);
 
     const columns   = [{
       dataField: 'name',
@@ -178,6 +219,14 @@ export default class CharacterInventory extends React.Component {
           onEquip={this.closeEquiOptionsWithMessage.bind(this)}
           characterId={this.props.characterId}
         />
+
+        <CharacterDestroyWarningModal
+          show={this.state.showWarning}
+          onClose={this.closeDestroyWarning.bind(this)}
+          itemToDestroy={this.state.itemToDestroy}
+          onDestroyed={this.closeDestroyWarningWithMesage.bind(this)}
+          characterId={this.props.characterId}
+        />
       </div>
     );
   }
@@ -185,6 +234,7 @@ export default class CharacterInventory extends React.Component {
 
 let equipAction   = null;
 let unEquipAction = null;
+let destroyAction = null;
 
 const actionsFormatter = (cell, row) => {
   if (row.hasOwnProperty('actions')) {
@@ -198,7 +248,9 @@ const actionsFormatter = (cell, row) => {
           <Dropdown.Menu>
             <Dropdown.Item data-item-id={row.id} onClick={equipAction}>Equip</Dropdown.Item>
             <Dropdown.Item href="#/action-3">Sell</Dropdown.Item>
-            <Dropdown.Item href="#/action-2">Destroy</Dropdown.Item>
+            <Dropdown.Item data-item-id={row.id} onClick={destroyAction}>
+              <span className="text-danger">Destroy</span>
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </span>

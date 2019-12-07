@@ -23,8 +23,9 @@ export default class Actions extends React.Component {
       showMessage: false,
     }
 
-    this.echo   = Echo.private('show-timeout-bar-' + this.props.userId);
-    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.echo         = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.topBar       = Echo.private('update-top-bar-' + this.props.userId);
+    this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -63,6 +64,14 @@ export default class Actions extends React.Component {
           show_message: this.state.character.show_message,
           skills: this.state.character.skills,
         }
+      });
+    });
+
+    this.topBar.listen('Flare.Events.UpdateCharacterAttackEvent', (event) => {
+      this.setState({
+        character: event.character.data,
+        characterMaxHealth: event.character.data.health,
+        showMessage: false,
       });
     });
   }

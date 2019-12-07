@@ -25,6 +25,7 @@ class Monster extends Model
         'int',
         'ac',
         'gold',
+        'max_level',
         'health_range',
         'attack_range',
         'drop_check',
@@ -45,6 +46,7 @@ class Monster extends Model
         'ac'         => 'integer',
         'gold'       => 'integer',
         'drop_check' => 'integer',
+        'max_level'  => 'integer',
     ];
 
     public function skills() {

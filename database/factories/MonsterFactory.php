@@ -22,5 +22,6 @@ $factory->define(Monster::class, function (Faker $faker) {
         'attack_range' => '1-6',
         'gold'         => 25,
         'drop_check'   => 6,
+        'max_level'    => 0,
     ];
 });

@@ -6,6 +6,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
+use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Listeners\UpdateCharacterAttackListener;
 use App\Flare\Listeners\UpdateCharacterInventoryListener;
 use App\Flare\Listeners\UpdateCharacterSheetListener;
 use App\Flare\Listeners\CreateCharacterListener;
@@ -27,6 +29,11 @@ class EventsProvider extends ServiceProvider {
         // When a characetr inventory updates:
         UpdateCharacterInventoryEvent::class => [
             UpdateCharacterInventoryListener::class,
+        ],
+
+        // When a characters inventory or anything else changes:
+        UpdateCharacterAttackEvent::class => [
+            UpdateCharacterAttackListener::class,
         ]
     ];
 

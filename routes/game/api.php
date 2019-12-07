@@ -4,3 +4,4 @@ Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetControl
 Route::get('/character-inventory/{character}', ['uses' => 'Api\CharacterInventoryController@inventory']);
 Route::post('/equip-item/{character}', ['uses' => 'Api\CharacterInventoryController@equipItem']);
 Route::delete('/unequip-item/{character}', ['uses' => 'Api\CharacterInventoryController@unequipItem']);
+Route::delete('/destroy-item/{character}', ['uses' => 'Api\CharacterInventoryController@destroyItem']);
