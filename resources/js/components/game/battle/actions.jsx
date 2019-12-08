@@ -53,24 +53,24 @@ export default class Actions extends React.Component {
     });
 
     this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', (event) => {
-      this.setState({
-        character: {
-          ac: event.characterSheet.data.ac,
-          attack: event.characterSheet.data.attack,
-          health: event.characterSheet.data.health,
-          can_attack: this.state.character.can_attack,
-          id: this.state.character.id,
-          name: this.state.character.name,
-          show_message: this.state.character.show_message,
-          skills: this.state.character.skills,
-        }
-      });
+      const character = this.state.character;
+
+        character.ac           =  event.characterSheet.data.ac,
+        character.attack       =  event.characterSheet.data.attack,
+        character.health       =  event.characterSheet.data.health,
+        character.can_attack   =  this.state.character.can_attack,
+        character.id           =  this.state.character.id,
+        character.name         =  this.state.character.name,
+        character.show_message =  this.state.character.show_message,
+        character.skills       =  this.state.character.skills,
+
+      this.setState({character: character});
     });
 
-    this.topBar.listen('Flare.Events.UpdateCharacterAttackEvent', (event) => {
+    this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event) => {
       this.setState({
-        character: event.character.data,
-        characterMaxHealth: event.character.data.health,
+        character: event.attack.data,
+        characterMaxHealth: event.attack.data.health,
         showMessage: false,
       });
     });

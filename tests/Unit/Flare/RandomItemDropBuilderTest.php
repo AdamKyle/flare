@@ -10,6 +10,7 @@ use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Builders\CharacterBuilder;
+use App\Flare\Models\Item;
 
 class RandomItemDropBuilderTest extends TestCase
 {
@@ -82,5 +83,26 @@ class RandomItemDropBuilderTest extends TestCase
 
         $this->assertNotNull($item->artifactProperty);
         $this->assertTrue($item->itemAffixes->isNotEmpty());
+    }
+
+    public function testCreateOneHundredItemsThereShouldOnlyBeTwo() {
+        $randomItemGenerator = resolve(RandomItemDropBuilder::class)
+                                    ->setItemAffixes(config('game.item_affixes'))
+                                    ->setArtifactProperties(config('game.artifact_properties'));
+
+        $looting = $this->character->skills->where('name', 'Looting')->first();
+
+        $looting->update([
+            'skill_bonus' => 100
+        ]);
+
+        for ($i = 0; $i < 100; $i++) {
+            $item = $randomItemGenerator->generateItem($this->character);
+
+            $this->assertNotNull($item->artifactProperty);
+            $this->assertTrue($item->itemAffixes->isNotEmpty());
+        }
+
+        $this->assertEquals(2, Item::count());
     }
 }

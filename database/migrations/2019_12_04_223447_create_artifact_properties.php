@@ -18,7 +18,7 @@ class CreateArtifactProperties extends Migration
             $table->bigInteger('item_id')->unsigned();
             $table->string('name');
             $table->foreign('item_id')
-                ->references('id')->on('items');
+                ->references('id')->on('items')->onDelete('cascade');
             $table->integer('base_damage_mod');
             $table->string('description');
             $table->timestamps();

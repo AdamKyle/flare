@@ -18,7 +18,7 @@ class CreateItemAffixes extends Migration
             $table->bigInteger('item_id')->unsigned();
             $table->string('name');
             $table->foreign('item_id')
-                ->references('id')->on('items');
+                ->references('id')->on('items')->onDelete('cascade');
             $table->string('description');
             $table->integer('base_damage_mod');
             $table->string('type');

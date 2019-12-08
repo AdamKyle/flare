@@ -24,19 +24,19 @@ class CharacterInformationBuilder {
     public function hasArtifacts(): bool {
         return $this->character->equippedItems->filter(function ($equippedItem) {
             return $equippedItem->item->type === 'artifact' || !is_null($equippedItem->item->artifactProperty);
-        })->isEmpty();
+        })->isNotEmpty();
     }
 
     public function hasAffixes(): bool {
         return $this->character->equippedItems->filter(function ($equippedItem) {
             return $equippedItem->item->itemAffixes->isNotEmpty();
-        })->isEmpty();
+        })->isNotEmpty();
     }
 
     public function hasSpells(): bool {
         return $this->character->equippedItems->filter(function ($equippedItem) {
             return $equippedItem->item->type === 'spell';
-        })->isEmpty();
+        })->isNotEmpty();
     }
 
     protected function getWeaponDamage(): int {

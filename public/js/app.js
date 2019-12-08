@@ -107490,23 +107490,15 @@ function (_React$Component) {
         });
       });
       this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', function (event) {
-        _this2.setState({
-          character: {
-            ac: event.characterSheet.data.ac,
-            attack: event.characterSheet.data.attack,
-            health: event.characterSheet.data.health,
-            can_attack: _this2.state.character.can_attack,
-            id: _this2.state.character.id,
-            name: _this2.state.character.name,
-            show_message: _this2.state.character.show_message,
-            skills: _this2.state.character.skills
-          }
+        var character = _this2.state.character;
+        character.ac = event.characterSheet.data.ac, character.attack = event.characterSheet.data.attack, character.health = event.characterSheet.data.health, character.can_attack = _this2.state.character.can_attack, character.id = _this2.state.character.id, character.name = _this2.state.character.name, character.show_message = _this2.state.character.show_message, character.skills = _this2.state.character.skills, _this2.setState({
+          character: character
         });
       });
-      this.topBar.listen('Flare.Events.UpdateCharacterAttackEvent', function (event) {
+      this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', function (event) {
         _this2.setState({
-          character: event.character.data,
-          characterMaxHealth: event.character.data.health,
+          character: event.attack.data,
+          characterMaxHealth: event.attack.data.health,
           showMessage: false
         });
       });

@@ -34,7 +34,7 @@ class DropsCheckListener
                         ->setItemAffixes(config('game.item_affixes'))
                         ->setArtifactProperties(config('game.artifact_properties'))
                         ->generateItem($event->character);
-            dump($drop);
+
             $this->attemptToPickUpItem($event, $drop);
         }
     }

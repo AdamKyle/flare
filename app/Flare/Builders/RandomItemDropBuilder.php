@@ -24,16 +24,18 @@ class RandomItemDropBuilder {
     }
 
     public function generateItem(Character $character): Item {
-        $item = Item::inRandomOrder()->whereNull('artifact_property_id')->first();
+        $item = Item::inRandomOrder()->with(['itemAffixes'])->doesntHave('artifactProperty')->get()->first();
 
         $duplicateItem = $item->replicate();
+        $duplicateItem->save();
 
-        if (!is_null($item->itemAffix)) {
-            $duplicateItem->itemAffix = $item->itemAffix->replicate();
-            $duplicateItem->itemAffix->save();
+        if ($item->itemAffixes->isNotEmpty()) {
+            foreach ($item->itemAffixes as $itemAffix) {
+                $duplicateItem->itemAffixes()->create($itemAffix->getAttributes());
+            }
         }
 
-        $duplicateItem->save();
+        $duplicateItem->refresh()->load(['itemAffixes']);
 
         if ($this->shouldHaveArtifactAttached($character)) {
             $artifact            = $this->fetchRandomArtifactProperty();
@@ -47,27 +49,30 @@ class RandomItemDropBuilder {
             $affix['item_id'] = $item->id;
 
             if ($duplicateItem->itemAffixes->isNotEmpty()) {
-                $types = $duplicateItem->itemAffixes->filter(function($itemAffix) use ($affix) {
-                    return $itemAffix->type === $affix['type'];
-                })->all();
+                $hasSameAffix = $duplicateItem->itemAffixes->where('type', '=', $affix['type'])->first();
 
-                if ($types->isEmpty()) {
-                    $duplicateItem->itemAffixes()->create($affix);
+                if (!is_null($hasSameAffix)) {
+                    $duplicateItem->delete();
+
+                    return $item;
                 } else {
-                    $duplicateItem->artifactProperty->delete();
+                    $duplicateItem->itemAffixes()->create($affix);
                 }
             } else {
                 $duplicateItem->itemAffixes()->create($affix);
             }
         }
 
-        if (is_null($duplicateItem->artifactProperty) && $duplicateItem->itemAffixes->isEmpty()) {
+        $duplicateItem = $this->setItemName($duplicateItem->load(['itemAffixes', 'artifactProperty']));
+        $foundItems    = Item::where('name', '=', $duplicateItem->name);
+
+        if ($foundItems->count() > 1) {
+            $item = Item::where('name', '=', $duplicateItem->name)->first();
+
             $duplicateItem->delete();
 
             return $item;
         }
-
-        $duplicateItem = $this->setItemName($duplicateItem->load(['itemAffixes', 'artifactProperty']));
 
         return $duplicateItem;
     }
@@ -75,7 +80,7 @@ class RandomItemDropBuilder {
     protected function shouldHaveArtifactAttached(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return rand(0, 100) + $lootingChance > 1; //70;
+        return rand(0, 100) + $lootingChance > 70;
     }
 
     protected function shouldHaveItemAffix(Character $character): bool {
