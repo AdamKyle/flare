@@ -109402,31 +109402,37 @@ var questItemNameFormatter = function questItemNameFormatter(cell, row) {
 
 var actionsFormatter = function actionsFormatter(cell, row) {
   if (row.hasOwnProperty('actions')) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Toggle, {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["DropdownButton"], {
+      drop: "left",
       variant: "primary",
-      id: "dropdown-basic"
-    }, "Actions"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Menu, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
+      title: "Actions",
+      id: "dropdown-button-drop-left",
+      key: "left"
+    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
       "data-item-id": row.id,
       onClick: equipAction
     }, "Equip"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
-      href: "#/action-3"
+      "data-item-id": row.id
     }, "Sell"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
       "data-item-id": row.id,
       onClick: destroyAction,
       className: "text-danger"
-    }, "Destroy"))));
+    }, "Destroy")));
   }
 };
 
 var equipmentActionsFormatter = function equipmentActionsFormatter(cell, row) {
   if (row.hasOwnProperty('actions')) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Toggle, {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["DropdownButton"], {
+      drop: "left",
       variant: "primary",
-      id: "dropdown-basic"
-    }, "Actions"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Menu, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
+      title: "Actions",
+      id: "dropdown-button-drop-left",
+      key: "left"
+    }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Dropdown"].Item, {
       "data-equipment-id": row.id,
       onClick: unEquipAction
-    }, "Unequip"))));
+    }, "Unequip")));
   }
 };
 

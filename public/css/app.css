@@ -11473,6 +11473,10 @@ a.text-dark:focus {
   cursor: pointer;
 }
 
+.accordion > .card {
+  overflow: visible;
+}
+
 .magical-item {
   color: #8d29b5;
 }

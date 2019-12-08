@@ -1,6 +1,7 @@
 import React                        from 'react';
 import BootstrapTable               from 'react-bootstrap-table-next';
 import {Dropdown,
+        DropdownButton,
         Alert,
         Popover,
         OverlayTrigger,
@@ -372,19 +373,19 @@ const actionsFormatter = (cell, row) => {
   if (row.hasOwnProperty('actions')) {
     return (
       <span>
-        <Dropdown>
-          <Dropdown.Toggle variant="primary" id="dropdown-basic">
-            Actions
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item data-item-id={row.id} onClick={equipAction}>Equip</Dropdown.Item>
-            <Dropdown.Item href="#/action-3">Sell</Dropdown.Item>
-            <Dropdown.Item data-item-id={row.id} onClick={destroyAction} className="text-danger">
-              Destroy
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+        <DropdownButton
+          drop='left'
+          variant="primary"
+          title='Actions'
+          id='dropdown-button-drop-left'
+          key='left'
+        >
+          <Dropdown.Item data-item-id={row.id} onClick={equipAction}>Equip</Dropdown.Item>
+          <Dropdown.Item data-item-id={row.id}>Sell</Dropdown.Item>
+          <Dropdown.Item data-item-id={row.id} onClick={destroyAction} className="text-danger">
+            Destroy
+          </Dropdown.Item>
+        </DropdownButton>
       </span>
     );
   }
@@ -394,15 +395,15 @@ const equipmentActionsFormatter = (cell, row) => {
   if (row.hasOwnProperty('actions')) {
     return (
       <span>
-        <Dropdown>
-          <Dropdown.Toggle variant="primary" id="dropdown-basic">
-            Actions
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item data-equipment-id={row.id} onClick={unEquipAction}>Unequip</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+        <DropdownButton
+          drop='left'
+          variant="primary"
+          title='Actions'
+          id='dropdown-button-drop-left'
+          key='left'
+        >
+          <Dropdown.Item data-equipment-id={row.id} onClick={unEquipAction}>Unequip</Dropdown.Item>
+        </DropdownButton>
       </span>
     );
   }
