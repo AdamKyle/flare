@@ -108094,9 +108094,9 @@ function (_React$Component) {
       return item.item_affixes.map(function (affix) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           key: affix.id
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "mt-2 mb-2 text-center"
-        }, item.artifact_property.description));
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, affix.description)));
       });
     }
   }, {
@@ -108323,6 +108323,17 @@ function (_React$Component) {
 
       var increasesDamageBy = 0;
       var replacesWeapon = 'None';
+      var weapons = this.state.equippedItems.filter(function (e) {
+        return e.item.type === 'weapon';
+      });
+
+      if (weapons.length === 0) {
+        return {
+          increasesDamageBy: this.fetchItemDamage(item),
+          replacesWeapon: 'Having nothing equipped.'
+        };
+      }
+
       this.state.equippedItems.forEach(function (equipment) {
         var equippedItemDamage = _this2.fetchItemDamage(equipment.item);
 
@@ -108419,7 +108430,7 @@ function (_React$Component) {
           key: affix.id
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "mt-2 mb-2 text-center"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, item.artifact_property.description)));
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, affix.description)));
       });
     }
   }, {
@@ -108981,8 +108992,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_bootstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-bootstrap */ "./node_modules/react-bootstrap/esm/index.js");
 /* harmony import */ var _character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./character-equip-options-modal */ "./resources/js/components/game/components/character-equip-options-modal.jsx");
 /* harmony import */ var _character_destroy_warning_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./character-destroy-warning-modal */ "./resources/js/components/game/components/character-destroy-warning-modal.jsx");
-/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-bootstrap-table-next/dist/react-bootstrap-table2.min.css */ "./node_modules/react-bootstrap-table-next/dist/react-bootstrap-table2.min.css");
-/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _item_info__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./item-info */ "./resources/js/components/game/components/item-info.jsx");
+/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-bootstrap-table-next/dist/react-bootstrap-table2.min.css */ "./node_modules/react-bootstrap-table-next/dist/react-bootstrap-table2.min.css");
+/* harmony import */ var react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_bootstrap_table_next_dist_react_bootstrap_table2_min_css__WEBPACK_IMPORTED_MODULE_6__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -109008,6 +109020,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var CharacterInventory =
 /*#__PURE__*/
 function (_React$Component) {
@@ -109022,6 +109035,7 @@ function (_React$Component) {
     _this.state = {
       showEquipOptions: false,
       showWarning: false,
+      showItemDescription: false,
       inventory: _this.props.inventory.items,
       equipment: _this.props.equipment,
       itemToEquip: null,
@@ -109174,7 +109188,8 @@ function (_React$Component) {
       destroyAction = this.destroyItem.bind(this);
       var columns = [{
         dataField: 'name',
-        text: 'Item Name'
+        text: 'Item Name',
+        formatter: nameFormatter
       }, {
         dataField: 'type',
         text: 'Item Type'
@@ -109191,7 +109206,8 @@ function (_React$Component) {
       }];
       var equipmentColumns = [{
         dataField: 'item.name',
-        text: 'Item Name'
+        text: 'Item Name',
+        formatter: equipmentNameFormatter
       }, {
         dataField: 'item.type',
         text: 'Item Type'
@@ -109265,6 +109281,69 @@ function (_React$Component) {
 var equipAction = null;
 var unEquipAction = null;
 var destroyAction = null;
+
+var nameFormatter = function nameFormatter(cell, row) {
+  var className = 'regular-item';
+  console.log(row);
+
+  if (row.artifact_property !== null) {
+    className = 'artifact-item';
+  }
+
+  if (row.item_affixes.length > 0) {
+    className = 'enchanted-item';
+  }
+
+  if (row.item_affixes.length > 0 && row.artifact_property !== null) {
+    className = 'magical-item';
+  }
+
+  var popover = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Popover"], {
+    id: "inventory-item"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_item_info__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    item: row
+  }));
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["OverlayTrigger"], {
+    placement: "right",
+    overlay: popover
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+    href: "#",
+    className: className
+  }, row.name));
+};
+
+var equipmentNameFormatter = function equipmentNameFormatter(cell, row) {
+  var className = 'regular-item';
+  console.log(row);
+
+  if (row.item.artifact_property !== null) {
+    className = 'artifact-item';
+  }
+
+  if (row.item.item_affixes.length > 0) {
+    className = 'enchanted-item';
+  }
+
+  if (row.item.item_affixes.length > 0 && row.artifact_property !== null) {
+    className = 'magical-item';
+  }
+
+  var spopover = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Popover"], {
+    id: "equipped-item",
+    style: {
+      maxWidth: 500
+    }
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_item_info__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    item: row.item
+  }));
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["OverlayTrigger"], {
+    placement: "right",
+    overlay: spopover
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+    href: "#",
+    className: className
+  }, row.item.name)));
+};
 
 var actionsFormatter = function actionsFormatter(cell, row) {
   if (row.hasOwnProperty('actions')) {
@@ -109398,6 +109477,118 @@ function (_React$Component) {
   }]);
 
   return CharacterSheet;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/game/components/item-info.jsx":
+/*!***************************************************************!*\
+  !*** ./resources/js/components/game/components/item-info.jsx ***!
+  \***************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ItemInfo; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var ItemInfo =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(ItemInfo, _React$Component);
+
+  function ItemInfo(props) {
+    var _this;
+
+    _classCallCheck(this, ItemInfo);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ItemInfo).call(this, props));
+    _this.state = {
+      item: _this.props.item
+    };
+    return _this;
+  }
+
+  _createClass(ItemInfo, [{
+    key: "renderAffixes",
+    value: function renderAffixes(item) {
+      return item.item_affixes.map(function (affix) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: affix.id
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, affix.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + affix.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "mt-2 mb-2 text-center"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, affix.description)));
+      });
+    }
+  }, {
+    key: "renderButtons",
+    value: function renderButtons(item) {
+      switch (item.type) {
+        case 'weapon':
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            className: "btn btn-primary",
+            onClick: this.equip.bind(this),
+            "data-type": "left-hand"
+          }, "Left Hand"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            className: "btn btn-primary ml-2",
+            onClick: this.equip.bind(this),
+            "data-type": "right-hand"
+          }, "Right Hand"));
+
+        default:
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+            className: "btn btn-primary",
+            onClick: this.equip.bind(this),
+            "data-type": item.type
+          }, "Confirm");
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var item = this.state.item;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "item-info"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-header"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h6", null, item.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "mt-2 mb-2 text-center"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, item.artifact_property.description)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, item.item_affixes.length > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Item Affixes"), this.renderAffixes(item), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null)))));
+    }
+  }]);
+
+  return ItemInfo;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 

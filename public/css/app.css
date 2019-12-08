@@ -11469,6 +11469,52 @@ a.text-dark:focus {
   margin-left: 10px;
 }
 
+.magical-item {
+  color: #8d29b5;
+}
+
+.magical-item:hover,
+.magical-item:visited,
+.magical-item:focus {
+  color: #8d29b5;
+}
+
+.regular-item {
+  color: #777676;
+}
+
+.regular-item:hover,
+.regular-item:visited,
+.regular-item:focus {
+  color: #777676;
+}
+
+.artifact-item {
+  color: #5b689a;
+}
+
+.artifact-item:hover,
+.artifact-item:visited,
+.artifact-item:focus {
+  color: #5b689a;
+}
+
+#inventory-item {
+  max-width: 500px;
+}
+
+#inventory-item .item-info .card-header {
+  max-width: 500px;
+}
+
+#equipped-item {
+  max-width: 500px;
+}
+
+#equipped-item .item-info .card-header {
+  max-width: 500px;
+}
+
 dl {
   display: -webkit-box;
   display: flex;

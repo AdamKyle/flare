@@ -1,8 +1,12 @@
 import React                        from 'react';
 import BootstrapTable               from 'react-bootstrap-table-next';
-import {Dropdown, Alert}            from 'react-bootstrap';
+import {Dropdown,
+        Alert,
+        Popover,
+        OverlayTrigger}                    from 'react-bootstrap';
 import CharacterEquipOptionsModal   from './character-equip-options-modal';
 import CharacterDestroyWarningModal from './character-destroy-warning-modal';
+import ItemInfo                     from './item-info';
 
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 
@@ -11,15 +15,16 @@ export default class CharacterInventory extends React.Component {
     super(props);
 
     this.state = {
-      showEquipOptions: false,
-      showWarning:      false,
-      inventory:        this.props.inventory.items,
-      equipment:        this.props.equipment,
-      itemToEquip:      null,
-      itemToDestroy:    null,
-      equippedItems:    null,
-      message:          null,
-      error:            null,
+      showEquipOptions:    false,
+      showWarning:         false,
+      showItemDescription: false,
+      inventory:           this.props.inventory.items,
+      equipment:           this.props.equipment,
+      itemToEquip:         null,
+      itemToDestroy:       null,
+      equippedItems:       null,
+      message:             null,
+      error:               null,
     }
   }
 
@@ -144,6 +149,7 @@ export default class CharacterInventory extends React.Component {
     const columns   = [{
       dataField: 'name',
       text: 'Item Name',
+      formatter: nameFormatter,
     }, {
       dataField: 'type',
       text: 'Item Type'
@@ -162,6 +168,7 @@ export default class CharacterInventory extends React.Component {
     const equipmentColumns   = [{
       dataField: 'item.name',
       text: 'Item Name',
+      formatter: equipmentNameFormatter,
     }, {
       dataField: 'item.type',
       text: 'Item Type'
@@ -235,6 +242,68 @@ export default class CharacterInventory extends React.Component {
 let equipAction   = null;
 let unEquipAction = null;
 let destroyAction = null;
+
+const nameFormatter = (cell, row) => {
+
+  let className = 'regular-item';
+  console.log(row);
+
+  if (row.artifact_property !== null) {
+    className = 'artifact-item';
+  }
+
+  if (row.item_affixes.length > 0) {
+    className = 'enchanted-item';
+  }
+
+  if (row.item_affixes.length > 0 && row.artifact_property !== null) {
+    className = 'magical-item';
+  }
+
+  const popover = (
+    <Popover id="inventory-item">
+      <ItemInfo item={row} />
+    </Popover>
+  );
+
+  return (
+    <OverlayTrigger placement="right" overlay={popover}>
+      <a href="#" className={className}>{row.name}</a>
+    </OverlayTrigger>
+  );
+}
+
+const equipmentNameFormatter = (cell, row) => {
+
+  let className = 'regular-item';
+  console.log(row);
+
+  if (row.item.artifact_property !== null) {
+    className = 'artifact-item';
+  }
+
+  if (row.item.item_affixes.length > 0) {
+    className = 'enchanted-item';
+  }
+
+  if (row.item.item_affixes.length > 0 && row.artifact_property !== null) {
+    className = 'magical-item';
+  }
+
+  const spopover = (
+    <Popover id="equipped-item" style={{maxWidth: 500}}>
+      <ItemInfo item={row.item} />
+    </Popover>
+  );
+
+  return (
+    <span>
+      <OverlayTrigger placement="right" overlay={spopover}>
+        <a href="#" className={className}>{row.item.name}</a>
+      </OverlayTrigger>
+    </span>
+  );
+}
 
 const actionsFormatter = (cell, row) => {
   if (row.hasOwnProperty('actions')) {

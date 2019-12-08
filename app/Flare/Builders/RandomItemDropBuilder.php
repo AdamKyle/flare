@@ -61,6 +61,10 @@ class RandomItemDropBuilder {
             } else {
                 $duplicateItem->itemAffixes()->create($affix);
             }
+        } else {
+            $duplicateItem->delete();
+
+            return $item;
         }
 
         $duplicateItem = $this->setItemName($duplicateItem->load(['itemAffixes', 'artifactProperty']));
@@ -80,13 +84,13 @@ class RandomItemDropBuilder {
     protected function shouldHaveArtifactAttached(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return rand(0, 100) + $lootingChance > 70;
+        return rand(1, 100) + $lootingChance > 60;
     }
 
     protected function shouldHaveItemAffix(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return rand(0, 100) + $lootingChance > 1; //60;
+        return rand(1, 100) + $lootingChance > 50;
     }
 
     protected function fetchRandomArtifactProperty() {

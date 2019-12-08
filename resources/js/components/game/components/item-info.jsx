@@ -1,12 +1,12 @@
 import React from 'react';
 
-export default class CharacterDestroyWarning extends React.Component {
+export default class ItemInfo extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      itemToDestroy: this.props.itemToDestroy,
+      item: this.props.item,
     }
   }
 
@@ -43,18 +43,15 @@ export default class CharacterDestroyWarning extends React.Component {
   }
 
   render() {
-    const item = this.state.itemToDestroy;
+    const item = this.state.item;
 
     return (
-      <>
+      <div className="item-info">
         <div className="row">
           <div className="col-md-12">
-            <div className="alert alert-warning mb-2">
-              This will destroy the item from your inventory. Are you sure?
-            </div>
             <div className="card">
               <div className="card-header">
-                {item.name}
+                <h6>{item.name}</h6>
               </div>
               <div className="card-body">
                 <dl>
@@ -65,10 +62,10 @@ export default class CharacterDestroyWarning extends React.Component {
                   <dt>Type:</dt>
                   <dd>{item.type}</dd>
                 </dl>
-                <hr />
                 {item.artifact_property !== null
                  ?
                   <>
+                   <hr />
                    <h5>Artifact Details</h5>
                    <dl>
                      <dt>Name:</dt>
@@ -96,7 +93,7 @@ export default class CharacterDestroyWarning extends React.Component {
             </div>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 }

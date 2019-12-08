@@ -31,6 +31,11 @@ class RandomItemDropBuilderTest extends TestCase
             'type' => 'weapon',
         ]);
 
+        $this->createItem([
+            'name' => 'Bloody Spear',
+            'type' => 'weapon',
+        ]);
+
         $race = $this->createRace([
             'str_mod' => 3,
         ]);
@@ -93,8 +98,10 @@ class RandomItemDropBuilderTest extends TestCase
         $looting = $this->character->skills->where('name', 'Looting')->first();
 
         $looting->update([
-            'skill_bonus' => 100
+            'skill_bonus' => 1000
         ]);
+
+        $this->character->refresh();
 
         for ($i = 0; $i < 100; $i++) {
             $item = $randomItemGenerator->generateItem($this->character);
@@ -103,6 +110,6 @@ class RandomItemDropBuilderTest extends TestCase
             $this->assertTrue($item->itemAffixes->isNotEmpty());
         }
 
-        $this->assertEquals(2, Item::count());
+        $this->assertEquals(4, Item::count());
     }
 }

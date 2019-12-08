@@ -55,7 +55,7 @@ class CharacterBuilder {
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
-            'item_id'      => Item::where('name', '=', 'Rusty Dagger')->first()->id,
+            'item_id'      => Item::first()->id,
         ]);
 
         $this->character->map()->create([
@@ -64,7 +64,7 @@ class CharacterBuilder {
 
         $this->character->equippedItems()->create([
             'character_id' => $this->character->id,
-            'item_id'      => Item::where('name', '=', 'Rusty Dagger')->first()->id,
+            'item_id'      => $this->character->inventory->slots()->first()->item_id,
             'type'         => 'left-hand',
         ]);
 

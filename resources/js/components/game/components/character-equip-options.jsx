@@ -16,6 +16,15 @@ export default class EquipOptions extends React.Component {
     let increasesDamageBy = 0;
     let replacesWeapon    = 'None';
 
+    const weapons = this.state.equippedItems.filter(e => e.item.type === 'weapon');
+
+    if (weapons.length === 0) {
+      return {
+        increasesDamageBy: this.fetchItemDamage(item),
+        replacesWeapon:    'Having nothing equipped.',
+      };
+    }
+
     this.state.equippedItems.forEach((equipment) => {
 
       const equippedItemDamage = this.fetchItemDamage(equipment.item);
@@ -125,7 +134,7 @@ export default class EquipOptions extends React.Component {
             <dt>Base Damage Mod:</dt>
             <dd>{'+' + affix.base_damage_mod}</dd>
           </dl>
-          <div className="mt-2 mb-2 text-center"><i>{item.artifact_property.description}</i></div>
+          <div className="mt-2 mb-2 text-center"><i>{affix.description}</i></div>
         </div>
       )
     })

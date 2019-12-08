@@ -1,0 +1,39 @@
+.magical-item {
+  color: #8d29b5;
+
+  &:hover, &:visited, &:focus {
+    color: #8d29b5;
+  }
+}
+
+.regular-item {
+  color: #777676;
+
+  &:hover, &:visited, &:focus {
+    color: #777676;
+  }
+}
+
+.artifact-item {
+  color: #5b689a;
+
+  &:hover, &:visited, &:focus {
+    color: #5b689a;
+  }
+}
+
+#inventory-item {
+  max-width: 500px;
+
+  .item-info .card-header {
+    max-width: 500px;
+  }
+}
+
+#equipped-item {
+  max-width: 500px;
+
+  .item-info .card-header {
+    max-width: 500px;
+  }
+}
