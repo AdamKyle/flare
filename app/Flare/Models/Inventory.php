@@ -5,6 +5,7 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\Item;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\QuestItemSlot;
 
 class Inventory extends Model
 {
@@ -27,5 +28,9 @@ class Inventory extends Model
 
     public function slots() {
         return $this->hasMany(InventorySlot::class);
+    }
+
+    public function questItemSlots() {
+        return $this->hasMany(QuestItemSlot::class);
     }
 }

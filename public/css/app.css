@@ -11469,6 +11469,10 @@ a.text-dark:focus {
   margin-left: 10px;
 }
 
+.accordion > .card > .card-header {
+  cursor: pointer;
+}
+
 .magical-item {
   color: #8d29b5;
 }
@@ -11497,6 +11501,16 @@ a.text-dark:focus {
 .artifact-item:visited,
 .artifact-item:focus {
   color: #5b689a;
+}
+
+.quest-item {
+  color: #b78d11;
+}
+
+.quest-item:hover,
+.quest-item:visited,
+.quest-item:focus {
+  color: #b78d11;
 }
 
 #inventory-item {

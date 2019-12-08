@@ -29,6 +29,7 @@ export default class CharacterInventoryModal extends React.Component {
         this.setState({
           characaterInventory: result.data.inventory.data,
           equipment: result.data.equipment,
+          questItems: result.data.quest_items,
           isLoading: false,
         });
       });
@@ -37,6 +38,7 @@ export default class CharacterInventoryModal extends React.Component {
       this.setState({
         characaterInventory: event.inventory.inventory.data,
         equipment: event.inventory.equipment,
+        questItems: event.inventory.quest_items,
       });
     });
   }
@@ -57,7 +59,12 @@ export default class CharacterInventoryModal extends React.Component {
           <Modal.Title><span className="character-inventory">Character Inventory</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {this.state.isLoading ? 'Please wait ...' : <CharacterInventory inventory={this.state.characaterInventory} equipment={this.state.equipment} characterId={this.props.characterId} />}
+          {this.state.isLoading ? 'Please wait ...' : <CharacterInventory
+            inventory={this.state.characaterInventory}
+            equipment={this.state.equipment}
+            questItems={this.state.questItems}
+            characterId={this.props.characterId} />
+          }
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-primary" type="button" onClick={this.props.onClose}>

@@ -3,7 +3,9 @@ import BootstrapTable               from 'react-bootstrap-table-next';
 import {Dropdown,
         Alert,
         Popover,
-        OverlayTrigger}                    from 'react-bootstrap';
+        OverlayTrigger,
+        Accordion,
+        Card}                       from 'react-bootstrap';
 import CharacterEquipOptionsModal   from './character-equip-options-modal';
 import CharacterDestroyWarningModal from './character-destroy-warning-modal';
 import ItemInfo                     from './item-info';
@@ -20,6 +22,7 @@ export default class CharacterInventory extends React.Component {
       showItemDescription: false,
       inventory:           this.props.inventory.items,
       equipment:           this.props.equipment,
+      questItems:          this.props.questItems,
       itemToEquip:         null,
       itemToDestroy:       null,
       equippedItems:       null,
@@ -187,6 +190,15 @@ export default class CharacterInventory extends React.Component {
       formatter: equipmentActionsFormatter,
     }];
 
+    const questItems   = [{
+      dataField: 'item.name',
+      text: 'Item Name',
+      formatter: questItemNameFormatter,
+    }, {
+      dataField: 'item.type',
+      text: 'Item Type'
+    }];
+
     return (
       <div>
         {this.state.message !== null
@@ -205,16 +217,52 @@ export default class CharacterInventory extends React.Component {
          : null
         }
 
-        <div className="row">
+        <div className="row mb-2">
           <div className="col-md-12">
-            <BootstrapTable keyField='slot_id' data={ inventory } columns={ columns } />
+            <Accordion defaultActiveKey="0">
+              <Card>
+                <Accordion.Toggle as={Card.Header} eventKey="0">
+                  Inventory
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>
+                    <BootstrapTable keyField='slot_id' data={ inventory } columns={ columns } />
+                  </Card.Body>
+                </Accordion.Collapse>
+              </Card>
+            </Accordion>
           </div>
         </div>
-        <hr />
-        <h5>Equipped</h5>
-        <div className="row">
+        <div className="row mb-2">
           <div className="col-md-12">
-            <BootstrapTable keyField='id' data={ this.state.equipment } columns={ equipmentColumns } />
+            <Accordion defaultActiveKey="0">
+              <Card>
+                <Accordion.Toggle as={Card.Header} eventKey="0">
+                  Equipment
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>
+                    <BootstrapTable keyField='id' data={ this.state.equipment } columns={ equipmentColumns } />
+                  </Card.Body>
+                </Accordion.Collapse>
+              </Card>
+            </Accordion>
+          </div>
+        </div>
+        <div className="row mb-2">
+          <div className="col-md-12">
+            <Accordion>
+              <Card>
+                <Accordion.Toggle as={Card.Header} eventKey="0">
+                  Quest Items
+                </Accordion.Toggle>
+                <Accordion.Collapse eventKey="0">
+                  <Card.Body>
+                    <BootstrapTable keyField='id' data={ this.state.questItems } columns={ questItems } />
+                  </Card.Body>
+                </Accordion.Collapse>
+              </Card>
+            </Accordion>
           </div>
         </div>
 
@@ -246,7 +294,6 @@ let destroyAction = null;
 const nameFormatter = (cell, row) => {
 
   let className = 'regular-item';
-  console.log(row);
 
   if (row.artifact_property !== null) {
     className = 'artifact-item';
@@ -276,7 +323,6 @@ const nameFormatter = (cell, row) => {
 const equipmentNameFormatter = (cell, row) => {
 
   let className = 'regular-item';
-  console.log(row);
 
   if (row.item.artifact_property !== null) {
     className = 'artifact-item';
@@ -300,6 +346,23 @@ const equipmentNameFormatter = (cell, row) => {
     <span>
       <OverlayTrigger placement="right" overlay={spopover}>
         <a href="#" className={className}>{row.item.name}</a>
+      </OverlayTrigger>
+    </span>
+  );
+}
+
+const questItemNameFormatter = (cell, row) => {
+
+  const spopover = (
+    <Popover id="quest-item" style={{maxWidth: 500}}>
+      <ItemInfo item={row.item} />
+    </Popover>
+  );
+
+  return (
+    <span>
+      <OverlayTrigger placement="right" overlay={spopover}>
+        <a href="#" className='quest-item'>{row.item.name}</a>
       </OverlayTrigger>
     </span>
   );

@@ -1,3 +1,7 @@
+.accordion > .card > .card-header {
+  cursor: pointer;
+}
+
 .magical-item {
   color: #8d29b5;
 
@@ -19,6 +23,14 @@
 
   &:hover, &:visited, &:focus {
     color: #5b689a;
+  }
+}
+
+.quest-item {
+  color: #b78d11;
+
+  &:hover, &:visited, &:focus {
+    color: #b78d11;
   }
 }
 

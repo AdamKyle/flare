@@ -28,20 +28,6 @@ export default class ItemInfo extends React.Component {
     })
   }
 
-  renderButtons(item) {
-    switch(item.type) {
-      case 'weapon':
-        return (
-          <>
-            <button className="btn btn-primary" onClick={this.equip.bind(this)} data-type="left-hand">Left Hand</button>
-            <button className="btn btn-primary ml-2" onClick={this.equip.bind(this)} data-type="right-hand">Right Hand</button>
-          </>
-        );
-      default:
-        return <button className="btn btn-primary" onClick={this.equip.bind(this)} data-type={item.type}>Confirm</button>
-    }
-  }
-
   render() {
     const item = this.state.item;
 
@@ -54,10 +40,14 @@ export default class ItemInfo extends React.Component {
                 <h6>{item.name}</h6>
               </div>
               <div className="card-body">
-                <dl>
-                  <dt>Base Damage:</dt>
-                  <dd>{item.base_damage}</dd>
-                </dl>
+                {item.type !== 'quest'
+                 ?
+                 <dl className>
+                   <dt>Base Damage:</dt>
+                   <dd>{item.base_damage}</dd>
+                 </dl>
+                 : null
+               }
                 <dl>
                   <dt>Type:</dt>
                   <dd>{item.type}</dd>

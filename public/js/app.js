@@ -108930,13 +108930,15 @@ function (_React$Component2) {
         _this2.setState({
           characaterInventory: result.data.inventory.data,
           equipment: result.data.equipment,
+          questItems: result.data.quest_items,
           isLoading: false
         });
       });
       this.inventory.listen('Flare.Events.UpdateCharacterInventoryBroadcastEvent', function (event) {
         _this2.setState({
           characaterInventory: event.inventory.inventory.data,
-          equipment: event.inventory.equipment
+          equipment: event.inventory.equipment,
+          questItems: event.inventory.quest_items
         });
       });
     }
@@ -108959,6 +108961,7 @@ function (_React$Component2) {
       }, "Character Inventory"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Body, null, this.state.isLoading ? 'Please wait ...' : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_inventory__WEBPACK_IMPORTED_MODULE_3__["default"], {
         inventory: this.state.characaterInventory,
         equipment: this.state.equipment,
+        questItems: this.state.questItems,
         characterId: this.props.characterId
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Modal"].Footer, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         className: "btn btn-primary",
@@ -109038,6 +109041,7 @@ function (_React$Component) {
       showItemDescription: false,
       inventory: _this.props.inventory.items,
       equipment: _this.props.equipment,
+      questItems: _this.props.questItems,
       itemToEquip: null,
       itemToDestroy: null,
       equippedItems: null,
@@ -109225,6 +109229,14 @@ function (_React$Component) {
         text: 'Actions',
         formatter: equipmentActionsFormatter
       }];
+      var questItems = [{
+        dataField: 'item.name',
+        text: 'Item Name',
+        formatter: questItemNameFormatter
+      }, {
+        dataField: 'item.type',
+        text: 'Item Type'
+      }];
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, this.state.message !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Alert"], {
         variant: "success",
         onClose: function onClose() {
@@ -109242,22 +109254,49 @@ function (_React$Component) {
         },
         dismissible: true
       }, this.state.error) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "row"
+        className: "row mb-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-12"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"], {
+        defaultActiveKey: "0"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"].Toggle, {
+        as: react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"].Header,
+        eventKey: "0"
+      }, "Inventory"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"].Collapse, {
+        eventKey: "0"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"].Body, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
         keyField: "slot_id",
         data: inventory,
         columns: columns
-      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Equipped"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "row"
+      }))))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row mb-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-12"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"], {
+        defaultActiveKey: "0"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"].Toggle, {
+        as: react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"].Header,
+        eventKey: "0"
+      }, "Equipment"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"].Collapse, {
+        eventKey: "0"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"].Body, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
         keyField: "id",
         data: this.state.equipment,
         columns: equipmentColumns
-      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      }))))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-12"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"].Toggle, {
+        as: react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"].Header,
+        eventKey: "0"
+      }, "Quest Items"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Accordion"].Collapse, {
+        eventKey: "0"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Card"].Body, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap_table_next__WEBPACK_IMPORTED_MODULE_1___default.a, {
+        keyField: "id",
+        data: this.state.questItems,
+        columns: questItems
+      }))))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_character_equip_options_modal__WEBPACK_IMPORTED_MODULE_3__["default"], {
         show: this.state.showEquipOptions,
         onClose: this.closeEquiOptions.bind(this),
         equippedItems: this.state.equippedItems,
@@ -109284,7 +109323,6 @@ var destroyAction = null;
 
 var nameFormatter = function nameFormatter(cell, row) {
   var className = 'regular-item';
-  console.log(row);
 
   if (row.artifact_property !== null) {
     className = 'artifact-item';
@@ -109314,7 +109352,6 @@ var nameFormatter = function nameFormatter(cell, row) {
 
 var equipmentNameFormatter = function equipmentNameFormatter(cell, row) {
   var className = 'regular-item';
-  console.log(row);
 
   if (row.item.artifact_property !== null) {
     className = 'artifact-item';
@@ -109342,6 +109379,24 @@ var equipmentNameFormatter = function equipmentNameFormatter(cell, row) {
   }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
     href: "#",
     className: className
+  }, row.item.name)));
+};
+
+var questItemNameFormatter = function questItemNameFormatter(cell, row) {
+  var spopover = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["Popover"], {
+    id: "quest-item",
+    style: {
+      maxWidth: 500
+    }
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_item_info__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    item: row.item
+  }));
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_bootstrap__WEBPACK_IMPORTED_MODULE_2__["OverlayTrigger"], {
+    placement: "right",
+    overlay: spopover
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+    href: "#",
+    className: "quest-item"
   }, row.item.name)));
 };
 
@@ -109544,29 +109599,6 @@ function (_React$Component) {
       });
     }
   }, {
-    key: "renderButtons",
-    value: function renderButtons(item) {
-      switch (item.type) {
-        case 'weapon':
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-            className: "btn btn-primary",
-            onClick: this.equip.bind(this),
-            "data-type": "left-hand"
-          }, "Left Hand"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-            className: "btn btn-primary ml-2",
-            onClick: this.equip.bind(this),
-            "data-type": "right-hand"
-          }, "Right Hand"));
-
-        default:
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-            className: "btn btn-primary",
-            onClick: this.equip.bind(this),
-            "data-type": item.type
-          }, "Confirm");
-      }
-    }
-  }, {
     key: "render",
     value: function render() {
       var item = this.state.item;
@@ -109582,7 +109614,9 @@ function (_React$Component) {
         className: "card-header"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h6", null, item.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, item.type !== 'quest' ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", {
+        className: true
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.base_damage)) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Type:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.type)), item.artifact_property !== null ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Artifact Details"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Name:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, item.artifact_property.name)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dl", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dt", null, "Base Damage Mod:"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("dd", null, '+' + item.artifact_property.base_damage_mod)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "mt-2 mb-2 text-center"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", null, item.artifact_property.description)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null, item.item_affixes.length > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Item Affixes"), this.renderAffixes(item), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)) : null)))));
     }

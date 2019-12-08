@@ -18,6 +18,11 @@ class CreateItemsSeeder extends Seeder
                 'type'        => 'weapon',
                 'base_damage' => 3,
             ],
+            [
+                'name'        => 'The Legendary and Lost Flask of Fresh Air',
+                'type'        => 'quest',
+                'base_damage' => null,
+            ],
         ]);
     }
 }

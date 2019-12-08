@@ -46,6 +46,7 @@ class UpdateCharacterInventoryListener
 
                                                 return $equippedItem;
                                             }),
+            'quest_items' => $event->character->inventory->questItemSlots->load(['item', 'item.itemAffixes', 'item.artifactProperty']),
         ];
 
         broadcast(new UpdateCharacterInventoryBroadcastEvent($inventory, $event->character->user));
