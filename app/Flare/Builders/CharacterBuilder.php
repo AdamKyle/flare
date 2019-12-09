@@ -62,10 +62,12 @@ class CharacterBuilder {
             'character_id' => $this->character->id
         ]);
 
-        $this->character->equippedItems()->create([
-            'character_id' => $this->character->id,
-            'item_id'      => $this->character->inventory->slots()->first()->item_id,
-            'type'         => 'left-hand',
+        $this->character->equippedItems()->insert([
+            [
+                'character_id' => $this->character->id,
+                'item_id'      => $this->character->inventory->slots()->first()->item_id,
+                'position'     => 'left-hand',
+            ]
         ]);
 
         return $this;

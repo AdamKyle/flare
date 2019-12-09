@@ -21,6 +21,12 @@ return [
               'type' => 'suffix',
               'description' => 'Krawl was a legendary warrior of Kazix - A province long forgotten.'
           ],
+          [
+              'name' => 'Gathers Hunt',
+              'base_damage_mod' => 2,
+              'type' => 'prefix',
+              'description' => 'Once, long ago, hunters would gather and collectivly they would bring back a feast for the ages.'
+          ],
       ],
 
       /**
@@ -30,7 +36,11 @@ return [
            [
                'name' => 'Keaxes Vice',
                'base_damage_mod' => 5,
-               'type' => 'suffix',
+               'description' => 'Keaxes Vice packs a punch, crippling the enemy with its damage.',
+           ],
+           [
+               'name' => 'Droths Dexterity Guide',
+               'base_damage_mod' => 0,
                'description' => 'Keaxes Vice packs a punch, crippling the enemy with its damage.',
            ],
        ]

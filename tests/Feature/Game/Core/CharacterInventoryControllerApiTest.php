@@ -83,7 +83,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => $item->id,
-                             'type'    => 'right-hand',
+                             'position' => 'right-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -120,13 +120,13 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $this->character->equippedItems()->create([
             'iventory_id' => $this->character->inventory->id,
             'item_id'     => $item->id,
-            'type'        => 'left-hand'
+            'position'    => 'left-hand'
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => $newItem->id,
-                             'type'    => 'left-hand',
+                             'position' => 'left-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -165,13 +165,13 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $this->character->equippedItems()->create([
             'iventory_id' => $this->character->inventory->id,
             'item_id'     => $item->id,
-            'type'        => 'left-hand'
+            'position'    => 'left-hand'
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => $newItem->id,
-                             'type'    => 'left-hand',
+                             'position' => 'left-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -190,7 +190,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
 
        $content = json_decode($response->content());
 
-       $this->assertEquals("The type field is required.", $content->errors->type[0]);
+       $this->assertEquals("The position field is required.", $content->errors->position[0]);
     }
 
     public function testCannotEquipItemThatDoesntExistInInventory() {
@@ -203,7 +203,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => $item->id,
-                             'type'    => 'right-hand',
+                             'position' => 'right-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -217,7 +217,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id' => 1,
-                             'type'    => 'left-hand',
+                             'position' => 'left-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -231,7 +231,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id'    => 1,
-                             'type'       => 'right-hand',
+                             'position'   => 'right-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -239,8 +239,8 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $content = json_decode($response->content());
 
        $this->assertEquals("Switched: Rusty Dagger to: Right Hand.", $content->message);
-       $this->assertNull($this->character->equippedItems->where('type', '=', 'left-hand')->first());
-       $this->assertNotNull($this->character->equippedItems->where('type', '=', 'right-hand')->first());
+       $this->assertNull($this->character->equippedItems->where('position', '=', 'left-hand')->first());
+       $this->assertNotNull($this->character->equippedItems->where('position', '=', 'right-hand')->first());
     }
 
     public function testCannotEquipItemWhenTypeDoesntMatch() {
@@ -257,7 +257,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', '/api/equip-item/' . $this->character->id, [
                              'item_id'    => $item->id,
-                             'type'       => 'right-hand',
+                             'position'   => 'right-hand',
                              'equip_type' => 'weapon',
                          ])
                          ->response;
@@ -265,8 +265,8 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $content = json_decode($response->content());
 
        $this->assertEquals("Cannot equip Something else as it is not of type: weapon", $content->message);
-       $this->assertNotNull($this->character->equippedItems->where('type', '=', 'left-hand')->first());
-       $this->assertNull($this->character->equippedItems->where('type', '=', 'right-hand')->first());
+       $this->assertNotNull($this->character->equippedItems->where('position', '=', 'left-hand')->first());
+       $this->assertNull($this->character->equippedItems->where('position', '=', 'right-hand')->first());
     }
 
     public function testCanUnEquipItem() {

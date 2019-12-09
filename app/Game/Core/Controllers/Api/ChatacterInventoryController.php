@@ -49,9 +49,8 @@ class CharacterInventoryController extends Controller {
     }
 
     public function equipItem(Request $request, EquipItemService $equipItemService, Character $character) {
-
         $request->validate([
-            'type'       => 'required',
+            'position'   => 'required',
             'item_id'    => 'required',
             'equip_type' => 'required',
         ]);

@@ -21,6 +21,6 @@ $factory->define(EquippedItem::class, function (Faker $faker) {
     return [
         'character_id' => null,
         'item_id' => null,
-        'type'    => null,
+        'position' => null,
     ];
 });

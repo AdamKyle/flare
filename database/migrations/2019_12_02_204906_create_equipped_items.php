@@ -21,7 +21,7 @@ class CreateEquippedItems extends Migration
             $table->bigInteger('item_id')->unsigned();
             $table->foreign('item_id')
                 ->references('id')->on('items');
-            $table->string('type');
+            $table->string('position');
             $table->timestamps();
         });
     }

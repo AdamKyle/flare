@@ -76,20 +76,20 @@ class EquipItemService {
 
     public function getItemForPosition() {
         return $this->character->equippedItems
-                               ->where('type', '=', $this->request->type)
+                               ->where('position', '=', $this->request->position)
                                ->first();
     }
 
     protected function getEquippedItem(InventorySlot $characterItem) {
         return $this->character->equippedItems
-                               ->where('type', '=', $this->request->type)
+                               ->where('position', '=', $this->request->position)
                                ->where('item_id', '=', $characterItem->id)
                                ->first();
     }
 
     protected function switchItemPosition(EquippedItem $item, InventorySlot $characterItem): JsonResponse {
         $item->update([
-            'type' => $this->request->type,
+            'position' => $this->request->position,
         ]);
 
         $this->character->refresh();
@@ -100,7 +100,7 @@ class EquipItemService {
         event(new UpdateCharacterAttackEvent($this->character));
 
         return response()->json([
-            'message' => 'Switched: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)) . '.',
+            'message' => 'Switched: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->position)) . '.',
         ], 200);
     }
 
@@ -112,8 +112,8 @@ class EquipItemService {
         }
 
         $this->character->equippedItems()->create([
-            'item_id' => $characterItem->item->id,
-            'type'    => $this->request->type,
+            'item_id'  => $characterItem->item->id,
+            'position' => $this->request->position,
         ]);
 
         $this->character->refresh();
@@ -124,7 +124,7 @@ class EquipItemService {
         event(new UpdateCharacterAttackEvent($this->character));
 
         return response()->json([
-            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
+            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->position)),
         ], 200);
     }
 
@@ -137,7 +137,7 @@ class EquipItemService {
 
         $equippedItem->update([
             'item_id' => $characterItem->item->id,
-            'type'    => $this->request->type,
+            'position' => $this->request->position,
         ]);
 
         $this->character->refresh();
@@ -148,26 +148,7 @@ class EquipItemService {
         event(new UpdateCharacterAttackEvent($this->character));
 
         return response()->json([
-            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->type)),
+            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->position)),
         ], 200);
-    }
-
-    private function fetchItemName(Item $item): string {
-        $name    = $item->name;
-        $affixes = $item->itemAffixes;
-
-        if ($affixes->isNotEmpty()) {
-            foreach($affixes as $affix) {
-                if ($affix->type === 'suffix') {
-                    $name = $name . ' *' . $affix->name . '*';
-                }
-
-                if ($affix->type === 'prefix') {
-                    $name = '*'.$affix->name . '* ' . $name;
-                }
-            }
-        }
-
-        return $name;
     }
 }

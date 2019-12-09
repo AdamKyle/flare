@@ -40,8 +40,8 @@ class CharacterInformationBuilder {
     }
 
     protected function getWeaponDamage(): int {
-        $leftHand  = $this->character->equippedItems->where('type', '=', 'left-hand')->first();
-        $rightHand = $this->character->equippedItems->where('type', '=', 'right-hand')->first();
+        $leftHand  = $this->character->equippedItems->where('position', '=', 'left-hand')->first();
+        $rightHand = $this->character->equippedItems->where('position', '=', 'right-hand')->first();
 
         if (!is_null($leftHand) && !is_null($rightHand)) {
             return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($leftHand->item) +

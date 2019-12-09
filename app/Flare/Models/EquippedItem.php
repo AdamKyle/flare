@@ -16,7 +16,7 @@ class EquippedItem extends Model
     protected $fillable = [
         'item_id',
         'character_id',
-        'type',
+        'position',
     ];
 
     /**

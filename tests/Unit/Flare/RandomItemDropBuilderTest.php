@@ -90,7 +90,7 @@ class RandomItemDropBuilderTest extends TestCase
         $this->assertTrue($item->itemAffixes->isNotEmpty());
     }
 
-    public function testCreateOneHundredItemsThereShouldOnlyBeTwo() {
+    public function testCreateOneHundredItems() {
         $randomItemGenerator = resolve(RandomItemDropBuilder::class)
                                     ->setItemAffixes(config('game.item_affixes'))
                                     ->setArtifactProperties(config('game.artifact_properties'));
@@ -110,6 +110,6 @@ class RandomItemDropBuilderTest extends TestCase
             $this->assertTrue($item->itemAffixes->isNotEmpty());
         }
 
-        $this->assertEquals(4, Item::count());
+        $this->assertEquals(6, Item::count());
     }
 }
