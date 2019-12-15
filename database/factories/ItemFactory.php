@@ -22,5 +22,6 @@ $factory->define(Item::class, function (Faker $faker) {
         'name'                => null,
         'type'                => null,
         'base_damage'         => null,
+        'cost'                => null,
     ];
 });

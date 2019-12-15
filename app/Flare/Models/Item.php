@@ -18,6 +18,7 @@ class Item extends Model
         'name',
         'type',
         'base_damage',
+        'cost',
     ];
 
     /**
@@ -27,6 +28,7 @@ class Item extends Model
      */
     protected $casts = [
         'base_damage' => 'integer',
+        'cost'        => 'integer',
     ];
 
     public function artifactProperty() {

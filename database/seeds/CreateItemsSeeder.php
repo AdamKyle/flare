@@ -44,6 +44,11 @@ class CreateItemsSeeder extends Seeder
                 'base_damage' => null,
             ],
             [
+                'name'        => 'Ruined and burnt wooden mask',
+                'type'        => 'helmet',
+                'base_damage' => null,
+            ],
+            [
                 'name'        => 'Fingerless ripped gloves',
                 'type'        => 'gloves',
                 'base_damage' => null,
@@ -65,7 +70,7 @@ class CreateItemsSeeder extends Seeder
             ],
             [
                 'name'        => 'Basic ring of hatred and despair',
-                'type'        => 'spell',
+                'type'        => 'ring',
                 'base_damage' => 3,
             ],
             [

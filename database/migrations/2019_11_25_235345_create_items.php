@@ -18,6 +18,7 @@ class CreateItems extends Migration
             $table->string('name');
             $table->string('type');
             $table->integer('base_damage')->nullable();
+            $table->integer('cost')->nullable();
             $table->timestamps();
         });
     }
