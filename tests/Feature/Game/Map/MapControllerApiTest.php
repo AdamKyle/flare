@@ -6,11 +6,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
+use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 
 class MapControllerApiTest extends TestCase
 {
@@ -53,6 +55,10 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testMoveCharacter() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
@@ -74,6 +80,10 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testIsWater() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+
         File::copy(resource_path('tests/surface.png'), Storage::disk('public')->path('/') . 'surface.png');
 
         $this->setUpCharacter();
@@ -91,6 +101,10 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testIsNotWater() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+        
         File::copy(resource_path('tests/surface.png'), Storage::disk('public')->path('/') . 'surface.png');
 
         $this->setUpCharacter();

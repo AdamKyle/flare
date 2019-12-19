@@ -8,12 +8,14 @@ use Illuminate\Support\Facades\Queue;
 use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\ShowTimeOutEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\UpdateTopBarEvent;
+use App\Game\Battle\Events\UpdateTopBarBroadcastEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -106,6 +108,9 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -134,6 +139,9 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -166,6 +174,9 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -197,6 +208,9 @@ class BattleControllerApiTest extends TestCase
             DropCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -227,6 +241,8 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
             UpdateCharacterAttackEvent::class,
         ]);
 
@@ -256,6 +272,9 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -288,6 +307,8 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
             UpdateCharacterAttackEvent::class,
         ]);
 
@@ -320,6 +341,9 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
             UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
