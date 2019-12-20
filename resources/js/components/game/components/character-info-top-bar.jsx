@@ -40,14 +40,17 @@ export default class CharacterInfoTopBar extends React.Component {
       <div className="card character-top-bar mb-4">
         <div className="card-body">
           <div className="row">
-            <div className="col-md-4">
+            <div className="col-md-3">
               <span className="title">Name:</span> <span className="value">{sheet.name}</span>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <span className="title">Race:</span> <span className="value">{sheet.race}</span>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <span className="title">Class:</span> <span className="value">{sheet.class}</span>
+            </div>
+            <div className="col-md-3">
+              <span className="title">Gold:</span> <span className="value">{sheet.gold}</span>
             </div>
           </div>
           <hr />
