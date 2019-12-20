@@ -8,4 +8,4 @@ Route::delete('/unequip-item/{character}', ['uses' => 'Api\CharacterInventoryCon
 Route::delete('/destroy-item/{character}', ['uses' => 'Api\CharacterInventoryController@destroyItem']);
 
 // Shop Management:
-Route::get('/shop', ['uses' => 'Api\ShopController@index']);
+Route::get('/shop/{character}', ['uses' => 'Api\ShopController@index']);

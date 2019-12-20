@@ -35,7 +35,7 @@ class ShopControllerAP extends TestCase {
 
     public function testShouldGetASetOfItems() {
         $response = $this->actingAs($this->character->user, 'api')
-                         ->json('GET', '/api/shop')
+                         ->json('GET', '/api/shop/' . $this->character->id)
                          ->response;
 
         $content = json_decode($response->content());
@@ -45,7 +45,12 @@ class ShopControllerAP extends TestCase {
         $this->assertTrue(!empty($content->rings));
         $this->assertTrue(!empty($content->spells));
         $this->assertTrue(!empty($content->artifacts));
+        $this->assertTrue(!empty($content->inventory));
         $this->assertEquals(1, $content->artifacts[0]->artifact_property->id);
+
+        foreach($content->inventory as $slot) {
+            $this->assertTrue($slot->item->type !== 'quest');
+        }
     }
 
     protected function createCharacter() {
@@ -65,12 +70,35 @@ class ShopControllerAP extends TestCase {
             'base_damage' => 3,
         ]);
 
+        $item = $this->createItem([
+            'name' => 'Broken Sword',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $questItem = $this->createItem([
+            'name' => 'Gods Seel',
+            'type' => 'quest',
+            'base_damage' => null,
+        ]);
+
         $this->character = resolve(CharacterBuilder::class)
                                 ->setRace($race)
                                 ->setClass($class)
                                 ->createCharacter($user, 'Sample')
                                 ->assignSkills()
                                 ->character();
+
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $item->id
+            ],
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $questItem->id
+            ]
+        ]);
     }
 
     protected function createItemsForShop() {
