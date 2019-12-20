@@ -73,8 +73,9 @@ class ShopControllerAPiTest extends TestCase {
                          ->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals('Purchased ' . $this->item->name . '.', $content->message);
+        $this->assertNotNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
     }
 
     protected function createCharacter() {
