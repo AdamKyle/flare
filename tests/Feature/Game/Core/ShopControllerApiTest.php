@@ -3,14 +3,18 @@
 namespace Tests\Feature\Game\Core;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use App\Flare\Builders\CharacterBuilder;
+use App\Flare\Events\UpdateCharacterInventoryEvent;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Events\UpdateCharacterSheetEvent;
 
-class ShopControllerAP extends TestCase {
+class ShopControllerAPiTest extends TestCase {
 
     use RefreshDatabase,
         CreateUser,
@@ -19,6 +23,8 @@ class ShopControllerAP extends TestCase {
         CreateClass;
 
     private $character;
+
+    private $item;
 
     public function setUp(): void {
         parent::setUp();
@@ -53,6 +59,24 @@ class ShopControllerAP extends TestCase {
         }
     }
 
+    public function testShouldBeAbleToBuyItem() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/buy/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+        
+        $this->assertEquals('Purchased ' . $this->item->name . '.', $content->message);
+    }
+
     protected function createCharacter() {
         $user  = $this->createUser();
         $race  = $this->createRace([
@@ -70,10 +94,11 @@ class ShopControllerAP extends TestCase {
             'base_damage' => 3,
         ]);
 
-        $item = $this->createItem([
+        $this->item = $this->createItem([
             'name' => 'Broken Sword',
             'type' => 'weapon',
             'base_damage' => 3,
+            'cost' => 40,
         ]);
 
         $questItem = $this->createItem([
@@ -92,7 +117,7 @@ class ShopControllerAP extends TestCase {
         $this->character->inventory->slots()->insert([
             [
                 'inventory_id' => $this->character->inventory->id,
-                'item_id'      => $item->id
+                'item_id'      => $this->item->id
             ],
             [
                 'inventory_id' => $this->character->inventory->id,

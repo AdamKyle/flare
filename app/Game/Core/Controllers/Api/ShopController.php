@@ -2,12 +2,14 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use League\Fractal\Resource\Item as ItemCollection;
 use League\Fractal\Manager;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\ShopTransformer;
+use App\Game\Core\Events\BuyItemEvent;
 
 class ShopController extends Controller {
 
@@ -36,5 +38,31 @@ class ShopController extends Controller {
                 return $slot->item->type !== 'quest' && is_null($character->equippedItems->where('item_id', $slot->item->id)->first());
             })->all(),
         ], 200);
+    }
+
+    public function buy(Request $request, Character $character) {
+        if ($character->gold === 0) {
+            return response()->json(['message' => 'You do not have enough gold.'], 422);
+        }
+
+        $item = Item::find($request->item_id);
+
+        if (is_null($item)) {
+            return response()->json(['message' => 'Item not found.'], 422);
+        }
+
+        if ($item->cost > $character->gold) {
+            return response()->json(['message' => 'You do not have enough gold.'], 422);
+        }
+
+        event(new BuyItemEvent($item, $character));
+
+        return response()->json([
+            'message' => 'Purchased ' . $item->name . '.',
+        ], 200);
+    }
+
+    public function sell(Request $request, Character $character) {
+
     }
 }

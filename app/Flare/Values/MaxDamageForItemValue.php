@@ -7,6 +7,7 @@ use App\Flare\Models\Item;
 class MaxDamageForItemValue {
 
     public function fetchMaxDamage(Item $item): int {
+
         $damage = $item->base_damage;
 
         if (!is_null($item->artifactProperty)) {
@@ -17,6 +18,10 @@ class MaxDamageForItemValue {
             $item->itemAffixes->each(function($affix) use ($damage) {
                 $damage += $affix->base_damage_mod;
             });
+        }
+
+        if (is_null($damage)) {
+            return 1;
         }
 
         return $damage;
