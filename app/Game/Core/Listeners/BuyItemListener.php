@@ -16,6 +16,7 @@ class BuyItemListener
     public function handle(BuyItemEvent $event)
     {
         $event->character->gold -= $event->item->cost;
+        $event->character->save();
 
         $event->character->inventory->slots()->create([
             'inventory_id' => $event->character->inventory->id,

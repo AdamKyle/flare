@@ -10,3 +10,4 @@ Route::delete('/destroy-item/{character}', ['uses' => 'Api\CharacterInventoryCon
 // Shop Management:
 Route::get('/shop/{character}', ['uses' => 'Api\ShopController@index']);
 Route::post('/shop/buy/{character}', ['uses' => 'Api\ShopController@buy']);
+Route::post('/shop/sell/{character}', ['uses' => 'Api\ShopController@sell']);

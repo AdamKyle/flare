@@ -4,15 +4,22 @@ namespace App\Game\Core\Providers;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Game\Core\Events\BuyItemEvent;
+use App\Game\Core\Events\SellItemEvent;
+use App\Game\Core\Listeners\SellItemListener;
 use App\Game\Core\Listeners\BuyItemListener;
 
 class EventsProvider extends ServiceProvider {
 
     protected $listen = [
 
-        // Update character stats if the character gains a level.
+        // When a character buys an item
         BuyItemEvent::class => [
             BuyItemListener::class,
+        ],
+
+        // When a character sells an item
+        SellItemEvent::class => [
+            SellItemListener::class,
         ],
     ];
 

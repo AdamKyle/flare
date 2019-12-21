@@ -10,6 +10,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\ShopTransformer;
 use App\Game\Core\Events\BuyItemEvent;
+use App\Game\Core\Events\SellItemEvent;
 
 class ShopController extends Controller {
 
@@ -63,6 +64,20 @@ class ShopController extends Controller {
     }
 
     public function sell(Request $request, Character $character) {
+        $inventorySlot = $character->inventory->slots->where('item_id', $request->item_id)->first();
 
+        if (is_null($inventorySlot)) {
+            return response()->json([
+                'message' => 'Could not sell and item you do not have.',
+            ], 422);
+        }
+
+        $itemSoldName = $inventorySlot->item->name;
+
+        event(new SellItemEvent($inventorySlot, $character));
+
+        return response()->json([
+            'message' => 'Sold ' . $itemSoldName,
+        ], 200);
     }
 }

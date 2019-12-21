@@ -78,6 +78,176 @@ class ShopControllerAPiTest extends TestCase {
         $this->assertNotNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
     }
 
+    public function testCannotBuyWhenZeroGold() {
+        $this->character->gold = 0;
+        $this->character->save();
+
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/buy/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('You do not have enough gold.', $content->message);
+    }
+
+    public function testItemDoesntExist() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/buy/' . $this->character->id, [
+                             'item_id' => rand(1000, 40000),
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('Item not found.', $content->message);
+    }
+
+    public function testCannotBuyItemWhenItsToExpensive() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->item->cost = 200000;
+        $this->item->save();
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/buy/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('You do not have enough gold.', $content->message);
+    }
+
+    public function testSellRegularItem() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->character->gold = 0;
+        $this->character->save();
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/sell/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->character->refresh();
+
+        $this->assertEquals('Sold ' . $this->item->name, $content->message);
+        $this->assertEquals(30, $this->character->gold);
+        $this->assertNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
+    }
+
+    public function testSellItemWithAAffix() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->character->gold = 0;
+        $this->character->save();
+
+        $this->item->itemAffixes()->create(array_merge(['item_id' => $this->item->id], config('game.item_affixes')[0]));
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/sell/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->character->refresh();
+
+        $this->assertEquals('Sold ' . $this->item->name, $content->message);
+        $this->assertEquals(130, $this->character->gold);
+        $this->assertNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
+    }
+
+    public function testSellItemWithTwoAffixes() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->character->gold = 0;
+        $this->character->save();
+
+        $this->item->itemAffixes()->create(array_merge(['item_id' => $this->item->id], config('game.item_affixes')[0]));
+        $this->item->itemAffixes()->create(array_merge(['item_id' => $this->item->id], config('game.item_affixes')[1]));
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/sell/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->character->refresh();
+
+        $this->assertEquals('Sold ' . $this->item->name, $content->message);
+        $this->assertEquals(230, $this->character->gold);
+        $this->assertNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
+    }
+
+    public function testSellItemWithArtifactProperty() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+        ]);
+
+        $this->character->gold = 0;
+        $this->character->save();
+
+        $this->item->artifactProperty()->create(array_merge(
+            ['item_id' => $this->item->id],
+            config('game.artifact_properties')[0]
+        ));
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/sell/' . $this->character->id, [
+                             'item_id' => $this->item->id,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->character->refresh();
+
+        $this->assertEquals('Sold ' . $this->item->name, $content->message);
+        $this->assertEquals(530, $this->character->gold);
+        $this->assertNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
+    }
+
     protected function createCharacter() {
         $user  = $this->createUser();
         $race  = $this->createRace([
