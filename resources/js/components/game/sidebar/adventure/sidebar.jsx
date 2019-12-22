@@ -12,7 +12,7 @@ export default class Sidebar extends React.Component {
     return (
       <div className="card">
         <div className="card-body">
-          <Shop characterId={this.props.characterId} />
+          <Shop characterId={this.props.characterId} userId={this.props.userId} />
         </div>
       </div>
     );

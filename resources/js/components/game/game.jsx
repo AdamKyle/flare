@@ -39,7 +39,7 @@ class Game extends React.Component {
 
           </div>
           <div className="col-md-2">
-            <Sidebar characterId={this.props.characterId} />
+            <Sidebar characterId={this.props.characterId} userId={this.props.userId} />
           </div>
         </div>
         <div className="row">

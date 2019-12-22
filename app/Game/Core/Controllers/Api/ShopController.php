@@ -35,8 +35,8 @@ class ShopController extends Controller {
             'artifacts' => Item::with('artifactProperty')->where('type', 'artifact')->get(),
             'spells'    => Item::doesntHave('itemAffixes')->doesntHave('artifactProperty')->where('type', 'spell')->get(),
             'rings'     => Item::doesntHave('itemAffixes')->doesntHave('artifactProperty')->where('type', 'ring')->get(),
-            'inventory' => $character->inventory->slots->filter(function($slot) use ($character) {
-                return $slot->item->type !== 'quest' && is_null($character->equippedItems->where('item_id', $slot->item->id)->first());
+            'inventory' => $character->inventory->slots->filter(function($slot) {
+                return $slot->item->type !== 'quest';
             })->all(),
         ], 200);
     }

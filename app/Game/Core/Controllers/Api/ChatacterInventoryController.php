@@ -71,6 +71,11 @@ class CharacterInventoryController extends Controller {
 
         $name = $item->item->name;
 
+        $character->inventory->slots()->create([
+            'item_id' => $item->id,
+            'inventory_id' => $character->inventory->id,
+        ]);
+
         $item->delete();
 
         $character = $character->refresh();

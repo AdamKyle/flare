@@ -116,6 +116,8 @@ class EquipItemService {
             'position' => $this->request->position,
         ]);
 
+        $characterItem->delete();
+
         $this->character->refresh();
 
         event(new UpdateTopBarEvent($this->character));
@@ -139,6 +141,8 @@ class EquipItemService {
             'item_id' => $characterItem->item->id,
             'position' => $this->request->position,
         ]);
+
+        $characterItem->delete();
 
         $this->character->refresh();
 

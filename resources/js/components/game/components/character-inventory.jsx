@@ -108,6 +108,33 @@ export default class CharacterInventory extends React.Component {
     });
   }
 
+  sellItem(event) {
+    const foundItem = this.state.inventory.filter(i => i.id === parseInt(event.target.getAttribute('data-item-id')))[0];
+
+    if (foundItem.type === 'quest') {
+      return this.setState({
+        error: 'Cannot sell quest items.',
+      });
+    }
+
+    this.setState({
+      error: null,
+      message: null,
+    });
+
+    axios.post('/api/shop/sell/' + this.props.characterId, {
+      item_id: foundItem.id
+    }).then((result) => {
+      this.setState({
+         message: result.data.message,
+      });
+    }).catch((error) => {
+      this.setState({
+        error: error.response.data.message,
+      });
+    });
+  }
+
   closeEquiOptions() {
     this.setState({
       showEquipOptions: false,
@@ -135,20 +162,15 @@ export default class CharacterInventory extends React.Component {
     });
   }
 
-  fetchEquippedIds() {
-    return this.state.equipment.map((item) => {
-      return item.item.id;
-    });
-  }
 
   render() {
-    const equippedIds = this.fetchEquippedIds();
-    const inventory   = this.state.inventory.filter(i => !equippedIds.includes(i.id));
+    const inventory   = this.state.inventory;
 
     // Set up the actions.
     equipAction     = this.equip.bind(this);
     unEquipAction   = this.unEquip.bind(this);
     destroyAction   = this.destroyItem.bind(this);
+    sellAction      = this.sellItem.bind(this);
 
     const columns   = [{
       dataField: 'name',
@@ -291,6 +313,7 @@ export default class CharacterInventory extends React.Component {
 let equipAction   = null;
 let unEquipAction = null;
 let destroyAction = null;
+let sellAction    = null;
 
 const nameFormatter = (cell, row) => {
 
@@ -381,7 +404,7 @@ const actionsFormatter = (cell, row) => {
           key='left'
         >
           <Dropdown.Item data-item-id={row.id} onClick={equipAction}>Equip</Dropdown.Item>
-          <Dropdown.Item data-item-id={row.id}>Sell</Dropdown.Item>
+          <Dropdown.Item data-item-id={row.id} onClick={sellAction}>Sell</Dropdown.Item>
           <Dropdown.Item data-item-id={row.id} onClick={destroyAction} className="text-danger">
             Destroy
           </Dropdown.Item>

@@ -13,6 +13,7 @@ use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
+use App\Game\Core\Events\UpdateShopInventoryBroadcastEvent;
 
 class ShopControllerAPiTest extends TestCase {
 
@@ -64,6 +65,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')
@@ -86,6 +88,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')
@@ -104,6 +107,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')
@@ -122,6 +126,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $this->item->cost = 200000;
@@ -143,6 +148,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $this->character->gold = 0;
@@ -168,6 +174,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $this->character->gold = 0;
@@ -195,6 +202,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $this->character->gold = 0;
@@ -223,6 +231,7 @@ class ShopControllerAPiTest extends TestCase {
             UpdateCharacterInventoryEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
         ]);
 
         $this->character->gold = 0;
