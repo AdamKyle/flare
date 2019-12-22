@@ -242,50 +242,38 @@ export default class CharacterInventory extends React.Component {
 
         <div className="row mb-2">
           <div className="col-md-12">
-            <Accordion defaultActiveKey="0">
-              <Card>
-                <Accordion.Toggle as={Card.Header} eventKey="0">
-                  Inventory
-                </Accordion.Toggle>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    <BootstrapTable keyField='slot_id' data={ inventory } columns={ columns } />
-                  </Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion>
+            <Card>
+              <Card.Header>
+                Inventory
+              </Card.Header>
+              <Card.Body>
+                <BootstrapTable keyField='slot_id' data={ inventory } columns={ columns } />
+              </Card.Body>
+            </Card>
           </div>
         </div>
         <div className="row mb-2">
           <div className="col-md-12">
-            <Accordion defaultActiveKey="0">
-              <Card>
-                <Accordion.Toggle as={Card.Header} eventKey="0">
-                  Equipment
-                </Accordion.Toggle>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    <BootstrapTable keyField='id' data={ this.state.equipment } columns={ equipmentColumns } />
-                  </Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion>
+            <Card>
+              <Card.Header>
+                Equipment
+              </Card.Header>
+              <Card.Body>
+                <BootstrapTable keyField='id' data={ this.state.equipment } columns={ equipmentColumns } />
+              </Card.Body>
+            </Card>
           </div>
         </div>
         <div className="row mb-2">
           <div className="col-md-12">
-            <Accordion>
-              <Card>
-                <Accordion.Toggle as={Card.Header} eventKey="0">
-                  Quest Items
-                </Accordion.Toggle>
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    <BootstrapTable keyField='id' data={ this.state.questItems } columns={ questItems } />
-                  </Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion>
+            <Card>
+              <Card.Header>
+                Quest Items
+              </Card.Header>
+              <Card.Body>
+                <BootstrapTable keyField='id' data={ this.state.questItems } columns={ questItems } />
+              </Card.Body>
+            </Card>
           </div>
         </div>
 
