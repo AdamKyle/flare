@@ -73,11 +73,7 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                CreateAdminAccount::class,
-            ]);
-        }
+        //
     }
 
     public function provides()
