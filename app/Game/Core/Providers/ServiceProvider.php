@@ -3,11 +3,10 @@
 namespace App\Game\Core\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Services\EquipItemService;
 
-class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
+class ServiceProvider extends ApplicationServiceProvider
 {
     /**
      * Register any application services.
@@ -32,13 +31,5 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function boot()
     {
-    }
-
-    public function provides()
-    {
-        return [
-            Manager::class,
-            EquipItemService::class,
-        ];
     }
 }

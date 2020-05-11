@@ -9,10 +9,15 @@ use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateSkill;
+use Tests\Traits\CreateItem;
 
 class CharacterSetup {
 
-    use CreateCharacter, CreateSkill, CreateRace, CreateClass;
+    use CreateCharacter,
+        CreateSkill,
+        CreateRace,
+        CreateClass,
+        CreateItem;
 
     private $character;
 
@@ -32,12 +37,29 @@ class CharacterSetup {
             'level' => isset($options['level']) ? $options['level'] : 1,
             'xp' => isset($options['xp']) ? $options['xp'] : 0,
             'can_attack' => isset($options['can_attack']) ? $options['can_attack'] : true,
+            'inventory_max' => 1
         ]);
 
         // Create Empty Inventory:
         $this->character->inventory()->create([
             'character_id' => $this->character->id,
         ]);
+
+        if (isset($options['fill_inventory'])) {
+            $item = $this->createItem([
+                'name'        => 'Rusty Dagger',
+                'type'        => 'weapon',
+                'base_damage' => '6'
+            ]);
+
+            if ($options['fill_inventory']) {
+                $this->character->inventory->slots()->create([
+                    'inventory_id' => $this->character->inventory->id,
+                    'item_id'      => $item->id,
+                    'equiped'      => false,
+                ]);
+            }
+        }
 
         return $this;
     }

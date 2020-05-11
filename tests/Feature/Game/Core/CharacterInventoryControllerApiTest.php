@@ -93,6 +93,7 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $this->assertEquals("Equipped: Rusty Dagger to: Right Hand", $content->message);
     }
 
+
     public function testCanEquipNewItemIntoSameSlot() {
         $item = $this->createItem([
             'name' => 'Rusty Dagger',
@@ -134,6 +135,49 @@ class CharacterInventoryControllerApiTest extends TestCase {
        $content = json_decode($response->content());
 
        $this->assertEquals("Equipped: Rusty Dagger 2 to: Left Hand", $content->message);
+    }
+
+    public function testCannotEquipNewItemIntoSameSlotWhenRequestEquipTypeDoesntMatchItemType() {
+        $item = $this->createItem([
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $newItem = $this->createItem([
+            'name' => 'Rusty Dagger 2',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
+
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'     => $item->id,
+            ],
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'     => $newItem->id,
+            ],
+        ]);
+
+        $this->character->equippedItems()->create([
+            'iventory_id' => $this->character->inventory->id,
+            'item_id'     => $item->id,
+            'position'    => 'left-hand'
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/equip-item/' . $this->character->id, [
+                             'item_id' => $newItem->id,
+                             'position' => 'left-hand',
+                             'equip_type' => 'armour',
+                         ])
+                         ->response;
+
+       $content = json_decode($response->content());
+
+       $this->assertEquals("Cannot equip Rusty Dagger 2 as it is not of type: armour", $content->message);
     }
 
     public function testCanEquipNewItemIntoSameSlotWithSuffix() {

@@ -169,6 +169,31 @@ class ShopControllerAPiTest extends TestCase {
         $this->assertNull($this->character->inventory->slots->where('item_id', $this->item->id)->first());
     }
 
+    public function testCannotSellItemYouDontHave() {
+        Event::fake([
+            UpdateCharacterInventoryEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateTopBarEvent::class,
+            UpdateShopInventoryBroadcastEvent::class,
+        ]);
+
+        $this->character->gold = 0;
+        $this->character->save();
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/shop/sell/' . $this->character->id, [
+                             'item_id' => 10000,
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->character->refresh();
+
+        $this->assertEquals('Could not sell and item you do not have.', $content->message);
+        $this->assertEquals(422, $response->status());
+    }
+
     public function testSellItemWithAAffix() {
         Event::fake([
             UpdateCharacterInventoryEvent::class,
