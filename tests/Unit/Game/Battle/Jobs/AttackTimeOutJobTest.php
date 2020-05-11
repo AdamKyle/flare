@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Battle\Jobs;
+namespace Tests\Unit\Game\Battle\Jobs;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
