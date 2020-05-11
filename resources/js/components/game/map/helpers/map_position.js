@@ -55,16 +55,8 @@ export const getNewXPosition = (characterX, mapPositionX) => {
     return 0;
   }
 
-  if (characterX === 848) {
-    return -816;
-  }
-
-  if (characterX < 1136) {
-    return -816;
-  }
-
-  if (characterX === 1680) {
-    return -1120;
+  if (characterX > 848) {
+    return -464;
   }
 
   return mapPositionX;

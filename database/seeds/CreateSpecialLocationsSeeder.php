@@ -160,7 +160,7 @@ class CreateSpecialLocationsSeeder extends Seeder
         $randomY = rand(32, 1984);
 
         if ($randomY % 16 === 0) {
-            return $randomY + 16;
+            return $randomY;
         }
 
         return $this->getRandomY();
@@ -170,7 +170,7 @@ class CreateSpecialLocationsSeeder extends Seeder
         $randomX = rand(32, 1984);
 
         if ($randomX % 16 === 0) {
-            return $randomX + 16;
+            return $randomX;
         }
 
         return $this->getRandomX();

@@ -84,28 +84,22 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        File::copy(resource_path('tests/surface.png'), Storage::disk('public')->path('/') . 'surface.png');
-
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
                          ->json('GET', '/api/is-water/' . $this->character->id, [
-                             'character_position_x' => 336,
-                             'character_position_y' => 304,
+                             'character_position_x' => 1680,
+                             'character_position_y' => 1000,
                          ])
                          ->response;
 
         $this->assertEquals(422, $response->status());
-
-        unlink(Storage::disk('public')->path('/') . 'surface.png');
     }
 
     public function testIsNotWater() {
         Event::fake([
             MoveTimeOutEvent::class,
         ]);
-        
-        File::copy(resource_path('tests/surface.png'), Storage::disk('public')->path('/') . 'surface.png');
 
         $this->setUpCharacter();
 
@@ -117,8 +111,6 @@ class MapControllerApiTest extends TestCase
                          ->response;
 
         $this->assertEquals(200, $response->status());
-
-        unlink(Storage::disk('public')->path('/') . 'surface.png');
     }
 
     protected function setUpCharacter(array $options = []) {

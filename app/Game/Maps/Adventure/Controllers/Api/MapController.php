@@ -46,8 +46,7 @@ class MapController extends Controller {
     }
 
     public function isWater(Request $request, Character $character) {
-        // return response()->json([], 200);
-        $contents            = Storage::disk('public')->get('surface.png');
+        $contents            = Storage::disk('public')->get('maps/surface.png');
         $this->imageResource = imagecreatefromstring($contents);
 
         $waterRgb = 112219255;
