@@ -71,85 +71,85 @@ class CreateSpecialLocationsSeeder extends Seeder
                 'name'        => 'Smugglers Port',
                 'description' => 'A place where the stolen goods are smuggled in.',
                 'is_port'     => true,
-                'x'           => 1040,
-                'y'           => 592,
+                'x'           => 824,
+                'y'           => 856,
             ],
             [
                 'name'        => 'Port of Kalith',
                 'description' => 'Welcome to Kalith port! Adventure awaits!',
                 'is_port'     => true,
-                'x'           => 1040,
-                'y'           => 848,
+                'x'           => 600,
+                'y'           => 1096,
             ],
             [
                 'name'        => 'Dalix',
                 'description' => 'Dalix offers all your needs! Come to Dalix!',
                 'is_port'     => true,
-                'x'           => 1616,
-                'y'           => 832,
+                'x'           => 896,
+                'y'           => 1232,
             ],
             [
                 'name'        => 'Port of Salix',
                 'description' => 'The cousin of Dalix. A place where rules do not exist.',
                 'is_port'     => true,
-                'x'           => 1184,
-                'y'           => 1280,
+                'x'           => 1744,
+                'y'           => 1184,
             ],
             [
                 'name'        => 'Karth',
                 'description' => 'The port of Karth is a majour trading port.',
                 'is_port'     => true,
                 'x'           => 448,
-                'y'           => 1280,
+                'y'           => 1264,
             ],
             [
                 'name'        => 'Deoth',
                 'description' => 'Deoth contains the musuem of lost traeasures.',
                 'is_port'     => true,
-                'x'           => 448,
-                'y'           => 1280,
+                'x'           => 480,
+                'y'           => 1520,
             ],
             [
                 'name'        => 'Halix',
                 'description' => 'The port of Halix is home of the mystical beast monument.',
                 'is_port'     => true,
-                'x'           => 32,
-                'y'           => 1104,
+                'x'           => 48,
+                'y'           => 1120,
             ],
             [
                 'name'        => 'Lavion',
                 'description' => 'The best treasures are found on this island.',
                 'is_port'     => true,
-                'x'           => 32,
-                'y'           => 1344,
+                'x'           => 64,
+                'y'           => 1728,
             ],
             [
                 'name'        => 'Rax',
                 'description' => 'Lost port of Rax',
                 'is_port'     => true,
-                'x'           => 1328,
-                'y'           => 1456,
+                'x'           => 992,
+                'y'           => 1424,
             ],
             [
                 'name'        => 'Azyx',
                 'description' => 'Ancient civilization of the Azyx people use to use this port.',
                 'is_port'     => true,
-                'x'           => 1680,
-                'y'           => 1472,
+                'x'           => 1520,
+                'y'           => 1353,
             ],
             [
                 'name'        => 'Jungle of Xynx Port',
                 'description' => 'Leaving this port means adventurng deep into the jungle.',
                 'is_port'     => true,
-                'x'           => 1760,
-                'y'           => 1792,
+                'x'           => 528,
+                'y'           => 1504,
             ],
             [
                 'name'        => 'Edge of the world',
                 'description' => 'The edge of the world port.',
                 'is_port'     => true,
-                'x'           => 1184,
-                'y'           => 1984,
+                'x'           => 1056,
+                'y'           => 1712,
             ],
         ];
 
@@ -160,7 +160,7 @@ class CreateSpecialLocationsSeeder extends Seeder
         $randomY = rand(32, 1984);
 
         if ($randomY % 16 === 0) {
-            return $randomY;
+            return $randomY + 16;
         }
 
         return $this->getRandomY();
@@ -170,7 +170,7 @@ class CreateSpecialLocationsSeeder extends Seeder
         $randomX = rand(32, 1984);
 
         if ($randomX % 16 === 0) {
-            return $randomX;
+            return $randomX + 16;
         }
 
         return $this->getRandomX();

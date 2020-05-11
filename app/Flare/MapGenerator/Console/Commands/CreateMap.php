@@ -18,7 +18,7 @@ class CreateMap extends Command
      *
      * @var string
      */
-    protected $signature = 'create:map';
+    protected $signature = 'create:map {width} {height} {randomness}';
 
     /**
      * The console command description.
@@ -47,13 +47,13 @@ class CreateMap extends Command
         $water = new Color(66, 129, 178);
         $land  = new Color(23, 132, 72);
 
-         ini_set('memory_limit','3G');
+        ini_set('memory_limit','3G');
 
         resolve(MapBuilder::class)->setLandColor($land)
                                   ->setWaterColor($water)
-                                  ->setMapHeight(2000)
-                                  ->setMapWidth(2000)
-                                  ->setMapSeed(Str::random(80))
+                                  ->setMapHeight($this->argument('height'))
+                                  ->setMapWidth($this->argument('width'))
+                                  ->setMapSeed(Str::random($this->argument('randomness')))
                                   ->buildMap('surface');
     }
 }
