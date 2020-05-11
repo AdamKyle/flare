@@ -25,6 +25,7 @@ use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateSkill;
+use Tests\Setup\CharacterSetup;
 
 class BattleControllerApiTest extends TestCase
 {
@@ -46,6 +47,8 @@ class BattleControllerApiTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
+
+        $this->setUpMonster();
     }
 
     public function tearDown(): void {
@@ -368,6 +371,39 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(3, $this->character->xp);
     }
 
+    public function testCharacterSeesErrorForUnknownType() {
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            DropsCheckEvent::class,
+            GoldRushCheckEvent::class,
+            ShowTimeOutEvent::class,
+            UpdateTopBarEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+            UpdateCharacterSheetEvent::class,
+            UpdateCharacterAttackEvent::class,
+        ]);
+
+        $this->setUpCharacter([
+            'level' => 100,
+        ]);
+
+        $this->monster->max_level = 5;
+        $this->monster->save();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'apple-sauce',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('Could not find type of defender.', json_decode($response->content())->message);
+    }
+
     public function testWhenNotLoggedInCannotAccessBattleResults() {
 
         $response = $this->json('POST', '/api/battle-results/1')
@@ -376,7 +412,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(401, $response->status());
     }
 
-    protected function setUpCharacter(array $options = []) {
+    protected function setUpCharacter(array $options = []): void {
         $race = $this->createRace([
             'str_mod' => 3,
         ]);
@@ -388,30 +424,19 @@ class BattleControllerApiTest extends TestCase
 
         $this->user = $this->createUser();
 
-        $this->character = $this->createCharacter([
-            'name' => 'Sample',
-            'user_id' => $this->user->id,
-            'level' => isset($options['level']) ? $options['level'] : 1,
-            'xp' => isset($options['xp']) ? $options['xp'] : 0,
-            'can_attack' => true,
-        ]);
-
         $item = $this->createItem([
             'name'        => 'Rusty Dagger',
             'type'        => 'weapon',
             'base_damage' => '6'
         ]);
 
-        $this->character->inventory()->create([
-            'character_id' => $this->character->id,
-        ]);
+        $this->character = (new CharacterSetup)->setupCharacter($options, $this->user)
+                                               ->equipLeftHand($item)
+                                               ->setSkill('Looting', $options)
+                                               ->getCharacter();
+    }
 
-        $this->character->equippedItems()->create([
-            'character_id' => $this->character->id,
-            'item_id'      => $item->id,
-            'position'     => 'left-hand',
-        ]);
-
+    protected function setUpMonster(): void {
         $this->monster = $this->createMonster();
 
         $this->createSkill([
@@ -420,13 +445,6 @@ class BattleControllerApiTest extends TestCase
 
         $this->createSkill([
             'monster_id' => $this->monster->id,
-        ]);
-
-        $this->createSkill([
-            'character_id' => $this->character->id,
-            'name' => 'Looting',
-            'level' => isset($options['looting_level']) ? $options['looting_level'] : 1,
-            'skill_bonus' => isset($options['looting_bonus']) ? $options['looting_bonus'] : 0,
         ]);
     }
 }

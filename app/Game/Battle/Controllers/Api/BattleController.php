@@ -60,10 +60,6 @@ class BattleController extends Controller {
                     event(new AttackTimeOutEvent($character, $monster));
 
                     break;
-                case 'beast':
-                    break;
-                case 'player':
-                    break;
                 default:
                     return response()->json([
                         'message' => 'Could not find type of defender.'
