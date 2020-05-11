@@ -6,21 +6,32 @@ use App\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateRace;
+use Tests\Traits\CreateClass;
 use Tests\Traits\CreateSkill;
 
 class CharacterSetup {
 
-    use CreateCharacter, CreateSkill;
+    use CreateCharacter, CreateSkill, CreateRace, CreateClass;
 
     private $character;
 
     public function setupCharacter(array $options, User $user): CharacterSetup {
+        $race = $this->createRace([
+            'str_mod' => 3,
+        ]);
+
+        $class = $this->createClass([
+            'dex_mod'     => 3,
+            'damage_stat' => 'dex',
+        ]);
+
         $this->character = $this->createCharacter([
             'name' => 'Sample',
             'user_id' => $user->id,
             'level' => isset($options['level']) ? $options['level'] : 1,
             'xp' => isset($options['xp']) ? $options['xp'] : 0,
-            'can_attack' => true,
+            'can_attack' => isset($options['can_attack']) ? $options['can_attack'] : true,
         ]);
 
         // Create Empty Inventory:

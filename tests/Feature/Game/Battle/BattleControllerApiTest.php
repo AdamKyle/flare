@@ -413,15 +413,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     protected function setUpCharacter(array $options = []): void {
-        $race = $this->createRace([
-            'str_mod' => 3,
-        ]);
-
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-        ]);
-
         $this->user = $this->createUser();
 
         $item = $this->createItem([

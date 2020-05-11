@@ -3,12 +3,10 @@
 namespace App\Game\Battle\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
-use League\Fractal\Manager;
 use App\Game\Battle\Services\CharacterService;
 use App\Game\Battle\Values\LevelUpValue;
 
-class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
+class ServiceProvider extends ApplicationServiceProvider
 {
     /**
      * Register any application services.
@@ -17,10 +15,6 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function register()
     {
-        $this->app->bind(Manager::class, function ($app) {
-            return new Manager();
-        });
-
         $this->app->singleton(CharacterService::class, function($app) {
             return new CharacterService();
         });
@@ -37,14 +31,6 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function boot()
     {
-    }
-
-    public function provides()
-    {
-        return [
-            Manager::class,
-            CharacterService::class,
-            LevelUpValue::class,
-        ];
+        //
     }
 }

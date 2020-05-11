@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare;
+namespace Tests\Unit\Game\Messages;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
