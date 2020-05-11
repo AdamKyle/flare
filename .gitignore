@@ -3,6 +3,9 @@
 /public/storage
 /public/css
 /public/js
+/public/assets
+/public/fonts
+/public/images
 /storage/*.key
 /vendor
 /test-coverage

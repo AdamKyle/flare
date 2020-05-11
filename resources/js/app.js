@@ -6,6 +6,12 @@
 
 require('./bootstrap');
 
+require('../vendor/monster/theme/js/jquery.slimscroll.js');
+require('../vendor/monster/theme/js/waves.js');
+require('../vendor/monster/assets/plugins/sticky-kit-master/dist/sticky-kit.min.js');
+require('../vendor/monster/theme/js/sidebarmenu.js');
+require('../vendor/monster/theme/js/custom.js');
+
 /**
  * Next, we will create a fresh React component instance and attach it to
  * the page. Then, you may begin adding components to this application

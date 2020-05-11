@@ -1,4 +1,9 @@
 {
     "/js/app.js": "/js/app.js",
-    "/css/app.css": "/css/app.css"
+    "/css/app.css": "/css/app.css",
+    "/css/default.css": "/css/default.css",
+    "/js/sidebarmenu.js": "/js/sidebarmenu.js",
+    "/js/custom.js": "/js/custom.js",
+    "/js/jquery.slimscroll.js": "/js/jquery.slimscroll.js",
+    "/js/waves.js": "/js/waves.js"
 }
