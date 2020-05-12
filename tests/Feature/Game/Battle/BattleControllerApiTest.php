@@ -118,6 +118,8 @@ class BattleControllerApiTest extends TestCase
 
         $this->setUpCharacter();
 
+        $currentGold = $this->character->gold;
+
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/battle-results/' . $this->user->character->id, [
                              'is_defender_dead' => true,
@@ -130,7 +132,7 @@ class BattleControllerApiTest extends TestCase
 
         $this->character->refresh();
 
-        $this->assertEquals(25, $this->character->gold);
+        $this->assertTrue($currentGold !== $this->character->gold);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterLevelUp() {
@@ -187,6 +189,8 @@ class BattleControllerApiTest extends TestCase
             'looting_bonus' => 100,
         ]);
 
+        $currentGold = $this->character->gold;
+
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/battle-results/' . $this->character->id, [
                              'is_defender_dead' => true,
@@ -199,7 +203,7 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertEquals(1, $this->character->level);
-        $this->assertEquals(25, $this->character->gold);
+        $this->assertTrue($currentGold !== $this->character->gold);
         $this->assertTrue($this->character->inventory->slots->isNotEmpty());
     }
 
@@ -222,6 +226,8 @@ class BattleControllerApiTest extends TestCase
             'fill_inventory' => true,
         ]);
 
+        $currentGold = $this->character->gold;
+
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/battle-results/' . $this->character->id, [
                              'is_defender_dead' => true,
@@ -234,7 +240,7 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertEquals(1, $this->character->level);
-        $this->assertEquals(25, $this->character->gold);
+        $this->assertTrue($currentGold !== $this->character->gold);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {

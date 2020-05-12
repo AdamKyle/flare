@@ -20,7 +20,7 @@ class MapController extends Controller {
 
     public function index(Request $request, User $user) {
         return response()->json([
-            'map_url' => asset('/maps/surface.png'),
+            'map_url'       => Storage::disk('maps')->url($user->character->map->gameMap->path),
             'character_map' => $user->character->map,
             'character_id'  => $user->character->id,
             'locations'     => Location::all(),
@@ -46,7 +46,7 @@ class MapController extends Controller {
     }
 
     public function isWater(Request $request, Character $character) {
-        $contents            = Storage::disk('public')->get('maps/surface.png');
+        $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
         $this->imageResource = imagecreatefromstring($contents);
 
         $waterRgb = 112219255;

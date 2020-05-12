@@ -17,6 +17,10 @@
 @import 'game/top-bar';
 @import 'game/inventory';
 
+legend {
+  font-size: 0.9rem;
+}
+
 dl {
   display: flex;
   flex-wrap: wrap;

@@ -4,20 +4,16 @@ namespace Tests\Unit\Flare\Builders;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\Traits\CreateRace;
-use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
+use Tests\Setup\CharacterSetup;
 use App\Flare\Builders\RandomItemDropBuilder;
-use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\Item;
 
 class RandomItemDropBuilderTest extends TestCase
 {
 
     use RefreshDatabase,
-        CreateRace,
-        CreateClass,
         CreateItem,
         CreateUser;
 
@@ -31,25 +27,18 @@ class RandomItemDropBuilderTest extends TestCase
             'type' => 'weapon',
         ]);
 
-        $this->createItem([
+        $item = $this->createItem([
             'name' => 'Bloody Spear',
             'type' => 'weapon',
         ]);
 
-        $race = $this->createRace([
-            'str_mod' => 3,
-        ]);
-
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-        ]);
-
-        $this->character = resolve(CharacterBuilder::class)->setRace($race)
-                                                     ->setClass($class)
-                                                     ->createCharacter($this->createUser(), 'sample')
-                                                     ->assignSkills()
-                                                     ->character();
+        $this->character = (new CharacterSetup)->setupCharacter([], $this->createUser())
+                                               ->equipLeftHand($item)
+                                               ->setSkill('Looting', [
+                                                   'looting_level' => 100,
+                                                   'looting_bonus' => 100,
+                                               ])
+                                               ->getCharacter();
     }
 
     public function tearDown(): void {

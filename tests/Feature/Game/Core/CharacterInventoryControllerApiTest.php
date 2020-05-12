@@ -9,6 +9,7 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
+use Tests\Setup\CharacterSetup;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\Item;
 
@@ -26,28 +27,26 @@ class CharacterInventoryControllerApiTest extends TestCase {
         parent::setUp();
 
         $user  = $this->createUser();
-        $race  = $this->createRace([
-            'name' => 'Dwarf'
-        ]);
-        $class = $this->createClass([
-            'name'        => 'Fighter',
-            'damage_stat' => 'str',
-        ]);
 
-        $this->createItem([
+        $item = $this->createItem([
             'name' => 'Rusty Dagger',
             'type' => 'weapon',
             'base_damage' => 3,
         ]);
 
-        $this->character = resolve(CharacterBuilder::class)
-                                ->setRace($race)
-                                ->setClass($class)
-                                ->createCharacter($user, 'Sample')
-                                ->assignSkills()
-                                ->character();
+        $this->character = (new CharacterSetup)->setupCharacter([], $user)
+                                               ->equipLeftHand($item)
+                                               ->setSkill('Looting', [])
+                                               ->getCharacter();
 
-       Event::fake();
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $item->id
+            ],
+        ]);
+
+        Event::fake();
     }
 
     public function tearDown(): void {

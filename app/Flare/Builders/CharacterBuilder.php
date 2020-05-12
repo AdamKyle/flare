@@ -3,6 +3,7 @@
 namespace App\Flare\Builders;
 
 use App\User;
+use App\Admin\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Character;
@@ -30,7 +31,7 @@ class CharacterBuilder {
         return $this;
     }
 
-    public function createCharacter(User $user, string $name): CharacterBuilder {
+    public function createCharacter(User $user, GameMap $map, string $name): CharacterBuilder {
         $baseStat = resolve(BaseStatValue::class)->setRace($this->race)->setClass($this->class);
 
         $this->character = Character::create([
@@ -59,7 +60,8 @@ class CharacterBuilder {
         ]);
 
         $this->character->map()->create([
-            'character_id' => $this->character->id
+            'character_id' => $this->character->id,
+            'game_map_id'  => $map->id,  
         ]);
 
         $this->character->equippedItems()->insert([

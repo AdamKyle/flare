@@ -9,6 +9,7 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
+use Tests\Setup\CharacterSetup;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -284,14 +285,7 @@ class ShopControllerAPiTest extends TestCase {
 
     protected function createCharacter() {
         $user  = $this->createUser();
-        $race  = $this->createRace([
-            'name' => 'Dwarf'
-        ]);
 
-        $class = $this->createClass([
-            'name'        => 'Fighter',
-            'damage_stat' => 'str',
-        ]);
 
         $this->createItem([
             'name' => 'Rusty Dagger',
@@ -312,12 +306,14 @@ class ShopControllerAPiTest extends TestCase {
             'base_damage' => null,
         ]);
 
-        $this->character = resolve(CharacterBuilder::class)
-                                ->setRace($race)
-                                ->setClass($class)
-                                ->createCharacter($user, 'Sample')
-                                ->assignSkills()
-                                ->character();
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => '6'
+        ]);
+
+        $this->character = (new CharacterSetup)->setupCharacter(['gold' => 1000], $user)
+                                               ->getCharacter();
 
         $this->character->inventory->slots()->insert([
             [

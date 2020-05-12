@@ -274,6 +274,7 @@
 
             @guest
                 <div class="container-fluid" style="min-height: 853px;">
+                    @include('layouts.partials.alerts')
                     @yield('content')
                 </div>
 
@@ -281,6 +282,7 @@
             @else
                 <div class="page-wrapper">
                     <div class="container-fluid">
+                        @include('layouts.partials.alerts')
                         @yield('content')
                     </div>
                 </div>

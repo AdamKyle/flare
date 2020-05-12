@@ -3,11 +3,13 @@
 namespace Tests\Unit\Flare;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
+use App\Admin\Models\GameMap;
 use App\Flare\Builders\CharacterBuilder;
 
 class CreateCharacterTest extends TestCase
@@ -19,6 +21,8 @@ class CreateCharacterTest extends TestCase
         CreateItem,
         CreateUser;
 
+    private $gameMap;
+
     public function setUp(): void {
         parent::setup();
 
@@ -26,6 +30,22 @@ class CreateCharacterTest extends TestCase
             'name' => 'Rusty Dagger',
             'type' => 'weapon',
         ]);
+
+        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.png'));
+
+        $this->gameMap = GameMap::create([
+            'name'    => 'surface',
+            'path'    => $path,
+            'default' => true,
+        ]);
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+
+        $this->gameMap = null;
+
+        Storage::disk('maps')->deleteDirectory('Surface/');
     }
 
     public function testCreateCharacter()
@@ -41,7 +61,7 @@ class CreateCharacterTest extends TestCase
 
         $character = resolve(CharacterBuilder::class)->setRace($race)
                                                      ->setClass($class)
-                                                     ->createCharacter($this->createUser(), 'sample')
+                                                     ->createCharacter($this->createUser(), $this->gameMap, 'sample')
                                                      ->assignSkills()
                                                      ->character();
 
@@ -71,7 +91,7 @@ class CreateCharacterTest extends TestCase
 
         $character = resolve(CharacterBuilder::class)->setRace($race)
                                                      ->setClass($class)
-                                                     ->createCharacter($this->createUser(), 'sample')
+                                                     ->createCharacter($this->createUser(), $this->gameMap, 'sample')
                                                      ->assignSkills()
                                                      ->character();
 

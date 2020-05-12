@@ -8,6 +8,7 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
+use Tests\Setup\CharacterSetup;
 use App\Flare\Builders\CharacterBuilder;
 
 class CharacterSheetControllerApiTest extends TestCase {
@@ -32,18 +33,23 @@ class CharacterSheetControllerApiTest extends TestCase {
             'damage_stat' => 'str',
         ]);
 
-        $this->createItem([
+        $item = $this->createItem([
             'name' => 'Rusty Dagger',
             'type' => 'weapon',
             'base_damage' => 3,
         ]);
 
-        $this->character = resolve(CharacterBuilder::class)
-                                ->setRace($race)
-                                ->setClass($class)
-                                ->createCharacter($user, 'Sample')
-                                ->assignSkills()
-                                ->character();
+        $this->character = (new CharacterSetup)->setupCharacter([], $user)
+                                               ->equipRightHand($item)
+                                               ->setSkill('Looting', [])
+                                               ->getCharacter();
+
+        $this->character->inventory->slots()->insert([
+           [
+               'inventory_id' => $this->character->inventory->id,
+               'item_id'      => $item->id
+           ],
+        ]);
     }
 
     public function tearDown(): void {

@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Admin\Models\GameMap;
 
 class Map extends Model
 {
@@ -18,6 +19,7 @@ class Map extends Model
         'position_y',
         'character_position_x',
         'character_position_y',
+        'game_map_id',
     ];
 
     /**
@@ -31,4 +33,8 @@ class Map extends Model
         'character_position_x' => 'integer',
         'character_position_y' => 'integer',
     ];
+
+    public function gameMap() {
+        return $this->hasOne(GameMap::class, 'id', 'game_map_id');
+    }
 }

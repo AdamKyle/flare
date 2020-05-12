@@ -39,6 +39,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
+        $this->mapAdminRoutes();
+
         $this->mapGameRoutes();
         $this->mapGameCoreApiRoutes();
         $this->mapGameMessageApiRoutes();
@@ -73,6 +75,13 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapAdminRoutes()
+    {
+        Route::middleware('web')
+             ->namespace('App\Admin\Controllers')
+             ->group(base_path('routes/admin/web.php'));
     }
 
     protected function mapGameRoutes()

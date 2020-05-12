@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use App\Admin\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -28,6 +30,20 @@ class RegistrationTest extends TestCase
             'type' => 'weapon',
             'base_damage' => 3,
         ]);
+
+        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.png'));
+
+        $gameMap = GameMap::create([
+            'name'    => 'surface',
+            'path'    => $path,
+            'default' => true,
+        ]);
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+
+        Storage::disk('maps')->deleteDirectory('Surface/');
     }
 
     public function testCanSeeRegistation() {
@@ -70,6 +86,32 @@ class RegistrationTest extends TestCase
       $this->assertEquals('bob', $user->character->name);
       $this->assertEquals($race->name, $user->character->race->name);
       $this->assertEquals($class->name, $user->character->class->name);
+    }
+
+    public function testCannotRegisterWhenNoMap() {
+        Storage::disk('maps')->deleteDirectory('Surface/');
+
+        GameMap::first()->delete();
+
+        $race  = $this->createRace([
+            'dex_mod' => 2,
+        ]);
+
+        $class = $this->createClass([
+            'str_mod' => 2,
+            'damage_stat' => 'str',
+        ]);
+
+        $this->visit('/login')
+             ->click('Register')
+             ->submitForm('Register', [
+                 'email'                 => 'a@example.net',
+                 'password'              => 'TestExamplePassword',
+                 'password_confirmation' => 'TestExamplePassword',
+                 'name'                  => 'bob',
+                 'race'                  => $race->id,
+                 'class'                 => $class->id,
+             ])->see('No game map has been set as default or created. Registration is disabled.');
     }
 
     public function testCannotRegisterWhenCharacterExists() {

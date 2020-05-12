@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
+use App\Admin\Models\GameMap;
 
 class RegisterController extends Controller
 {
@@ -84,13 +85,19 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
+        $map = GameMap::where('default', true)->first();
+
+        if (is_null($map)) {
+            return redirect()->back()->with('error', 'No game map has been set as default or created. Registration is disabled.');
+        }
+
         $this->validator($request->all())->validate();
 
         $user = $this->create($request->all());
 
         event(new Registered($user));
 
-        event(new CreateCharacterEvent($user, $request));
+        event(new CreateCharacterEvent($user, $map, $request));
 
         $this->guard()->login($user);
 

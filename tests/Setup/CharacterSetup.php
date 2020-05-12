@@ -32,13 +32,14 @@ class CharacterSetup {
         ]);
 
         $this->character = $this->createCharacter([
-            'name' => 'Sample',
-            'user_id' => $user->id,
-            'level' => isset($options['level']) ? $options['level'] : 1,
-            'xp' => isset($options['xp']) ? $options['xp'] : 0,
-            'can_attack' => isset($options['can_attack']) ? $options['can_attack'] : true,
-            'can_move'   => isset($options['can_move']) ? $options['can_move'] : true,
-            'inventory_max' => 1
+            'name'          => 'Sample',
+            'user_id'       => $user->id,
+            'level'         => isset($options['level']) ? $options['level'] : 1,
+            'xp'            => isset($options['xp']) ? $options['xp'] : 0,
+            'can_attack'    => isset($options['can_attack']) ? $options['can_attack'] : true,
+            'can_move'      => isset($options['can_move']) ? $options['can_move'] : true,
+            'inventory_max' => 1,
+            'gold'          => isset($options['gold']) ? $options['gold'] : 10,
         ]);
 
         // Create Empty Inventory:

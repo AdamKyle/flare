@@ -185,6 +185,11 @@ return [
        App\Flare\MapGenerator\Providers\ServiceProvider::class,
 
        /**
+        * Admin Related
+        */
+       App\Admin\Providers\ServiceProvider::class,
+
+       /**
         * Game Related
         */
       App\Game\Core\Providers\ServiceProvider::class,
