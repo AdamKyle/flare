@@ -56,7 +56,8 @@ class MapsControllerTest extends TestCase
              ->type('Surface', 'name')
              ->select('yes', 'default')
              ->attach(UploadedFile::fake()->image('avatar.jpg'), 'map')
-             ->press('Submit');
+             ->press('Submit')
+             ->see('Surface');
 
         $this->assertTrue(GameMap::all()->isNotEmpty());
         $this->assertNotNull(GameMap::where('default', true)->first());
