@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Flare;
 
+use Artisan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;

@@ -63,4 +63,53 @@ class CharacterSheetControllerApiTest extends TestCase {
         $this->assertFalse(empty($content->sheet->data->skills));
         $this->assertEquals($this->character->name, $content->sheet->data->name);
     }
+
+    public function testGetCharacterInfoWithBothLeftAndRightWeapon() {
+        $this->character->equippedItems()->insert([
+            [
+                'character_id' => $this->character->id,
+                'item_id'      => $this->character->inventory->slots()->first()->item_id,
+                'position'     => 'right-hand',
+            ]
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->data->skills));
+        $this->assertEquals($this->character->name, $content->sheet->data->name);
+    }
+
+    public function testGetCharacterInfoWithRightHand() {
+        $this->character->equippedItems()->first()->update([
+            'position' => 'right-hand'
+        ]);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->data->skills));
+        $this->assertEquals($this->character->name, $content->sheet->data->name);
+    }
+
+    public function testGetCharacterInfoWithNoWeapon() {
+        $this->character->equippedItems()->first()->delete();
+
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->data->skills));
+    }
 }

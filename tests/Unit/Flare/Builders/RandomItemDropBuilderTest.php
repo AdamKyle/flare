@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare;
+namespace Tests\Unit\Flare\Builders;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -87,6 +87,72 @@ class RandomItemDropBuilderTest extends TestCase
         $item = $randomItemGenerator->generateItem($this->character);
 
         $this->assertNotNull($item->artifactProperty);
+        $this->assertTrue($item->itemAffixes->isNotEmpty());
+    }
+
+    public function testCreateEnchantedItemWithAffixes() {
+
+        $randomItemGenerator = resolve(RandomItemDropBuilder::class)
+                                    ->setItemAffixes([
+                                        [
+                                           "name" => "Gathers Hunt",
+                                           "base_damage_mod" => 2,
+                                           "type" => "prefix",
+                                           "description" => "Once, long ago, hunters would gather and collectivly they would bring back a feast for the ages.",
+                                        ]
+                                    ])
+                                    ->setArtifactProperties(config('game.artifact_properties'));
+
+        foreach(Item::all() as $item) {
+            $item->itemAffixes()->create([
+                'name' => 'Something',
+                'base_damage_mod' => 6,
+                'type' => 'suffix',
+                'description' => 'test',
+            ]);
+        }
+
+        $looting = $this->character->skills->where('name', 'Looting')->first();
+        $looting->update([
+            'skill_bonus' => 100
+        ]);
+
+        $item = $randomItemGenerator->generateItem($this->character);
+
+        $this->assertTrue($item->itemAffixes->isNotEmpty());
+
+        Item::first()->itemAffixes()->first()->delete();
+    }
+
+    public function testDontCreateEnchantedItemWithSameAffixes() {
+
+        $randomItemGenerator = resolve(RandomItemDropBuilder::class)
+                                    ->setItemAffixes([
+                                        [
+                                            'name' => 'Something',
+                                            'base_damage_mod' => 6,
+                                            'type' => 'suffix',
+                                            'description' => 'test',
+                                        ]
+                                    ])
+                                    ->setArtifactProperties(config('game.artifact_properties'));
+
+        foreach(Item::all() as $item) {
+            $item->itemAffixes()->create([
+                'name' => 'Something',
+                'base_damage_mod' => 6,
+                'type' => 'suffix',
+                'description' => 'test',
+            ]);
+        }
+
+        $looting = $this->character->skills->where('name', 'Looting')->first();
+        $looting->update([
+            'skill_bonus' => 100
+        ]);
+
+        $item = $randomItemGenerator->generateItem($this->character);
+
         $this->assertTrue($item->itemAffixes->isNotEmpty());
     }
 
