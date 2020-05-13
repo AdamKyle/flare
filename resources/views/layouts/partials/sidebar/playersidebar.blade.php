@@ -1,4 +1,5 @@
 <ul id="sidebarnav">
+    <li><a href={{route('game')}}>Home</a></li>
     <li class="nav-small-cap">Character Management</li>
     <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="mdi mdi-gauge"></i><span class="hide-menu">Character <span class="label label-rounded label-success">5</span></span></a>
@@ -42,8 +43,8 @@
     <li>
         <a class="has-arrow " href="#" aria-expanded="false"><i class="mdi mdi-book-multiple"></i><span class="hide-menu">Shop</span></a>
         <ul aria-expanded="false" class="collapse">
-            <li><a href="layout-single-column.html">Buy</a></li>
-            <li><a href="layout-fix-header.html">Sell</a></li>
+            <li><a href={{route('game.shop.buy')}}>Buy</a></li>
+            <li><a href={{route('game.shop.sell')}}>Sell</a></li>
         </ul>
     </li>
     <li>
