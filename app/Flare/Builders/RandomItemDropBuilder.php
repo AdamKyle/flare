@@ -28,7 +28,7 @@ class RandomItemDropBuilder {
 
         $duplicateItem = $item->replicate();
         $duplicateItem->save();
-        //dd($item);
+
         if ($item->itemAffixes->isNotEmpty()) {
             foreach ($item->itemAffixes as $itemAffix) {
                 $duplicateItem->itemAffixes()->create($itemAffix->getAttributes());

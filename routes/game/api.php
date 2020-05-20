@@ -1,13 +1,3 @@
 <?php
 
-// Inventory Management:
-Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
-Route::get('/character-inventory/{character}', ['uses' => 'Api\CharacterInventoryController@inventory']);
-Route::post('/equip-item/{character}', ['uses' => 'Api\CharacterInventoryController@equipItem']);
-Route::delete('/unequip-item/{character}', ['uses' => 'Api\CharacterInventoryController@unequipItem']);
-Route::delete('/destroy-item/{character}', ['uses' => 'Api\CharacterInventoryController@destroyItem']);
-
-// Shop Management:
-Route::get('/shop/{character}', ['uses' => 'Api\ShopController@index']);
-Route::post('/shop/buy/{character}', ['uses' => 'Api\ShopController@buy']);
-Route::post('/shop/sell/{character}', ['uses' => 'Api\ShopController@sell']);
+Route::get('/calculate/item/comparison', ['as' => 'calculate.item.comparison', 'uses' => 'Api\ItemComparisonController@compare']);

@@ -5,7 +5,6 @@ import Actions             from './battle/actions';
 import TimeOutBar          from './timeout/timeout-bar';
 import Map                 from './map/map';
 import CharacterInfoTopBar from './components/character-info-top-bar';
-import Sidebar             from './sidebar/adventure/sidebar';
 
 class Game extends React.Component {
   constructor(props) {
@@ -20,7 +19,7 @@ class Game extends React.Component {
       <div>
         <hr />
         <div className="row mb-4">
-          <div className="col-md-10">
+          <div className="col-md-12">
             <div className="row">
               <div className="col-md-12">
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
@@ -36,10 +35,6 @@ class Game extends React.Component {
                 <Actions apiUrl={this.apiUrl} userId={this.props.userId} />
               </div>
             </div>
-
-          </div>
-          <div className="col-md-2">
-            <Sidebar characterId={this.props.characterId} userId={this.props.userId} />
           </div>
         </div>
         <div className="row">

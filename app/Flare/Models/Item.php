@@ -38,4 +38,8 @@ class Item extends Model
     public function itemAffixes() {
         return $this->hasMany(ItemAffix::class);
     }
+
+    public function slot() {
+        return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
+    }
 }

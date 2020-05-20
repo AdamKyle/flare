@@ -22,6 +22,8 @@ class CreateInventorySlots extends Migration
             $table->foreign('item_id')
                 ->references('id')->on('items');
             $table->timestamps();
+            $table->boolean('equipped')->nullable()->default(false);
+            $table->string('position')->nullable();
         });
     }
 

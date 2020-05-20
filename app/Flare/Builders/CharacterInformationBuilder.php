@@ -7,8 +7,14 @@ use App\Flare\Values\MaxDamageForItemValue;
 
 class CharacterInformationBuilder {
 
+    private $character;
+
+    private $inventory;
+
     public function setCharacter(Character $character): CharacterInformationBuilder {
         $this->character = $character;
+
+        $this->inventory = $character->inventory;
 
         return $this;
     }
@@ -22,26 +28,26 @@ class CharacterInformationBuilder {
     }
 
     public function hasArtifacts(): bool {
-        return $this->character->equippedItems->filter(function ($equippedItem) {
-            return $equippedItem->item->type === 'artifact' || !is_null($equippedItem->item->artifactProperty);
+        return $this->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'artifact' || !is_null($slot->item->artifactProperty);
         })->isNotEmpty();
     }
 
     public function hasAffixes(): bool {
-        return $this->character->equippedItems->filter(function ($equippedItem) {
-            return $equippedItem->item->itemAffixes->isNotEmpty();
+        return $this->inventory->slots->filter(function ($slot) {
+            return $slot->item->itemAffixes->isNotEmpty();
         })->isNotEmpty();
     }
 
     public function hasSpells(): bool {
-        return $this->character->equippedItems->filter(function ($equippedItem) {
-            return $equippedItem->item->type === 'spell';
+        return $this->inventory->slots->filter(function ($slot) {
+            return $slot->item->type === 'spell';
         })->isNotEmpty();
     }
 
     protected function getWeaponDamage(): int {
-        $leftHand  = $this->character->equippedItems->where('position', '=', 'left-hand')->first();
-        $rightHand = $this->character->equippedItems->where('position', '=', 'right-hand')->first();
+        $leftHand  = $this->inventory->slots->where('position', '=', 'left-hand')->first();
+        $rightHand = $this->inventory->slots->where('position', '=', 'right-hand')->first();
 
         if (!is_null($leftHand) && !is_null($rightHand)) {
             return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($leftHand->item) +

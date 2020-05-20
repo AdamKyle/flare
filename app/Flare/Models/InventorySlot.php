@@ -17,6 +17,7 @@ class InventorySlot extends Model
         'inventory_id',
         'item_id',
         'equipped',
+        'position',
     ];
 
     /**

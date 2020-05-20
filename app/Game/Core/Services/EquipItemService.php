@@ -13,6 +13,7 @@ use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\EquippedItem;
+use App\Game\Core\Exceptions\EquipItemException;
 
 class EquipItemService {
 
@@ -32,127 +33,66 @@ class EquipItemService {
         return $this;
     }
 
-    public function equipItem(): JsonResponse {
-        $item          = Item::find($this->request->item_id);
+    public function equipItem(): Item {
 
-        $characterItem = $this->character->inventory->slots->filter(function($slot) use ($item) {
-            return $slot->item->id === $item->id;
+        $characterSlot = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->id === (int) $this->request->slot_id && !$slot->equipped;
         })->first();
 
-        if (is_null($characterItem)) {
-            return response()->json([
-                'message' => 'Cannot equip ' . $item->name . '. You do not currently have this in yor inventory.',
-            ], 422);
+        if (is_null($characterSlot)) {
+            throw new EquipItemException('Could not equip item because you either do not have it, or it is equipped already.');
         }
 
-        $equippedItem = $this->getEquippedItem($characterItem);
+        $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->position === $this->request->position; 
+        })->first();
 
-        if (!is_null($equippedItem)) {
-            return response()->json([
-                'message' => 'Cannot equip ' . $characterItem->item->name . ' to the same hand.',
-            ], 422);
-        } else {
-            $equippedItemToSwitch = $this->getEquippedItemFromId($characterItem);
+        if (!is_null($itemForPosition)) {
+            $itemForPosition->update([
+                'equipped' => false,
+                'position' => null,
+            ]);
+        }
 
-            if (!is_null($equippedItemToSwitch)) {
-                return $this->switchItemPosition($equippedItemToSwitch, $characterItem);
+        $characterSlot->update([
+            'equipped' => true,
+            'position' => $this->request->position,
+        ]);
+
+        event(new UpdateTopBarEvent($this->character));
+
+        return $characterSlot->item;
+    }
+
+    public function isItemBetter(Item $toCompare, Item $equipped): bool {
+        $totalDamageForEquipped = $this->getItemDamage($equipped);
+        $totalDamageForCompare  = $this->getItemDamage($toCompare);
+
+        if ($totalDamageForCompare > $totalDamageForEquipped) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function getItemDamage(Item $item): int {
+        $attack = $item->base_damage;
+
+
+        $artifact = $item->artifactProperty;
+        
+        if (!is_null($artifact)) {
+            $attack += $artifact->base_damage_mod;
+        }
+
+        $affixes = $item->itemAffixes;
+
+        if ($affixes->isNotEmpty()) {
+            foreach($affixes as $affix) {
+                $attack += $affix->base_damage_mod;
             }
-
-            $equippedItemInPosition = $this->getItemForPosition();
-
-            if (!is_null($equippedItemInPosition)) {
-                return $this->updateEquipmentSlot($characterItem, $equippedItemInPosition);
-            }
-
-            return $this->attachItem($characterItem);
-        }
-    }
-
-    public function getEquippedItemFromId(InventorySlot $characterItem) {
-        return $this->character->equippedItems
-                               ->where('item_id', '=', $characterItem->id)
-                               ->first();
-    }
-
-    public function getItemForPosition() {
-        return $this->character->equippedItems
-                               ->where('position', '=', $this->request->position)
-                               ->first();
-    }
-
-    protected function getEquippedItem(InventorySlot $characterItem) {
-        return $this->character->equippedItems
-                               ->where('position', '=', $this->request->position)
-                               ->where('item_id', '=', $characterItem->id)
-                               ->first();
-    }
-
-    protected function switchItemPosition(EquippedItem $item, InventorySlot $characterItem): JsonResponse {
-        $item->update([
-            'position' => $this->request->position,
-        ]);
-
-        $this->character->refresh();
-
-        event(new UpdateTopBarEvent($this->character));
-        event(new UpdateCharacterSheetEvent($this->character));
-        event(new UpdateCharacterInventoryEvent($this->character));
-        event(new UpdateCharacterAttackEvent($this->character));
-
-        return response()->json([
-            'message' => 'Switched: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->position)) . '.',
-        ], 200);
-    }
-
-    protected function attachItem(InventorySlot $characterItem): JsonResponse {
-        if ($characterItem->item->type !== $this->request->equip_type) {
-            return response()->json([
-                'message' => 'Cannot equip ' . $characterItem->item->name . ' as it is not of type: ' . $this->request->equip_type,
-            ], 422);
         }
 
-        $this->character->equippedItems()->create([
-            'item_id'  => $characterItem->item->id,
-            'position' => $this->request->position,
-        ]);
-
-        $characterItem->delete();
-
-        $this->character->refresh();
-
-        event(new UpdateTopBarEvent($this->character));
-        event(new UpdateCharacterSheetEvent($this->character));
-        event(new UpdateCharacterInventoryEvent($this->character));
-        event(new UpdateCharacterAttackEvent($this->character));
-
-        return response()->json([
-            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->position)),
-        ], 200);
-    }
-
-    protected function updateEquipmentSlot(InventorySlot $characterItem, EquippedItem $equippedItem): JsonResponse {
-        if ($characterItem->item->type !== $this->request->equip_type) {
-            return response()->json([
-                'message' => 'Cannot equip ' . $characterItem->item->name . ' as it is not of type: ' . $this->request->equip_type,
-            ], 422);
-        }
-
-        $equippedItem->update([
-            'item_id' => $characterItem->item->id,
-            'position' => $this->request->position,
-        ]);
-
-        $characterItem->delete();
-
-        $this->character->refresh();
-
-        event(new UpdateTopBarEvent($this->character));
-        event(new UpdateCharacterSheetEvent($this->character));
-        event(new UpdateCharacterInventoryEvent($this->character));
-        event(new UpdateCharacterAttackEvent($this->character));
-
-        return response()->json([
-            'message' => 'Equipped: ' . $characterItem->item->name . ' to: ' . str_replace('-', ' ', Str::title($this->request->position)),
-        ], 200);
+        return $attack;
     }
 }

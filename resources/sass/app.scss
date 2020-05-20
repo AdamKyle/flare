@@ -44,6 +44,13 @@ dd {
   left: 20px;
 }
 
-.modal-title {
-  cursor: crosshair;
+.modal-body {
+  text-align: initial;
+}
+
+@media (min-width: 576px) {
+  .modal-dialog {
+      max-width: 1000px;
+      margin: 1.75rem auto;
+  }
 }

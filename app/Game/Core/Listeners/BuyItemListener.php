@@ -27,13 +27,10 @@ class BuyItemListener
         $event->character->refresh();
 
         event(new UpdateTopBarEvent($event->character));
-        event(new UpdateCharacterInventoryEvent($event->character));
         event(new UpdateCharacterSheetEvent($event->character));
 
         $inventory = $event->character->inventory->slots->filter(function($slot) {
             return $slot->item->type !== 'quest';
         })->all();
-
-        event(new UpdateShopInventoryBroadcastEvent($inventory, $event->character->user));
     }
 }

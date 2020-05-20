@@ -57,19 +57,13 @@ class CharacterBuilder {
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => Item::first()->id,
+            'equipped'     => true,
+            'position'     => 'left-hand',
         ]);
 
         $this->character->map()->create([
             'character_id' => $this->character->id,
-            'game_map_id'  => $map->id,  
-        ]);
-
-        $this->character->equippedItems()->insert([
-            [
-                'character_id' => $this->character->id,
-                'item_id'      => $this->character->inventory->slots()->first()->item_id,
-                'position'     => 'left-hand',
-            ]
+            'game_map_id'  => $map->id,
         ]);
 
         return $this;

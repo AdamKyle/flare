@@ -32,12 +32,9 @@ class UpdateCharacterInventoryListener
 
         $event->character->refresh();
 
-        $characterInventory = new Item($event->character->inventory, $this->characterInventoryTransformer);
-        $characterInventory = $this->manager->createData($characterInventory)->toArray();
-
         $inventory = [
             'inventory' => $characterInventory,
-            'equipment' => $event->character->equippedItems
+            'equipment' => $event->character->inventory->slots
                                             ->load(['item', 'item.itemAffixes', 'item.artifactProperty'])
                                             ->transform(function($equippedItem) {
                                                 $equippedItem->actions          = null;
@@ -48,7 +45,5 @@ class UpdateCharacterInventoryListener
                                             }),
             'quest_items' => $event->character->inventory->questItemSlots->load(['item', 'item.itemAffixes', 'item.artifactProperty']),
         ];
-
-        broadcast(new UpdateCharacterInventoryBroadcastEvent($inventory, $event->character->user));
     }
 }
