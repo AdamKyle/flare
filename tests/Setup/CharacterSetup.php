@@ -5,6 +5,7 @@ namespace Tests\Setup;
 use App\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -66,22 +67,41 @@ class CharacterSetup {
         return $this;
     }
 
-    public function equipLeftHand(Item $item): CharacterSetup {
-        $this->character->equippedItems()->create([
-            'character_id' => $this->character->id,
+    public function giveItem(Item $item): CharacterSetup {
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
-            'position'     => 'left-hand',
+            'equiped'      => false,
         ]);
+
+        $this->character->refresh();
 
         return $this;
     }
 
-    public function equipRightHand(Item $item): CharacterSetup {
-        $this->character->equippedItems()->create([
-            'character_id' => $this->character->id,
-            'item_id'      => $item->id,
-            'position'     => 'right-hand',
+    public function equipLeftHand(int $slotId = 1): CharacterSetup {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => 'left-hand',
         ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    public function equipRightHand(int $slotId): CharacterSetup {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => 'right-hand',
+        ]);
+
+        $this->character->refresh();
 
         return $this;
     }
@@ -99,6 +119,24 @@ class CharacterSetup {
 
     public function getCharacter(): Character {
         return $this->character;
+    }
+
+    protected function fetchSlot(int $slotId): InventorySlot {
+        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($slotId) {
+            return $slot->id === $slotId && !$slot->equipped;
+         })->first();
+ 
+         if (is_null($foundMatching)) {
+             throw new \Exception('Item is not in inventory or is already equipped');
+         }
+ 
+         $slot = $this->character->inventory->slots->find($slotId);
+ 
+         if (is_null($slot)) {
+             throw new \Exception('Slot is not found, did you give the item to the player?');
+         }
+
+         return $slot;
     }
 
 }
