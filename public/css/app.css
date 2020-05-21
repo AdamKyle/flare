@@ -24544,7 +24544,8 @@ a.text-dark:focus {
   content: "\F21A";
   font-size: 16px;
   color: #2d74de;
-  top: -10px;
+  top: -8px;
+  left: -16px;
 }
 
 .character-map-ready {
