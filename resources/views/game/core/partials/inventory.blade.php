@@ -63,7 +63,18 @@
                         @include('game.core.partials.destroy-modal', ['slot' => $slot])
                     </td>
                 @else
-                    <td><a href="#" class="btn btn-primary">Sell</a></td>
+                    <td>
+                        <form id="item-sell-{{$slot->id}}" action="{{route('game.shop.sell.item')}}" method="POST" style="display: none">
+                            @csrf
+
+                            <input type="hidden" name="slot_id" value={{$slot->id}} />
+                        </form>
+
+                        <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"
+                           onclick="event.preventDefault();
+                                         document.getElementById('item-sell-{{$slot->id}}').submit();">
+                            {{ __('Sell') }}
+                    </td>
                 @endif
             </tr>
         @endforeach

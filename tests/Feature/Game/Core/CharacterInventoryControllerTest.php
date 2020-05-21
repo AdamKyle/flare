@@ -203,6 +203,25 @@ class CharacterInventoryControllerTest extends TestCase
         ])->see('Equipped')->see('Your current equipment may be better. Check the equip options.');
     }
 
+    public function testCannotSeeComparePage() {
+        $item = $this->createItem([
+            'name' => 'Spear',
+            'base_damage' => 6,
+            'type' => 'weapon',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => false,
+        ]);
+
+        $this->actingAs($this->character->user)->visitRoute('game.character.inventory')->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'apple-sauce',
+            'slot_id'            => '2',
+        ])->see('Error. Invalid Input.');
+    }
+
     public function testSeeComparePageWithNothingEquipped() {
         $this->character->inventory->slots->each(function($slot){
             $slot->update([

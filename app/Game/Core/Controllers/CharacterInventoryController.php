@@ -15,6 +15,7 @@ use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Game\Core\Exceptions\EquipItemException;
+use App\Game\Core\Requests\ComparisonValidation;
 
 class CharacterInventoryController extends Controller {
 
@@ -52,7 +53,7 @@ class CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function compare(Request $request) {
+    public function compare(ComparisonValidation $request) {
         $character   = auth()->user()->character;
         $inventory   = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
@@ -66,7 +67,7 @@ class CharacterInventoryController extends Controller {
 
         $slotId        = $itemToEquip->id;
         $itemToEquip   = $itemToEquip->item->load(['artifactProperty', 'itemAffixes', 'slot']);
-
+ 
         if ($inventory->isEmpty()) {
             return view('game.core.character.equipment-compare', [
                 'details'     => [],
@@ -75,7 +76,7 @@ class CharacterInventoryController extends Controller {
                 'slotId'      => $slotId,
             ]);
         }
-
+       
 
         return view('game.core.character.equipment-compare', [
             'details'     => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),

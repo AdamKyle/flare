@@ -6,6 +6,7 @@ Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);
 Route::get('/shop/buy', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
 Route::get('/shop/sell', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
 Route::post('/shop/buy/item', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
+Route::post('/shop/sell/item', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
 
 Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
 

@@ -18,9 +18,8 @@ class SellItemListener
     {
         $item = $event->inventorySlot->item;
 
-        $goldGained = ($item->cost - ($item->cost * 0.25)) +
-            $this->costForAffixes($item) + $this->costForArtifact($item);
-
+        $goldGained = round(($item->cost - ($item->cost * 0.25)) +
+            $this->costForAffixes($item) + $this->costForArtifact($item));
 
         $event->character->gold += $goldGained;
         $event->character->save();
@@ -45,10 +44,7 @@ class SellItemListener
             return 0;
         }
 
-        if ($item->itemAffixes->count() === 2) {
-            return 200;
-        }
-
+        // TODO: Add a better way of calculating this.
         return 100;
     }
 
@@ -57,6 +53,7 @@ class SellItemListener
             return 0;
         }
 
+        // TODO: Add a better way of calculating this.
         return 500;
     }
 }

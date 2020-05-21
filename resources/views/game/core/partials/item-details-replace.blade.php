@@ -1,5 +1,5 @@
 <div class="alert alert-success">
-    Replacing this weapon will increase the attack by: {{$details['damage_ajdustment']}}.
+    Replacing this weapon will increase the attack by: {{$details['damage_adjustment']}}.
 </div>
 <h6>Item Details</h6>
 <table class="table table-bordered">

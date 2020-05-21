@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Core\Events\BuyItemEvent;
+use App\Game\Core\Events\SellItemEvent;
 
 class ShopController extends Controller {
 
@@ -59,6 +60,19 @@ class ShopController extends Controller {
     }
 
     public function sell(Request $request) {
+        $character     = auth()->user()->character;
+        $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
+            return $slot->id === (int) $request->slot_id && !$slot->equipped;
+        })->first();
 
+        if (is_null($inventorySlot)) {
+            return redirect()->back()->with('error', 'Item not found.');
+        }
+
+        $name = $inventorySlot->item->name;
+
+        event(new SellItemEvent($inventorySlot, $character));
+
+        return redirect()->back()->with('success', 'Sold: ' . $name . '.');
     }
 }

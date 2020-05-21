@@ -71,7 +71,7 @@ class EquipItemService {
             case 'weapon':
                 return resolve(WeaponComparison::class)->fetchDetails($toCompare, $inventorySlots);
             default:
-                throw new EquipItemException('Could not determine which item type comparsion class to load.');
+                return [];
         }
     }
 }

@@ -13,7 +13,9 @@ class WeaponComparison implements ComparisonContract {
         $comparison = [];
 
         foreach($inventorySlots as $slot) {
-            $comparison[$slot->position] = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
+            if ($slot->position !== null) {
+                $comparison[$slot->position] = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
+            }
         }
         
         return $comparison;
@@ -25,17 +27,13 @@ class WeaponComparison implements ComparisonContract {
             return $slot->position === $hand;
         })->first();
 
-        if (is_null($foundHand)) {
-            return [];
-        }
-
         if ($this->isItemBetter($toCompare, $foundHand->item)) {
             return [
                 'is_better'         => true,
                 'replaces_item'     => $foundHand->item,
                 'slot'              => $foundHand,
                 'position'          => $foundHand->position,
-                'damage_ajdustment' => $this->getDamageIncrease($toCompare, $foundHand->item),
+                'damage_adjustment' => $this->getDamageIncrease($toCompare, $foundHand->item),
             ];
         } else {
             return [
@@ -43,7 +41,7 @@ class WeaponComparison implements ComparisonContract {
                 'replaces_item'     => null,
                 'slot'              => $foundHand,
                 'position'          => $foundHand->position,
-                'damage_ajdustment' => $this->getDamageDecrease($toCompare, $foundHand->item),
+                'damage_adjustment' => $this->getDamageDecrease($toCompare, $foundHand->item),
             ];
         }
     }
@@ -63,11 +61,7 @@ class WeaponComparison implements ComparisonContract {
         $totalDamageForEquipped = $this->getItemDamage($equipped);
         $totalDamageForCompare  = $this->getItemDamage($toCompare);
 
-        if ($totalDamageForCompare > $totalDamageForEquipped) {
-            return $totalDamageForCompare - $totalDamageForEquipped;
-        }
-
-        return 0;
+        return $totalDamageForCompare - $totalDamageForEquipped;
     }
 
     public function getDamageDecrease(Item $toCompare, Item $equipped) {
@@ -75,7 +69,7 @@ class WeaponComparison implements ComparisonContract {
         $totalDamageForCompare  = $this->getItemDamage($toCompare);
 
         if ($totalDamageForCompare < $totalDamageForEquipped) {
-            return $totalDamageForEquipped - $totalDamageForCompare;
+            return $totalDamageForCompare - $totalDamageForEquipped;
         }
 
         return 0;
