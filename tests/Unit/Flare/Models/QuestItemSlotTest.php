@@ -18,7 +18,7 @@ class QuestItemSlotTest extends TestCase
     public function testQuestItemSlotCanGetParentItem()
     {
         $user      = $this->createUser();
-        $character = (new CharacterSetup)->setupCharacter(['can_attack' => false], $user)
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_attack' => false])
                                          ->getCharacter();
         $item = $this->createItem([
             'name'        => 'Rusty Dagger',

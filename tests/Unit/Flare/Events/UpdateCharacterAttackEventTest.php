@@ -25,7 +25,7 @@ class UpdateCharacterAttackEventTest extends TestCase
             'base_damage' => '6'
         ]);
 
-        $character = (new CharacterSetup)->setupCharacter(['can_attack' => false], $user)
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_attack' => false])
                                          ->giveItem($item)
                                          ->equipLeftHand()
                                          ->getCharacter();

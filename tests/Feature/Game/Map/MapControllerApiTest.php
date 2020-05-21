@@ -121,7 +121,7 @@ class MapControllerApiTest extends TestCase
             'default' => true,
         ]);
 
-        $this->character = (new CharacterSetup)->setupCharacter($options, $this->user)
+        $this->character = (new CharacterSetup)->setupCharacter($this->user, $options)
                                                ->getCharacter();
 
         $this->character->map()->create([

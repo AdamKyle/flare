@@ -18,7 +18,7 @@ class UpdateCharacterSheetEventTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_attack' => false], $user)
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_attack' => false])
                                          ->getCharacter();
 
         event(new UpdateCharacterSheetEvent($character));

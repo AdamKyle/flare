@@ -139,20 +139,25 @@ class CharacterInventoryController extends Controller {
 
     public function destroy(Request $request) {
         $character = auth()->user()->character;
-        $item      = $character->inventory->slots->find($request->slot_id)->first();
+        
+        $slot      = $character->inventory->slots->filter(function($slot) use ($request) {
+            return $slot->id === (int) $request->slot_id;
+        })->first();
 
-        if (is_null($item)) {
-            return response()->json([
-                'message' => 'Could not find a matching item.',
-            ], 422);
+        if (is_null($slot)) {
+            return redirect()->back()->with('error', 'You don\'t own that item.');
         }
 
-        $name = $item->item->name;
+        if ($slot->equipped) {
+            return redirect()->back()->with('error', 'Cannot destory equipped item.');
+        }
 
-        $item->delete();
+        $name = $slot ->item->name;
 
-        $character = $character->refresh();
+        $slot->delete();
 
-        return redirect()->back()->with('success', 'Destroyed ' . $name);
+        $character->refresh();
+
+        return redirect()->back()->with('success', 'Destroyed ' . $name . '.');
     }
 }

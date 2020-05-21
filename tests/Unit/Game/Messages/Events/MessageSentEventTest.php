@@ -20,7 +20,7 @@ class MessageSentEventTest extends TestCase
 
         $user->messages()->create(['message' => 'hello']);
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $user)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new MessageSentEvent($user, $user->messages()->first()));
 

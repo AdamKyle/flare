@@ -18,7 +18,7 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $user)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'level_up'));
 
@@ -33,7 +33,7 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $user)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'gold_rush', '980'));
 
@@ -48,7 +48,7 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $user)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'gained_item', 'item name'));
 
@@ -63,7 +63,7 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $user)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'xxxx', 'item name'));
 

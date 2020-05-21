@@ -1,0 +1,205 @@
+<?php
+
+namespace Tests\Feature\Game\Core;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\CreateUser;
+use Tests\Traits\CreateItem;
+use Tests\Setup\CharacterSetup;
+
+class CharacterInventoryControllerTest extends TestCase
+{
+    use RefreshDatabase,
+        CreateItem,
+        CreateUser;
+
+    private $character;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => '6',
+        ]);
+
+        $this->character = (new CharacterSetup())
+                                ->setupCharacter($this->createUser())
+                                ->giveItem($item)
+                                ->equipLeftHand()
+                                ->getCharacter();
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
+    public function testCanSeeCharacterInventory() {
+        $this->actingAs($this->character->user)
+                    ->visitRoute('game.character.inventory')
+                    ->see('Equiped Items'); 
+    }
+
+    public function testCanUnEquipItem() {
+        $this->actingAs($this->character->user)->post(route('game.inventory.unequip'), [
+            'item_to_remove' => 1
+        ]);
+
+        $this->character->refresh();
+
+        $this->character->inventory->slots->each(function($slot) {
+            $this->assertFalse($slot->equipped);
+        });
+    }
+
+    public function testCannotUnEquipItem() {
+        $response = $this->actingAs($this->character->user)->post(route('game.inventory.unequip'), [
+            'item_to_remove' => 2
+        ])->response;
+
+        $this->character->refresh();
+
+        $response->assertSessionHas('error', 'No item found to be equipped.');
+
+        $this->character->inventory->slots->each(function($slot) {
+            $this->assertTrue($slot->equipped);
+        });
+    }
+
+    public function testCanEquipItem() {
+        $this->character->inventory->slots->each(function($slot){
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
+
+        $this->character->refresh();
+
+        $response = $this->actingAs($this->character->user)->post(route('game.equip.item'), [
+            'position'   => 'left-hand',
+            'slot_id'    => '1',
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $this->character->refresh();
+
+        $this->character->inventory->slots->each(function($slot) {
+            $this->assertTrue($slot->equipped);
+        });
+    }
+
+    public function testCannotEquipItemYouDontHave() {
+        $this->character->inventory->slots->each(function($slot){
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
+
+        $this->character->refresh();
+
+        $response = $this->actingAs($this->character->user)->post(route('game.equip.item'), [
+            'position'   => 'left-hand',
+            'slot_id'    => '7',
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $response->assertSessionHas('error', 'Could not equip item because you either do not have it, or it is equipped already.');
+
+        $this->character->refresh();
+
+        $this->character->inventory->slots->each(function($slot) {
+            $this->assertFalse($slot->equipped);
+        });
+    }
+
+    public function testPutDifferentItemIntoSameSlot() {
+        $item = $this->createItem([
+            'name' => 'Spear',
+            'base_damage' => 6,
+            'type' => 'weapon',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => false,
+        ]);
+
+        $this->character->refresh();
+
+        $response = $this->actingAs($this->character->user)->post(route('game.equip.item'), [
+            'position'   => 'left-hand',
+            'slot_id'    => '2',
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $this->character->refresh();
+
+        $slot = $this->character->inventory->slots->where('item_id', $item->id)->where('equipped', true)->first();
+
+        $this->assertNotNull($slot);
+        $this->assertEquals($slot->item->name, 'Spear');
+        $this->assertEquals($slot->position, 'left-hand');
+        $this->assertTrue($slot->equipped);
+    }
+
+    public function testCanDestroyItem() {
+        $this->character->inventory->slots->each(function($slot){
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
+
+        $this->character->refresh();
+
+        $response = $this->actingAs($this->character->user)->post(route('game.destroy.item'), [
+            'slot_id' => '1'
+        ])->response;
+
+        $response->assertSessionHas('success', 'Destroyed Rusty Dagger.');
+
+        $this->assertTrue($this->character->inventory->slots->isEmpty());
+    }
+
+    public function testCannotDestroyItemYouDontHave() {
+        $response = $this->actingAs($this->character->user)->post(route('game.destroy.item'), [
+            'slot_id' => '2'
+        ])->response;
+
+        $response->assertSessionHas('error', 'You don\'t own that item.');
+    }
+
+    public function testCannotDestroyItemYouHaveEquipped() {
+        $response = $this->actingAs($this->character->user)->post(route('game.destroy.item'), [
+            'slot_id' => '1'
+        ])->response;
+
+        $response->assertSessionHas('error', 'Cannot destory equipped item.');
+    }
+
+    public function testSeeComparePage() {
+        $item = $this->createItem([
+            'name' => 'Spear',
+            'base_damage' => 6,
+            'type' => 'weapon',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => false,
+        ]);
+
+        $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'weapon',
+            'slot_id'            => '2',
+        ])->see('Equipped')->see('The equipped items are either better or the same as the item you want to equip.');
+    }
+}

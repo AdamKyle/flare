@@ -46,7 +46,7 @@ class GameMapTest extends TestCase
             'default' => true,
         ]);
 
-        $this->character = (new CharacterSetup)->setupCharacter($options, $user)
+        $this->character = (new CharacterSetup)->setupCharacter($user, $options)
                                                ->getCharacter();
 
         $this->character->map()->create([

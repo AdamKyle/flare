@@ -18,7 +18,7 @@ class MoveTimeOutJobTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $user)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         Event::fake();
 

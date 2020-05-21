@@ -461,7 +461,7 @@ class BattleControllerApiTest extends TestCase
             'base_damage' => '6'
         ]);
 
-        $this->character = (new CharacterSetup)->setupCharacter($options, $this->user)
+        $this->character = (new CharacterSetup)->setupCharacter($this->user, $options)
                                                ->giveItem($item)
                                                ->equipLeftHand()
                                                ->setSkill('Looting', $options)

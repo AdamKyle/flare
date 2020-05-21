@@ -41,7 +41,7 @@ class MapsControllerTest extends TestCase
     public function testNonAdminCannotSeeMapsPage() {
         $user = $this->createUser();
 
-        (new CharacterSetup)->setupCharacter([], $user)->getCharacter();
+        (new CharacterSetup)->setupCharacter($user)->getCharacter();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('maps'))->dontSee('Maps Information:')->see('You don\'t have permission to view that.');
     }
@@ -76,7 +76,7 @@ class MapsControllerTest extends TestCase
     public function testNonAdminCannotSeeUploadMapPage() {
         $user = $this->createUser();
 
-        (new CharacterSetup)->setupCharacter([], $user)->getCharacter();
+        (new CharacterSetup)->setupCharacter($user)->getCharacter();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('maps.upload'))->dontSee('Upload Map')->see('You don\'t have permission to view that.');
     }

@@ -22,7 +22,7 @@ class CharacterSetup {
 
     private $character;
 
-    public function setupCharacter(array $options, User $user): CharacterSetup {
+    public function setupCharacter(User $user, array $options = []): CharacterSetup {
         $race = $this->createRace([
             'str_mod' => 3,
         ]);

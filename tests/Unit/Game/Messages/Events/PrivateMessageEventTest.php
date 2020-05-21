@@ -19,7 +19,7 @@ class PrivateMessageEventTest extends TestCase
         $user = $this->createUser();
         $from = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter(['can_move' => false], $from)->getCharacter();
+        $character = (new CharacterSetup)->setupCharacter($from, ['can_move' => false])->getCharacter();
 
         event(new PrivateMessageEvent($from, $user, 'test'));
 
