@@ -33,7 +33,8 @@ class RandomItemDropBuilderTest extends TestCase
         ]);
 
         $this->character = (new CharacterSetup)->setupCharacter([], $this->createUser())
-                                               ->equipLeftHand($item)
+                                               ->giveItem($item)
+                                               ->equipLeftHand()
                                                ->setSkill('Looting', [
                                                    'looting_level' => 100,
                                                    'looting_bonus' => 100,
