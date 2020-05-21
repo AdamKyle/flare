@@ -12,7 +12,7 @@ class ImageBuilder {
         imagepng($image);
         $imageData = ob_get_contents();
 
-        Storage::disk($storageDisk)->put($fileName . '.png', $imageData);
+        Storage::disk($storageDisk)->put($fileName . '.jpeg', $imageData);
         imagedestroy($image);
 
         ob_clean();
