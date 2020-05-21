@@ -26,7 +26,8 @@ class UpdateCharacterInventoryEventTest extends TestCase
         ]);
 
         $character = (new CharacterSetup)->setupCharacter(['can_attack' => false], $user)
-                                         ->equipLeftHand($item)
+                                         ->giveItem($item)
+                                         ->equipLeftHand()
                                          ->getCharacter();
 
         event(new UpdateCharacterInventoryEvent($character));

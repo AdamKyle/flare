@@ -33,7 +33,7 @@ class UpdateCharacterInventoryListener
         $event->character->refresh();
 
         $inventory = [
-            'inventory' => $characterInventory,
+            'inventory' => $event->character->inventory,
             'equipment' => $event->character->inventory->slots
                                             ->load(['item', 'item.itemAffixes', 'item.artifactProperty'])
                                             ->transform(function($equippedItem) {
