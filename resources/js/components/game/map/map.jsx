@@ -6,7 +6,6 @@ import {
 }                                         from 'react-bootstrap';
 import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
-import CharacterInfoModal                 from '../components/character-info-modal';
 import LocationInfoModal                  from '../components/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
 
@@ -59,10 +58,10 @@ export default class Map extends React.Component {
     });
 
     this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
-      // this.setState({
-      //   canMove: event.canMove,
-      //   showMessage: false,
-      // });
+      this.setState({
+        canMove: event.canMove,
+        showMessage: false,
+      });
     });
   }
 
@@ -173,18 +172,6 @@ export default class Map extends React.Component {
      });
   }
 
-  showCharacterInfo() {
-    this.setState({
-      showCharacterInfo: true,
-    });
-  }
-
-  hideCharacterInfo() {
-    this.setState({
-      showCharacterInfo: false,
-    });
-  }
-
   openLocationDetails(e) {
     const location = this.state.locations.filter(l => l.id === parseInt(event.target.getAttribute('data-location-id')))[0];
 
@@ -251,7 +238,7 @@ export default class Map extends React.Component {
             <div>
               <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 2000, height: 2000}}>
                 {this.renderLocations()}
-                <div className="map-x-pin" style={this.playerIcon()} onClick={this.showCharacterInfo.bind(this)}></div>
+                <div className="map-x-pin" style={this.playerIcon()}></div>
               </div>
             </div>
            </Draggable>
@@ -275,7 +262,6 @@ export default class Map extends React.Component {
          </div>
         </div>
 
-        <CharacterInfoModal show={this.state.showCharacterInfo} onClose={this.hideCharacterInfo.bind(this)} characterId={this.state.characterId} userId={this.props.userId} />
         <LocationInfoModal show={this.state.showLocationInfo} onClose={this.closeLocationDetails.bind(this)} location={this.state.location} />
       </div>
     )

@@ -93,7 +93,7 @@ class CharacterSetup {
         return $this;
     }
 
-    public function equipRightHand(int $slotId): CharacterSetup {
+    public function equipRightHand(int $slotId = 1): CharacterSetup {
         $slot = $this->fetchSlot($slotId);
 
         $slot->update([
