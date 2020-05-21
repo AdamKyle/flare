@@ -200,6 +200,29 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '2',
-        ])->see('Equipped')->see('The equipped items are either better or the same as the item you want to equip.');
+        ])->see('Equipped')->see('Your current equipment may be better. Check the equip options.');
+    }
+
+    public function testSeeComparePageWithNothingEquipped() {
+        $this->character->inventory->slots->each(function($slot){
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
+
+        $this->character->refresh();
+
+        $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'weapon',
+            'slot_id'            => '1',
+        ])->see('Equipped')->see('You have nothing equipped. Anything is better then nothing.');
+    }
+
+    public function testCannotSeeComparePageWithItemNotInYourInventory() {
+        $this->actingAs($this->character->user)->visitRoute('game.character.inventory')->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'weapon',
+            'slot_id'            => '10',
+        ])->see('Item not found in your inventory.');
     }
 }

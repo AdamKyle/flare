@@ -59,43 +59,29 @@ class CharacterInventoryController extends Controller {
         });
 
         $itemToEquip = InventorySlot::find($request->slot_id);
-
+        
         if (is_null($itemToEquip)) {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
-        $slotId      = $itemToEquip->id;
-        $replaces    = null;
-        $itemToEquip = $itemToEquip->item->load(['artifactProperty', 'itemAffixes', 'slot']);
+        $slotId        = $itemToEquip->id;
+        $itemToEquip   = $itemToEquip->item->load(['artifactProperty', 'itemAffixes', 'slot']);
 
         if ($inventory->isEmpty()) {
             return view('game.core.character.equipment-compare', [
-                'replacesExistingItem'  => $replaces,
-                'itemToEquip'           => $itemToEquip,
-                'matchingEquippedItems' => null,
-                'type'                  => $request->item_to_equip_type,
-                'slotId'                => $slotId,
+                'details'     => [],
+                'itemToEquip' => $itemToEquip,
+                'type'        => $request->item_to_equip_type,
+                'slotId'      => $slotId,
             ]);
         }
 
-        $matchingEquippedItems = $inventory->filter(function($slot) use($request) {
-            return $slot->item->type = $request->item_to_equip_type && $slot->equipped;
-        });
-
-        foreach($matchingEquippedItems as $equipped) {
-            if ($this->equipItemService->isItemBetter($itemToEquip, $equipped->item)) {
-                $replaces = $equipped;
-
-                break;
-            }
-        }
 
         return view('game.core.character.equipment-compare', [
-            'replacesExistingItem'  => $replaces,
-            'itemToEquip'           => $itemToEquip,
-            'matchingEquippedItems' => $matchingEquippedItems,
-            'type'                  => $request->item_to_equip_type,
-            'slotId'                => $slotId,
+            'details'     => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),
+            'itemToEquip' => $itemToEquip,
+            'type'        => $request->item_to_equip_type,
+            'slotId'      => $slotId,
         ]);
     }
 

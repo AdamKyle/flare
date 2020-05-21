@@ -10,38 +10,22 @@
                     <h4 class="card-title">Equipped</h4>
                     <hr />
 
-                    @if (is_null($replacesExistingItem))
-                        @if (is_null($matchingEquippedItems)) 
-                            <div class="alert alert-info">
-                                You have nothing equipped. Anything is better then nothing.
-                            </div>
-                        @else
-                            <div class="alert alert-info">
-                                The equipped items are either better or the same as the item you want to equip.
-                            </div>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Base Damage</th>
-                                        <th>Type</th>
-                                        <th>Position</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($matchingEquippedItems as $equipped)
-                                        <tr>
-                                            <td>{{$equipped->item->name}}</td>
-                                            <td>{{$equipped->item->base_damage}}</td>
-                                            <td>{{$equipped->item->type}}</td>
-                                            <td>{{$equipped->position}}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @endif
+                    @if (empty($details))
+                        <div class="alert alert-info">
+                            You have nothing equipped. Anything is better then nothing.
+                        </div>
                     @else
-                        <?php dump($replacesExistingItem); ?>
+                        @foreach($details as $key => $value)
+                            @if (!empty($details[$key]))
+                                @if ($details[$key]['is_better'])
+                                    @include('game.core.partials.item-details-replace', [
+                                        'details' => $details[$key]
+                                    ])
+                                @else
+                                    <div class="alert alert-warning">Your current equipment may be better. Check the equip options.</div>
+                                @endif
+                            @endif
+                        @endforeach
                     @endif
                 </div>
             </div>
@@ -51,74 +35,9 @@
                 <div class="card-body">
                     <h4 class="card-title">To Equip:</h4>
                     <hr />
-                    <h6>Item Details</h6>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Base Damage</th>
-                                <th>Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th>{{$itemToEquip->name}}</th>
-                                <th>{{$itemToEquip->base_damage}}</th>
-                                <th>{{$itemToEquip->type}}</th>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <hr />
-                    <h6>Item Artifact</h6>
-                    @if (is_null($itemToEquip->artifactProperty))
-                        <div class="alert alert-info">
-                            There is no artifact set to this item.
-                        </div>
-                    @else
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Base Damage Mod</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>{{$itemToEquip->artifactProperty->name}}</th>
-                                    <th>{{$itemToEquip->artifactProperty->base_damage_mod}}</th>
-                                    <th>{{$itemToEquip->artifactProperty->description}}</th>
-                                </tr>
-                            </tbody>
-                        </table>
-                    @endif
-
-                    <hr />
-                    <h6>Item Affixes</h6>
-                    @if ($itemToEquip->itemAffixes->isEmpty())
-                        <div class="alert alert-info">
-                            There are no affixes on this item.
-                        </div>
-                    @else
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Base Damage Mod</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($itemToEquip->itemAffixes as $affix)
-                                    <tr>
-                                        <th>{{$affix->name}}</th>
-                                        <th>{{$affix->base_damage_mod}}</th>
-                                        <th>{{$affix->description}}</th>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
+                    @include('game.core.partials.item-details-to-equip', [
+                        'item' => $itemToEquip
+                    ])
 
                     <form class="mt-4" action="{{route('game.equip.item')}}" method="POST">
                         @csrf
@@ -131,13 +50,21 @@
                             <div class="form-check">
                                 <label class="form-check-label">
                                   <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="left-hand">
-                                    Left Hand
+                                    @if (isset($details['left-hand']))
+                                        Left Hand <span class={{$details['left-hand']['damage_ajdustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['left-hand']['damage_ajdustment']}} (Replace)</span>
+                                    @else
+                                        Left Hand <span class="text-success">+{{$itemToEquip->getTotalDamage()}} (Equip)</span>
+                                    @endif
                                 </label>
                             </div>
                             <div class="form-check">
                                 <label class="form-check-label">
                                     <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="right-hand">
-                                    Right Hand
+                                    @if (isset($details['right-hand']))
+                                        Right Hand <span class={{$details['right-hand']['damage_ajdustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['right-hand']['damage_ajdustment']}} (Replace)</span>
+                                    @else
+                                        Right Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Equip)</span>
+                                    @endif
                                 </label>
                             </div>
                         </fieldset>

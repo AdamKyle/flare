@@ -30,7 +30,7 @@ class ShopController extends Controller {
 
     public function shopSell() {
         return view('game.core.shop.sell', [
-            'inventory' => auth()->user()->character->character->inventory->slots->filter(function($slot) {
+            'inventory' => auth()->user()->character->inventory->slots->filter(function($slot) {
                 return $slot->item->type !== 'quest' && !$slot->equipped;
             })->all(),
         ]);

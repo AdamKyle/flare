@@ -13,7 +13,9 @@ use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\EquippedItem;
+use App\Game\Core\Comparison\WeaponComparison;
 use App\Game\Core\Exceptions\EquipItemException;
+use Illuminate\Database\Eloquent\Collection;
 
 class EquipItemService {
 
@@ -64,35 +66,12 @@ class EquipItemService {
         return $characterSlot->item;
     }
 
-    public function isItemBetter(Item $toCompare, Item $equipped): bool {
-        $totalDamageForEquipped = $this->getItemDamage($equipped);
-        $totalDamageForCompare  = $this->getItemDamage($toCompare);
-
-        if ($totalDamageForCompare > $totalDamageForEquipped) {
-            return true;
+    public function getItemStats(Item $toCompare, Collection $inventorySlots): array {
+        switch($this->request->item_to_equip_type) {
+            case 'weapon':
+                return resolve(WeaponComparison::class)->fetchDetails($toCompare, $inventorySlots);
+            default:
+                throw new EquipItemException('Could not determine which item type comparsion class to load.');
         }
-
-        return false;
-    }
-
-    protected function getItemDamage(Item $item): int {
-        $attack = $item->base_damage;
-
-
-        $artifact = $item->artifactProperty;
-        
-        if (!is_null($artifact)) {
-            $attack += $artifact->base_damage_mod;
-        }
-
-        $affixes = $item->itemAffixes;
-
-        if ($affixes->isNotEmpty()) {
-            foreach($affixes as $affix) {
-                $attack += $affix->base_damage_mod;
-            }
-        }
-
-        return $attack;
     }
 }

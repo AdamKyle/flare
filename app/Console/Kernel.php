@@ -6,6 +6,8 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 use App\Flare\Console\Commands\CreateAdminAccount;
+use App\Console\Commands\GiveItem;
+use App\Console\Commands\CreateItem;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,6 +18,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         CreateAdminAccount::class,
+        GiveItem::class,
+        CreateItem::class,
     ];
 
     /**

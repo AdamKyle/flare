@@ -42,4 +42,20 @@ class Item extends Model
     public function slot() {
         return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
     }
+
+    public function scopeGetTotalDamage(): int {
+        $damage = $this->base_damage;
+
+        if (!is_null($this->artifactProperty)) {
+            $damage += $this->base_damage_mod;
+        }
+
+        if ($this->itemAffixes->isNotEmpty()) {
+            foreach ($this->itemAffixes as $affix) {
+                $damage += $affix->base_damage_mod;
+            }
+        }
+
+        return $damage;
+    }
 }
