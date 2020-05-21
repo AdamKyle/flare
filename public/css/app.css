@@ -24536,7 +24536,8 @@ a.text-dark:focus {
   content: "\F6D9";
   font-size: 16px;
   color: #d9a29e;
-  top: -10px;
+  top: -18px;
+  left: -6px;
 }
 
 .map-body .game-map .port-x-pin:after {

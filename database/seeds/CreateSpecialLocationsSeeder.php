@@ -167,7 +167,7 @@ class CreateSpecialLocationsSeeder extends Seeder
     }
 
     protected function getRandomX(): int {
-        $randomX = rand(32, 1984);
+        $randomX = rand(16, 1984);
 
         if ($randomX % 16 === 0) {
             return $randomX;
