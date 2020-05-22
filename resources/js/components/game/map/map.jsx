@@ -8,6 +8,7 @@ import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
 import LocationInfoModal                  from '../components/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
+import SetSail                            from './components/set-sail';
 
 export default class Map extends React.Component {
 
@@ -32,6 +33,9 @@ export default class Map extends React.Component {
       showMessage: false,
       locations: null,
       location: null,
+      currentPort: null,
+      portList: [],
+      secondsRemaining: 10,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -42,8 +46,8 @@ export default class Map extends React.Component {
       this.setState({
         mapUrl: result.data.map_url,
         controlledPosition: {
-          x: result.data.character_map.position_x,
-          y: result.data.character_map.position_y
+          x: getNewXPosition(result.data.character_map.character_position_x, result.data.character_map.position_x),
+          y:  getNewYPosition(result.data.character_map.character_position_y, result.data.character_map.position_y),
         },
         characterPosition: {
           x: result.data.character_map.character_position_x,
@@ -54,14 +58,17 @@ export default class Map extends React.Component {
         canMove: result.data.can_move,
         showMessage: result.data.show_message,
         locations: result.data.locations,
+        currentPort: result.data.port_details !== null ? result.data.port_details.current_port : null,
+        portList: result.data.port_details !== null ? result.data.port_details.port_list : [],
       });
     });
 
     this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
-      // this.setState({
-      //   canMove: event.canMove,
-      //   showMessage: false,
-      // });
+      this.setState({
+        canMove: event.canMove,
+        showMessage: false,
+        secondsRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
+      });
     });
   }
 
@@ -95,6 +102,18 @@ export default class Map extends React.Component {
       top: this.state.characterPosition.y + 'px',
       left: this.state.characterPosition.x + 'px',
     }
+  }
+
+  updatePlayerPosition(position) {
+    const characterX = position.character_position_x;
+    const characterY = position.character_position_y;
+    const mapX       = position.position_x;
+    const mapY       = position.position_y;
+
+    this.setState({
+      characterPosition: {x: characterX, y: characterY},
+      controlledPosition: {x: getNewXPosition(characterX, mapX), y: getNewYPosition(characterY, mapY)},
+    });
   }
 
   move(e) {
@@ -159,6 +178,11 @@ export default class Map extends React.Component {
             position_y: this.state.controlledPosition.y,
             character_position_x: this.state.characterPosition.x,
             character_position_y: this.state.characterPosition.y,
+          }).then((result) => {
+            this.setState({
+              currentPort: result.data.hasOwnProperty('current_port') ? result.data.current_port : null,
+              portList: result.data.hasOwnProperty('port_list') ? result.data.port_list : [],
+            });
           });
         });
       })
@@ -216,6 +240,7 @@ export default class Map extends React.Component {
   }
 
   render() {
+    console.log(this.state.secondsRemaining);
     if (this.state.isLoading) {
       return 'Please wait ...';
     }
@@ -244,6 +269,19 @@ export default class Map extends React.Component {
            </Draggable>
          </div>
          <hr />
+         {this.state.currentPort !== null 
+          ? 
+          <div className="clear-fix mb-2">
+            <SetSail 
+              currentPort={this.state.currentPort} 
+              portList={this.state.portList} 
+              characterId={this.state.characterId} 
+              updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+              canSetSail={this.state.canMove}
+            />
+          </div>
+          : null
+         }
          <div className="clear-fix">
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="north" onClick={this.move.bind(this)}>North</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" onClick={this.move.bind(this)}>South</button>
@@ -257,6 +295,7 @@ export default class Map extends React.Component {
                  channel={'show-timeout-move-'}
                  cssClass={'character-map-timeout'}
                  readyCssClass={'character-map-ready float-left'}
+                 forSeconds={this.state.secondsRemaining}
               />
            }
          </div>

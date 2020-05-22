@@ -214,6 +214,7 @@ export default class Actions extends React.Component {
                         channel={'show-timeout-bar-'}
                         cssClass={'character-timeout'}
                         readyCssClass={'character-ready'}
+                        forSeconds={10}
                      />
                   }
                 </div>

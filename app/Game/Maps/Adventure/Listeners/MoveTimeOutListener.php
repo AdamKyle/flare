@@ -19,8 +19,12 @@ class MoveTimeOutListener
      */
     public function handle(MoveTimeOutEvent $event)
     {
-        MoveTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
-
-        broadcast(new ShowTimeOutEvent($event->character->user, true, false));
+        if ($event->timeOut !== 0) {
+            MoveTimeOutJob::dispatch($event->character)->delay(now()->addMinutes($event->timeOut));
+        } else {
+            MoveTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
+        }
+        
+        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $event->timeOut));
     }
 }

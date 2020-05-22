@@ -29,7 +29,7 @@ export default class TimeOutBar extends React.Component {
   componentDidMount() {
     this.echo.listen(this.props.eventName , (event) => {
       this.setState({
-        maxTimeOut: event.activatebar ? 10 : 0,
+        maxTimeOut: event.activatebar ? this.props.forSeconds : 0,
         active: event.activatebar,
       });
     });

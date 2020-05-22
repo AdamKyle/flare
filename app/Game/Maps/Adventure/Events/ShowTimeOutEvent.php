@@ -37,15 +37,23 @@ class ShowTimeOutEvent implements ShouldBroadcastNow
     public $canMove;
 
     /**
+     * how many seconds does the player have to wait?
+     *
+     * @var int $forLength
+     */
+    public $forLength;
+
+    /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(User $user, bool $activatebar, bool $canMove)
+    public function __construct(User $user, bool $activatebar, bool $canMove, int $forLength = 0)
     {
         $this->user        = $user;
         $this->activatebar = $activatebar;
         $this->canMove     = $canMove;
+        $this->forLength   = $forLength;
     }
 
     /**

@@ -6,19 +6,34 @@ use Storage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateCharacterSheetBroadcastEvent;
+use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Map;
 use App\Flare\Models\Location;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
+use App\Game\Maps\Adventure\Services\PortService;
 use App\User;
 
 class MapController extends Controller {
 
-    public function __construct() {
+    private $portService;
+
+    public function __construct(PortService $portService) {
+
+        $this->portService = $portService;
+
         $this->middleware('auth:api');
     }
 
     public function index(Request $request, User $user) {
+        $port        = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->where('is_port', true)->first();
+        $portDetails = null;
+
+        if (!is_null($port)) {
+            $portDetails = $this->portService->getPortDetails($user->character, $port);
+        }
+
         return response()->json([
             'map_url'       => Storage::disk('maps')->url($user->character->map->gameMap->path),
             'character_map' => $user->character->map,
@@ -26,6 +41,7 @@ class MapController extends Controller {
             'locations'     => Location::all(),
             'can_move'      => $user->character->can_move,
             'show_message'  => $user->character->can_move ? false : true,
+            'port_details'  => $portDetails,
         ]);
     }
 
@@ -38,11 +54,47 @@ class MapController extends Controller {
             'position_y'           => $request->position_y,
         ]);
 
+        $port        = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->where('is_port', true)->first();
+        $portDetails = [];
+
+        if (!is_null($port)) {
+            $portDetails = $this->portService->getPortDetails($character, $port);
+        }
+
         $character->update(['can_move' => false]);
 
         event(new MoveTimeOutEvent($character));
 
-        return response()->json([], 200);
+        return response()->json($portDetails, 200);
+    }
+
+    public function setSail(Request $request, Location $location, Character $character) {
+        $fromPort = Location::where('id', $request->current_port_id)->where('is_port', true)->first();
+
+        if (is_null($fromPort)) {
+            return response()->json([
+                'message' => 'This is not a recognized port.',
+            ], 422);
+        }
+
+        if ($character->gold < $request->cost) {
+            return response()->json([
+                'message' => 'Not enough gold.',
+            ], 422);
+        }
+
+        $character->gold -= $request->cost;
+        $character->save();
+
+        $this->portService->setSail($character, $location);
+        
+        event(new UpdateCharacterSheetEvent($character));
+        event(new MoveTimeOutEvent($character, $request->time_out_value));
+
+        return response()->json([
+            'character_position_details' => $character->map,
+            'port_details'               => $this->portService->getPortDetails($character, $location),
+        ]);
     }
 
     public function isWater(Request $request, Character $character) {

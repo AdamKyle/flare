@@ -10,21 +10,13 @@ class MoveTimeOutEvent
 {
     use SerializesModels;
 
-    /**
-     * The character.
-     *
-     * @var \App\Flare\Models\Monster;
-     */
     public $character;
 
-    /**
-     * Create a new event instance.
-     *
-     * @param  \App\User $user
-     * @return void
-     */
-    public function __construct(Character $character)
+    public $timeout;
+
+    public function __construct(Character $character, int $timeOut = 0)
     {
+        $this->timeOut   = $timeOut;
         $this->character = $character;
     }
 }

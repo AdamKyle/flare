@@ -8,6 +8,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Console\Commands\GiveItem;
 use App\Console\Commands\CreateItem;
+use App\Console\Commands\GiveCharacterGold;
 
 class Kernel extends ConsoleKernel
 {
@@ -20,6 +21,7 @@ class Kernel extends ConsoleKernel
         CreateAdminAccount::class,
         GiveItem::class,
         CreateItem::class,
+        GiveCharacterGold::class,
     ];
 
     /**
