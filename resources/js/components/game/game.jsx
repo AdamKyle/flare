@@ -14,25 +14,18 @@ class Game extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div>
         <hr />
         <div className="row mb-4">
           <div className="col-md-12">
             <div className="row">
-              <div className="col-md-12">
+              <div className="col-md-6">
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-12">
-                <Map apiUrl={this.apiUrl} userId={this.props.userId} />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-12">
                 <Actions apiUrl={this.apiUrl} userId={this.props.userId} />
+              </div>
+              <div className="col-md-6">
+                <Map apiUrl={this.apiUrl} userId={this.props.userId} />
               </div>
             </div>
           </div>

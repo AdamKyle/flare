@@ -58,10 +58,10 @@ export default class Map extends React.Component {
     });
 
     this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
-      this.setState({
-        canMove: event.canMove,
-        showMessage: false,
-      });
+      // this.setState({
+      //   canMove: event.canMove,
+      //   showMessage: false,
+      // });
     });
   }
 
