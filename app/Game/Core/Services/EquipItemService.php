@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Services;
 
+use App;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -67,11 +68,12 @@ class EquipItemService {
     }
 
     public function getItemStats(Item $toCompare, Collection $inventorySlots): array {
-        switch($this->request->item_to_equip_type) {
-            case 'weapon':
-                return resolve(WeaponComparison::class)->fetchDetails($toCompare, $inventorySlots);
-            default:
-                return [];
+        $class = App::tagged($this->request->item_to_equip_type);
+        
+        foreach($class as $c) {
+            $class = $c;
         }
+
+        return $c->fetchDetails($toCompare, $inventorySlots);
     }
 }

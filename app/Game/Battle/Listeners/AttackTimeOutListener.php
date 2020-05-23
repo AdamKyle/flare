@@ -22,7 +22,8 @@ class AttackTimeOutListener
     public function handle(AttackTimeOutEvent $event)
     {
         $event->character->update([
-            'can_attack' => false
+            'can_attack'          => false,
+            'can_attack_again_at' => now()->addSeconds(10),
         ]);
 
         AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));

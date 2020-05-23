@@ -27,6 +27,8 @@ class Character extends Model
         'inventory_max',
         'can_attack',
         'can_move',
+        'can_move_again_at',
+        'can_attack_again_at',
         'level',
         'xp',
         'xp_next',
@@ -45,19 +47,21 @@ class Character extends Model
      * @var array
      */
     protected $casts = [
-        'inventory_max' => 'integer',
-        'can_attack'    => 'boolean',
-        'can_move'      => 'boolean',
-        'level'         => 'integer',
-        'xp'            => 'integer',
-        'xp_next'       => 'integer',
-        'str'           => 'integer',
-        'dur'           => 'integer',
-        'dex'           => 'integer',
-        'chr'           => 'integer',
-        'int'           => 'integer',
-        'ac'            => 'integer',
-        'gold'          => 'integer',
+        'inventory_max'       => 'integer',
+        'can_attack'          => 'boolean',
+        'can_move'            => 'boolean',
+        'can_move_again_at'   => 'datetime',
+        'can_attack_again_at' => 'datetime',
+        'level'               => 'integer',
+        'xp'                  => 'integer',
+        'xp_next'             => 'integer',
+        'str'                 => 'integer',
+        'dur'                 => 'integer',
+        'dex'                 => 'integer',
+        'chr'                 => 'integer',
+        'int'                 => 'integer',
+        'ac'                  => 'integer',
+        'gold'                => 'integer',
     ];
 
     public function race() {

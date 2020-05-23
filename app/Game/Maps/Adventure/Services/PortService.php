@@ -30,12 +30,22 @@ class PortService {
         return $this->portDetails;
     }
 
+    public function doesMatch(Character $character, Location $from, Location $to, int $timeOut, int $cost): bool {
+        $ports = $this->fetchOtherPorts($character, $from);
+
+        $foundPort = $ports->filter(function($port) use ($to) {
+            return $port->id === $to->id;
+        })->first();
+
+        return $foundPort->time === $timeOut && $foundPort->cost === $cost;
+    }
+
     public function setSail(Character $character, Location $newPort): Character {
         $character->map()->update([
             'character_position_x' => $newPort->x,
             'character_position_y' => $newPort->y,
             'position_x'           => $this->mapPositionValue->fetchXPosition($character->map->character_position_x, $character->map->position_x),
-            'position_x'           => $this->mapPositionValue->fetchYPosition($character->map->character_position_y, $character->map->position_y),
+            'position_x'           => $this->mapPositionValue->fetchYPosition($character->map->character_position_y),
         ]);
 
         return $character->refresh();
@@ -49,7 +59,6 @@ class PortService {
             $time     = $this->distanceCalculator->calculateMinutes($distance);
             $cost     = ($time * 100); 
 
-            $portLocation->name       = $portLocation->name;
             $portLocation->distance   = $distance;
             $portLocation->time       = $time;
             $portLocation->cost       = $cost;

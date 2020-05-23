@@ -1,4 +1,5 @@
 import React from 'react';
+import moment, { max } from 'moment';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 const renderTime = value => {
@@ -27,12 +28,94 @@ export default class TimeOutBar extends React.Component {
   }
 
   componentDidMount() {
+
+    let maxTimeOut = 0;
+
+    if (this.props.timeRemaining !== null) {
+      let now    = moment();
+      let then   = moment(this.props.timeRemaining);
+
+      let duration = moment.duration(then.diff(now));
+
+      maxTimeOut = duration.asSeconds();
+    }
+
+    this.setState({
+      maxTimeOut: maxTimeOut,
+      active: maxTimeOut > 0,
+    });
+
     this.echo.listen(this.props.eventName , (event) => {
       this.setState({
         maxTimeOut: event.activatebar ? this.props.forSeconds : 0,
         active: event.activatebar,
       });
     });
+  }
+
+  fetchTimer() {
+    const maxTimeOut = this.state.maxTimeOut;
+    const isHours    = (maxTimeOut / 3600) > 1;
+    const isMinutes  = (maxTimeOut / 60) > 1;
+
+    if (isHours) {
+      return (
+        <div className={this.props.cssClass}>
+          <div className="float-left">
+            <CountdownCircleTimer
+              isPlaying={this.state.active}
+              duration={maxTimeOut}
+              initialRemainingTime={maxTimeOut}
+              colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+              size={40}
+              strokeWidth={2}
+              onComplete={() => [false, 0]}
+            >
+              {({ remainingTime }) => (remainingTime / 3600).toFixed(0)}
+            </CountdownCircleTimer>
+          </div>
+          <div className="float-left mt-2 ml-2">Hours</div>
+        </div>
+      );
+    } else if (isMinutes) {
+      return (
+        <div className={this.props.cssClass}>
+          <div className="float-left">
+            <CountdownCircleTimer
+              isPlaying={this.state.active}
+              duration={maxTimeOut}
+              initialRemainingTime={maxTimeOut}
+              colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+              size={40}
+              strokeWidth={2}
+              onComplete={() => [false, 0]}
+            >
+              {({ remainingTime }) => (remainingTime / 60).toFixed(0)}
+            </CountdownCircleTimer>
+          </div>
+          <div className="float-left mt-2 ml-2">Minutes</div>
+        </div>
+      );
+    } else {
+      return (
+        <div className={this.props.cssClass}>
+          <div className="float-left">
+            <CountdownCircleTimer
+              isPlaying={this.state.active}
+              duration={maxTimeOut}
+              initialRemainingTime={maxTimeOut}
+              colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+              size={40}
+              strokeWidth={2}
+              onComplete={() => [false, 0]}
+            >
+              {({ remainingTime }) => remainingTime}
+            </CountdownCircleTimer>
+          </div>
+          <div className="float-left mt-2 ml-2">Seconds</div>
+        </div>
+      );
+    }
   }
 
   render() {
@@ -44,17 +127,7 @@ export default class TimeOutBar extends React.Component {
       )
     }
     return(
-      <div className={this.props.cssClass}>
-        <CountdownCircleTimer
-          isPlaying={this.state.active}
-          durationSeconds={this.state.maxTimeOut}
-          colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
-          renderTime={renderTime}
-          size={40}
-          strokeWidth={2}
-          onComplete={() => [false, 0]}
-        />
-      </div>
+      <>{this.fetchTimer()}</>
     );
   }
 }

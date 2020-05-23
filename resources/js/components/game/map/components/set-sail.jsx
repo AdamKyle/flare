@@ -76,7 +76,7 @@ export default class SetSail extends React.Component {
                     <dd>{foundPort.x}/{foundPort.y}</dd>
                     <dt>Set Sail?</dt>
                     <dd>
-                        {foundPort.can_afford ? <button className="btn btn-primary" onClick={() => this.handleSetSail(foundPort.id)}>Set Sail</button> : <span className="text-danger">You don't have the gold.</span>}
+                        {this.setSailButton(foundPort)}
                     </dd>
                 </dl>
             );

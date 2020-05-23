@@ -17,7 +17,7 @@ use App\Flare\Models\Location;
 |
 */
 
-$factory->define(Item::class, function (Faker $faker) {
+$factory->define(Location::class, function (Faker $faker) {
     return [
         'name' => null,
         'description' => null,

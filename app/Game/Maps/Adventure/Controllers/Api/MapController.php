@@ -12,8 +12,10 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Map;
 use App\Flare\Models\Location;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
+use App\Game\Maps\Adventure\Requests\SetSailValidation;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\User;
+use Carbon\Carbon;
 
 class MapController extends Controller {
 
@@ -40,6 +42,7 @@ class MapController extends Controller {
             'character_id'  => $user->character->id,
             'locations'     => Location::all(),
             'can_move'      => $user->character->can_move,
+            'timeout'       => $user->character->can_move_again_at,
             'show_message'  => $user->character->can_move ? false : true,
             'port_details'  => $portDetails,
         ]);
@@ -55,20 +58,24 @@ class MapController extends Controller {
         ]);
 
         $port        = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->where('is_port', true)->first();
+        
         $portDetails = [];
 
         if (!is_null($port)) {
             $portDetails = $this->portService->getPortDetails($character, $port);
         }
 
-        $character->update(['can_move' => false]);
+        $character->update([
+            'can_move'          => false,
+            'can_move_again_at' => now()->addSeconds(10),
+        ]);
 
         event(new MoveTimeOutEvent($character));
 
         return response()->json($portDetails, 200);
     }
 
-    public function setSail(Request $request, Location $location, Character $character) {
+    public function setSail(SetSailValidation $request, Location $location, Character $character) {
         $fromPort = Location::where('id', $request->current_port_id)->where('is_port', true)->first();
 
         if (is_null($fromPort)) {
@@ -83,8 +90,17 @@ class MapController extends Controller {
             ], 422);
         }
 
-        $character->gold -= $request->cost;
-        $character->save();
+        if (!$this->portService->doesMatch($character, $fromPort, $location, (int) $request->time_out_value, (int) $request->cost)) {
+            return response()->json([
+                'message' => 'Invalid input. Please refresh and try again.',
+            ], 422);
+        }
+
+        $character->update([
+            'can_move'          => false,
+            'gold'              => $character->gold - $request->cost,
+            'can_move_again_at' => now()->addMinutes($request->time_out_value),
+        ]);
 
         $this->portService->setSail($character, $location);
         
@@ -98,6 +114,7 @@ class MapController extends Controller {
     }
 
     public function isWater(Request $request, Character $character) {
+        
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
         $this->imageResource = imagecreatefromstring($contents);
 

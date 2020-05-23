@@ -36,6 +36,7 @@ export default class Map extends React.Component {
       currentPort: null,
       portList: [],
       secondsRemaining: 10,
+      timeRemaining: null,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -60,6 +61,7 @@ export default class Map extends React.Component {
         locations: result.data.locations,
         currentPort: result.data.port_details !== null ? result.data.port_details.current_port : null,
         portList: result.data.port_details !== null ? result.data.port_details.port_list : [],
+        timeRemaining: result.data.timeout !== null ? result.data.timeout : null,
       });
     });
 
@@ -68,6 +70,7 @@ export default class Map extends React.Component {
         canMove: event.canMove,
         showMessage: false,
         secondsRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
+        timeRemaining: event.canMove ? null : this.state.timeRemaining,
       });
     });
   }
@@ -240,7 +243,6 @@ export default class Map extends React.Component {
   }
 
   render() {
-    console.log(this.state.secondsRemaining);
     if (this.state.isLoading) {
       return 'Please wait ...';
     }
@@ -287,17 +289,15 @@ export default class Map extends React.Component {
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" onClick={this.move.bind(this)}>South</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" onClick={this.move.bind(this)}>East</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
-           {this.state.showMessage
-            ? 'Almost Ready!'
-            : <TimeOutBar
-                 userId={this.props.userId}
-                 eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent'
-                 channel={'show-timeout-move-'}
-                 cssClass={'character-map-timeout'}
-                 readyCssClass={'character-map-ready float-left'}
-                 forSeconds={this.state.secondsRemaining}
-              />
-           }
+           <TimeOutBar
+              userId={this.props.userId}
+              eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent'
+              channel={'show-timeout-move-'}
+              cssClass={'character-map-timeout'}
+              readyCssClass={'character-map-ready float-left'}
+              forSeconds={this.state.secondsRemaining}
+              timeRemaining={this.state.timeRemaining}
+            />
          </div>
         </div>
 

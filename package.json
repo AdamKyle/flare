@@ -26,10 +26,11 @@
     },
     "dependencies": {
         "laravel-echo": "^1.6.1",
+        "moment": "^2.26.0",
         "pusher-js": "^5.0.3",
         "react-bootstrap": "^1.0.0-beta.16",
         "react-bootstrap-table-next": "^3.3.1",
-        "react-countdown-circle-timer": "^1.0.3",
+        "react-countdown-circle-timer": "^2.1.2",
         "react-draggable": "^4.1.0",
         "rpg-awesome": "^0.2.0"
     }

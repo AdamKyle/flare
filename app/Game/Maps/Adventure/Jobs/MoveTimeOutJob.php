@@ -33,8 +33,12 @@ class MoveTimeOutJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->character->can_move = true;
-        $this->character->save();
+        $this->character->update([
+            'can_move' => true,
+            'can_move_again_at' => null,
+        ]);
+
+        $this->character->refresh();
 
         broadcast(new ShowTimeOutEvent($this->character->user, false, true));
     }

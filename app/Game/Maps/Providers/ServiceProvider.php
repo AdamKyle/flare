@@ -34,9 +34,4 @@ class ServiceProvider extends ApplicationServiceProvider
     {
         //
     }
-
-    public function provides()
-    {
-        return [];
-    }
 }

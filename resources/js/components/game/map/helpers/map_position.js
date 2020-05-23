@@ -1,4 +1,4 @@
-export const getNewYPosition = (characterY, mapPositionY) => {
+export const getNewYPosition = (characterY) => {
   if (characterY < 336) {
     return 0;
   }
@@ -43,11 +43,7 @@ export const getNewYPosition = (characterY, mapPositionY) => {
     return -1520;
   }
 
-  if (characterY === 1856) {
-    return -1648;
-  }
-
-  return mapPositionY;
+  return -1648;
 }
 
 export const getNewXPosition = (characterX, mapPositionX) => {

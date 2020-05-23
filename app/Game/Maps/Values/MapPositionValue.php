@@ -5,34 +5,34 @@ namespace App\Game\Maps\Values;
 class MapPositionValue {
 
     public function fetchXPosition(int $characterX, int $mapPositionX): int {
-        if ($characterX <= 736) {
-            return 0;
-          }
-        
-          if ($characterX > 1936) {
-            return -1245;
-          }
-        
-          if ($characterX > 1536) {
-            return -1200;
-          }
-        
-          if ($characterX > 1136) {
-            return -800;
-          }
-        
-          if ($characterX > 736) {
-            return -400;
-          }
-        
-          return $mapPositionX;
-    }
-
-    public function fetchYPosition(int $characterY, int $mapPositionY): int {
-        if ($characterY < 336) {
+        if ($characterX === 736) {
             return 0;
         }
     
+        if ($characterX > 1936) {
+            return -1245;
+        }
+    
+        if ($characterX > 1536) {
+            return -1200;
+        }
+    
+        if ($characterX > 1136) {
+            return -800;
+        }
+    
+        if ($characterX > 736) {
+            return -400;
+        }
+    
+        return $mapPositionX;
+    }
+
+    public function fetchYPosition(int $characterY): int {
+        if ($characterY < 336) {
+            return 0;
+        }
+
         if ($characterY === 336) {
             return -304;
         }
@@ -72,11 +72,7 @@ class MapPositionValue {
         if ($characterY < 1856) {
             return -1520;
         }
-    
-        if ($characterY === 1856) {
-            return -1648;
-        }
-    
-        return $mapPositionY;
+
+        return -1648;
     }
 }

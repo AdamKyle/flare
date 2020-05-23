@@ -21,6 +21,7 @@ export default class Actions extends React.Component {
       isLoading: true,
       canAttack: true,
       showMessage: false,
+      timeRemaining: null,
     }
 
     this.echo         = Echo.private('show-timeout-bar-' + this.props.userId);
@@ -41,6 +42,7 @@ export default class Actions extends React.Component {
         characterCurrentHealth: result.data.character.data.health,
         isLoading: false,
         canAttack: result.data.character.data.can_attack,
+        timeRemaining: result.data.character.data.can_attack_again_at,
         showMessage: result.data.character.data.show_message,
       });
     });
@@ -206,17 +208,15 @@ export default class Actions extends React.Component {
 
               <div className="col-md-3">
                 <div className="ml-2 mt-2">
-                  {this.state.showMessage
-                   ? 'Almost Ready!'
-                   : <TimeOutBar
-                        userId={this.props.userId}
-                        eventName='Game.Battle.Events.ShowTimeOutEvent'
-                        channel={'show-timeout-bar-'}
-                        cssClass={'character-timeout'}
-                        readyCssClass={'character-ready'}
-                        forSeconds={10}
-                     />
-                  }
+                <TimeOutBar
+                  userId={this.props.userId}
+                  eventName='Game.Battle.Events.ShowTimeOutEvent'
+                  channel={'show-timeout-bar-'}
+                  cssClass={'character-timeout'}
+                  readyCssClass={'character-ready'}
+                  forSeconds={10}
+                  timeRemaining={this.state.timeRemaining}
+                />
                 </div>
               </div>
           </div>

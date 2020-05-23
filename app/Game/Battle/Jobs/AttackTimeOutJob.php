@@ -33,8 +33,13 @@ class AttackTimeOutJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->character->can_attack = true;
-        $this->character->save();
+
+        $this->character->update([
+            'can_attack'          => true,
+            'can_attack_again_at' => null,
+        ]);
+
+        $this->character->refresh();
 
         broadcast(new ShowTimeOutEvent($this->character->user, false, true));
     }
