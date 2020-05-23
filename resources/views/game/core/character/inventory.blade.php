@@ -37,7 +37,7 @@
                     <strong>Max Attack: </strong> {{$characterInfo['maxAttack']}}
                     <hr />
                     <table class="table table-bordered text-center">
-                        <thead class="thead-dark">
+                        <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Base Damage</th>

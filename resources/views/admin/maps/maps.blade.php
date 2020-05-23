@@ -10,7 +10,7 @@
                     <h4 class="card-title">Maps</h4>
 
                     <table class="table table-bordered text-center">
-                        <thead class="thead-dark">
+                        <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Default Map</th>

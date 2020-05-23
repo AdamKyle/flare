@@ -1,5 +1,5 @@
-<table class="table table-bordered text-center">
-    <thead class="thead-dark">
+<table class="display table table-bordered text-center">
+    <thead>
         <tr>
             <th>Name</th>
             <th>Base Damage</th>

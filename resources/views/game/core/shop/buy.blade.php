@@ -11,7 +11,7 @@
                             <h4 class="card-title">Weapons</h4>
 
                             <table class="table table-bordered text-center">
-                                <thead class="thead-dark">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Base Damage</th>
@@ -51,7 +51,7 @@
                             <h4 class="card-title">Armour</h4>
 
                             <table class="table table-bordered text-center">
-                                <thead class="thead-dark">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Type</th>
@@ -82,7 +82,7 @@
                             <h4 class="card-title">Artifacts</h4>
 
                             <table class="table table-bordered text-center">
-                                <thead class="thead-dark">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Cost</th>
@@ -108,7 +108,7 @@
                             <h4 class="card-title">Spells</h4>
 
                             <table class="table table-bordered text-center">
-                                <thead class="thead-dark">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Base Damage</th>
@@ -139,7 +139,7 @@
                             <h4 class="card-title">Rings</h4>
 
                             <table class="table table-bordered text-center">
-                                <thead class="thead-dark">
+                                <thead>
                                     <tr>
                                         <th>Name</th>
                                         <th>Base Damage</th>
