@@ -54,7 +54,7 @@
                                 <a class="dropdown-item" href="{{route('game.inventory.unequip')}}"
                                    onclick="event.preventDefault();
                                                  document.getElementById('item-unequip-{{$slot->id}}').submit();">
-                                    {{ __('Unequip') }}
+                                    {{ __('Unequip') }}</a>
                             @endif
 
                           </div>

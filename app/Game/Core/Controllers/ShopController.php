@@ -55,7 +55,7 @@ class ShopController extends Controller {
         }
 
         event(new BuyItemEvent($item, $character));
-
+        
         return redirect()->back()->with('success', 'Purchased: ' . $item->name . '.');
     }
 
