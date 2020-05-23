@@ -270,6 +270,9 @@ export default class Map extends React.Component {
             </div>
            </Draggable>
          </div>
+         <div className="character-position mt-2">
+          <p>Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
+         </div>
          <hr />
          {this.state.currentPort !== null 
           ? 
