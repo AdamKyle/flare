@@ -114,6 +114,10 @@ class MessageControllerApiTest extends TestCase
                          ])
                          ->response;
 
+        $this->assertEquals($user->messages->first()->fromUser->id, $user->id);
+        $this->assertEquals($user->messages->first()->toUser->id, $characterSecond->user->id);
+        $this->assertEquals($user->messages->first()->message, 'sample');
+
         $this->assertEquals(200, $response->status());
     }
 

@@ -38,13 +38,20 @@ class MessageController extends Controller {
 
     public function sendPrivateMessage(Request $request) {
         $character = Character::where('name', '=', $request->user_name)->first();
+        $user      = auth()->user();
 
         if (!is_null($character)) {
-            broadcast(new PrivateMessageEvent(auth()->user(), $character->user, $request->message));
+            $user->messages()->create([
+                'from_user' => $user->id,
+                'to_user'   => $character->user->id,
+                'message'   => $request->message,
+            ]);
+
+            broadcast(new PrivateMessageEvent($user, $character->user, $request->message));
             return response()->json([], 200);
         }
 
-        broadcast(new ServerMessageEvent(auth()->user(), $this->serverMessage->build('no_matching_user')));
+        broadcast(new ServerMessageEvent($user, $this->serverMessage->build('no_matching_user')));
         return response()->json([], 200);
     }
 }

@@ -185,7 +185,7 @@ export default class Chat extends React.Component {
       getServerMessage('invalid_command');
       return;
     }
-
+    
     axios.post('/api/private-message', {
       user_name: messageData[1],
       message: messageData[2],
