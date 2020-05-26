@@ -21,6 +21,8 @@ class CharacterSheetController extends Controller {
             'characterInfo' => [
                 'maxAttack' => $characterInfo->buildAttack(),
                 'maxHealth' => $characterInfo->buildHealth(),
+                'maxHeal'   => $characterInfo->buildHealFor(),
+                'maxAC'     => $characterInfo->buildDefence(),
             ],
         ]);
     }

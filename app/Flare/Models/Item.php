@@ -19,11 +19,14 @@ class Item extends Model
         'item_suffix_id',
         'item_prefix_id',
         'type',
+        'default_position',
         'base_damage',
+        'base_ac',
         'cost',
         'base_damage_mod',
         'description',
         'base_healing_mod',
+        'base_ac_mod',
         'str_mod',
         'dur_mod',
         'dex_mod',
@@ -42,9 +45,11 @@ class Item extends Model
     protected $casts = [
         'base_damage'          => 'integer',
         'base_healing'         => 'integer',
+        'base_ac'              => 'integer',
         'cost'                 => 'integer',
         'base_damage_mod'      => 'float',
         'base_healing_mod'     => 'float',
+        'base_ac_mod'          => 'float',
         'str_mod'              => 'float',
         'dur_mod'              => 'float',
         'dex_mod'              => 'float',
@@ -67,7 +72,7 @@ class Item extends Model
     }
 
     public function scopeGetTotalDamage(): int {
-        $baseDamage = $this->base_damage;
+        $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
         $damage     = $baseDamage;
 
         if (!is_null($this->itemPrefix)) {
@@ -79,5 +84,35 @@ class Item extends Model
         }
 
         return round($damage);
+    }
+
+    public function scopeGetTotalDefence(): int {
+        $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
+        $ac     = $baseAc;
+
+        if (!is_null($this->itemPrefix)) {
+            $ac += ($baseAc * $this->itemPrefix->base_ac_mod);
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            $ac += ($baseAc * $this->itemSuffix->base_ac_mod);
+        }
+
+        return round($ac);
+    }
+
+    public function scopeGetTotalHealing(): int {
+        $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
+        $healFor     = $baseHealing;
+
+        if (!is_null($this->itemPrefix)) {
+            $healFor += ($baseHealing * $this->itemPrefix->base_heal_mod);
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            $healFor += ($baseHealing * $this->itemSuffix->base_heal_mod);
+        }
+
+        return round($healFor);
     }
 }

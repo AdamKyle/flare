@@ -35,7 +35,9 @@ class DropsCheckListener
                         ->setItemAffixes(ItemAffix::all())
                         ->generateItem($event->character);
 
-            $this->attemptToPickUpItem($event, $drop);
+            if (!is_null($drop->itemSuffix) && !is_null($drop->itemPrefix)) {
+                $this->attemptToPickUpItem($event, $drop);
+            }
         }
     }
 

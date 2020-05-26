@@ -2,7 +2,8 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Base Damage</th>
+            <th>Damage</th>
+            <th>AC</th>
             @if ($actions === 'manage')
                 <th>Equiped</th>
                 <th>Position</th>
@@ -16,7 +17,8 @@
         @foreach($inventory as $slot)
             <tr>
                 <td>{{$slot->item->name}}</td>
-                <td>{{$slot->item->base_damage}}</td>
+                <td>{{$slot->item->getTotalDamage()}}</td>
+                <td>{{$slot->item->getTotalDefence()}}</td>
 
                 @if ($actions === 'manage')
                     <td>{{$slot->equipped ? 'Yes' : 'No'}}</td>

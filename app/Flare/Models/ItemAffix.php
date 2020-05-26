@@ -16,6 +16,7 @@ class ItemAffix extends Model
     protected $fillable = [
         'name',
         'base_damage_mod',
+        'base_ac_mod',
         'type',
         'description',
         'base_healing_mod',

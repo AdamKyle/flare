@@ -16,7 +16,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'name'          => $character->name,
             'attack'        => $characterInformation->buildAttack(),
             'health'        => $characterInformation->buildHealth(),
-            'ac'            => $character->ac,
+            'ac'            => $characterInformation->buildDefence(),
             'skills'        => $character->skills,
             'damage_stat'   => $character->damage_stat,
             'race'          => $character->race->name,

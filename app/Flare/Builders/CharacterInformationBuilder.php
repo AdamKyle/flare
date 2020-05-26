@@ -14,7 +14,7 @@ class CharacterInformationBuilder {
     public function setCharacter(Character $character): CharacterInformationBuilder {
         $this->character = $character;
 
-        $this->inventory = $character->inventory;
+        $this->inventory = $character->inventory->slots->where('equipped', true);
 
         return $this;
     }
@@ -23,13 +23,21 @@ class CharacterInformationBuilder {
         return ($this->character->{$this->character->damage_stat} + 10) + $this->getWeaponDamage();
     }
 
+    public function buildDefence(): int {
+        return 10 + $this->getDefence();
+    }
+
+    public function buildHealFor(): int {
+        return $this->fetchHealingAmount();
+    }
+
     public function buildHealth(): int {
         return $this->character->dur + 10;
     }
 
     public function hasArtifacts(): bool {
-        return $this->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'artifact' && $slot->equipped;
+        return $this->inventory->filter(function ($slot) {
+            return $slot->item->type === 'artifact';
         })->isNotEmpty();
     }
 
@@ -38,28 +46,38 @@ class CharacterInformationBuilder {
     }
 
     public function hasSpells(): bool {
-        return $this->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'spell' && $slot->equipped;
+        return $this->inventory->filter(function ($slot) {
+            return $slot->item->type === 'spell';
         })->isNotEmpty();
     }
 
     protected function getWeaponDamage(): int {
-        $leftHand  = $this->inventory->slots->where('position', '=', 'left-hand')->first();
-        $rightHand = $this->inventory->slots->where('position', '=', 'right-hand')->first();
+        $damage = 0;
 
-        if (!is_null($leftHand) && !is_null($rightHand)) {
-            
-            return $leftHand->item->getTotalDamage() + $rightHand->item->getTotalDamage();
+        foreach ($this->inventory as $slot) {
+            $damage += $slot->item->getTotalDamage();
         }
 
-        if (!is_null($leftHand)) {
-            return $leftHand->item->getTotalDamage();
+        return $damage;
+    }
+
+    protected function getDefence(): int {
+        $defence = 0;
+
+        foreach ($this->inventory as $slot) {
+            $defence += $slot->item->getTotalDefence();
         }
 
-        if (!is_null($rightHand)) {
-            return $rightHand->item->getTotalDamage();
+        return $defence;
+    }
+
+    protected function fetchHealingAmount(): int {
+        $healFor = 0;
+
+        foreach ($this->inventory as $slot) {
+            $healFor += $slot->item->getTotalHealing();
         }
 
-        return 0;
+        return $healFor;
     }
 }

@@ -34,13 +34,18 @@
                 <div class="card-body">
                     <h4 class="card-title">Equiped Items</h4>
                     <hr />
-                    <strong>Max Attack: </strong> {{$characterInfo['maxAttack']}}
+                        <div class="clear-fix">
+                            <span class=""><strong>Max Attack: </strong> {{$characterInfo['maxAttack']}} /</span>
+                            <span class="ml-1"><strong>Max Defence: </strong> {{$characterInfo['maxDefence']}} /</span>
+                            <span class="ml-1"><strong>Max Heal For: </strong> {{$characterInfo['maxHeal']}}</span>
+                        </div>
                     <hr />
                     <table class="table table-bordered text-center">
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Base Damage</th>
+                                <th>Damage</th>
+                                <th>AC</th>
                                 <th>Type</th>
                                 <th>Position</th>
                             </tr>
@@ -49,7 +54,8 @@
                             @foreach($equipped as $equippedItem)
                                 <tr>
                                     <td>{{$equippedItem->item->name}}</td>
-                                    <td>{{$equippedItem->item->base_damage}}</td>
+                                    <td>{{$equippedItem->item->getTotalDamage()}}</td>
+                                    <td>{{$equippedItem->item->getTotalDefence()}}</td>
                                     <td>{{$equippedItem->item->type}}</td>
                                     <td>{{$equippedItem->position}}</td>
                                 </tr>

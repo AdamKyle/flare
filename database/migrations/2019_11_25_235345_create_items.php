@@ -23,9 +23,11 @@ class CreateItems extends Migration
             $table->string('default_position')->nullable();
             $table->integer('base_damage')->nullable();
             $table->integer('base_healing')->nullable();
+            $table->integer('base_ac')->nullable();
             $table->integer('cost')->nullable();
             $table->decimal('base_damage_mod')->nullable();
             $table->decimal('base_healing_mod')->nullable();
+            $table->decimal('base_ac_mod')->nullable();
             $table->decimal('str_mod')->nullable();
             $table->decimal('dur_mod')->nullable();
             $table->decimal('dex_mod')->nullable();

@@ -2,72 +2,44 @@
     Replacing this weapon will increase the attack by: {{$details['damage_adjustment']}}.
 </div>
 <h6>Item Details</h6>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Base Damage</th>
-            <th>Type</th>
-            <th>Position</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>{{$details['replaces_item']->name}}</th>
-            <th>{{$details['replaces_item']->base_damage}}</th>
-            <th>{{$details['replaces_item']->type}}</th>
-            <th>{{$details['slot']->position}}</th>
-        </tr>
-    </tbody>
-</table>
+<dl>
+    <dt>Name:</dt>
+    <dd>{{$details['replaces_item']->name}}</dd>
+    <dt>Base Damage:</dt>
+    <dd>{{$details['replaces_item']->base_damage}}</dd>
+    <dt>Position:</dt>
+    <dd>{{$details['slot']->position}}</dd>
+</dl>
 <hr />
-<h6>Item Artifact</h6>
-@if (is_null($details['replaces_item']->artifactProperty))
-    <div class="alert alert-info">
-        There is no artifact set to this item.
-    </div>
-@else
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Base Damage Mod</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th>{{$details['replaces_item']->artifactProperty->name}}</th>
-                <th>{{$details['replaces_item']->artifactProperty->base_damage_mod}}</th>
-                <th>{{$details['replaces_item']->artifactProperty->description}}</th>
-            </tr>
-        </tbody>
-    </table>
-@endif
 
-<hr />
 <h6>Item Affixes</h6>
-@if ($details['replaces_item']->itemAffixes->isEmpty())
+@if (is_null($details['replaces_item']->itemPrefix) && is_null($details['replaces_item']->itemSuffix))
     <div class="alert alert-info">
         There are no affixes on this item.
     </div>
 @else
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Base Damage Mod</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($details['replaces_item']->itemAffixes as $affix)
-                <tr>
-                    <th>{{$affix->name}}</th>
-                    <th>{{$affix->base_damage_mod}}</th>
-                    <th>{{$affix->description}}</th>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    @if (!is_null($details['replaces_item']->itemPrefix))
+        <dl>
+            <dt>Name:</dt>
+            <dd>{{$details['replaces_item']->itemPrefix->name}}</dd>
+            <dt>Base Damage:</dt>
+            <dd>{{$details['replaces_item']->itemPrefix->base_damage_mod * 100}}%</dd>
+            <dt>Base AC:</dt>
+            <dd>{{$details['replaces_item']->itemPrefix->base_ac_mod * 100}}%</dd>
+            <dt>Description:</dt>
+            <dd>{{$details['replaces_item']->itemPrefix->description}}</dd>
+        </dl>
+    @endif
+    @if (!is_null($details['replaces_item']->itemPrefix))
+        <dl>
+            <dt>Name:</dt>
+            <dd>{{$details['replaces_item']->itemSuffix->name}}</dd>
+            <dt>Base Damage:</dt>
+            <dd>{{$details['replaces_item']->itemSuffix->base_damage_mod * 100}}%</dd>
+            <dt>Base AC:</dt>
+            <dd>{{$details['replaces_item']->itemSuffix->base_ac_mod * 100}}%</dd>
+            <dt>Description:</dt>
+            <dd>{{$details['replaces_item']->itemSuffix->description}}</dd>
+        </dl>
+    @endif
 @endif

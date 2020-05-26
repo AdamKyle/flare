@@ -41,14 +41,16 @@ class CharacterInventoryController extends Controller {
                 return $equippedItem;
             });
 
-        $chatacterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 
         return view('game.core.character.inventory', [
             'inventory' => $inventory,
             'equipped'  => $equipped,
             'questItems' => $character->inventory->questItemSlots->load('item'),
             'characterInfo' => [
-                'maxAttack' => $chatacterInfo->buildAttack(),
+                'maxAttack'  => $characterInfo->buildAttack(),
+                'maxDefence' => $characterInfo->buildDefence(),
+                'maxHeal'    => $characterInfo->buildHealFor(),
             ],
         ]);
     }
@@ -67,20 +69,22 @@ class CharacterInventoryController extends Controller {
 
         $slotId        = $itemToEquip->id;
         $itemToEquip   = $itemToEquip->item->load(['itemPrefix', 'itemSuffix', 'slot']);
- 
+
+        $type = $this->fetchType($request->item_to_equip_type);
+        
         if ($inventory->isEmpty()) {
             return view('game.core.character.equipment-compare', [
                 'details'     => [],
                 'itemToEquip' => $itemToEquip,
-                'type'        => $request->item_to_equip_type,
+                'type'        => $type,
                 'slotId'      => $slotId,
             ]);
         }
-       
+        
         return view('game.core.character.equipment-compare', [
             'details'     => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),
             'itemToEquip' => $itemToEquip,
-            'type'        => $request->item_to_equip_type,
+            'type'        => $type,
             'slotId'      => $slotId,
         ]);
     }
@@ -139,5 +143,21 @@ class CharacterInventoryController extends Controller {
         $character->refresh();
 
         return redirect()->back()->with('success', 'Destroyed ' . $name . '.');
+    }
+
+    protected function fetchType(string $type): string {
+        $acceptedTypes = [
+            'weapon', 'ring', 'shield', 'artifact'
+        ];
+
+        if (in_array($type, $acceptedTypes)) {
+            return $type;
+        }
+
+        if ($type === 'spell-healing' || $type === 'spell-damage') {
+            return 'spell';
+        }
+
+        return 'armour';
     }
 }

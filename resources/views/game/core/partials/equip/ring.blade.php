@@ -8,19 +8,19 @@
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring_one">
             @if (isset($details['left-hand']))
-                Left Hand <span class={{$details['left-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['left-hand']['damage_adjustment']}} (Replace)</span>
+                Left Hand <span class={{$details['ring_one']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['ring_one']['damage_adjustment']}} (Replace)</span>
             @else
-                Left Hand <span class="text-success">+{{$itemToEquip->getTotalDamage()}} (Equip)</span>
+                Left Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Damage)</span>
             @endif
         </label>
     </div>
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring_two">
-            @if (isset($details['right-hand']))
-                Right Hand <span class={{$details['right-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['right-hand']['damage_adjustment']}} (Replace)</span>
+            @if (isset($details['ring_two']))
+                Right Hand <span class={{$details['right-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['ring_two']['damage_adjustment']}} (Replace)</span>
             @else
-                Right Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Equip)</span>
+                Right Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Damage)</span>
             @endif
         </label>
     </div>
