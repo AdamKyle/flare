@@ -18,14 +18,14 @@ class ShopController extends Controller {
     public function shopBuy() {
 
         return view('game.core.shop.buy', [
-            'weapons'   => Item::doesntHave('itemAffixes')->doesntHave('artifactProperty')->where('type', 'weapon')->get(),
-            'armour'    => Item::doesntHave('itemAffixes')->doesntHave('artifactProperty')->whereIn('type', [
+            'weapons'   => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->where('type', 'weapon')->get(),
+            'armour'    => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->whereIn('type', [
                 'body', 'leggings', 'sleeves', 'gloves', 'helmet', 'shield'
             ])->get(),
 
-            'artifacts' => Item::with('artifactProperty')->where('type', 'artifact')->get(),
-            'spells'    => Item::doesntHave('itemAffixes')->doesntHave('artifactProperty')->where('type', 'spell')->get(),
-            'rings'     => Item::doesntHave('itemAffixes')->doesntHave('artifactProperty')->where('type', 'ring')->get(),
+            'artifacts' => Item::where('type', 'artifact')->get(),
+            'spells'    => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->where('type', 'spell')->get(),
+            'rings'     => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->where('type', 'ring')->get(),
         ]);
     }
 
@@ -60,11 +60,12 @@ class ShopController extends Controller {
     }
 
     public function sell(Request $request) {
+        
         $character     = auth()->user()->character;
         $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === (int) $request->slot_id && !$slot->equipped;
         })->first();
-
+        
         if (is_null($inventorySlot)) {
             return redirect()->back()->with('error', 'Item not found.');
         }
@@ -72,7 +73,7 @@ class ShopController extends Controller {
         $name = $inventorySlot->item->name;
 
         event(new SellItemEvent($inventorySlot, $character));
-
+        
         return redirect()->back()->with('success', 'Sold: ' . $name . '.');
     }
 }

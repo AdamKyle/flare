@@ -2,53 +2,45 @@
 
 namespace App\Flare\Builders;
 
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
+use App\Flare\Models\ItemAffix;
 
 class RandomItemDropBuilder {
 
-    private $artifactProperties;
+    private $itemAffixes; 
 
-    private $itemAffixes;
-
-    public function setArtifactProperties(array $artifactProperties): RandomItemDropBuilder {
-        $this->artifactProperties = $artifactProperties;
-
-        return $this;
-    }
-
-    public function setItemAffixes(array $itemAffixes): RandomItemDropBuilder {
+    public function setItemAffixes(Collection $itemAffixes): RandomItemDropBuilder {
         $this->itemAffixes = $itemAffixes;
 
         return $this;
     }
 
     public function generateItem(Character $character): Item {
-        $item = Item::inRandomOrder()->with(['itemAffixes'])->doesntHave('artifactProperty')->get()->first();
+        $item = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])->where('type', '!=', 'artifact')->where('type', '!=', 'quest')->get()->first();
 
         $duplicateItem = $item->replicate();
         $duplicateItem->save();
 
-        if ($item->itemAffixes->isNotEmpty()) {
-            foreach ($item->itemAffixes as $itemAffix) {
-                $duplicateItem->itemAffixes()->create($itemAffix->getAttributes());
-            }
+        if (!is_null($item->itemSuffix)) {
+            $duplicateItem->update([
+                'item_suffix_id' => $item->itemSuffix->id,
+            ]);
         }
 
-        $duplicateItem->refresh()->load(['itemAffixes']);
-
-        if ($this->shouldHaveArtifactAttached($character)) {
-            $artifact            = $this->fetchRandomArtifactProperty();
-            $artifact['item_id'] = $item->id;
-
-            $duplicateItem->artifactProperty()->create($artifact);
+        if (!is_null($item->itemPrefix)) {
+            $duplicateItem->update([
+                'item_prefix_id' => $item->itemPrefix->id,
+            ]);
         }
+
+        $duplicateItem->refresh()->load(['itemSuffix', 'itemPrefix']);
 
         if ($this->shouldHaveItemAffix($character)) {
-            $affix            = $this->fetchRandomItemAffix();
-            $affix['item_id'] = $item->id;
+            $affix = $this->fetchRandomItemAffix();
 
-            if ($duplicateItem->itemAffixes->isNotEmpty()) {
+            if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
                 $hasSameAffix = $duplicateItem->itemAffixes->where('type', '=', $affix['type'])->first();
 
                 if (!is_null($hasSameAffix)) {
@@ -56,10 +48,10 @@ class RandomItemDropBuilder {
 
                     return $item;
                 } else {
-                    $duplicateItem->itemAffixes()->create($affix);
+                    $duplicateItem = $this->attachAffix($duplicateItem, $affix);
                 }
             } else {
-                $duplicateItem->itemAffixes()->create($affix);
+                $duplicateItem = $this->attachAffix($duplicateItem, $affix);
             }
         } else {
             $duplicateItem->delete();
@@ -67,12 +59,10 @@ class RandomItemDropBuilder {
             return $item;
         }
 
-        $duplicateItem = $this->setItemName($duplicateItem->load(['itemAffixes', 'artifactProperty']));
-        $foundItems    = Item::where('name', '=', $duplicateItem->name);
+        $duplicateItem = $this->setItemName($duplicateItem);
+        $foundItems    = Item::where('name', '=', $duplicateItem->name)->get();
 
         if ($foundItems->count() > 1) {
-            $item = Item::where('name', '=', $duplicateItem->name)->first();
-
             $duplicateItem->delete();
 
             return $item;
@@ -81,40 +71,31 @@ class RandomItemDropBuilder {
         return $duplicateItem;
     }
 
-    protected function shouldHaveArtifactAttached(Character $character): bool {
-        $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+    protected function attachAffix(Item $item, ItemAffix $itemAffix): Item {
+        $item->update(['item_'.$itemAffix->type.'_id' => $itemAffix->id]);
 
-        return rand(1, 100) + $lootingChance > 60;
+        return $item->refresh();
     }
 
     protected function shouldHaveItemAffix(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return rand(1, 100) + $lootingChance > 50;
+        return (rand(1, 100) + $lootingChance) > 50;
     }
 
-    protected function fetchRandomArtifactProperty() {
-        return $this->artifactProperties[rand(0, count($this->artifactProperties) - 1)];
-    }
-
-    protected function fetchRandomItemAffix() {
+    protected function fetchRandomItemAffix(): ItemAffix {
         return $this->itemAffixes[rand(0, count($this->itemAffixes) - 1)];
     }
 
     private function setItemName(Item $item): Item {
         $name    = $item->name;
-        $affixes = $item->itemAffixes;
 
-        if ($affixes->isNotEmpty()) {
-            foreach($affixes as $affix) {
-                if ($affix->type === 'suffix') {
-                    $name = $name . ' *' . $affix->name . '*';
-                }
+        if (!is_null($item->itemSuffix)) {
+            $name = $name . ' *' . $item->itemSuffix->name . '*';
+        }
 
-                if ($affix->type === 'prefix') {
-                    $name = '*'.$affix->name . '* ' . $name;
-                }
-            }
+        if (!is_null($item->itemSuffix)) {
+            $name = '*' . $item->itemSuffix->name . '* ' . $name;
         }
 
         $item->name = $name;

@@ -15,12 +15,18 @@ class CreateItemAffixes extends Migration
     {
         Schema::create('item_affixes', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('item_id')->unsigned();
             $table->string('name');
-            $table->foreign('item_id')
-                ->references('id')->on('items')->onDelete('cascade');
             $table->string('description');
-            $table->integer('base_damage_mod');
+            $table->decimal('base_damage_mod')->nullable();
+            $table->decimal('base_healing_mod')->nullable();
+            $table->decimal('str_mod')->nullable();
+            $table->decimal('dur_mod')->nullable();
+            $table->decimal('dex_mod')->nullable();
+            $table->decimal('chr_mod')->nullable();
+            $table->decimal('int_mod')->nullable();
+            $table->decimal('ac_mod')->nullable();
+            $table->string('skill_name')->nullable();
+            $table->decimal('skill_training_bonus')->nullable();
             $table->string('type');
             $table->timestamps();
         });

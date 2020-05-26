@@ -42,7 +42,7 @@
 
 <hr />
 <h6>Item Affixes</h6>
-@if ($item->itemAffixes->isEmpty())
+@if (is_null($item->itemPrefix) && is_null($item->itemSuffix))
     <div class="alert alert-info">
         There are no affixes on this item.
     </div>
@@ -56,13 +56,20 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($item->itemAffixes as $affix)
+            @if (!is_null($item->itemPrefix))
                 <tr>
-                    <th>{{$affix->name}}</th>
-                    <th>{{$affix->base_damage_mod}}</th>
-                    <th>{{$affix->description}}</th>
+                    <th>{{$item->itemPrefix->name}}</th>
+                    <th>{{$item->itemPrefix->base_damage_mod}}</th>
+                    <th>{{$item->itemPrefix->description}}</th>
                 </tr>
-            @endforeach
+            @endif
+            @if (!is_null($item->itemSuffix))
+                <tr>
+                    <th>{{$item->itemSuffix->name}}</th>
+                    <th>{{$item->itemSuffix->base_damage_mod}}</th>
+                    <th>{{$item->itemSuffix->description}}</th>
+                </tr>
+            @endif
         </tbody>
     </table>
 @endif

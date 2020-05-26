@@ -2,9 +2,9 @@
 
 namespace App\Game\Core\Providers;
 
-use App\Game\Core\Comparison\WeaponComparison;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
+use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Services\EquipItemService;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -24,11 +24,9 @@ class ServiceProvider extends ApplicationServiceProvider
             return new EquipItemService();
         });
 
-        $this->app->bind(WeaponComparison::class, function($app) {
-            return new WeaponComparison();
+        $this->app->bind(ItemComparison::class, function($app) {
+            return new ItemComparison();
         });
-
-        $this->app->tag(WeaponComparison::class, 'weapon');
     }
 
     /**

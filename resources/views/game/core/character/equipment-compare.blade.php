@@ -12,7 +12,7 @@
 
                     @if (empty($details))
                         <div class="alert alert-info">
-                            You have nothing equipped. Anything is better then nothing.
+                            You have nothing equipped for this item type. Anything is better then nothing.
                         </div>
                     @else
                         @foreach($details as $key => $value)
@@ -41,33 +41,12 @@
 
                     <form class="mt-4" action="{{route('game.equip.item')}}" method="POST">
                         @csrf
-                        <input type="hidden" name="slot_id" value={{$slotId}} />
-                        <input type="hidden" name="equip_type" value={{$type}} />
-
-                        <fieldset class="form-group row">
-                          <legend class="col-sm-2">Which Position</legend>
-                          <div class="col-sm-10">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                  <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="left-hand">
-                                    @if (isset($details['left-hand']))
-                                        Left Hand <span class={{$details['left-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['left-hand']['damage_adjustment']}} (Replace)</span>
-                                    @else
-                                        Left Hand <span class="text-success">+{{$itemToEquip->getTotalDamage()}} (Equip)</span>
-                                    @endif
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="right-hand">
-                                    @if (isset($details['right-hand']))
-                                        Right Hand <span class={{$details['right-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['right-hand']['damage_adjustment']}} (Replace)</span>
-                                    @else
-                                        Right Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Equip)</span>
-                                    @endif
-                                </label>
-                            </div>
-                        </fieldset>
+                        @include('game.core.partials.equip.' . $type, [
+                            'slotId'      => $slotId,
+                            'details'     => $details,
+                            'itemToEquip' => $itemToEquip,
+                            'type'        => $type
+                        ])
                         <button type="submit" class="btn btn-primary">Equip</button>
                     </form>
                 </div>

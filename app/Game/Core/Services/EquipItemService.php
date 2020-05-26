@@ -14,7 +14,7 @@ use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\EquippedItem;
-use App\Game\Core\Comparison\WeaponComparison;
+use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Exceptions\EquipItemException;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -68,12 +68,6 @@ class EquipItemService {
     }
 
     public function getItemStats(Item $toCompare, Collection $inventorySlots): array {
-        $class = App::tagged($this->request->item_to_equip_type);
-        
-        foreach($class as $c) {
-            $class = $c;
-        }
-
-        return $c->fetchDetails($toCompare, $inventorySlots);
+       return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots);
     }
 }

@@ -28,11 +28,11 @@
                                             <td>
                                                 <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
                                                    onclick="event.preventDefault();
-                                                                 document.getElementById('shop-buy-form').submit();">
+                                                                 document.getElementById('shop-buy-form-weapon-{{$weapon->id}}').submit();">
                                                     {{ __('Buy') }}
                                                 </a>
 
-                                                <form id="shop-buy-form" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
+                                                <form id="shop-buy-form-weapon-{{$weapon->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
                                                     @csrf
 
                                                     <input type="hidden" name="item_id" value={{$weapon->id}} />
@@ -65,7 +65,19 @@
                                             <td>{{$armour->name}}</td>
                                             <td>{{$armour->type}}</td>
                                             <td>{{$armour->cost}}</td>
-                                            <td><a href="#" class="btn btn-primary">Buy</a></td>
+                                            <td>
+                                                <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
+                                                   onclick="event.preventDefault();
+                                                                 document.getElementById('shop-buy-form-armour-{{$armour->id}}').submit();">
+                                                    {{ __('Buy') }}
+                                                </a>
+
+                                                <form id="shop-buy-form-armour-{{$armour->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
+                                                    @csrf
+
+                                                    <input type="hidden" name="item_id" value={{$armour->id}} />
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -94,7 +106,19 @@
                                         <tr>
                                             <td>{{$artifact->name}}</td>
                                             <td>{{$artifact->cost}}</td>
-                                            <td><a href="#" class="btn btn-primary">Buy</a></td>
+                                            <td>
+                                                <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
+                                                   onclick="event.preventDefault();
+                                                                 document.getElementById('shop-buy-form-artifact-{{$armour->id}}').submit();">
+                                                    {{ __('Buy') }}
+                                                </a>
+
+                                                <form id="shop-buy-form-artifact-{{$armour->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
+                                                    @csrf
+
+                                                    <input type="hidden" name="item_id" value={{$artifact->id}} />
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -122,7 +146,19 @@
                                             <td>{{$spell->name}}</td>
                                             <td>{{!is_null($spell->base_damage) ? $spell->base_damage : 'N/A'}}</td>
                                             <td>{{$spell->cost}}</td>
-                                            <td><a href="#" class="btn btn-primary">Buy</a></td>
+                                            <td>
+                                                <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
+                                                   onclick="event.preventDefault();
+                                                                 document.getElementById('shop-buy-form-spell-{{$spell->id}}').submit();">
+                                                    {{ __('Buy') }}
+                                                </a>
+
+                                                <form id="shop-buy-form-spell-{{$spell->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
+                                                    @csrf
+
+                                                    <input type="hidden" name="item_id" value={{$spell->id}} />
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -148,12 +184,24 @@
                                     </tr>
                                 </thead>
                                 <tbody class="text-center">
-                                    @foreach($weapons as $weapon)
+                                    @foreach($rings as $ring)
                                         <tr>
-                                            <td>{{$weapon->name}}</td>
-                                            <td>{{$weapon->base_damage}}</td>
-                                            <td>{{$weapon->cost}}</td>
-                                            <td><a href="#" class="btn btn-primary">Buy</a></td>
+                                            <td>{{$ring->name}}</td>
+                                            <td>{{$ring->base_damage}}</td>
+                                            <td>{{$ring->cost}}</td>
+                                            <td>
+                                                <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
+                                                   onclick="event.preventDefault();
+                                                                 document.getElementById('shop-buy-form-rings-{{$ring->id}}').submit();">
+                                                    {{ __('Buy') }}
+                                                </a>
+
+                                                <form id="shop-buy-form-rings-{{$ring->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
+                                                    @csrf
+
+                                                    <input type="hidden" name="item_id" value={{$ring->id}} />
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

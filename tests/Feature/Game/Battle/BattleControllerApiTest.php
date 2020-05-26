@@ -12,6 +12,7 @@ use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\ShowTimeOutEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\UpdateTopBarEvent;
@@ -26,6 +27,7 @@ use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateSkill;
 use Tests\Setup\CharacterSetup;
+use Tests\Traits\CreateItemAffix;
 
 class BattleControllerApiTest extends TestCase
 {
@@ -37,7 +39,8 @@ class BattleControllerApiTest extends TestCase
         CreateCharacter,
         CreateMonster,
         CreateItem,
-        CreateSkill;
+        CreateSkill,
+        CreateItemAffix;
 
     private $user;
 
@@ -49,6 +52,38 @@ class BattleControllerApiTest extends TestCase
         parent::setUp();
 
         $this->setUpMonster();
+
+        $this->createItemAffix([
+            'name'                 => 'Sample',
+            'base_damage_mod'      => '0.10',
+            'type'                 => 'prefix',
+            'description'          => 'Sample',
+            'base_healing_mod'     => '0.10',
+            'str_mod'              => '0.10',
+            'dur_mod'              => '0.10',
+            'dex_mod'              => '0.10',
+            'chr_mod'              => '0.10',
+            'int_mod'              => '0.10',
+            'ac_mod'               => '0.10',
+            'skill_name'           => null,
+            'skill_training_bonus' => null,
+        ]);
+
+        $this->createItemAffix([
+            'name'                 => 'Sample',
+            'base_damage_mod'      => '0.10',
+            'type'                 => 'suffix',
+            'description'          => 'Sample',
+            'base_healing_mod'     => '0.10',
+            'str_mod'              => '0.10',
+            'dur_mod'              => '0.10',
+            'dex_mod'              => '0.10',
+            'chr_mod'              => '0.10',
+            'int_mod'              => '0.10',
+            'ac_mod'               => '0.10',
+            'skill_name'           => null,
+            'skill_training_bonus' => null,
+        ]);
     }
 
     public function tearDown(): void {
@@ -110,7 +145,6 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateCharacterAttackEvent::class,
@@ -140,10 +174,9 @@ class BattleControllerApiTest extends TestCase
 
         Event::fake([
             ServerMessageEvent::class,
-            DropCheckEvent::class,
+            DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateCharacterAttackEvent::class,
@@ -178,7 +211,6 @@ class BattleControllerApiTest extends TestCase
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateCharacterAttackEvent::class,

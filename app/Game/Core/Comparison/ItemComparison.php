@@ -7,7 +7,7 @@ use App\Flare\Models\Item;
 use App\Game\Core\Exceptions\EquipItemException;
 use Illuminate\Database\Eloquent\Collection;
 
-class WeaponComparison implements ComparisonContract {
+class ItemComparison {
 
     public function fetchDetails(Item $toCompare, Collection $inventorySlots): array {
         $comparison = [];
@@ -26,7 +26,7 @@ class WeaponComparison implements ComparisonContract {
         $foundHand = $inventorySlots->filter(function($slot) use ($hand) {
             return $slot->position === $hand;
         })->first();
-
+        
         if ($this->isItemBetter($toCompare, $foundHand->item)) {
             return [
                 'is_better'         => true,
@@ -46,27 +46,16 @@ class WeaponComparison implements ComparisonContract {
         }
     }
 
-    protected function isItemBetter(Item $toCompare, Item $equipped): bool {
-        $totalDamageForEquipped = $this->getItemDamage($equipped);
-        $totalDamageForCompare  = $this->getItemDamage($toCompare);
-
-        if ($totalDamageForCompare > $totalDamageForEquipped) {
-            return true;
-        }
-
-        return false;
-    }
-
     public function getDamageIncrease(Item $toCompare, Item $equipped): int {
-        $totalDamageForEquipped = $this->getItemDamage($equipped);
-        $totalDamageForCompare  = $this->getItemDamage($toCompare);
+        $totalDamageForEquipped = $equipped->getTotalDamage();
+        $totalDamageForCompare  = $toCompare->getTotalDamage();
 
         return $totalDamageForCompare - $totalDamageForEquipped;
     }
 
     public function getDamageDecrease(Item $toCompare, Item $equipped) {
-        $totalDamageForEquipped = $this->getItemDamage($equipped);
-        $totalDamageForCompare  = $this->getItemDamage($toCompare);
+        $totalDamageForEquipped = $equipped->getTotalDamage();
+        $totalDamageForCompare  = $toCompare->getTotalDamage();
 
         if ($totalDamageForCompare < $totalDamageForEquipped) {
             return $totalDamageForCompare - $totalDamageForEquipped;
@@ -75,24 +64,14 @@ class WeaponComparison implements ComparisonContract {
         return 0;
     }
 
-    protected function getItemDamage(Item $item): int {
-        $attack = $item->base_damage;
+    protected function isItemBetter(Item $toCompare, Item $equipped): bool {
+        $totalDamageForEquipped = $equipped->getTotalDamage();
+        $totalDamageForCompare  = $toCompare->getTotalDamage();
 
-
-        $artifact = $item->artifactProperty;
-        
-        if (!is_null($artifact)) {
-            $attack += $artifact->base_damage_mod;
+        if ($totalDamageForCompare > $totalDamageForEquipped) {
+            return true;
         }
 
-        $affixes = $item->itemAffixes;
-
-        if ($affixes->isNotEmpty()) {
-            foreach($affixes as $affix) {
-                $attack += $affix->base_damage_mod;
-            }
-        }
-
-        return $attack;
+        return false;
     }
 }

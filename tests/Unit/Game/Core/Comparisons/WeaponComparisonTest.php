@@ -2,7 +2,8 @@
 
 namespace Tests\Unit\Game\Core\Comparisons;
 
-use App\Game\Core\Comparison\WeaponComparison;
+use App\Flare\Models\ItemAffix;
+use App\Game\Core\Comparison\ItemComparison;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Game\Core\Events\UpdateShopInventoryBroadcastEvent;
@@ -10,10 +11,11 @@ use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateUser;
 use Tests\Setup\CharacterSetup;
+use Tests\Traits\CreateItemAffix;
 
-class WeaponComparisonTest extends TestCase
+class itemComparisonTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateUser;
+    use RefreshDatabase, CreateItem, CreateUser, CreateItemAffix;
 
     private $character;
 
@@ -35,6 +37,22 @@ class WeaponComparisonTest extends TestCase
             'cost' => 10,
             'type' => 'weapon',
         ]);
+
+        $this->createItemAffix([
+            'name'                 => 'Sample',
+            'base_damage_mod'      => '0.10',
+            'type'                 => 'suffix',
+            'description'          => 'Sample',
+            'base_healing_mod'     => '0.10',
+            'str_mod'              => '0.10',
+            'dur_mod'              => '0.10',
+            'dex_mod'              => '0.10',
+            'chr_mod'              => '0.10',
+            'int_mod'              => '0.10',
+            'ac_mod'               => '0.10',
+            'skill_name'           => null,
+            'skill_training_bonus' => null,
+        ]);
         
         $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
                                                ->giveItem($itemForCharacter)
@@ -52,14 +70,14 @@ class WeaponComparisonTest extends TestCase
             ]);
         });
 
-        $weaponComparison = new WeaponComparison();
+        $itemComparison = new ItemComparison();
 
-        $this->assertTrue(empty($weaponComparison->fetchDetails($this->item, $this->character->inventory->slots)));
+        $this->assertTrue(empty($itemComparison->fetchDetails($this->item, $this->character->inventory->slots)));
     }
 
     public function testWeaponIsBetter() {
-        $weaponComparison  = new WeaponComparison();
-        $comparisonDetails = $weaponComparison->fetchDetails($this->item, $this->character->inventory->slots);
+        $itemComparison  = new ItemComparison();
+        $comparisonDetails = $itemComparison->fetchDetails($this->item, $this->character->inventory->slots);
  
         $this->assertFalse(empty($comparisonDetails));
 
@@ -70,24 +88,13 @@ class WeaponComparisonTest extends TestCase
     }
 
     public function testWeaponIsBetterWithArtifactsAndAffixes() {
-        $weaponComparison  = new WeaponComparison();
+        $itemComparison  = new ItemComparison();
 
-        $this->item->artifactProperty()->create([
-            'item_id'         => $this->item->id,
-            'name'            => 'Sample',
-            'base_damage_mod' => 10,
-            'description'     => 'Sample',
+        $this->item->update([
+            'item_suffix_id' => ItemAffix::first()->id,
         ]);
 
-        $this->item->itemAffixes()->create([
-            'item_id'         => $this->item->id,
-            'name'            => 'Sample',
-            'base_damage_mod' => 10,
-            'description'     => 'Sample',
-            'type'            => 'suffix'
-        ]);
-
-        $comparisonDetails = $weaponComparison->fetchDetails($this->item, $this->character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($this->item, $this->character->inventory->slots);
  
         $this->assertFalse(empty($comparisonDetails));
 
@@ -98,7 +105,7 @@ class WeaponComparisonTest extends TestCase
     }
 
     public function testDownGradingAWeapon() {
-        $weaponComparison  = new WeaponComparison();
+        $itemComparison  = new ItemComparison();
 
         $this->character->inventory->slots->each(function($slot){
             $slot->update([
@@ -118,7 +125,7 @@ class WeaponComparisonTest extends TestCase
 
         $downGradedItem = $this->character->inventory->slots->first()->item;
 
-        $comparisonDetails = $weaponComparison->fetchDetails($downGradedItem, $this->character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($downGradedItem, $this->character->inventory->slots);
 
         $this->assertFalse(empty($comparisonDetails));
 
@@ -129,9 +136,9 @@ class WeaponComparisonTest extends TestCase
     }
 
     public function testComparingTheSameWeapon() {
-        $weaponComparison  = new WeaponComparison();
+        $itemComparison  = new itemComparison();
         $sameItem          = $this->character->inventory->slots->first()->item;
-        $comparisonDetails = $weaponComparison->fetchDetails($sameItem, $this->character->inventory->slots);
+        $comparisonDetails = $itemComparison->fetchDetails($sameItem, $this->character->inventory->slots);
 
         $this->assertFalse(empty($comparisonDetails));
 

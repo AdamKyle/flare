@@ -29,19 +29,17 @@ class CharacterInformationBuilder {
 
     public function hasArtifacts(): bool {
         return $this->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'artifact' || !is_null($slot->item->artifactProperty);
+            return $slot->item->type === 'artifact' && $slot->equipped;
         })->isNotEmpty();
     }
 
     public function hasAffixes(): bool {
-        return $this->inventory->slots->filter(function ($slot) {
-            return $slot->item->itemAffixes->isNotEmpty();
-        })->isNotEmpty();
+        return true;
     }
 
     public function hasSpells(): bool {
         return $this->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'spell';
+            return $slot->item->type === 'spell' && $slot->equipped;
         })->isNotEmpty();
     }
 
@@ -50,16 +48,16 @@ class CharacterInformationBuilder {
         $rightHand = $this->inventory->slots->where('position', '=', 'right-hand')->first();
 
         if (!is_null($leftHand) && !is_null($rightHand)) {
-            return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($leftHand->item) +
-                   resolve(MaxDamageForItemValue::class)->fetchMaxDamage($rightHand->item);
+            
+            return $leftHand->item->getTotalDamage() + $rightHand->item->getTotalDamage();
         }
 
         if (!is_null($leftHand)) {
-            return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($leftHand->item);
+            return $leftHand->item->getTotalDamage();
         }
 
         if (!is_null($rightHand)) {
-            return resolve(MaxDamageForItemValue::class)->fetchMaxDamage($rightHand->item);
+            return $rightHand->item->getTotalDamage();
         }
 
         return 0;

@@ -35,15 +35,14 @@ class UpdateCharacterInventoryListener
         $inventory = [
             'inventory' => $event->character->inventory,
             'equipment' => $event->character->inventory->slots
-                                            ->load(['item', 'item.itemAffixes', 'item.artifactProperty'])
+                                            ->load(['item', 'item.itemPrefix', 'item.itemSuffix'])
                                             ->transform(function($equippedItem) {
                                                 $equippedItem->actions          = null;
-                                                $equippedItem->item->max_damage = resolve(MaxDamageForItemValue::class)
-                                                                                    ->fetchMaxDamage($equippedItem->item);
+                                                $equippedItem->item->max_damage = $equippedItem->item->getTotalDamage();
 
                                                 return $equippedItem;
                                             }),
-            'quest_items' => $event->character->inventory->questItemSlots->load(['item', 'item.itemAffixes', 'item.artifactProperty']),
+            'quest_items' => $event->character->inventory->questItemSlots->load(['item', 'item.itemPrefix', 'item.itemSuffix']),
         ];
     }
 }

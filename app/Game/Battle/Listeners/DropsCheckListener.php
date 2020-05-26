@@ -8,6 +8,7 @@ use App\Game\Battle\Services\CharacterService;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
 
 class DropsCheckListener
 {
@@ -31,8 +32,7 @@ class DropsCheckListener
 
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
-                        ->setItemAffixes(config('game.item_affixes'))
-                        ->setArtifactProperties(config('game.artifact_properties'))
+                        ->setItemAffixes(ItemAffix::all())
                         ->generateItem($event->character);
 
             $this->attemptToPickUpItem($event, $drop);

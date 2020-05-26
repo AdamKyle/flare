@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             CreateItemsSeeder::class,
             CreateMonstersSeeder::class,
             CreateSpecialLocationsSeeder::class,
+            CreateAffixes::class,
         ]);
     }
 }

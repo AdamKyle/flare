@@ -16,9 +16,22 @@ class Item extends Model
      */
     protected $fillable = [
         'name',
+        'item_suffix_id',
+        'item_prefix_id',
         'type',
         'base_damage',
         'cost',
+        'base_damage_mod',
+        'description',
+        'base_healing_mod',
+        'str_mod',
+        'dur_mod',
+        'dex_mod',
+        'chr_mod',
+        'int_mod',
+        'ac_mod',
+        'skill_name',
+        'skill_training_bonus',
     ];
 
     /**
@@ -27,16 +40,26 @@ class Item extends Model
      * @var array
      */
     protected $casts = [
-        'base_damage' => 'integer',
-        'cost'        => 'integer',
+        'base_damage'          => 'integer',
+        'base_healing'         => 'integer',
+        'cost'                 => 'integer',
+        'base_damage_mod'      => 'float',
+        'base_healing_mod'     => 'float',
+        'str_mod'              => 'float',
+        'dur_mod'              => 'float',
+        'dex_mod'              => 'float',
+        'chr_mod'              => 'float',
+        'int_mod'              => 'float',
+        'ac_mod'               => 'float',
+        'skill_training_bonus' => 'float',
     ];
 
-    public function artifactProperty() {
-        return $this->hasOne(ArtifactProperty::class);
+    public function itemSuffix() {
+        return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }
 
-    public function itemAffixes() {
-        return $this->hasMany(ItemAffix::class);
+    public function itemPrefix() {
+        return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
     }
 
     public function slot() {
@@ -44,18 +67,17 @@ class Item extends Model
     }
 
     public function scopeGetTotalDamage(): int {
-        $damage = $this->base_damage;
+        $baseDamage = $this->base_damage;
+        $damage     = $baseDamage;
 
-        if (!is_null($this->artifactProperty)) {
-            $damage += $this->base_damage_mod;
+        if (!is_null($this->itemPrefix)) {
+            $damage += ($baseDamage * $this->itemPrefix->base_damage_mod);
         }
 
-        if ($this->itemAffixes->isNotEmpty()) {
-            foreach ($this->itemAffixes as $affix) {
-                $damage += $affix->base_damage_mod;
-            }
+        if (!is_null($this->itemSuffix)) {
+            $damage += ($baseDamage * $this->itemSuffix->base_damage_mod);
         }
 
-        return $damage;
+        return round($damage);
     }
 }

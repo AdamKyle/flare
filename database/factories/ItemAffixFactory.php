@@ -19,10 +19,18 @@ use App\Flare\Models\ItemAffix;
 
 $factory->define(ItemAffix::class, function (Faker $faker) {
     return [
-        'item_id'         => null,
-        'name'            => null,
-        'base_damage_mod' => null,
-        'type'            => null,
-        'description'     => null,
+        'name'                 => null,
+        'base_damage_mod'      => null,
+        'type'                 => null,
+        'description'          => null,
+        'base_healing_mod'     => null,
+        'str_mod'              => null,
+        'dur_mod'              => null,
+        'dex_mod'              => null,
+        'chr_mod'              => null,
+        'int_mod'              => null,
+        'ac_mod'               => null,
+        'skill_name'           => null,
+        'skill_training_bonus' => null,
     ];
 });

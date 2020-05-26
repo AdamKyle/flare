@@ -235,7 +235,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '1',
-        ])->see('Equipped')->see('You have nothing equipped. Anything is better then nothing.');
+        ])->see('Equipped')->see('You have nothing equipped for this item type. Anything is better then nothing.');
     }
 
     public function testCannotSeeComparePageWithItemNotInYourInventory() {

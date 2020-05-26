@@ -24,7 +24,7 @@ class ComparisonValidation extends FormRequest
     public function rules()
     {
         return [
-            'item_to_equip_type' => 'required|in:weapon,body,shield,leggings,sleeves,helmet,gloves',
+            'item_to_equip_type' => 'required|in:weapon,body,shield,leggings,sleeves,helmet,gloves,ring,spell',
             'slot_id'            => 'required',
         ];
     }
@@ -33,7 +33,7 @@ class ComparisonValidation extends FormRequest
         return [
             'item_to_equip_type.required' => 'Error. Invalid Input.',
             'item_to_equip_type.in'       => 'Error. Invalid Input.',
-            'slot_id.in'                  => 'Error. Invalid Input.',
+            'slot_id.required'            => 'Error. Invalid Input.',
         ];
     }
 }

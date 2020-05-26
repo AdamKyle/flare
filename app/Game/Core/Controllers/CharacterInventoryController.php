@@ -16,6 +16,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
+use App\Game\Core\Requests\EquipItemValidation;
 
 class CharacterInventoryController extends Controller {
 
@@ -33,10 +34,9 @@ class CharacterInventoryController extends Controller {
         $inventory = $character->inventory->slots;
 
         $equipped = $inventory->where('equipped', true)->load([
-                'item', 'item.itemAffixes', 'item.artifactProperty'
+                'item', 'item.itemPrefix', 'item.itemSuffix'
             ])->transform(function($equippedItem) {
-                $equippedItem->item->max_damage = resolve(MaxDamageForItemValue::class)
-                                                    ->fetchMaxDamage($equippedItem->item);
+                $equippedItem->item->max_damage = $equippedItem->item->getTotalDamage();
 
                 return $equippedItem;
             });
@@ -46,7 +46,7 @@ class CharacterInventoryController extends Controller {
         return view('game.core.character.inventory', [
             'inventory' => $inventory,
             'equipped'  => $equipped,
-            'questItems' => $character->inventory->questItemSlots->load('item', 'item.itemAffixes', 'item.artifactProperty'),
+            'questItems' => $character->inventory->questItemSlots->load('item'),
             'characterInfo' => [
                 'maxAttack' => $chatacterInfo->buildAttack(),
             ],
@@ -66,7 +66,7 @@ class CharacterInventoryController extends Controller {
         }
 
         $slotId        = $itemToEquip->id;
-        $itemToEquip   = $itemToEquip->item->load(['artifactProperty', 'itemAffixes', 'slot']);
+        $itemToEquip   = $itemToEquip->item->load(['itemPrefix', 'itemSuffix', 'slot']);
  
         if ($inventory->isEmpty()) {
             return view('game.core.character.equipment-compare', [
@@ -77,7 +77,6 @@ class CharacterInventoryController extends Controller {
             ]);
         }
        
-
         return view('game.core.character.equipment-compare', [
             'details'     => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),
             'itemToEquip' => $itemToEquip,
@@ -86,13 +85,7 @@ class CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function equipItem(Request $request) {
-        $request->validate([
-            'position'   => 'required',
-            'slot_id'    => 'required',
-            'equip_type' => 'required',
-        ]);
-        
+    public function equipItem(EquipItemValidation $request) {
         try {
             $item = $this->equipItemService->setRequest($request)
                                    ->setCharacter(auth()->user()->character)

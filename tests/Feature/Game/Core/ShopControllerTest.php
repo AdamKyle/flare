@@ -7,16 +7,20 @@ use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use Tests\Setup\CharacterSetup;
+use Tests\Traits\CreateItemAffix;
 
 class ShopControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateItem,
-        CreateUser;
+        CreateUser,
+        CreateItemAffix;
 
     private $character;
 
     private $item;
+
+    private $itemAffix;
 
     public function setUp(): void {
         parent::setUp();
@@ -26,6 +30,22 @@ class ShopControllerTest extends TestCase
             'type'        => 'weapon',
             'base_damage' => 6,
             'cost'        => 10,
+        ]);
+
+        $this->itemAffix = $this->createItemAffix([
+            'name'                 => 'Sample',
+            'base_damage_mod'      => '0.10',
+            'type'                 => 'suffix',
+            'description'          => 'Sample',
+            'base_healing_mod'     => '0.10',
+            'str_mod'              => '0.10',
+            'dur_mod'              => '0.10',
+            'dex_mod'              => '0.10',
+            'chr_mod'              => '0.10',
+            'int_mod'              => '0.10',
+            'ac_mod'               => '0.10',
+            'skill_name'           => null,
+            'skill_training_bonus' => null,
         ]);
         
 
@@ -42,6 +62,8 @@ class ShopControllerTest extends TestCase
         $this->character = null;
 
         $this->item = null;
+
+        $this->itemAffix = null;
     }
 
     public function testCanSeeShop() {
@@ -122,19 +144,9 @@ class ShopControllerTest extends TestCase
             'gold' => 0,
         ]);
 
-        $this->item->artifactProperty()->create([
-            'item_id'          => $this->item->id,
-            'name'             => 'Sample',
-            'base_damage_mod'  => 6,
-            'description'      => 'sample',
-        ]);
 
-        $this->item->itemAffixes()->create([
-            'item_id'          => $this->item->id,
-            'name'             => 'Sample',
-            'base_damage_mod'  => 6,
-            'description'      => 'sample',
-            'type'             => 'suffix',
+        $this->item->update([
+            'item_suffix_id' => $this->itemAffix->id,
         ]);
 
         $slot = $this->character->inventory->slots()->create([
