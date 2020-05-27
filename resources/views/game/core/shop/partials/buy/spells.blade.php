@@ -14,7 +14,7 @@
             <tbody class="text-center">
                 @foreach($spells as $spell)
                     <tr>
-                        <td>{{$spell->name}}</td>
+                        <td><a href="{{route('items.item', ['item' => $spell->id])}}">{{$spell->name}}</a></td>
                         <td>{{!is_null($spell->base_damage) ? $spell->base_damage : 'N/A'}}</td>
                         <td>{{$spell->cost}}</td>
                         <td>

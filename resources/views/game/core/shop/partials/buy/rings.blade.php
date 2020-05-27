@@ -14,7 +14,7 @@
             <tbody class="text-center">
                 @foreach($rings as $ring)
                     <tr>
-                        <td>{{$ring->name}}</td>
+                        <td><a href="{{route('items.item', ['item' => $ring->id])}}">{{$ring->name}}</a></td>
                         <td>{{$ring->base_damage}}</td>
                         <td>{{$ring->cost}}</td>
                         <td>

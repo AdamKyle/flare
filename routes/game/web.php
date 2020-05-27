@@ -15,3 +15,5 @@ Route::get('/game/character/inventory/compare', ['as' => 'game.inventory.compare
 Route::post('/game/equip/item', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
 Route::post('/game/unequip/item', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
 Route::post('/game/destroy/item', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
+
+Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemController@show']);

@@ -53,7 +53,7 @@
                         <tbody class="text-center">
                             @foreach($equipped as $equippedItem)
                                 <tr>
-                                    <td>{{$equippedItem->item->name}}</td>
+                                    <td><a href="{{route('items.item', ['item' => $equippedItem->item->id])}}">{{$equippedItem->item->name}}</a></td>
                                     <td>{{$equippedItem->item->getTotalDamage()}}</td>
                                     <td>{{$equippedItem->item->getTotalDefence()}}</td>
                                     <td>{{$equippedItem->item->type}}</td>

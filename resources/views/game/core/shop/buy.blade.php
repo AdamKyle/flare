@@ -18,7 +18,7 @@
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#spells" aria-expanded="false" aria-controls="spells">
                         View Spells
                     </button>
-                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#spells" aria-expanded="false" aria-controls="spells">
+                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#rings" aria-expanded="false" aria-controls="rings">
                         View Rings
                     </button>
                 </p>

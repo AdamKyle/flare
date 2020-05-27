@@ -16,7 +16,7 @@
     <tbody class="text-center">
         @foreach($inventory as $slot)
             <tr>
-                <td>{{$slot->item->name}}</td>
+                <td><a href="{{route('items.item', ['item' => $slot->item->id])}}">{{$slot->item->name}}</a></td>
                 <td>{{$slot->item->getTotalDamage()}}</td>
                 <td>{{$slot->item->getTotalDefence()}}</td>
 

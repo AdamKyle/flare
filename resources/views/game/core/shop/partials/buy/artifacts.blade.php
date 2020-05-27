@@ -13,7 +13,7 @@
             <tbody class="text-center">
                 @foreach($artifacts as $artifact)
                     <tr>
-                        <td>{{$artifact->name}}</td>
+                        <td><a href="{{route('items.item', ['item' => $artifact->id])}}">{{$artifact->name}}</a></td>
                         <td>{{$artifact->cost}}</td>
                         <td>
                             <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"

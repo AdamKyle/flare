@@ -14,7 +14,7 @@
             <tbody class="text-center">
                 @foreach($armour as $armour)
                     <tr>
-                        <td>{{$armour->name}}</td>
+                        <td><a href="{{route('items.item', ['item' => $armour->id])}}">{{$armour->name}}</a></td>
                         <td>{{$armour->type}}</td>
                         <td>{{$armour->cost}}</td>
                         <td>
