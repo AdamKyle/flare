@@ -42,6 +42,8 @@ class BattleController extends Controller {
     }
 
     public function battleResults(Request $request, Character $character) {
+        event(new AttackTimeOutEvent($character));
+
         if ($request->is_character_dead) {
             event(new ServerMessageEvent($character->user, 'dead_character'));
 
@@ -53,12 +55,9 @@ class BattleController extends Controller {
             switch ($request->defender_type) {
                 case 'monster':
                     $monster = Monster::find($request->monster_id);
-
                     event(new UpdateCharacterEvent($character, $monster));
                     event(new DropsCheckEvent($character, $monster));
                     event(new GoldRushCheckEvent($character, $monster));
-                    event(new AttackTimeOutEvent($character, $monster));
-
                     break;
                 default:
                     return response()->json([
