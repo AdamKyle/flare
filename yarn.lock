@@ -1893,9 +1893,9 @@ code-point-at@^1.0.0:
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
 collect.js@^4.12.8:
-  version "4.25.0"
-  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.25.0.tgz#3cc9580935997263ab283488d760f9956c420e8b"
-  integrity sha512-Wk+cWM9iQouzCe2RulakcE6BKweADOHYcz3pVcO2e6jRPfTuZWiLmAjJ2+lI3K9ldFyp77GZVheKjaGnoTAofw==
+  version "4.27.0"
+  resolved "https://registry.yarnpkg.com/collect.js/-/collect.js-4.27.0.tgz#ca3b9e1107ad6284ac684d232ec15c64027690f9"
+  integrity sha512-v9v5RpXI3oah8PlbOJ/Z9qU5iDMJSiSpPZ5hhmHF4ezVDUlwgz5/NiuBK6DArqNzgoGqIJotzBQPyDO1+O6Rgg==
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -4445,9 +4445,9 @@ mime@1.6.0:
   integrity sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==
 
 mime@^2.4.4:
-  version "2.4.5"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-2.4.5.tgz#d8de2ecb92982dedbb6541c9b6841d7f218ea009"
-  integrity sha512-3hQhEUF027BuxZjQA3s7rIv/7VCQPa27hN9u9g87sEkWaKwQPuXOkVKtOeiyUrnWqTDiOs8Ed2rwg733mB0R5w==
+  version "2.4.6"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-2.4.6.tgz#e5b407c90db442f2beb5b162373d07b69affa4d1"
+  integrity sha512-RZKhC3EmpBchfTGBVb8fb+RL2cWyw/32lshnsETttkBAyAUXSGHxbEJWWRXc751DrIxG1q04b8QwMbAwkRPpUA==
 
 mimic-fn@^2.0.0:
   version "2.1.0"
