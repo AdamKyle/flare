@@ -44,7 +44,7 @@ class CharacterInventoryController extends Controller {
         $characterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 
         return view('game.core.character.inventory', [
-            'inventory' => $inventory,
+            'inventory' => $inventory->where('equipped', false)->all(),
             'equipped'  => $equipped,
             'questItems' => $character->inventory->questItemSlots->load('item'),
             'characterInfo' => [

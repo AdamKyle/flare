@@ -5,30 +5,34 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Equipped</h4>
-                    <hr />
-
-                    @if (empty($details))
-                        <div class="alert alert-info">
-                            You have nothing equipped for this item type. Anything is better then nothing.
-                        </div>
-                    @else
-                        @foreach($details as $key => $value)
+            @if (empty($details))
+                <div class="alert alert-info">
+                    You have nothing equipped for this item type. Anything is better then nothing.
+                </div>
+            @else
+                @foreach($details as $key => $value)
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Equipped: {{$key}}</h4>
                             @if (!empty($details[$key]))
                                 @if ($details[$key]['is_better'])
                                     @include('game.core.partials.item-details-replace', [
                                         'details' => $details[$key]
                                     ])
+                                    <h6>Stat Details</h6>
+                                    @include('game.core.partials.equip.details.single-item-stat-details', ['value' => $details[$key]])
                                 @else
-                                    <div class="alert alert-warning">Your current equipment may be better. Check the equip options.</div>
+                                    @include('game.core.partials.currently-equipped', [
+                                        'details' => $details[$key]
+                                    ])
+                                    <h6>Stat Details</h6>
+                                    @include('game.core.partials.equip.details.single-item-stat-details', ['value' => $details[$key]])
                                 @endif
                             @endif
-                        @endforeach
-                    @endif
-                </div>
-            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
         </div>
         <div class="col-md-6">
             <div class="card">

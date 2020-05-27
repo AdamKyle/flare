@@ -24625,6 +24625,26 @@ a.text-dark:focus {
   max-width: 500px;
 }
 
+#shop button[aria-expanded=true]:after {
+  bottom: 100%;
+  content: "\F078";
+  font-family: "Font Awesome 5 Free";
+  display: inline;
+  font-weight: 900;
+  font-size: 16px;
+  color: #fff;
+}
+
+#shop button[aria-expanded=false]:after {
+  bottom: 100%;
+  content: "\F077";
+  font-family: "Font Awesome 5 Free";
+  display: inline;
+  font-weight: 900;
+  font-size: 16px;
+  color: #fff;
+}
+
 legend {
   font-size: 0.9rem;
 }

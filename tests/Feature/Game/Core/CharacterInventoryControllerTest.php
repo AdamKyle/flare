@@ -200,7 +200,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '2',
-        ])->see('Equipped')->see('Your current equipment may be better. Check the equip options.');
+        ])->see('Equipped')->see('Equipped: left-hand');
     }
 
     public function testCannotSeeComparePage() {
