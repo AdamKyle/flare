@@ -23,6 +23,11 @@ class CharacterSheetController extends Controller {
                 'maxHealth' => $characterInfo->buildHealth(),
                 'maxHeal'   => $characterInfo->buildHealFor(),
                 'maxAC'     => $characterInfo->buildDefence(),
+                'str'       => $characterInfo->statMod('str'),
+                'dur'       => $characterInfo->statMod('dur'),
+                'dex'       => $characterInfo->statMod('dex'),
+                'chr'       => $characterInfo->statMod('chr'),
+                'int'       => $characterInfo->statMod('int'),
             ],
         ]);
     }

@@ -30,6 +30,11 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'dex'           => $character->dex,
             'chr'           => $character->chr,
             'int'           => $character->int,
+            'str_modded'    => $characterInformation->statMod('str'),
+            'dur_modded'    => $characterInformation->statMod('dur'),
+            'dex_modded'    => $characterInformation->statMod('dex'),
+            'chr_modded'    => $characterInformation->statMod('chr'),
+            'int_modded'    => $characterInformation->statMod('int'),
             'gold'          => $character->gold,
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Values\MaxDamageForItemValue;
 
 class CharacterInformationBuilder {
@@ -17,6 +18,29 @@ class CharacterInformationBuilder {
         $this->inventory = $character->inventory->slots->where('equipped', true);
 
         return $this;
+    }
+
+    public function statMod(string $stat): float {
+
+        $base = $this->character->{$stat};
+
+        $equipped = $this->inventory->filter(function($slot) {
+            return $slot->equipped;
+        });
+
+        if ($equipped->isEmpty()) {
+            return $base;
+        }
+
+        foreach ($equipped as $slot) {
+            $percentageIncrease = $this->fetchModdedStat($stat, $slot->item);
+
+            if ($percentageIncrease !== 0.0) {
+                $base += ($base * $this->fetchModdedStat($stat, $slot->item));
+            }
+        }
+
+        return $base;
     }
 
     public function buildAttack(): int {
@@ -79,5 +103,22 @@ class CharacterInformationBuilder {
         }
 
         return $healFor;
+    }
+
+    protected function fetchModdedStat(string $stat, Item $item): float {
+        $staMod          = $item->{$stat . '_mod'};
+        $totalPercentage = !is_null($staMod) ? $staMod : 0.0;
+
+        if (!is_null($item->itemPrefix)) {
+            $prefixMod        = $item->itemPrefix->{$stat . '_mod'};
+            $totalPercentage += !is_null($prefixMod) ? $prefixMod : 0.0;
+        }
+
+        if (!is_null($item->itemSuffix)) {
+            $suffixMod        = $item->itemSuffix->{$stat . '_mod'};
+            $totalPercentage += !is_null($suffixMod) ? $suffixMod : 0.0;
+        }
+
+        return  $totalPercentage;
     }
 }
