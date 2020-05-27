@@ -87,8 +87,4 @@ class Character extends Model
     public function map() {
         return $this->hasOne(Map::class);
     }
-
-    public function equippedItems() {
-        return $this->hasMany(EquippedItem::class);
-    }
 }

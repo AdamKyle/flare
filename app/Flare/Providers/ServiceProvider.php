@@ -11,8 +11,6 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
-use App\Flare\Transformers\CharacterInventoryTransformer;
-use App\Flare\Transformers\ShopTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\MaxDamageForItemValue;
 
@@ -51,14 +49,6 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
 
         $this->app->bind(CharacterSheetTransformer::class, function($app){
             return new CharacterSheetTransformer();
-        });
-
-        $this->app->bind(CharacterInventoryTransformer::class, function($app){
-            return new CharacterInventoryTransformer();
-        });
-
-        $this->app->bind(ShopTransformer::class, function($app) {
-            return new ShopTransformer();
         });
 
         $this->app->bind(BaseSkillValue::class, function($app) {
