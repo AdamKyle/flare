@@ -36,7 +36,8 @@
                     <h4 class="card-title">To Equip:</h4>
                     <hr />
                     @include('game.core.partials.item-details-to-equip', [
-                        'item' => $itemToEquip
+                        'item'         => $itemToEquip,
+                        'details'      => $details,
                     ])
 
                     <form class="mt-4" action="{{route('game.equip.item')}}" method="POST">

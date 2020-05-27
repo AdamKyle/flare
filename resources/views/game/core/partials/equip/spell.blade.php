@@ -8,21 +8,13 @@
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell_one">
-                @if (isset($details['spell_one']))
-                    Spll Slot One <span class={{$details['spell_one']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['spell_one']['damage_adjustment']}} Ac</span>
-                @else
-                    Spell Slot One <span class="text-success">{{$itemToEquip->getTotalDamage()}} Damage</span>
-                @endif
+                Spll Slot One
             </label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="spell_two">
-                @if (isset($details['spell_two']))
-                    Spell Slot Two <span class={{$details['spell_two']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['spell_two']['damage_adjustment']}} Ac</span>
-                @else
-                    Spell Slot Two <span class="text-success">{{$itemToEquip->getTotalDamage()}} Damage</span>
-                @endif
+                Spell Slot Two
             </label>
         </div>
     </fieldset>
@@ -33,21 +25,13 @@
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell_one">
-                @if (isset($details['spell_one']))
-                    Spll Slot One <span class={{$details['spell_one']['healing_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['spell_one']['healing_adjustment']}} Ac</span>
-                @else
-                    Spell Slot One <span class="text-success">{{$itemToEquip->getTotalHealing()}} Healing</span>
-                @endif
+                Spll Slot One
             </label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="spell_two">
-                @if (isset($details['spell_two']))
-                    Spell Slot Two <span class={{$details['spell_two']['healing_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['spell_two']['healing_adjustment']}} Ac</span>
-                @else
-                    Spell Slot Two <span class="text-success">{{$itemToEquip->getTotalHealing()}} Healing</span>
-                @endif
+                Spell Slot Two
             </label>
         </div>
     </fieldset>

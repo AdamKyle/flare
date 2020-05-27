@@ -7,21 +7,13 @@
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="left-hand">
-            @if (isset($details['left-hand']))
-                Left Hand <span class={{$details['left-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['left-hand']['damage_adjustment']}} (Damage)</span>
-            @else
-                Left Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Damage)</span>
-            @endif
+            Left Hand
         </label>
     </div>
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="right-hand">
-            @if (isset($details['right-hand']))
-                Right Hand <span class={{$details['right-hand']['damage_adjustment'] > 0 ? "text-success" : "text-danger"}}>{{$details['right-hand']['damage_adjustment']}} (Damage)</span>
-            @else
-                Right Hand <span class="text-success">{{$itemToEquip->getTotalDamage()}} (Damage)</span>
-            @endif
+            Right Hand
         </label>
     </div>
 </fieldset>

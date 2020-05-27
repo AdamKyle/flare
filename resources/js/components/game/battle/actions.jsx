@@ -22,6 +22,7 @@ export default class Actions extends React.Component {
       canAttack: true,
       showMessage: false,
       timeRemaining: null,
+      disableAttack: false,
     }
 
     this.echo         = Echo.private('show-timeout-bar-' + this.props.userId);
@@ -129,6 +130,7 @@ export default class Actions extends React.Component {
       }).then((result) => {
         this.setState({
           characterCurrentHealth: this.state.characterMaxHealth,
+          canAttack: false
         });
       });
     }

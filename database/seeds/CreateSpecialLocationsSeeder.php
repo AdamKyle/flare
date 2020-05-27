@@ -55,7 +55,7 @@ class CreateSpecialLocationsSeeder extends Seeder
         Location::insert($locations);
 
         // Generic Locations:
-        for ($i = 0; $i <= 120; $i++) {
+        for ($i = 0; $i <= 10; $i++) {
             Location::create([
                 'name'        => 'Ancient Ruins',
                 'description' => 'The history of this place speaks of battles, war, love, lust and greed. No wonder it fell.',

@@ -68,6 +68,7 @@ class CharacterInventoryController extends Controller {
         }
 
         $slotId        = $itemToEquip->id;
+        $slotPosition  = $itemToEquip->position;
         $itemToEquip   = $itemToEquip->item->load(['itemPrefix', 'itemSuffix', 'slot']);
 
         $type = $this->fetchType($request->item_to_equip_type);
@@ -82,10 +83,11 @@ class CharacterInventoryController extends Controller {
         }
         
         return view('game.core.character.equipment-compare', [
-            'details'     => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),
-            'itemToEquip' => $itemToEquip,
-            'type'        => $type,
-            'slotId'      => $slotId,
+            'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),
+            'itemToEquip'  => $itemToEquip,
+            'type'         => $type,
+            'slotId'       => $slotId,
+            'slotPosition' => $slotPosition
         ]);
     }
 

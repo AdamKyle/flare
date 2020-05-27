@@ -35,7 +35,12 @@ class ItemComparison {
                 'position'           => $foundPosition->position,
                 'damage_adjustment'  => $this->getDamageIncrease($toCompare, $foundPosition->item),
                 'ac_adjustment'      => $this->getAcIncrease($toCompare, $foundPosition->item),
-                'healing_adjustment' => $this->getHealIncrease($toCompare, $foundPosition->item)
+                'healing_adjustment' => $this->getHealIncrease($toCompare, $foundPosition->item),
+                'str_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'str'),
+                'dur_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'dur'),
+                'dex_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'dex'),
+                'chr_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'chr'),
+                'int_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'int'),
             ];
         } else {
             return [
@@ -45,7 +50,12 @@ class ItemComparison {
                 'position'           => $foundPosition->position,
                 'damage_adjustment'  => $this->getDamageDecrease($toCompare, $foundPosition->item),
                 'ac_adjustment'      => $this->getAcDecrease($toCompare, $foundPosition->item),
-                'healing_adjustment' => $this->getHealDecrease($toCompare, $foundPosition->item)
+                'healing_adjustment' => $this->getHealDecrease($toCompare, $foundPosition->item),
+                'str_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'str'),
+                'dur_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'dur'),
+                'dex_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'dex'),
+                'chr_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'chr'),
+                'int_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'int'),
             ];
         }
     }
@@ -110,6 +120,24 @@ class ItemComparison {
         }
 
         return 0;
+    }
+
+    public function getStatIncrease(Item $toCompare, Item $equipped, string $stat): float {
+        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
+        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
+
+        return $totalPercentageForCompare - $totalPercentageForEquipped;
+    }
+
+    public function getStatDecrease(Item $toCompare, Item $equipped, string $stat): float {
+        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
+        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
+
+        if ($totalPercentageForCompare < $totalPercentageForEquipped) {
+            return $totalPercentageForCompare - $totalPercentageForEquipped;
+        }
+
+        return 0.0;
     }
 
     protected function isItemBetter(Item $toCompare, Item $equipped): bool {

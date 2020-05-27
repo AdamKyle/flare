@@ -115,4 +115,20 @@ class Item extends Model
 
         return round($healFor);
     }
+
+    public function scopeGetTotalPercentageForStat($qeury, string $stat): float {
+        $baseStat = is_null($this->{$stat . '_mod'}) ? 0.0 : $this->{$stat . '_mod'};
+
+        if (!is_null($this->itemPrefix)) {
+            $stat      = $this->itemPrefix->{$stat . '_mod'};
+            $baseStat += !is_null($stat) ? $stat : 0.0;
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            $stat      = $this->itemSuffix->{$stat . '_mod'};
+            $baseStat += !is_null($stat) ? $stat : 0.0;
+        }
+
+        return $baseStat;
+    }
 }
