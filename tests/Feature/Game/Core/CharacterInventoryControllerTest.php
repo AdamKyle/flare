@@ -203,6 +203,46 @@ class CharacterInventoryControllerTest extends TestCase
         ])->see('Equipped')->see('Equipped: left-hand');
     }
 
+    public function testSeeComparePageForSpell() {
+        $item = $this->createItem([
+            'name' => 'spell',
+            'base_damage' => 6,
+            'type' => 'spell-damage',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => false,
+        ]);
+
+        $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'spell-damage',
+            'slot_id'            => '2',
+        ])->see('Equipped')->see('Item Details');
+    }
+
+    public function testSeeComparePageForArmour() {
+        $item = $this->createItem([
+            'name' => 'Armour',
+            'base_damage'      => 6,
+            'base_ac'          => 6,
+            'type'             => 'gloves',
+            'default_position' => 'hands',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => false,
+        ]);
+
+        $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'gloves',
+            'slot_id'            => '2',
+        ])->see('Equipped')->see('Item Details');
+    }
+
     public function testCannotSeeComparePage() {
         $item = $this->createItem([
             'name' => 'Spear',

@@ -22,6 +22,7 @@ class Item extends Model
         'default_position',
         'base_damage',
         'base_ac',
+        'base_healing',
         'cost',
         'base_damage_mod',
         'description',

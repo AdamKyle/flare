@@ -34,8 +34,8 @@ class DropsCheckListener
             $drop = resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::all())
                         ->generateItem($event->character);
-
-            if (!is_null($drop->itemSuffix) && !is_null($drop->itemPrefix)) {
+            
+            if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {
                 $this->attemptToPickUpItem($event, $drop);
             }
         }
@@ -43,6 +43,7 @@ class DropsCheckListener
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
         if ($event->character->inventory->slots->count() !== $event->character->inventory_max) {
+
             $event->character->inventory->slots()->create([
                 'item_id'      => $item->id,
                 'inventory_id' => $event->character->inventory->id,

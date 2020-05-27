@@ -39,7 +39,7 @@ class RandomItemDropBuilder {
 
         if ($this->shouldHaveItemAffix($character)) {
             $affix = $this->fetchRandomItemAffix();
-
+            
             if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
                 $hasSameAffix = $duplicateItem->itemAffixes->where('type', '=', $affix['type'])->first();
 
@@ -94,13 +94,13 @@ class RandomItemDropBuilder {
             $name = $name . ' *' . $item->itemSuffix->name . '*';
         }
 
-        if (!is_null($item->itemSuffix)) {
-            $name = '*' . $item->itemSuffix->name . '* ' . $name;
+        if (!is_null($item->itemPrefix)) {
+            $name = '*' . $item->itemPrefix->name . '* ' . $name;
         }
-
+        
         $item->name = $name;
         $item->save();
 
-        return $item;
+        return $item->refresh();
     }
 }

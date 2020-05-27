@@ -124,7 +124,7 @@ class BattleControllerApiTest extends TestCase
     public function testBattleResultsCharacterIsDead() {
         Queue::Fake();
 
-        Event::fake([ServerMessageEvent::class, UpdateTopBarEvent::class]);
+        Event::fake([ServerMessageEvent::class, UpdateTopBarBroadcastEvent::class]);
 
         $this->setUpCharacter();
 
@@ -236,7 +236,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertEquals(1, $this->character->level);
         $this->assertTrue($currentGold !== $this->character->gold);
-        $this->assertTrue($this->character->inventory->slots->isNotEmpty());
+        $this->assertTrue(count($this->character->inventory->slots) > 1);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterCannotGainItemBecauseInventoryIsFull() {
@@ -246,7 +246,6 @@ class BattleControllerApiTest extends TestCase
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
             UpdateCharacterSheetEvent::class,
             UpdateCharacterAttackEvent::class,
@@ -255,7 +254,10 @@ class BattleControllerApiTest extends TestCase
         $this->setUpCharacter([
             'looting_level' => 100,
             'looting_bonus' => 100,
-            'fill_inventory' => true,
+        ]);
+
+        $this->character->update([
+            'inventory_max' => 1,
         ]);
 
         $currentGold = $this->character->gold;
@@ -273,6 +275,8 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertEquals(1, $this->character->level);
         $this->assertTrue($currentGold !== $this->character->gold);
+        
+        $this->assertFalse(count($this->character->inventory->slots) > 1);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {

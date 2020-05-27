@@ -39,7 +39,7 @@ class CharacterSetup {
             'xp'            => isset($options['xp']) ? $options['xp'] : 0,
             'can_attack'    => isset($options['can_attack']) ? $options['can_attack'] : true,
             'can_move'      => isset($options['can_move']) ? $options['can_move'] : true,
-            'inventory_max' => 1,
+            'inventory_max' => 75,
             'gold'          => isset($options['gold']) ? $options['gold'] : 10,
         ]);
 
