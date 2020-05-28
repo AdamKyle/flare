@@ -2,8 +2,8 @@
 <dl>
     <dt>Name:</dt>
     <dd>{{$details['slot']->item->name}}</dd>
-    <dt>Base Damage:</dt>
-    <dd>{{$details['slot']->item->base_damage}}</dd>
+    <dt>Damage:</dt>
+    <dd>{{$details['slot']->item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Position:</dt>
     <dd>{{$details['slot']->position}}</dd>
 </dl>
@@ -27,7 +27,7 @@
             <dd>{{$details['slot']->item->itemPrefix->description}}</dd>
         </dl>
     @endif
-    @if (!is_null($details['slot']->item->itemPrefix))
+    @if (!is_null($details['slot']->item->itemSuffix))
         <dl>
             <dt>Name:</dt>
             <dd>{{$details['slot']->item->itemSuffix->name}}</dd>

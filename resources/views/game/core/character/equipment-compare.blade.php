@@ -15,19 +15,11 @@
                         <div class="card-body">
                             <h4 class="card-title">Equipped: {{$key}}</h4>
                             @if (!empty($details[$key]))
-                                @if ($details[$key]['is_better'])
-                                    @include('game.core.partials.item-details-replace', [
-                                        'details' => $details[$key]
-                                    ])
-                                    <h6>Stat Details</h6>
-                                    @include('game.core.partials.equip.details.single-item-stat-details', ['value' => $details[$key]])
-                                @else
-                                    @include('game.core.partials.currently-equipped', [
-                                        'details' => $details[$key]
-                                    ])
-                                    <h6>Stat Details</h6>
-                                    @include('game.core.partials.equip.details.single-item-stat-details', ['value' => $details[$key]])
-                                @endif
+                                @include('game.core.partials.currently-equipped', [
+                                    'details' => $details[$key]
+                                ])
+                                <h6>Stat Details</h6>
+                                @include('game.core.partials.equip.details.item-stat-details', ['item' => $details[$key]['slot']->item])
                             @endif
                         </div>
                     </div>

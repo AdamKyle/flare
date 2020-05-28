@@ -42,8 +42,6 @@ class BattleController extends Controller {
     }
 
     public function battleResults(Request $request, Character $character) {
-        event(new AttackTimeOutEvent($character));
-
         if ($request->is_character_dead) {
             event(new ServerMessageEvent($character->user, 'dead_character'));
 
@@ -66,5 +64,9 @@ class BattleController extends Controller {
                     ], 422);
             }
         }
+    }
+
+    public function timeOut(Character $character) {
+        event(new AttackTimeOutEvent($character));
     }
 }

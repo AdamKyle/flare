@@ -18,4 +18,5 @@ Route::post('/game/destroy/item', ['as' => 'game.destroy.item', 'uses' => 'Chara
 
 Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemController@show']);
 
+Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);
 Route::post('/skill/train', ['as' => 'train.skill', 'uses' => 'CharacterSkillController@train']);

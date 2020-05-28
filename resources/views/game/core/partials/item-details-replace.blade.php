@@ -6,7 +6,7 @@
     <dt>Name:</dt>
     <dd>{{$details['replaces_item']->name}}</dd>
     <dt>Base Damage:</dt>
-    <dd>{{$details['replaces_item']->base_damage}}</dd>
+    <dd>{{$details['replaces_item']->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Position:</dt>
     <dd>{{$details['slot']->position}}</dd>
 </dl>

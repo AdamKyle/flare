@@ -28,7 +28,6 @@ export default class TimeOutBar extends React.Component {
   }
 
   componentDidMount() {
-
     let maxTimeOut = 0;
 
     if (this.props.timeRemaining !== null) {

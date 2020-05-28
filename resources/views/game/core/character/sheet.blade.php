@@ -71,6 +71,8 @@
                                 <dd>{{$character->gold}}</dd>
                                 <dt>Used / Max inventory space:</dt>
                                 <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
+                                <dt>Stat to focus on for max damage:</dt>
+                                <dd>{{$character->class->damage_stat}}</dd>
                             </dl>
                             <hr />
                             <a href="{{route('game.character.inventory')}}" class="btn btn-primary">Inventory</a>
@@ -82,7 +84,7 @@
                             <h4 class="card-title">Skills</h4>
                             @foreach($character->skills as $skill)
                                 <dl>
-                                    <dt>{{$skill->name}}:</dt>
+                                    <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>
                                     <dd>
                                         <div class="row">
                                             <div class="col-md-6">

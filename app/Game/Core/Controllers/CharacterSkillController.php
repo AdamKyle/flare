@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
-
+use App\Flare\Models\Skill;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Requests\TrainSkillValidation;
 
@@ -40,5 +40,11 @@ class CharacterSkillController extends Controller {
         ]);
 
         return redirect()->back()->with('success', 'You are now training ' . $skill->name);
+    }
+
+    public function show(Skill $skill) {
+        return view('game.core.character.skill', [
+            'skill' => $skill
+        ]);
     }
 }

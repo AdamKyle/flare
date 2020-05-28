@@ -49,6 +49,7 @@ export default class Actions extends React.Component {
     });
 
     this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', (event) => {
+      console.log(event);
       this.setState({
         canAttack:   event.canAttack,
         showMessage: false,
@@ -122,12 +123,17 @@ export default class Actions extends React.Component {
     this.setState(state);
 
     if (state.monsterCurrentHealth <= 0) {
-      axios.post('/api/battle-results/' + this.state.character.id, {
-        is_character_dead: this.characterCurrentHealth === 0 ? true : false,
-        is_defender_dead: true,
-        defender_type: 'monster',
-        monster_id: this.state.monster.id,
-      }).then((result) => {
+      const data = [
+        axios.post('/api/battle-timeout/' + this.state.character.id),
+        axios.post('/api/battle-results/' + this.state.character.id, {
+          is_character_dead: this.characterCurrentHealth === 0 ? true : false,
+          is_defender_dead: true,
+          defender_type: 'monster',
+          monster_id: this.state.monster.id,
+        }),
+      ];
+
+      axios.all(data).then((result) => {
         this.setState({
           characterCurrentHealth: this.state.characterMaxHealth,
           canAttack: false

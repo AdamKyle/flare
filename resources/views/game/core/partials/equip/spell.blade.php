@@ -8,7 +8,7 @@
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell_one">
-                Spll Slot One
+                Spell Slot One
             </label>
         </div>
         <div class="form-check">
@@ -25,7 +25,7 @@
         <div class="form-check">
             <label class="form-check-label">
                 <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell_one">
-                Spll Slot One
+                Spell Slot One
             </label>
         </div>
         <div class="form-check">

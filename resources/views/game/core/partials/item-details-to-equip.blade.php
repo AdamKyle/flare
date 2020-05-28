@@ -1,6 +1,6 @@
 @include('game.items.partials.item-details', ['item' => $item])
 <hr />
-<h6>Increases Stats By:</h6>
+<h6>Stat Details:</h6>
 @if (empty($details))
     @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
 @else
