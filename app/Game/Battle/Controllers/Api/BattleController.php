@@ -64,9 +64,9 @@ class BattleController extends Controller {
                     ], 422);
             }
         }
-    }
 
-    public function timeOut(Character $character) {
         event(new AttackTimeOutEvent($character));
+
+        return response()->json([], 200);
     }
 }
