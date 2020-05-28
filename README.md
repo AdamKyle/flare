@@ -36,7 +36,6 @@ This game is heavily under development but some of the features that you will ge
 - Recruit, build up and gather resources.
 - More the come ...
 
-
 This game is completely free and any special gear or bonuses that are similar to the two games mentioned above
 can all be gained in game with no need to spend out side money. This point was very important to me.
 
@@ -49,6 +48,23 @@ can all be gained in game with no need to spend out side money. This point was v
 - `composer install && yarn && php artisan migrate --seed && php artisan create:admin email && yarn dev`
 - Log in as an admin (you will have to reset your password first), you will be known as "God" when chatting and will be able to view the dashboard.
 - Regular players, who sign up, will only see the game section.
+
+
+## Redis
+
+We use redis for jobs and queues with in the system. To get started, make sure you have php redis installed, the redis server and that its running.
+
+Next update the .env file with:
+
+```
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=yourpassword
+REDIS_PORT=6379
+REDIS_CLIENT=phpredis
+REDIS_CLUSTER=phpredis
+```
+
+then run: `php artisan queue:work --queue=high,default --tries=1`
 
 ## Websockets
 
