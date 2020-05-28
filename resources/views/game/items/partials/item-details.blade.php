@@ -17,7 +17,7 @@
         There are no affixes on this item.
     </div>
 @else
-    @if (!is_null($item->prefix))
+    @if (!is_null($item->itemPrefix))
         <dl>
             <dt>Name:</dt>
             <dd>{{$item->itemPrefix->name}}</dd>
@@ -29,14 +29,14 @@
             <dd>{{$item->itemPrefix->description}}</dd>
         </dl>
     @endif
-    @if (!is_null($item->prefix))
+    @if (!is_null($item->itemSuffix))
         <dl>
             <dt>Name:</dt>
             <dd>{{$item->itemSuffix->name}}</dd>
             <dt>Base Damage:</dt>
             <dd>{{$item->itemSuffix->base_damage_mod * 100}}%</dd>
             <dt>Description:</dt>
-            <dd>{{$item->itemSuffix->description * 100}}%</dd>
+            <dd>{{$item->itemSuffix->description}}</dd>
         </dl>
     @endif
 @endif

@@ -1,4 +1,4 @@
-@include('game.items.partials.item-details', ['item' => $item]);
+@include('game.items.partials.item-details', ['item' => $item])
 <hr />
 <h6>Increases Stats By:</h6>
 @if (empty($details))
