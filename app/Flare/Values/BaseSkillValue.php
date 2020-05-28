@@ -19,7 +19,7 @@ class BaseSkillValue {
             'xp'                      => 0,
             'xp_max'                  => 100,
             'skill_bonus'             => $this->getCharacterSkillBonus($character, $name),
-            'skill_bonus_per_level'   => 1,
+            'skill_bonus_per_level'   => 0.013333333333333,
         ];
     }
 
@@ -34,7 +34,7 @@ class BaseSkillValue {
             'xp'                      => 0,
             'xp_max'                  => 100,
             'skill_bonus'             => 0,
-            'skill_bonus_per_level'   => 1,
+            'skill_bonus_per_level'   => 0.013333333333333,
         ];
     }
 
