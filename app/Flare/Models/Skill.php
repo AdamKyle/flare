@@ -15,11 +15,19 @@ class Skill extends Model
     protected $fillable = [
         'character_id',
         'monster_id',
+        'description',
         'name',
         'currently_training',
         'level',
+        'max_level',
         'xp',
         'xp_max',
+        'xp_towards',
+        'base_damage_mod',
+        'base_healing_mod',
+        'base_ac_mod',
+        'fight_time_out_mod',
+        'move_time_out_mod',
         'skill_bonus',
         'skill_bonus_per_level',
     ];
@@ -32,9 +40,20 @@ class Skill extends Model
     protected $casts = [
         'currently_training'    => 'boolean',
         'level'                 => 'integer',
+        'max_level'             => 'integer',
         'xp'                    => 'integer',
         'xp_max'                => 'integer',
-        'skill_bonus'           => 'integer',
-        'skill_bonus_per_level' => 'integer',
+        'xp_towards'            => 'float',
+        'base_damage_mod'       => 'float',
+        'base_healing_mod'      => 'float',
+        'base_ac_mod'           => 'float',
+        'fight_time_out_mod'    => 'float',
+        'move_time_out_mod'     => 'float',
+        'skill_bonus'           => 'float',
+        'skill_bonus_per_level' => 'float',
     ];
+
+    public function character() {
+        return $this->belongsTo(Character::class);
+    }
 }

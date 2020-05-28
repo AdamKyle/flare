@@ -37,6 +37,14 @@ class ServerMessageListener
                 $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse';
 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'skill_level_up':
+                $skill = $event->user->character->skills->filter(function($skill) {
+                    return $skill->currently_training;
+                })->first();
+
+                $message = $skill->name . ' Now level: ' . $skill->level;
+
+                return broadcast(new ServerMessage($event->user, $message));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

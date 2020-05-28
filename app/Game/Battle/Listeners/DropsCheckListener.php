@@ -28,7 +28,7 @@ class DropsCheckListener
     public function handle(DropsCheckEvent $event)
     {
         $lootingChance = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        $canGetDrop    = (rand(1, 100) + $lootingChance) > (100 - $event->monster->drop_check);
+        $canGetDrop    = (rand(1, 100) * (1 + ($lootingChance))) > (100 - $event->monster->drop_check);
 
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)

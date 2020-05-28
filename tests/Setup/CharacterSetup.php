@@ -110,6 +110,7 @@ class CharacterSetup {
         $this->createSkill([
             'character_id' => $this->character->id,
             'name' => $name,
+            'description' => 'sample',
             'level' => isset($options[strtolower($name).'_level']) ? $options[strtolower($name).'_level'] : 1,
             'skill_bonus' => isset($options[strtolower($name).'_bonus']) ? $options[strtolower($name).'_bonus'] : 0,
         ]);

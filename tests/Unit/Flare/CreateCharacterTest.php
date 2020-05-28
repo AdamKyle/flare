@@ -94,7 +94,7 @@ class CreateCharacterTest extends TestCase
                                                      ->assignSkills()
                                                      ->character();
 
-        $this->assertEquals(2, $character->skills->where('name', '=', 'Accuracy')->first()->skill_bonus);
-        $this->assertEquals(3, $character->skills->where('name', '=', 'Dodge')->first()->skill_bonus);
+        $this->assertEquals('0.03', $character->skills()->where('name', '=', 'Accuracy')->first()->skill_bonus);
+        $this->assertEquals('0.04', $character->skills()->where('name', '=', 'Dodge')->first()->skill_bonus);
     }
 }

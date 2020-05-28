@@ -7,6 +7,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Game\Battle\Events\UpdateCharacterEvent;
+use App\Game\Battle\Events\UpdateSkillEvent;
 use App\Game\Battle\Services\CharacterService;
 
 class UpdateCharacterListener
@@ -27,18 +28,28 @@ class UpdateCharacterListener
     public function handle(UpdateCharacterEvent $event)
     {
         $xp = 0;
+        $xpReduction = 0.0;
+
+        $currentSkill = $event->character->skills->filter(function($skill) {
+            return $skill->currently_training;
+        })->first();
+        
+        if (!is_null($currentSkill)) {
+            $xpReduction = $currentSkill->xp_towards;
+            event(new UpdateSkillEvent($currentSkill));
+        }
 
         if ($event->monster->max_level === 0) {
             // Always Just give.
-            $xp = $event->character->xp + $event->monster->xp;
+            $xp = $event->character->xp + ($xpReduction !==  0.0 ? ($event->monster->xp * $xpReduction) : $event->monster->xp);
         } else if ($event->character->level < $event->monster->max_level) {
             // So the monster has a max exp level and the character is below it, so they get full xp.
-            $xp = $event->character->xp + $event->monster->xp;
+            $xp = $event->character->xp + ($xpReduction !==  0.0 ? ($event->monster->xp * $xpReduction) : $event->monster->xp);
         } else if ($event->character->level > $event->monster->max_level) {
             // So the monster has a max exp level and the character is above it, so they get 1/3rd xp.
-            $xp = $event->character->xp + 3.3333;
+            $xp = $event->character->xp + ($xpReduction !==  0.0 ? (3.3333 * $xpReduction) : 3.3333);
         }
-
+        
         if ($xp >= $event->character->xp_next) {
             $this->characterService->levelUpCharacter($event->character);
 

@@ -34,8 +34,8 @@ class CreateMonstersSeeder extends Seeder
         ]);
 
         foreach(Monster::all() as $monster) {
-            foreach(config('game.skill_names') as $name) {
-                $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $name);
+            foreach(config('game.skills') as $options) {
+                $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $options);
             }
 
             $monster->skills()->insert($skills);

@@ -24676,9 +24676,14 @@ dd {
   text-align: initial;
 }
 
+.train-skill-btn {
+  position: relative;
+  top: -7px;
+}
+
 @media (min-width: 576px) {
   .modal-dialog {
-    max-width: 1000px;
+    max-width: 650px;
     margin: 1.75rem auto;
   }
 }

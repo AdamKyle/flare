@@ -23,9 +23,10 @@ class CharacterSheetController extends Controller {
 
     public function sheet(Character $character) {
         $character = new Item($character, $this->characterSheetTransformer);
-
+        $sheet     = $this->manager->createData($character)->toArray();
+        
         return response()->json([
-            'sheet' => $this->manager->createData($character)->toArray(),
+            'sheet' => $sheet,
         ], 200);
     }
 }

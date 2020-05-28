@@ -6,7 +6,6 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('game.character.sheet')}}">Character Sheet</a></li>
             <li><a href="{{route('game.character.inventory')}}">Inventory</a></li>
-            <li><a href="index2.html">Skills</a></li>
         </ul>
     </li>
     <li>

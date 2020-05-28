@@ -44,17 +44,19 @@ class CharacterInformationBuilder {
     }
 
     public function buildAttack(): int {
+        
         $characterDamageStat = $this->statMod($this->character->damage_stat);
+        $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
 
         return round(($characterDamageStat + 10) + $this->getWeaponDamage());
     }
 
     public function buildDefence(): int {
-        return 10 + $this->getDefence();
+        return round((10 + $this->getDefence()) * (1 + $this->fetchSkillACMod()));
     }
 
     public function buildHealFor(): int {
-        return $this->fetchHealingAmount();
+        return round($this->fetchHealingAmount() * (1 + $this->fetchSkillHealingMod()));
     }
 
     public function buildHealth(): int {
@@ -63,7 +65,7 @@ class CharacterInformationBuilder {
 
     public function hasArtifacts(): bool {
         return $this->inventory->filter(function ($slot) {
-            return $slot->item->type === 'artifact';
+            return $slot->item->type === 'artifact' && $slot->equipped;
         })->isNotEmpty();
     }
 
@@ -73,8 +75,38 @@ class CharacterInformationBuilder {
 
     public function hasSpells(): bool {
         return $this->inventory->filter(function ($slot) {
-            return $slot->item->type === 'spell';
+            return $slot->item->type === 'spell' && $slot->equipped;
         })->isNotEmpty();
+    }
+
+    protected function fetchSkillAttackMod(): float {
+        $percentageBonus = 0.0;
+
+        foreach ($this->character->skills as $skill) {
+            $percentageBonus += $skill->base_damage_mod + ($skill->level / 100);
+        }
+
+        return $percentageBonus;
+    }
+
+    protected function fetchSkillHealingMod(): float {
+        $percentageBonus = 0.0;
+        
+        foreach ($this->character->skills as $skill) {
+            $percentageBonus += $skill->base_healing_mod + ($skill->level / 100);
+        }
+
+        return $percentageBonus;
+    }
+
+    protected function fetchSkillACMod(): float {
+        $percentageBonus = 0.0;
+        
+        foreach ($this->character->skills as $skill) {
+            $percentageBonus += $skill->base_ac_mod = ($skill->level / 100);
+        }
+
+        return $percentageBonus;
     }
 
     protected function getWeaponDamage(): int {

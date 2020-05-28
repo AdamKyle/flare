@@ -111,6 +111,39 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(17, $content->character->data->attack);
     }
 
+    public function testCanGetActionsWithSkills() {
+
+        $this->setUpCharacter();
+
+        $this->character->skills->where('name', 'Looting')->first()->update([
+            'base_damage_mod' => 0.5
+        ]);
+
+        $this->character->skills->where('name', 'Dodge')->first()->update([
+            'base_ac_mod' => 0.5
+        ]);
+
+        $this->character->skills->where('name', 'Accuracy')->first()->update([
+            'base_healing_mod' => 0.5
+        ]);
+
+        $this->character->refresh();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('GET', '/api/actions', [
+                             'user_id' => $this->user->id
+                         ])
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertNotEmpty($content->monsters);
+        $this->assertNotEmpty($content->monsters[0]->skills);
+        $this->assertEquals($this->character->name, $content->character->data->name);
+        $this->assertEquals(18, $content->character->data->attack);
+    }
+
     public function testWhenNotLoggedInCannotGetActions() {
         $response = $this->json('GET', '/api/actions', [
                              'user_id' => 1
@@ -474,6 +507,8 @@ class BattleControllerApiTest extends TestCase
                                                ->giveItem($item)
                                                ->equipLeftHand()
                                                ->setSkill('Looting', $options)
+                                               ->setSkill('Dodge', $options)
+                                               ->setSkill('Accuracy', $options)
                                                ->getCharacter();
     }
 

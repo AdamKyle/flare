@@ -70,9 +70,9 @@ class CharacterBuilder {
     }
 
     public function assignSkills(): CharacterBuilder {
-        foreach (config('game.skill_names') as $name) {
+        foreach (config('game.skills') as $options) {
             $this->character->skills()->create(
-                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $name)
+                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $options)
             );
         }
 
@@ -80,6 +80,6 @@ class CharacterBuilder {
     }
 
     public function character(): Character {
-        return $this->character;
+        return $this->character->refresh();
     }
 }
