@@ -3,7 +3,6 @@
 namespace Tests\Unit\Admin\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use App\Admin\Models\GameMap;
 use Tests\Setup\CharacterSetup;

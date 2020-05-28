@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\ItemAffix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -229,6 +230,39 @@ class CharacterInventoryControllerTest extends TestCase
             'base_ac'          => 6,
             'type'             => 'gloves',
             'default_position' => 'hands',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => false,
+        ]);
+
+        $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'gloves',
+            'slot_id'            => '2',
+        ])->see('Equipped')->see('Item Details');
+    }
+
+    public function testSeeComparePageForItemWithPrefixAndSuffix() {
+        $item = $this->createItem([
+            'name' => 'Armour',
+            'base_damage'      => 6,
+            'base_ac'          => 6,
+            'type'             => 'gloves',
+            'default_position' => 'hands',
+            'item_suffix_id'   => ItemAffix::create([
+                'name' => 'Sample',
+                'base_healing_mod' => 0.10,
+                'str_mod' => 0.10,
+                'type' => 'suffix',
+            ])->id,
+            'item_prefix_id'   => ItemAffix::create([
+                'name' => 'Sample',
+                'base_healing_mod' => 0.10,
+                'dex_mod' => 0.10,
+                'type' => 'prefix',
+            ])->id,
         ]);
 
         $this->character->inventory->slots()->create([

@@ -22,7 +22,7 @@ class RandomItemDropBuilder {
 
         $duplicateItem = $item->replicate();
         $duplicateItem->save();
-
+ 
         if (!is_null($item->itemSuffix)) {
             $duplicateItem->update([
                 'item_suffix_id' => $item->itemSuffix->id,
@@ -41,9 +41,9 @@ class RandomItemDropBuilder {
             $affix = $this->fetchRandomItemAffix();
             
             if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
-                $hasSameAffix = $duplicateItem->itemAffixes->where('type', '=', $affix['type'])->first();
-
-                if (!is_null($hasSameAffix)) {
+                $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
+                
+                if ($hasSameAffix) {
                     $duplicateItem->delete();
 
                     return $item;
@@ -62,13 +62,13 @@ class RandomItemDropBuilder {
         $duplicateItem = $this->setItemName($duplicateItem);
         $foundItems    = Item::where('name', '=', $duplicateItem->name)->get();
 
-        if ($foundItems->count() > 1) {
-            $duplicateItem->delete();
-
-            return $item;
-        }
-
         return $duplicateItem;
+    }
+
+    protected function hasSameAffix(Item $duplicateItem, ItemAffix $affix): bool {
+        $foundAffix = $duplicateItem->{'item'.ucfirst($affix->type)};
+
+        return $foundAffix->name === $affix->name;
     }
 
     protected function attachAffix(Item $item, ItemAffix $itemAffix): Item {

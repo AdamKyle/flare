@@ -55,6 +55,7 @@ class BattleController extends Controller {
             switch ($request->defender_type) {
                 case 'monster':
                     $monster = Monster::find($request->monster_id);
+
                     event(new UpdateCharacterEvent($character, $monster));
                     event(new DropsCheckEvent($character, $monster));
                     event(new GoldRushCheckEvent($character, $monster));

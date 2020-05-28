@@ -46,7 +46,6 @@ class UpdateCharacterListener
 
             event(new ServerMessageEvent($event->character->user, 'level_up'));
             event(new UpdateTopBarEvent($event->character));
-            event(new UpdateCharacterSheetEvent($event->character));
             event(new UpdateCharacterAttackEvent($event->character));
 
         } else {
@@ -60,7 +59,6 @@ class UpdateCharacterListener
             $event->character->refresh();
 
             event(new UpdateTopBarEvent($event->character));
-            event(new UpdateCharacterSheetEvent($event->character));
         }
     }
 }

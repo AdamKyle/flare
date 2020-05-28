@@ -4,7 +4,6 @@ namespace Tests\Feature\Game\Map;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;

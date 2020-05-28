@@ -4,7 +4,6 @@ namespace Tests\Feature\Admin\Maps;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 use Illuminate\Http\UploadedFile;
 use App\Admin\Models\GameMap;
 use Tests\TestCase;

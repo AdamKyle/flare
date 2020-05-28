@@ -30,11 +30,6 @@ class RandomItemDropBuilderTest extends TestCase
             'type' => 'weapon',
         ]);
 
-        $item = $this->createItem([
-            'name' => 'Bloody Spear',
-            'type' => 'weapon',
-        ]);
-
         $this->createItemAffix([
             'name'                 => 'Sample',
             'base_damage_mod'      => '0.10',
@@ -51,9 +46,23 @@ class RandomItemDropBuilderTest extends TestCase
             'skill_training_bonus' => null,
         ]);
 
+        $this->createItemAffix([
+            'name'                 => 'Sample',
+            'base_damage_mod'      => '0.10',
+            'type'                 => 'prefix',
+            'description'          => 'Sample',
+            'base_healing_mod'     => '0.10',
+            'str_mod'              => '0.10',
+            'dur_mod'              => '0.10',
+            'dex_mod'              => '0.10',
+            'chr_mod'              => '0.10',
+            'int_mod'              => '0.10',
+            'ac_mod'               => '0.10',
+            'skill_name'           => null,
+            'skill_training_bonus' => null,
+        ]);
+
         $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
-                                               ->giveItem($item)
-                                               ->equipLeftHand()
                                                ->setSkill('Looting', [
                                                    'looting_level' => 100,
                                                    'looting_bonus' => 100,
@@ -78,7 +87,7 @@ class RandomItemDropBuilderTest extends TestCase
 
         $item = $randomItemGenerator->generateItem($this->character);
 
-        $this->assertNull($item->itemSuffix);
+        $this->assertNotEmpty($item->getRelations());
     }
 
     public function testCreateEnchantedItem() {
@@ -92,6 +101,75 @@ class RandomItemDropBuilderTest extends TestCase
 
         $item = $randomItemGenerator->generateItem($this->character);
 
-        $this->assertNotNull($item->itemSuffix);
+        $this->assertNotEmpty($item->getRelations());
+    }
+
+    public function testFailToCreateEnchantedItemWhenItemAlreadyHasSuffixAndPrefixOfTheSameType() {
+        Item::first()->delete();
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5
+        ]);
+
+        Item::first()->update([
+            'item_suffix_id' => ItemAffix::where('type', 'suffix')->first()->id,
+            'item_prefix_id' => ItemAffix::where('type', 'prefix')->first()->id,
+        ]);
+
+        $randomItemGenerator = resolve(RandomItemDropBuilder::class)
+                                    ->setItemAffixes(ItemAffix::all());
+
+        $item = $randomItemGenerator->generateItem($this->character);
+
+        $this->assertEquals(Item::count(), 1);
+    }
+
+    public function testCreateEnchantedItemWhenItemAlreadyHasSuffixAndPrefix() {
+        Item::first()->delete();
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5
+        ]);
+
+        Item::first()->update([
+            'item_suffix_id' => ItemAffix::where('type', 'suffix')->first()->id,
+            'item_prefix_id' => ItemAffix::where('type', 'prefix')->first()->id,
+        ]);
+
+        $this->createItemAffix([
+            'name'                 => 'Sample 2',
+            'base_damage_mod'      => '0.10',
+            'type'                 => 'suffix',
+            'description'          => 'Sample',
+            'base_healing_mod'     => '0.10',
+            'str_mod'              => '0.10',
+            'dur_mod'              => '0.10',
+            'dex_mod'              => '0.10',
+            'chr_mod'              => '0.10',
+            'int_mod'              => '0.10',
+            'ac_mod'               => '0.10',
+            'skill_name'           => null,
+            'skill_training_bonus' => null,
+        ]);
+
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+             ->setMethods(array('fetchRandomItemAffix'))
+             ->getMock();
+
+        $randomItemBuilder->expects($this->any())
+            ->method('fetchRandomItemAffix')
+            ->willReturn(ItemAffix::where('name', 'Sample 2')->first());
+
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $item = $randomItemBuilder->generateItem($this->character);
+        
+        $this->assertEquals(Item::count(), 2);
     }
 }

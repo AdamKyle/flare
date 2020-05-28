@@ -3,7 +3,6 @@
 namespace App\Flare\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -14,7 +13,7 @@ use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\MaxDamageForItemValue;
 
-class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
+class ServiceProvider extends ApplicationServiceProvider
 {
     /**
      * Register any application services.
@@ -23,23 +22,19 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
      */
     public function register()
     {
-        $this->app->singleton(BaseStatValue::class, function ($app) {
+        $this->app->bind(BaseStatValue::class, function ($app) {
             return new BaseStatValue();
         });
 
-        $this->app->bind(MaxDamageForItemValue::class, function($app) {
-            return new MaxDamageForItemValue();
-        });
-
-        $this->app->singleton(CharacterBuilder::class, function ($app) {
+        $this->app->bind(CharacterBuilder::class, function ($app) {
             return new CharacterBuilder();
         });
 
-        $this->app->singleton(CharacterInformationBuilder::class, function($app) {
+        $this->app->bind(CharacterInformationBuilder::class, function($app) {
             return new CharacterInformationBuilder();
         });
 
-        $this->app->singleton(RandomItemDropBuilder::class, function($app) {
+        $this->app->bind(RandomItemDropBuilder::class, function($app) {
             return new RandomItemDropBuilder();
         });
 
@@ -54,6 +49,8 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
         $this->app->bind(BaseSkillValue::class, function($app) {
             return new BaseSkillValue();
         });
+
+        $this->commands([CreateAdminAccount::class]);
     }
 
     /**
@@ -64,10 +61,5 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
     public function boot()
     {
         //
-    }
-
-    public function provides()
-    {
-        return [];
     }
 }

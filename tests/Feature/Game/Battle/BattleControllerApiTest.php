@@ -5,17 +5,13 @@ namespace Tests\Feature\Game\Battle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
-use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Events\UpdateCharacterSheetEvent;
+use App\Flare\Models\Monster;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\ShowTimeOutEvent;
-use App\Game\Battle\Events\UpdateCharacterEvent;
-use App\Game\Battle\Events\UpdateTopBarEvent;
 use App\Game\Battle\Events\UpdateTopBarBroadcastEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
@@ -51,7 +47,9 @@ class BattleControllerApiTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->setUpMonster();
+        $this->setUpMonsters();
+
+        $this->monster = Monster::first();
 
         $this->createItemAffix([
             'name'                 => 'Sample',
@@ -95,6 +93,7 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testCanGetActions() {
+
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
@@ -146,8 +145,6 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -178,8 +175,6 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -212,8 +207,6 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -247,8 +240,6 @@ class BattleControllerApiTest extends TestCase
             GoldRushCheckEvent::class,
             AttackTimeOutEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -284,12 +275,9 @@ class BattleControllerApiTest extends TestCase
 
         Event::fake([
             ServerMessageEvent::class,
-            DropCheckEvent::class,
+            DropsCheckEvent::class,
             AttackTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -319,10 +307,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -350,10 +335,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -385,10 +367,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter();
@@ -419,10 +398,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -455,10 +431,7 @@ class BattleControllerApiTest extends TestCase
             DropsCheckEvent::class,
             GoldRushCheckEvent::class,
             ShowTimeOutEvent::class,
-            UpdateTopBarEvent::class,
             UpdateTopBarBroadcastEvent::class,
-            UpdateCharacterSheetEvent::class,
-            UpdateCharacterAttackEvent::class,
         ]);
 
         $this->setUpCharacter([
@@ -504,15 +477,7 @@ class BattleControllerApiTest extends TestCase
                                                ->getCharacter();
     }
 
-    protected function setUpMonster(): void {
-        $this->monster = $this->createMonster();
-
-        $this->createSkill([
-            'monster_id' => $this->monster->id,
-        ]);
-
-        $this->createSkill([
-            'monster_id' => $this->monster->id,
-        ]);
+    protected function setUpMonsters(): void {
+        $this->artisan('db:seed --class=CreateMonstersSeeder');
     }
 }

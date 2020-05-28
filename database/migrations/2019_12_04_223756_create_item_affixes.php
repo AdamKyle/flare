@@ -16,7 +16,7 @@ class CreateItemAffixes extends Migration
         Schema::create('item_affixes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->decimal('base_damage_mod')->nullable();
             $table->decimal('base_healing_mod')->nullable();
             $table->decimal('str_mod')->nullable();
