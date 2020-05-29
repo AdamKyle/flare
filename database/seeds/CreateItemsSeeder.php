@@ -353,6 +353,26 @@ class CreateItemsSeeder extends Seeder
                 'skill_training_bonus' => null,
                 'default_position'     => null,
             ],
+            [
+                'name'                 => 'Weapon Smiths Book',
+                'type'                 => 'quest',
+                'base_healing'         => null,
+                'base_damage'          => null,
+                'base_ac'              => null,
+                'cost'                 => null,
+                'base_damage_mod'      => null,
+                'description'          => 'Gives you 150% Crafting XP when you craft a weapon.',
+                'base_healing_mod'     => null,
+                'str_mod'              => null,
+                'dur_mod'              => null,
+                'dex_mod'              => null,
+                'chr_mod'              => null,
+                'int_mod'              => null,
+                'ac_mod'               => null,
+                'skill_name'           => 'Weapon Crafting',
+                'skill_training_bonus' => 1.0,
+                'default_position'     => null,
+            ],
         ]);
     }
 }
