@@ -17,16 +17,17 @@ class BaseSkillValue {
             'name'                      => $options['name'],
             'currently_training'        => false,
             'level'                     => 0,
-            'max_level'                 => 100,
+            'max_level'                 => $options['max_level'],
             'xp'                        => 0,
-            'xp_max'                    => rand(100, 350),
+            'xp_max'                    => $options['xp_max'],
             'base_damage_mod'           => $options['base_damage_mod'],
             'base_healing_mod'          => $options['base_healing_mod'],
             'base_ac_mod'               => $options['base_ac_mod'],
             'fight_time_out_mod'        => $options['fight_time_out_mod'],
             'move_time_out_mod'         => $options['move_time_out_mod'],
             'skill_bonus'               => ($this->getCharacterSkillBonus($character, $options['name']) / 100) + 0.01,
-            'skill_bonus_per_level'     => 0.01,
+            'can_train'                 => $options['can_train'],
+            'skill_bonus_per_level'     => $options['skill_bonus_per_level'],
         ];
     }
 

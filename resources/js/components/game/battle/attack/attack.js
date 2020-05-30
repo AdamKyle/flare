@@ -96,6 +96,8 @@ export default class Attack {
   doAttack(attacker, type) {
     if (type === 'player') {
       this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.attack;
+      
+      if (attacker.has_healing_spells)
 
       if (attacker.has_artifacts) {
         this.battleMessages.push({
@@ -109,9 +111,23 @@ export default class Attack {
         });
       }
 
-      if (attacker.has_spells) {
+      if (attacker.has_damage_spells) {
         this.battleMessages.push({
           message: 'Your spells burst forward towards the enemy!'
+        });
+      }
+
+      if (attacker.heal_for > 0) {
+        const healFor = attacker.heal_for + this.characterCurrentHealth;
+
+        if (healFor >= attacker.health) {
+          this.characterCurrentHealth = attacker.health;
+        } else {
+          this.characterCurrentHealth += healFor;
+        }
+
+        this.battleMessages.push({
+          message: 'Light floods your eyes as your wounds heal over.' 
         });
       }
 

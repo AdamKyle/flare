@@ -60,7 +60,15 @@ class CharacterInformationBuilder {
     }
 
     public function buildHealth(): int {
-        return $this->character->dur + 10;
+        $totalPercentage = 1.0;
+
+        foreach ($this->character->inventory->slots as $slot) {
+            if ($slot->equipped) {
+                $totalPercentage += $slot->item->getTotalPercentageForStat('dur');
+            }
+        }
+        
+        return ($this->character->dur + 10) * $totalPercentage;
     }
 
     public function hasArtifacts(): bool {
@@ -70,12 +78,20 @@ class CharacterInformationBuilder {
     }
 
     public function hasAffixes(): bool {
-        return true;
+        return $this->inventory->filter(function ($slot) {
+            return ((!is_null($slot->item->itemPrefix)) || (!is_null($slot->item->itemSuffix))) && $slot->equipped;
+        })->isNotEmpty();
     }
 
-    public function hasSpells(): bool {
+    public function hasHealingSpells(): bool {
         return $this->inventory->filter(function ($slot) {
-            return $slot->item->type === 'spell' && $slot->equipped;
+            return $slot->item->type === 'spell-healing' && $slot->equipped;
+        })->isNotEmpty();
+    }
+
+    public function hasDamageSpells(): bool {
+        return $this->inventory->filter(function ($slot) {
+            return $slot->item->type === 'spell-damage' && $slot->equipped;
         })->isNotEmpty();
     }
 

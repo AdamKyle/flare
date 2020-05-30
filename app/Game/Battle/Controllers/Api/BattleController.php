@@ -49,7 +49,6 @@ class BattleController extends Controller {
         }
 
         if ($request->is_defender_dead) {
-
             switch ($request->defender_type) {
                 case 'monster':
                     $monster = Monster::find($request->monster_id);

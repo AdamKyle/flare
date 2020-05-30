@@ -7,6 +7,15 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">{{$skill->name}}</h4>
+                    <p>{{$skill->description}}</p>
+                    <hr />
+                    @if (!$skill->can_train)
+                        <p>
+                            This skill cannot be trained by fighting alone. Instead it is trained by crafting items of this type.
+                            Each time you craft an item you have a chance to gain a level. Certain quest items can help increase
+                            the amount of xp you get from training this skill.
+                        </p>
+                    @endif
                     <dl>
                         <dt>Level:</dt>
                         <dd>{{$skill->level}}/{{$skill->max_level}}</dd>

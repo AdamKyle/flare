@@ -122,7 +122,6 @@ export default class Actions extends React.Component {
     this.setState(state);
 
     if (state.monsterCurrentHealth <= 0) {
-
       axios.post('/api/battle-results/' + this.state.character.id, {
         is_character_dead: this.characterCurrentHealth === 0 ? true : false,
         is_defender_dead: true,

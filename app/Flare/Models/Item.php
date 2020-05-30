@@ -34,6 +34,10 @@ class Item extends Model
         'chr_mod',
         'int_mod',
         'ac_mod',
+        'effect',
+        'can_craft',
+        'skill_level_required',
+        'skill_level_trivial',
         'skill_name',
         'skill_training_bonus',
     ];
@@ -58,6 +62,9 @@ class Item extends Model
         'int_mod'              => 'float',
         'ac_mod'               => 'float',
         'skill_training_bonus' => 'float',
+        'can_craft'            => 'boolean',
+        'skill_level_required' => 'integer',
+        'skill_level_trivial'  => 'integer',
     ];
 
     public function itemSuffix() {
@@ -131,5 +138,26 @@ class Item extends Model
         }
 
         return $baseStat;
+    }
+
+    public function scopeGetSkillTrainingBonus($query, string $skillName): float {
+        $baseSkillTraining = is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus;
+
+        if (!is_null($this->itemPrefix)) {
+            if ($this->itemPrefix->skill_name === $skillName) {
+                $stat               = $this->itemPrefix->skill_training_bonus;
+                $baseSkillTraining += !is_null($stat) ? $stat : 0.0;
+            }
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            if ($this->itemSuffix->skill_name === $skillName) {
+                $stat               = $this->itemSuffix->skill_training_bonus;
+                $baseSkillTraining += !is_null($stat) ? $stat : 0.0;
+            }
+            
+        }
+
+        return $baseSkillTraining;
     }
 }

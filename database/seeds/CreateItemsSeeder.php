@@ -32,6 +32,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Chapped, scared and ripped leather breast plate',
@@ -52,6 +53,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => 'body',
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Steel rimmed wooden shield',
@@ -72,6 +74,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Worn out musty old shoes',
@@ -92,6 +95,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => 'feet',
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Torn, ripped and bloody leggings',
@@ -112,6 +116,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => 'legs',
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Old cotton sleeves',
@@ -132,6 +137,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => 'sleeves',
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Ruined and burnt wooden mask',
@@ -152,6 +158,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => 'head',
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Fingerless ripped gloves',
@@ -172,6 +179,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => 'hands',
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Ice spell',
@@ -192,6 +200,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Cure spell',
@@ -212,6 +221,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Basic ring of hatred and despair',
@@ -232,6 +242,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Virgins Petrified Blood',
@@ -252,6 +263,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Tears of a demon',
@@ -272,6 +284,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Conjuration Bag',
@@ -292,6 +305,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Ancient Soldiers Broken Sword',
@@ -312,6 +326,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Dioxes Bow',
@@ -332,6 +347,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => null,
             ],
             [
                 'name'                 => 'Flask of Fresh Air',
@@ -352,6 +368,7 @@ class CreateItemsSeeder extends Seeder
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
                 'default_position'     => null,
+                'effect'               => 'walk-on-water',
             ],
             [
                 'name'                 => 'Weapon Smiths Book',
@@ -370,8 +387,9 @@ class CreateItemsSeeder extends Seeder
                 'int_mod'              => null,
                 'ac_mod'               => null,
                 'skill_name'           => 'Weapon Crafting',
-                'skill_training_bonus' => 1.0,
+                'skill_training_bonus' => 1.5,
                 'default_position'     => null,
+                'effect'               => null,
             ],
         ]);
     }

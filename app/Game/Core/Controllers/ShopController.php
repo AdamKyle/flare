@@ -26,6 +26,7 @@ class ShopController extends Controller {
             'artifacts' => Item::where('type', 'artifact')->get(),
             'spells'    => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->whereIn('type', ['spell-damage', 'spell-healing'])->get(),
             'rings'     => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->where('type', 'ring')->get(),
+            'gold'      => auth()->user()->character->gold,
         ]);
     }
 

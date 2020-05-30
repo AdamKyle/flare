@@ -28,6 +28,7 @@ class Skill extends Model
         'base_ac_mod',
         'fight_time_out_mod',
         'move_time_out_mod',
+        'can_train',
         'skill_bonus',
         'skill_bonus_per_level',
     ];
@@ -49,6 +50,7 @@ class Skill extends Model
         'base_ac_mod'           => 'float',
         'fight_time_out_mod'    => 'float',
         'move_time_out_mod'     => 'float',
+        'can_train'             => 'boolean',
         'skill_bonus'           => 'float',
         'skill_bonus_per_level' => 'float',
     ];

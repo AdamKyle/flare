@@ -26,8 +26,8 @@ class AttackTimeOutListener
             'can_attack_again_at' => now()->addSeconds(10),
         ]);
 
-        AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
-
         broadcast(new ShowTimeOutEvent($event->character->user, true, false));
+
+        AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
     }
 }

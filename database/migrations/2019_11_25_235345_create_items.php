@@ -34,6 +34,7 @@ class CreateItems extends Migration
             $table->decimal('chr_mod')->nullable();
             $table->decimal('int_mod')->nullable();
             $table->decimal('ac_mod')->nullable();
+            $table->string('effect')->nullable();
             $table->string('skill_name')->nullable();
             $table->decimal('skill_training_bonus')->nullable();
             $table->timestamps();

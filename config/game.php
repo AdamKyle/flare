@@ -14,6 +14,10 @@ return [
             'base_ac_mod'               => 0.0,
             'fight_time_out_mod'        => 0.0,
             'move_time_out_mod'         => 0.0,
+            'can_train'                 => true,
+            'max_level'                 => 100,
+            'xp_max'                    => rand(100, 350),
+            'skill_bonus_per_level'     => 0.01
          ],
          [
             'name'                      => 'Dodge',
@@ -23,6 +27,10 @@ return [
             'base_ac_mod'               => 0.0,
             'fight_time_out_mod'        => 0.0,
             'move_time_out_mod'         => 0.0,
+            'can_train'                 => true,
+            'max_level'                 => 100,
+            'xp_max'                    => rand(100, 350),
+            'skill_bonus_per_level'     => 0.01
          ],
          [
             'name'                      => 'Looting',
@@ -32,24 +40,23 @@ return [
             'base_ac_mod'               => 0.0,
             'fight_time_out_mod'        => 0.0,
             'move_time_out_mod'         => 0.0,
+            'can_train'                 => true,
+            'max_level'                 => 100,
+            'xp_max'                    => rand(100, 350),
+            'skill_bonus_per_level'     => 0.01
          ],
-    ],
-
-    /**
-     * These are the allowed Affixes:
-    */
-    'item_affixes' => [
-        [
-            'name' => 'Krawls Claw',
-            'base_damage_mod' => 2,
-            'type' => 'suffix',
-            'description' => 'Krawl was a legendary warrior of Kazix - A province long forgotten.'
-        ],
-        [
-            'name' => 'Gathers Hunt',
-            'base_damage_mod' => 2,
-            'type' => 'prefix',
-            'description' => 'Once, long ago, hunters would gather and collectivly they would bring back a feast for the ages.'
-        ],
+         [
+            'name'                      => 'Weapon Crafting',
+            'description'               => 'A skill used in crafting weapons.',
+            'base_damage_mod'           => 0.0,
+            'base_healing_mod'          => 0.0,
+            'base_ac_mod'               => 0.0,
+            'fight_time_out_mod'        => 0.0,
+            'move_time_out_mod'         => 0.0,
+            'can_train'                 => false,
+            'max_level'                 => 400,
+            'xp_max'                    => rand(50, 150),
+            'skill_bonus_per_level'     => 0.25
+         ],
     ],
 ];

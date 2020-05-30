@@ -34,6 +34,7 @@ class CreateSkills extends Migration
             $table->decimal('base_ac_mod')->nullable();
             $table->decimal('fight_time_out_mod')->nullable();
             $table->decimal('move_time_out_mod')->nullable();
+            $table->boolean('can_train')->nullable()->default(true);
             $table->decimal('skill_bonus');
             $table->decimal('skill_bonus_per_level');
             $table->timestamps();

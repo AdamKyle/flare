@@ -92,16 +92,18 @@
                                                     <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->level}}" aria-valuemin="0" style="width: {{$skill->level}}%;">{{$skill->level}}</div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <a href="#" class="btn btn-primary btn-sm mb-2 train-skill-btn" data-toggle="modal" data-target="#skill-train-{{$skill->id}}">
-                                                    Train
+                                            @if ((bool) $skill->can_train)
+                                                <div class="col-md-6">
+                                                    <a href="#" class="btn btn-primary btn-sm mb-2 train-skill-btn" data-toggle="modal" data-target="#skill-train-{{$skill->id}}">
+                                                        Train
 
-                                                    @if ($skill->currently_training)
-                                                    <i class="ml-2 fas fa-check"></i>
-                                                    @endif
-                                                </a>
-                                                @include('game.core.character.partials.skill-train-modal', ['skill' => $skill])
-                                            </div>
+                                                        @if ($skill->currently_training)
+                                                        <i class="ml-2 fas fa-check"></i>
+                                                        @endif
+                                                    </a>
+                                                    @include('game.core.character.partials.skill-train-modal', ['skill' => $skill])
+                                                </div>
+                                            @endif
                                         </div>
                                     </dd>
                                 </dl>
