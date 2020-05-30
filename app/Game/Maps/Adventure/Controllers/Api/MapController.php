@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use Storage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -42,6 +43,7 @@ class MapController extends Controller {
             'timeout'       => $user->character->can_move_again_at,
             'show_message'  => $user->character->can_move ? false : true,
             'port_details'  => $portDetails,
+            'is_dead'       => $user->character->is_dead,
         ]);
     }
 
@@ -102,6 +104,7 @@ class MapController extends Controller {
         $this->portService->setSail($character, $location);
         
         event(new MoveTimeOutEvent($character, $request->time_out_value));
+        event(new UpdateTopBarEvent($character));
 
         return response()->json([
             'character_position_details' => $character->map,

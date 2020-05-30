@@ -60,6 +60,11 @@ class CharacterInformationBuilder {
     }
 
     public function buildHealth(): int {
+
+        if ($this->character->is_dead) {
+            return 0;
+        }
+
         $totalPercentage = 1.0;
 
         foreach ($this->character->inventory->slots as $slot) {

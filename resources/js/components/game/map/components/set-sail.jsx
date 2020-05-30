@@ -29,6 +29,10 @@ export default class SetSail extends React.Component {
     }
 
     handleSetSail(portId) {
+        if (this.props.characterIsDead) {
+            return getServerMessage('character_is_dead');
+        }
+
         const foundPort = this.state.portList.filter(pl => pl.id === portId)[0];
 
         axios.post('/api/map/set-sail/' + portId + '/' + this.props.characterId, {
@@ -47,6 +51,10 @@ export default class SetSail extends React.Component {
     }
 
     setSailButton(foundPort) {
+        if (this.props.characterIsDead) {
+            return <span className="text-danger">You must revive.</span>
+        }
+        
         if (this.props.canSetSail) {
             if (foundPort.can_afford) {
                return <button className="btn btn-primary" onClick={() => this.handleSetSail(foundPort.id)}>Set Sail</button>

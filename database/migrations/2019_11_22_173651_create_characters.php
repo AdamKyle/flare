@@ -39,6 +39,7 @@ class CreateCharacters extends Migration
             $table->integer('inventory_max')->nullable()->default(75);
             $table->boolean('can_attack')->nullable()->default(true);
             $table->boolean('can_move')->nullable()->default(true);
+            $table->boolean('is_dead')->nullable()->default(false);
             $table->dateTime('can_move_again_at')->nullable();
             $table->dateTime('can_attack_again_at')->nullable();
             $table->timestamps();

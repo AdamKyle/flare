@@ -15,7 +15,7 @@ class CreateAffixes extends Seeder
         ItemAffix::insert([
             [
                 'name'                 => 'Queens Blessing',
-                'base_damage_mod'      => '0.02',
+                'base_damage_mod'      => '0.15',
                 'type'                 => 'suffix',
                 'description'          => 'The queen has blessed this item.',
                 'base_healing_mod'     => null,

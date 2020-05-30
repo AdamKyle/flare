@@ -28,6 +28,7 @@ export default class Actions extends React.Component {
     this.echo         = Echo.private('show-timeout-bar-' + this.props.userId);
     this.topBar       = Echo.private('update-top-bar-' + this.props.userId);
     this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
+    this.isDead       = Echo.private('character-is-dead-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -48,10 +49,21 @@ export default class Actions extends React.Component {
       });
     });
 
+    this.isDead.listen('Game.Battle.Events.CharacterIsDeadBroadcastEvent', (event) => {
+      let character = _.cloneDeep(this.state.character);
+
+      character.is_dead = event.isDead;
+
+      this.setState({
+        character: character,
+      });
+    });
+
     this.echo.listen('Game.Battle.Events.ShowTimeOutEvent', (event) => {
       this.setState({
-        canAttack:   event.canAttack,
-        showMessage: false,
+        canAttack:     event.canAttack,
+        showMessage:   false,
+        timeRemaining: event.forLength,
       });
     });
 
@@ -121,19 +133,39 @@ export default class Actions extends React.Component {
 
     this.setState(state);
 
-    if (state.monsterCurrentHealth <= 0) {
+    if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
       axios.post('/api/battle-results/' + this.state.character.id, {
-        is_character_dead: this.characterCurrentHealth === 0 ? true : false,
-        is_defender_dead: true,
+        is_character_dead: state.characterCurrentHealth <= 0,
+        is_defender_dead: state.monsterCurrentHealth <= 0,
         defender_type: 'monster',
         monster_id: this.state.monster.id,
       }).then((result) => {
+        let health = state.characterCurrentHealth;
+
+        if (health >= 0) {
+          health = this.state.characterMaxHealth;
+        }
+
         this.setState({
-          characterCurrentHealth: this.state.characterMaxHealth,
+          characterCurrentHealth: health,
           canAttack: false
         });
       });
     }
+  }
+
+  revive() {
+    if (!this.state.canAttack) {
+      return getServerMessage('cant_attack');
+    }
+    
+    axios.post('/api/battle-revive/' + this.state.character.id).then((result) => {
+      this.setState({
+        character: result.data.character.data,
+        characterMaxHealth: result.data.character.data.health,
+        characterCurrentHealth: result.data.character.data.health,
+      });
+    });
   }
 
   monsterOptions() {
@@ -147,7 +179,12 @@ export default class Actions extends React.Component {
       return null;
     }
 
-    const characterCurrentHealth = (this.state.characterCurrentHealth / this.state.characterMaxHealth) * 100;
+    let characterCurrentHealth = 0;
+
+    if (this.state.characterCurrentHealth !== 0 && this.state.characterMaxHealth !== 0) {
+      characterCurrentHealth = (this.state.characterCurrentHealth / this.state.characterMaxHealth) * 100;
+    }
+
     const monsterCurrentHealth   = (this.state.monsterCurrentHealth / this.state.monsterMaxHealth) * 100;
 
     return (
@@ -194,7 +231,8 @@ export default class Actions extends React.Component {
               <div className="col-md-6">
                   <select className="form-control" id="monsters" name="monsters"
                     value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
-                    onChange={this.updateActions.bind(this)}>
+                    onChange={this.updateActions.bind(this)}
+                    disabled={this.state.character.is_dead}>
                       <option value="" key="0">Please select a monster</option>
                       {this.monsterOptions()}
                   </select>
@@ -216,7 +254,7 @@ export default class Actions extends React.Component {
                   channel={'show-timeout-bar-'}
                   cssClass={'character-timeout'}
                   readyCssClass={'character-ready'}
-                  forSeconds={10}
+                  forSeconds={this.state.timeRemaining}
                   timeRemaining={this.state.timeRemaining}
                 />
                 </div>
@@ -224,13 +262,21 @@ export default class Actions extends React.Component {
           </div>
           <hr />
           <div className="battle-section text-center">
-            {this.state.monsterCurrentHealth !== 0
+            {this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead
               ?
               <>
                 <button className="btn btn-primary" onClick={this.attack.bind(this)}>Attack</button>
                 {this.healthMeters()}
               </>
               : null
+            }
+            {this.state.character.is_dead
+             ? 
+             <>
+              <button className="btn btn-primary" onClick={this.revive.bind(this)}>Revive</button>
+              <p className="mt-3">You are dead. Click revive to live again.</p>
+             </>
+             : null
             }
             {this.battleMessages()}
           </div>

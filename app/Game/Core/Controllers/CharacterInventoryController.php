@@ -22,6 +22,9 @@ class CharacterInventoryController extends Controller {
         $this->equipItemService = $equipItemService;
 
         $this->middleware('auth');
+        $this->middleware('is.character.dead')->only([
+            'compare', 'equipItem', 'destroy'
+        ]);
     }
 
     public function index(Character $character) {

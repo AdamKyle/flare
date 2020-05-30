@@ -10,3 +10,9 @@ Broadcast::channel('show-timeout-bar-{userId}', function ($user, $userId) {
 Broadcast::channel('update-top-bar-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
 });
+
+
+// When the character is dead
+Broadcast::channel('character-is-dead-{userId}', function ($user, $userId) {
+	return $user->id === (int) $userId;
+});

@@ -25,6 +25,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'can_attack'          => $character->can_attack,
             'can_attack_again_at' => $character->can_attack_again_at,
             'show_message'        => $character->can_attack ? false : true,
+            'is_dead'             => $character->is_dead,
         ];
     }
 }

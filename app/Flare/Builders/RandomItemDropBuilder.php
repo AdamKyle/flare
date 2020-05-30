@@ -94,13 +94,13 @@ class RandomItemDropBuilder {
     private function setItemName(Item $item): Item {
         $name      = array_map('trim', explode('*', $item->name));
         $foundItem = Item::whereIn('name', $name)->first();
-        dump($foundItem);
+
         if (is_null($foundItem)) {
             return $item;
         }
 
         $name = $foundItem->name;
-        dump($name);
+
         if (!is_null($item->itemSuffix)) {
             $name = $name . ' *' . $item->itemSuffix->name . '*';
         }
@@ -108,7 +108,7 @@ class RandomItemDropBuilder {
         if (!is_null($item->itemPrefix)) {
             $name = '*' . $item->itemPrefix->name . '* ' . $name;
         }
-        dump($name);
+
         $item->name = $name;
         $item->save();
 

@@ -16,7 +16,7 @@ return [
             'move_time_out_mod'         => 0.0,
             'can_train'                 => true,
             'max_level'                 => 100,
-            'xp_max'                    => rand(100, 350),
+            'xp_max'                    => rand(100, 150),
             'skill_bonus_per_level'     => 0.01
          ],
          [
@@ -29,7 +29,7 @@ return [
             'move_time_out_mod'         => 0.0,
             'can_train'                 => true,
             'max_level'                 => 100,
-            'xp_max'                    => rand(100, 350),
+            'xp_max'                    => rand(100, 150),
             'skill_bonus_per_level'     => 0.01
          ],
          [
@@ -42,7 +42,7 @@ return [
             'move_time_out_mod'         => 0.0,
             'can_train'                 => true,
             'max_level'                 => 100,
-            'xp_max'                    => rand(100, 350),
+            'xp_max'                    => rand(100, 150),
             'skill_bonus_per_level'     => 0.01
          ],
          [

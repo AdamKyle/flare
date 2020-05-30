@@ -21,13 +21,15 @@ class AttackTimeOutListener
      */
     public function handle(AttackTimeOutEvent $event)
     {
+        $time = $event->character->is_dead ? 20 : 10;
+
         $event->character->update([
             'can_attack'          => false,
-            'can_attack_again_at' => now()->addSeconds(10),
+            'can_attack_again_at' => now()->addSeconds($time),
         ]);
 
-        broadcast(new ShowTimeOutEvent($event->character->user, true, false));
+        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $time));
 
-        AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
+        AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds($time));
     }
 }

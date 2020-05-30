@@ -36,16 +36,19 @@ class ShowTimeOutEvent implements ShouldBroadcast
      */
     public $canAttack;
 
+    public $forLength;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(User $user, bool $activatebar, bool $canAttack)
+    public function __construct(User $user, bool $activatebar, bool $canAttack, int $forLength = 0)
     {
         $this->user        = $user;
         $this->activatebar = $activatebar;
         $this->canAttack   = $canAttack;
+        $this->forLength   = $forLength;
     }
 
     /**

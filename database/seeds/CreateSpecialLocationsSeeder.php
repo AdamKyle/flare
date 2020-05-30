@@ -71,8 +71,8 @@ class CreateSpecialLocationsSeeder extends Seeder
                 'name'        => 'Smugglers Port',
                 'description' => 'A place where the stolen goods are smuggled in.',
                 'is_port'     => true,
-                'x'           => 824,
-                'y'           => 856,
+                'x'           => 832,
+                'y'           => 880,
             ],
             [
                 'name'        => 'Port of Kalith',
@@ -135,21 +135,21 @@ class CreateSpecialLocationsSeeder extends Seeder
                 'description' => 'Ancient civilization of the Azyx people use to use this port.',
                 'is_port'     => true,
                 'x'           => 1520,
-                'y'           => 1353,
+                'y'           => 1369,
             ],
             [
                 'name'        => 'Jungle of Xynx Port',
                 'description' => 'Leaving this port means adventurng deep into the jungle.',
                 'is_port'     => true,
                 'x'           => 528,
-                'y'           => 1504,
+                'y'           => 1520,
             ],
             [
                 'name'        => 'Edge of the world',
                 'description' => 'The edge of the world port.',
                 'is_port'     => true,
                 'x'           => 1056,
-                'y'           => 1712,
+                'y'           => 1728,
             ],
         ];
 

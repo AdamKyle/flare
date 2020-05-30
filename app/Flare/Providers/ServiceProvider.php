@@ -8,6 +8,7 @@ use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Console\Commands\CreateAdminAccount;
+use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Values\BaseSkillValue;
@@ -60,6 +61,8 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function boot()
     {
-        //
+        $router = $this->app['router'];
+
+        $router->aliasMiddleware('is.character.dead', IsCharacterDeadMiddleware::class);
     }
 }

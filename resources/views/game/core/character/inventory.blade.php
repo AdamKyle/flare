@@ -23,7 +23,30 @@
                             @if ($questItems->isEmpty())
                                 <div class="alert alert-info">You have no quest items.</div>
                             @else
-                                <?php dump($questItems); ?>
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Effect</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                    @foreach($questItems as $questItem)
+                                        <tr>
+                                            <td><a href="{{route('items.item', ['item' => $questItem->item->id])}}">{{$questItem->item->name}}</a></td>
+                                            <td>
+                                                @switch($questItem->item->effect)
+                                                    @case('walk-on-water')
+                                                        Walk On Water
+                                                        @break
+                                                    @default
+                                                        N/A
+                                                @endswitch
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                             @endif
                         </div>
                     </div>

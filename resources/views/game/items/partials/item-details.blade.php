@@ -8,6 +8,16 @@
     <dd>{{$item->base_ac}}</dd>
     <dt>Type:</dt>
     <dd>{{$item->type}}</dd>
+    <dt>Effect:</dt>
+    <dd>
+        @switch($item->effect)
+            @case('walk-on-water')
+                Walk On Water
+                @break
+            @default
+                N/A
+        @endswitch
+    </dd>
 </dl>
 <hr />
 

@@ -37,9 +37,11 @@ export default class Map extends React.Component {
       portList: [],
       secondsRemaining: 10,
       timeRemaining: null,
+      isDead: false,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
+    this.isDead = Echo.private('character-is-dead-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -62,6 +64,7 @@ export default class Map extends React.Component {
         currentPort: result.data.port_details !== null ? result.data.port_details.current_port : null,
         portList: result.data.port_details !== null ? result.data.port_details.port_list : [],
         timeRemaining: result.data.timeout !== null ? result.data.timeout : null,
+        isDead: result.data.is_dead,
       });
     });
 
@@ -71,6 +74,12 @@ export default class Map extends React.Component {
         showMessage: false,
         secondsRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
         timeRemaining: event.canMove ? null : this.state.timeRemaining,
+      });
+    });
+
+    this.isDead.listen('Game.Battle.Events.CharacterIsDeadBroadcastEvent', (event) => {
+      this.setState({
+        isDead: event.isDead
       });
     });
   }
@@ -120,9 +129,12 @@ export default class Map extends React.Component {
   }
 
   move(e) {
-
     if (!this.state.canMove) {
       return getServerMessage('cant_move');
+    }
+
+    if (this.state.isDead) {
+      return getServerMessage('dead_character');
     }
 
     const movement  = e.target.getAttribute('data-direction');
@@ -278,6 +290,7 @@ export default class Map extends React.Component {
           ? 
           <div className="clear-fix mb-2">
             <SetSail 
+              characterIsDead={this.state.isDead}
               currentPort={this.state.currentPort} 
               portList={this.state.portList} 
               characterId={this.state.characterId} 
@@ -288,10 +301,10 @@ export default class Map extends React.Component {
           : null
          }
          <div className="clear-fix">
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="north" onClick={this.move.bind(this)}>North</button>
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" onClick={this.move.bind(this)}>South</button>
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" onClick={this.move.bind(this)}>East</button>
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" onClick={this.move.bind(this)}>West</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="north" disabled={this.state.isDead} onClick={this.move.bind(this)}>North</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" disabled={this.state.isDead} onClick={this.move.bind(this)}>South</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
+           <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
            <TimeOutBar
               userId={this.props.userId}
               eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent'
@@ -301,6 +314,7 @@ export default class Map extends React.Component {
               forSeconds={this.state.secondsRemaining}
               timeRemaining={this.state.timeRemaining}
             />
+            {this.state.isDead ? <span className="text-danger revive">You must revive.</span> : null}
          </div>
         </div>
 

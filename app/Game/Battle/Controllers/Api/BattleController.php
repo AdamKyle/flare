@@ -7,6 +7,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -14,8 +15,7 @@ use App\Game\Battle\Events\UpdateCharacterEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Events\UpdateTopBarEvent;
-use App\Game\Battle\Jobs\AttackTimeOut;
+use App\Game\Battle\Events\CharacterIsDeadBroadcastEvent;
 use App\User;
 
 class BattleController extends Controller {
@@ -26,6 +26,7 @@ class BattleController extends Controller {
 
     public function __construct(Manager $manager, CharacterAttackTransformer $character) {
         $this->middleware('auth:api');
+        $this->middleware('is.character.dead')->except(['revive', 'index']);
 
         $this->manager   = $manager;
         $this->character = $character;
@@ -43,7 +44,15 @@ class BattleController extends Controller {
 
     public function battleResults(Request $request, Character $character) {
         if ($request->is_character_dead) {
+
+            $character->update(['is_dead' => true]);
+
+            $character = $character->refresh();
+
             event(new ServerMessageEvent($character->user, 'dead_character'));
+            event(new AttackTimeOutEvent($character));
+            event(new CharacterIsDeadBroadcastEvent($character->user, true));
+            event(new UpdateTopBarEvent($character));
 
             return response()->json([], 200);
         }
@@ -56,6 +65,7 @@ class BattleController extends Controller {
                     event(new UpdateCharacterEvent($character, $monster));
                     event(new DropsCheckEvent($character, $monster));
                     event(new GoldRushCheckEvent($character, $monster));
+                    event(new AttackTimeOutEvent($character));
                     break;
                 default:
                     return response()->json([
@@ -64,8 +74,21 @@ class BattleController extends Controller {
             }
         }
 
-        event(new AttackTimeOutEvent($character));
-
         return response()->json([], 200);
+    }
+
+    public function revive(Request $request, Character $character) {
+        $character->update([
+            'is_dead' => false
+        ]);
+
+        event(new CharacterIsDeadBroadcastEvent($character->user));
+        event(new UpdateTopBarEvent($character));
+
+        $character = new Item($character, $this->character);
+
+        return response()->json([
+            'character' => $this->manager->createData($character)->toArray()
+        ], 200);
     }
 }

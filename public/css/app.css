@@ -24525,8 +24525,6 @@ a.text-dark:focus {
   left: -10px;
   /* Half of the width, give or take a pixel */
   position: absolute;
-  height: 40px;
-  width: 20px;
   font-weight: 900;
   font-size: 16px;
   color: #d69c44;
@@ -24544,12 +24542,17 @@ a.text-dark:focus {
   content: "\F21A";
   font-size: 16px;
   color: #2d74de;
-  top: -17px;
-  left: -9px;
+  left: -14px;
 }
 
 .character-map-ready {
   margin-top: 5px;
+}
+
+.revive {
+  position: relative;
+  top: 5px;
+  left: 10px;
 }
 
 .xp-bar .value {

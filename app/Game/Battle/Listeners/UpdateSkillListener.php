@@ -20,8 +20,11 @@ class UpdateSkillListener
      */
     public function handle(UpdateSkillEvent $event)
     {
+        $equipmentBonus = $this->fetchSkilltrainingBonusFromEquipment($event->skill);
+        $questItemBonus = $this->fetchSkilltrainingBonusFromQuestItems($event->skill);
+
         $event->skill->update([
-            'xp' => ($event->skill->xp) + (10 * (1 + $event->skill->xp_towards)),
+            'xp' => $event->skill->xp + (10 * (1 + ($event->skill->xp_towards + $equipmentBonus + $questItemBonus))),
         ]);
 
         $skill = $event->skill->refresh();
@@ -29,19 +32,39 @@ class UpdateSkillListener
         if ($skill->xp >= $skill->xp_max) {
             if ($skill->level <= $skill->max_level) {
                 $level      = $skill->level + 1;
-                $xpTwoards  = rand(100, 350);
                 $skillBonus = $skill->skill_bonus + $skill->skill_bonus_per_level;
 
                 $skill->update([
                     'level'       => $level,
-                    'xp_twoards'  => rand(100, 350),
+                    'xp_twoards'  => rand(100, 150),
                     'skill_bonus' => $skillBonus,
                     'xp'          => 0
                 ]);
 
-                event(new ServerMessageEvent($event->skill->character->user, 'skill_level_up'));
+                event(new ServerMessageEvent($skill->character->user, 'skill_level_up'));
             }
         }
     }
 
+    protected function fetchSkilltrainingBonusFromEquipment(Skill $skill): float {
+        $totalSkillBonus = 0.0;
+
+        foreach ($skill->character->inventory->slots as $slot) {
+            if ($slot->equipped) {
+                $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
+            }
+        }
+
+        return $totalSkillBonus;
+    }
+
+    protected function fetchSkilltrainingBonusFromQuestItems(Skill $skill): float {
+        $totalSkillBonus = 0.0;
+
+        foreach ($skill->character->inventory->questItemSlots as $slot) {
+            $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
+        }
+
+        return $totalSkillBonus;
+    }
 }
