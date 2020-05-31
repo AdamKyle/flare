@@ -5635,9 +5635,9 @@ react-bootstrap@^1.0.0-beta.16:
     warning "^4.0.3"
 
 react-countdown-circle-timer@^2.1.2:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/react-countdown-circle-timer/-/react-countdown-circle-timer-2.1.3.tgz#98ca13e7c45251403349d86db364310592ea0813"
-  integrity sha512-Iuyul3M+3rRM2tf5NYHNMFmIWgs/zVND+8GMvsYHlbzR/rVsznCmXNw//HpTq6204GtkXetmg95zguyWpOhlHA==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-countdown-circle-timer/-/react-countdown-circle-timer-2.2.0.tgz#7118b42b900274d8345b6f1bd1d418be53fec475"
+  integrity sha512-vGixp+NpmiTCPPKTDdTbYpvmHHSynmZar1tndyU5ABfKWHvnsWHXuLK0y+ILXyPAh6OG+xvmP1MSf7N2QIVq2A==
   dependencies:
     use-elapsed-time "2.1.3"
 
