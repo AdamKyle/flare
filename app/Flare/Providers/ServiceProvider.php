@@ -8,6 +8,7 @@ use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Console\Commands\CreateAdminAccount;
+use App\Flare\Console\Commands\UpdateCharacterSkills;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
@@ -51,7 +52,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BaseSkillValue();
         });
 
-        $this->commands([CreateAdminAccount::class]);
+        $this->commands([CreateAdminAccount::class, UpdateCharacterSkills::class]);
     }
 
     /**

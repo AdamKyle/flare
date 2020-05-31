@@ -5,6 +5,7 @@ namespace App\Game\Battle\Listeners;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Skill;
 use App\Game\Battle\Events\UpdateSkillEvent;
+use App\Game\Messages\Events\SkillLeveledUpServerMessageEvent;
 
 class UpdateSkillListener
 {
@@ -36,12 +37,12 @@ class UpdateSkillListener
 
                 $skill->update([
                     'level'       => $level,
-                    'xp_twoards'  => rand(100, 150),
+                    'xp_twoards'  => $skill->can_train ? rand(100, 150) : rand(50, 100),
                     'skill_bonus' => $skillBonus,
                     'xp'          => 0
                 ]);
 
-                event(new ServerMessageEvent($skill->character->user, 'skill_level_up'));
+                event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
             }
         }
     }

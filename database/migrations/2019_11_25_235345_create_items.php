@@ -35,6 +35,10 @@ class CreateItems extends Migration
             $table->decimal('int_mod')->nullable();
             $table->decimal('ac_mod')->nullable();
             $table->string('effect')->nullable();
+            $table->boolean('can_craft')->nullable()->default(false);
+            $table->integer('skill_level_required')->nullable();
+            $table->integer('skill_level_trivial')->nullable();
+            $table->string('crafting_type')->nullable();
             $table->string('skill_name')->nullable();
             $table->decimal('skill_training_bonus')->nullable();
             $table->timestamps();

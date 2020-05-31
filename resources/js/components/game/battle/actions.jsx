@@ -3,6 +3,7 @@ import Monster from './monster/monster';
 import Attack from './attack/attack';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
+import { Dropdown } from 'react-bootstrap';
 
 export default class Actions extends React.Component {
 
@@ -23,12 +24,19 @@ export default class Actions extends React.Component {
       showMessage: false,
       timeRemaining: null,
       disableAttack: false,
+      showCrafting: false,
+      craftingType: null,
+      itemToCraft: null,
+      itemsToCraft: null,
+      timeRemainingCraft: null,
+      canCraft: true,
     }
 
-    this.echo         = Echo.private('show-timeout-bar-' + this.props.userId);
-    this.topBar       = Echo.private('update-top-bar-' + this.props.userId);
-    this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
-    this.isDead       = Echo.private('character-is-dead-' + this.props.userId);
+    this.echo            = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
+    this.attackUpdate    = Echo.private('update-character-attack-' + this.props.userId);
+    this.isDead          = Echo.private('character-is-dead-' + this.props.userId);
+    this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -45,6 +53,8 @@ export default class Actions extends React.Component {
         isLoading: false,
         canAttack: result.data.character.data.can_attack,
         timeRemaining: result.data.character.data.can_attack_again_at,
+        canCraft: result.data.character.data.can_craft,
+        timeReminaingCraft: result.data.character.data.can_craft_again_at,
         showMessage: result.data.character.data.show_message,
       });
     });
@@ -64,6 +74,14 @@ export default class Actions extends React.Component {
         canAttack:     event.canAttack,
         showMessage:   false,
         timeRemaining: event.forLength,
+      });
+    });
+
+    this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
+      this.setState({
+        canCraft:           event.canCraft,
+        showMessage:        false,
+        timeRemainingCraft: event.canCraft ? 0 : 10,
       });
     });
 
@@ -221,21 +239,140 @@ export default class Actions extends React.Component {
     )
   }
 
+  addCraftingAction() {
+    this.setState({
+      showCrafting: this.state.showCrafting ? false : true,
+      itemToCraft: 0,
+      craftingType: null,
+      itemsToCraft: null,
+    });
+  }
+
+  updateCraftingType(event) {
+    this.setState({
+      craftingType: event.target.value,
+    }, () => {
+      if (this.state.craftingType !== null) {
+        axios.get('/api/crafting/' + this.state.character.id, {
+          params: {
+            crafting_type: this.state.craftingType
+          }
+        }).then((result) => {
+          this.setState({
+            itemsToCraft: result.data.items
+          });
+        });
+      }
+    });
+  }
+
+  buildCraftableItemsOptions() {
+    if (this.state.itemsToCraft !== null) {
+      return this.state.itemsToCraft.map((item) => {
+        return <option key={item.id} value={item.id}>{item.name} --> Cost to craft: {item.cost}</option>
+      });
+    }
+    
+  }
+
+  setItemToCraft(event) {
+    this.setState({
+      itemToCraft: parseInt(event.target.value),
+    });
+  }
+
+  craft() {
+
+    if (!this.state.canCraft) {
+      return getServerMessage('cant_craft');
+    }
+
+    const foundItem = this.state.itemsToCraft.filter(item => item.id === this.state.itemToCraft)[0];
+
+    if (foundItem.cost > this.state.character.gold) {
+      return getServerMessage('not_enough_gold');
+    }
+    
+
+    axios.post('/api/craft/' + this.state.character.id, {
+      item_to_craft: this.state.itemToCraft,
+      type: this.state.craftingType,
+    }).then((result) => {
+      this.setState({
+        itemsToCraft: result.data.items
+      });
+    });
+  }
+
+  changeType() {
+    this.setState({
+      craftingType: null,
+      itemsToCraft: null,
+      itemToCraft: null,
+    });
+  }
+
+  renderCraftingDropDowns() {
+    if (this.state.showCrafting) {
+      if (this.state.craftingType === null) {
+        return (
+          <select className="form-control ml-2 mt-2" id="crafting-type" name="crafting-type"
+          value={0}
+          onChange={this.updateCraftingType.bind(this)}
+          disabled={this.state.character.is_dead}>
+            <option value="" key="0">Please select a crafting type</option>
+            <option value="Weapon" key="weapon">Weapon</option>
+            <option value="Armour" key="armour">Armour</option>
+            <option value="Spell" key="spell">Spell</option>
+            <option value="Ring" key="ring">Ring</option>
+            <option value="Artifact" key="artifact">Artifact</option>
+          </select>
+        );
+      }
+
+      return (
+        <select className="form-control ml-2 mt-2" id="crafting" name="crafting"
+        value={this.state.itemToCraft !== null ? this.state.itemToCraft : 0}
+        onChange={this.setItemToCraft.bind(this)}
+        disabled={this.state.character.is_dead}>
+          <option value={0} key="0">Please select something to make</option>
+          {this.buildCraftableItemsOptions()}
+        </select>
+      );
+    }
+  }
+
   renderActions() {
+
     return (
       <div className="row justify-content-center">
         <div className="col-md-12">
           <div className="form-group row">
               <div className="col-md-2">
+                <Dropdown>
+                  <Dropdown.Toggle variant="primary" id="dropdown-basic" size="sm" disabled={this.state.character.is_dead}>
+                    Additional actions
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={this.addCraftingAction.bind(this)}>{this.state.showCrafting ? 'Remove Crafting' : 'Craft'}</Dropdown.Item>
+                    {this.state.showCrafting
+                     ?
+                     <Dropdown.Item onClick={this.changeType.bind(this)}>Change Type</Dropdown.Item>
+                     : null
+                    }
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
               <div className="col-md-6">
-                  <select className="form-control" id="monsters" name="monsters"
+                  <select className="form-control ml-2" id="monsters" name="monsters"
                     value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
                     onChange={this.updateActions.bind(this)}
                     disabled={this.state.character.is_dead}>
                       <option value="" key="0">Please select a monster</option>
                       {this.monsterOptions()}
                   </select>
+                  {this.renderCraftingDropDowns()}
               </div>
 
               <div className="col-md-1">
@@ -244,19 +381,42 @@ export default class Actions extends React.Component {
                   disabled={this.state.monster !== 0 ? false : true}
                   onClick={this.fightAgain.bind(this)}
                   >Again!</button>
+                {(this.state.itemToCraft !== 0 && this.state.itemToCraft !== null && this.state.showCrafting) ? 
+                <button className="btn btn-primary mt-2"
+                type="button"
+                disabled={this.state.character.is_dead}
+                onClick={this.craft.bind(this)}
+                >Craft!</button> : null}
+                
               </div>
 
               <div className="col-md-3">
                 <div className="ml-2 mt-2">
-                <TimeOutBar
-                  userId={this.props.userId}
-                  eventName='Game.Battle.Events.ShowTimeOutEvent'
-                  channel={'show-timeout-bar-'}
-                  cssClass={'character-timeout'}
-                  readyCssClass={'character-ready'}
-                  forSeconds={this.state.timeRemaining}
-                  timeRemaining={this.state.timeRemaining}
-                />
+                  <TimeOutBar
+                    userId={this.props.userId}
+                    cssClass={'character-timeout'}
+                    readyCssClass={'character-ready'}
+                    eventName='Game.Battle.Events.ShowTimeOutEvent'
+                    channel={'show-timeout-bar-'}
+                    forSeconds={this.state.timeRemaining}
+                    timeRemaining={this.state.timeRemaining}
+                  />
+                </div>
+                <div className="ml-2 mt-2">
+                  {(this.state.itemToCraft !== 0 && this.state.itemToCraft !== null && this.state.showCrafting)
+                   ?
+                   <TimeOutBar
+                      userId={this.props.userId}
+                      eventName='Game.Core.Events.ShowCraftingTimeOutEvent'
+                      channel={'show-crafting-timeout-bar-'}
+                      cssClass={'character-timeout mt-1'}
+                      readyCssClass={'character-ready mt-4'}
+                      forSeconds={10}
+                      timeRemaining={this.state.timeRemainingCraft}
+                    />
+                  : null
+                  }
+                  
                 </div>
               </div>
           </div>

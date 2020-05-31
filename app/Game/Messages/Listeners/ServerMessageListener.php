@@ -26,7 +26,7 @@ class ServerMessageListener
     {
         switch($event->type) {
             case 'level_up':
-                $message = 'You are now level: ' . $event->user->character->level;
+                $message = 'You are now level: ' . $event->user->character->level . '!';
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gold_rush':
@@ -34,7 +34,15 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gained_item':
-                $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse';
+                $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse!';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'crafted':
+                $message = 'You crafted a: ' . $event->forMessage . '!';
+
+                return broadcast(new ServerMessage($event->user, $message));
+            case 'failed_to_craft':
+                $message = 'You failed to craft the item! You lost the investment. Youll still gain experience towards crafting.';
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'skill_level_up':
@@ -42,7 +50,7 @@ class ServerMessageListener
                     return $skill->currently_training;
                 })->first();
 
-                $message = $skill->name . ' Now level: ' . $skill->level;
+                $message = $skill->name . ' now level: ' . $skill->level . '!';
 
                 return broadcast(new ServerMessage($event->user, $message));
             default:
