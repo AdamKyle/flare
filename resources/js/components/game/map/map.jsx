@@ -306,12 +306,10 @@ export default class Map extends React.Component {
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
            <TimeOutBar
-              userId={this.props.userId}
-              eventName='Game.Maps.Adventure.Events.ShowTimeOutEvent'
-              channel={'show-timeout-move-'}
+              eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
+              channel={'show-timeout-move-' + this.props.userId}
               cssClass={'character-map-timeout'}
               readyCssClass={'character-map-ready float-left'}
-              forSeconds={this.state.secondsRemaining}
               timeRemaining={this.state.timeRemaining}
             />
             {this.state.isDead ? <span className="text-danger revive">You must revive.</span> : null}

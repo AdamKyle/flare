@@ -1,0 +1,203 @@
+import React from 'react';
+import TimeOutBar from '../timeout/timeout-bar';
+
+export default class CraftingAction extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      canCraft: true,
+      isDead: this.props.isDead,
+      itemToCraft: 0,
+      itemsToCraft: [],
+      craftingType: null,
+      showCrafting: true,
+      chracterId: this.props.characterId,
+      timeRemaining: this.props.timeRemaining,
+      gold: 0,
+    }
+
+    this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
+  }
+
+  componentDidMount() {
+    this.setState({
+      showCrafting: this.props.showCrafting,
+      characterId: this.props.characterId,
+      isDead: this.props.isDead,
+      gold: this.props.characterGold,
+    });
+
+    this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
+      this.setState({
+        canCraft:      event.canCraft,
+        timeRemaining: event.canCraft ? 0 : 10,
+      });
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.showCrafting !== prevProps.showCrafting) {
+      this.setState({
+        showCrafting: this.props.showCrafting,
+      });
+    }
+
+    if (this.props.isDead !== prevProps.isDead) {
+      this.setState({
+        isDead: this.props.isDead,
+      });
+    }
+
+    if (this.props.shouldChangeCraftingType) {
+      this.setState({
+        craftingType: null,
+        itemsToCraft: [],
+        itemToCraft: 0,
+      }, () => {
+        this.props.changeCraftingType(false);
+      });
+    }
+
+    if (this.props.characterGold !== prevProps.characterGold) {
+      this.setState({
+        gold: this.props.characterGold,
+      });
+    }
+  }
+
+  updateCraftingType(event) {
+    this.setState({
+      craftingType: event.target.value,
+    }, () => {
+      if (this.state.craftingType !== null) {
+        axios.get('/api/crafting/' + this.state.characterId, {
+          params: {
+            crafting_type: this.state.craftingType
+          }
+        }).then((result) => {
+          this.setState({
+            itemsToCraft: result.data.items
+          });
+        });
+      }
+    });
+  }
+
+  buildCraftableItemsOptions() {
+    if (this.state.itemsToCraft !== null) {
+      return this.state.itemsToCraft.map((item) => {
+        return <option key={item.id} value={item.id}>{item.name} --> Cost to craft: {item.cost}</option>
+      });
+    }
+  }
+
+  setItemToCraft(event) {
+    this.setState({
+      itemToCraft: parseInt(event.target.value),
+    });
+  }
+
+  craft() {
+    if (!this.state.canCraft) {
+      return getServerMessage('cant_craft');
+    }
+
+    const foundItem = this.state.itemsToCraft.filter(item => item.id === this.state.itemToCraft)[0];
+
+    if (foundItem.cost > this.state.gold) {
+      return getServerMessage('not_enough_gold');
+    }
+    
+
+    axios.post('/api/craft/' + this.state.characterId, {
+      item_to_craft: this.state.itemToCraft,
+      type: this.state.craftingType,
+    }).then((result) => {
+      this.setState({
+        itemsToCraft: result.data.items
+      });
+    });
+  }
+
+  renderCraftingDropDowns() {
+    if (this.state.showCrafting) {
+      if (this.state.craftingType === null) {
+        return (
+          <select className="form-control ml-3 mt-2" id="crafting-type" name="crafting-type"
+            value={0}
+            onChange={this.updateCraftingType.bind(this)}
+            disabled={this.state.isDead}>
+            <option value="" key="0">Please select a crafting type</option>
+            <option value="Weapon" key="weapon">Weapon</option>
+            <option value="Armour" key="armour">Armour</option>
+            <option value="Spell" key="spell">Spell</option>
+            <option value="Ring" key="ring">Ring</option>
+            <option value="Artifact" key="artifact">Artifact</option>
+          </select>
+        );
+      }
+
+      return (
+        <select className="form-control ml-3 mt-2" id="crafting" name="crafting"
+          value={this.state.itemToCraft !== null ? this.state.itemToCraft : 0}
+          onChange={this.setItemToCraft.bind(this)}
+          disabled={this.state.isDead}>
+          <option value={0} key="0">Please select something to make</option>
+          {this.buildCraftableItemsOptions()}
+        </select>
+      );
+    }
+  }
+
+  renderCraftingButton() {
+
+    if (this.state.itemToCraft !== 0 && this.state.showCrafting) {
+      return (
+        <button className="btn btn-primary mt-2"
+          type="button"
+          disabled={this.state.isDead}
+          onClick={this.craft.bind(this)}
+        >
+          Craft!
+        </button>
+      );
+    }
+
+    return null;
+
+  }
+
+  render() {
+    if (!this.state.showCrafting) {
+      return null;
+    }
+
+    return (
+      <div className="form-group row">
+        <div className="col-md-8">
+          {this.renderCraftingDropDowns()}
+          
+        </div>
+        <div className="col-md-1">
+          {this.renderCraftingButton()}
+        </div>
+        <div className="col-md-3">
+          <div className="ml-4 mt-2">
+            {this.state.itemToCraft !== 0 ?
+              <TimeOutBar 
+                cssClass={'character-timeout'}
+                readyCssClass={'character-ready'}
+                timeRemaining={this.state.timeRemaining}
+                channel={'show-crafting-timeout-bar-' + this.props.userId}
+                eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
+              />
+              : null
+            }
+          </div>
+        </div>
+      </div>
+    )
+  }
+} 
