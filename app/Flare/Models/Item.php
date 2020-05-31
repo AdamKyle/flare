@@ -40,6 +40,10 @@ class Item extends Model
         'skill_level_trivial',
         'skill_name',
         'skill_training_bonus',
+        'can_craft',
+        'skill_level_required',
+        'skill_level_trivial',
+        'crafting_type',
     ];
 
     /**
@@ -62,6 +66,9 @@ class Item extends Model
         'int_mod'              => 'float',
         'ac_mod'               => 'float',
         'skill_training_bonus' => 'float',
+        'can_craft'            => 'boolean',
+        'skill_level_required' => 'integer',
+        'skill_level_trivial'  => 'integer',
         'can_craft'            => 'boolean',
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',

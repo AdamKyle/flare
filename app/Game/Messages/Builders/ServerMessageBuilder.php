@@ -34,6 +34,10 @@ class ServerMessageBuilder {
                 return 'You cannot go that way.';
             case 'cannot_walk_on_water':
                 return 'You cannot walk on water without a Flask of Fresh Air.';
+            case 'not_enough_gold':
+                return 'You dont have enough gold for that.';
+            case 'cant_craft':
+                return 'You must wait for the timer (beside Craft) to state: Ready!';
             default:
                 return '';
         }
