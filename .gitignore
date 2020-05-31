@@ -7,6 +7,8 @@
 /public/fonts
 /public/images
 /storage/*.key
+/public/css/app.css
+/public/css/default.css
 /vendor
 /test-coverage
 .env
