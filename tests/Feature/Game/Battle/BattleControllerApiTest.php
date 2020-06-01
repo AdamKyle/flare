@@ -6,13 +6,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;
 use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Battle\Events\DropsCheckEvent;
 use App\Game\Battle\Events\ShowTimeOutEvent;
 use App\Game\Battle\Events\UpdateTopBarBroadcastEvent;
+use App\Game\Messages\Events\SkillLeveledUpServerMessageEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -492,6 +495,117 @@ class BattleControllerApiTest extends TestCase
                          ->response;
 
         $this->assertEquals(401, $response->status());
+    }
+
+    public function testWhenCharacterIsDeadReturnFourOhOne() {
+        Queue::fake();
+        Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
+
+        $this->setUpCharacter();
+        
+        $this->character->update([
+            'is_dead' => true
+        ]);
+
+        $response = $this->json('POST', '/api/battle-revive/' . $this->user->character->id)
+                         ->response;
+        
+        $this->assertEquals(401, $response->status());
+    }
+
+    public function testCharacterCannotFightWhenDead() {
+        Queue::fake();
+        Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
+
+        $this->setUpCharacter();
+        
+        $this->character->update([
+            'is_dead' => true
+        ]);
+
+        $this->monster->max_level = 5;
+        $this->monster->save();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'apple-sauce',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+        
+        $this->assertEquals("You are dead and must revive before trying to do that. Dead people can't do things.", json_decode($response->content())->error);
+        $this->assertEquals(422, $response->status());
+    }
+
+    public function testWhenCharacterIsDead() {
+        Queue::fake();
+        Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
+
+        $this->setUpCharacter();
+        
+        $this->character->update([
+            'is_dead' => true
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-revive/' . $this->character->id)
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        $this->assertFalse($this->character->is_dead); 
+    }
+
+    public function testSkillLevelUpFromFight() {
+        Queue::fake();
+        Event::fake([SkillLeveledUpServerMessageEvent::class]);
+
+        $this->setUpCharacter();
+
+        $this->character->skills()->where('name', 'Looting')->first()->update([
+            'currently_training' => true,
+            'xp'                 => 99,
+            'xp_max'             => 100,
+        ]);
+
+        $this->character->inventory->questItemSlots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $this->createItem([
+                'name' => 'Sample',
+                'skill_name' => 'Looting',
+                'skill_training_bonus' => 1.0,
+                'type' => 'quest'
+            ])->id,
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $this->createItem([
+                'name' => 'Sample Item',
+                'skill_name' => 'Looting',
+                'skill_training_bonus' => 1.0,
+                'type' => 'weapon'
+            ])->id,
+            'equipped' => true,
+            'position' => 'body',
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        $this->assertEquals(2, $this->character->skills->where('name', 'Looting')->first()->level);
     }
 
     protected function setUpCharacter(array $options = []): void {
