@@ -71,30 +71,6 @@ export default class Chat extends React.Component {
         messages: messages
       });
     });
-    //
-    // this.globalMessages.listen('GlobalMessage', (event) => {
-    //   const messages = cloneDeep(this.state.messages);
-    //   const message = event.message;
-    //   message['type'] = 'global-message';
-    //
-    //   messages.unshift(message);
-    //
-    //   this.setState({
-    //     messages: messages
-    //   });
-    // });
-    //
-    // this.dropMessage.listen('DropMessages', (event) => {
-    //   const messages = cloneDeep(this.state.messages);
-    //   const message = event.message;
-    //   message['type'] = 'drop-message';
-    //
-    //   messages.unshift(message);
-    //
-    //   this.setState({
-    //     messages: messages
-    //   });
-    // });
   }
 
   componentWillUnMount() {

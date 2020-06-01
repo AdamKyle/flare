@@ -15,6 +15,7 @@ export default class ActionsSection extends React.Component {
 			isLoading: true,
 			character: null,
 			monsters: null,
+			canCraft: true,
 		};
 	}
 
@@ -40,13 +41,19 @@ export default class ActionsSection extends React.Component {
 
 	changeCraftingType(change) {
 		this.setState({
-			changeCraftingType: change
+			changeCraftingType: change,
 		});
 	}
 
 	updateShowCrafting(show) {
 		this.setState({
-			showCrafting: show
+			showCrafting: show,
+		});
+	}
+
+	updateCanCraft(can) {
+		this.setState({
+			canCraft: can,
 		});
 	}
 
@@ -65,16 +72,18 @@ export default class ActionsSection extends React.Component {
 								isDead={this.state.isDead} 
 								changeCraftingType={this.changeCraftingType.bind(this)}
 								updateShowCrafting={this.updateShowCrafting.bind(this)}
+								canCraft={this.state.canCraft}
 							/>
 						</div>
 						<BattleAction
 							userId={this.props.userId}
 							character={this.state.character}
 							monsters={this.state.monsters}
-              showCrafting={this.state.showCrafting}
-              shouldChangeCraftingType={this.state.changeCraftingType}
-              isCharacterDead={this.characterIsDead.bind(this)}
-              changeCraftingType={this.changeCraftingType.bind(this)}
+							showCrafting={this.state.showCrafting}
+							shouldChangeCraftingType={this.state.changeCraftingType}
+							isCharacterDead={this.characterIsDead.bind(this)}
+							changeCraftingType={this.changeCraftingType.bind(this)}
+							updateCanCraft={this.updateCanCraft.bind(this)}
 						/>
 					</div>
 				</div>

@@ -208,24 +208,6 @@
                                         <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                                     </li>
                                 @endif
-                            @else
-                                <li class="nav-item dropdown">
-                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                        {{ Auth::user()->name }} <span class="caret"></span>
-                                    </a>
-
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="{{ route('logout') }}"
-                                           onclick="event.preventDefault();
-                                                         document.getElementById('logout-form').submit();">
-                                            {{ __('Logout') }}
-                                        </a>
-
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
-                                    </div>
-                                </li>
                             @endguest
                         </ul>
                     </div>
@@ -253,7 +235,7 @@
                         <!-- item-->
                         <a href="" class="link" data-toggle="tooltip" title="Settings"><i class="ti-settings"></i></a>
                         <!-- item-->
-                        <a href="" class="link" data-toggle="tooltip" title="Bug Report"><i class="mdi mdi-gmail"></i></a>
+                        <a href="" class="link" data-toggle="tooltip" title="Bug Report"><i class="ra ra-beetle"></i></a>
                         <!-- item-->
                         <a class="link" href="{{ route('logout') }}"
                            data-toggle="tooltip"
@@ -277,7 +259,7 @@
                     @yield('content')
                 </div>
 
-                <footer class="footer" style="left: 0;"> © 2019 Monster Admin by wrappixel.com </footer>
+                <footer class="footer" style="left: 0;"> © 2020 Flare </footer>
             @else
                 <div class="page-wrapper">
                     <div class="container-fluid">
@@ -286,7 +268,7 @@
                     </div>
                 </div>
 
-                <footer class="footer"> © 2019 Monster Admin by wrappixel.com </footer>
+                <footer class="footer"> © 2020 Flare </footer>
             @endif
         </div>
     </div>

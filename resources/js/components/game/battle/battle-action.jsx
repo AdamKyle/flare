@@ -252,6 +252,7 @@ export default class BattleAction extends React.Component {
           userId={this.props.userId}
           characterGold={this.state.character.gold}
           timeRemaining={this.props.character.can_craft_again_at}
+          updateCanCraft={this.props.updateCanCraft}
         />
         <hr />
         <div className="battle-section text-center">

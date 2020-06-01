@@ -9,6 +9,9 @@
 
 @import '../vendor/monster/theme/css/style.css';
 
+// RPG Icons
+@import 'node_modules/rpg-awesome/scss/rpg-awesome';
+
 // Game
 @import 'game/chat';
 @import 'game/actions';

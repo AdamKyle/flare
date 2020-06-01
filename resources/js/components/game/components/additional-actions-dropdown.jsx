@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
+import { getServerMessage } from '../helpers/server_message';
 
 export default class AdditionalActionsDropDown extends React.Component {
 
@@ -12,6 +13,10 @@ export default class AdditionalActionsDropDown extends React.Component {
     }
 
     addCraftingAction() {
+      if (!this.props.canCraft) {
+        return getServerMessage('cant_craft');
+      }
+
       this.setState({
         showCrafting: this.state.showCrafting ? false : true,
       }, () => {
@@ -20,6 +25,10 @@ export default class AdditionalActionsDropDown extends React.Component {
     }
 
     changeType() {
+      if (!this.props.canCraft) {
+        return getServerMessage('cant_craft');
+      }
+
       this.props.changeCraftingType(true);
     }
 

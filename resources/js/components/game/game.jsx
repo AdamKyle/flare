@@ -16,8 +16,7 @@ class Game extends React.Component {
 
   render() {
     return (
-      <div>
-        <hr />
+      <>
         <div className="row mb-4">
           <div className="col-md-12">
             <div className="row">
@@ -36,8 +35,7 @@ class Game extends React.Component {
             <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
           </div>
         </div>
-        <hr />
-      </div>
+      </>
     )
   }
 }

@@ -53,6 +53,6 @@ class LoginTest extends TestCase
              ->submitForm('Login', [
                 'email'    => $user->email,
                 'password' => 'password',
-             ])->see('Hello! ' . $character->name);
+             ])->see('Manage Kingdoms');
     }
 }

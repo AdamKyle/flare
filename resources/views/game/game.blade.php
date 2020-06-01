@@ -4,7 +4,6 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            Hello! {{$user->character->name}}
             <div id="game"></div>
         </div>
     </div>

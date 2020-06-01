@@ -1,5 +1,6 @@
 import React from 'react';
 import TimeOutBar from '../timeout/timeout-bar';
+import { getServerMessage } from '../helpers/server_message';
 
 export default class CraftingAction extends React.Component {
 
@@ -33,6 +34,8 @@ export default class CraftingAction extends React.Component {
       this.setState({
         canCraft:      event.canCraft,
         timeRemaining: event.canCraft ? 0 : 10,
+      }, () => {
+        this.props.updateCanCraft(event.canCraft);
       });
     });
   }
@@ -78,7 +81,8 @@ export default class CraftingAction extends React.Component {
           }
         }).then((result) => {
           this.setState({
-            itemsToCraft: result.data.items
+            itemsToCraft: result.data.items,
+            itemToCraft: result.data.items[0].id,
           });
         });
       }
@@ -141,10 +145,9 @@ export default class CraftingAction extends React.Component {
 
       return (
         <select className="form-control ml-3 mt-2" id="crafting" name="crafting"
-          value={this.state.itemToCraft !== null ? this.state.itemToCraft : 0}
+          value={this.state.itemToCraft !== null ? this.state.itemToCraft : 1}
           onChange={this.setItemToCraft.bind(this)}
-          disabled={this.state.isDead}>
-          <option value={0} key="0">Please select something to make</option>
+          disabled={this.state.isDead || !this.state.canCraft}>
           {this.buildCraftableItemsOptions()}
         </select>
       );
@@ -152,7 +155,6 @@ export default class CraftingAction extends React.Component {
   }
 
   renderCraftingButton() {
-
     if (this.state.itemToCraft !== 0 && this.state.showCrafting) {
       return (
         <button className="btn btn-primary mt-2"
@@ -184,7 +186,7 @@ export default class CraftingAction extends React.Component {
           {this.renderCraftingButton()}
         </div>
         <div className="col-md-3">
-          <div className="ml-4 mt-2">
+          <div className="ml-4 mt-3">
             {this.state.itemToCraft !== 0 ?
               <TimeOutBar 
                 cssClass={'character-timeout'}
