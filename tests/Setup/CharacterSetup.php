@@ -106,7 +106,7 @@ class CharacterSetup {
         return $this;
     }
 
-    public function setSkill(string $name, array $options): CharacterSetup {
+    public function setSkill(string $name, array $options = []): CharacterSetup {
         $this->createSkill([
             'character_id' => $this->character->id,
             'name' => $name,

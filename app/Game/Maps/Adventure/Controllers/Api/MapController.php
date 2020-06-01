@@ -119,6 +119,7 @@ class MapController extends Controller {
         })->isNotEmpty();
         
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
+        
         $this->imageResource = imagecreatefromstring($contents);
 
         $waterRgb = 112219255;

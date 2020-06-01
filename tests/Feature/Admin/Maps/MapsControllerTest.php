@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 use App\Admin\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use tests\Traits\CreateRole;
+use Tests\Traits\CreateRole;
 use Tests\Setup\CharacterSetup;
 
 class MapsControllerTest extends TestCase

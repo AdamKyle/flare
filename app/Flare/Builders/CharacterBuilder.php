@@ -106,6 +106,8 @@ class CharacterBuilder {
     }
 
     public function isWater(Character $character, int $x, int $y): bool {
+        ini_set('memory_limit','12m');
+
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
         $this->imageResource = imagecreatefromstring($contents);
 

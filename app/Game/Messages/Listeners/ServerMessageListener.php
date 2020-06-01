@@ -45,14 +45,6 @@ class ServerMessageListener
                 $message = 'You failed to craft the item! You lost the investment. Youll still gain experience towards crafting.';
 
                 return broadcast(new ServerMessage($event->user, $message));
-            case 'skill_level_up':
-                $skill = $event->user->character->skills->filter(function($skill) {
-                    return $skill->currently_training;
-                })->first();
-
-                $message = $skill->name . ' now level: ' . $skill->level . '!';
-
-                return broadcast(new ServerMessage($event->user, $message));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

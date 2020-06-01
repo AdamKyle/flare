@@ -5,6 +5,7 @@ namespace App\Game\Core\Providers;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
+use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\EquipItemService;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -26,6 +27,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemComparison::class, function($app) {
             return new ItemComparison();
+        });
+
+        $this->app->bind(CraftingSkillService::class, function($app) {
+            return new CraftingSkillService();
         });
     }
 

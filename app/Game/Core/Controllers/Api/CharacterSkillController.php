@@ -9,6 +9,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Battle\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Services\CraftingSkillService;
 use Illuminate\Http\Request;
 
 class CharacterSkillController extends Controller {
@@ -16,6 +17,7 @@ class CharacterSkillController extends Controller {
 
     public function __construct() {
         $this->middleware('auth:api');
+        $this->middleware('is.character.dead');
     }
 
     public function fetchItemsToCraft(Request $request, Character $character) {
@@ -30,7 +32,7 @@ class CharacterSkillController extends Controller {
         ], 200);
     }
 
-    public function trainCrafting(Request $request, Character $character) {
+    public function trainCrafting(CraftingSkillService $craftingSkill, Request $request, Character $character) {
         $item = Item::find($request->item_to_craft);
 
         if (is_null($item)) {
@@ -45,9 +47,8 @@ class CharacterSkillController extends Controller {
             return response()->json([], 200);
         }
 
-        $currentSkill = $character->skills->filter(function($skill) use($request) {
-            return $skill->name === $request->type . ' Crafting';
-        })->first();
+        $craftingSkill = $craftingSkill->setCharacter($character);
+        $currentSkill  = $craftingSkill->getCurrentSkill($request->type);
 
         if (is_null($currentSkill)) {
             return response()->json([
@@ -55,32 +56,33 @@ class CharacterSkillController extends Controller {
             ], 422);
         }
 
-        $dcCheck = rand(0, $currentSkill->max_level);
-        $dcCheck = $dcCheck !== 0 ? $dcCheck - $currentSkill->level : $dcCheck / 2;
-
-        $characterRoll = rand(0, $currentSkill->max_level) * (1 + ($currentSkill->skill_bonus));
-        
         $character->update([
             'gold' => $character->gold - $item->cost,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        if ($characterRoll > $dcCheck) {
-            $this->attemptToPickUpItem($character->refresh(), $item);
+        if ($currentSkill->level < $item->skill_level_required) {
+            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
         } else {
-            event(new ServerMessageEvent($character->user, 'failed_to_craft'));
+            $dcCheck       = $craftingSkill->fetchDCCheck($currentSkill);
+            $characterRoll = $craftingSkill->fetchCharacterRoll($currentSkill);
+
+            if ($characterRoll > $dcCheck) {
+                $this->attemptToPickUpItem($character->refresh(), $item);
+                event(new UpdateSkillEvent($currentSkill));
+            } else {
+                event(new ServerMessageEvent($character->user, 'failed_to_craft'));
+            }
         }
 
-        event(new UpdateSkillEvent($currentSkill));
-
-        $items      = item::where('can_craft', true)
-                            ->where('crafting_type', strtolower($request->type))
-                            ->where('skill_level_required', '<=', $currentSkill->refresh()->level)
-                            ->get();
+        $items = Item::where('can_craft', true)
+                    ->where('crafting_type', strtolower($request->type))
+                    ->where('skill_level_required', '<=', $currentSkill->refresh()->level)
+                    ->get();
 
         event(new CraftedItemTimeOutEvent($character->refresh()));
-
+        
         return response()->json([
             'items' => $items,
         ], 200);

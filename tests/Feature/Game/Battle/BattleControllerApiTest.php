@@ -561,7 +561,6 @@ class BattleControllerApiTest extends TestCase
 
     public function testSkillLevelUpFromFight() {
         Queue::fake();
-        Event::fake([SkillLeveledUpServerMessageEvent::class]);
 
         $this->setUpCharacter();
 
