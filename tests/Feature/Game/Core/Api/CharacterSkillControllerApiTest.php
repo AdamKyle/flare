@@ -46,6 +46,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'can_craft' => true,
                     'skill_level_required' => 1,
                     'crafting_type' => 'weapon',
+                    'skill_level_trivial' => 10,
                 ])->id,
                 'type' => 'Weapon',
             ])
@@ -85,6 +86,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'can_craft' => true,
                     'skill_level_required' => 1,
                     'crafting_type' => 'weapon',
+                    'skill_level_trivial' => 10,
                 ])->id,
                 'type' => 'Apples',
             ])
@@ -115,6 +117,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'can_craft' => true,
                     'skill_level_required' => 100,
                     'crafting_type' => 'weapon',
+                    'skill_level_trivial' => 10,
                 ])->id,
                 'type' => 'Weapon',
             ])
@@ -136,6 +139,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'skill_level_required' => 1,
             'skill_level_trivial' => 1,
             'crafting_type' => 'weapon',
+            'skill_level_trivial' => 0,
         ]);
 
         $this->assertEquals(0, $this->character->skills->where('name', 'Weapon Crafting')->first()->xp);
@@ -147,8 +151,9 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'type' => 'weapon',
                     'cost' => 1,
                     'can_craft' => true,
-                    'skill_level_required' => 100,
+                    'skill_level_required' => 1,
                     'crafting_type' => 'weapon',
+                    'skill_level_trivial' => 0,
                 ])->id,
                 'type' => 'Weapon',
             ])
@@ -160,7 +165,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue($content->items[0]->name === 'sample 2');
-        $this->assertEquals(1, count($content->items));
+        $this->assertEquals(2, count($content->items));
     }
 
     public function testCannotCraftItemCostsTooMuch() {
@@ -175,6 +180,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'can_craft' => true,
                     'skill_level_required' => 100,
                     'crafting_type' => 'weapon',
+                    'skill_level_trivial' => 10,
                 ])->id,
                 'type' => 'Weapon',
             ])
@@ -214,6 +220,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'can_craft' => true,
                     'skill_level_required' => 1,
                     'crafting_type' => 'weapon',
+                    'skill_level_trivial' => 10,
                 ])->id,
                 'type' => 'Weapon',
             ])
@@ -284,6 +291,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'can_craft' => true,
             'skill_level_required' => 1,
             'crafting_type' => 'weapon',
+            'skill_level_trivial' => 10,
         ])->id;
 
         $response = $this->actingAs($this->character->user, 'api')
@@ -323,7 +331,9 @@ class CharacterSkillControllerApiTest extends TestCase {
             'cost' => 1,
             'can_craft' => true,
             'skill_level_required' => 1,
+            'skill_level_trivial' => 10,
             'crafting_type' => 'weapon',
+            'skill_level_trivial' => 10,
         ])->id;
 
         $response = $this->actingAs($this->character->user, 'api')
@@ -352,6 +362,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'can_craft' => true,
             'skill_level_required' => 1,
             'crafting_type' => 'weapon',
+            'skill_level_trivial' => 10,
         ])->id;
 
         $response = $this->actingAs($this->character->user, 'api')
@@ -375,6 +386,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'can_craft' => true,
             'skill_level_required' => 1,
             'crafting_type' => 'weapon',
+            'skill_level_trivial' => 10,
         ]);
 
         $response = $this->actingAs($this->character->user, 'api')

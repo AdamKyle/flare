@@ -81,8 +81,8 @@ class ItemComparison {
     public function getAcIncrease(Item $toCompare, Item $equipped): int {
         $totalDefenceForEquipped = $equipped->getTotalDefence();
         $totalDefenceForCompare  = $toCompare->getTotalDefence();
-        
-        if ($totalDefenceForEquipped === 0) {
+
+        if ($totalDefenceForEquipped === 0.0) {
             return 0;
         }
 
