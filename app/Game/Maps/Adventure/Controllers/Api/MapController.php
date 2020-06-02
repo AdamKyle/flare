@@ -103,7 +103,7 @@ class MapController extends Controller {
 
         $this->portService->setSail($character, $location);
         
-        event(new MoveTimeOutEvent($character, $request->time_out_value));
+        event(new MoveTimeOutEvent($character, $request->time_out_value, true));
         event(new UpdateTopBarEvent($character));
 
         return response()->json([

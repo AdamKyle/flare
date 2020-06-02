@@ -68,6 +68,10 @@ class RandomItemDropBuilder {
     protected function hasSameAffix(Item $duplicateItem, ItemAffix $affix): bool {
         $foundAffix = $duplicateItem->{'item'.ucFirst($affix->type)};
 
+        if (is_null($foundAffix)) {
+            return false;
+        }
+
         return $foundAffix->name === $affix->name;
     }
 

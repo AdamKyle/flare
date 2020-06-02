@@ -49,7 +49,16 @@ export default class TimeOutBar extends React.Component {
 
       if (event.hasOwnProperty('forLength')) {
         if (event.forLength !== 0) {
-          forLength = event.forLength;
+
+          if (event.hasOwnProperty('setSail')) {
+            if (event.setSail) {
+              forLength = event.forLength * 60;
+            } else {
+              forLength = event.forLength;
+            }
+          } else {
+            forLength = event.forLength;
+          }
         }
       }
       

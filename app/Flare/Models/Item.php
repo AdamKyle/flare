@@ -86,7 +86,7 @@ class Item extends Model
         return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
     }
 
-    public function scopeGetTotalDamage(): int {
+    public function scopeGetTotalDamage(): float {
         $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
         $damage     = $baseDamage;
 
@@ -98,10 +98,10 @@ class Item extends Model
             $damage += ($baseDamage * $this->itemSuffix->base_damage_mod);
         }
 
-        return round($damage);
+        return $damage;
     }
 
-    public function scopeGetTotalDefence(): int {
+    public function scopeGetTotalDefence(): float {
         $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
         $ac     = $baseAc;
 
@@ -113,10 +113,10 @@ class Item extends Model
             $ac += ($baseAc * $this->itemSuffix->base_ac_mod);
         }
 
-        return round($ac);
+        return $ac;
     }
 
-    public function scopeGetTotalHealing(): int {
+    public function scopeGetTotalHealing(): float {
         $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
         $healFor     = $baseHealing;
 
@@ -128,7 +128,7 @@ class Item extends Model
             $healFor += ($baseHealing * $this->itemSuffix->base_heal_mod);
         }
 
-        return round($healFor);
+        return $healFor;
     }
 
     public function scopeGetTotalPercentageForStat($qeury, string $stat): float {

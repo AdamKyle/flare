@@ -82,6 +82,8 @@ export default class Chat extends React.Component {
 
     this.setState({
       message: '/m ' + name + ': '
+    }, () => {
+      this.chatInput.focus();
     });
   }
 
@@ -215,6 +217,7 @@ export default class Chat extends React.Component {
                   value={this.state.message}
                   onChange={this.handleOnChange.bind(this)}
                   onKeyPress={this.handleKeyPress.bind(this)}
+                  ref={(input) => { this.chatInput = input; }} 
                 />
               </div>
 

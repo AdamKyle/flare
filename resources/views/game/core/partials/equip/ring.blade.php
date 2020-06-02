@@ -6,13 +6,13 @@
     <div class="col-sm-10">
     <div class="form-check">
         <label class="form-check-label">
-            <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring_one">
+            <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring-one">
             Left Finger
         </label>
     </div>
     <div class="form-check">
         <label class="form-check-label">
-            <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring_two">
+            <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring-two">
             Right Finger
         </label>
     </div>

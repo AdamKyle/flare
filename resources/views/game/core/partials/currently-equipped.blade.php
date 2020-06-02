@@ -5,7 +5,7 @@
     <dt>Damage:</dt>
     <dd>{{$details['slot']->item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Position:</dt>
-    <dd>{{$details['slot']->position}}</dd>
+    <dd>{{title_case(str_replace('-', ' ', $details['slot']->position))}}</dd>
 </dl>
 <hr />
 

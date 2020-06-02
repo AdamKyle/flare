@@ -25,6 +25,6 @@ class MoveTimeOutListener
             MoveTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
         }
         
-        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $event->timeOut));
+        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $event->timeOut, $event->setSail));
     }
 }

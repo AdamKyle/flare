@@ -35,7 +35,6 @@ export default class Map extends React.Component {
       location: null,
       currentPort: null,
       portList: [],
-      secondsRemaining: 10,
       timeRemaining: null,
       isDead: false,
     }
@@ -70,10 +69,9 @@ export default class Map extends React.Component {
 
     this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
       this.setState({
-        // canMove: event.canMove,
-        // showMessage: false,
-        secondsRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
-        timeRemaining: event.canMove ? null : this.state.timeRemaining,
+        canMove: event.canMove,
+        showMessage: false,
+        timeRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
       });
     });
 

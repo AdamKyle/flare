@@ -8,7 +8,7 @@
     <dt>Base Damage:</dt>
     <dd>{{$details['replaces_item']->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Position:</dt>
-    <dd>{{$details['slot']->position}}</dd>
+    <dd>{{title_case(str_replace('-', ' ', $details['slot']->position))}}</dd>
 </dl>
 <hr />
 

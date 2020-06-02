@@ -14,9 +14,12 @@ class MoveTimeOutEvent
 
     public $timeout;
 
-    public function __construct(Character $character, int $timeOut = 0)
+    public $setSail;
+
+    public function __construct(Character $character, int $timeOut = 0, bool $setSail = false)
     {
         $this->timeOut   = $timeOut;
         $this->character = $character;
+        $this->setSail   = $setSail;
     }
 }

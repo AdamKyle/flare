@@ -43,6 +43,8 @@ export default class BattleAction extends React.Component {
       canAttack: this.props.character.can_attack,
       timeRemaining: this.props.character.can_attack_again_at,
       showMessage: this.props.character.show_message,
+    }, () => {
+      this.props.isCharacterDead(this.props.character.is_dead);
     });
 
     this.isDead.listen('Game.Battle.Events.CharacterIsDeadBroadcastEvent', (event) => {
@@ -50,7 +52,7 @@ export default class BattleAction extends React.Component {
 
       character.is_dead = event.isDead;
 
-      this.props.characterIsDead(event.isDead);
+      this.props.isCharacterDead(event.isDead);
 
       this.setState({
         character: character,
@@ -86,6 +88,17 @@ export default class BattleAction extends React.Component {
         showMessage: false,
       });
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.isDead !== prevProps.isDead) {
+      let character = _.cloneDeep(this.state.character);
+      character.is_dead = this.props.isDead;
+
+      this.setState({
+        character: character
+      });
+    }
   }
 
   updateActions(event) {
@@ -161,6 +174,8 @@ export default class BattleAction extends React.Component {
         character: result.data.character.data,
         characterMaxHealth: result.data.character.data.health,
         characterCurrentHealth: result.data.character.data.health,
+      }, () => {
+        this.props.isCharacterDead(result.data.character.data.is_dead);
       });
     });
   }

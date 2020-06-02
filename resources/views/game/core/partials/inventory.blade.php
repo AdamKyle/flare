@@ -6,7 +6,6 @@
             <th>AC</th>
             @if ($actions === 'manage')
                 <th>Equiped</th>
-                <th>Position</th>
             @endif
             <th>Type</th>
             <th>Cost</th>
@@ -22,7 +21,6 @@
 
                 @if ($actions === 'manage')
                     <td>{{$slot->equipped ? 'Yes' : 'No'}}</td>
-                    <td>{{$slot->position}}</td>
                 @endif
                 <td>{{$slot->item->type}}</td>
                 <td>{{$slot->item->cost}}</td>

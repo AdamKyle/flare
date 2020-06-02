@@ -7,13 +7,13 @@
         <div class="col-sm-10">
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell_one">
+                <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell-one">
                 Spell Slot One
             </label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="spell_two">
+                <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="spell-two">
                 Spell Slot Two
             </label>
         </div>
@@ -24,13 +24,13 @@
         <div class="col-sm-10">
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell_one">
+                <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="spell-one">
                 Spell Slot One
             </label>
         </div>
         <div class="form-check">
             <label class="form-check-label">
-                <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="spell_two">
+                <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="spell-two">
                 Spell Slot Two
             </label>
         </div>

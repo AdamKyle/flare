@@ -7,6 +7,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Base Damage</th>
+                    <th>Base Healing</th>
                     <th>Cost</th>
                     <th>Actions</th>
                 </tr>
@@ -16,6 +17,7 @@
                     <tr>
                         <td><a href="{{route('items.item', ['item' => $spell->id])}}">{{$spell->name}}</a></td>
                         <td>{{!is_null($spell->base_damage) ? $spell->base_damage : 'N/A'}}</td>
+                        <td>{{!is_null($spell->base_healing) ? $spell->base_healing : 'N/A'}}</td>
                         <td>{{$spell->cost}}</td>
                         <td>
                             <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"

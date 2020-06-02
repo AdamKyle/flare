@@ -28,7 +28,8 @@ export default class ActionsSection extends React.Component {
       this.setState({
         character: result.data.character.data,
 				monsters: result.data.monsters,
-				isLoading: false
+        isLoading: false,
+        isDead: result.data.character.data.is_dead,
       });
 		});
 	}
@@ -79,7 +80,8 @@ export default class ActionsSection extends React.Component {
 							userId={this.props.userId}
 							character={this.state.character}
 							monsters={this.state.monsters}
-							showCrafting={this.state.showCrafting}
+              showCrafting={this.state.showCrafting}
+              isDead={this.state.isDead}
 							shouldChangeCraftingType={this.state.changeCraftingType}
 							isCharacterDead={this.characterIsDead.bind(this)}
 							changeCraftingType={this.changeCraftingType.bind(this)}

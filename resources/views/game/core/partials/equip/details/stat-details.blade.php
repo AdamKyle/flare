@@ -3,7 +3,7 @@
         @if ($hasDefaultPosition)
             <p>If Replaced:</p>
         @else
-            <p>If {{$key}} Replaced:</p>
+            <p>If {{title_case(str_replace('-', ' ', $key))}} Replaced:</p>
         @endif
         <dl>
             <dt>Attack:</dt>
