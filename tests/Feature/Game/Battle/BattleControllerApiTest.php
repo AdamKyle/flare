@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Events\GoldRushCheckEvent;
 use App\Game\Battle\Events\DropCheckEvent;

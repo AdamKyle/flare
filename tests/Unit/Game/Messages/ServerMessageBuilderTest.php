@@ -114,4 +114,11 @@ class ServerMessageBuilderTest extends TestCase
 
         $this->assertEquals('You cannot walk on water without a Flask of Fresh Air.', $message);
     }
+
+    public function testGetMessageCannotCraft()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('cant_craft');
+
+        $this->assertEquals('You must wait for the timer (beside Craft) to state: Ready!', $message);
+    }
 }

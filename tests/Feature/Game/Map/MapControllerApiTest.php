@@ -128,23 +128,6 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals($location->name, $content->current_port->name);
     }
 
-    public function testIsWater() {
-        Event::fake([
-            MoveTimeOutEvent::class,
-        ]);
-
-        $this->setUpCharacter();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('GET', '/api/is-water/' . $this->character->id, [
-                             'character_position_x' => 1680,
-                             'character_position_y' => 1000,
-                         ])
-                         ->response;
-
-        $this->assertEquals(422, $response->status());
-    }
-
     public function testIsNotWater() {
         Event::fake([
             MoveTimeOutEvent::class,

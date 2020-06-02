@@ -88,12 +88,6 @@ class CharacterInformationBuilder {
         })->isNotEmpty();
     }
 
-    public function hasHealingSpells(): bool {
-        return $this->inventory->filter(function ($slot) {
-            return $slot->item->type === 'spell-healing' && $slot->equipped;
-        })->isNotEmpty();
-    }
-
     public function hasDamageSpells(): bool {
         return $this->inventory->filter(function ($slot) {
             return $slot->item->type === 'spell-damage' && $slot->equipped;

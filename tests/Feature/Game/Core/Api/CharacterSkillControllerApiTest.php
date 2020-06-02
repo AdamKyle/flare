@@ -190,6 +190,43 @@ class CharacterSkillControllerApiTest extends TestCase {
     }
 
     public function testCanPickUpCraftedItem() {
+        $suffix = ItemAffix::create([
+            'name' => 'Sample-suffix',
+            'skill_training_bonus' => 1.5,
+            'skill_name' => 'Weapon Crafting',
+            'type' => 'suffix'
+        ]);
+
+        $prefix = ItemAffix::create([
+            'name' => 'Sample-prefix',
+            'skill_training_bonus' => 1.5,
+            'skill_name' => 'Weapon Crafting',
+            'type' => 'prefix',
+        ]);
+
+        $item = $this->createItem([
+            'name' => 'sample',
+            'type' => 'weapon',
+            'cost' => 1,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'crafting_type' => 'weapon',
+            'skill_name' => 'Weapon Crafting',
+            'skill_training_bonus' => 1.5,
+        ]);
+
+        $item->update([
+            'item_prefix_id' => $prefix->id,
+            'item_suffix_id' => $suffix->id,
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equipped'     => true,
+            'position'     => 'left-hand',
+        ]);
+
         $craftingSkilLService = $this->getMockBuilder(CraftingSkillService::class)
                                      ->setMethods(array('fetchDCCheck', 'fetchCharacterRoll'))
                                      ->getMock();
@@ -223,7 +260,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue($this->character->refresh()->inventory->slots->count() === 1);
+        $this->assertTrue($this->character->refresh()->inventory->slots->count() === 2);
         $this->assertTrue($this->character->refresh()->inventory->slots->filter(function($slot) {
             return $slot->item->name === 'sample';
         })->isNotEmpty());

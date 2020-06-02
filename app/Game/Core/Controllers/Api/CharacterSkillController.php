@@ -70,6 +70,7 @@ class CharacterSkillController extends Controller {
 
             if ($characterRoll > $dcCheck) {
                 $this->attemptToPickUpItem($character->refresh(), $item);
+
                 event(new UpdateSkillEvent($currentSkill));
             } else {
                 event(new ServerMessageEvent($character->user, 'failed_to_craft'));
