@@ -1,8 +1,8 @@
 import React, { Children, isValidElement, cloneElement } from 'react';
 import BattleAction from '../battle/battle-action';
-import AdditionalActionsDropDown from './additional-actions-dropdown';
+import AdditionalCoreActionsDropDown from './additional-core-actions-dropdown';
 
-export default class ActionsSection extends React.Component {
+export default class CoreActionsSection extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -20,17 +20,17 @@ export default class ActionsSection extends React.Component {
 	}
 
 	componentDidMount() {
-    axios.get('/api/actions', {
-      params: {
-        user_id: this.props.userId
-      }
-    }).then((result) => {
-      this.setState({
-        character: result.data.character.data,
+		axios.get('/api/actions', {
+			params: {
+				user_id: this.props.userId
+			}
+		}).then((result) => {
+			this.setState({
+				character: result.data.character.data,
 				monsters: result.data.monsters,
-        isLoading: false,
-        isDead: result.data.character.data.is_dead,
-      });
+				isLoading: false,
+				isDead: result.data.character.data.is_dead,
+			});
 		});
 	}
 
@@ -59,7 +59,7 @@ export default class ActionsSection extends React.Component {
 	}
 
 	render() {
-		
+
 		if (this.state.isLoading) {
 			return 'Please wait ...';
 		}
@@ -69,8 +69,8 @@ export default class ActionsSection extends React.Component {
 				<div className="card-body">
 					<div className="row justify-content-center">
 						<div className="col-md-2">
-							<AdditionalActionsDropDown 
-								isDead={this.state.isDead} 
+							<AdditionalCoreActionsDropDown
+								isDead={this.state.isDead}
 								changeCraftingType={this.changeCraftingType.bind(this)}
 								updateShowCrafting={this.updateShowCrafting.bind(this)}
 								canCraft={this.state.canCraft}
@@ -80,8 +80,8 @@ export default class ActionsSection extends React.Component {
 							userId={this.props.userId}
 							character={this.state.character}
 							monsters={this.state.monsters}
-              showCrafting={this.state.showCrafting}
-              isDead={this.state.isDead}
+							showCrafting={this.state.showCrafting}
+							isDead={this.state.isDead}
 							shouldChangeCraftingType={this.state.changeCraftingType}
 							isCharacterDead={this.characterIsDead.bind(this)}
 							changeCraftingType={this.changeCraftingType.bind(this)}

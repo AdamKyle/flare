@@ -127,6 +127,42 @@ class CharacterSkillControllerApiTest extends TestCase {
         $this->assertEquals(1, count($content->items));
     }
 
+    public function testCanCraftItemTooEasy() {
+        $this->createItem([
+            'name' => 'sample 2',
+            'type' => 'weapon',
+            'cost' => 1,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 1,
+            'crafting_type' => 'weapon',
+        ]);
+
+        $this->assertEquals(0, $this->character->skills->where('name', 'Weapon Crafting')->first()->xp);
+
+        $response = $this->actingAs($this->character->user, 'api')
+            ->json('POST', '/api/craft/' . $this->character->id, [
+                'item_to_craft' => $this->createItem([
+                    'name' => 'sample',
+                    'type' => 'weapon',
+                    'cost' => 1,
+                    'can_craft' => true,
+                    'skill_level_required' => 100,
+                    'crafting_type' => 'weapon',
+                ])->id,
+                'type' => 'Weapon',
+            ])
+            ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(0, $this->character->skills->where('name', 'Weapon Crafting')->first()->xp);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertTrue($content->items[0]->name === 'sample 2');
+        $this->assertEquals(1, count($content->items));
+    }
+
     public function testCannotCraftItemCostsTooMuch() {
         $currentGold = $this->character->gold;
 

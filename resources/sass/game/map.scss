@@ -12,8 +12,8 @@
 
       &:after {
         bottom: 100%;
-        content: '\f3c5';
-        font-family: 'Font Awesome\ 5 Free';
+        content: "";
+        font-family: 'RPGAwesome';
         display: block;
         left: -10px; /* Half of the width, give or take a pixel */
         position: absolute;
@@ -25,6 +25,7 @@
 
     .location-x-pin {
       &:after {
+        font-family: 'Font Awesome\ 5 Free';
         content: '\f6d9';
         font-size: 16px;
         color: #d9a29e;
@@ -35,6 +36,7 @@
 
     .port-x-pin {
       &:after {
+        font-family: 'Font Awesome\ 5 Free';
         content: '\f21a';
         font-size: 16px;
         color: #2d74de;

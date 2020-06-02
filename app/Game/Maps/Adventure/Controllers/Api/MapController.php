@@ -117,7 +117,6 @@ class MapController extends Controller {
         
         $this->imageResource = imagecreatefromstring($contents);
 
-        $waterRgb = 112219255;
         $rgb      = imagecolorat($this->imageResource, $request->character_position_x, $request->character_position_y);
 
         $r = ($rgb >> 16) & 0xFF;
@@ -125,8 +124,11 @@ class MapController extends Controller {
         $b = $rgb & 0xFF;
         
         $color = $r.$g.$b;
-
-        if ((int) $color === $waterRgb) {
+        
+        /**
+         *  The colors: 112219255, 112217247 are repersentitive of water.
+         */
+        if ((int) $color === 112219255 || (int) $color === 112217247) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();

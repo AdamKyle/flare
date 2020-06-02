@@ -64,6 +64,14 @@ export default class Map extends React.Component {
         portList: result.data.port_details !== null ? result.data.port_details.port_list : [],
         timeRemaining: result.data.timeout !== null ? result.data.timeout : null,
         isDead: result.data.is_dead,
+      }, () => {
+        this.props.updatePort({
+          currentPort: this.state.currentPort,
+          portList: this.state.portList,
+          characterId: this.state.characterId,
+          characterIsDead: this.state.isDead,
+          canMove: this.state.canMove,
+        });
       });
     });
 
@@ -72,6 +80,14 @@ export default class Map extends React.Component {
         canMove: event.canMove,
         showMessage: false,
         timeRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
+      }, () => {
+        this.props.updatePort({
+          currentPort: this.state.currentPort,
+          portList: this.state.portList,
+          characterId: this.state.characterId,
+          characterIsDead: this.state.isDead,
+          canMove: event.canMove,
+        });
       });
     });
 
@@ -80,6 +96,12 @@ export default class Map extends React.Component {
         isDead: event.isDead
       });
     });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!_.isEmpty(this.props.position)) {
+      this.updatePlayerPosition(this.props.position);
+    }
   }
 
   handleDrag(e, position) {
@@ -123,6 +145,8 @@ export default class Map extends React.Component {
     this.setState({
       characterPosition: {x: characterX, y: characterY},
       controlledPosition: {x: getNewXPosition(characterX, mapX), y: getNewYPosition(characterY, mapY)},
+    }, () => {
+      this.props.updatePlayerPosition({});
     });
   }
 
@@ -195,6 +219,18 @@ export default class Map extends React.Component {
             this.setState({
               currentPort: result.data.hasOwnProperty('current_port') ? result.data.current_port : null,
               portList: result.data.hasOwnProperty('port_list') ? result.data.port_list : [],
+            }, () => {
+              this.props.updatePort({
+                currentPort: this.state.currentPort,
+                portList: this.state.portList,
+                characterId: this.state.characterId,
+                characterIsDead: this.state.isDead,
+                canMove: this.state.canMove,
+              });
+
+              if (this.state.currentPort == null) {
+                this.props.openPortDetails(false);
+              }
             });
           });
         });
@@ -252,6 +288,10 @@ export default class Map extends React.Component {
     });
   }
 
+  openPortDetails() {
+    this.props.openPortDetails(true);
+  }
+
   render() {
     if (this.state.isLoading) {
       return 'Please wait ...';
@@ -284,25 +324,12 @@ export default class Map extends React.Component {
           <p>Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
          </div>
          <hr />
-         {this.state.currentPort !== null 
-          ? 
-          <div className="clear-fix mb-2">
-            <SetSail 
-              characterIsDead={this.state.isDead}
-              currentPort={this.state.currentPort} 
-              portList={this.state.portList} 
-              characterId={this.state.characterId} 
-              updatePlayerPosition={this.updatePlayerPosition.bind(this)}
-              canSetSail={this.state.canMove}
-            />
-          </div>
-          : null
-         }
          <div className="clear-fix">
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="north" disabled={this.state.isDead} onClick={this.move.bind(this)}>North</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" disabled={this.state.isDead} onClick={this.move.bind(this)}>South</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
            <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
+           { this.state.currentPort !== null ? <button type="button" className="float-left btn btn-success mr-2" data-direction="west" onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
            <TimeOutBar
               eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
               channel={'show-timeout-move-' + this.props.userId}

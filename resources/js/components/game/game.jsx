@@ -3,15 +3,42 @@ import ReactDOM            from 'react-dom';
 import Chat                from './messages/chat';
 import Map                 from './map/map';
 import CharacterInfoTopBar from './components/character-info-top-bar';
-import ActionsSection from './components/actions-section';
-import BattleAction from './battle/battle-action';
-import AdditionalActionsDropDown from './components/additional-actions-dropdown';
+import CoreActionsSection  from './components/core-actions-section';
+import PortLocationActions from './components/port-location-actions';
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
 
     this.apiUrl = window.location.protocol + '//' + window.location.host + '/api/';
+
+    this.state = {
+      portDetails: {
+        currentPort: null,
+        portList: [],
+        characterId: null,
+        isDead: false,
+        canMove: true,
+      },
+      position: {},
+      openPortDetails: false,
+    }
+  }
+
+  updatePort(portDetails) {
+    this.setState({
+      portDetails: portDetails,
+    });
+  }
+
+  updatePlayerPosition(position) {
+    this.setState({position: position});
+  }
+
+  openPortDetails(open) {
+    this.setState({
+      openPortDetails: open,
+    });
   }
 
   render() {
@@ -22,10 +49,18 @@ class Game extends React.Component {
             <div className="row">
               <div className="col-md-6">
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
-                <ActionsSection  apiUrl={this.apiUrl} userId={this.props.userId} />
+                <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} />
+                {this.state.openPortDetails ? <PortLocationActions portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
               </div>
               <div className="col-md-6">
-                <Map apiUrl={this.apiUrl} userId={this.props.userId} />
+                <Map 
+                  apiUrl={this.apiUrl}
+                  userId={this.props.userId}
+                  updatePort={this.updatePort.bind(this)}
+                  position={this.state.position}
+                  updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+                  openPortDetails={this.openPortDetails.bind(this)}
+                />
               </div>
             </div>
           </div>

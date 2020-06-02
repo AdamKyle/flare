@@ -64,6 +64,10 @@ class CharacterSkillController extends Controller {
 
         if ($currentSkill->level < $item->skill_level_required) {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+        } else if ($currentSkill->level >= $item->skill_level_trivial) { 
+            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+
+            $this->attemptToPickUpItem($character->refresh(), $item);
         } else {
             $dcCheck       = $craftingSkill->fetchDCCheck($currentSkill);
             $characterRoll = $craftingSkill->fetchCharacterRoll($currentSkill);

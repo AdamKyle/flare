@@ -26684,8 +26684,8 @@ a.text-dark:focus {
 .map-body .game-map .location-x-pin:after,
 .map-body .game-map .port-x-pin:after {
   bottom: 100%;
-  content: "\F3C5";
-  font-family: "Font Awesome 5 Free";
+  content: "\EA6F";
+  font-family: "RPGAwesome";
   display: block;
   left: -10px;
   /* Half of the width, give or take a pixel */
@@ -26696,6 +26696,7 @@ a.text-dark:focus {
 }
 
 .map-body .game-map .location-x-pin:after {
+  font-family: "Font Awesome 5 Free";
   content: "\F6D9";
   font-size: 16px;
   color: #d9a29e;
@@ -26704,6 +26705,7 @@ a.text-dark:focus {
 }
 
 .map-body .game-map .port-x-pin:after {
+  font-family: "Font Awesome 5 Free";
   content: "\F21A";
   font-size: 16px;
   color: #2d74de;

@@ -40,6 +40,8 @@ class ServerMessageBuilder {
                 return 'You must wait for the timer (beside Craft) to state: Ready!';
             case 'to_hard_to_craft':
                 return 'You lost your investment and epically failed to craft this item.';
+            case 'to_easy_to_craft':
+                return 'This is far too easy to craft! You will get no experience for this item.';
             default:
                 return '';
         }
