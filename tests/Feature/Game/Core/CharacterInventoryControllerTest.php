@@ -94,6 +94,29 @@ class CharacterInventoryControllerTest extends TestCase
         });
     }
 
+    public function testCannotEquipItemWhenCharacterDead() {
+        $this->character->update([
+            'is_dead' => true,
+        ]);
+
+        $this->character->inventory->slots->each(function($slot){
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
+
+        $this->character->refresh();
+
+        $response = $this->actingAs($this->character->user)->visitRoute('game')->post(route('game.equip.item'), [
+            'position'   => 'left-hand',
+            'slot_id'    => '1',
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $response->assertSessionHas('error', "You are dead and must revive before trying to do that. Dead people can't do things.");
+    }
+
     public function testCannotEquipItemYouDontHave() {
         $this->character->inventory->slots->each(function($slot){
             $slot->update([

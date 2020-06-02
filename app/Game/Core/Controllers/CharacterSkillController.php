@@ -18,14 +18,6 @@ class CharacterSkillController extends Controller {
     public function train(TrainSkillValidation $request) {
         $character = auth()->user()->character;
 
-        // Update all skills.
-        $character->skills->each(function($skill) {
-            $skill->update([
-                'currently_training' => false,
-                'xp_twoards'         => 0.0,
-            ]);
-        });
-
         // Find the skill we want to train.
         $skill = $character->refresh()->skills->filter(function ($skill) use($request) {
             return $skill->id === (int) $request->skill_id;
@@ -34,6 +26,14 @@ class CharacterSkillController extends Controller {
         if (is_null($skill)) {
             return redirect()->back()->with('error', 'Invalid Input.');
         }
+
+        // Update all skills.
+        $character->skills->each(function($skill) {
+            $skill->update([
+                'currently_training' => false,
+                'xp_twoards'         => 0.0,
+            ]);
+        });
 
         // Beggin training
         $skill->update([

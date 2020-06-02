@@ -68,26 +68,6 @@ class CharacterBuilder {
             'game_map_id'  => $map->id,
         ]);
 
-        return $this->assignPosition();
-    }
-
-    public function assignPosition(): CharacterBuilder {
-        $xPosition = $this->getRandomY();
-        $yPosition = $this->getRandomX();
-
-        if ($this->isWater($this->character, $xPosition, $yPosition)) {
-            return $this->assignPosition();
-        }
-
-        $mapPosition = resolve(MapPositionValue::class);
-
-        $this->character->map->update([
-            'character_position_x' => $xPosition,
-            'character_position_y' => $yPosition,
-            'position_x'           => $mapPosition->fetchXPosition($xPosition, 0),
-            'position_x'           => $mapPosition->fetchYPosition($xPosition, 0),
-        ]);
-
         return $this;
     }
 
@@ -103,45 +83,5 @@ class CharacterBuilder {
 
     public function character(): Character {
         return $this->character->refresh();
-    }
-
-    public function isWater(Character $character, int $x, int $y): bool {
-        $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
-        $this->imageResource = imagecreatefromstring($contents);
-
-        $waterRgb = 112219255;
-        $rgb      = imagecolorat($this->imageResource, $x, $y);
-
-        $r = ($rgb >> 16) & 0xFF;
-        $g = ($rgb >> 8) & 0xFF;
-        $b = $rgb & 0xFF;
-
-        $color = $r.$g.$b;
-
-        if ((int) $color === $waterRgb) {
-            return true;
-        }
-
-        return false;
-    }
-
-    protected function getRandomY(): int {
-        $randomY = rand(32, 1984);
-
-        if ($randomY % 16 === 0) {
-            return $randomY;
-        }
-
-        return $this->getRandomY();
-    }
-
-    protected function getRandomX(): int {
-        $randomX = rand(16, 1984);
-
-        if ($randomX % 16 === 0) {
-            return $randomX;
-        }
-
-        return $this->getRandomX();
     }
 }

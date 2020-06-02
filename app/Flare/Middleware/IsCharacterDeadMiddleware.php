@@ -17,8 +17,16 @@ class IsCharacterDeadMiddleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (auth()->user()->character->is_dead) {
-            return redirect()->route('game')->with('error', 'You are dead and must revive before trying to do that. Dead people can\'t do things.');
+        if ($request->wantsJson()) {
+            if (auth()->user()->character->is_dead) {
+                return response()->json([
+                    'error' => 'You are dead and must revive before trying to do that. Dead people can\'t do things.',
+                ], 422);
+            }
+        } else {
+            if (auth()->user()->character->is_dead) {
+                return redirect()->route('game')->with('error', 'You are dead and must revive before trying to do that. Dead people can\'t do things.');
+            }
         }
 
         return $next($request);

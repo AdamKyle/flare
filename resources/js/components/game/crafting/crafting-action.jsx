@@ -119,9 +119,11 @@ export default class CraftingAction extends React.Component {
       item_to_craft: this.state.itemToCraft,
       type: this.state.craftingType,
     }).then((result) => {
-      this.setState({
-        itemsToCraft: result.data.items
-      });
+      if (!_.isEmpty(result.data.items)) {
+        this.setState({
+          itemsToCraft: result.data.items
+        });
+      }
     });
   }
 

@@ -113,12 +113,8 @@ class MapController extends Controller {
     }
 
     public function isWater(Request $request, Character $character) {
-
-        $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
-            return $slot->item->effect === 'walk-on-water';
-        })->isNotEmpty();
-        
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
+        
         $this->imageResource = imagecreatefromstring($contents);
 
         $waterRgb = 112219255;
@@ -127,12 +123,17 @@ class MapController extends Controller {
         $r = ($rgb >> 16) & 0xFF;
         $g = ($rgb >> 8) & 0xFF;
         $b = $rgb & 0xFF;
-
+        
         $color = $r.$g.$b;
 
-        if ((int) $color === $waterRgb && !$hasItem) {
-            // TODO: Implement loic to check for a relic called: 'flask of fresh air'.
-            return response()->json([], 422);
+        if ((int) $color === $waterRgb) {
+            $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
+                return $slot->item->effect === 'walk-on-water';
+            })->isNotEmpty();
+
+            if (!$hasItem) {
+                return response()->json([], 422);
+            }
         }
 
         return response()->json([], 200);
