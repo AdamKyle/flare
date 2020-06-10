@@ -77,8 +77,8 @@ export default class Map extends React.Component {
 
     this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
       this.setState({
-        canMove: event.canMove,
-        showMessage: false,
+        // canMove: event.canMove,
+        // showMessage: false,
         timeRemaining: event.forLength !== 0 ? (event.forLength * 60) : 10,
       }, () => {
         this.props.updatePort({
@@ -182,19 +182,19 @@ export default class Map extends React.Component {
           break;
     }
 
-    if (y < 32) {
+    if (y < 16) {
       return getServerMessage('cannot_move_up');
     }
 
-    if (x < 16) {
+    if (x < 0) {
       return getServerMessage('cannot_move_left');
     }
 
-    if (y > 1984) {
+    if (y > 496) {
       return getServerMessage('cannot_move_down');
     }
 
-    if (x > 1984) {
+    if (x > 496) {
       return getServerMessage('cannot_move_right');
     }
 
@@ -303,7 +303,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
                position={this.state.controlledPosition}
-               bounds={{top: -1648, left: -464, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+               bounds={{top: -160, left: -25, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
                handle=".handle"
                defaultPosition={{x: 0, y: 0}}
                grid={[16, 16]}
@@ -313,7 +313,7 @@ export default class Map extends React.Component {
                onStop={this.handleStop}
             >
             <div>
-              <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 2000, height: 2000}}>
+              <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
                 {this.renderLocations()}
                 <div className="map-x-pin" style={this.playerIcon()}></div>
               </div>

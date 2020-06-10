@@ -114,7 +114,7 @@ class MapController extends Controller {
 
     public function isWater(Request $request, Character $character) {
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
-        
+
         $this->imageResource = imagecreatefromstring($contents);
 
         $rgb      = imagecolorat($this->imageResource, $request->character_position_x, $request->character_position_y);
@@ -124,11 +124,13 @@ class MapController extends Controller {
         $b = $rgb & 0xFF;
         
         $color = $r.$g.$b;
-        
-        /**
-         *  The colors: 112219255, 112217247 are repersentitive of water.
-         */
-        if ((int) $color === 112219255 || (int) $color === 112217247) {
+
+        // These repersent water:
+        $invalidColors = [
+            115217255, 114217255, 112219255, 112217247, 106222255, 117217251
+        ];
+        dump($color);
+        if (in_array((int) $color, $invalidColors)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();

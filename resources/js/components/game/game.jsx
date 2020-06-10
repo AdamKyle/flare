@@ -47,12 +47,12 @@ class Game extends React.Component {
         <div className="row mb-4">
           <div className="col-md-12">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-8">
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
                 <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} />
                 {this.state.openPortDetails ? <PortLocationActions portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
               </div>
-              <div className="col-md-6">
+              <div className="col-md-4">
                 <Map 
                   apiUrl={this.apiUrl}
                   userId={this.props.userId}

@@ -7,13 +7,13 @@ use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Console\Commands\UpdateCharacterSkills;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Values\BaseSkillValue;
-use App\Flare\Values\MaxDamageForItemValue;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -50,6 +50,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BaseSkillValue::class, function($app) {
             return new BaseSkillValue();
+        });
+
+        $this->app->bind(CoordinatesCache::class, function($app) {
+            return new CoordinatesCache();
         });
 
         $this->commands([CreateAdminAccount::class, UpdateCharacterSkills::class]);

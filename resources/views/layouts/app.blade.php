@@ -27,7 +27,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/default.css')}}" id="theme" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/wizard/steps.css')}}" id="wizard" rel="stylesheet">
+    <link href="{{ asset('css/default-dark.css')}}" id="theme" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/r-2.2.5/datatables.min.css"/>
     
 </head>
@@ -273,6 +274,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/r-2.2.5/datatables.min.js"></script>
 
     <script>

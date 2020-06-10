@@ -26687,8 +26687,8 @@ a.text-dark:focus {
   content: "\EA6F";
   font-family: "RPGAwesome";
   display: block;
-  left: -10px;
-  /* Half of the width, give or take a pixel */
+  left: -6px;
+  top: -18px;
   position: absolute;
   font-weight: 900;
   font-size: 16px;
@@ -26709,7 +26709,7 @@ a.text-dark:focus {
   content: "\F21A";
   font-size: 16px;
   color: #2d74de;
-  left: -14px;
+  left: -8px;
 }
 
 .character-map-ready {

@@ -93,4 +93,8 @@ class Character extends Model
     public function map() {
         return $this->hasOne(Map::class);
     }
+
+    public function adventureLogs() {
+        return $this->hasMany(AdventureLog::class, 'character_id', 'id');
+    }
 }

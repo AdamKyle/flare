@@ -9,6 +9,8 @@ require('./bootstrap');
 require('../vendor/monster/theme/js/jquery.slimscroll.js');
 require('../vendor/monster/theme/js/waves.js');
 require('../vendor/monster/assets/plugins/sticky-kit-master/dist/sticky-kit.min.js');
+require('../vendor/monster/assets/plugins/wizard/jquery.steps.min.js');
+require('../vendor/monster/assets/plugins/wizard/jquery.validate.min.js');
 require('../vendor/monster/theme/js/sidebarmenu.js');
 require('../vendor/monster/theme/js/custom.js');
 
@@ -19,3 +21,9 @@ require('../vendor/monster/theme/js/custom.js');
  */
 
 require('./components/game/game');
+
+/**
+ *  Next, we will require any additional jquery code we need.
+ */
+
+ require('./jquery/form-wizard/steps');

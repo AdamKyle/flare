@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Admin\Models\GameMap;
 use Illuminate\Database\Eloquent\Model;
 
 class Location extends Model
@@ -14,8 +15,9 @@ class Location extends Model
      */
     protected $fillable = [
         'name',
+        'game_map_id',
+        'quest_reward_item_id',
         'description',
-        'asset_path',
         'is_port',
         'x',
         'y',
@@ -31,4 +33,16 @@ class Location extends Model
         'x'       => 'integer',
         'is_port' => 'boolean',
     ];
+
+    public function questRewardItem() {
+        return $this->hasOne(Item::class, 'id', 'quest_reward_item_id');
+    }
+
+    public function map() {
+        return $this->hasOne(GameMap::class, 'id', 'game_map_id');
+    }
+
+    public function adventure() {
+        return $this->hasOne(Adventure::class, 'id', 'location_id');
+    }
 }
