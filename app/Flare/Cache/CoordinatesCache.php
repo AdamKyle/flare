@@ -17,13 +17,13 @@ class CoordinatesCache {
 
     public function buildXCoordinates(): array {
         
-        $start = 16;
-        $max   = 1984;
+        $start = 0;
+        $max   = 466;
         $coordinates = [$start];
 
         $current = $start;
 
-        for ($i = 2; $i <= ($max / $start); $i++) {
+        for ($i = 2; $i <= ($max / 16); $i++) {
             $current += 16;
 
             array_push($coordinates, $current);
@@ -34,8 +34,8 @@ class CoordinatesCache {
 
     public function buildYCoordinates(): array {
         
-        $start = 32;
-        $max   = 1984;
+        $start = 16;
+        $max   = 496;
         $coordinates = [$start];
 
         $current = $start;
