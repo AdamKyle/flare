@@ -61,24 +61,27 @@ class MapController extends Controller {
         
         $portDetails = [];
 
-        if ($location->is_port) {
-            $portDetails = $this->portService->getPortDetails($character, $location);
-        }
-
-        if (!is_null($location->questRewardItem)) {
-            $item = $character->inventory->questItemSlots->filter(function($slot) use ($location) {
-                return $slot->item_id === $location->questRewardItem->id;
-            })->first();
-
-            if (is_null($item)) {
-                $character->inventory->questItemSlots()->create([
-                    'inventory_id' => $character->inventory->id,
-                    'item_id'      => $location->questRewardItem->id,
-                ]);
-
-                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
+        if (!is_null($location)) {
+            if ($location->is_port) {
+                $portDetails = $this->portService->getPortDetails($character, $location);
+            }
+    
+            if (!is_null($location->questRewardItem)) {
+                $item = $character->inventory->questItemSlots->filter(function($slot) use ($location) {
+                    return $slot->item_id === $location->questRewardItem->id;
+                })->first();
+    
+                if (is_null($item)) {
+                    $character->inventory->questItemSlots()->create([
+                        'inventory_id' => $character->inventory->id,
+                        'item_id'      => $location->questRewardItem->id,
+                    ]);
+    
+                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
+                }
             }
         }
+        
 
         $character->update([
             'can_move'          => false,
