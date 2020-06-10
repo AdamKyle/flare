@@ -11,8 +11,8 @@
         <div class="col-md-12">
             <div class="card wizard-content">
                 <div class="card-body">
-                    <h4 class="card-title">Create Location</h4>
-                    <form action="{{route('locations.store')}}" method="POST" id="location-wizard" class="validation-wizard wizard-circle">
+                    <h4 class="card-title">{{is_null($location) ? 'Create Location' : 'Edit Location: ' . $location->name}}</h4>
+                    <form action="{{is_null($location) ? route('locations.store') : route('location.update', ['location' => $location->id])}}" method="POST" id="location-wizard" class="validation-wizard wizard-circle">
                         @csrf
                         
                         <!-- Step 1 -->
@@ -34,7 +34,7 @@
                                         <select class="custom-select form-control" id="quest-item" name="quest_item_id">
                                             <option value="">Select Item</option>
                                             @foreach($items as $id => $name)
-                                                <option value="{{$id}}">{{$name}}</option>
+                                                <option value="{{$id}}" {{!is_null($location) ? ($location->quest_reward_item_id === $id ? 'selected' : '') : ''}}>{{$name}}</option>
                                             @endforeach
                                         </select>
                                     </div>

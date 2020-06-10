@@ -47,14 +47,22 @@ class LocationsController extends Controller {
     }
 
     public function update(Request $request, Location $location) {
-        $location->update([
-            'name'                 => $request->name,
-            'game_map_id'          => (int) $request->map_id,
-            'quest_reward_item_id' => (int) $request->quest_item_id,
-            'description'          => $request->description,
-            'x'                    => (int) $request->x_position,
-            'y'                    => (int) $request->y_position,
-        ]);
+        if ($location->is_port) {
+            $location->update([
+                'name'                 => $request->name,
+                'quest_reward_item_id' => (int) $request->quest_item_id,
+                'description'          => $request->description,
+            ]);
+        } else {
+            $location->update([
+                'name'                 => $request->name,
+                'game_map_id'          => (int) $request->map_id,
+                'quest_reward_item_id' => (int) $request->quest_item_id,
+                'description'          => $request->description,
+                'x'                    => (int) $request->x_position,
+                'y'                    => (int) $request->y_position,
+            ]);
+        }
         
         return redirect()->route('locations.location', [
             'location' => $location->id

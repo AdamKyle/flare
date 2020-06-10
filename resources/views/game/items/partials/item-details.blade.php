@@ -3,9 +3,9 @@
     <dt>Name:</dt>
     <dd>{{$item->name}}</dd>
     <dt>Base Damage:</dt>
-    <dd>{{$item->gettotalDamage()}} <em>(With all modifiers)</em></dd>
+    <dd>{{$item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Base AC:</dt>
-    <dd>{{$item->base_ac}}</dd>
+    <dd>{{$item->getTotalDefence()}} <em>(With all modifiers)</em></dd>
     <dt>Type:</dt>
     <dd>{{$item->type}}</dd>
     <dt>Effect:</dt>

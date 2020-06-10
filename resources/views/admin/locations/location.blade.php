@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row page-titles">
         <div class="col-md-12 align-self-right">
-            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+            <a href="{{route('locations.list')}}" class="btn btn-primary float-right ml-2">Back</a>
         </div>
     </div>
     <div class="row justify-content-center">
@@ -23,7 +23,9 @@
                         <dd>{{$location->is_port ? 'Yes' : 'No'}}</dd>
                     </dl>
                     <hr />
-                    <a href="#" class="btn btn-primary mt-2">Edit Location</a>
+                    <a href="{{route('location.edit', [
+                        'location' => $location->id,
+                    ])}}" class="btn btn-primary mt-2">Edit Location</a>
                 </div>
             </div>
 
@@ -35,7 +37,9 @@
                     @include('game.items.partials.item-details', ['item' => $location->questRewardItem])
                     @include('game.core.partials.equip.details.item-stat-details', ['item' => $location->questRewardItem])
                     @else
-                        <div class="alert alert-info"> This location has no quest item rewards. <a href="#">Assign one.</a> </div>
+                        <div class="alert alert-info"> This location has no quest item rewards. <a href="{{route('location.edit', [
+                            'location' => $location->id,
+                        ])}}">Assign one.</a> </div>
                     @endif
                 </div>
             </div>

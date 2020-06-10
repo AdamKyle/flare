@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use Storage;
 use Illuminate\Http\Request;
@@ -56,12 +57,27 @@ class MapController extends Controller {
             'position_y'           => $request->position_y,
         ]);
 
-        $port        = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->where('is_port', true)->first();
+        $location        = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->first();
         
         $portDetails = [];
 
-        if (!is_null($port)) {
-            $portDetails = $this->portService->getPortDetails($character, $port);
+        if ($location->is_port) {
+            $portDetails = $this->portService->getPortDetails($character, $location);
+        }
+
+        if (!is_null($location->questRewardItem)) {
+            $item = $character->inventory->questItemSlots->filter(function($slot) use ($location) {
+                return $slot->item_id === $location->questRewardItem->id;
+            })->first();
+
+            if (is_null($item)) {
+                $character->inventory->questItemSlots()->create([
+                    'inventory_id' => $character->inventory->id,
+                    'item_id'      => $location->questRewardItem->id,
+                ]);
+
+                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
+            }
         }
 
         $character->update([
@@ -102,6 +118,21 @@ class MapController extends Controller {
         ]);
 
         $this->portService->setSail($character, $location);
+
+        if (!is_null($location->questRewardItem)) {
+            $item = $character->inventory->questItemSlots->filter(function($slot) use ($location) {
+                return $slot->item_id === $location->questRewardItem->id;
+            })->first();
+
+            if (is_null($item)) {
+                $character->inventory->questItemSlots()->create([
+                    'inventory_id' => $character->inventory->id,
+                    'item_id'      => $location->questRewardItem->id,
+                ]);
+
+                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
+            }
+        }
         
         event(new MoveTimeOutEvent($character, $request->time_out_value, true));
         event(new UpdateTopBarEvent($character));
