@@ -16,7 +16,8 @@ Route::post('/game/equip/item', ['as' => 'game.equip.item', 'uses' => 'Character
 Route::post('/game/unequip/item', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
 Route::post('/game/destroy/item', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
 
-Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemController@show']);
+Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+Route::get('/adeventures/{adventure}', ['as' => 'game.adventures.adventure', 'uses' => 'AdventuresController@show']);
 
 Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);
 Route::post('/skill/train', ['as' => 'train.skill', 'uses' => 'CharacterSkillController@train']);

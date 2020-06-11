@@ -43,13 +43,6 @@
                     @endif
                 </div>
             </div>
-
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h4 class="card-title">Adventures</h4>
-                    Show adventure details table.
-                </div>
-            </div>
         </div>
     </div>
 </div>

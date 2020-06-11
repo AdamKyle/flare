@@ -24,7 +24,7 @@ class ComparisonValidation extends FormRequest
     public function rules()
     {
         return [
-            'item_to_equip_type' => 'required|in:weapon,body,shield,leggings,sleeves,helmet,gloves,ring,spell-healing,spell-damage,artifact',
+            'item_to_equip_type' => 'required|in:weapon,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,artifact',
             'slot_id'            => 'required',
         ];
     }

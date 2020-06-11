@@ -133,7 +133,7 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id}>
               <div className="message">
-                <strong onClick={this.messageUser.bind(this)} data-name={message.name}>{message.name}</strong> {message.message}
+                <strong onClick={this.messageUser.bind(this)} data-name={message.name}>{message.name}</strong>: {message.message}
               </div>
             </li>
           )

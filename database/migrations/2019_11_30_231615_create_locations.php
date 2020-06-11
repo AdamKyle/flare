@@ -15,7 +15,6 @@ class CreateLocations extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('adventure_id')->unsigned()->nullable();
             $table->bigInteger('quest_reward_item_id')->unsigned()->nullable();
             $table->integer('x');
             $table->integer('y');

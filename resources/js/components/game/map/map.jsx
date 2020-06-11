@@ -34,6 +34,7 @@ export default class Map extends React.Component {
       locations: null,
       location: null,
       currentPort: null,
+      adventures: [],
       portList: [],
       timeRemaining: null,
       isDead: false,
@@ -61,6 +62,7 @@ export default class Map extends React.Component {
         showMessage: result.data.show_message,
         locations: result.data.locations,
         currentPort: result.data.port_details !== null ? result.data.port_details.current_port : null,
+        adventures: result.data.adventure_details !== null ? result.data.adventure_details : [],
         portList: result.data.port_details !== null ? result.data.port_details.port_list : [],
         timeRemaining: result.data.timeout !== null ? result.data.timeout : null,
         isDead: result.data.is_dead,
@@ -72,6 +74,8 @@ export default class Map extends React.Component {
           characterIsDead: this.state.isDead,
           canMove: this.state.canMove,
         });
+
+        this.props.updateAdventure(this.state.adventures);
       });
     });
 
@@ -292,6 +296,10 @@ export default class Map extends React.Component {
     this.props.openPortDetails(true);
   }
 
+  openAdventureDetails() {
+    this.props.openAdventureDetails(true);
+  }
+
   render() {
     if (this.state.isLoading) {
       return 'Please wait ...';
@@ -324,12 +332,16 @@ export default class Map extends React.Component {
           <p>Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
          </div>
          <hr />
-         <div className="clear-fix">
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="north" disabled={this.state.isDead} onClick={this.move.bind(this)}>North</button>
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="south" disabled={this.state.isDead} onClick={this.move.bind(this)}>South</button>
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
-           <button type="button" className="float-left btn btn-primary mr-2" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
-           { this.state.currentPort !== null ? <button type="button" className="float-left btn btn-success mr-2" data-direction="west" onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+         <div className="mb-2 mt-2">
+          {this.state.isDead ? <span className="text-danger revive">You must revive.</span> : null}
+         </div>
+         <div className="clearfix">
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.state.isDead} onClick={this.move.bind(this)}>North</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead} onClick={this.move.bind(this)}>South</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
+           { this.state.currentPort !== null ? <button type="button" className="float-left btn btn-success mr-2 btn-sm" onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+           { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-left btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
            <TimeOutBar
               eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
               channel={'show-timeout-move-' + this.props.userId}
@@ -337,7 +349,6 @@ export default class Map extends React.Component {
               readyCssClass={'character-map-ready float-left'}
               timeRemaining={this.state.timeRemaining}
             />
-            {this.state.isDead ? <span className="text-danger revive">You must revive.</span> : null}
          </div>
         </div>
 

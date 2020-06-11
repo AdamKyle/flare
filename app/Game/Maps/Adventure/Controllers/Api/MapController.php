@@ -28,23 +28,29 @@ class MapController extends Controller {
     }
 
     public function index(Request $request, User $user) {
-        $port        = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->where('is_port', true)->first();
-        $portDetails = null;
+        $location         = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->first();
+        $portDetails      = null;
+        $adventureDetails = null;
 
-        if (!is_null($port)) {
-            $portDetails = $this->portService->getPortDetails($user->character, $port);
+        if (!is_null($location)) {
+            if ($location->is_port) {
+                $portDetails      = $this->portService->getPortDetails($user->character, $location);
+            }
+            
+            $adventureDetails = $location->adventures;
         }
 
         return response()->json([
-            'map_url'       => Storage::disk('maps')->url($user->character->map->gameMap->path),
-            'character_map' => $user->character->map,
-            'character_id'  => $user->character->id,
-            'locations'     => Location::all(),
-            'can_move'      => $user->character->can_move,
-            'timeout'       => $user->character->can_move_again_at,
-            'show_message'  => $user->character->can_move ? false : true,
-            'port_details'  => $portDetails,
-            'is_dead'       => $user->character->is_dead,
+            'map_url'           => Storage::disk('maps')->url($user->character->map->gameMap->path),
+            'character_map'     => $user->character->map,
+            'character_id'      => $user->character->id,
+            'locations'         => Location::all(),
+            'can_move'          => $user->character->can_move,
+            'timeout'           => $user->character->can_move_again_at,
+            'show_message'      => $user->character->can_move ? false : true,
+            'port_details'      => $portDetails,
+            'adventure_details' => $adventureDetails,
+            'is_dead'           => $user->character->is_dead,
         ]);
     }
 

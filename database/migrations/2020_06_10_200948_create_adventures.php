@@ -15,9 +15,6 @@ class CreateAdventures extends Migration
     {
         Schema::create('adventures', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('location_id')->unsigned();
-            $table->foreign('location_id')
-                  ->references('id')->on('locations');
             $table->string('name');
             $table->text('description');
             $table->bigInteger('reward_item_id')->unsigned();

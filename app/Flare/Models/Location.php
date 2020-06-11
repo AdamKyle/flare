@@ -42,7 +42,7 @@ class Location extends Model
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');
     }
 
-    public function adventure() {
-        return $this->hasOne(Adventure::class, 'id', 'location_id');
+    public function adventures() {
+        return $this->belongsToMany(Adventure::class);
     }
 }

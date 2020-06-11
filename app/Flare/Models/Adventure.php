@@ -3,12 +3,6 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\Skill;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\EquippedItem;
-use App\User;
 
 class Adventure extends Model
 {
@@ -19,7 +13,6 @@ class Adventure extends Model
      * @var array
      */
     protected $fillable = [
-        'location_id',
         'name',
         'description',
         'reward_item_id',
@@ -44,10 +37,14 @@ class Adventure extends Model
     ];
 
     public function monsters() {
-        return $this->hasMany(Monster::class);
+        return $this->belongsToMany(Monster::class);
     }
 
-    public function location() {
-        return $this->belongsTo(Location::class, 'location_id', 'id');
+    public function locations() {
+        return $this->belongsToMany(Location::class);
+    }
+
+    public function itemReward() {
+        return $this->hasOne(Item::class, 'id', 'reward_item_id');
     }
 }

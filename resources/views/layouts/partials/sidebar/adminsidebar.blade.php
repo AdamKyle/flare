@@ -13,4 +13,11 @@
             <li><a href="{{route('locations.create')}}">Create Location</a></li>
         </ul>
     </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-trail"></i><span class="hide-menu">Manage Adventures</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('adventures.list')}}">Adventures</a></li>
+            <li><a href="{{route('adventures.create')}}">Create Adventure</a></li>
+        </ul>
+    </li>
 </ul>

@@ -5,6 +5,7 @@ import Map                 from './map/map';
 import CharacterInfoTopBar from './components/character-info-top-bar';
 import CoreActionsSection  from './components/core-actions-section';
 import PortLocationActions from './components/port-location-actions';
+import AdeventureActions from './components/adventure-actions';
 
 class Game extends React.Component {
   constructor(props) {
@@ -20,14 +21,22 @@ class Game extends React.Component {
         isDead: false,
         canMove: true,
       },
+      adventureDetails: [],
       position: {},
       openPortDetails: false,
+      openAdventureDetails: false,
     }
   }
 
   updatePort(portDetails) {
     this.setState({
       portDetails: portDetails,
+    });
+  }
+
+  updateAdventure(adventureDetails) {
+    this.setState({
+      adventureDetails: adventureDetails,
     });
   }
 
@@ -38,6 +47,14 @@ class Game extends React.Component {
   openPortDetails(open) {
     this.setState({
       openPortDetails: open,
+      openAdventureDetails: false,
+    });
+  }
+
+  openAdventureDetails(open) {
+    this.setState({
+      openPortDetails: false,
+      openAdventureDetails: open,
     });
   }
 
@@ -51,6 +68,7 @@ class Game extends React.Component {
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
                 <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} />
                 {this.state.openPortDetails ? <PortLocationActions portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
+                {this.state.openAdventureDetails ? <AdeventureActions adventureDetails={this.state.adventureDetails} userId={this.props.userId} openAdventureDetails={this.openAdventureDetails.bind(this)} /> : null}
               </div>
               <div className="col-md-4">
                 <Map 
@@ -60,6 +78,8 @@ class Game extends React.Component {
                   position={this.state.position}
                   updatePlayerPosition={this.updatePlayerPosition.bind(this)}
                   openPortDetails={this.openPortDetails.bind(this)}
+                  openAdventureDetails={this.openAdventureDetails.bind(this)}
+                  updateAdventure={this.updateAdventure.bind(this)}
                 />
               </div>
             </div>
