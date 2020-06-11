@@ -30,6 +30,8 @@ export default class CoreActionsSection extends React.Component {
 				monsters: result.data.monsters,
 				isLoading: false,
 				isDead: result.data.character.data.is_dead,
+			}, () => {
+				this.props.setCharacterId(this.state.character.id);
 			});
 		});
 	}

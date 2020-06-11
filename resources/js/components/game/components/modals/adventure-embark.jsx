@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import Axios from 'axios';
 
 export default class AdventureEmbark extends React.Component {
 
@@ -45,11 +46,16 @@ export default class AdventureEmbark extends React.Component {
       return this.setState({errorMessage: 'Cannot embark when you have not selected how many levels at a time.'})
     }
     
-    console.log('here we fucking go!');
+    axios.post('/api/character/'+this.props.characterId+'/adventure/' + this.state.adventure.id, {
+      levels_at_a_time: this.state.levelsToComplete
+    }).then((result) => {
+      console.log(result);
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   render() {
-    
     if (this.state.isLoading) {
       return(
         <>

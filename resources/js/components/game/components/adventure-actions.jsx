@@ -84,7 +84,7 @@ export default class AdeventureActions extends React.Component {
           {this.adventures()}
         </div>
 
-        {this.state.showEmbark ? <AdventureEmbark adventure={this.state.adventure} show={this.state.showEmbark} embarkClose={this.embarkClose.bind(this)} /> : null }
+        {this.state.showEmbark ? <AdventureEmbark characterId={this.props.characterId} adventure={this.state.adventure} show={this.state.showEmbark} embarkClose={this.embarkClose.bind(this)} /> : null }
       </div>
     )
   }
