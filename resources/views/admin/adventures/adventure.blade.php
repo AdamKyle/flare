@@ -27,9 +27,11 @@
                         <dd>{{$adventure->skill_bonus_exp * 100}}%</dd>
                     </dl>
                     <hr />
-                    <a href="{{route('adventure.edit', [
-                        'adventure' => $adventure->id,
-                    ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+                    @if (auth()->user()->hasRole('Admin'))
+                        <a href="{{route('adventure.edit', [
+                            'adventure' => $adventure->id,
+                        ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+                    @endif
                 </div>
             </div>
 
@@ -38,9 +40,9 @@
                     <h4 class="card-title">Quest Item Reward</h4>
                     <p>All quest items are rewarded once for completing the adventure</p>
                     @if (!is_null($adventure->itemReward))
-                    @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
-                    @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
-                    @else
+                        @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
+                        @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
+                    @elseif (auth()->user->hasRole('Admin'))
                         <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
                             'adventure' => $adventure->id,
                         ])}}">Assign one.</a> </div>

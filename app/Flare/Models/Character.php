@@ -95,6 +95,6 @@ class Character extends Model
     }
 
     public function adventureLogs() {
-        return $this->hasMany(AdventureLog::class, 'character_id', 'id');
+        return $this->hasMany(AdventureLog::class);
     }
 }
