@@ -49,7 +49,9 @@ export default class AdventureEmbark extends React.Component {
     axios.post('/api/character/'+this.props.characterId+'/adventure/' + this.state.adventure.id, {
       levels_at_a_time: this.state.levelsToComplete
     }).then((result) => {
-      console.log(result);
+      this.props.updateMessage(result.data.message);
+      this.props.updateCharacterAdventures(result.data.adventure_logs);
+      this.props.embarkClose();
     }).catch((error) => {
       console.log(error);
     });

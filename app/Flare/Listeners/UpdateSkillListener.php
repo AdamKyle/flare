@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Game\Battle\Listeners;
+namespace App\Flare\Listeners;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\Adventure;
 use App\Flare\Models\Skill;
-use App\Game\Battle\Events\UpdateSkillEvent;
-use App\Game\Messages\Events\SkillLeveledUpServerMessageEvent;
+use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 
 class UpdateSkillListener
 {
@@ -23,9 +24,10 @@ class UpdateSkillListener
     {
         $equipmentBonus = $this->fetchSkilltrainingBonusFromEquipment($event->skill);
         $questItemBonus = $this->fetchSkilltrainingBonusFromQuestItems($event->skill);
+        $adventureBonus = $this->fetchAdventureBonus($event->adventure);
 
         $event->skill->update([
-            'xp' => $event->skill->xp + (10 * (1 + ($event->skill->xp_towards + $equipmentBonus + $questItemBonus))),
+            'xp' => $event->skill->xp + (10 * (1 + ($event->skill->xp_towards + $equipmentBonus + $questItemBonus + $adventureBonus))),
         ]);
 
         $skill = $event->skill->refresh();
@@ -67,5 +69,13 @@ class UpdateSkillListener
         }
 
         return $totalSkillBonus;
+    }
+
+    protected function fetchAdventureBonus(Adventure $adventure = null): float {
+        if (!is_null($adventure)) {
+            return $adventure->skill_exp_bonus;
+        }
+
+        return 0.0;
     }
 }

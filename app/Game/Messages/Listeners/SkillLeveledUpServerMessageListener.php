@@ -4,7 +4,7 @@ namespace App\Game\Messages\Listeners;
 
 use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
 use App\Game\Messages\Builders\ServerMessageBuilder;
-use App\Game\Messages\Events\SkillLeveledUpServerMessageEvent;
+use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 
 class SkillLeveledUpServerMessageListener
 {

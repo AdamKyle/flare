@@ -5,6 +5,8 @@ namespace App\Game\Core\Providers;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
+use App\Game\Core\Services\AdventureFightService;
+use App\Game\Core\Services\AdventureService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\EquipItemService;
 
@@ -31,6 +33,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CraftingSkillService::class, function($app) {
             return new CraftingSkillService();
+        });
+
+        $this->app->bind(AdventureFightService::class, function($app, $parameters) {
+            return new AdventureFightService($parameters['character'], $parameters['adventure']);
+        });
+
+        $this->app->bind(AdventureService::class, function($app, $parameters) {
+            return new AdventureService($parameters['character'], $parameters['adventure'], $parameters['levels_at_a_time']);
         });
     }
 

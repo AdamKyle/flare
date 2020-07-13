@@ -36,6 +36,7 @@ export default class Map extends React.Component {
       currentPort: null,
       adventures: [],
       portList: [],
+      adventureLogs: [],
       timeRemaining: null,
       isDead: false,
     }
@@ -66,6 +67,7 @@ export default class Map extends React.Component {
         portList: result.data.port_details !== null ? result.data.port_details.port_list : [],
         timeRemaining: result.data.timeout !== null ? result.data.timeout : null,
         isDead: result.data.is_dead,
+        adventureLogs: result.data.adventure_logs,
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -75,7 +77,7 @@ export default class Map extends React.Component {
           canMove: this.state.canMove,
         });
 
-        this.props.updateAdventure(this.state.adventures);
+        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs);
       });
     });
 
@@ -220,9 +222,11 @@ export default class Map extends React.Component {
             character_position_x: this.state.characterPosition.x,
             character_position_y: this.state.characterPosition.y,
           }).then((result) => {
+            console.log(result);
             this.setState({
-              currentPort: result.data.hasOwnProperty('current_port') ? result.data.current_port : null,
-              portList: result.data.hasOwnProperty('port_list') ? result.data.port_list : [],
+              currentPort: result.data.port_details.hasOwnProperty('current_port') ? result.data.port_details.current_port : null,
+              portList: result.data.port_details.hasOwnProperty('port_list') ? result.data.port_details.port_list : [],
+              adventures: result.data.adventure_details,
             }, () => {
               this.props.updatePort({
                 currentPort: this.state.currentPort,
@@ -232,8 +236,14 @@ export default class Map extends React.Component {
                 canMove: this.state.canMove,
               });
 
+              this.props.updateAdventure(this.state.adventures);
+
               if (this.state.currentPort == null) {
                 this.props.openPortDetails(false);
+              }
+
+              if (_.isEmpty(this.state.adventures)) {
+                this.props.openAdventureDetails(false);
               }
             });
           });
@@ -329,7 +339,11 @@ export default class Map extends React.Component {
            </Draggable>
          </div>
          <div className="character-position mt-2">
-          <p>Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
+          <div className="mb-2 mt-2 clearfix">
+            <p className="float-left">Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
+            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+            { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
+          </div>
          </div>
          <hr />
          <div className="mb-2 mt-2">
@@ -340,8 +354,6 @@ export default class Map extends React.Component {
            <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead} onClick={this.move.bind(this)}>South</button>
            <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
            <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
-           { this.state.currentPort !== null ? <button type="button" className="float-left btn btn-success mr-2 btn-sm" onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
-           { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-left btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
            <TimeOutBar
               eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
               channel={'show-timeout-move-' + this.props.userId}

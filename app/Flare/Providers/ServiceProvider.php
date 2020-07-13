@@ -11,6 +11,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Console\Commands\UpdateCharacterSkills;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Values\BaseSkillValue;
@@ -54,6 +55,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CoordinatesCache::class, function($app) {
             return new CoordinatesCache();
+        });
+
+        $this->app->bind(CharacterRewardService::class, function($app, $paramters) {
+            return new CharacterRewardService($paramters['character']);
         });
 
         $this->commands([CreateAdminAccount::class, UpdateCharacterSkills::class]);

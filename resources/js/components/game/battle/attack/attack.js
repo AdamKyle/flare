@@ -76,13 +76,13 @@ export default class Attack {
     const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     const defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
 
-    return (randomNumber(1, 20) + attackerAccuracy) > 10 + defenderDodge;
+    return (randomNumber(1, 20) * (1 + attackerAccuracy)) > (10 * (1 + defenderDodge));
   }
 
   blockedAttack(defender, attacker) {
     const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
 
-    return (randomNumber(1, 20) + attackerAccuracy) < defender.ac;
+    return (randomNumber(1, 20) * (1 + attackerAccuracy)) < defender.ac;
   }
 
   isMonsterDead() {
@@ -96,8 +96,6 @@ export default class Attack {
   doAttack(attacker, type) {
     if (type === 'player') {
       this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.attack;
-      
-      if (attacker.has_healing_spells)
 
       if (attacker.has_artifacts) {
         this.battleMessages.push({
@@ -120,15 +118,13 @@ export default class Attack {
       if (attacker.heal_for > 0) {
         const healFor = attacker.heal_for + this.characterCurrentHealth;
 
-        if (healFor >= attacker.health) {
-          this.characterCurrentHealth = attacker.health;
-        } else {
+        if (attacker.health <= (attacker.health * 0.75)) {
           this.characterCurrentHealth += healFor;
-        }
 
-        this.battleMessages.push({
-          message: 'Light floods your eyes as your wounds heal over.' 
-        });
+          this.battleMessages.push({
+            message: 'Light floods your eyes as your wounds heal over.' 
+          });
+        }
       }
 
       this.battleMessages.push({

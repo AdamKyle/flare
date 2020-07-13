@@ -113,17 +113,22 @@ export default class CraftingAction extends React.Component {
     if (foundItem.cost > this.state.gold) {
       return getServerMessage('not_enough_gold');
     }
-    
 
-    axios.post('/api/craft/' + this.state.characterId, {
-      item_to_craft: this.state.itemToCraft,
-      type: this.state.craftingType,
-    }).then((result) => {
-      if (!_.isEmpty(result.data.items)) {
-        this.setState({
-          itemsToCraft: result.data.items
-        });
-      }
+    this.setState({
+      canCraft: false,
+    }, () => {
+      this.props.updateCanCraft(event.canCraft);
+      
+      axios.post('/api/craft/' + this.state.characterId, {
+        item_to_craft: this.state.itemToCraft,
+        type: this.state.craftingType,
+      }).then((result) => {
+        if (!_.isEmpty(result.data.items)) {
+          this.setState({
+            itemsToCraft: result.data.items
+          });
+        }
+      });
     });
   }
 
@@ -161,7 +166,7 @@ export default class CraftingAction extends React.Component {
       return (
         <button className="btn btn-primary mt-2"
           type="button"
-          disabled={this.state.isDead}
+          disabled={this.state.isDead || !this.state.canCraft}
           onClick={this.craft.bind(this)}
         >
           Craft!

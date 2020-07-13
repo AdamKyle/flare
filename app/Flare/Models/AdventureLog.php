@@ -21,7 +21,8 @@ class AdventureLog extends Model
     protected $fillable = [
         'character_id',
         'adventure_id',
-        'completed',
+        'complete',
+        'in_progress',
         'last_completed_level',
     ];
 
@@ -32,6 +33,7 @@ class AdventureLog extends Model
      */
     protected $casts = [
         'complete'             => 'boolean',
+        'in_progress'          => 'boolean',
         'last_completed_level' => 'integer',
     ];
 

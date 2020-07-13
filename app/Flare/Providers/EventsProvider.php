@@ -1,12 +1,15 @@
 <?php
 namespace App\Flare\Providers;
 
+use App\Flare\Console\Commands\UpdateCharacterSkills;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Listeners\UpdateSkillListener;
 use App\Flare\Listeners\UpdateCharacterAttackListener;
 use App\Flare\Listeners\UpdateCharacterInventoryListener;
 use App\Flare\Listeners\UpdateCharacterSheetListener;
@@ -34,7 +37,12 @@ class EventsProvider extends ServiceProvider {
         // When a characters inventory or anything else changes:
         UpdateCharacterAttackEvent::class => [
             UpdateCharacterAttackListener::class,
-        ]
+        ],
+
+        // When a character trains a skill:
+        UpdateSkillEvent::class => [
+            UpdateSkillListener::class,
+        ],
     ];
 
     /**

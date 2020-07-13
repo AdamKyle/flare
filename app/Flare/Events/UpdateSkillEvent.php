@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Game\Battle\Events;
+namespace App\Flare\Events;
 
+use App\Flare\Models\Adventure;
 use App\Flare\Models\Skill;
 use Illuminate\Queue\SerializesModels;
 use App\User;
@@ -15,14 +16,17 @@ class UpdateSkillEvent
      */
     public $skill;
 
+    public $adventure;
+
     /**
      * Create a new event instance.
      *
      * @param  \App\User $user
      * @return void
      */
-    public function __construct(Skill $skill)
+    public function __construct(Skill $skill, Adventure $adventure = null)
     {
-        $this->skill = $skill;
+        $this->skill     = $skill;
+        $this->adventure = $adventure;
     }
 }

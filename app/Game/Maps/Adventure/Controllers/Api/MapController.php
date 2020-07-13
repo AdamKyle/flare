@@ -50,6 +50,7 @@ class MapController extends Controller {
             'show_message'      => $user->character->can_move ? false : true,
             'port_details'      => $portDetails,
             'adventure_details' => $adventureDetails,
+            'adventure_logs'    => $user->character->adventureLogs,
             'is_dead'           => $user->character->is_dead,
         ]);
     }
@@ -66,6 +67,7 @@ class MapController extends Controller {
         $location        = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->first();
         
         $portDetails = [];
+        $adventureDetails = [];
 
         if (!is_null($location)) {
             if ($location->is_port) {
@@ -86,9 +88,12 @@ class MapController extends Controller {
                     event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
                 }
             }
+
+            if ($location->adventures->isNotEmpty()) {
+                $adventureDetails = $location->adventures;
+            }
         }
         
-
         $character->update([
             'can_move'          => false,
             'can_move_again_at' => now()->addSeconds(10),
@@ -96,7 +101,10 @@ class MapController extends Controller {
 
         event(new MoveTimeOutEvent($character));
 
-        return response()->json($portDetails, 200);
+        return response()->json([
+            'port_details' => $portDetails,
+            'adventure_details' => $adventureDetails,
+        ], 200);
     }
 
     public function setSail(SetSailValidation $request, Location $location, Character $character) {

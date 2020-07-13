@@ -29,7 +29,7 @@ class CreateMonstersSeeder extends Seeder
                 'health_range' => '8-20',
                 'attack_range' => '2-8',
                 'gold'         => 25,
-                'drop_check'   => 10,
+                'drop_check'   => 0.10,
             ]
         ]);
 

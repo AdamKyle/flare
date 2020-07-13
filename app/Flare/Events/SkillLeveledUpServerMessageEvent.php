@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Messages\Events;
+namespace App\Flare\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;

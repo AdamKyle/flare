@@ -13,7 +13,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
 
         return [
             'id'                  => $character->id,
-            'ac'                  => $character->ac,
+            'ac'                  => $characterInformation->buildDefence(),
             'name'                => $character->name,
             'attack'              => $characterInformation->buildAttack(),
             'health'              => $characterInformation->buildHealth(),

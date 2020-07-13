@@ -26657,7 +26657,7 @@ a.text-dark:focus {
 
 .character-map-timeout {
   float: left;
-  margin-top: -2px;
+  margin-top: -10px;
 }
 
 .character-map-timeout .timer {
@@ -26713,7 +26713,7 @@ a.text-dark:focus {
 }
 
 .character-map-ready {
-  margin-top: 5px;
+  margin-top: 0px;
 }
 
 .revive {

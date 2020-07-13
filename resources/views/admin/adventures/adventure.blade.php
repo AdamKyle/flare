@@ -73,6 +73,27 @@
                     </table>
                 </div>
             </div>
+
+            <div class="card mt-2">
+                <div class="card-body">
+                    <h4 class="card-title">Monsters</h4>
+                    <div class="alert alert-info">Monsters are selected at random for each adventure level.</div>
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($adventure->monsters as $monster)
+                            <tr>
+                                <td>{{$monster->name}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             
         </div>
     </div>

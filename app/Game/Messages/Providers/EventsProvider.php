@@ -4,7 +4,7 @@ namespace App\Game\Messages\Providers;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Flare\Events\ServerMessageEvent;
-use App\Game\Messages\Events\SkillLeveledUpServerMessageEvent;
+use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Messages\Listeners\SkillLeveledUpServerMessageListener;
 use App\Game\Messages\Listeners\ServerMessageListener;
 
