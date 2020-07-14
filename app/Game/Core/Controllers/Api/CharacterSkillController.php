@@ -7,7 +7,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Game\Core\Events\UpdateSkillEvent;
+use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Services\CraftingSkillService;
 use Illuminate\Http\Request;
@@ -18,6 +18,7 @@ class CharacterSkillController extends Controller {
     public function __construct() {
         $this->middleware('auth:api');
         $this->middleware('is.character.dead');
+        $this->middleware('is.character.adventuring');
     }
 
     public function fetchItemsToCraft(Request $request, Character $character) {

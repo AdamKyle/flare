@@ -19,7 +19,9 @@ class EmbarkOnAdventureListener
                 'can_adventure_again_at' => $timeTillFinished,
             ]);
 
-            return AdventureJob::dispatch($event->character->refresh(), $event->adventure, $event->levelsAtATime)->delay($timeTillFinished);
+            $jobId = AdventureJob::dispatch($event->character->refresh(), $event->adventure, $event->levelsAtATime)->delay($timeTillFinished);
+
+            dump($jobId);
         }
     }
 }

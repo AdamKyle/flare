@@ -13,6 +13,9 @@ class CharacterSkillController extends Controller {
         $this->middleware('is.character.dead')->only([
             'train'
         ]);
+        $this->middleware('is.character.adventuring')->only([
+            'train'
+        ]);
     }
 
     public function train(TrainSkillValidation $request) {

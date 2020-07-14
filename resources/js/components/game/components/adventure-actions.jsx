@@ -63,7 +63,6 @@ export default class AdeventureActions extends React.Component {
     axios.post('/api/character/'+this.props.characterId+'/adventure/'+adventure.id+'/cancel').then((result) => {
       this.setState({
         message: result.data.message,
-        characterAdventureLogs: result.data.adventure_logs,
         canAdventureAgainAt: null,
       });
     }).catch((error) => {
@@ -84,9 +83,8 @@ export default class AdeventureActions extends React.Component {
     });
   }
 
-  updateCharacterAdventures(adventureLogs, adventureAgainAt) {
+  updateCharacterAdventures(adventureAgainAt) {
     this.setState({
-      characterAdventureLogs: adventureLogs,
       canAdventureAgainAt: adventureAgainAt,
     });
   }

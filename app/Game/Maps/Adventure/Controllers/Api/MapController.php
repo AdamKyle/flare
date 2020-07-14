@@ -25,6 +25,8 @@ class MapController extends Controller {
         $this->portService = $portService;
 
         $this->middleware('auth:api');
+        $this->middleware('is.character.adventuring')->except(['index']);
+        $this->middleware('is.character.dead')->except(['index']);
     }
 
     public function index(Request $request, User $user) {

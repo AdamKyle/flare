@@ -40,10 +40,12 @@ export default class Map extends React.Component {
       canAdventureAgainAt: null,
       timeRemaining: null,
       isDead: false,
+      isAdventuring: false,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
+    this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -70,6 +72,7 @@ export default class Map extends React.Component {
         isDead: result.data.is_dead,
         adventureLogs: result.data.adventure_logs,
         canAdventureAgainAt: result.data.adventure_completed_at,
+        isAdventuring: !_.isEmpty(result.data.adventure_logs.filter(al => al.in_progress))
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -102,6 +105,13 @@ export default class Map extends React.Component {
     this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
       this.setState({
         isDead: event.isDead
+      });
+    });
+
+    this.adventureLogs.listen('Game.Core.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log(event);
+      this.setState({
+        isAdventuring: event.isAdventuring,
       });
     });
   }
@@ -343,7 +353,7 @@ export default class Map extends React.Component {
          <div className="character-position mt-2">
           <div className="mb-2 mt-2 clearfix">
             <p className="float-left">Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
-            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
             { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
           </div>
          </div>
@@ -352,10 +362,18 @@ export default class Map extends React.Component {
           {this.state.isDead ? <span className="text-danger revive">You must revive.</span> : null}
          </div>
          <div className="clearfix">
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.state.isDead} onClick={this.move.bind(this)}>North</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead} onClick={this.move.bind(this)}>South</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead} onClick={this.move.bind(this)}>East</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead} onClick={this.move.bind(this)}>West</button>
+          {this.state.isAdventuring
+           ?
+           <div className="alert alert-warning" role="alert">
+             You are currently adventuring and cannot move or set sail.
+           </div>
+           : 
+           null
+           }
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>North</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>South</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>East</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>West</button>
            <TimeOutBar
               eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
               channel={'show-timeout-move-' + this.props.userId}

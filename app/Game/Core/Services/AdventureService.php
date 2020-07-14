@@ -95,7 +95,7 @@ class AdventureService {
 
         event(new UpdateAdventureLogsBroadcastEvent($this->character->refresh()->adventureLogs, $this->character->user));
 
-        event(new ServerMessageEvent($this->character->user, 'adventure_dead', 'You died while on your explortations! Chek your Adventure logs for more information. Any rewards you gained before desth is below.'));
+        event(new ServerMessageEvent($this->character->user, 'adventure', 'You died while on your explortations! Chek your Adventure logs for more information. Any rewards you gained before desth is below.'));
 
         $this->setLogs($adventureLog, $attackService);
     } 

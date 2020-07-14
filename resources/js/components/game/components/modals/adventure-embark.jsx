@@ -50,7 +50,7 @@ export default class AdventureEmbark extends React.Component {
       levels_at_a_time: this.state.levelsToComplete
     }).then((result) => {
       this.props.updateMessage(result.data.message);
-      this.props.updateCharacterAdventures(result.data.adventure_logs, result.data.adventure_completed_at);
+      this.props.updateCharacterAdventures(result.data.adventure_completed_at);
       this.props.embarkClose();
     }).catch((error) => {
       console.log(error);

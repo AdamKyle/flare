@@ -14,6 +14,7 @@ class ShopController extends Controller {
     public function __construct() {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
+        $this->middleware('is.character.adventuring');
     }
 
     public function shopBuy() {

@@ -25,6 +25,9 @@ class CharacterInventoryController extends Controller {
         $this->middleware('is.character.dead')->only([
             'compare', 'equipItem', 'destroy'
         ]);
+        $this->middleware('is.character.adventuring')->only([
+            'compare', 'equipItem', 'destroy'
+        ]);
     }
 
     public function index(Character $character) {

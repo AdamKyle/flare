@@ -27,6 +27,7 @@ class BattleController extends Controller {
     public function __construct(Manager $manager, CharacterAttackTransformer $character) {
         $this->middleware('auth:api');
         $this->middleware('is.character.dead')->except(['revive', 'index']);
+        $this->middleware('is.character.adventuring')->except(['index']);
 
         $this->manager   = $manager;
         $this->character = $character;

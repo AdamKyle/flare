@@ -15,6 +15,7 @@ class AdventureController extends Controller {
     public function __construct() {
         $this->middleware('auth:api');
         $this->middleware('is.character.dead');
+        $this->middleware('is.character.adventuring');
     }
 
     public function adventure(Request $request, Character $character, Adventure $adventure) {
@@ -57,7 +58,6 @@ class AdventureController extends Controller {
 
         return response()->json([
             'message'                => 'Adventure has started!',
-            'adventure_logs'         => $character->adventureLogs,
             'adventure_completed_at' => $character->can_adventure_again_at,
         ], 200);
     }
@@ -77,9 +77,10 @@ class AdventureController extends Controller {
             'in_progress' => false,
         ]);
 
+        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+
         return response()->json([
             'message'        => 'Adventure canceled.',
-            'adventure_logs' => $character->refresh()->adventureLogs,
         ], 200);
     }
 }
