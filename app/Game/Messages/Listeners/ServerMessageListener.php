@@ -49,6 +49,8 @@ class ServerMessageListener
                 $message = 'You failed to craft the item! You lost the investment. Youll still gain experience towards crafting.';
 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'adventure':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

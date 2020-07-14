@@ -18,7 +18,7 @@ export default class SetSail extends React.Component {
   }
 
   componentDidMount() {
-    this.isDead.listen('Game.Battle.Events.CharacterIsDeadBroadcastEvent', (event) => {
+    this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
       this.setState({
         isDead: event.isDead
       });

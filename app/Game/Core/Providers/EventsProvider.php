@@ -10,6 +10,12 @@ use App\Game\Core\Events\EmbarkOnAdventureEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Core\Events\UpdateSkillEvent;
+use App\Game\Core\Listeners\UpdateSkillListener;
+use App\Game\Core\Listeners\AttackTimeOutListener;
+use App\Game\Core\Listeners\UpdateTopBarListener;
 use App\Game\Core\Listeners\UpdateCharacterListener;
 use App\Game\Core\Listeners\DropsCheckListener;
 use App\Game\Core\Listeners\GoldRushCheckListener;
@@ -21,6 +27,16 @@ use App\Game\Core\Listeners\BuyItemListener;
 class EventsProvider extends ServiceProvider {
 
     protected $listen = [
+
+        // When the battle is over, set the attack time out.
+        AttackTimeOutEvent::class => [
+            AttackTimeOutListener::class,
+        ],
+
+        // When the character levels up, update the top bar:
+        UpdateTopBarEvent::class => [
+            UpdateTopBarListener::class,
+        ],
 
         // When a character buys an item
         BuyItemEvent::class => [
@@ -45,6 +61,10 @@ class EventsProvider extends ServiceProvider {
         // Update character stats if the character gains a level.
         UpdateCharacterEvent::class => [
             UpdateCharacterListener::class,
+        ],
+
+        UpdateSkillEvent::class => [
+            UpdateSkillListener::class,
         ],
 
         // When battle is over check if their are drops.

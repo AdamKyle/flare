@@ -194,7 +194,6 @@ return [
       App\Game\Core\Providers\ServiceProvider::class,
       App\Game\Core\Providers\EventsProvider::class,
       App\Game\Battle\Providers\ServiceProvider::class,
-      App\Game\Battle\Providers\EventsProvider::class,
       App\Game\Messages\Providers\EventsProvider::class,
       App\Game\Maps\Adventure\Providers\ServiceProvider::class,
       App\Game\Maps\Adventure\Providers\EventsProvider::class,

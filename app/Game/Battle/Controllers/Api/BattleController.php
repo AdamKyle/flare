@@ -14,8 +14,8 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Events\CharacterIsDeadBroadcastEvent;
+use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\User;
 
 class BattleController extends Controller {

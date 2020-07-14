@@ -45,7 +45,7 @@ class Monster extends Model
         'int'        => 'integer',
         'ac'         => 'integer',
         'gold'       => 'integer',
-        'drop_check' => 'integer',
+        'drop_check' => 'float',
         'max_level'  => 'integer',
     ];
 

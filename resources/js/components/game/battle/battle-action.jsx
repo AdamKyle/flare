@@ -25,12 +25,14 @@ export default class BattleAction extends React.Component {
       timeRemaining: null,
       disableAttack: false,
       itemsToCraft: null,
+      isAdventuring: false,
     }
 
     this.timeOut         = Echo.private('show-timeout-bar-' + this.props.userId);
     this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
     this.attackUpdate    = Echo.private('update-character-attack-' + this.props.userId);
     this.isDead          = Echo.private('character-is-dead-' + this.props.userId);
+    this.adventureLogs   = Echo.private('update-adventure-logs-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -43,11 +45,13 @@ export default class BattleAction extends React.Component {
       canAttack: this.props.character.can_attack,
       timeRemaining: this.props.character.can_attack_again_at,
       showMessage: this.props.character.show_message,
+      isAdventuring: !this.props.character.can_adventure,
     }, () => {
       this.props.isCharacterDead(this.props.character.is_dead);
+      this.props.isCharacterAdventuring(!this.props.character.can_adventure);
     });
 
-    this.isDead.listen('Game.Battle.Events.CharacterIsDeadBroadcastEvent', (event) => {
+    this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
       let character = _.cloneDeep(this.state.character);
 
       character.is_dead = event.isDead;
@@ -59,13 +63,13 @@ export default class BattleAction extends React.Component {
       });
     });
 
-    this.timeOut.listen('Game.Battle.Events.ShowTimeOutEvent', (event) => {
+    this.timeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
       this.setState({
         canAttack:     event.canAttack,
       });
     });
 
-    this.topBar.listen('Game.Battle.Events.UpdateTopBarBroadcastEvent', (event) => {
+    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       const character = this.state.character;
 
       character.ac           =  event.characterSheet.data.ac,
@@ -86,6 +90,15 @@ export default class BattleAction extends React.Component {
         character: event.attack.data,
         characterMaxHealth: event.attack.data.health,
         showMessage: false,
+      });
+    });
+
+    this.adventureLogs.listen('Game.Core.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log(event);
+      this.setState({
+        isAdventuring: event.isAdventuring,
+      }, () => {
+        this.props.isCharacterAdventuring(event.isAdventuring)
       });
     });
   }
@@ -226,12 +239,20 @@ export default class BattleAction extends React.Component {
   renderActions() {
     return (
       <div className="col-md-10">
+        {this.state.isAdventuring
+         ?
+         <div className="alert alert-warning" role="alert">
+          You are currently adventuring and cannot fight any monsters or craft.
+        </div>
+         : 
+         null
+        }
         <div className="form-group row">
             <div className="col-md-8">
                 <select className="form-control ml-3" id="monsters" name="monsters"
                   value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
                   onChange={this.updateActions.bind(this)}
-                  disabled={this.state.character.is_dead}>
+                  disabled={this.state.character.is_dead || this.state.isAdventuring}>
                     <option value="" key="0">Please select a monster</option>
                     {this.monsterOptions()}
                 </select>
@@ -253,7 +274,7 @@ export default class BattleAction extends React.Component {
                   forSeconds={this.state.timeRemaining}
                   timeRemaining={this.state.timeRemaining}
                   channel={'show-timeout-bar-' + this.props.userId}
-                  eventClass={'Game.Battle.Events.ShowTimeOutEvent'}
+                  eventClass={'Game.Core.Events.ShowTimeOutEvent'}
                 />
               </div>
             </div>

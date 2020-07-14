@@ -40,7 +40,7 @@ class AdventureJob implements ShouldQueue
      */
     public function handle()
     {
-        if ($this->character->adventureLogs->where('adventure_id', $this->adventure->id)->isNotEmpty()) {
+        if ($this->character->adventureLogs->where('adventure_id', $this->adventure->id)->first()->in_progress) {
             $adevntureService = resolve(AdventureService::class, [
                 'character'        => $this->character,
                 'adventure'        => $this->adventure,

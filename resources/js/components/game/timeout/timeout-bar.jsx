@@ -56,6 +56,8 @@ export default class TimeOutBar extends React.Component {
             } else {
               forLength = event.forLength;
             }
+          } else if (event.hasOwnProperty('canAdventureAgainAt')) {
+            forLength = event.canAdventureAgainAt;
           } else {
             forLength = event.forLength;
           }

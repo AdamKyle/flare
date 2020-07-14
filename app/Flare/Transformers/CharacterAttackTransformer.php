@@ -26,6 +26,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'can_attack_again_at' => $character->can_attack_again_at,
             'can_craft'           => $character->can_craft,
             'can_craft_again_at'  => $character->can_craft_again_at,
+            'can_adventure'       => $character->can_adventure,
             'show_message'        => $character->can_attack ? false : true,
             'is_dead'             => $character->is_dead,
             'gold'                => $character->gold,

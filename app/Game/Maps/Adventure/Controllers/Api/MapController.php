@@ -41,17 +41,18 @@ class MapController extends Controller {
         }
 
         return response()->json([
-            'map_url'           => Storage::disk('maps')->url($user->character->map->gameMap->path),
-            'character_map'     => $user->character->map,
-            'character_id'      => $user->character->id,
-            'locations'         => Location::all(),
-            'can_move'          => $user->character->can_move,
-            'timeout'           => $user->character->can_move_again_at,
-            'show_message'      => $user->character->can_move ? false : true,
-            'port_details'      => $portDetails,
-            'adventure_details' => $adventureDetails,
-            'adventure_logs'    => $user->character->adventureLogs,
-            'is_dead'           => $user->character->is_dead,
+            'map_url'                => Storage::disk('maps')->url($user->character->map->gameMap->path),
+            'character_map'          => $user->character->map,
+            'character_id'           => $user->character->id,
+            'locations'              => Location::all(),
+            'can_move'               => $user->character->can_move,
+            'timeout'                => $user->character->can_move_again_at,
+            'show_message'           => $user->character->can_move ? false : true,
+            'port_details'           => $portDetails,
+            'adventure_details'      => $adventureDetails,
+            'adventure_logs'         => $user->character->adventureLogs,
+            'adventure_completed_at' => $user->character->can_adventure_again_at,
+            'is_dead'                => $user->character->is_dead,
         ]);
     }
 

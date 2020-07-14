@@ -63,8 +63,8 @@ class AdventureFightService {
 
         if (!$this->canHit($attacker, $defender)) {
             $this->logInformation[] = [
-                'attacker' => $attacker,
-                'defender' => $defender,
+                'attacker' => $attacker->name,
+                'defender' => $defender->name,
                 'message'  => $attacker->name . ' Missed!',
             ];
 
@@ -73,8 +73,8 @@ class AdventureFightService {
 
         if ($this->blockedAttack($defender, $attacker)) {
             $this->logInformation[] = [
-                'attacker' => $attacker,
-                'defender' => $defender,
+                'attacker' => $attacker->name,
+                'defender' => $defender->name,
                 'message'  => $defender->name . ' blocked the attack!',
             ];
 
@@ -82,8 +82,8 @@ class AdventureFightService {
         }
 
         $this->logInformation[] = [
-            'attacker' => $attacker,
-            'defender' => $defender,
+            'attacker' => $attacker->name,
+            'defender' => $defender->name,
             'messages' => $this->completeAttack($attacker, $defender),
         ];
         

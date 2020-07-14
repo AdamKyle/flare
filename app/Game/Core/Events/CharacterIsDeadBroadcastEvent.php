@@ -1,26 +1,21 @@
 <?php
 
-namespace App\Game\Battle\Events;
+namespace App\Game\Core\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\User;
 
-class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
+class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * the character sheet
-     *
-     * @var array
-     */
-    public $characterSheet;
+ 
+    public $isDead = false;
 
     /**
      * The user
@@ -34,10 +29,10 @@ class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct(array $characterSheet, User $user)
+    public function __construct(User $user, bool $isDead = false)
     {
-        $this->characterSheet = $characterSheet;
-        $this->user           = $user;
+        $this->user   = $user;
+        $this->isDead = $isDead;
     }
 
     /**
@@ -47,6 +42,6 @@ class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-top-bar-' . $this->user->id);
+        return new PrivateChannel('character-is-dead-' . $this->user->id);
     }
 }

@@ -37,6 +37,7 @@ export default class Map extends React.Component {
       adventures: [],
       portList: [],
       adventureLogs: [],
+      canAdventureAgainAt: null,
       timeRemaining: null,
       isDead: false,
     }
@@ -68,6 +69,7 @@ export default class Map extends React.Component {
         timeRemaining: result.data.timeout !== null ? result.data.timeout : null,
         isDead: result.data.is_dead,
         adventureLogs: result.data.adventure_logs,
+        canAdventureAgainAt: result.data.adventure_completed_at,
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -77,7 +79,7 @@ export default class Map extends React.Component {
           canMove: this.state.canMove,
         });
 
-        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs);
+        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
       });
     });
 
@@ -97,7 +99,7 @@ export default class Map extends React.Component {
       });
     });
 
-    this.isDead.listen('Game.Battle.Events.CharacterIsDeadBroadcastEvent', (event) => {
+    this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
       this.setState({
         isDead: event.isDead
       });

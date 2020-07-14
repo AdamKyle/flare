@@ -24,6 +24,7 @@ class AdventureLog extends Model
         'complete',
         'in_progress',
         'last_completed_level',
+        'logs',
     ];
 
     /**
@@ -32,6 +33,7 @@ class AdventureLog extends Model
      * @var array
      */
     protected $casts = [
+        'logs'                 => 'array',
         'complete'             => 'boolean',
         'in_progress'          => 'boolean',
         'last_completed_level' => 'integer',

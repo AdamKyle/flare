@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Battle\Events;
+namespace App\Game\Core\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;

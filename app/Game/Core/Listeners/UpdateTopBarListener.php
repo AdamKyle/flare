@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Game\Battle\Listeners;
+namespace App\Game\Core\Listeners;
 
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Game\Battle\Events\UpdateTopBarBroadcastEvent;
+use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 
 class UpdateTopBarListener
 {

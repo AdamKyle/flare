@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Game\Battle\Listeners;
+namespace App\Game\Core\Listeners;
 
-use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Events\ShowTimeOutEvent;
-use App\Game\Battle\Jobs\AttackTimeOutJob;
+use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Core\Events\ShowTimeOutEvent;
+use App\Game\Core\Jobs\AttackTimeOutJob;
 
 
 class AttackTimeOutListener

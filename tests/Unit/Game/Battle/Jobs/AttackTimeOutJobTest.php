@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\Battle\Jobs;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Game\Battle\Jobs\AttackTimeOutJob;
-use App\Game\Battle\Events\ShowTimeOutEvent;
+use App\Game\Core\Events\ShowTimeOutEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Setup\CharacterSetup;

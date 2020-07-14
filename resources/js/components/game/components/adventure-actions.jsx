@@ -1,5 +1,6 @@
 import React from 'react';
 import AdventureEmbark from './modals/adventure-embark';
+import TimeOutBar from '../timeout/timeout-bar';
 
 export default class AdeventureActions extends React.Component {
 
@@ -13,6 +14,7 @@ export default class AdeventureActions extends React.Component {
       adventure: null,
       message: null,
       characterAdventureLogs: [],
+      canAdventureAgainAt: null,
     }
 
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
@@ -22,12 +24,14 @@ export default class AdeventureActions extends React.Component {
     this.setState({
       adventureDetails: this.props.adventureDetails,
       characterAdventureLogs: this.props.adventureLogs,
+      canAdventureAgainAt: this.props.adventureAgainAt,
       isLoading: false,
     });
 
     this.adventureLogs.listen('Game.Core.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
       this.setState({
         characterAdventureLogs: event.adventureLogs,
+        canAdventureAgainAt: event.canAdventureAgainAt,
       });
     });
   }
@@ -59,7 +63,8 @@ export default class AdeventureActions extends React.Component {
     axios.post('/api/character/'+this.props.characterId+'/adventure/'+adventure.id+'/cancel').then((result) => {
       this.setState({
         message: result.data.message,
-        characterAdventureLogs: result.data.adventure_logs
+        characterAdventureLogs: result.data.adventure_logs,
+        canAdventureAgainAt: null,
       });
     }).catch((error) => {
       console.error(error);
@@ -79,16 +84,31 @@ export default class AdeventureActions extends React.Component {
     });
   }
 
-  updateCharacterAdventures(adventureLogs) {
+  updateCharacterAdventures(adventureLogs, adventureAgainAt) {
     this.setState({
       characterAdventureLogs: adventureLogs,
+      canAdventureAgainAt: adventureAgainAt,
     });
+  }
+
+  timeOutBar() {
+    return (
+      <TimeOutBar
+        cssClass={'float-right'}
+        readyCssClass={'character-ready'}
+        forSeconds={this.state.canAdventureAgainAt}
+        timeRemaining={this.state.canAdventureAgainAt}
+        channel={'show-timeout-bar-' + this.props.userId}
+        eventClass={'Game.Core.Events.UpdateAdventureLogsBroadcastEvent'}
+      />
+    )
   }
 
   adventures() {
     const details = [];
 
     let foundAdventure = null;
+    const hasAdventureInProgres = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
 
     _.forEach(this.state.adventureDetails, (adventure) => {
 
@@ -103,10 +123,12 @@ export default class AdeventureActions extends React.Component {
         details.push(
             <div className="row mb-2" key={adventure.id}>
                 <div className="col-md-2">{adventure.name}</div>
-                <div className="col-md-10">
-                    <button className="mr-2 btn btn-primary" data-adventure-id={adventure.id} onClick={this.embarkShow.bind(this)}>Embark</button>
+                <div className="col-md-5">
+                    <button className="mr-2 btn btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres} onClick={this.embarkShow.bind(this)}>Embark</button>
                     <a href={'/adeventures/' + adventure.id} target="_blank" className="mr-2 btn btn-primary">Details</a>
+                    
                     { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? <button className="mr-2 btn btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel Adventure</button> : null : null }
+                    { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? this.timeOutBar() : null : null }
                 </div>
             </div>
         );
@@ -115,10 +137,18 @@ export default class AdeventureActions extends React.Component {
     return details;
   }
 
+  removeMessage() {
+    this.setState({
+      message: null,
+    });
+  }
+
   render() {
     if (this.state.isLoading) {
       return <>Please wait ...</>
     }
+
+    const hasAdventureInProgres = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
 
     return (
       <div className="card">
@@ -129,9 +159,12 @@ export default class AdeventureActions extends React.Component {
           </div>
           <hr />
           {this.state.message !== null ? <div className="alert alert-success">
+            <button type="button" className="close" onClick={this.removeMessage.bind(this)}>
+              <span aria-hidden="true">&times;</span>
+            </button>
             {this.state.message}
           </div> : null}
-          <div className="alert alert-info">You may only embark on one adventure at a time</div>
+          { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
           {this.adventures()}
         </div>
 

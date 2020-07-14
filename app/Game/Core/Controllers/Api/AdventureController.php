@@ -6,6 +6,7 @@ use App\Flare\Models\Adventure;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\EmbarkOnAdventureEvent;
+use App\Game\Core\Events\UpdateAdventureLogsBroadcastEvent;
 use Illuminate\Http\Request;
 
 class AdventureController extends Controller {
@@ -48,12 +49,17 @@ class AdventureController extends Controller {
             ]);
         }
 
+        $character = $character->refresh();
+
         event(new EmbarkOnAdventureEvent($character, $adventure, $request->levels_at_a_time));
 
+        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+
         return response()->json([
-            'message'        => 'Adventure has started!',
-            'adventure_logs' => $character->refresh()->adventureLogs,
-        ]);
+            'message'                => 'Adventure has started!',
+            'adventure_logs'         => $character->adventureLogs,
+            'adventure_completed_at' => $character->can_adventure_again_at,
+        ], 200);
     }
 
     public function cancelAdventure(Character $character, Adventure $adventure) {
@@ -67,11 +73,13 @@ class AdventureController extends Controller {
 
         $adventureLog = $character->adventureLogs->where('adventure_id', $adventure->id)->first();
 
-        $adventureLog->delete();
+        $adventureLog->update([
+            'in_progress' => false,
+        ]);
 
         return response()->json([
             'message'        => 'Adventure canceled.',
-            'adventure_logs' => $character->refresh()->adventureLogs(),
-        ]);
+            'adventure_logs' => $character->refresh()->adventureLogs,
+        ], 200);
     }
 }

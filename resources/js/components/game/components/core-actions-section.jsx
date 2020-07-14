@@ -9,6 +9,7 @@ export default class CoreActionsSection extends React.Component {
 
 		this.state = {
 			isDead: false,
+			isAdventuring: false,
 			changeCraftingType: false,
 			showCrafting: false,
 			characterId: null,
@@ -39,6 +40,12 @@ export default class CoreActionsSection extends React.Component {
 	characterIsDead(isDead) {
 		this.setState({
 			isDead: isDead,
+		});
+	}
+
+	characterIsAdventuring(adventuring) {
+		this.setState({
+			isAdventuring: adventuring,
 		});
 	}
 
@@ -73,6 +80,7 @@ export default class CoreActionsSection extends React.Component {
 						<div className="col-md-2">
 							<AdditionalCoreActionsDropDown
 								isDead={this.state.isDead}
+								isAdventuring={this.state.isAdventuring}
 								changeCraftingType={this.changeCraftingType.bind(this)}
 								updateShowCrafting={this.updateShowCrafting.bind(this)}
 								canCraft={this.state.canCraft}
@@ -86,6 +94,7 @@ export default class CoreActionsSection extends React.Component {
 							isDead={this.state.isDead}
 							shouldChangeCraftingType={this.state.changeCraftingType}
 							isCharacterDead={this.characterIsDead.bind(this)}
+							isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
 							changeCraftingType={this.changeCraftingType.bind(this)}
 							updateCanCraft={this.updateCanCraft.bind(this)}
 						/>

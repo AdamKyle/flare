@@ -27,6 +27,7 @@ class Game extends React.Component {
       openPortDetails: false,
       openAdventureDetails: false,
       characterId: null,
+      canAdventureAgainAt: null,
     }
   }
 
@@ -36,10 +37,11 @@ class Game extends React.Component {
     });
   }
 
-  updateAdventure(adventureDetails, adventureLogs) {
+  updateAdventure(adventureDetails, adventureLogs, adventureAgainAt) {
     this.setState({
       adventureDetails: adventureDetails,
       adventureLogs: adventureLogs,
+      canAdventureAgainAt: adventureAgainAt,
     });
   }
 
@@ -75,7 +77,7 @@ class Game extends React.Component {
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
                 <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} setCharacterId={this.setCharacterId.bind(this)} />
                 {this.state.openPortDetails ? <PortLocationActions portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
-                {this.state.openAdventureDetails ? <AdeventureActions adventureDetails={this.state.adventureDetails} userId={this.props.userId} characterId={this.state.characterId} openAdventureDetails={this.openAdventureDetails.bind(this)} adventureLogs={this.state.adventureLogs} /> : null}
+                {this.state.openAdventureDetails ? <AdeventureActions adventureDetails={this.state.adventureDetails} userId={this.props.userId} characterId={this.state.characterId} openAdventureDetails={this.openAdventureDetails.bind(this)} adventureAgainAt={this.state.canAdventureAgainAt} adventureLogs={this.state.adventureLogs} /> : null}
               </div>
               <div className="col-md-4">
                 <Map 

@@ -4,7 +4,7 @@ namespace Tests\Unit\Game\Battle\Events;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Game\Battle\Events\UpdateTopBarBroadcastEvent;
+use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
