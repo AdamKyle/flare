@@ -295,7 +295,7 @@ export default class BattleAction extends React.Component {
           {this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead
             ?
             <>
-              <button className="btn btn-primary" onClick={this.attack.bind(this)} disabled={!this.state.isAdventuring}>Attack</button>
+              <button className="btn btn-primary" onClick={this.attack.bind(this)} disabled={this.state.isAdventuring}>Attack</button>
               {this.healthMeters()}
             </>
             : null

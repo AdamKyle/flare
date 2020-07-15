@@ -14,6 +14,7 @@
                     <h4 class="card-title">{{is_null($adventure) ? 'Create Adventure' : 'Edit Adventure: ' . $adventure->name}}</h4>
                     <form action="{{is_null($adventure) ? route('adventures.store') : route('adventure.update', ['adventure' => $adventure->id])}}" method="POST">
                         @csrf
+
                         @include('admin.adventures.partials.adventure-details', [
                             'adventure'    => $adventure,
                             'locations'    => $locations,

@@ -40,7 +40,7 @@ class AdventuresController extends Controller {
 
     public function edit(Adventure $adventure) {
         return view('admin.adventures.manage', [
-            'adventure' => null,
+            'adventure' => $adventure,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
             'monsters'  => Monster::all()->pluck('name', 'id')->toArray(),
@@ -53,9 +53,9 @@ class AdventuresController extends Controller {
         $adventure->update($requestForModel);
 
         $adventure->locations()->sync($request->location_ids);
-        $adventure->monsters()->synce($request->monster_ids);
+        $adventure->monsters()->sync($request->monster_ids);
         
-        return redirect()->route('adventures.adventures', [
+        return redirect()->route('adventures.adventure', [
             'adventure' => $adventure->id
         ])->with('success', $adventure->name . ' updated!');
     }

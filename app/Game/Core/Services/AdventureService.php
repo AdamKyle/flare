@@ -77,11 +77,11 @@ class AdventureService {
 
     protected function characterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog, int $level) {
         $this->character->update([
-            'is_dead'       => true,
-            'can_move'      => true,
-            'can_attack'    => true,
-            'can_craft'     => true,
-            'can_adventure' => true,
+            'can_move'               => true,
+            'can_attack'             => true,
+            'can_craft'              => true,
+            'can_adventure'          => true,
+            'can_adventure_again_at' => null,
         ]);
 
         $this->character->refresh();

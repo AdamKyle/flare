@@ -29,11 +29,13 @@
                             </tr>
                         </thead>
                         <tbody class="text-center">
-                            @foreach($adventures as $adventures)
+                            @foreach($adventures as $adventure)
                                 <tr>
-                                    <td><a href="{{route('locations.location', ['location' => $advenutre])}}">{{$adventure->name}}</a></td>
+                                    <td><a href="{{route('adventures.adventure', ['adventure' => $adventure])}}">{{$adventure->name}}</a></td>
                                     <td>{{$adventure->description}}</td>
-                                    <td>{{$adventure->location->name}}</td>
+                                    <td>
+                                        {{implode(',', $adventure->locations->pluck('name')->toArray())}}
+                                    </td>
                                     <td>{{$adventure->levels}}</td>
                                     <td>{{$adventure->time_per_level}}</td>
                                     <td>{{$adventure->itemReward->name}}</td>

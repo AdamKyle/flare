@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\EmbarkOnAdventureEvent;
 use App\Game\Core\Events\UpdateAdventureLogsBroadcastEvent;
+use Cache;
 use Illuminate\Http\Request;
 
 class AdventureController extends Controller {
@@ -76,6 +77,8 @@ class AdventureController extends Controller {
         $adventureLog->update([
             'in_progress' => false,
         ]);
+
+        Cache::forget('character_'.$character->id.'_adventure_'.$adventure->id);
 
         event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
 

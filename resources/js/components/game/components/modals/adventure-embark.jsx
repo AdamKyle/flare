@@ -38,7 +38,7 @@ export default class AdventureEmbark extends React.Component {
       return <option value="5">5 levels at a time</option>
     }
 
-    return <option value="1">1 level at a time</option>
+    return null;
   }
 
   embark() {
