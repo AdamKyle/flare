@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Setup\CharacterSetup;
 
-class testUpdateCharacterSkills extends TestCase
+class UpdateCharacterSkillsTest extends TestCase
 {
 
     use RefreshDatabase,

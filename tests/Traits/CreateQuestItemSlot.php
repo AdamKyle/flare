@@ -4,9 +4,9 @@ namespace Tests\Traits;
 
 use App\Flare\Models\QuestItemSlot;
 
-trait CreateInventorySlot {
+trait CreateQuestItemSlot{
 
-    public function createInventorySlot(array $options = []): InventorySlot {
+    public function createInventorySlot(array $options = []): QuestItemSlot {
         return factory(QuestItemSlot::class)->create($options);
     }
 }

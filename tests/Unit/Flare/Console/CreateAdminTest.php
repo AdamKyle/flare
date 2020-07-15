@@ -7,7 +7,7 @@ use Tests\TestCase;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
-class CreateAdminTests extends TestCase
+class CreateAdminTest extends TestCase
 {
 
     use RefreshDatabase,

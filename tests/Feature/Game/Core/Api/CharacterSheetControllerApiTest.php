@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Core;
+namespace Tests\Feature\Game\Core\Api;
 
 use App\Flare\Models\ItemAffix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
