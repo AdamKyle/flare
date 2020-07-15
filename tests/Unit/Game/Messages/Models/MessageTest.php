@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Messages\Listeners;
+namespace Tests\Unit\Game\Messages\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Messages\Models\Message;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare;
+namespace Tests\Unit\Flare\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
