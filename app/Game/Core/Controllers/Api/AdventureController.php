@@ -16,7 +16,7 @@ class AdventureController extends Controller {
     public function __construct() {
         $this->middleware('auth:api');
         $this->middleware('is.character.dead');
-        $this->middleware('is.character.adventuring');
+        $this->middleware('is.character.adventuring')->except(['cancelAdventure']);
     }
 
     public function adventure(Request $request, Character $character, Adventure $adventure) {
