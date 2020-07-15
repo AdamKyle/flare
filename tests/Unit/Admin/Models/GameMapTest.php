@@ -37,7 +37,7 @@ class GameMapTest extends TestCase
     protected function setUpCharacter(array $options = []) {
         $user = $this->createUser();
 
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.png'));
+        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
 
         $gameMap = GameMap::create([
             'name'    => 'surface',

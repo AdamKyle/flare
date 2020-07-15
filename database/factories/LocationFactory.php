@@ -21,10 +21,8 @@ $factory->define(Location::class, function (Faker $faker) {
     return [
         'name' => null,
         'game_map_id' => null,
-        'adventure_id' => null,
         'quest_reward_item_id' => null,
         'description' => null,
-        'asset_path' => null,
         'is_port' => null,
         'x' => null,
         'y' => null,

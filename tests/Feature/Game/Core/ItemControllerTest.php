@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class ItemController extends TestCase
+class ItemsControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateItem;

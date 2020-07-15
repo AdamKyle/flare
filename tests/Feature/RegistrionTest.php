@@ -31,7 +31,7 @@ class RegistrationTest extends TestCase
             'base_damage' => 3,
         ]);
 
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.png'));
+        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
 
         $gameMap = GameMap::create([
             'name'    => 'surface',

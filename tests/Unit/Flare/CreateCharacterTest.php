@@ -31,7 +31,7 @@ class CreateCharacterTest extends TestCase
             'type' => 'weapon',
         ]);
 
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.png'));
+        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
 
         $this->gameMap = GameMap::create([
             'name'    => 'surface',

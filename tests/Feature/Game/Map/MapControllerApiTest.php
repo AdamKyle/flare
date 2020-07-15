@@ -58,7 +58,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
@@ -106,7 +105,6 @@ class MapControllerApiTest extends TestCase
         $location = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
@@ -125,7 +123,7 @@ class MapControllerApiTest extends TestCase
 
         $content = json_decode($response->content());
 
-        $this->assertEquals($location->name, $content->current_port->name);
+        $this->assertEquals($location->name, $content->port_details->current_port->name);
     }
 
     public function testIsNotWater() {
@@ -149,7 +147,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
@@ -173,7 +170,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
@@ -182,7 +178,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
@@ -206,7 +201,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
@@ -229,7 +223,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
@@ -238,7 +231,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
@@ -263,7 +255,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
@@ -272,7 +263,6 @@ class MapControllerApiTest extends TestCase
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
-            'asset_path'  => null,
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
@@ -307,7 +297,7 @@ class MapControllerApiTest extends TestCase
     protected function setUpCharacter(array $options = []) {
         $this->user = $this->createUser();
 
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.png'));
+        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
 
         $gameMap = GameMap::create([
             'name'    => 'surface',

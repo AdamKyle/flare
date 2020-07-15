@@ -5,7 +5,7 @@ namespace App\Game\Core\Controllers;
 use App\Flare\Models\Item;
 use App\Http\Controllers\Controller;
 
-class ItemController extends Controller {
+class ItemsController extends Controller {
 
     public function __construct() {
     }

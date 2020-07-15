@@ -23,11 +23,11 @@ class MapPositionValueTest extends TestCase
 
     public function testMapPositionsForCharacterX() {
         $values = [
-            736, 1938, 1538, 1138, 738, 32
+            463, 464, 465
         ];
 
         $expected = [
-            0, -1245, -1200, -800, -400, 0
+            0, 0, -150
         ];
 
         for ($i = 0; $i < count($values); $i++) {
@@ -38,15 +38,15 @@ class MapPositionValueTest extends TestCase
 
     public function testMapPositionsForCharacterY() {
         $values = [
-            336, 639, 640, 927, 944, 1247, 1248, 1551, 1552, 1855, 1856, 333
+            319, 465
         ];
 
         $expected = [
-            -304, -304, -608, -608, -900, -900, -1212, -1212, -1520, -1520, -1648, 0
+            0, -150
         ];
 
         for ($i = 0; $i < count($values); $i++) {
-            $position = $this->mapPositionValue->fetchYPosition($values[$i]);
+            $position = $this->mapPositionValue->fetchYPosition($values[$i], $values[$i]);
             $this->assertEquals($expected[$i], $position);
         }
     }
