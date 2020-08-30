@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Game\Core\Listeners;
+namespace App\Game\Maps\Adventure\Listeners;
 
 use App\Flare\Events\ServerMessageEvent;
 use Cache;
 use Illuminate\Support\Str;
-use App\Game\Core\Events\EmbarkOnAdventureEvent;
-use App\Game\Core\Events\UpdateAdventureLogsBroadcastEvent;
-use App\Game\Core\Jobs\AdventureJob;
+use App\Game\Maps\Adventure\Jobs\AdventureJob;
+use App\Game\Maps\Adventure\Events\EmbarkOnAdventureEvent;
+use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 
 class EmbarkOnAdventureListener
 {

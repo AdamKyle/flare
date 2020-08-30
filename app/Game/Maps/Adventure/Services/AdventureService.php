@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\Maps\Adventure\Services;
 
 use RuntimeException;
 use App\Flare\Models\Adventure;

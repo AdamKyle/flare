@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\Maps\Adventure\Controllers\Api;
 
 use App\Flare\Models\Adventure;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\EmbarkOnAdventureEvent;
-use App\Game\Core\Events\UpdateAdventureLogsBroadcastEvent;
+use App\Game\Maps\Adventure\Events\EmbarkOnAdventureEvent;
+use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 use Cache;
 use Illuminate\Http\Request;
 

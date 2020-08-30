@@ -26851,6 +26851,10 @@ dd {
   top: -7px;
 }
 
+.card {
+  box-shadow: 1px 1px 2px 0px rgba(115, 115, 115, 0.55);
+}
+
 @media (min-width: 576px) {
   .modal-dialog {
     max-width: 650px;

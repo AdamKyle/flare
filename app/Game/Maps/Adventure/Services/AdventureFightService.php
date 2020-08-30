@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\Maps\Adventure\Services;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Adventure;

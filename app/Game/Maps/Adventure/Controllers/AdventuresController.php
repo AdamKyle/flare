@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Controllers;
+namespace App\Game\Maps\Adventure\Controllers;
 
 use App\Flare\Models\Adventure;
 use App\Http\Controllers\Controller;

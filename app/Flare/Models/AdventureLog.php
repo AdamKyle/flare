@@ -3,12 +3,6 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\Skill;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\EquippedItem;
-use App\User;
 
 class AdventureLog extends Model
 {

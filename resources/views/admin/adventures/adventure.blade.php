@@ -3,9 +3,12 @@
 @section('content')
 <div class="container-fluid">
     <div class="row page-titles">
-        <div class="col-md-12 align-self-right">
-            <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
-        </div>
+
+        @if(auth()->user()->hasRole('Admin'))
+            <div class="col-md-12 align-self-right">
+                <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
+            </div>
+        @endif
     </div>
     <div class="row justify-content-center">
         <div class="col-md-12">

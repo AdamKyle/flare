@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\Maps\Adventure\Events;
 
 use App\Flare\Models\AdventureLog;
 use Illuminate\Broadcasting\Channel;

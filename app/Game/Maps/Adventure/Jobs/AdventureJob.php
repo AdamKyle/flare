@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Jobs;
+namespace App\Game\Maps\Adventure\Jobs;
 
 use App\Flare\Models\Adventure;
 use Illuminate\Bus\Queueable;
@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
-use App\Game\Core\Services\AdventureService;
+use App\Game\Maps\Adventure\Services\AdventureService;
 use Cache;
 
 class AdventureJob implements ShouldQueue
@@ -45,7 +45,7 @@ class AdventureJob implements ShouldQueue
     public function handle()
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
-        dump($name, $this->name);
+
         if (is_null($name) || $name !== $this->name) {
             return;
         }
