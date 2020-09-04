@@ -22,7 +22,7 @@ This game is heavily under development but some of the features that you will ge
 # Adventure
 
 - Pick a race and a class and begin your adventure!
-- Move around on a 2000x2000 map that is completely draggable. Explore caves, ancient ruins and more with time based mechanics.
+- Move around on a 500x500 map that is completely draggable on a 16x16 grid. Explore caves, ancient ruins and more with time based mechanics.
 - Fight monsters, gain loots, gold, experience and levels!
 - Equip your gear and become stronger. Play to your classes strengths and become the strongest character!
 - Chat in real time with other people including private messages.

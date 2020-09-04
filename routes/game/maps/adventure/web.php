@@ -1,3 +1,3 @@
 <?php
 
-Route::get('/adeventures/{adventure}', ['as' => 'game.adventures.adventure', 'uses' => 'AdventuresController@show']);
+Route::get('/adeventures/{adventure}', ['as' => 'map.adventures.adventure', 'uses' => 'AdventuresController@show']);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Battle\Values;
+namespace App\Game\Core\Values;
 
 use App\Flare\Models\Character;
 

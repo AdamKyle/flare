@@ -27,11 +27,15 @@ class AdventureLog extends Model
      * @var array
      */
     protected $casts = [
-        'logs'                 => 'array',
         'complete'             => 'boolean',
         'in_progress'          => 'boolean',
         'last_completed_level' => 'integer',
+        'logs'                 => 'array',
     ];
+
+    public function setLogsAttribute($value) {
+        $this->attributes['logs'] = json_encode($value);
+    }
 
     public function character() {
         return $this->belongsTo(Character::class);

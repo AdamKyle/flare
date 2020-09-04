@@ -7,6 +7,7 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
+use Facades\App\Flare\Calculators\SkillXPCalculator;
 
 class UpdateSkillListener
 {
@@ -22,12 +23,8 @@ class UpdateSkillListener
      */
     public function handle(UpdateSkillEvent $event)
     {
-        $equipmentBonus = $this->fetchSkilltrainingBonusFromEquipment($event->skill);
-        $questItemBonus = $this->fetchSkilltrainingBonusFromQuestItems($event->skill);
-        $adventureBonus = $this->fetchAdventureBonus($event->adventure);
-
         $event->skill->update([
-            'xp' => $event->skill->xp + (10 * (1 + ($event->skill->xp_towards + $equipmentBonus + $questItemBonus + $adventureBonus))),
+            'xp' => $event->skill->xp + SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure),
         ]);
 
         $skill = $event->skill->refresh();
@@ -47,35 +44,5 @@ class UpdateSkillListener
                 event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
             }
         }
-    }
-
-    protected function fetchSkilltrainingBonusFromEquipment(Skill $skill): float {
-        $totalSkillBonus = 0.0;
-
-        foreach ($skill->character->inventory->slots as $slot) {
-            if ($slot->equipped) {
-                $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
-            }
-        }
-
-        return $totalSkillBonus;
-    }
-
-    protected function fetchSkilltrainingBonusFromQuestItems(Skill $skill): float {
-        $totalSkillBonus = 0.0;
-
-        foreach ($skill->character->inventory->questItemSlots as $slot) {
-            $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
-        }
-
-        return $totalSkillBonus;
-    }
-
-    protected function fetchAdventureBonus(Adventure $adventure = null): float {
-        if (!is_null($adventure)) {
-            return $adventure->skill_exp_bonus;
-        }
-
-        return 0.0;
     }
 }

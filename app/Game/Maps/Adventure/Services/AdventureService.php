@@ -13,9 +13,9 @@ use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
-use App\Game\Core\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Core\Exceptions\MonsterIsDeadException;
 use App\Game\Core\Exceptions\CharacterIsDeadException;
+use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 
 class AdventureService {
 
@@ -24,6 +24,8 @@ class AdventureService {
     private $adventure;
 
     private $levelsAtATime;
+
+    private $reqawards = [];
 
     public function __construct(Character $character, Adventure $adventure, $levelsAtATime = 'all') {
         $this->character     = $character;
@@ -81,6 +83,7 @@ class AdventureService {
             'can_attack'             => true,
             'can_craft'              => true,
             'can_adventure'          => true,
+            'is_dead'                => true,
             'can_adventure_again_at' => null,
         ]);
 
@@ -111,17 +114,19 @@ class AdventureService {
     }
 
     protected function setLogs(AdventureLog $adventureLog, AdventureFightService $attackService) {
-        $logs = json_decode($adventureLog->logs);
+        $logs = $adventureLog->logs;
 
         if (empty($logs)) {
             $adventureLog->update([
-                'logs' => json_encode($attackService->getLogInformation()),
+                'logs' => [
+                    $attackService->getLogInformation()
+                ],
             ]);
         } else {
             $logs[] = $attackService->getLogInformation();
 
             $adventureLog->update([
-                'logs' => json_encode($logs),
+                'logs' => $logs,
             ]);
         }
     }
@@ -134,6 +139,7 @@ class AdventureService {
             'can_attack'             => true,
             'can_craft'              => true,
             'can_adventure'          => true,
+            'is_dead'                => false,
             'can_adventure_again_at' => null,
         ]);
 
@@ -160,6 +166,7 @@ class AdventureService {
     } 
 
     protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false) {
+
         if ($isDead) {
             $adventureLog->update([
                 'in_progress' => false,

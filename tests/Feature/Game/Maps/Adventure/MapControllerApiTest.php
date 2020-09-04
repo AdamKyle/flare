@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Map;
+namespace Tests\Feature\Game\Maps\Adventure;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;

@@ -35,9 +35,9 @@ class AdventureFightService {
     }
 
     public function processBattle() {
-        $this->monster = $this->adventure->monsters()->inRandomOrder()->first();
-
-        $healthRange = explode('-', $this->monster->health_range);
+        $this->monster              = $this->adventure->monsters()->inRandomOrder()->first();
+        
+        $healthRange                = explode('-', $this->monster->health_range);
 
         $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
 
@@ -105,7 +105,7 @@ class AdventureFightService {
             $ac = $this->characterInformation->buildDefence();
         }
 
-        return (rand(1, 20) * (1 + $accuracyBonus)) > $ac;
+        return $ac > (rand(1, 20) * (1 + $accuracyBonus));
     }
 
     protected function completeAttack($attacker, $defender): array {

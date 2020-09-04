@@ -5,7 +5,7 @@ namespace App\Game\Core\Listeners;
 use Illuminate\Database\Eloquent\Collection;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\Adventure;
+use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 
 class GoldRushCheckListener
 {
@@ -21,11 +21,10 @@ class GoldRushCheckListener
     public function handle(GoldRushCheckEvent $event)
     {
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        $adventureBonus = $this->getAdventureGoldrushChance($event->adventure);
-        $hasGoldRush    = (rand(1, 100) * (1 + ($lootingChance + $adventureBonus))) > (100 - (100 * $event->monster->drop_check));
+        
+        $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($event->monster, $lootingChance, $event->adventure);
 
         if ($hasGoldRush) {
-            $drops    = $event->monster->drops;
             $goldRush = rand(0, 1000) + 1000;
 
             $event->character->gold += $goldRush;
@@ -35,13 +34,7 @@ class GoldRushCheckListener
         }
     }
 
-    protected function getAdventureGoldrushChance(Adventure $adventure = null): float {
-        if (!is_null($adventure)) {
-            return $adventure->gold_rush_chance;
-        }
-
-        return 0.0;
-    }
+    
 
 
 }

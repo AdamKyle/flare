@@ -2,11 +2,13 @@
 
 namespace App\Flare\Services;
 
+use App\Flare\Calculators\XPCalculator as CalculatorsXPCalculator;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
+use Facades\App\Flare\Calculators\XPCalculator;
 
 class CharacterRewardService {
 
@@ -26,7 +28,7 @@ class CharacterRewardService {
             $this->trainSkill($currentSkill, $adventure);
         }
 
-        $this->character->xp = $this->fetchMonsterXp($monster, $xpReduction);
+        $this->character->xp += XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
         $this->character->gold += $monster->gold;
 
         $this->character->save();
@@ -34,22 +36,6 @@ class CharacterRewardService {
 
     public function getCharacter(): Character {
         return $this->character->refresh();
-    }
-
-    public function fetchMonsterXp(Monster $monster, float $xpReduction = 0.0) {
-
-        if ($monster->max_level === 0) {
-            // Always Just give.
-            $xp = $this->character->xp + ($xpReduction !==  0.0 ? ($monster->xp - ($monster->xp * $xpReduction)) : $monster->xp);
-        } else if ($this->character->level < $monster->max_level) {
-            // So the monster has a max exp level and the character is below it, so they get full xp.
-            $xp = $this->character->xp + ($xpReduction !==  0.0 ? ($monster->xp - ($monster->xp * $xpReduction)) : $monster->xp);
-        } else if ($this->character->level > $monster->max_level) {
-            // So the monster has a max exp level and the character is above it, so they get 1/3rd xp.
-            $xp = $this->character->xp + ($xpReduction !==  0.0 ? (3.3333 - (3.3333 * $xpReduction)) : 3.3333);
-        }
-
-        return $xp;
     }
 
     public function fetchCurrentSkillInTraining() {

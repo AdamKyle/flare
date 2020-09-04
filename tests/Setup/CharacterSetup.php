@@ -2,10 +2,12 @@
 
 namespace Tests\Setup;
 
+use App\Flare\Models\Adventure;
 use App\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Game\Core\Services\CharacterService;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -67,6 +69,18 @@ class CharacterSetup {
         return $this;
     }
 
+    public function levelCharacterUp(int $levels = 1): CharacterSetup {
+        $characterService = new CharacterService();
+
+        for ($i = 0; $i <= $levels; $i++) {
+            $characterService->levelUpCharacter($this->character);
+
+            $this->character->refresh();
+        }
+
+        return $this;
+    }
+
     public function giveItem(Item $item): CharacterSetup {
 
         $this->character->inventory->slots()->create([
@@ -114,6 +128,20 @@ class CharacterSetup {
             'level' => isset($options[strtolower($name).'_level']) ? $options[strtolower($name).'_level'] : 1,
             'skill_bonus' => isset($options[strtolower($name).'_bonus']) ? $options[strtolower($name).'_bonus'] : 0,
         ]);
+
+        return $this;
+    }
+
+    public function createAdventureLog(Adventure $adventure, array $options = []): CharacterSetup {
+
+        $log = array_merge([
+            'character_id' => $this->character->id,
+            'adventure_id' => $adventure->id,
+        ], $options);
+
+        $this->character->adventureLogs()->create($log);
+
+        $this->character->refresh();
 
         return $this;
     }

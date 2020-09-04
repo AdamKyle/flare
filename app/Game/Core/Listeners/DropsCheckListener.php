@@ -4,12 +4,13 @@ namespace App\Game\Core\Listeners;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Battle\Services\CharacterService;
+use App\Game\Core\Services\CharacterService;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class DropsCheckListener
 {
@@ -29,8 +30,8 @@ class DropsCheckListener
     public function handle(DropsCheckEvent $event)
     {
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        $adventureBonus = $this->getAdventureBonus($event->adventure);
-        $canGetDrop     = (rand(1, 100) * (1 + ($lootingChance + $adventureBonus))) > (100 - (100 * $event->monster->drop_check));
+        
+        $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $event->adventure);
 
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
@@ -41,14 +42,6 @@ class DropsCheckListener
                 $this->attemptToPickUpItem($event, $drop);
             }
         }
-    }
-
-    protected function getAdventureBonus(Adventure $adventure = null): float {
-        if (!is_null($adventure)) {
-            return $adventure->item_find_chance;
-        }
-
-        return 0.0;
     }
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
