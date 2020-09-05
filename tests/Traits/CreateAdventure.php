@@ -14,7 +14,7 @@ trait CreateAdventure {
 
     use CreateItem;
 
-    public function createNewAdventure(Monster $monster = null): Adventure {
+    public function createNewAdventure(Monster $monster = null, int $levels = 1): Adventure {
 
         $adventure = factory(Adventure::class)->create([
             'name'             => 'Sample',
@@ -25,7 +25,7 @@ trait CreateAdventure {
                 'base_damage' => 1,
                 'cost'        => 1,
             ]),
-            'levels'           => 1,
+            'levels'           => $levels,
             'time_per_level'   => 1,
             'gold_rush_chance' => 0.10,
             'item_find_chance' => 0.10,

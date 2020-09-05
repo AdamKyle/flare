@@ -35,14 +35,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CraftingSkillService::class, function($app) {
             return new CraftingSkillService();
         });
-
-        $this->app->bind(AdventureFightService::class, function($app, $parameters) {
-            return new AdventureFightService($parameters['character'], $parameters['adventure']);
-        });
-
-        $this->app->bind(AdventureService::class, function($app, $parameters) {
-            return new AdventureService($parameters['character'], $parameters['adventure'], $parameters['levels_at_a_time']);
-        });
     }
 
     /**

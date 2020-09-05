@@ -247,8 +247,8 @@ class BattleControllerApiTest extends TestCase
         ]);
 
         $this->setUpCharacter([
-            'looting_level' => 100,
-            'looting_bonus' => 100,
+            'level' => 100,
+            'bonus' => 100,
         ]);
 
         $currentGold = $this->character->gold;
@@ -264,7 +264,6 @@ class BattleControllerApiTest extends TestCase
         $this->character->refresh();
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals(1, $this->character->level);
         $this->assertTrue($currentGold !== $this->character->gold);
         $this->assertTrue(count($this->character->inventory->slots) > 1);
     }

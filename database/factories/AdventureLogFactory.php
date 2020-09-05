@@ -24,5 +24,6 @@ $factory->define(AdventureLog::class, function (Faker $faker) {
         'in_progress'          => null,
         'last_completed_level' => null,
         'logs'                 => null,
+        'rewards'              => null,
     ];
 });

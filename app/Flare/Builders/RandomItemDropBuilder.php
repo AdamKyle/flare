@@ -39,6 +39,12 @@ class RandomItemDropBuilder {
 
         if ($this->shouldHaveItemAffix($character)) {
             $affix = $this->fetchRandomItemAffix();
+
+            if (is_null($affix)) {
+                $duplicateItem->delete();
+
+                return $item;
+            }
             
             if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
                 $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
@@ -87,8 +93,14 @@ class RandomItemDropBuilder {
         return (rand(1, 100) + $lootingChance) > 50;
     }
 
-    protected function fetchRandomItemAffix(): ItemAffix {
-        return $this->itemAffixes[rand(0, count($this->itemAffixes) - 1)];
+    protected function fetchRandomItemAffix() {
+        $index = count($this->itemAffixes) - 1;
+
+        if ($index !== -1) {
+            return $this->itemAffixes[rand(0, $index)];
+        }
+
+        return null;
     }
 
     private function setItemName(Item $item): Item {

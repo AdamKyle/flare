@@ -107,6 +107,32 @@ class CharacterSetup {
         return $this;
     }
 
+    public function equipSpellSlot(int $slotId = 1, string $position = 'spell-one'): CharacterSetup {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => $position,
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    public function equipArtifact(int $slotId = 1, string $position = 'artifact-one'): CharacterSetup {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => $position,
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
     public function equipRightHand(int $slotId = 1): CharacterSetup {
         $slot = $this->fetchSlot($slotId);
 
@@ -120,14 +146,34 @@ class CharacterSetup {
         return $this;
     }
 
-    public function setSkill(string $name, array $options = []): CharacterSetup {
+    public function setSkill(string $name, array $options = [], bool $currentlyTraining = false): CharacterSetup {
+        
+        if ($currentlyTraining) {
+            $found = $this->character->skills->filter(function($skill) {
+                return $skill->currently_training;
+            })->first();
+
+            if (!is_null($found)) {
+                
+                if (isset($options['xp_towards'])) {
+                    throw new \Exception("you forgot to add xp_towards as an option for this skill: " . $found->name);
+                }
+
+                throw new \Exception('You already have a skill set as currently training: ' . $found->name);
+            }
+        }
+        
         $this->createSkill([
             'character_id' => $this->character->id,
             'name' => $name,
             'description' => 'sample',
-            'level' => isset($options[strtolower($name).'_level']) ? $options[strtolower($name).'_level'] : 1,
-            'skill_bonus' => isset($options[strtolower($name).'_bonus']) ? $options[strtolower($name).'_bonus'] : 0,
+            'level' => isset($options['level']) ? $options['level'] : 1,
+            'skill_bonus' => isset($options['bonus']) ? $options['bonus'] : 0,
+            'currently_training' => $currentlyTraining,
+            'xp_towards' => isset($options['xp_towards']) && $currentlyTraining ? $options['xp_towards'] : 0,
         ]);
+
+        $this->character->refresh();
 
         return $this;
     }

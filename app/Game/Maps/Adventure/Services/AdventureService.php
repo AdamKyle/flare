@@ -16,6 +16,7 @@ use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Exceptions\MonsterIsDeadException;
 use App\Game\Core\Exceptions\CharacterIsDeadException;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
+use App\Game\Maps\Adventure\Builders\RewardBuilder;
 
 class AdventureService {
 
@@ -25,12 +26,40 @@ class AdventureService {
 
     private $levelsAtATime;
 
-    private $reqawards = [];
+    private $rewardBuilder;
 
-    public function __construct(Character $character, Adventure $adventure, $levelsAtATime = 'all') {
-        $this->character     = $character;
-        $this->adventure     = $adventure;
-        $this->levelsAtATime = $levelsAtATime;
+    private $name;
+
+    private $rewards = [
+        'gold'  => 0,
+        'exp'   => 0,
+        'items' => [],
+    ];
+
+    public function __construct(
+        Character $character, 
+        Adventure $adventure, 
+        RewardBuilder $rewardBuilder,
+        string $name,
+        $levelsAtATime = 'all') 
+    {
+        $this->character          = $character;
+        $this->adventure          = $adventure;
+        $this->levelsAtATime      = $levelsAtATime;
+        $this->rewardBuilder      = $rewardBuilder; 
+        $this->name               = $name;
+
+        $skill = $this->character->skills->filter(function($skill) {
+            return $skill->currently_training;
+        })->first();
+
+        if (!is_null($skill)) {
+            $this->rewards['skill'] = [
+                'skill' => $skill,
+                'exp_towards' => $skill->xp_towards,
+                'exp'   => 0,
+            ];
+        }
     }
 
     public function processAdventure() {
@@ -61,7 +90,7 @@ class AdventureService {
                     
                     $this->characterIsDead($attackService, $adventureLog, $i);
 
-                    return;
+                    break;
                 }
 
                 if ($e instanceof MonsterIsDeadException) {
@@ -70,11 +99,13 @@ class AdventureService {
                     if ($this->adventure->levels === $i) {
                         $this->adventureIsOver($adventureLog, $i);
 
-                        return;
+                        break;
                     }
                 }
             }
         }
+
+        return;
     }
 
     protected function characterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog, int $level) {
@@ -94,21 +125,37 @@ class AdventureService {
         event(new CharacterIsDeadBroadcastEvent($this->character->user, true));
         event(new UpdateTopBarEvent($this->character));
 
+        $this->setLogs($adventureLog, $attackService);
+
         $this->updateAdventureLog($adventureLog, $level, true);
 
         event(new UpdateAdventureLogsBroadcastEvent($this->character->refresh()->adventureLogs, $this->character->user));
 
-        event(new ServerMessageEvent($this->character->user, 'adventure', 'You died while on your explortations! Chek your Adventure logs for more information. Any rewards you gained before desth is below.'));
-
-        $this->setLogs($adventureLog, $attackService);
+        event(new ServerMessageEvent($this->character->user, 'adventure', 'You died while on your explortations! Check your Adventure logs for more information.'));
     } 
 
     protected function monsterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog) {
-        $monster = $attackService->getMonster();
+        $monster     = $attackService->getMonster();
+        $xpReduction = 0.0;
 
-        event(new UpdateCharacterEvent($this->character, $monster, $this->adventure));
-        event(new DropsCheckEvent($this->character, $monster, $this->adventure));
-        event(new GoldRushCheckEvent($this->character, $monster, $this->adventure));
+        if (isset($this->rewards['skill'])) {
+            $xpReduction = $this->rewards['skill']['exp_towards'];
+
+            $this->rewards['skill']['exp'] += $this->rewardBuilder->fetchSkillXPReward($this->rewards['skill']['skill'], $this->adventure);
+        }
+
+        $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction);
+
+        $drop = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
+
+        if (!is_null($drop)) {
+            $this->rewards['items'][] = [
+                'id' => $drop->id,
+                'name' => $drop->name,
+            ];
+        }
+
+        $this->rewards['gold'] += $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
 
         $this->setLogs($adventureLog, $attackService);
     }
@@ -117,14 +164,21 @@ class AdventureService {
         $logs = $adventureLog->logs;
 
         if (empty($logs)) {
+
+            $logDetails              = [];
+            $logDetails[$this->name] = $attackService->getLogInformation();
+
             $adventureLog->update([
-                'logs' => [
-                    $attackService->getLogInformation()
-                ],
+                'logs' => $logDetails,
             ]);
         } else {
-            $logs[] = $attackService->getLogInformation();
 
+            if (isset($logs[$this->name])) {
+                $logs[$this->name][] = $attackService->getLogInformation();
+            } else {
+                $logs[$this->name] = $attackService->getLogInformation();
+            }
+            
             $adventureLog->update([
                 'logs' => $logs,
             ]);
@@ -166,17 +220,18 @@ class AdventureService {
     } 
 
     protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false) {
-
         if ($isDead) {
             $adventureLog->update([
-                'in_progress' => false,
+                'in_progress'          => false,
                 'last_completed_level' => $level,
+                'rewards'              => $this->rewards,
             ]);
         } else {
             $adventureLog->update([
-                'in_progress' => false,
+                'in_progress'          => false,
                 'last_completed_level' => $level,
-                'complete' => true,
+                'complete'             => true,
+                'rewards'              => $this->rewards,
             ]);
         }
     }

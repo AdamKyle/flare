@@ -17,10 +17,12 @@ class EmbarkOnAdventureEvent
 
     public $adventure;
 
+    public $repeatingAdventure;
+
     public function __construct(Character $character, Adventure $adventure, $levelsAtATime = 'all')
     {
-        $this->levelsAtATime = $levelsAtATime;
-        $this->character     = $character;
-        $this->adventure     = $adventure; 
+        $this->levelsAtATime      = $levelsAtATime;
+        $this->character          = $character;
+        $this->adventure          = $adventure;
     }
 }

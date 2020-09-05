@@ -13,11 +13,17 @@ class AdventureSetup {
 
     private $monster = null;
 
-    public function setMonster(Monster $monster): AdventureSetup {
+    public function setMonster(Monster $monster, int $bonusIncrease = 0): AdventureSetup {
         $this->monster = $monster;
 
         foreach(config('game.skills') as $options) {
             $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $options);
+        }
+        
+        if ($bonusIncrease !== 0) {
+            foreach ($skills as $skill) {
+                $skill['skill_bonus'] = $bonusIncrease;
+            }
         }
 
         $monster->skills()->insert($skills);

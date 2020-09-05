@@ -41,7 +41,7 @@ class AdventureFightService {
 
         $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
 
-        $this->attack($this->character, $this->monster);
+        return $this->attack($this->character, $this->monster);
     }
 
     public function getLogInformation() {
@@ -87,7 +87,7 @@ class AdventureFightService {
             'messages' => $this->completeAttack($attacker, $defender),
         ];
         
-        $this->attack($defender, $attacker);
+        return $this->attack($defender, $attacker);
     }
 
     protected function canHit($attacker, $defender): bool {
@@ -131,11 +131,9 @@ class AdventureFightService {
             $healFor = $this->characterInformation->buildHealFor();
 
             if ($healFor > 0) {
-                if ($this->currentCharacterHealth <= ($this->currentCharacterHealth * 0.75)) {
-                    $this->currentCharacterHealth = $healFor;
+                $this->currentCharacterHealth = $healFor;
 
-                    $messages = ['Light floods your eyes as your wounds heal over.'];
-                }
+                $messages = ['Light floods your eyes as your wounds heal over.'];
             }
 
             $messages = [$this->character->name . ' hit for ' . $characterAttack];

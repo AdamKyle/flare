@@ -19,6 +19,7 @@ class AdventureLog extends Model
         'in_progress',
         'last_completed_level',
         'logs',
+        'rewards'
     ];
 
     /**
@@ -31,10 +32,15 @@ class AdventureLog extends Model
         'in_progress'          => 'boolean',
         'last_completed_level' => 'integer',
         'logs'                 => 'array',
+        'rewards'              => 'array',
     ];
 
     public function setLogsAttribute($value) {
         $this->attributes['logs'] = json_encode($value);
+    }
+
+    public function setRewardsAttribute($value) {
+        $this->attributes['rewards'] = json_encode($value);
     }
 
     public function character() {

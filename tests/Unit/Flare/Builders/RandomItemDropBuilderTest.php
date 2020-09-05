@@ -159,12 +159,16 @@ class RandomItemDropBuilderTest extends TestCase
         ]);
 
         $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
-             ->setMethods(array('fetchRandomItemAffix'))
+             ->setMethods(array('fetchRandomItemAffix', 'shouldHaveItemAffix'))
              ->getMock();
 
         $randomItemBuilder->expects($this->any())
             ->method('fetchRandomItemAffix')
             ->willReturn(ItemAffix::where('name', 'Sample 2')->first());
+
+        $randomItemBuilder->expects($this->any())
+            ->method('shouldHaveItemAffix')
+            ->willReturn(true);
 
         $randomItemBuilder->setItemAffixes(ItemAffix::all());
 
