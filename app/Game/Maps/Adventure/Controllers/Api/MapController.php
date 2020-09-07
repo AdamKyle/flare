@@ -174,7 +174,7 @@ class MapController extends Controller {
         $b = $rgb & 0xFF;
         
         $color = $r.$g.$b;
-
+        var_dump($water->isWaterTile((int) $color)); die();
         if ($water->isWaterTile((int) $color)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
