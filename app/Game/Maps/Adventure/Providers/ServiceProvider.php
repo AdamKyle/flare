@@ -11,7 +11,7 @@ use App\Game\Maps\Adventure\Services\AdventureFightService;
 use App\Game\Maps\Adventure\Services\AdventureService;
 use App\Game\Battle\Values\LevelUpValue;
 use App\Game\Core\Services\CharacterService;
-
+use App\Game\Maps\Adventure\Values\WaterValue;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -50,6 +50,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $parameters['name'],
                 $parameters['levels_at_a_time'],
             );
+        });
+
+        $this->app->bind(WaterValue::class, function($app) {
+            return new WaterValue();
         });
     }
 
