@@ -281,7 +281,7 @@ class MapControllerApiTest extends TestCase
                              'character_position_y' => 288,
                          ])
                          ->response;
-        var_dump($response->content());
+        var_dump($response->content()->trace);
         $this->assertEquals(200, $response->status());
     }
 
