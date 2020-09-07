@@ -10,11 +10,6 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\AdventureLog;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
-use App\Game\Core\Exceptions\MonsterIsDeadException;
-use App\Game\Core\Exceptions\CharacterIsDeadException;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
 
@@ -83,24 +78,21 @@ class AdventureService {
         }
 
         for ($i = $startingLevel; $i <= $this->adventure->levels; $i++) {
-            try {
-                $attackService->processBattle();
-            } catch (RuntimeException $e) {
-                if ($e instanceof CharacterIsDeadException) {
-                    
-                    $this->characterIsDead($attackService, $adventureLog, $i);
+            $attackService->processBattle();
+            
+            if ($attackService->isCharacterDead()) {
+                $this->characterIsDead($attackService, $adventureLog, $i);
+
+                break;
+            }
+
+            if ($attackService->isMonsterDead()) {
+                $this->monsterIsDead($attackService, $adventureLog);
+
+                if ($this->adventure->levels === $i) {
+                    $this->adventureIsOver($adventureLog, $i);
 
                     break;
-                }
-
-                if ($e instanceof MonsterIsDeadException) {
-                    $this->monsterIsDead($attackService, $adventureLog);
-
-                    if ($this->adventure->levels === $i) {
-                        $this->adventureIsOver($adventureLog, $i);
-
-                        break;
-                    }
                 }
             }
         }
@@ -136,6 +128,7 @@ class AdventureService {
 
     protected function monsterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog) {
         $monster     = $attackService->getMonster();
+
         $xpReduction = 0.0;
 
         if (isset($this->rewards['skill'])) {

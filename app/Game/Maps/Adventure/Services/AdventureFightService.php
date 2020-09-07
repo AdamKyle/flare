@@ -24,6 +24,9 @@ class AdventureFightService {
 
     private $characterInformation;
 
+    // Used to stop recursive issues with attack.
+    private $counter = 0;
+
     public function __construct(Character $character, Adventure $adventure) {
 
         $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
@@ -36,7 +39,6 @@ class AdventureFightService {
 
     public function processBattle() {
         $this->monster              = $this->adventure->monsters()->inRandomOrder()->first();
-        
         $healthRange                = explode('-', $this->monster->health_range);
 
         $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
@@ -52,13 +54,31 @@ class AdventureFightService {
         return $this->monster;
     }
 
+    public function isCharacterDead(): bool {
+        return $this->currentCharacterHealth <= 0;
+    }
+
+    public function isMonsterDead(): bool {
+        return $this->currentMonsterHealth <= 0;
+    }
+
     protected function attack($attacker, $defender) {
-        if ($this->isCharacterDead()) {
-            throw new CharacterIsDeadException();
+        if ($this->isCharacterDead() || $this->isMonsterDead()) {
+            return;
         }
 
-        if ($this->isMonsterDead()) {
-            throw new MonsterIsDeadException();
+        /**
+         *  There could be an issue where the battle goes on for ever.
+         *  Should that be the case, after ten rounds we give in.
+         */
+        if ($this->counter === 10) {
+            $this->logInformation[] = [
+                'attacker' => $attacker->name,
+                'defender' => $defender->name,
+                'messages' => 'This floor took too long. You decided to retreat out of exhaustion, making your way to the next floor.',
+            ];
+
+            return;
         }
 
         if (!$this->canHit($attacker, $defender)) {
@@ -67,6 +87,8 @@ class AdventureFightService {
                 'defender' => $defender->name,
                 'message'  => $attacker->name . ' Missed!',
             ];
+
+            $this->counter += 1;
 
             return $this->attack($defender, $attacker);
         } 
@@ -78,6 +100,8 @@ class AdventureFightService {
                 'message'  => $defender->name . ' blocked the attack!',
             ];
 
+            $this->counter += 1;
+
             return $this->attack($defender, $attacker);
         }
 
@@ -86,6 +110,8 @@ class AdventureFightService {
             'defender' => $defender->name,
             'messages' => $this->completeAttack($attacker, $defender),
         ];
+
+        $this->counter = 0;
         
         return $this->attack($defender, $attacker);
     }
@@ -148,14 +174,6 @@ class AdventureFightService {
         return [
             $attacker->name . ' hit for ' . $monsterAttack,
         ];
-    }
-
-    protected function isCharacterDead(): bool {
-        return $this->currentCharacterHealth <= 0;
-    }
-
-    protected function isMonsterDead(): bool {
-        return $this->currentMonsterHealth <= 0;
     }
 
     protected function fetchMonsterAttack($attacker) {
