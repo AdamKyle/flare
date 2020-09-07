@@ -180,7 +180,7 @@ class MapController extends Controller {
         $invalidColors = [
             115217255, 114217255, 112219255, 112217247, 106222255, 117217251, 115223255
         ];
-
+        var_dump($color, $invalidColors);
         if (in_array((int) $color, $invalidColors)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
