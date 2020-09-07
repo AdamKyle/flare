@@ -216,6 +216,8 @@ export default class Map extends React.Component {
       return getServerMessage('cannot_move_right');
     }
 
+    console.log(x, y);
+
     axios.get('/api/is-water/' + this.state.characterId, {
       params: {
         character_position_x: x,

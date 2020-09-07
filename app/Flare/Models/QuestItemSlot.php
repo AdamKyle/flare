@@ -18,6 +18,10 @@ class QuestItemSlot extends Model
         'item_id',
     ];
 
+    protected $casts = [
+        'item_id' => 'integer',
+    ];
+
     public function item() {
         return $this->hasOne(Item::class, 'id', 'item_id');
     }
