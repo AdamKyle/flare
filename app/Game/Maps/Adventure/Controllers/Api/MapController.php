@@ -176,12 +176,7 @@ class MapController extends Controller {
         
         $color = $r.$g.$b;
 
-        // These repersent water:
-        $invalidColors = [
-            115217255, 114217255, 112219255, 112217247, 106222255, 117217251, 115223255
-        ];
-        var_dump($color, $invalidColors);
-        if (in_array((int) $color, $invalidColors)) {
+        if ($this->isWaterTile((int) $color)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();
@@ -192,5 +187,14 @@ class MapController extends Controller {
         }
 
         return response()->json([], 200);
+    }
+
+    protected function isWaterTile(int $color): bool {
+        // These repersent water:
+        $invalidColors = [
+            115217255, 114217255, 112219255, 112217247, 106222255, 117217251, 115223255
+        ];
+
+        return in_array($color, $invalidColors);
     }
 }
