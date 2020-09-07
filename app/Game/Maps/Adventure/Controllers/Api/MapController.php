@@ -6,16 +6,14 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use Storage;
 use Illuminate\Http\Request;
+use App\User;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Flare\Models\Map;
 use App\Flare\Models\Location;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\Game\Maps\Adventure\Values\WaterValue;
-use App\User;
-use Carbon\Carbon;
 
 class MapController extends Controller {
 
