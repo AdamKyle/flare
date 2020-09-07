@@ -13,6 +13,8 @@ use Tests\Traits\CreateAdventure;
 use Tests\Setup\CharacterSetup;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Admin\Models\GameMap;
+use App\Game\Maps\Adventure\Values\WaterValue;
+use Mockery;
 
 class MapControllerApiTest extends TestCase
 {
@@ -237,8 +239,6 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals(1, $this->character->inventory->questItemSlots->count());
     }
 
-
-
     public function testMoveCharacterToPort() {
         Event::fake([
             MoveTimeOutEvent::class,
@@ -292,6 +292,10 @@ class MapControllerApiTest extends TestCase
 
         $this->setUpCharacter();
 
+        $water = Mockery::mock(WaterValue::class);
+
+        $water->shouldReceive('isWaterTile')->andReturn(true);
+
         $response = $this->actingAs($this->user, 'api')
                          ->json('GET', '/api/is-water/' . $this->character->id, [
                              'character_position_x' => 176,
@@ -308,6 +312,10 @@ class MapControllerApiTest extends TestCase
         ]);
 
         $this->setUpCharacter();
+
+        $water = Mockery::mock(WaterValue::class);
+
+        $water->shouldReceive('isWaterTile')->andReturn(true);
 
         $this->character->inventory->questItemSlots()->create([
             'inventory_id' => $this->character->inventory->id,

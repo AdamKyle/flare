@@ -13,6 +13,7 @@ use App\Flare\Models\Location;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
 use App\Game\Maps\Adventure\Services\PortService;
+use App\Game\Maps\Adventure\Values\WaterValue;
 use App\User;
 use Carbon\Carbon;
 
@@ -163,7 +164,7 @@ class MapController extends Controller {
         ]);
     }
 
-    public function isWater(Request $request, Character $character) {
+    public function isWater(Request $request, WaterValue $water, Character $character) {
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
 
         $this->imageResource = imagecreatefromstring($contents);
@@ -176,7 +177,7 @@ class MapController extends Controller {
         
         $color = $r.$g.$b;
 
-        if ($this->isWaterTile((int) $color)) {
+        if ($water->isWaterTile((int) $color)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();
@@ -187,14 +188,5 @@ class MapController extends Controller {
         }
 
         return response()->json([], 200);
-    }
-
-    protected function isWaterTile(int $color): bool {
-        // These repersent water:
-        $invalidColors = [
-            115217255, 114217255, 112219255, 112217247, 106222255, 117217251, 115223255
-        ];
-
-        return in_array($color, $invalidColors);
     }
 }
