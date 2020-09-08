@@ -13,7 +13,7 @@ use Tests\Traits\CreateAdventure;
 use Tests\Setup\CharacterSetup;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Admin\Models\GameMap;
-use App\Game\Maps\Adventure\Values\WaterValue;
+use App\Game\Maps\Adventure\Values\MapTileValue;
 use Mockery;
 
 class MapControllerApiTest extends TestCase
@@ -41,8 +41,6 @@ class MapControllerApiTest extends TestCase
         $this->user      = null;
         $this->character = null;
         $this->monster   = null;
-
-        Storage::disk('maps')->deleteDirectory('Surface/');
     }
 
     public function testGetMap() {
@@ -273,6 +271,13 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
         $this->setUpCharacter();
 
         $response = $this->actingAs($this->user, 'api')
@@ -292,10 +297,11 @@ class MapControllerApiTest extends TestCase
 
         $this->setUpCharacter();
 
-        $water = Mockery::mock(WaterValue::class);
+        $water = Mockery::mock(MapTileValue::class);
 
-        $this->app->instance(WaterValue::class, $water);
-
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
         $response = $this->actingAs($this->user, 'api')
@@ -315,10 +321,11 @@ class MapControllerApiTest extends TestCase
 
         $this->setUpCharacter();
 
-        $water = Mockery::mock(WaterValue::class);
+        $water = Mockery::mock(MapTileValue::class);
 
-        $this->app->instance(WaterValue::class, $water);
-
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
         $this->character->inventory->questItemSlots()->create([
@@ -610,11 +617,9 @@ class MapControllerApiTest extends TestCase
     protected function setUpCharacter(array $options = []) {
         $this->user = $this->createUser();
 
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
-
         $gameMap = GameMap::create([
             'name'    => 'surface',
-            'path'    => $path,
+            'path'    => 'some/path',
             'default' => true,
         ]);
 

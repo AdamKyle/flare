@@ -13,7 +13,7 @@ use App\Flare\Models\Location;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
 use App\Game\Maps\Adventure\Services\PortService;
-use App\Game\Maps\Adventure\Values\WaterValue;
+use App\Game\Maps\Adventure\Values\MapTileValue;
 
 class MapController extends Controller {
 
@@ -21,10 +21,10 @@ class MapController extends Controller {
 
     private $water;
 
-    public function __construct(PortService $portService, WaterValue $water) {
+    public function __construct(PortService $portService, MapTileValue $mapTile) {
 
         $this->portService = $portService;
-        $this->water       = $water;
+        $this->mapTile     = $mapTile;
 
         $this->middleware('auth:api');
         $this->middleware('is.character.adventuring')->except(['index']);
@@ -166,19 +166,10 @@ class MapController extends Controller {
     }
 
     public function isWater(Request $request, Character $character) {
-        $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
-
-        $this->imageResource = imagecreatefromstring($contents);
-
-        $rgb      = imagecolorat($this->imageResource, $request->character_position_x, $request->character_position_y);
-
-        $r = ($rgb >> 16) & 0xFF;
-        $g = ($rgb >> 8) & 0xFF;
-        $b = $rgb & 0xFF;
         
-        $color = $r.$g.$b;
+        $color = $this->mapTile->getTileColor($character, $request->character_position_x, $request->character_position_y);
 
-        if ($this->water->isWaterTile((int) $color)) {
+        if ($this->mapTile->isWaterTile((int) $color)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();

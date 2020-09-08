@@ -29,8 +29,6 @@ class AdventureController extends Controller {
 
         $foundAdventureLog  = $character->adventureLogs->where('adventure_id', $adventure->id)->first();
 
-        $repeatingAdventure = false;
-
         if (!is_null($foundAdventureLog)) {
             $lastCompletedLevel = $foundAdventureLog->last_completed_level;
 
@@ -39,8 +37,6 @@ class AdventureController extends Controller {
                     $lastCompletedLevel = null;
                 }
             }
-
-            $repeatingAdventure = true;
 
             $foundAdventureLog->update([
                 'in_progress'          => true,
@@ -57,7 +53,7 @@ class AdventureController extends Controller {
 
         $character = $character->refresh();
 
-        event(new EmbarkOnAdventureEvent($character, $adventure, $request->levels_at_a_time));
+        event(new EmbarkOnAdventureEvent($character, $adventure, $request->lavels_at_a_time));
 
         event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
 

@@ -9,8 +9,8 @@ use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
 use App\Game\Maps\Adventure\Services\AdventureFightService;
 use App\Game\Maps\Adventure\Services\AdventureService;
-use App\Game\Battle\Values\LevelUpValue;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Maps\Adventure\Values\MapTileValue;
 use App\Game\Maps\Adventure\Values\WaterValue;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -28,10 +28,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->singleton(CharacterService::class, function($app) {
             return new CharacterService();
-        });
-
-        $this->app->singleton(LevelUpValue::class, function($app) {
-            return new LevelUpValue();
         });
 
         $this->app->bind(RewardBuilder::class, function($app) {
@@ -52,8 +48,8 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(WaterValue::class, function($app) {
-            return new WaterValue();
+        $this->app->bind(MapTileValue::class, function($app) {
+            return new MapTileValue();
         });
     }
 

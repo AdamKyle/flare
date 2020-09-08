@@ -17,8 +17,6 @@ class EmbarkOnAdventureEvent
 
     public $adventure;
 
-    public $repeatingAdventure;
-
     public function __construct(Character $character, Adventure $adventure, $levelsAtATime = 'all')
     {
         $this->levelsAtATime      = $levelsAtATime;
