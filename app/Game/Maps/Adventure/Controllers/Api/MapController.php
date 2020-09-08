@@ -19,9 +19,12 @@ class MapController extends Controller {
 
     private $portService;
 
-    public function __construct(PortService $portService) {
+    private $water;
+
+    public function __construct(PortService $portService, WaterValue $water) {
 
         $this->portService = $portService;
+        $this->water       = $water;
 
         $this->middleware('auth:api');
         $this->middleware('is.character.adventuring')->except(['index']);
@@ -162,7 +165,7 @@ class MapController extends Controller {
         ]);
     }
 
-    public function isWater(Request $request, WaterValue $water, Character $character) {
+    public function isWater(Request $request, Character $character) {
         $contents            = Storage::disk('maps')->get($character->map->gameMap->path);
 
         $this->imageResource = imagecreatefromstring($contents);
@@ -174,8 +177,8 @@ class MapController extends Controller {
         $b = $rgb & 0xFF;
         
         $color = $r.$g.$b;
-        var_dump($water->isWaterTile((int) $color)); die();
-        if ($water->isWaterTile((int) $color)) {
+
+        if ($this->water->isWaterTile((int) $color)) {
             $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();

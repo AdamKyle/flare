@@ -294,11 +294,13 @@ class MapControllerApiTest extends TestCase
 
         $water = Mockery::mock(WaterValue::class);
 
-        $water->shouldReceive('isWaterTile')->andReturn(true);
+        $this->app->instance(WaterValue::class, $water);
+
+        $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
         $response = $this->actingAs($this->user, 'api')
                          ->json('GET', '/api/is-water/' . $this->character->id, [
-                             'character_position_x' => 176,
+                             'character_position_x' => 160,
                              'character_position_y' => 64,
                          ])
                          ->response;
@@ -315,7 +317,9 @@ class MapControllerApiTest extends TestCase
 
         $water = Mockery::mock(WaterValue::class);
 
-        $water->shouldReceive('isWaterTile')->andReturn(true);
+        $this->app->instance(WaterValue::class, $water);
+
+        $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
         $this->character->inventory->questItemSlots()->create([
             'inventory_id' => $this->character->inventory->id,
