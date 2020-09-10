@@ -64,8 +64,8 @@ class RandomItemDropBuilderTest extends TestCase
 
         $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
                                                ->setSkill('Looting', [
-                                                   'looting_level' => 100,
-                                                   'looting_bonus' => 100,
+                                                   'level'       => 100,
+                                                   'skill_bonus' => 100,
                                                ])
                                                ->getCharacter();
     }

@@ -65,7 +65,7 @@ class CharacterInventoryController extends Controller {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
-        $positions = $validPositions->getPositons($itemToEquip->item);
+        $positions = $validPositions->getPositions($itemToEquip->item);
         
         if (empty($positions)) {
             $inventory = $character->inventory->slots->filter(function($slot) use($request) {

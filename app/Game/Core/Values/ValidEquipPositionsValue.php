@@ -6,7 +6,7 @@ use App\Flare\Models\Item;
 
 class ValidEquipPositionsValue {
 
-    public function getPositons(Item $item): array {
+    public function getPositions(Item $item): array {
         if (!is_null($item->default_position)) {
             return [];
         }

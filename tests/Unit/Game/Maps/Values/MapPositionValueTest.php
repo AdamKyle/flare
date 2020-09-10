@@ -46,7 +46,7 @@ class MapPositionValueTest extends TestCase
         ];
 
         for ($i = 0; $i < count($values); $i++) {
-            $position = $this->mapPositionValue->fetchYPosition($values[$i], $values[$i]);
+            $position = $this->mapPositionValue->fetchYPosition($values[$i]);
             $this->assertEquals($expected[$i], $position);
         }
     }

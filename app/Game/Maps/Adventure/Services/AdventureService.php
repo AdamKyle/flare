@@ -155,7 +155,7 @@ class AdventureService {
 
     protected function setLogs(AdventureLog $adventureLog, AdventureFightService $attackService) {
         $logs = $adventureLog->logs;
-        dump($logs);
+
         if (empty($logs)) {
 
             $logDetails              = [];

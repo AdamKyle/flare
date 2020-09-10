@@ -251,11 +251,12 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testSeeComparePageForArmour() {
         $item = $this->createItem([
-            'name' => 'Armour',
+            'name'             => 'Armour',
             'base_damage'      => 6,
             'base_ac'          => 6,
             'type'             => 'gloves',
             'default_position' => 'hands',
+            'crafting_type'    => 'armour',
         ]);
 
         $this->character->inventory->slots()->create([
@@ -265,7 +266,6 @@ class CharacterInventoryControllerTest extends TestCase
         ]);
 
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
-            'item_to_equip_type' => 'gloves',
             'slot_id'            => '2',
         ])->see('Equipped')->see('Item Details');
     }
@@ -343,5 +343,34 @@ class CharacterInventoryControllerTest extends TestCase
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '10',
         ])->see('Item not found in your inventory.');
+    }
+
+    public function testUnequipAll() {
+        $item = $this->createItem([
+            'name'             => 'Armour',
+            'base_damage'      => 6,
+            'base_ac'          => 6,
+            'type'             => 'gloves',
+            'default_position' => 'hands',
+            'crafting_type'    => 'armour',
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equiped'      => true,
+            'position'     => 'hands',
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.unequip.all'))
+                                                           ->response;
+
+        $response->assertSessionHas('success', 'All items have been removed.');
+
+        $equipped = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->equipped;
+        })->all();
+
+        $this->assertTrue(empty($equipped));
     }
 }

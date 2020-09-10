@@ -38,14 +38,15 @@ class AdventureServiceTest extends TestCase
                                         ->levelCharacterUp(10)
                                         ->createAdventureLog($adventure)
                                         ->setSkill('Accuracy', [
-                                            'bonus' => 10,
+                                            'skill_bonus' => 10,
                                             'xp_towards' => 10,
-                                        ], true)
+                                            'currently_training' => true
+                                        ])
                                         ->setSkill('Dodge', [
-                                            'bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'bonus' => 0,
+                                            'skill_bonus' => 0,
                                         ])
                                         ->getCharacter();
 
@@ -72,14 +73,14 @@ class AdventureServiceTest extends TestCase
                                         ->levelCharacterUp(10)
                                         ->createAdventureLog($adventure)
                                         ->setSkill('Accuracy', [
-                                            'bonus' => 10,
+                                            'skill_bonus' => 10,
                                             'xp_towards' => 10,
                                         ], true)
                                         ->setSkill('Dodge', [
-                                            'bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->getCharacter();
 
@@ -122,13 +123,13 @@ class AdventureServiceTest extends TestCase
         $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->setSkill('Accuracy', [
-                                            'accuracy_bonus' => 0,
+                                            'skill_bonus' => 0,
                                         ])
                                         ->setSkill('Dodge', [
-                                            'dodge_bonus' => 0,
+                                            'skill_bonus' => 0,
                                         ])
                                         ->setSkill('Looting', [
-                                            'looting_bonus' => 0,
+                                            'skill_bonus' => 0,
                                         ])
                                         ->getCharacter();
 
@@ -172,13 +173,13 @@ class AdventureServiceTest extends TestCase
                                             'logs' => [['adventure' => 'sample']],
                                         ])
                                         ->setSkill('Accuracy', [
-                                            'accuracy_bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->setSkill('Dodge', [
-                                            'dodge_bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'looting_bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->getCharacter();
 
@@ -240,13 +241,13 @@ class AdventureServiceTest extends TestCase
                                             ],
                                         ])
                                         ->setSkill('Accuracy', [
-                                            'accuracy_bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->setSkill('Dodge', [
-                                            'dodge_bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'looting_bonus' => 10,
+                                            'skill_bonus' => 10,
                                         ])
                                         ->getCharacter();
 

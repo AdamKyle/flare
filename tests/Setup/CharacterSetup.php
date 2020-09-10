@@ -163,15 +163,11 @@ class CharacterSetup {
             }
         }
         
-        $this->createSkill([
+        $this->createSkill(array_merge([
             'character_id' => $this->character->id,
             'name' => $name,
             'description' => 'sample',
-            'level' => isset($options['level']) ? $options['level'] : 1,
-            'skill_bonus' => isset($options['bonus']) ? $options['bonus'] : 0,
-            'currently_training' => $currentlyTraining,
-            'xp_towards' => isset($options['xp_towards']) && $currentlyTraining ? $options['xp_towards'] : 0,
-        ]);
+        ], $options));
 
         $this->character->refresh();
 

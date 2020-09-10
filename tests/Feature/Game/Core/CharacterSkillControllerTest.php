@@ -94,6 +94,24 @@ class CharacterSkillControllerTest extends TestCase
         $this->assertEquals($this->character->skills->where('name', 'Dodge')->first()->xp_towards, 0.1);
     }
 
+    public function testCanCancelTrain() {
+        $this->character->skills->where('name', 'Dodge')->first()->update([
+            'currently_training' => true,
+            'xp_towards'         => 1,
+        ]);
+
+        $this->assertEquals($this->character->skills->where('name', 'Dodge')->first()->xp_towards, 1);
+
+        $this->actingAs($this->character->user)->visitRoute('game.character.sheet')->post(route('cancel.train.skill', [
+            'skill' => $this->character->skills->where('name', 'Dodge')->first()->id,
+        ]));
+
+        $this->character->refresh();
+
+        $this->assertEquals($this->character->skills->where('name', 'Dodge')->first()->xp_towards, 0.0);
+        $this->assertFalse($this->character->skills->where('name', 'Dodge')->first()->currently_training);
+    }
+
     public function testShouldSeeSkillPage() {
         $this->actingAs($this->character->user)->visit(route('skill.character.info', [
             'skill' => $this->character->skills->where('name', 'Dodge')->first()->id,

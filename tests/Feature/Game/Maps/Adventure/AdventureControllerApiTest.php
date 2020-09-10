@@ -76,6 +76,32 @@ class AdventureControllerApiTest extends TestCase
         $this->assertEquals("Adventure has started!", $content->message);
     }
 
+    public function testCannotAdvenutreWhenOneIsInProgress() {
+
+        // Set up an inprogress adventure:
+        $this->character->update([
+            'can_attack'             => false,
+            'can_move'               => false,
+            'can_craft'              => false,
+            'can_adventure'          => false,
+            'can_adventure_again_at' => now()->addMinutes(10),
+        ]);
+
+        $this->createLog($this->character, $this->adventure, true, 1);
+
+        $response = $this->actingAs($this->character->user, 'api')
+                            ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [
+                                'levels_at_a_time' => 'all'
+                            ])
+                            ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        
+        $this->assertEquals('You are adventuring, you cannot do that.', $content->error);
+    }
+
     public function testCancelAdventure() {
 
         // Set up an inprogress adventure:

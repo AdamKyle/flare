@@ -27,14 +27,14 @@ class AdventureJobTest extends TestCase
         $character = (new CharacterSetup)->setupCharacter($user)
                                          ->createAdventureLog($adventure)
                                          ->setSkill('Accuracy', [
-                                                'bonus' => 10,
+                                                'skill_bonus' => 10,
                                                 'xp_towards' => 10,
                                             ], true)
                                          ->setSkill('Dodge', [
-                                                'bonus' => 10,
+                                                'skill_bonus' => 10,
                                             ])
                                          ->setSkill('Looting', [
-                                                'bonus' => 0,
+                                                'skill_bonus' => 0,
                                             ])
                                          ->getCharacter();
 
@@ -60,14 +60,14 @@ class AdventureJobTest extends TestCase
         $character = (new CharacterSetup)->setupCharacter($user)
                                          ->createAdventureLog($adventure)
                                          ->setSkill('Accuracy', [
-                                                'bonus' => 10,
+                                                'skill_bonus' => 10,
                                                 'xp_towards' => 10,
                                             ], true)
                                          ->setSkill('Dodge', [
-                                                'bonus' => 10,
+                                                'skill_bonus' => 10,
                                             ])
                                          ->setSkill('Looting', [
-                                                'bonus' => 0,
+                                                'skill_bonus' => 0,
                                             ])
                                          ->getCharacter();
 

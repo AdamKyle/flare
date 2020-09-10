@@ -55,15 +55,9 @@ class CharacterSkillController extends Controller {
     }
 
     public function cancelTrain(Skill $skill) {
-        $skill = auth()->user()->character->skills()->find($skill->id);
-
-        if (is_null($skill)) {
-            return redirect()->back()->with('success', 'Invalid input.');
-        }
-
         $skill->update([
             'currently_training' => false,
-            'xp_twoards'         => 0.0,
+            'xp_towards'         => 0.0,
         ]);
 
         return redirect()->back()->with('success', 'You stopped training: ' . $skill->name);

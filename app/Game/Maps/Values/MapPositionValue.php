@@ -16,15 +16,11 @@ class MapPositionValue {
         return $mapPositionX;
     }
 
-    public function fetchYPosition(int $characterY, int $mapPositionY): int {
-        if ($characterY < 320) {
+    public function fetchYPosition(int $characterY): int {
+        if ($characterY <= 320) {
             return 0;
         }
 
-        if ($characterY > 320) {
-            return -150;
-        }
-    
-        return $mapPositionY;
+        return -150;
     }
 }

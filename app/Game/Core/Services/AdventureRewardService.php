@@ -41,7 +41,7 @@ class AdventureRewardService {
         if ($character->xp >= $character->xp_next) {
             $this->characterService->levelUpCharacter($character);
 
-            $this->messages[] = 'You gained a level! Now level: ' . $this->character->refresh()->level;
+            $this->messages[] = 'You gained a level! Now level: ' . $character->refresh()->level;
 
             $character->refresh();
         }
@@ -55,7 +55,8 @@ class AdventureRewardService {
 
             $skill->xp += $rewards['skill']['exp'];
             $skill->save();
-
+            $skill->refresh();
+            
             if ($skill->xp >= $skill->xp_max) {
                 if ($skill->level <= $skill->max_level) {
                     $level      = $skill->level + 1;
@@ -68,7 +69,9 @@ class AdventureRewardService {
                         'xp'          => 0
                     ]);
 
-                    $this->messages[] = 'Your skill: ' . $skill->name . ' gained a level!';
+                    $skill->refresh();
+
+                    $this->messages[] = 'Your skill: ' . $skill->name . ' gained a level and is now level: ' . $skill->level;
                 }
             }
         }

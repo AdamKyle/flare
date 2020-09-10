@@ -2,13 +2,10 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Flare\Models\Adventure;
-use App\Flare\Models\AdventureLog;
-use App\Flare\Models\Skill;
-use App\Http\Controllers\Controller;
-use App\Game\Core\Requests\TrainSkillValidation;
-use App\Game\Core\Services\AdventureRewardService;
 use Illuminate\Http\Request;
+use App\Flare\Models\AdventureLog;
+use App\Http\Controllers\Controller;
+use App\Game\Core\Services\AdventureRewardService;
 
 class CharacterAdventureController extends Controller {
 
@@ -51,6 +48,10 @@ class CharacterAdventureController extends Controller {
     public function collectReward(Request $request, AdventureRewardService $adventureRewardService, AdventureLog $adventureLog) {
         $character = auth()->user()->character;
         $rewards   = $adventureLog->rewards;
+
+        if (is_null($rewards)) {
+            return redirect()->to(route('game'))->with('error', 'You cannot collect already collected rewards.');
+        }
 
         $messages  = $adventureRewardService->distributeRewards($rewards, $character)->getMessages();
         

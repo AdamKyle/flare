@@ -246,9 +246,9 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([
-            'level' => 100,
-            'bonus' => 100,
+        $this->setUpCharacter([], [
+            'level'       => 100,
+            'skill_bonus' => 100,
         ]);
 
         $currentGold = $this->character->gold;
@@ -278,9 +278,9 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([
-            'looting_level' => 100,
-            'looting_bonus' => 100,
+        $this->setUpCharacter([], [
+            'level'       => 100,
+            'skill_bonus' => 100,
         ]);
 
         $this->character->update([
@@ -316,9 +316,9 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([
-            'looting_level' => 100,
-            'looting_bonus' => 100,
+        $this->setUpCharacter([], [
+            'level'       => 100,
+            'skill_bonus' => 100,
         ]);
 
         $response = $this->actingAs($this->user, 'api')
@@ -607,7 +607,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(2, $this->character->skills->where('name', 'Looting')->first()->level);
     }
 
-    protected function setUpCharacter(array $options = []): void {
+    protected function setUpCharacter(array $options = [], array $skillOptions = []): void {
         $this->user = $this->createUser();
 
         $item = $this->createItem([
@@ -619,9 +619,9 @@ class BattleControllerApiTest extends TestCase
         $this->character = (new CharacterSetup)->setupCharacter($this->user, $options)
                                                ->giveItem($item)
                                                ->equipLeftHand()
-                                               ->setSkill('Looting', $options)
-                                               ->setSkill('Dodge', $options)
-                                               ->setSkill('Accuracy', $options)
+                                               ->setSkill('Looting', $skillOptions)
+                                               ->setSkill('Dodge', $skillOptions)
+                                               ->setSkill('Accuracy', $skillOptions)
                                                ->getCharacter();
     }
 
