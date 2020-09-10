@@ -13,3 +13,4 @@ Route::post('/map/set-sail/{location}/{character}', ['uses' => 'Api\MapControlle
 // Adventure:
 Route::post('/character/{character}/adventure/{adventure}', ['uses' => 'Api\AdventureController@adventure']);
 Route::post('/character/{character}/adventure/{adventure}/cancel', ['uses' => 'Api\AdventureController@cancelAdventure']);
+Route::get('/character/adventure/logs', ['uses' => 'Api\AdventureController@getLogs']);

@@ -34,6 +34,7 @@ export default class AdeventureActions extends React.Component {
       this.setState({
         characterAdventureLogs: event.adventureLogs,
         canAdventureAgainAt: event.canAdventureAgainAt,
+        message: null,
       }, () => {
         this.props.updateAdventure(this.state.adventureDetails, this.state.characterAdventureLogs, this.state.canAdventureAgainAt);
       });

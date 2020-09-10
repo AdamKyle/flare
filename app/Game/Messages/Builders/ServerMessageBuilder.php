@@ -42,6 +42,8 @@ class ServerMessageBuilder {
                 return 'You lost your investment and epically failed to craft this item.';
             case 'to_easy_to_craft':
                 return 'This is far too easy to craft! You will get no experience for this item.';
+            case 'something_went_wrong':
+                return 'A component was unable to render. Please try refreshing the page.';
             default:
                 return '';
         }

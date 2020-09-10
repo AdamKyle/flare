@@ -5,7 +5,8 @@ import Map                 from './map/map';
 import CharacterInfoTopBar from './components/character-info-top-bar';
 import CoreActionsSection  from './components/core-actions-section';
 import PortLocationActions from './components/port-location-actions';
-import AdeventureActions from './components/adventure-actions';
+import AdeventureActions   from './components/adventure-actions';
+import AdventureMenu       from './components/menu/adventure-menu';
 
 class Game extends React.Component {
   constructor(props) {
@@ -68,7 +69,6 @@ class Game extends React.Component {
   }
 
   render() {
-    console.log(this.state.adventureLogs);
     return (
       <>
         <div className="row mb-4">
@@ -114,5 +114,15 @@ if (game !== null) {
   ReactDOM.render(
       <Game userId={parseInt(player.content)} characterId={character.content}/>,
       game
+  );
+}
+
+// Mount the Menu Components for the Side Menu:
+const adventureMenu = document.getElementById('adventure-menu');
+
+if (adventureMenu !== null) {
+  ReactDOM.render(
+      <AdventureMenu userId={parseInt(player.content)} />,
+      adventureMenu
   );
 }

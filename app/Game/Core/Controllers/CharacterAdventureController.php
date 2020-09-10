@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Flare\Models\AdventureLog;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
+use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
+use App\Game\Maps\Adventure\Jobs\AdventureJob;
 
 class CharacterAdventureController extends Controller {
 
@@ -23,8 +25,24 @@ class CharacterAdventureController extends Controller {
         $character = auth()->user()->character;
 
         return view('game.core.character.completed-adventures', [
-            'completedAdventures' => $character->adventureLogs->where('completed', true),
-            'failedAdventures'    => $character->adventureLogs->where('completed', false),
+            'adventures' => $character->adventureLogs,
+        ]);
+    }
+
+    public function completedAdventure(AdventureLog $adventureLog) {
+        return view('game.core.character.completed-adventure', [
+            'adventureLog' => $adventureLog,
+        ]);
+    }
+
+    public function completedAdventureLogs(AdventureLog $adventureLog, string $name) {
+        if (!isset($adventureLog->logs[$name])) {
+            return redirect()->back()->with('error', 'Invalid input.');
+        }
+        
+        return view('game.core.character.current-adventure', [
+            'log'          => $adventureLog->logs[$name],
+            'adventureLog' => $adventureLog
         ]);
     }
 
@@ -58,6 +76,8 @@ class CharacterAdventureController extends Controller {
         $adventureLog->update([
             'rewards' => null,
         ]);
+
+        event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 
         return redirect()->to(route('game'))->with('success', $messages);
     }

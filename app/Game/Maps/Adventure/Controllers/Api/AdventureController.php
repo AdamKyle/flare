@@ -19,6 +19,10 @@ class AdventureController extends Controller {
         $this->middleware('is.character.adventuring')->except(['cancelAdventure']);
     }
 
+    public function getLogs(Request $request) {
+        return response()->json(auth()->user()->character->adventureLogs, 200);
+    }
+
     public function adventure(Request $request, Character $character, Adventure $adventure) {
         $character->update([
             'can_attack'    => false,
