@@ -93,11 +93,19 @@ export default class AdventureEmbark extends React.Component {
           </Modal.Header>
           <Modal.Body>
             {this.state.errorMessage !== null ? <div className="alert alert-danger mb-2">{this.state.errorMessage}</div> : null}
-
-            <div className="alert alert-warning">
-              <p>Please make sure you have equipped any items you want for this adventure.
-              Once started you cannot equip gear, you cannot craft, attack or move until the adventure is done.</p>
-              <p>You can still manage your kingdoms while your character is adventuring.</p>
+            <div class="alert alert-info" role="alert">
+              <h4 class="alert-heading">Before you set off.</h4>
+              <p>
+                Please make sure you have equipped any items you want for this adventure. <br />
+                Once started you cannot equip gear, you cannot craft, attack or move until the adventure is done<sup>*</sup>.
+              </p>
+              <p>
+                You are still able to manage your kingdoms. This will be done through a third party NPC called
+                an advisor.
+              </p>
+              <hr />
+              <p class="mb-0">Should you need additional help, please consider this resource on <a href="#">adventureing</a>.</p>
+              <p class="text-muted" style={{fontSize: '12px'}}><sup>*</sup> You are free to logout. Any relevant details will be emailed to you should you have those settings enabled.</p>
             </div>
             <div className="row">
               <div className="col-md-12">

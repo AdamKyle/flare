@@ -46,7 +46,7 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'failed_to_craft':
-                $message = 'You failed to craft the item! You lost the investment. Youll still gain experience towards crafting.';
+                $message = 'You failed to craft the item! You lost the investment.';
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'adventure':

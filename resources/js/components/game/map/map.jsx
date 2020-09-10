@@ -9,6 +9,8 @@ import {getNewXPosition, getNewYPosition} from './helpers/map_position';
 import LocationInfoModal                  from '../components/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
 import SetSail                            from './components/set-sail';
+import CardTemplate                       from '../components/templates/card-template';
+import ContentLoader, { Facebook }        from 'react-content-loader';
 
 export default class Map extends React.Component {
 
@@ -108,8 +110,7 @@ export default class Map extends React.Component {
       });
     });
 
-    this.adventureLogs.listen('Game.Core.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
-      console.log(event);
+    this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
       this.setState({
         isAdventuring: event.isAdventuring,
       });
@@ -216,8 +217,6 @@ export default class Map extends React.Component {
       return getServerMessage('cannot_move_right');
     }
 
-    console.log(x, y);
-
     axios.get('/api/is-water/' + this.state.characterId, {
       params: {
         character_position_x: x,
@@ -250,7 +249,7 @@ export default class Map extends React.Component {
                 canMove: this.state.canMove,
               });
 
-              this.props.updateAdventure(this.state.adventures);
+              this.props.updateAdventure(this.state.adventures, [], null);
 
               if (this.state.currentPort == null) {
                 this.props.openPortDetails(false);
@@ -326,7 +325,17 @@ export default class Map extends React.Component {
 
   render() {
     if (this.state.isLoading) {
-      return 'Please wait ...';
+      return (
+        <CardTemplate>
+          <ContentLoader viewBox="0 0 380 300">
+            {/* Only SVG shapes */}    
+            <rect x="0" y="0" rx="4" ry="4" width="500" height="230" />
+            <rect x="0" y="245" rx="3" ry="3" width="250" height="10" />
+            <rect x="0" y="265" rx="3" ry="3" width="250" height="10" />
+            <rect x="0" y="285" rx="3" ry="3" width="250" height="10" />
+          </ContentLoader>
+        </CardTemplate>
+      );
     }
 
     return (

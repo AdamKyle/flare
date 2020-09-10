@@ -1,6 +1,8 @@
 import React from 'react';
 import AdventureEmbark from './modals/adventure-embark';
 import TimeOutBar from '../timeout/timeout-bar';
+import CardTemplate from './templates/card-template';
+import ContentLoader, { Facebook } from 'react-content-loader';
 
 export default class AdeventureActions extends React.Component {
 
@@ -32,6 +34,8 @@ export default class AdeventureActions extends React.Component {
       this.setState({
         characterAdventureLogs: event.adventureLogs,
         canAdventureAgainAt: event.canAdventureAgainAt,
+      }, () => {
+        this.props.updateAdventure(this.state.adventureDetails, this.state.characterAdventureLogs, this.state.canAdventureAgainAt);
       });
     });
   }
@@ -92,7 +96,7 @@ export default class AdeventureActions extends React.Component {
   timeOutBar() {
     return (
       <TimeOutBar
-        cssClass={'float-right'}
+        cssClass={'float-right adventure-timeout-bar'}
         readyCssClass={'character-ready'}
         forSeconds={this.state.canAdventureAgainAt}
         timeRemaining={this.state.canAdventureAgainAt}
@@ -106,7 +110,10 @@ export default class AdeventureActions extends React.Component {
     const details = [];
 
     let foundAdventure = null;
+    
     const hasAdventureInProgres = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
+
+    const hasCollectedRewards = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.rewards !== null));
 
     _.forEach(this.state.adventureDetails, (adventure) => {
 
@@ -122,10 +129,10 @@ export default class AdeventureActions extends React.Component {
             <div className="row mb-2" key={adventure.id}>
                 <div className="col-md-2">{adventure.name}</div>
                 <div className="col-md-5">
-                    <button className="mr-2 btn btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres} onClick={this.embarkShow.bind(this)}>Embark</button>
-                    <a href={'/adeventures/' + adventure.id} target="_blank" className="mr-2 btn btn-primary">Details</a>
+                    <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres || hasCollectedRewards} onClick={this.embarkShow.bind(this)}>Embark</button>
+                    <a href={'/adeventures/' + adventure.id} target="_blank" className="mr-2 btn btn-sm btn-primary">Details</a>
                     
-                    { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? <button className="mr-2 btn btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel Adventure</button> : null : null }
+                    { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? <button className="mr-2 btn btn-sm btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel Adventure</button> : null : null }
                     { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? this.timeOutBar() : null : null }
                 </div>
             </div>
@@ -143,28 +150,37 @@ export default class AdeventureActions extends React.Component {
 
   render() {
     if (this.state.isLoading) {
-      return <>Please wait ...</>
+      return (
+        <CardTemplate>
+          <ContentLoader viewBox="0 0 380 30">
+            {/* Only SVG shapes */}    
+            <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
+            <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
+            <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
+          </ContentLoader>
+        </CardTemplate>
+      );
     }
 
     const hasAdventureInProgres = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
 
+    const hasCollectedRewards = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.rewards !== null));
+
     return (
-      <div className="card">
-        <div className="card-body p-3">
-          <div className="clearfix">
-            <h4 className="card-title float-left">Adventures</h4>
-            <button className="float-right btn btn-sm btn-danger" onClick={this.hideAdventure.bind(this)}>Close</button>
-          </div>
-          <hr />
-          {this.state.message !== null ? <div className="alert alert-success">
-            <button type="button" className="close" onClick={this.removeMessage.bind(this)}>
-              <span aria-hidden="true">&times;</span>
-            </button>
-            {this.state.message}
-          </div> : null}
-          { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
-          {this.adventures()}
-        </div>
+      <CardTemplate
+        cardTitle="Adventures"
+        close={this.hideAdventure.bind(this)}
+        otherClasses="p-3"
+      >
+        {this.state.message !== null ? <div className="alert alert-success">
+          <button type="button" className="close" onClick={this.removeMessage.bind(this)}>
+            <span aria-hidden="true">&times;</span>
+          </button>
+          {this.state.message}
+        </div> : null}
+        { hasCollectedRewards ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
+        { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
+        {this.adventures()}
 
         {this.state.showEmbark ? <AdventureEmbark 
           characterId={this.props.characterId} 
@@ -174,7 +190,7 @@ export default class AdeventureActions extends React.Component {
           updateMessage={this.updateMessage.bind(this)}
           updateCharacterAdventures={this.updateCharacterAdventures.bind(this)}
         /> : null }
-      </div>
+      </CardTemplate>
     )
   }
 } 

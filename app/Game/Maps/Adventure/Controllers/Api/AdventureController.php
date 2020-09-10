@@ -53,9 +53,7 @@ class AdventureController extends Controller {
 
         $character = $character->refresh();
 
-        event(new EmbarkOnAdventureEvent($character, $adventure, $request->lavels_at_a_time));
-
-        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+        event(new EmbarkOnAdventureEvent($character, $adventure, $request->levels_at_a_time));
 
         return response()->json([
             'message'                => 'Adventure has started!',

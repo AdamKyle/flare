@@ -73,9 +73,10 @@ class AdventureFightService {
          */
         if ($this->counter === 10) {
             $this->logInformation[] = [
-                'attacker' => $attacker->name,
-                'defender' => $defender->name,
-                'messages' => 'This floor took too long. You decided to retreat out of exhaustion, making your way to the next floor.',
+                'attacker'   => $attacker->name,
+                'defender'   => $defender->name,
+                'messages'   => 'This floor took too long. You decided to retreat out of exhaustion, making your way to the next floor.',
+                'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
             return;
@@ -83,9 +84,10 @@ class AdventureFightService {
 
         if (!$this->canHit($attacker, $defender)) {
             $this->logInformation[] = [
-                'attacker' => $attacker->name,
-                'defender' => $defender->name,
-                'message'  => $attacker->name . ' Missed!',
+                'attacker'   => $attacker->name,
+                'defender'   => $defender->name,
+                'message'    => $attacker->name . ' Missed!',
+                'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
             $this->counter += 1;
@@ -95,9 +97,10 @@ class AdventureFightService {
 
         if ($this->blockedAttack($defender, $attacker)) {
             $this->logInformation[] = [
-                'attacker' => $attacker->name,
-                'defender' => $defender->name,
-                'message'  => $defender->name . ' blocked the attack!',
+                'attacker'   => $attacker->name,
+                'defender'   => $defender->name,
+                'message'    => $defender->name . ' blocked the attack!',
+                'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
             $this->counter += 1;
@@ -106,9 +109,10 @@ class AdventureFightService {
         }
 
         $this->logInformation[] = [
-            'attacker' => $attacker->name,
-            'defender' => $defender->name,
-            'messages' => $this->completeAttack($attacker, $defender),
+            'attacker'   => $attacker->name,
+            'defender'   => $defender->name,
+            'messages'   => $this->completeAttack($attacker, $defender),
+            'is_monster' => $attacker instanceOf Character ? false : true
         ];
 
         $this->counter = 0;

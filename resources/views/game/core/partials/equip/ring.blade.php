@@ -8,12 +8,24 @@
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring-one">
             Left Finger
+
+            @if (!empty($details))
+                @if (isset($details['ring-one']))
+                <i class="fas fa-check text-success ml-2"></i> <em><x-item-display-color :item="$details['ring_one']['slot']->item" /> will be replaced.</em>
+                @endif
+            @endif
         </label>
     </div>
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring-two">
             Right Finger
+
+            @if (!empty($details))
+                @if (isset($details['ring-two']))
+                <i class="fas fa-check text-success ml-2"></i> <em><x-item-display-color :item="$details['ring-two']['slot']->item" /> will be replaced.</em>
+                @endif
+            @endif
         </label>
     </div>
 </fieldset>

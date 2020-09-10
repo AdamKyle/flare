@@ -1,5 +1,7 @@
 import React   from 'react';
 import SetSail from '../map/components/set-sail';
+import CardTemplate from './templates/card-template';
+import ContentLoader, { Facebook } from 'react-content-loader';
 
 export default class PortLocationActions extends React.Component {
 
@@ -43,31 +45,37 @@ export default class PortLocationActions extends React.Component {
 
   render() {
     if (this.state.isLoading) {
-      return <>Please wait ...</>
+      return (
+        <CardTemplate>
+          <ContentLoader viewBox="0 0 380 30">
+            {/* Only SVG shapes */}    
+            <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
+            <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
+            <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
+          </ContentLoader>
+        </CardTemplate>
+      );
     }
 
     return (
-      <div className="card">
-				<div className="card-body p-3">
-          <div className="clearfix">
-            <h4 className="card-title float-left">Set Sail</h4>
-            <button className="float-right btn btn-sm btn-danger" onClick={this.hidePort.bind(this)}>Close</button>
-          </div>
-          <hr />
-					<div className="row">
-            <SetSail 
-              characterIsDead={this.state.portDetails.characterIsDead}
-              currentPort={this.state.portDetails.currentPort} 
-              portList={this.state.portDetails.portList} 
-              characterId={this.state.portDetails.characterId} 
-              updatePlayerPosition={this.updatePlayerPosition.bind(this)}
-              canMove={this.state.portDetails.canMove}
-              userId={this.props.userId}
-              updatePlayerPosition={this.props.updatePlayerPosition}
-            />
-          </div>
+      <CardTemplate
+        OtherCss="p-3"
+        cardTitle="Set Sail"
+        close={this.hidePort.bind(this)}
+      >
+        <div className="row">
+          <SetSail 
+            characterIsDead={this.state.portDetails.characterIsDead}
+            currentPort={this.state.portDetails.currentPort} 
+            portList={this.state.portDetails.portList} 
+            characterId={this.state.portDetails.characterId} 
+            updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+            canMove={this.state.portDetails.canMove}
+            userId={this.props.userId}
+            updatePlayerPosition={this.props.updatePlayerPosition}
+          />
         </div>
-      </div>
+      </CardTemplate>
     )
   }
 } 

@@ -1,4 +1,4 @@
-<dl>
+<dl class="mt-2">
     <dt>Attack:</dt>
     <dd><span class='text-success'>{{$item->getTotalDamage()}}</span></dd>
     <dt>AC:</dt>

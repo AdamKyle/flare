@@ -20,13 +20,12 @@
         </ul>
     </li>
     <li class="nav-devider"></li>
-    <li class="nav-small-cap">Manage Quests</li>
+    <li class="nav-small-cap">Manage Adventures</li>
     <li>
-        <a class="has-arrow " href="#" aria-expanded="false"><i class="ra ra-trail"></i><span class="hide-menu">Quests</span></a>
+        <a class="has-arrow " href="#" aria-expanded="false"><i class="ra ra-trail"></i><span class="hide-menu">Adventure Logs</span></a>
         <ul aria-expanded="false" class="collapse">
-            <li><a href="layout-single-column.html">Active Quests</a></li>
-            <li><a href="layout-fix-header.html">Completed Quests</a></li>
-            <li><a href="layout-fix-sidebar.html">Quest Items</a></li>
+            <li><a href="{{route('game.current.adventure')}}">Current Adventure</a></li>
+            <li><a href="{{route('game.completed.adventures')}}">Completed Adventures</a></li>
         </ul>
     </li>
     <li class="nav-devider"></li>

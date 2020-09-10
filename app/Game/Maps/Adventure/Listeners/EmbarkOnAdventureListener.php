@@ -27,8 +27,12 @@ class EmbarkOnAdventureListener
             ]);
 
             Cache::put('character_'.$event->character->id.'_adventure_'.$event->adventure->id, $jobName, $timeTillForget);
+            
+            $event->character->refresh();
 
-            AdventureJob::dispatch($event->character->refresh(), $event->adventure, $event->levelsAtATime, $jobName)->delay($timeTillFinished);
+            event(new UpdateAdventureLogsBroadcastEvent($event->character->adventureLogs, $event->character->user));
+
+            AdventureJob::dispatch($event->character, $event->adventure, $event->levelsAtATime, $jobName)->delay($timeTillFinished);
         } else {
             if (!is_numeric($event->levelsAtATime)) {
                 return $this->failedToInitializeAdvenute($event);
@@ -47,6 +51,10 @@ class EmbarkOnAdventureListener
                 ]);
     
                 Cache::put('character_'.$event->character->id.'_adventure_'.$event->adventure->id, $jobName, $timeTillForget);
+
+                $event->character->refresh();
+
+                event(new UpdateAdventureLogsBroadcastEvent($event->character->adventureLogs, $event->character->user));
     
                 AdventureJob::dispatch($event->character->refresh(), $event->adventure, $levels, $jobName)->delay($timeTillFinished);
             }

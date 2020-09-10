@@ -43,9 +43,9 @@ class RewardBuilder {
         $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $lootingChance, $adventure);
 
         if ($hasGoldRush) {
-            return rand(0, 1000) + 1000;
+            return $monster->gold + rand(0, 10000);
         }
         
-        return 0;
+        return $monster->gold;
     }
 }

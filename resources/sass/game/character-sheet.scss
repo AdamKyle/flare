@@ -1,0 +1,18 @@
+.character-skill-info {
+    dl {
+        dt {
+            width: 25%;
+        }
+
+        dd {
+            width: 75%;
+
+            .skill-info-icon {
+                font-size: 20px;
+                position: relative;
+                top: -8px;
+            }
+        }
+    }
+    
+}

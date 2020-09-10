@@ -21,9 +21,10 @@ class CharacterInventoryControllerTest extends TestCase
         parent::setUp();
 
         $item = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'weapon',
-            'base_damage' => '6',
+            'name'          => 'Rusty Dagger',
+            'type'          => 'weapon',
+            'base_damage'   => '6',
+            'crafting_type' => 'weapon'
         ]);
 
         $this->character = (new CharacterSetup())
@@ -213,18 +214,19 @@ class CharacterInventoryControllerTest extends TestCase
             'name' => 'Spear',
             'base_damage' => 6,
             'type' => 'weapon',
+            'crafting_type' => 'weapon',
         ]);
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
-            'equiped'      => false,
+            'equipped'     => false,
         ]);
 
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '2',
-        ])->see('Equipped')->see('Equipped: left-hand');
+        ])->see('Equipped')->see('Equipped:  <span class="normal-item">Rusty Dagger</span> ');
     }
 
     public function testSeeComparePageForSpell() {
@@ -232,16 +234,17 @@ class CharacterInventoryControllerTest extends TestCase
             'name' => 'spell',
             'base_damage' => 6,
             'type' => 'spell-damage',
+            'crafting_type' => 'spell',
         ]);
 
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
-            'equiped'      => false,
+            'equipped'     => false,
         ]);
 
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
-            'item_to_equip_type' => 'spell-damage',
+            'item_to_equip_type' => 'spell',
             'slot_id'            => '2',
         ])->see('Equipped')->see('Item Details');
     }

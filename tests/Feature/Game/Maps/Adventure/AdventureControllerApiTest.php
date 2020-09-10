@@ -51,7 +51,7 @@ class AdventureControllerApiTest extends TestCase
     public function testEmbarkAdventure() {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [
-                             'lavels_at_a_time' => 'all'
+                             'levels_at_a_time' => 'all'
                          ])
                          ->response;
 
@@ -66,7 +66,7 @@ class AdventureControllerApiTest extends TestCase
 
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [
-                             'lavels_at_a_time' => 'all'
+                             'levels_at_a_time' => 'all'
                          ])
                          ->response;
 

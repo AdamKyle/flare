@@ -6,8 +6,8 @@ use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Middleware\IsCharacterAdventuringMiddleware;
-use App\Game\Core\Services\AdventureFightService;
-use App\Game\Core\Services\AdventureService;
+use App\Game\Core\Services\AdventureRewardService;
+use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\EquipItemService;
 
@@ -34,6 +34,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CraftingSkillService::class, function($app) {
             return new CraftingSkillService();
+        });
+
+        $this->app->bind(AdventureRewardService::class, function($app) {
+            return new AdventureRewardService(new CharacterService);
         });
     }
 

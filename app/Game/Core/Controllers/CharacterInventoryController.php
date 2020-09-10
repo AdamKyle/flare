@@ -12,6 +12,7 @@ use App\Flare\Models\InventorySlot;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
 use App\Game\Core\Requests\EquipItemValidation;
+use App\Game\Core\Values\ValidEquipPositionsValue;
 
 class CharacterInventoryController extends Controller {
 
@@ -56,23 +57,35 @@ class CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function compare(ComparisonValidation $request) {
+    public function compare(ComparisonValidation $request, ValidEquipPositionsValue $validPositions) {
         $character   = auth()->user()->character;
-        $inventory   = $character->inventory->slots->filter(function($slot) use($request) {
-            return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
-        });
-
         $itemToEquip = InventorySlot::find($request->slot_id);
-        
+
         if (is_null($itemToEquip)) {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
+        }
+
+        $positions = $validPositions->getPositons($itemToEquip->item);
+        
+        if (empty($positions)) {
+            $inventory = $character->inventory->slots->filter(function($slot) use($request) {
+                return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
+            });
+        } else {
+            $inventory = $character->inventory->slots->filter(function ($slot) use ($positions) {
+                return in_array($slot->position, $positions) && $slot->equipped;
+            });
         }
 
         $slotId        = $itemToEquip->id;
         $slotPosition  = $itemToEquip->position;
         $itemToEquip   = $itemToEquip->item->load(['itemPrefix', 'itemSuffix', 'slot']);
 
-        $type = $this->fetchType($request->item_to_equip_type);
+        if ($request->has('item_to_equip_type')) {
+            $type = $this->fetchType($request->item_to_equip_type);
+        } else {
+            $type = $itemToEquip->crafting_type;
+        }
         
         if ($inventory->isEmpty()) {
             return view('game.core.character.equipment-compare', [
@@ -124,6 +137,21 @@ class CharacterInventoryController extends Controller {
         return redirect()->back()->with('success', 'Unequipped item.');
     }
 
+    public function unequipAll(Request $request) {
+        $character = auth()->user()->character;
+
+        $character->inventory->slots->each(function($slot) {
+            $slot->update([
+                'equipped' => false,
+                'position' => null,
+            ]);
+        });
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return redirect()->back()->with('success', 'All items have been removed.');
+    }
+
     public function destroy(Request $request) {
         $character = auth()->user()->character;
         
@@ -150,15 +178,11 @@ class CharacterInventoryController extends Controller {
 
     protected function fetchType(string $type): string {
         $acceptedTypes = [
-            'weapon', 'ring', 'shield', 'artifact'
+            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour'
         ];
 
         if (in_array($type, $acceptedTypes)) {
             return $type;
-        }
-
-        if ($type === 'spell-healing' || $type === 'spell-damage') {
-            return 'spell';
         }
 
         return 'armour';

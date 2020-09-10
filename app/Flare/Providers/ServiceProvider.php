@@ -15,6 +15,9 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Values\BaseSkillValue;
+use App\Flare\View\Components\AdventureLogs;
+use App\Flare\View\Components\ItemDisplayColor;
+use Blade;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -74,5 +77,9 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('is.character.dead', IsCharacterDeadMiddleware::class);
+
+        // Blade Components - Cross System:
+        Blade::component('item-display-color', ItemDisplayColor::class);
+        Blade::component('adventure-logs', AdventureLogs::class);
     }
 }

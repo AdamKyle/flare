@@ -1,7 +1,5 @@
 <h6>Item Details</h6>
 <dl>
-    <dt>Name:</dt>
-    <dd>{{$details['slot']->item->name}}</dd>
     <dt>Damage:</dt>
     <dd>{{$details['slot']->item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Position:</dt>

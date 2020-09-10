@@ -1,6 +1,15 @@
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show mb-2 mt-2">
-        {{ session('success') }}
+        @if (is_array(session('success')))
+            <h5 class="ml-2" style="color: #486353;">Adventure Rewards Collected!</h5>
+            <ul>
+                @foreach(session('success') as $message) 
+                    <li>{{$message}}</li>
+                @endforeach
+            </ul>
+        @else
+            {{ session('success') }}
+        @endif
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

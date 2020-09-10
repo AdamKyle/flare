@@ -1,5 +1,5 @@
 @foreach($details as $key => $value)
-    <div class="col-md-6">
+    <div class="col-md-6 mt-4">
         @if ($hasDefaultPosition)
             <p>If Replaced:</p>
         @else

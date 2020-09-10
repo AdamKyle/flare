@@ -23,5 +23,6 @@ $factory->define(Item::class, function (Faker $faker) {
         'type'                => null,
         'base_damage'         => null,
         'cost'                => null,
+        'crafting_type'       => null,
     ];
 });

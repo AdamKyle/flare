@@ -80,20 +80,23 @@
                     </div>
 
                     <div class="card mt-2">
-                        <div class="card-body">
+                        <div class="card-body character-skill-info">
                             <h4 class="card-title">Skills</h4>
                             @foreach($character->skills as $skill)
                                 <dl>
                                     <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>
                                     <dd>
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                Level/Max: {{$skill->level}} / {{$skill->max_level}}
+                                            </div>
+                                            <div class="col-md-4">
                                                 <div class="progress skill-training mb-2 text-center">
-                                                    <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->level}}" aria-valuemin="0" style="width: {{$skill->level}}%;">{{$skill->level}}</div>
+                                                    <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->xp}}" aria-valuemin="0" style="width: {{$skill->xp}}%;">{{$skill->xp}}</div>
                                                 </div>
                                             </div>
                                             @if ((bool) $skill->can_train)
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <a href="#" class="btn btn-primary btn-sm mb-2 train-skill-btn" data-toggle="modal" data-target="#skill-train-{{$skill->id}}">
                                                         Train
 
@@ -101,6 +104,26 @@
                                                         <i class="ml-2 fas fa-check"></i>
                                                         @endif
                                                     </a>
+
+                                                    @if ($skill->currently_training)
+                                                        <a class="btn btn-danger btn-sm mb-2 train-skill-btn" href="{{ route('logout') }}"
+                                                           onclick="event.preventDefault();
+                                                                    document.getElementById('cancel-skill-train-form').submit();"
+                                                        >
+                                                            Cancel
+                                                        </a>
+
+                                                        <i class="ml-2 fas fa-info-circle skill-info-icon text-info" 
+                                                           data-toggle="tooltip" data-placement="top" 
+                                                           title="Xp % Towards: {{$skill->xp_towards * 100}}%"
+                                                        ></i>
+
+                                                        <form id="cancel-skill-train-form" action="{{ route('cancel.train.skill', [
+                                                            'skill' => $skill->id
+                                                        ]) }}" method="POST" style="display: none;">
+                                                            @csrf
+                                                        </form>
+                                                    @endif
                                                     @include('game.core.character.partials.skill-train-modal', ['skill' => $skill])
                                                 </div>
                                             @endif

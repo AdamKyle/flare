@@ -13,7 +13,7 @@
                 @foreach($details as $key => $value)
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Equipped: {{$key}}</h4>
+                            <h4 class="card-title">Equipped: <x-item-display-color :item="$value['slot']->item" /></h4>
                             @if (!empty($details[$key]))
                                 @include('game.core.partials.currently-equipped', [
                                     'details' => $details[$key]
@@ -29,7 +29,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">To Equip:</h4>
+                    <h4 class="card-title">To Equip: <x-item-display-color :item="$itemToEquip" /> </h4>
                     <hr />
                     @include('game.core.partials.item-details-to-equip', [
                         'item'         => $itemToEquip,

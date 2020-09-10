@@ -1,0 +1,1 @@
+<span class="{{$color}}">{{$item->name}}</span>
