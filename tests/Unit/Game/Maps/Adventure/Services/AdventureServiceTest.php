@@ -105,7 +105,7 @@ class AdventureServiceTest extends TestCase
             'name' => 'Monster',
             'damage_stat' => 'str',
             'xp' => 10,
-            'str' => 100,
+            'str' => 500,
             'dur' => 2,
             'dex' => 4,
             'chr' => 1,

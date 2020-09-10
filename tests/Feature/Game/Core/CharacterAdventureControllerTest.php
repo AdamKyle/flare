@@ -19,11 +19,13 @@ class CharacterAdventureControllerTest extends TestCase
 
     private $character;
 
+    private $adventure;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $adventure = $this->createNewAdventure();
+        $this->adventure = $this->createNewAdventure();
 
         $item = $this->createItem([
             'name' => 'Spear',
@@ -43,7 +45,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $this->character->adventureLogs()->create([
             'character_id'         => $this->character->id,
-            'adventure_id'         => $adventure->id,
+            'adventure_id'         => $this->adventure->id,
             'complete'             => true,
             'in_progress'          => false,
             'last_completed_level' => 1,
@@ -61,7 +63,7 @@ class CharacterAdventureControllerTest extends TestCase
                         ],
                     ],
                 ]
-                ],
+            ],
             'rewards'              => 
             [
                 "exp" => 100,
@@ -79,6 +81,8 @@ class CharacterAdventureControllerTest extends TestCase
                 ],
               ]
         ]);
+
+        $this->character->refresh();
     }
 
     public function tearDown(): void
@@ -98,7 +102,39 @@ class CharacterAdventureControllerTest extends TestCase
     public function testCharacterCanSeeAllAdventures() {
         $this->actingAs($this->character->user)
              ->visitRoute('game.completed.adventures')
-             ->see('Test');
+             ->see('Previous Adventures')
+             ->see($this->adventure->name);
+    }
+
+    public function testCharacterCanSeeAllLogsForAdventure() {
+        $this->actingAs($this->character->user)
+             ->visitRoute('game.completed.adventure', [
+                 'adventureLog' => $this->character->adventureLogs->first()->id,
+             ])
+             ->see($this->adventure->name)
+             ->see('Log Entry 1');
+    }
+
+    public function testCharacterCanSeeSpecificLogForAdventure() {
+        $this->actingAs($this->character->user)
+             ->visitRoute('game.completed.adventure.logs', [
+                 'adventureLog' => $this->character->adventureLogs->first()->id,
+                 'name'         => 'vcCBZhAOqy3Dg9V6a1MRWCthCGFNResjhH7ttUsFFpREdVoH9oNqyrjVny3cX8McbjyGHZYeJ8txcTov'
+             ])
+             ->see($this->adventure->name)
+             ->see('Level: 1');
+    }
+
+    public function testCharacterCannotSeeSpecificLogForAdventureInvalidName() {
+        $this->actingAs($this->character->user)
+             ->visitRoute('game') // come here first, for a place to come back too
+             ->visitRoute('game.completed.adventure.logs', [
+                 'adventureLog' => $this->character->adventureLogs->first()->id,
+                 'name'         => 'xxxx'
+             ])
+             ->dontSee($this->adventure->name)
+             ->dontsee('Level: 1')
+             ->see('Invalid input.');
     }
 
     public function testCharacterCannotSeeLatestAdventure()
@@ -137,6 +173,20 @@ class CharacterAdventureControllerTest extends TestCase
 
 
         $response->assertSessionHas('error', "You are dead and must revive before trying to do that. Dead people can't do things."); 
+    }
+
+    public function testCannotGiveOutRewardsWhenThereAreNone() {
+        $this->character->adventureLogs->first()->update([
+            'rewards' => null
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+             ->post(route('game.current.adventure.reward', [
+                 'adventureLog' => 1,
+             ]))->response;
+
+
+        $response->assertSessionHas('error', "You cannot collect already collected rewards."); 
     }
 
     public function testCannotDistributeRewardsWhenAdventureing() {
