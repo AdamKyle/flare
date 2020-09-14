@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare;
+namespace Tests\Unit\Flare\Cache;
 
 use App\Flare\Cache\CoordinatesCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -28,7 +28,6 @@ class AdventureLogs extends Component
      */
     public function render()
     {
-        dump($this->logs);
         if (array_values($this->logs) === $this->logs) {
             $this->hasLevels = true;
         }

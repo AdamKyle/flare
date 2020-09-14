@@ -7,7 +7,9 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
-@import '../vendor/monster/theme/css/style.css';
+// Theme:
+@import 'core-theme';
+@import 'dark-theme';
 
 // RPG Icons
 @import 'node_modules/rpg-awesome/scss/rpg-awesome';
@@ -70,6 +72,18 @@ dd {
   -webkit-box-shadow: 0px 0 2px 0px rgba(115, 115, 115, 0.55);
   -moz-box-shadow: 0px 0 2px 0px rgba(115, 115, 115, 0.55);
   box-shadow: 0px 0 2px 0px rgba(115, 115, 115, 0.55);
+}
+
+.progress {
+  height: 15px;
+}
+
+#sidebarnav {
+  li {
+    ul {
+      margin-top: -7px;
+    }
+  }
 }
 
 @media (min-width: 576px) {

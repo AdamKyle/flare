@@ -57,23 +57,22 @@ export default class AdventureMenu extends React.Component {
 
   renderCurrentAdventureLink() {
     if (this.hasRewardsToCollect()) {
-        return <><a href="/current-adventure/" >Current Adventure <i className="ml-3 text-success fas fa-check-double fa-bounce"></i></a></>
+        return <><a href="/current-adventure/" className="text-success">Rewards <i className="ml-3 text-success fas fa-check-double fa-bounce"></i></a></>
     }
 
     return null;
   }
 
   render() {
-
-
+    
     return (
       <>
         <a className="has-arrow" 
           href="#" onClick={this.open.bind(this)} 
           aria-expanded={open} aria-controls="adventure-links">
-            <i className="ra ra-trail"></i>
+            <i className={'ra ra-trail ' + (this.hasRewardsToCollect() ? 'text-success fa-bounce' : null)}></i>
             <span className="hide-menu">
-              Adventure Logs {this.hasRewardsToCollect() ? <i className="ml-3 text-success fas fa-check-double fa-bounce"></i> : null}
+              Adventure Logs
             </span>
           </a>
         <Collapse in={this.state.open}>

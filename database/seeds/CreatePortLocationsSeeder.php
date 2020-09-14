@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\Admin\Models\GameMap;
 use Illuminate\Database\Seeder;
 use App\Flare\Models\Location;

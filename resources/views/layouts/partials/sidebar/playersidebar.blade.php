@@ -1,8 +1,11 @@
 <ul id="sidebarnav">
-    <li><a href={{route('game')}}>Home</a></li>
+    <li>
+        <a href="{{route('game')}}" aria-expanded="false"><i class="fas fa-gamepad"></i><span class="hide-menu ml-2">Game</span></a>
+    </li>
+    <li class="nav-devider"></li>
     <li class="nav-small-cap">Character Management</li>
     <li>
-        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character <span class="label label-rounded label-success">5</span></span></a>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('game.character.sheet')}}">Character Sheet</a></li>
             <li><a href="{{route('game.character.inventory')}}">Inventory</a></li>
@@ -22,11 +25,7 @@
     <li class="nav-devider"></li>
     <li class="nav-small-cap">Manage Adventures</li>
     <li id="adventure-menu">
-        {{-- <a class="has-arrow " href="#" aria-expanded="false"><i class="ra ra-trail"></i><span class="hide-menu">Adventure Logs</span></a>
-        <ul aria-expanded="false" class="collapse">
-            <li id="adventure-menu"></li>
-            <li><a href="{{route('game.completed.adventures')}}">Completed Adventures</a></li>
-        </ul> --}}
+        {{-- The adventure menu is built via a react component. --}}
     </li>
     <li class="nav-devider"></li>
     <li class="nav-small-cap">Buy/Sell Items</li>

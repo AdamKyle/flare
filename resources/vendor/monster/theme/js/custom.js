@@ -10,23 +10,23 @@ $(function () {
         $(".preloader").fadeOut();
     });
     jQuery(document).on('click', '.mega-dropdown', function (e) {
-        e.stopPropagation()
+        e.stopPropagation();
     });
     // ==============================================================
     // This is for the top header part and sidebar part
     // ==============================================================
-     var set = function () {
+    var set = function () {
             var width = (window.innerWidth > 0) ? window.innerWidth : this.screen.width;
             var topOffset = 70;
-            if (width < 1170) {
-                $("body").addClass("mini-sidebar");
-                $('.navbar-brand span').hide();
+            if (width < 4170) {
+                $("body").addClass("mini-sidebar logo-center");
+
                 $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible");
                 $(".sidebartoggler i").addClass("ti-menu");
             }
             else {
                 $("body").removeClass("mini-sidebar");
-                $('.navbar-brand span').show();
+
                 $(".sidebartoggler i").removeClass("ti-menu");
             }
 
@@ -40,22 +40,39 @@ $(function () {
     };
     $(window).ready(set);
     $(window).on("resize", set);
+
+    var set2 = function () {
+            var width = (window.innerWidth > 0) ? window.innerWidth : this.screen.width;
+            var topOffset = 70;
+            if (width < 1000) {
+                $('.navbar-brand span').hide();
+                $('.app-search').hide();
+            }
+            else {
+                $('.navbar-brand span').show();
+                $('.app-search').show();
+            }
+    };
+    $(window).ready(set2);
+    $(window).on("resize", set2);
     // ==============================================================
     // Theme options
     // ==============================================================
     $(".sidebartoggler").on('click', function () {
-        if ($("body").hasClass("mini-sidebar")) {
+        var element = document.getElementByClassName('mini-sidebar');
+        
+        if (element !== null) {
             $("body").trigger("resize");
             $(".scroll-sidebar, .slimScrollDiv").css("overflow", "hidden").parent().css("overflow", "visible");
             $("body").removeClass("mini-sidebar");
-            $('.navbar-brand span').show();
+
             $(".sidebartoggler i").addClass("ti-menu");
         }
         else {
             $("body").trigger("resize");
             $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible");
             $("body").addClass("mini-sidebar");
-            $('.navbar-brand span').hide();
+
             $(".sidebartoggler i").removeClass("ti-menu");
         }
     });
@@ -85,16 +102,34 @@ $(function () {
     });
 
     // ==============================================================
+    // Auto select left navbar
+    // ==============================================================
+    $(function () {
+        var url = window.location;
+        var element = $('ul#sidebarnav a').filter(function () {
+            return this.href == url;
+        }).addClass('active').parent().addClass('active');
+        while (true) {
+            if (element.is('li')) {
+                element = element.parent().addClass('in').parent().addClass('active');
+            }
+            else {
+                break;
+            }
+        }
+
+    });
+    // ==============================================================
     //tooltip
     // ==============================================================
     $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            $('[data-toggle="tooltip"]').tooltip();
         });
         // ==============================================================
         //Popover
         // ==============================================================
     $(function () {
-            $('[data-toggle="popover"]').popover()
+            $('[data-toggle="popover"]').popover();
         });
         // ==============================================================
         // Sidebarmenu
@@ -109,7 +144,7 @@ $(function () {
         position: 'left'
         , size: "5px"
         , height: '100%'
-        , color: '#dcdcdc'
+        , color: '#31363d'
      });
     $('.message-center').slimScroll({
         position: 'right'

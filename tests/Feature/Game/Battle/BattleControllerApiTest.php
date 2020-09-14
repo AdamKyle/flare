@@ -7,16 +7,14 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Monster;
 use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\DropCheckEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
-use App\Game\Messages\Events\SkillLeveledUpServerMessageEvent;
+use CreateMonstersSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -626,6 +624,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     protected function setUpMonsters(): void {
-        $this->artisan('db:seed --class=CreateMonstersSeeder');
+        $this->seed(CreateMonstersSeeder::class);
     }
 }

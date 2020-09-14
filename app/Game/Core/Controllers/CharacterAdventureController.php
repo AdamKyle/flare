@@ -7,7 +7,6 @@ use App\Flare\Models\AdventureLog;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
-use App\Game\Maps\Adventure\Jobs\AdventureJob;
 
 class CharacterAdventureController extends Controller {
 
@@ -78,6 +77,7 @@ class CharacterAdventureController extends Controller {
         ]);
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
+
 
         return redirect()->to(route('game'))->with('success', $messages);
     }

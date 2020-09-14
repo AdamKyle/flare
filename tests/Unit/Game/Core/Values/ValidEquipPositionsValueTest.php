@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
-class AdventureJobTest extends TestCase
+class ValidEquipPositionsValueTest extends TestCase
 {
     use RefreshDatabase, CreateItem;
 

@@ -13,6 +13,7 @@ const mix = require('laravel-mix');
 
 mix.react('resources/js/app.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
-   .copy('resources/vendor/monster/theme/css/colors/default-dark.css', 'public/css')
-   .copyDirectory('resources/vendor/monster/assets', 'public/assets')
-   .sourceMaps();
+   .extract()
+   .version()
+   .sourceMaps()
+   .browserSync('127.0.0.1:8000');

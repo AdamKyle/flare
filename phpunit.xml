@@ -1,42 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         backupGlobals="false"
-         backupStaticAttributes="false"
-         bootstrap="vendor/autoload.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinter">
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./app</directory>
-            <exclude>
-              <directory suffix=".php">./app/Flare/MapGenerator</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-    <php>
-        <server name="APP_ENV" value="testing"/>
-        <server name="BCRYPT_ROUNDS" value="4"/>
-        <server name="CACHE_DRIVER" value="array"/>
-        <server name="MAIL_DRIVER" value="array"/>
-        <server name="QUEUE_CONNECTION" value="sync"/>
-        <server name="DB_CONNECTION" value="sqlite" />
-        <server name="SESSION_DRIVER" value="array"/>
-        <env name="BROADCAST_DRIVER" value="log"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-    </php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false" backupStaticAttributes="false" bootstrap="vendor/autoload.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" printerClass="\Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./app</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="Unit">
+      <directory suffix="Test.php">./tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Feature">
+      <directory suffix="Test.php">./tests/Feature</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <ini name="memory_limit" value="-1" />
+    <server name="APP_ENV" value="testing"/>
+    <server name="BCRYPT_ROUNDS" value="4"/>
+    <server name="CACHE_DRIVER" value="array"/>
+    <server name="MAIL_DRIVER" value="array"/>
+    <server name="QUEUE_CONNECTION" value="sync"/>
+    <server name="DB_CONNECTION" value="sqlite"/>
+    <server name="SESSION_DRIVER" value="array"/>
+    <env name="BROADCAST_DRIVER" value="log"/>
+    <env name="TELESCOPE_ENABLED" value="false"/>
+  </php>
 </phpunit>

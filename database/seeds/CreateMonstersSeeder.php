@@ -1,9 +1,9 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Skill;
-use App\Flare\Models\Item;
 use App\Flare\Values\BaseSkillValue;
 
 class CreateMonstersSeeder extends Seeder
