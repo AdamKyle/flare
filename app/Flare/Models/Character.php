@@ -100,4 +100,8 @@ class Character extends Model
     public function adventureLogs() {
         return $this->hasMany(AdventureLog::class);
     }
+
+    public function notifications() {
+        return $this->hasMany(Notification::class, 'character_id', 'id');
+    }
 }

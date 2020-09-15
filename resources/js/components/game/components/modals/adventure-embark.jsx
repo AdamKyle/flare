@@ -33,9 +33,9 @@ export default class AdventureEmbark extends React.Component {
     const levels = this.state.adventure.levels;
 
     if (levels % 10 === 0) {
-      return <option value="10">10 levels at a time</option>
-    } else if (levels % 5 === 0) {
       return <option value="5">5 levels at a time</option>
+    } else if (levels % 5 === 0) {
+      return <option value="1">1 level at a time</option>
     }
 
     return null;

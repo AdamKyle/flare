@@ -59,16 +59,15 @@ $(function () {
     // Theme options
     // ==============================================================
     $(".sidebartoggler").on('click', function () {
-        var element = document.getElementByClassName('mini-sidebar');
-        
-        if (element !== null) {
+        var element = document.getElementsByClassName('mini-sidebar');
+
+        if (element.length === 0) {
             $("body").trigger("resize");
             $(".scroll-sidebar, .slimScrollDiv").css("overflow", "hidden").parent().css("overflow", "visible");
             $("body").removeClass("mini-sidebar");
 
             $(".sidebartoggler i").addClass("ti-menu");
-        }
-        else {
+        } else {
             $("body").trigger("resize");
             $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible");
             $("body").addClass("mini-sidebar");

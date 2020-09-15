@@ -7,6 +7,7 @@ import CoreActionsSection  from './components/core-actions-section';
 import PortLocationActions from './components/port-location-actions';
 import AdeventureActions   from './components/adventure-actions';
 import AdventureMenu       from './components/menu/adventure-menu';
+import NotificationCenter  from './components/nav-bar/notification-center';
 
 class Game extends React.Component {
   constructor(props) {
@@ -124,5 +125,16 @@ if (adventureMenu !== null) {
   ReactDOM.render(
       <AdventureMenu userId={parseInt(player.content)} />,
       adventureMenu
+  );
+}
+
+// Mount the Notification Center:
+
+const notificationCenter = document.getElementById('notification-center');
+
+if (notificationCenter !== null) {
+  ReactDOM.render(
+      <NotificationCenter userId={parseInt(player.content)} />,
+      notificationCenter
   );
 }

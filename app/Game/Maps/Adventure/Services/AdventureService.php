@@ -10,6 +10,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\AdventureLog;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
+use App\Game\Core\Events\CreateAdventureNotificationEvent;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
 
@@ -122,6 +123,7 @@ class AdventureService {
         $this->updateAdventureLog($adventureLog, $level, true);
 
         event(new UpdateAdventureLogsBroadcastEvent($this->character->refresh()->adventureLogs, $this->character->user));
+        event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
 
         event(new ServerMessageEvent($this->character->user, 'adventure', 'You died while on your explortations! Check your Adventure logs for more information.'));
     } 
@@ -209,7 +211,9 @@ class AdventureService {
 
         event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
 
-        event(new ServerMessageEvent($this->character->user, 'adventure', 'Adventure completed! Check your logs for more details. Below is your rewards.'));
+        event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
+
+        event(new ServerMessageEvent($this->character->user, 'adventure', 'Adventure completed! Check your logs for more details.'));
     } 
 
     protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false) {

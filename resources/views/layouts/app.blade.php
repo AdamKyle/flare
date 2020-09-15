@@ -58,9 +58,6 @@
                             <!-- toggle and nav items -->
                             <!-- ============================================================== -->
                             <ul class="navbar-nav mr-auto mt-md-0 ">
-                                <!-- ============================================================== -->
-                                <!-- Comment -->
-                                <!-- ============================================================== -->
                                 <li class="nav-item"> 
                                     <a class="nav-link sidebartoggler hidden-sm-down text-muted" href="javascript:void(0)">
                                         <i class="fas fa-bars"></i>

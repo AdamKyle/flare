@@ -22108,6 +22108,52 @@ a.link:focus {
   }
 }
 
+.notification-center {
+  margin-top: 22px;
+}
+
+.notification-center .dropdown-menu {
+  width: 375px;
+}
+
+.notification-center .dropdown-item {
+  white-space: normal;
+}
+
+.notification-center .dropdown-item:active,
+.notification-center .dropdown-item:hover {
+  color: #16181b;
+  text-decoration: none;
+  background-color: #f8f9fa;
+}
+
+.notification-center i {
+  font-size: 24px;
+}
+
+.notification-center span {
+  position: absolute;
+  left: 15px;
+  bottom: 20px;
+}
+
+.notification-center .notification {
+  width: 290px;
+}
+
+.notification-center .notification p {
+  word-break: break-word;
+  width: 230px;
+}
+
+.notification-center .notification .danger-bar {
+  border-left: 5px solid #e3342f;
+}
+
+.notification-center .notification .success-bar {
+  border-left: 5px solid #38c172;
+}
+
 legend {
   font-size: 0.9rem;
 }

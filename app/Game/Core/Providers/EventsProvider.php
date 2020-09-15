@@ -12,6 +12,8 @@ use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\UpdateSkillEvent;
+use App\Game\Core\Events\CreateAdventureNotificationEvent;
+use App\Game\Core\Listeners\CreateAdventureNotificationListener;
 use App\Game\Core\Listeners\UpdateSkillListener;
 use App\Game\Core\Listeners\AttackTimeOutListener;
 use App\Game\Core\Listeners\UpdateTopBarListener;
@@ -21,6 +23,7 @@ use App\Game\Core\Listeners\GoldRushCheckListener;
 use App\Game\Core\Listeners\CraftedItemTimeOutListener;
 use App\Game\Core\Listeners\SellItemListener;
 use App\Game\Core\Listeners\BuyItemListener;
+
 
 class EventsProvider extends ServiceProvider {
 
@@ -69,6 +72,11 @@ class EventsProvider extends ServiceProvider {
         // When a battle is over, check if we got a gold rush.
         GoldRushCheckEvent::class => [
             GoldRushCheckListener::class,
+        ],
+
+        // When an adventure ends we create the notification:
+        CreateAdventureNotificationEvent::class => [
+            CreateAdventureNotificationListener::class,
         ],
     ];
 

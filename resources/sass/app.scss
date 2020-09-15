@@ -25,6 +25,9 @@
 @import 'game/shop';
 @import 'game/icons';
 
+// Components:
+@import 'game/components/react-notifications/notification';
+
 legend {
   font-size: 0.9rem;
 }
