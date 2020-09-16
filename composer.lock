@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7e1df7e7714dc72a1a66b3cead2b3ed",
+    "content-hash": "2320533361439f80da6cdc095ba6ecd5",
     "packages": [
         {
             "name": "beyondcode/laravel-websockets",
-            "version": "1.7.0",
+            "version": "1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/beyondcode/laravel-websockets.git",
-                "reference": "00dd9b0b2521a9aa7cfba30d75b4e38838c80509"
+                "reference": "331a127486f93905b39f0df7e29296cbada0ffa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beyondcode/laravel-websockets/zipball/00dd9b0b2521a9aa7cfba30d75b4e38838c80509",
-                "reference": "00dd9b0b2521a9aa7cfba30d75b4e38838c80509",
+                "url": "https://api.github.com/repos/beyondcode/laravel-websockets/zipball/331a127486f93905b39f0df7e29296cbada0ffa0",
+                "reference": "331a127486f93905b39f0df7e29296cbada0ffa0",
                 "shasum": ""
             },
             "require": {
@@ -82,7 +82,7 @@
                 "beyondcode",
                 "laravel-websockets"
             ],
-            "time": "2020-09-10T13:44:10+00:00"
+            "time": "2020-09-15T14:41:15+00:00"
         },
         {
             "name": "brick/math",
@@ -897,16 +897,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.1.0",
+            "version": "v8.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "d769a497a20e4a374ff7454dde7eee65145e3659"
+                "reference": "7f8ac4f4abee41215b7f421f0dc491c844aea7b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/d769a497a20e4a374ff7454dde7eee65145e3659",
-                "reference": "d769a497a20e4a374ff7454dde7eee65145e3659",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/7f8ac4f4abee41215b7f421f0dc491c844aea7b9",
+                "reference": "7f8ac4f4abee41215b7f421f0dc491c844aea7b9",
                 "shasum": ""
             },
             "require": {
@@ -936,7 +936,7 @@
                 "symfony/routing": "^5.1",
                 "symfony/var-dumper": "^5.1",
                 "tijsverkoyen/css-to-inline-styles": "^2.2.2",
-                "vlucas/phpdotenv": "^5.0",
+                "vlucas/phpdotenv": "^5.2",
                 "voku/portable-ascii": "^1.4.8"
             },
             "conflict": {
@@ -1056,7 +1056,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-09-11T14:24:58+00:00"
+            "time": "2020-09-15T14:50:30+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -5594,16 +5594,16 @@
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v5.1.0",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "448c76d7a9e30c341ff5bc367a923af74ae18467"
+                "reference": "fba64139db67123c7a57072e5f8d3db10d160b66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/448c76d7a9e30c341ff5bc367a923af74ae18467",
-                "reference": "448c76d7a9e30c341ff5bc367a923af74ae18467",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/fba64139db67123c7a57072e5f8d3db10d160b66",
+                "reference": "fba64139db67123c7a57072e5f8d3db10d160b66",
                 "shasum": ""
             },
             "require": {
@@ -5626,7 +5626,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.1-dev"
+                    "dev-master": "5.2-dev"
                 }
             },
             "autoload": {
@@ -5666,7 +5666,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-07-14T19:26:25+00:00"
+            "time": "2020-09-14T15:57:31+00:00"
         },
         {
             "name": "voku/portable-ascii",
@@ -5872,16 +5872,16 @@
         },
         {
             "name": "beyondcode/laravel-dump-server",
-            "version": "dev-l8-compatibility",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/laravel-shift/laravel-dump-server.git",
-                "reference": "6dcb27ad6ac0f09f1c3ab34c5b93670b977cf7b7"
+                "url": "https://github.com/beyondcode/laravel-dump-server.git",
+                "reference": "1df6bb3bf13a2e818c1abbb7065ea362277be5c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel-shift/laravel-dump-server/zipball/6dcb27ad6ac0f09f1c3ab34c5b93670b977cf7b7",
-                "reference": "6dcb27ad6ac0f09f1c3ab34c5b93670b977cf7b7",
+                "url": "https://api.github.com/repos/beyondcode/laravel-dump-server/zipball/1df6bb3bf13a2e818c1abbb7065ea362277be5c0",
+                "reference": "1df6bb3bf13a2e818c1abbb7065ea362277be5c0",
                 "shasum": ""
             },
             "require": {
@@ -5911,19 +5911,7 @@
                     "helpers.php"
                 ]
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "BeyondCode\\DumpServer\\Tests\\": "tests"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "vendor/bin/phpunit"
-                ],
-                "test-coverage": [
-                    "vendor/bin/phpunit --coverage-html coverage"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -5941,10 +5929,7 @@
                 "beyondcode",
                 "laravel-dump-server"
             ],
-            "support": {
-                "source": "https://github.com/laravel-shift/laravel-dump-server/tree/l8-compatibility"
-            },
-            "time": "2020-09-08T12:21:04+00:00"
+            "time": "2020-09-14T07:14:12+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -7681,16 +7666,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "9.1.8",
+            "version": "9.1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "f98f8466126d83b55b924a94d2244c53c216b8fb"
+                "reference": "cf6582906d4b2502c5f4c6be6a3d0b4cd5b3ef7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/f98f8466126d83b55b924a94d2244c53c216b8fb",
-                "reference": "f98f8466126d83b55b924a94d2244c53c216b8fb",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/cf6582906d4b2502c5f4c6be6a3d0b4cd5b3ef7f",
+                "reference": "cf6582906d4b2502c5f4c6be6a3d0b4cd5b3ef7f",
                 "shasum": ""
             },
             "require": {
@@ -7698,7 +7683,7 @@
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
                 "nikic/php-parser": "^4.8",
-                "php": "^7.3 || ^8.0",
+                "php": ">=7.3",
                 "phpunit/php-file-iterator": "^3.0.3",
                 "phpunit/php-text-template": "^2.0.2",
                 "sebastian/code-unit-reverse-lookup": "^2.0.2",
@@ -7750,7 +7735,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-09-07T08:07:10+00:00"
+            "time": "2020-09-15T06:14:11+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -9426,9 +9411,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "beyondcode/laravel-dump-server": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

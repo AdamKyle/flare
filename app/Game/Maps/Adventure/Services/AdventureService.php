@@ -45,6 +45,16 @@ class AdventureService {
         $this->rewardBuilder      = $rewardBuilder; 
         $this->name               = $name;
 
+        $this->createSkillRewardSection();
+    }
+
+    public function processAdventure() {
+        if ($this->levelsAtATime === 'all') {
+            $this->processAllLevels();
+        }
+    }
+
+    protected function createSkillRewardSection(): void {
         $skill = $this->character->skills->filter(function($skill) {
             return $skill->currently_training;
         })->first();
@@ -55,12 +65,6 @@ class AdventureService {
                 'exp_towards' => $skill->xp_towards,
                 'exp'   => 0,
             ];
-        }
-    }
-
-    public function processAdventure() {
-        if ($this->levelsAtATime === 'all') {
-            $this->processAllLevels();
         }
     }
 
@@ -79,8 +83,9 @@ class AdventureService {
         }
 
         for ($i = $startingLevel; $i <= $this->adventure->levels; $i++) {
+
             $attackService->processBattle();
-            
+
             if ($attackService->isCharacterDead()) {
                 $this->characterIsDead($attackService, $adventureLog, $i);
 
@@ -96,6 +101,8 @@ class AdventureService {
                     break;
                 }
             }
+
+            $attackService->resetLogInfo();
         }
 
         return;

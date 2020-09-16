@@ -27,7 +27,7 @@
                     <dt>Gold Rush Chance</dt>
                     <dd>{{$adventure->gold_rush_chance * 100}}%</dd>
                     <dt>Skill Bonus EXP</dt>
-                    <dd>{{$adventure->skill_bonus_exp * 100}}%</dd>
+                    <dd>{{$adventure->skill_exp_bonus * 100}}%</dd>
                 </dl>
                 <hr />
                 @if (auth()->user()->hasRole('Admin'))

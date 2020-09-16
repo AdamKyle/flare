@@ -7,12 +7,6 @@
         "laravel"
     ],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/laravel-shift/laravel-dump-server.git"
-        }
-    ],
     "require": {
         "php": "^7.2",
         "beyondcode/laravel-websockets": "^1.7",
@@ -29,7 +23,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8.1",
-        "beyondcode/laravel-dump-server": "dev-l8-compatibility",
+        "beyondcode/laravel-dump-server": "1.5.0",
         "facade/ignition": "^2.3.6",
         "fzaninotto/faker": "^1.9.1",
         "laravel/browser-kit-testing": "^6.1.0",
