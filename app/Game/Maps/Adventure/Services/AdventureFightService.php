@@ -148,20 +148,22 @@ class AdventureFightService {
 
     protected function completeAttack($attacker, $defender): array {
         if ($attacker instanceof Character) {
+            $messages = [];
+
             $characterAttack = $this->characterInformation->buildAttack();
 
             $this->currentMonsterHealth -= $characterAttack;
 
             if ($this->characterInformation->hasArtifacts()) {
-                $messages = ['Your artifacts glow before the enemy!'];
+                $messages[] = ['Your artifacts glow before the enemy!'];
             }
 
             if ($this->characterInformation->hasAffixes()) {
-                $messages = ['The enchantments on your equipment lash out at the enemy!'];
+                $messages[] = ['The enchantments on your equipment lash out at the enemy!'];
             }
 
             if ($this->characterInformation->hasDamageSpells()) {
-                $messages = ['Your spells burst forward towards the enemy!'];
+                $messages[] = ['Your spells burst forward towards the enemy!'];
             }
 
             $healFor = $this->characterInformation->buildHealFor();
@@ -169,16 +171,16 @@ class AdventureFightService {
             if ($healFor > 0) {
                 $this->currentCharacterHealth = $healFor;
 
-                $messages = ['Light floods your eyes as your wounds heal over.'];
+                $messages[] = ['Light floods your eyes as your wounds heal over.'];
             }
 
-            $messages = [$this->character->name . ' hit for ' . $characterAttack];
+            $messages[] = [$this->character->name . ' hit for ' . $characterAttack];
         } else {
             $monsterAttack = $this->fetchMonsterAttack($attacker);
             
             $this->currentCharacterHealth -= $monsterAttack;
 
-            $messages =  [$attacker->name . ' hit for ' . $monsterAttack];
+            $messages[] =  [$attacker->name . ' hit for ' . $monsterAttack];
         }
 
         return $messages;

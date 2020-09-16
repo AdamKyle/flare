@@ -11,7 +11,7 @@
 
             @if (!empty($details))
                 @if (isset($details['ring-one']))
-                <i class="fas fa-check text-success ml-2"></i> <em><x-item-display-color :item="$details['ring_one']['slot']->item" /> will be replaced.</em>
+                <i class="fas fa-check text-success ml-2"></i> <em><x-item-display-color :item="$details['ring-one']['slot']->item" /> will be replaced.</em>
                 @endif
             @endif
         </label>

@@ -1,4 +1,3 @@
-
 @if ($hasLevels)
     @foreach ($logs as $level => $logsForLevel)
         <div class="card adventure-fight-log mb-3">
