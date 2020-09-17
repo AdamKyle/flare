@@ -48,7 +48,7 @@ class MapController extends Controller {
             'map_url'                => Storage::disk('maps')->url($user->character->map->gameMap->path),
             'character_map'          => $user->character->map,
             'character_id'           => $user->character->id,
-            'locations'              => Location::all(),
+            'locations'              => Location::with('adventures', 'questRewardItem')->get(),
             'can_move'               => $user->character->can_move,
             'timeout'                => $user->character->can_move_again_at,
             'show_message'           => $user->character->can_move ? false : true,

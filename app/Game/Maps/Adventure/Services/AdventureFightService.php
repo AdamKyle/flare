@@ -69,6 +69,7 @@ class AdventureFightService {
     }
 
     protected function attack($attacker, $defender) {
+        dump($this->currentMonsterHealth);
         if ($this->isCharacterDead() || $this->isMonsterDead()) {
             return;
         }

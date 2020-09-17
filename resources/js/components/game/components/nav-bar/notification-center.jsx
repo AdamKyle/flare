@@ -126,7 +126,6 @@ export default class NotificationCenter extends React.Component {
       return null;
     }
 
-    console.log(this.state.notificationCount, this.state.notifications);
     return (
       <div className="notification-center">
         <Dropdown>

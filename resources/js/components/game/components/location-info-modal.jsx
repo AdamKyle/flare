@@ -41,6 +41,7 @@ export default class CharacterInfoModal extends React.Component {
           <LocationInfo location={location} />
         </Modal.Body>
         <Modal.Footer>
+          <div className="float-left">{'Coordinates: ' + location.x + '/' + location.y}</div>
           <button className="btn btn-primary" type="button" onClick={this.props.onClose}>
             Close
           </button>

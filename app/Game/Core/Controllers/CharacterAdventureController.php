@@ -78,7 +78,12 @@ class CharacterAdventureController extends Controller {
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 
-
+        if (empty($messages)) {
+            $messages = [
+                'You finished and now ready for the next adventure.'
+            ];
+        }
+        
         return redirect()->to(route('game'))->with('success', $messages);
     }
 }

@@ -83,7 +83,7 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Rewards: {{$adventure->itemReward->name}}</h4>
-                <em class="text-muted">All quest items are rewarded once for completing the adventure</em>
+                <em class="text-muted">All quest items are rewarded once for completing the adventure the first time only.</em>
                 <div class="mt-2">
                     @if (!is_null($adventure->itemReward))
                         @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
