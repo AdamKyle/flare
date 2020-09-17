@@ -22141,6 +22141,10 @@ a.link:focus {
   width: 290px;
 }
 
+.notification-center .notification a {
+  color: #16181b;
+}
+
 .notification-center .notification p {
   word-break: break-word;
   width: 230px;

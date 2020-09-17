@@ -62,7 +62,7 @@
                             </dd>
                         @endif
                     </dl>
-                    <p style="font-size: 12px" class="text-muted"><sup>*</sup> This item has already been awarded to you upon a <strong>successful</strong> completion of the adventure.</p>
+                    <p style="font-size: 12px" class="text-muted"><sup>*</sup> This item has already been awarded to you upon a <strong>successful</strong> completion of the adventure, once.</p>
                 </div>
                 <hr />
                 <div class="clearfix">

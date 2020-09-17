@@ -1,5 +1,6 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
+import { getServerMessage } from '../../helpers/server_message';
 
 export default class NotificationCenter extends React.Component {
 
@@ -9,17 +10,46 @@ export default class NotificationCenter extends React.Component {
     this.state = {
       notifications: [],
       notificationCount: 0,
+      loading: true,
     };
 
     this.notifications = Echo.private('update-notifications-' + this.props.userId);
   }
 
   componentDidMount() {
+
+    axios.get('/api/notifications').then((result) => {
+      this.setState({
+        notifications: result.data,
+        notificationCount: result.data.length,
+        loading: false,
+      });
+    }).catch((err) => {
+      console.log(error);
+      return getServerMessage('something_went_wrong');
+    });
+
     this.notifications.listen('Game.Core.Events.UpdateNotificationsBroadcastEvent', (event) => {
       this.setState({
         notifications: event.notifications,
         notificationCount: event.notifications.length,
       });
+    });
+  }
+
+  clearAll(e) {
+    e.preventDefault();
+
+    axios.post('/api/notifications/clear').catch((err) => {
+      console.log(error);
+    });
+  }
+
+  clearNotification(notification) {
+    axios.post('/api/notifications/' + notification.id + '/clear').then((result) => {
+      window.location = notification.url;
+    }).catch((err) => {
+      console.log(error);
     });
   }
 
@@ -49,7 +79,7 @@ export default class NotificationCenter extends React.Component {
           aria-labelledby={labeledBy}
         >
           <div className="actions clearfix">
-            <a href="#" className="float-right mr-2">Clear</a>
+            <a href="#" onClick={this.clearAll.bind(this)} className="float-right mr-2">Clear</a>
           </div>
           <ul className="list-unstyled">
             {children}
@@ -77,7 +107,7 @@ export default class NotificationCenter extends React.Component {
 
     this.state.notifications.forEach((notification) => {
       notifications.push(
-        <Dropdown.Item eventKey={notification.id}>
+        <Dropdown.Item eventKey={notification.id} key={notification.id} data-notification-id={notification.id} onClick={() => {this.clearNotification(notification)}}>
           <div className="notification">
             <div className={notification.status === 'success' ? 'success-bar pl-3 clearfix' : 'danger-bar pl-3 clearfix'}>
               <i className={this.fetchIcon(notification.type) + ' float-left mt-2 pr-2'} />
@@ -92,6 +122,11 @@ export default class NotificationCenter extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return null;
+    }
+
+    console.log(this.state.notificationCount, this.state.notifications);
     return (
       <div className="notification-center">
         <Dropdown>

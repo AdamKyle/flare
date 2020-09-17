@@ -19,6 +19,12 @@ class Notification extends Model
         'message',
         'status',
         'type',
+        'read',
+        'url',
+    ];
+
+    protected $casts = [
+        'read' => 'boolean',
     ];
 
     public function character() {

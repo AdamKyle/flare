@@ -22,6 +22,7 @@ export default class AdventureMenu extends React.Component {
         logs: result.data,
       });
     }).catch(function (error) {
+      console.log(error);
       return getServerMessage('something_went_wrong');
     });
 

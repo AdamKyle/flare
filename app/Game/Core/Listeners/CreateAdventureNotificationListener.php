@@ -19,8 +19,9 @@ class CreateAdventureNotificationListener
             'message'      => $event->adventureLog->complete ? 'Adventure Has been completed! Click to collect your rewards!' : 'You have died but have rewards. Please revive before collecting them.',
             'status'       => $event->adventureLog->complete ? 'success' : 'failed',
             'type'         => 'adventure',
+            'url'          => route('game.current.adventure'),
         ]);
 
-        event(new UpdateNotificationsBroadcastEvent($event->adventureLog->character->notifications, $event->adventureLog->character->user));
+        event(new UpdateNotificationsBroadcastEvent($event->adventureLog->character->notifications()->where('read', false)->get(), $event->adventureLog->character->user));
     }
 }
