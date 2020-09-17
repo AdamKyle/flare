@@ -14,7 +14,7 @@ class AddUrlToNotifications extends Migration
     public function up()
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->string('url');
+            $table->string('url')->default('');
         });
     }
 
