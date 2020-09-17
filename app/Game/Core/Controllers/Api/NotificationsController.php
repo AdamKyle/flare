@@ -38,7 +38,7 @@ class NotificationsController extends Controller {
         $notification = $character->notifications()->where('id', $notification->id)->where('character_id', $notification->character_id)->first();
 
         if (is_null($notification)) {
-            return response()->json(['invalid input'], 422);
+            return response()->json(['error' => 'Invalid input.'], 422);
         }
 
         $notification->update([

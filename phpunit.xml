@@ -4,6 +4,9 @@
     <include>
       <directory suffix=".php">./app</directory>
     </include>
+    <exclude>
+      <directory suffix=".php">./app/Flare/MapGenerator</directory>
+    </exclude>
   </coverage>
   <testsuites>
     <testsuite name="Unit">

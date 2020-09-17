@@ -2,11 +2,10 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\NotificationsDatabaseFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\Character;
 
-class Notification extends Model
-{
+class Notification extends Model {
 
     /**
      * The attributes that are mass assignable.
