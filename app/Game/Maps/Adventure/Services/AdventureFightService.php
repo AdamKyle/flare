@@ -73,6 +73,19 @@ class AdventureFightService {
             return;
         }
 
+        if ($this->count >= 10) {
+            $this->logInformation[] = [
+                'attacker'   => $attacker->name,
+                'defender'   => $defender->name,
+                'message'    => 'Floor took too long.',
+                'is_monster' => $attacker instanceOf Character ? false : true
+            ];
+
+            $this->count = 0;
+
+            return;
+        }
+
         if (!$this->canHit($attacker, $defender)) {
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
