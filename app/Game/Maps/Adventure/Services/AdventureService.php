@@ -85,6 +85,8 @@ class AdventureService {
         for ($i = $startingLevel; $i <= $this->adventure->levels; $i++) {
             dump('level: ' . $i);
             $attackService->processBattle();
+            dump('Adventure Logs:');
+            dump($attackService->getLogInformation());
 
             if ($attackService->isCharacterDead()) {
                 $this->characterIsDead($attackService, $adventureLog, $i);

@@ -69,19 +69,7 @@ class AdventureFightService {
     }
 
     protected function attack($attacker, $defender) {
-        dump($this->currentMonsterHealth);
         if ($this->isCharacterDead() || $this->isMonsterDead()) {
-            return;
-        }
- 
-        if ($this->counter >= 10) {
-            $this->logInformation[] = [
-                'attacker'   => $attacker->name,
-                'defender'   => $defender->name,
-                'messages'   => 'This floor took too long. You decided to retreat out of exhaustion, making your way to the next floor.',
-                'is_monster' => false
-            ];
-
             return;
         }
 
@@ -95,7 +83,7 @@ class AdventureFightService {
 
             $this->counter += 1;
 
-            $this->attack($defender, $attacker);
+            return $this->attack($defender, $attacker);
         } 
 
         if ($this->blockedAttack($defender, $attacker)) {
@@ -108,12 +96,14 @@ class AdventureFightService {
 
             $this->counter += 1;
 
-            $this->attack($defender, $attacker);
+            return $this->attack($defender, $attacker);
         }
 
-        if (!$this->isMonsterDead()) {
-            $messages = $this->completeAttack($attacker, $defender);
+        $messages      = $this->completeAttack($attacker, $defender);
 
+        $this->counter = 0;
+
+        if (!empty($messages)) {
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
@@ -121,12 +111,10 @@ class AdventureFightService {
                 'is_monster' => $attacker instanceof Character ? false : true
             ];
 
-            $this->attack($defender,    $attacker);
+            return $this->attack($defender, $attacker);
         }
 
-        $this->counter = 0;
-
-        return;
+        return;        
     }
 
     protected function canHit($attacker, $defender): bool {
@@ -148,9 +136,14 @@ class AdventureFightService {
     }
 
     protected function completeAttack($attacker, $defender): array {
-        if ($attacker instanceof Character) {
-            $messages = [];
+        $messages = [];
 
+        if ($this->isCharacterDead() || $this->isMonsterDead()) {
+            return $messages;
+        }
+
+        if ($attacker instanceof Character) {
+            
             $characterAttack = $this->characterInformation->buildAttack();
 
             $this->currentMonsterHealth -= $characterAttack;
