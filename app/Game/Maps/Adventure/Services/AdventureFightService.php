@@ -73,7 +73,7 @@ class AdventureFightService {
             return;
         }
 
-        if ($this->count >= 10) {
+        if ($this->counter >= 10) {
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
@@ -81,7 +81,7 @@ class AdventureFightService {
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
-            $this->count = 0;
+            $this->counter = 0;
 
             return;
         }
