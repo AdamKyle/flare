@@ -16,9 +16,9 @@ class Skills extends Component
     public $monsterSkill  = null;
     
     protected $rules = [
-        'monsterSkill.base_damage_mod'  => 'required',
-        'monsterSkill.base_healing_mod' => 'required',
-        'monsterSkill.base_ac_mod'      => 'required',
+        'monsterSkill.base_damage_mod'  => 'nullable',
+        'monsterSkill.base_healing_mod' => 'nullable',
+        'monsterSkill.base_ac_mod'      => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];
@@ -55,6 +55,8 @@ class Skills extends Component
         $this->validate();
 
         $this->monsterSkill->save();
+
+        session()->flash('message', 'Saved successfully.');
 
         $this->emitTo('create', 'storeMonster', $this->monster->refresh()->load('skills'));
     }

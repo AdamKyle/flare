@@ -21,6 +21,11 @@
 
     @if (!is_null($monsterSkill))
         <h4 class="mb-3">{{$monsterSkill->name}}</h4>
+        @if (session()->has('message'))
+            <div class="alert alert-success mb-3">
+                {{ session('message') }}
+            </div>
+        @endif
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
