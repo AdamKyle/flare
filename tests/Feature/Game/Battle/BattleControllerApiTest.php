@@ -51,8 +51,6 @@ class BattleControllerApiTest extends TestCase
 
         $this->setUpMonsters();
 
-        $this->monster = Monster::first();
-
         $this->createItemAffix([
             'name'                 => 'Sample',
             'base_damage_mod'      => '0.10',
@@ -217,13 +215,11 @@ class BattleControllerApiTest extends TestCase
             'level' => 1,
         ]);
 
-        $this->character->refresh();
-
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/battle-results/' . $this->character->id, [
                              'is_defender_dead' => true,
-                             'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'defender_type'    => 'monster',
+                             'monster_id'       => $this->monster->id,
                          ])
                          ->response;
 
@@ -624,6 +620,20 @@ class BattleControllerApiTest extends TestCase
     }
 
     protected function setUpMonsters(): void {
-        $this->seed(CreateMonstersSeeder::class);
+        $this->monster = $this->createMonster([
+            'name'         => 'Goblin',
+            'damage_stat'  => 'str',
+            'xp'           => 10,
+            'str'          => 1,
+            'dur'          => 6,
+            'dex'          => 7,
+            'chr'          => 8,
+            'int'          => 8,
+            'ac'           => 6,
+            'health_range' => '8-20',
+            'attack_range' => '2-8',
+            'gold'         => 25,
+            'drop_check'   => 0.10,
+        ]);
     }
 }

@@ -3,15 +3,19 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Skill;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\EquippedItem;
 use App\User;
+use Database\Factories\CharacterFactory;
 
 class Character extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -103,5 +107,9 @@ class Character extends Model
 
     public function notifications() {
         return $this->hasMany(Notification::class, 'character_id', 'id');
+    }
+
+    protected static function newFactory() {
+        return CharacterFactory::new();
     }
 }

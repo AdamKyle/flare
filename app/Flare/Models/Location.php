@@ -2,11 +2,14 @@
 
 namespace App\Flare\Models;
 
-use App\Admin\Models\GameMap;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Admin\Models\GameMap;
+use Database\Factories\LocationFactory;
 
 class Location extends Model
 {
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -44,5 +47,9 @@ class Location extends Model
 
     public function adventures() {
         return $this->belongsToMany(Adventure::class);
+    }
+
+    protected static function newFactory() {
+        return LocationFactory::new();
     }
 }

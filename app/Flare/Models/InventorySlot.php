@@ -3,10 +3,14 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Item;
+use Database\Factories\InventorySlotFactory;
 
 class InventorySlot extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -31,5 +35,9 @@ class InventorySlot extends Model
 
     public function item() {
         return $this->hasOne(Item::class, 'id', 'item_id');
+    }
+
+    protected static function newFactory() {
+        return InventorySlotFactory::new();
     }
 }

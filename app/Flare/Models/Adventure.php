@@ -3,9 +3,13 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\AdventureFactory;
 
 class Adventure extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -46,5 +50,9 @@ class Adventure extends Model
 
     public function itemReward() {
         return $this->hasOne(Item::class, 'id', 'reward_item_id');
+    }
+
+    protected static function newFactory() {
+        return AdventureFactory::new();
     }
 }

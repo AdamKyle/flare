@@ -1,14 +1,28 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-use App\User;
-use Faker\Generator as Faker;
-use Illuminate\Support\Str;
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GameRace;
 
+class GameRaceFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = GameRace::class;
 
-$factory->define(GameRace::class, function (Faker $faker) {
-    return [
-        'name' => 'Sample Race',
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => 'Sample Race',
+        ];
+    }
+}

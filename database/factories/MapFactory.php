@@ -1,18 +1,32 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-use App\User;
-use Faker\Generator as Faker;
-use Illuminate\Support\Str;
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Map;
 
+class MapFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Map::class;
 
-$factory->define(Map::class, function (Faker $faker) {
-    return [
-        'character_id' => 1,
-        'position_x' => 0,
-        'position_y' => 0,
-        'character_position_x' => 32,
-        'character_position_y' => 32,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'character_id'         => 1,
+            'position_x'           => 0,
+            'position_y'           => 0,
+            'character_position_x' => 32,
+            'character_position_y' => 32,
+        ];
+    }
+}

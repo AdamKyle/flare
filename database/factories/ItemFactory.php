@@ -1,28 +1,32 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-use Faker\Generator as Faker;
-use Illuminate\Support\Str;
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Item;
 
+class ItemFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Item::class;
 
-/*
-|--------------------------------------------------------------------------
-| Model Factories
-|--------------------------------------------------------------------------
-|
-| This directory should contain each of the model factory definitions for
-| your application. Factories provide a convenient way to generate new
-| model instances for testing / seeding your application's database.
-|
-*/
-
-$factory->define(Item::class, function (Faker $faker) {
-    return [
-        'name'                => null,
-        'type'                => null,
-        'base_damage'         => null,
-        'cost'                => null,
-        'crafting_type'       => null,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name'          => null,
+            'type'          => null,
+            'base_damage'   => null,
+            'cost'          => null,
+            'crafting_type' => null,
+        ];
+    }
+}

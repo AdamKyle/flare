@@ -3,10 +3,12 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\Item;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\ItemAffixFactory;
 
 class ItemAffix extends Model
 {
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -46,4 +48,8 @@ class ItemAffix extends Model
         'ac_mod'               => 'float',
         'skill_training_bonus' => 'float',
     ];
+
+    protected static function newFactory() {
+        return ItemAffixFactory::new();
+    }
 }

@@ -3,9 +3,13 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\SkillFactory;
 
 class Skill extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -57,5 +61,9 @@ class Skill extends Model
 
     public function character() {
         return $this->belongsTo(Character::class);
+    }
+
+    protected static function newFactory() {
+        return SkillFactory::new();
     }
 }

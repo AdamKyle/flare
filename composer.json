@@ -14,7 +14,6 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^8.0",
         "laravel/helpers": "^1.2",
-        "laravel/legacy-factories": "^1.0",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
         "league/fractal": "^0.18.0",

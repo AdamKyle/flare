@@ -3,9 +3,13 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\GameRaceFactory;
 
 class GameRace extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -39,4 +43,8 @@ class GameRace extends Model
         'dodge_mod'    => 'integer',
         'deffense_mod' => 'integer',
     ];
+
+    protected static function newFactory() {
+        return GameRaceFactory::new();
+    }
 }

@@ -3,11 +3,14 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Skill;
-use App\Flare\Models\Drop;
+use Database\Factories\MonsterFactory;
 
 class Monster extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -58,5 +61,9 @@ class Monster extends Model
 
     public function questItem() {
         return $this->hasOne(Item::class, 'id', 'quest_item_id');
+    }
+
+    protected static function newFactory() {
+        return MonsterFactory::new();
     }
 }

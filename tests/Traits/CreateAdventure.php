@@ -16,7 +16,7 @@ trait CreateAdventure {
 
     public function createNewAdventure(Monster $monster = null, int $levels = 1): Adventure {
 
-        $adventure = factory(Adventure::class)->create([
+        $adventure = Adventure::factory()->create([
             'name'             => 'Sample',
             'description'      => 'Sample description',
             'reward_item_id'   => $this->createItem([
@@ -48,7 +48,7 @@ trait CreateAdventure {
         int $lastCompletedLevel = 1
     ): AdventureLog {
 
-        return factory(AdventureLog::class)->create([
+        return AdventureLog::factory()->create([
             'character_id'         => $character->id,
             'adventure_id'         => $adventure->id,
             'complete'             => false,
@@ -59,7 +59,7 @@ trait CreateAdventure {
     }
 
     protected function createMonsterForAdventure(): Monster {
-        $monster = factory(Monster::class)->create([
+        $monster = Monster::factory()->create([
             'name' => 'Monster',
             'damage_stat' => 'str',
             'xp' => 10,

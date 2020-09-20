@@ -2,10 +2,13 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\NotificationsDatabaseFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\NotificationFactory;
 
 class Notification extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -28,5 +31,9 @@ class Notification extends Model {
 
     public function character() {
         return $this->belongsTo(Charcater::class);
+    }
+
+    protected static function newFactory() {
+        return NotificationFactory::new();
     }
 }

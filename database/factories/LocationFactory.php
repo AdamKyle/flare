@@ -1,30 +1,34 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-use Faker\Generator as Faker;
-use Illuminate\Support\Str;
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Location;
 
+class LocationFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Location::class;
 
-/*
-|--------------------------------------------------------------------------
-| Model Factories
-|--------------------------------------------------------------------------
-|
-| This directory should contain each of the model factory definitions for
-| your application. Factories provide a convenient way to generate new
-| model instances for testing / seeding your application's database.
-|
-*/
-
-$factory->define(Location::class, function (Faker $faker) {
-    return [
-        'name' => null,
-        'game_map_id' => null,
-        'quest_reward_item_id' => null,
-        'description' => null,
-        'is_port' => null,
-        'x' => null,
-        'y' => null,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name'                 => null,
+            'game_map_id'          => null,
+            'quest_reward_item_id' => null,
+            'description'          => null,
+            'is_port'              => null,
+            'x'                    => null,
+            'y'                    => null,
+        ];
+    }
+}

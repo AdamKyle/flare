@@ -3,11 +3,14 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\ArtifactProperty;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\ItemAffix;
+use Database\Factories\ItemFactory;
 
 class Item extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -166,5 +169,9 @@ class Item extends Model
         }
 
         return $baseSkillTraining;
+    }
+
+    protected static function newFactory() {
+        return ItemFactory::new();
     }
 }

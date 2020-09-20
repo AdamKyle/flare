@@ -8,7 +8,7 @@ use App\User;
 trait CreateUser {
 
     public function createUser(array $options = []): User {
-        return factory(User::class)->create($options);
+        return User::factory()->create($options);
     }
 
     public function createAdmin(array $options = [], Role $role): User {

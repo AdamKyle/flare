@@ -3,10 +3,14 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Admin\Models\GameMap;
+use Database\Factories\MapFactory;
 
 class Map extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -36,5 +40,9 @@ class Map extends Model
 
     public function gameMap() {
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');
+    }
+
+    protected static function newFactory() {
+        return MapFactory::new();
     }
 }
