@@ -22158,6 +22158,136 @@ a.link:focus {
   border-left: 5px solid #38c172;
 }
 
+.form-wizard .steps {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.form-wizard .steps ul {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.form-wizard .steps ul li {
+  display: table-cell;
+  width: auto;
+  vertical-align: top;
+  text-align: center;
+  position: relative;
+}
+
+.form-wizard .steps ul li::before,
+.form-wizard .steps ul li::after {
+  content: "";
+  z-index: 9;
+  display: block;
+  position: absolute;
+  top: 45px;
+  width: 46%;
+  height: 3px;
+  background-color: #F3F3F3;
+}
+
+.form-wizard .steps ul li::before {
+  left: 0;
+}
+
+.form-wizard .steps ul li::after {
+  right: 0;
+}
+
+.form-wizard .steps ul li:first-child::before {
+  content: none;
+}
+
+.form-wizard .steps ul li:last-child::after {
+  content: none;
+}
+
+.form-wizard .steps ul li a {
+  position: relative;
+  padding-top: 52px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: block;
+  color: #909090;
+}
+
+.form-wizard .steps ul li a:hover,
+.form-wizard .steps ul li a :active,
+.form-wizard .steps ul li a :focus,
+.form-wizard .steps ul li a :visited {
+  text-decoration: none;
+  color: #909090;
+}
+
+.form-wizard .steps ul li a .circle {
+  width: 50px;
+  height: 50px;
+  line-height: 45px;
+  font-size: 1.3rem;
+  border-radius: 50%;
+  display: inline-block;
+  border: solid 5px #e8e8e8;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin-left: -24px;
+  z-index: 10;
+  text-align: center;
+}
+
+.form-wizard .steps ul li a .active {
+  border: solid 5px #3490dc;
+}
+
+@media (max-width: 992px) {
+  .form-wizard .steps ul li::before,
+  .form-wizard .steps ul li::after {
+    content: "";
+    z-index: 9;
+    display: block;
+    position: absolute;
+    top: 45px;
+    width: 44%;
+    height: 3px;
+    background-color: #F3F3F3;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-wizard .steps ul li::before,
+  .form-wizard .steps ul li::after {
+    content: "";
+    z-index: 9;
+    display: block;
+    position: absolute;
+    top: 45px;
+    width: 44%;
+    height: 3px;
+    background-color: #F3F3F3;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-wizard .steps ul li::before,
+  .form-wizard .steps ul li::after {
+    content: "";
+    z-index: 9;
+    display: block;
+    position: absolute;
+    top: 45px;
+    width: 33%;
+    height: 3px;
+    background-color: #F3F3F3;
+  }
+}
+
 legend {
   font-size: 0.9rem;
 }

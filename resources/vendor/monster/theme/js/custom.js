@@ -18,16 +18,12 @@ $(function () {
     var set = function () {
             var width = (window.innerWidth > 0) ? window.innerWidth : this.screen.width;
             var topOffset = 70;
+
             if (width < 4170) {
                 $("body").addClass("mini-sidebar logo-center");
 
                 $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible");
                 $(".sidebartoggler i").addClass("ti-menu");
-            }
-            else {
-                $("body").removeClass("mini-sidebar");
-
-                $(".sidebartoggler i").removeClass("ti-menu");
             }
 
             var height = ((window.innerHeight > 0) ? window.innerHeight : this.screen.height) - 1;

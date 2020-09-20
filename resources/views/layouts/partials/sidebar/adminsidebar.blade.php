@@ -20,4 +20,11 @@
             <li><a href="{{route('adventures.create')}}">Create Adventure</a></li>
         </ul>
     </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-eye-monster"></i><span class="hide-menu">Manage Monsters</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('monsters.list')}}">Monsters</a></li>
+            <li><a href="{{route('monsters.create')}}">Create Monster</a></li>
+        </ul>
+    </li>
 </ul>

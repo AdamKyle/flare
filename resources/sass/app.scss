@@ -28,6 +28,9 @@
 // Components:
 @import 'game/components/react-notifications/notification';
 
+// livewire components:
+@import 'game/components/livewire/form-wizard';
+
 legend {
   font-size: 0.9rem;
 }

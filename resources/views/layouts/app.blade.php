@@ -29,9 +29,18 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/wizard/steps.css')}}" id="wizard" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/r-2.2.5/datatables.min.css"/>
+
+    @livewireStyles
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
+    <script src="{{ asset('js/vendor.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="{{ asset('js/jquery.slimscroll.js') }}"></script>
+    <script src="{{ asset('js/sidebarmenu.js') }}"></script>
+    <script src="{{ asset('js/waves.js') }}"></script>
     
 </head>
-<body class="fix-header fix-sidebar card-no-border">
+<body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">
         <div id="app">
             <header class="topbar">
@@ -150,13 +159,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
 
-    <script src="{{ asset('js/vendor.js') }}"></script>
-    <script src="{{ asset('js/custom.js') }}"></script>
-    <script src="{{ asset('js/jquery.slimscroll.js') }}"></script>
-    <script src="{{ asset('js/sidebarmenu.js') }}"></script>
-    <script src="{{ asset('js/waves.js') }}"></script>
+    @livewireScripts
+
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
 

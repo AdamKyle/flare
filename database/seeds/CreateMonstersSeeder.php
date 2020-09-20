@@ -19,7 +19,7 @@ class CreateMonstersSeeder extends Seeder
             [
                 'name'         => 'Goblin',
                 'damage_stat'  => 'str',
-                'xp'           => 10,
+                'xp'           => 5,
                 'str'          => 1,
                 'dur'          => 6,
                 'dex'          => 7,

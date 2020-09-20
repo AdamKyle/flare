@@ -29,6 +29,8 @@ class Monster extends Model
         'health_range',
         'attack_range',
         'drop_check',
+        'quest_item_id',
+        'quest_item_drop_chance',
     ];
 
     /**
@@ -37,19 +39,24 @@ class Monster extends Model
      * @var array
      */
     protected $casts = [
-        'xp'         => 'integer',
-        'str'        => 'integer',
-        'dur'        => 'integer',
-        'dex'        => 'integer',
-        'chr'        => 'integer',
-        'int'        => 'integer',
-        'ac'         => 'integer',
-        'gold'       => 'integer',
-        'drop_check' => 'float',
-        'max_level'  => 'integer',
+        'xp'                     => 'integer',
+        'str'                    => 'integer',
+        'dur'                    => 'integer',
+        'dex'                    => 'integer',
+        'chr'                    => 'integer',
+        'int'                    => 'integer',
+        'ac'                     => 'integer',
+        'gold'                   => 'integer',
+        'drop_check'             => 'float',
+        'max_level'              => 'integer',
+        'quest_item_drop_chance' => 'float',
     ];
 
     public function skills() {
         return $this->hasMany(Skill::class);
+    }
+
+    public function questItem() {
+        return $this->hasOne(Item::class, 'id', 'quest_item_id');
     }
 }
