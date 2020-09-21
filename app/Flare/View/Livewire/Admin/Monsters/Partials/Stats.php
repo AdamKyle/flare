@@ -44,7 +44,7 @@ class Stats extends Component
             $this->monster->skills()->insert($skills);
         }
 
-        $this->emitTo('create', 'storeMonster', $this->monster);
+        $this->emitTo('create', 'storeModel', $this->monster);
         $this->emitTo('create', $functionName, $index, true);
     }
 
@@ -54,7 +54,6 @@ class Stats extends Component
         }
 
         if (is_array($this->monster)) {
-            dump($this->monster);
             $this->monster = Monster::find($this->monster['id'])->load('skills');
         }
     }

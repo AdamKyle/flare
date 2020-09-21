@@ -35,7 +35,7 @@ class QuestItem extends Component
             } else {
                 $this->monster->save();
 
-                $this->emitTo('create', 'storeMonster', $this->monster->refresh()->load('skills', 'questItem'));
+                $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills', 'questItem'));
                 $this->emitTo('create', $functionName, $index, true);
             }
             

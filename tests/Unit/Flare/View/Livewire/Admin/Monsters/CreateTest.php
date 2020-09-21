@@ -36,6 +36,6 @@ class CreateTest extends TestCase
     public function testStoreMonster() {
         $monster = $this->createMonster();
 
-        Livewire::test(Create::class)->call('storeMonster', $monster)->assertSet('monster', $monster);
+        Livewire::test(Create::class)->call('storeModel', $monster)->assertSet('model', $monster);
     }
 }
