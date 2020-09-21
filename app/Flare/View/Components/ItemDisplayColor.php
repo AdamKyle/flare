@@ -28,8 +28,7 @@ class ItemDisplayColor extends Component
      */
     public function render()
     {
-
-
+        dump($this->item);
         if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
             $this->color = 'two-enchant';
         } else if (!is_null($this->item->itemSuffix) || !is_null($this->item->itemPrefix)) {
@@ -39,6 +38,8 @@ class ItemDisplayColor extends Component
         } else {
             $this->color = 'normal-item';
         }
+
+        dump($this->color);
 
         return view('components.item-display-color');
     }

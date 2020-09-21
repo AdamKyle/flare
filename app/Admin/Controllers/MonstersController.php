@@ -29,10 +29,7 @@ class MonstersController extends Controller {
 
     public function create() {
         return view('admin.monsters.manage', [
-            'adventure' => null,
-            'locations' => Location::all()->pluck('name', 'id')->toArray(),
-            'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::all()->pluck('name', 'id')->toArray(),
+            'monster' => Monster::first(),
         ]);
     }
 
