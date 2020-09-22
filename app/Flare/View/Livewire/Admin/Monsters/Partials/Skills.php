@@ -39,7 +39,7 @@ class Skills extends Component
             $this->monsterSkill->save();
         }
 
-        $this->emitTo('create', 'storeMonster', $this->monster->refresh()->load('skills'));
+        $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills'));
         $this->emitTo('create', $functionName, $index, true);
     }
 
