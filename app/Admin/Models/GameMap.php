@@ -25,4 +25,9 @@ class GameMap extends Model
     public function maps() {
         return $this->hasMany(Map::class, 'game_map_id', 'id');
     }
+
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
 }

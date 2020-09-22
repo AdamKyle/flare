@@ -2,34 +2,15 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            Maps Information:
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Maps</h4>
-
-                    <table class="table table-bordered text-center">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Default Map</th>
-                                <th>Total Characters Using</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            @foreach($maps as $map)
-                                <tr>
-                                    <td>{{$map->name}}</td>
-                                    <td>{{$map->default ? 'Yes' : 'No'}}</td>
-                                    <td>{{$map->maps->count()}}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="row page-titles">
+        <div class="col-md-6 align-self-right">
+            <h4 class="mt-2">Maps</h4>
+        </div>
+        <div class="col-md-6 align-self-right">
+            <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
+            <a href="{{route('maps.upload')}}" class="btn btn-primary float-right ml-2">Upload New</a>
         </div>
     </div>
+    @livewire('admin.maps.data-table')
 </div>
 @endsection

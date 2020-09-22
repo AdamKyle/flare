@@ -49,6 +49,11 @@ class Location extends Model
         return $this->belongsToMany(Adventure::class);
     }
 
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
+
     protected static function newFactory() {
         return LocationFactory::new();
     }

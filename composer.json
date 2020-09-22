@@ -19,6 +19,7 @@
         "league/fractal": "^0.18.0",
         "livewire/livewire": "^2.2",
         "pusher/pusher-php-server": "^4.0",
+        "spatie/laravel-collection-macros": "^7.0",
         "spatie/laravel-permission": "^3.16"
     },
     "require-dev": {

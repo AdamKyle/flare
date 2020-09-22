@@ -1,22 +1,31 @@
 <?php
 
-namespace Tests\Unit\Flare\View\Livewire\Admin\Adventures;
+namespace Tests\Unit\Flare\View\Livewire\Admin\Maps;
+
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\View\Livewire\Admin\Adventures\DataTable;
+use App\Flare\View\Livewire\Admin\Maps\DataTable;
+use App\Admin\Models\GameMap;
 use Tests\TestCase;
-use Tests\Traits\CreateAdventure;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase, CreateAdventure;
+    use RefreshDatabase;
 
     public function testTheComponentLoads()
     {
-        $this->createNewAdventure(null, 1, 'Apples');
+        GameMap::create([
+            'name' => 'Apples',
+            'path' => 'test',
+            'default' => true
+        ]);
 
-        $this->createNewAdventure(null, 10, 'Bananas');
+        GameMap::create([
+            'name' => 'Bananas',
+            'path' => 'test',
+            'default' => true
+        ]);
         
         Livewire::test(DataTable::class)
             ->assertSee('Apples')

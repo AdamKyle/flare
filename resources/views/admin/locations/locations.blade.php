@@ -3,40 +3,14 @@
 @section('content')
 <div class="container-fluid">
     <div class="row page-titles">
-        <div class="col-md-12 align-self-right">
-            <a href="{{route('locations.create')}}" class="btn btn-primary float-right ml-2">Create</a>
+        <div class="col-md-6 align-self-right">
+            <h4 class="mt-2">Locations</h4>
+        </div>
+        <div class="col-md-6 align-self-right">
             <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
+            <a href="{{route('locations.create')}}" class="btn btn-primary float-right ml-2">Create</a>
         </div>
     </div>
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Locations</h4>
-
-                    <table class="table table-bordered text-center">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Map Name</th>
-                                <th>Position (X/Y)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center">
-                            @foreach($locations as $location)
-                                <tr>
-                                    <td><a href="{{route('locations.location', ['location' => $location])}}">{{$location->name}}</a></td>
-                                    <td>{{$location->description}}</td>
-                                    <td>{{$location->map->name}}</td>
-                                    <td>{{$location->x}}/{{$location->y}}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    @livewire('admin.locations.data-table')
 </div>
 @endsection
