@@ -52,6 +52,11 @@ class Adventure extends Model
         return $this->hasOne(Item::class, 'id', 'reward_item_id');
     }
 
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
+
     protected static function newFactory() {
         return AdventureFactory::new();
     }

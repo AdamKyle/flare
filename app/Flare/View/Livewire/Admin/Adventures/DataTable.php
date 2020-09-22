@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Flare\View\Livewire\Admin\Monsters;
+namespace App\Flare\View\Livewire\Admin\Adventures;
 
 use Livewire\Component;
 use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
-use App\Flare\Models\Monster;
+use App\Flare\Models\Adventure;
 
 class DataTable extends CoreDataTable
 {
-
     public function mount() {
-        $this->sortField = 'max_level';
+        $this->sortField = 'levels';
     }
-    
+
     public function render()
     {
-        return view('components.livewire.admin.monsters.data-table', [
-            'monsters' => Monster::dataTableSearch($this->search)
+        return view('components.livewire.admin.adventures.data-table', [
+            'adventures' => Adventure::dataTableSearch($this->search)
                                  ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                                  ->paginate($this->perPage),
         ]);

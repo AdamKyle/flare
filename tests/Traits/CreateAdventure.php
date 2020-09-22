@@ -14,10 +14,10 @@ trait CreateAdventure {
 
     use CreateItem;
 
-    public function createNewAdventure(Monster $monster = null, int $levels = 1): Adventure {
+    public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample'): Adventure {
 
         $adventure = Adventure::factory()->create([
-            'name'             => 'Sample',
+            'name'             => $name,
             'description'      => 'Sample description',
             'reward_item_id'   => $this->createItem([
                 'name'        => 'Item Name',

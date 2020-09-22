@@ -13,7 +13,7 @@
                     </div>
             
                     <div class="col">
-                        <input wire:model="search" class="form-control" type="text" placeholder="Search monsters...">
+                        <input wire:model="search" class="form-control" type="text" placeholder="Search adventures...">
                     </div>
                 </div>
                 <table class="table table-bordered">
@@ -28,76 +28,69 @@
                                 </a>
                             </th>
                             <th>
-                                <a wire:click.prevent="sortBy('max_level')" role="button" href="#">
-                                    Max level
+                                <a wire:click.prevent="sortBy('levels')" role="button" href="#">
+                                    Total Levels
                                     @include('admin.partials.data-table-icons', [
-                                        'field' => 'max_level'
+                                        'field' => 'levels'
                                     ])
                                 </a>
                             </th>
                             <th>
-                                <a wire:click.prevent="sortBy('damage_stat')" role="button" href="#">
-                                    Damage Stat
+                                <a wire:click.prevent="sortBy('time_per_level')" role="button" href="#">
+                                    Time Per Level
                                     @include('admin.partials.data-table-icons', [
-                                        'field' => 'damage_stat'
+                                        'field' => 'time_per_level'
                                     ])
                                 </a>
                             </th>
                             <th>
-                                <a wire:click.prevent="sortBy('health_range')" role="button" href="#">
-                                    Health Range
+                                <a wire:click.prevent="sortBy('gold_rush_chance')" role="button" href="#">
+                                    Gold Rush Chance
                                     @include('admin.partials.data-table-icons', [
-                                        'field' => 'health_range'
+                                        'field' => 'gold_rush_chance'
                                     ])
                                 </a>
                             </th>
                             <th>
-                                <a wire:click.prevent="sortBy('attack_range')" role="button" href="#">
-                                    Attack Range
+                                <a wire:click.prevent="sortBy('item_find_chance')" role="button" href="#">
+                                    Item Find Chance
                                     @include('admin.partials.data-table-icons', [
-                                        'field' => 'attack_range'
+                                        'field' => 'item_find_chance'
                                     ])
                                 </a>
                             </th>
                             <th>
-                                <a wire:click.prevent="sortBy('xp')" role="button" href="#">
-                                    XP
+                                <a wire:click.prevent="sortBy('skill_exp_bonus')" role="button" href="#">
+                                    Skill XP Bonus
                                     @include('admin.partials.data-table-icons', [
-                                        'field' => 'xp'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('gold')" role="button" href="#">
-                                    Gold
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'gold'
+                                        'field' => 'skill_exp_bonus'
                                     ])
                                 </a>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($monsters as $monster)
+                        @foreach($adventures as $adventure)
                             <tr>
-                                <td>{{$monster->name}}</td>
-                                <td>{{$monster->max_level}}</td>
-                                <td>{{$monster->damage_stat}}</td>
-                                <td>{{$monster->health_range}}</td>
-                                <td>{{$monster->attack_range}}</td>
-                                <td>{{$monster->xp}}</td>
-                                <td>{{$monster->gold}}</td>
+                                <td><a href="{{route('adventures.adventure', [
+                                    'adventure' => $adventure->id
+                                ])}}">{{$adventure->name}}</a></td>
+                                <td>{{$adventure->levels}}</td>
+                                <td>{{$adventure->time_per_level}} Minutes</td>
+                                <td>{{$adventure->gold_rush_chance * 100}}%</td>
+                                <td>{{$adventure->item_find_chance * 100}}%</td>
+                                <td>{{$adventure->skill_exp_bonus * 100}}%</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
                 <div class="row">
                     <div class="col">
-                        {{ $monsters->links() }}
+                        {{ $adventures->links() }}
                     </div>
             
                     <div class="col text-right text-muted">
-                        Showing {{ $monsters->firstItem() }} to {{ $monsters->lastItem() }} out of {{ $monsters->total() }} results
+                        Showing {{ $adventures->firstItem() }} to {{ $adventures->lastItem() }} out of {{ $adventures->total() }} results
                     </div>
                 </div>
             </div>
