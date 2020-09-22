@@ -8,86 +8,53 @@ use Livewire\Component;
 
 class Stats extends Component
 {
-    protected $rules     = [
-        'name'         => 'required',
-        'damage_stat'  => 'required',
-        'xp'           => 'required',
-        'str'          => 'required',
-        'dur'          => 'required',
-        'dex'          => 'required',
-        'chr'          => 'required',
-        'int'          => 'required',
-        'ac'           => 'required',
-        'gold'         => 'required',
-        'max_level'    => 'required',
-        'health_range' => 'required',
-        'attack_range' => 'required',
-        'drop_check'   => 'required',
+    protected $rules = [
+        'monster.name'         => 'required',
+        'monster.damage_stat'  => 'required',
+        'monster.xp'           => 'required',
+        'monster.str'          => 'required',
+        'monster.dur'          => 'required',
+        'monster.dex'          => 'required',
+        'monster.chr'          => 'required',
+        'monster.int'          => 'required',
+        'monster.ac'           => 'required',
+        'monster.gold'         => 'required',
+        'monster.max_level'    => 'required',
+        'monster.health_range' => 'required',
+        'monster.attack_range' => 'required',
+        'monster.drop_check'   => 'required',
     ];
 
     protected $listeners = ['validateInput'];
 
-    public $monster = null;
-
-    public $name          = '';
-    public $damage_stat   = '';
-    public $xp            = '';
-    public $str           = '';
-    public $dur           = '';
-    public $dex           = '';
-    public $chr           = '';
-    public $int           = '';
-    public $ac            = '';
-    public $gold          = '';
-    public $max_level     = '';
-    public $health_range  = '';
-    public $attack_range  = '';
-    public $drop_check    = '';
+    public $monster;
     
-
     public function validateInput(string $functionName, int $index) {
-        $data = $this->validate();
+        $this->validate();
 
-        if ($data) {
-            if (!is_null($this->monster)) {
+        $this->monster->save();
 
-                // if the monster is an array of attributes, find the monster based on it's id:
-                if (is_array($this->monster)) {
-                    $this->monster = Monster::find($this->monster['id']);
-                }
-                
-                $this->monster->update($data);
-            } else {
-                // Create the monster:
-                $this->monster = Monster::create($data);
-
-                // Get skills:
-                foreach(config('game.skills') as $options) {
-                    $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $options);
-                }
-                
-                // Set skills:
-                $this->monster->skills()->insert($skills);
+        if ($this->monster->skills->isEmpty()) {
+            // Get skills:
+            foreach(config('game.skills') as $options) {
+                $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $options);
             }
 
-            // Refresh the monster:
-            $this->monster = $this->monster->refresh()->load('skills');
-
-            // Pass it along:
-            // This will come through as an array as the model gets turned to json
-            // for event emition.
-            $this->emitTo('create', 'storeMonster', $this->monster);
-            $this->emitTo('create', $functionName, $index, true);
+            // Set skills:
+            $this->monster->skills()->insert($skills);
         }
+
+        $this->emitTo('create', 'storeModel', $this->monster);
+        $this->emitTo('create', $functionName, $index, true);
     }
 
     public function mount() {
-        if (!is_null($this->monster)) {
-            foreach ($this->monster as $attribute => $value) {
-                if (!is_array($value)) {
-                    $this->{$attribute} = $value;
-                }
-            }
+        if (is_null($this->monster)) {
+            $this->monster = new Monster;
+        }
+
+        if (is_array($this->monster)) {
+            $this->monster = Monster::find($this->monster['id'])->load('skills');
         }
     }
 

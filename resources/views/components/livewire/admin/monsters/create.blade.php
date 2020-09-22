@@ -22,7 +22,7 @@
                         @livewire('admin.monsters.partials.monster', [
                             'currentStep' => $currentStep,
                             'views'       => $views,
-                            'monster'     => $monster,
+                            'monster'     => $model,
                         ])
                     </div>
                     <div class="p-2 clearfix acions">
