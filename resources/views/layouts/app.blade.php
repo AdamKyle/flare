@@ -167,11 +167,11 @@
 
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/r-2.2.5/datatables.min.js"></script>
 
-    <script>
+    {{-- <script>
         $(document).ready( function () {
             $('table').DataTable();
         });
-    </script>
+    </script> --}}
 
     @stack('scripts')
 </body>

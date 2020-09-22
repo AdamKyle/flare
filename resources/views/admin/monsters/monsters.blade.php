@@ -7,6 +7,6 @@
             <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
         </div>
     </div>
-    Monsters were created!
+    @livewire('admin.monsters.data-table')
 </div>
 @endsection
