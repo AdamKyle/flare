@@ -16,10 +16,10 @@
                         </ul>
                     </div>
                     <div class="content p-2">
-                        @livewire('admin.monsters.partials.monster', [
+                        @livewire('admin.locations.partials.location', [
                             'currentStep' => $currentStep,
                             'views'       => $views,
-                            'monster'     => $model,
+                            'location'    => $model,
                         ])
                     </div>
                     <div class="p-2 clearfix acions">

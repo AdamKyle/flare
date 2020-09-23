@@ -32,7 +32,7 @@
                     <select class="custom-select form-control required" id="x-position" name="x_position" {{!is_null($location) ? ($location->is_port ? 'disabled' : '') : ''}}>
                         <option value="">Select X Position</option>
                         @foreach($coordinates['x'] as $coordinate)
-                            <option value="{{$coordinate}}" {{!is_null($location) ? ($location->x === $coordinate ? 'selected' : '') : ''}}>{{$coordinate}}</option>
+                            <option value="{{$coordinate}}">{{$coordinate}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -43,7 +43,7 @@
                     <select class="custom-select form-control required" id="y-position" name="y_position" {{!is_null($location) ? ($location->is_port ? 'disabled' : '') : ''}}>
                         <option value="">Select Y Position</option>
                         @foreach($coordinates['y'] as $coordinate)
-                            <option value="{{$coordinate}}" {{!is_null($location) ? ($location->y === $coordinate ? 'selected' : '') : ''}}>{{$coordinate}}</option>
+                            <option value="{{$coordinate}}">{{$coordinate}}</option>
                         @endforeach
                     </select>
                 </div>

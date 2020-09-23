@@ -1,6 +1,8 @@
 <ul class="navbar-nav my-lg-0">
-    <li class="nav-item ml-4" id="notification-center"> 
-    </li>
+    @if (!auth()->user()->hasRole('Admin'))
+        <li class="nav-item ml-4" id="notification-center"> 
+        </li>
+    @endif
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user"></i></a>
         <div class="dropdown-menu dropdown-menu-right animated flipInY">

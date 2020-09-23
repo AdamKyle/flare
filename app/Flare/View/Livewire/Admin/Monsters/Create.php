@@ -10,7 +10,7 @@ class Create extends FormWizard
 {
     public function mount() {
         $this->steps = [
-            'Monster', 'Monster Skills', 'Monster Quest Rewards'
+            'Monster', 'Monster Skills (Optional)', 'Monster Quest Rewards (Optional)'
         ];
 
         $this->views = [

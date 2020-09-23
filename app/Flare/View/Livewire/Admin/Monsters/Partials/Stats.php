@@ -27,6 +27,13 @@ class Stats extends Component
 
     protected $listeners = ['validateInput'];
 
+    protected $messages = [
+        'monster.max_level.required'    => 'Max level must be set.',
+        'monster.health_range.required' => 'Health range must be set.',
+        'monster.attack_range.required' => 'Attack range must be set.',
+        'monster.drop_check.required'   => 'Drop Check must be set.',
+    ];
+
     public $monster;
     
     public function validateInput(string $functionName, int $index) {

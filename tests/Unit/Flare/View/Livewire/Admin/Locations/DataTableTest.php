@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Locations;
 
-use App\Admin\Models\GameMap;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Locations\DataTable;
+use App\Admin\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
 

@@ -28,21 +28,15 @@ class LocationsController extends Controller {
         ]);
     }
 
-    public function create(CoordinatesCache $coordinatesCache) {
+    public function create() {
         return view('admin.locations.manage', [
             'location'    => null,
-            'maps'        => GameMap::all()->pluck('name', 'id')->toArray(),
-            'coordinates' => $coordinatesCache->getFromCache(),
-            'items'       => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
         ]);
     }
 
-    public function edit(CoordinatesCache $coordinatesCache, Location $location) {
+    public function edit(Location $location) {
         return view('admin.locations.manage', [
             'location'    => $location,
-            'maps'        => GameMap::all()->pluck('name', 'id')->toArray(),
-            'coordinates' => $coordinatesCache->getFromCache(),
-            'items'       => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
         ]);
     }
 
