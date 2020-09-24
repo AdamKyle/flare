@@ -22296,6 +22296,10 @@ a.link:focus {
   }
 }
 
+.data-table a {
+  color: #333;
+}
+
 legend {
   font-size: 0.9rem;
 }
