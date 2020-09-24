@@ -51,6 +51,7 @@ class ShopControllerTest extends TestCase
 
         $this->character = (new CharacterSetup())
                                 ->setupCharacter($this->createUser())
+                                ->givePlayerLocation()
                                 ->giveItem($this->item)
                                 ->equipLeftHand()
                                 ->getCharacter();
@@ -67,7 +68,7 @@ class ShopControllerTest extends TestCase
     }
 
     public function testCanSeeShop() {
-        $this->actingAs($this->character->user)->visitRoute('game.shop.buy')->see('Weapons')->see('Rings');
+        $this->actingAs($this->character->user)->visitRoute('game.shop.buy')->see('Buying');
     }
 
     public function testCanBuyItem() {

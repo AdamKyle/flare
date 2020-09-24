@@ -7,12 +7,14 @@ use App\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Admin\Models\GameMap;
 use App\Game\Core\Services\CharacterService;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateMap;
 
 class CharacterSetup {
 
@@ -20,7 +22,8 @@ class CharacterSetup {
         CreateSkill,
         CreateRace,
         CreateClass,
-        CreateItem;
+        CreateItem,
+        CreateMap;
 
     private $character;
 
@@ -66,6 +69,24 @@ class CharacterSetup {
             }
         }
 
+        return $this;
+    }
+
+    public function givePlayerLocation(int $x = 16, int $y =16): CharacterSetup {
+
+        $this->createMap([
+            'character_id'         => $this->character->id,
+            'position_x'           => $x,
+            'position_y'           => $y,
+            'character_position_x' => $x,
+            'character_position_y' => $y,
+            'game_map_id'          => GameMap::create([
+                'name'    => 'Sample',
+                'path'    => 'path',
+                'default' => true,
+            ])->id,
+        ]);
+        
         return $this;
     }
 

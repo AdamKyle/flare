@@ -2,14 +2,22 @@
 
 @section('content')
 <div class="container-fluid">
+    <div class="row page-titles">
+        <div class="col-md-6 align-self-right">
+            <h4 class="mt-2">Character Sheet</h4>
+        </div>
+        <div class="col-md-6 align-self-right">
+            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+        </div>
+    </div>
+    <hr />
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-6">
+                    <h4>Character Info</h4>
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Character Sheet</h4>
-        
                             <div class="row">
                                 <div class="col-md-4">
                                     <dl>
@@ -62,10 +70,9 @@
                     </div>
                 </div>
                 <div class="col-md-6">
+                    <h4>Inventory</h4>
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Inventory</h4>
-
                             <dl>
                                 <dt>Total gold:</dt>
                                 <dd>{{$character->gold}}</dd>
@@ -79,9 +86,9 @@
                         </div>
                     </div>
 
+                    <h4>Skills</h4>
                     <div class="card mt-2">
                         <div class="card-body character-skill-info">
-                            <h4 class="card-title">Skills</h4>
                             @foreach($character->skills as $skill)
                                 <dl>
                                     <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>

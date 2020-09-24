@@ -23,7 +23,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/monsters', ['as' => 'monsters.list', 'uses' => 'MonstersController@index']);
     Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
-    Route::get('/admin/monsters/{monster}', ['as' => 'monsters.adventure', 'uses' => 'MonstersController@show']);
+    Route::get('/admin/monsters/{monster}', ['as' => 'monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monsters.edit', 'uses' => 'MonstersController@edit']);
     Route::post('/admin/monsters/store', ['as' => 'monsters.store', 'uses' => 'MonstersController@store']);
     Route::post('/admin/monsters/{monster}/update', ['as' => 'monsters.update', 'uses' => 'MonstersController@update']);

@@ -2,11 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\Adventure;
-use App\Flare\Models\Item;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 
 class MonstersController extends Controller {
@@ -21,15 +18,15 @@ class MonstersController extends Controller {
         ]);
     }
 
-    public function show(Adventure $adventure) {
+    public function show(Monster $monster) {
         return view('admin.monsters.monster', [
-            'adventure' => $adventure,
+            'monster' => $monster,
         ]);
     }
 
     public function create() {
         return view('admin.monsters.manage', [
-            'monster' => Monster::first(),
+            'monster' => null
         ]);
     }
 

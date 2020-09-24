@@ -4,8 +4,8 @@ namespace App\Game\Core\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Game\Core\Events\BuyItemEvent;
 use App\Game\Core\Events\SellItemEvent;
 
@@ -19,24 +19,24 @@ class ShopController extends Controller {
 
     public function shopBuy() {
 
-        return view('game.core.shop.buy', [
-            'weapons'   => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->where('type', 'weapon')->get(),
-            'armour'    => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->whereIn('type', [
-                'body', 'leggings', 'sleeves', 'gloves', 'helmet', 'shield'
-            ])->get(),
+        $character = auth()->user()->character;
 
-            'artifacts' => Item::where('type', 'artifact')->get(),
-            'spells'    => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->whereIn('type', ['spell-damage', 'spell-healing'])->get(),
-            'rings'     => Item::doesntHave('itemPrefix')->doesntHave('itemSuffix')->where('type', 'ring')->get(),
-            'gold'      => auth()->user()->character->gold,
+        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+
+        return view('game.core.shop.buy', [
+            'isLocation' => !is_null($location),
+            'gold'       => auth()->user()->character->gold,
         ]);
     }
 
     public function shopSell() {
+        $character = auth()->user()->character;
+
+        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+        
         return view('game.core.shop.sell', [
-            'inventory' => auth()->user()->character->inventory->slots->filter(function($slot) {
-                return $slot->item->type !== 'quest' && !$slot->equipped;
-            })->all(),
+            'isLocation' => !is_null($location),
+            'gold'       => auth()->user()->character->gold,
         ]);
     }
 

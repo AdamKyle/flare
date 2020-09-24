@@ -1,5 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Nunito);@charset "UTF-8";
 
+.color-gold {
+  color: #ccab06;
+}
+
 /*!
  * Bootstrap v4.5.2 (https://getbootstrap.com/)
  * Copyright 2011-2020 The Bootstrap Authors
@@ -21948,6 +21952,10 @@ a.link:focus {
 
 .character-skill-info dl dt {
   width: 25%;
+}
+
+.character-skill-info dl dt a {
+  font-weight: lighter;
 }
 
 .character-skill-info dl dd {

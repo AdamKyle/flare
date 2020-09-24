@@ -18,10 +18,18 @@ class DataTable extends CoreDataTable
     public function fetchLocations() {
 
         if ($this->sortField === 'game_maps.name') {
-            return Location::join('game_maps', 'locations.game_map_id', '=' ,'game_maps.id')
-                            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-                            ->select('locations.*')
-                            ->paginate($this->perPage);
+            return Location::join('game_maps', function($join) {
+                $join = $join->on('locations.game_map_id', '=' ,'game_maps.id');
+
+                if ($this->search !== '') {
+                    $join->where('game_maps.name', 'like', '%'.$this->search.'%');
+                }
+
+                return $join;
+            })
+            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+            ->select('locations.*')
+            ->paginate($this->perPage);
         }
 
         return Location::dataTableSearch($this->search)
