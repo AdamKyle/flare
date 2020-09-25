@@ -4,7 +4,7 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use Database\Factories\LocationFactory;
 
 class Location extends Model

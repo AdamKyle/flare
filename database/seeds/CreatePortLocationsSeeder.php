@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use Illuminate\Database\Seeder;
 use App\Flare\Models\Location;
 use Illuminate\Support\Facades\Storage;

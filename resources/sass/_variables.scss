@@ -7,17 +7,23 @@ $font-size-base: 0.9rem;
 $line-height-base: 1.6;
 
 // Colors
-$blue: #3490dc;
+$blue: #0095ff;
 $indigo: #6574cd;
 $purple: #9561e2;
 $pink: #f66d9b;
-$red: #e3342f;
+$red: #ea726e;
 $orange: #f6993f;
-$yellow: #ffed4a;
+$yellow: #d1ca86;
 $green: #38c172;
 $teal: #4dc0b5;
-$cyan: #6cb2eb;
+$cyan: #a8d0f1;
 $gold: #ccab06;
+
+// Borders:
+$border: 0;
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
 
 .color-gold {
     color: $gold;

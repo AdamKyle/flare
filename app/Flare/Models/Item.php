@@ -90,48 +90,63 @@ class Item extends Model
     }
 
     public function scopeGetTotalDamage(): float {
-        $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
+        $baseDamage = is_null($this->base_damage) ? 1 : $this->base_damage;
         $damage     = $baseDamage;
 
         if (!is_null($this->itemPrefix)) {
-            $damage += ($baseDamage * $this->itemPrefix->base_damage_mod);
+            $damage += ($baseDamage * (1 + $this->itemPrefix->base_damage_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            $damage += ($baseDamage * $this->itemSuffix->base_damage_mod);
+            $damage += ($baseDamage * (1 + $this->itemSuffix->base_damage_mod));
         }
 
-        return $damage;
+        // If the damage was never increased, lets set it to 0.
+        if ($damage === 1) {
+            $damage = 0;
+        }
+
+        return round($damage);
     }
 
     public function scopeGetTotalDefence(): float {
-        $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
+        $baseAc = is_null($this->base_ac) ? 1 : $this->base_ac;
         $ac     = $baseAc;
 
         if (!is_null($this->itemPrefix)) {
-            $ac += ($baseAc * $this->itemPrefix->base_ac_mod);
+            $ac += ($baseAc * (1 + $this->itemPrefix->base_ac_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            $ac += ($baseAc * $this->itemSuffix->base_ac_mod);
+            $ac += ($baseAc * (1 + $this->itemSuffix->base_ac_mod));
         }
 
-        return $ac;
+        // If the ac was never increased, lets set it to 0.
+        if ($ac === 1) {
+            $ac = 0;
+        }
+
+        return round($ac);
     }
 
     public function scopeGetTotalHealing(): float {
-        $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
+        $baseHealing = is_null($this->base_healing) ? 1 : $this->base_healing;
         $healFor     = $baseHealing;
 
         if (!is_null($this->itemPrefix)) {
-            $healFor += ($baseHealing * $this->itemPrefix->base_heal_mod);
+            $healFor += ($baseHealing * (1 + $this->itemPrefix->base_heal_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            $healFor += ($baseHealing * $this->itemSuffix->base_heal_mod);
+            $healFor += ($baseHealing * (1 + $this->itemSuffix->base_heal_mod));
         }
 
-        return $healFor;
+        // If the healFor was never increased, lets set it to 0.
+        if ($healFor === 1) {
+            $healFor = 0;
+        }
+
+        return round($healFor);
     }
 
     public function scopeGetTotalPercentageForStat($qeury, string $stat): float {
@@ -151,21 +166,27 @@ class Item extends Model
     }
 
     public function scopeGetSkillTrainingBonus($query, string $skillName): float {
-        $baseSkillTraining = is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus;
+        $baseSkillTraining = 0.0;
 
         if (!is_null($this->itemPrefix)) {
             if ($this->itemPrefix->skill_name === $skillName) {
                 $stat               = $this->itemPrefix->skill_training_bonus;
-                $baseSkillTraining += !is_null($stat) ? $stat : 0.0;
+                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus)) : 0.0;
             }
         }
 
         if (!is_null($this->itemSuffix)) {
             if ($this->itemSuffix->skill_name === $skillName) {
                 $stat               = $this->itemSuffix->skill_training_bonus;
-                $baseSkillTraining += !is_null($stat) ? $stat : 0.0;
+                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus)) : 0.0;
             }
             
+        }
+
+        if (!is_null($this->skill_name)) {
+            if ($this->skill_name === $skillName) {
+                $baseSkillTraining += $this->skill_training_bonus;
+            }
         }
 
         return $baseSkillTraining;

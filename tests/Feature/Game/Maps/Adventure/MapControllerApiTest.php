@@ -12,7 +12,7 @@ use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
 use Tests\Setup\CharacterSetup;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Game\Maps\Adventure\Values\MapTileValue;
 use Mockery;
 

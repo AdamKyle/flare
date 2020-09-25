@@ -4,7 +4,7 @@ namespace App\Flare\View\Livewire\Admin\Locations\Partials;
 
 use Livewire\Component;
 use App\Flare\Cache\CoordinatesCache;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 
 class Details extends Component

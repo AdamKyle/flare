@@ -8,7 +8,6 @@
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('game.character.sheet')}}">Character Sheet</a></li>
-            <li><a href="{{route('game.character.inventory')}}">Inventory</a></li>
         </ul>
     </li>
     <li class="nav-devider"></li>

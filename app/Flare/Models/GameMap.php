@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Models;
+namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\Map;

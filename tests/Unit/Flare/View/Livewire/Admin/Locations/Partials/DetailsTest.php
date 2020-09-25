@@ -6,7 +6,7 @@ use App\Flare\Models\Monster;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Locations\Partials\Details;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;

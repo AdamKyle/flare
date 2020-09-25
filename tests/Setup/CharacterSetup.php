@@ -7,7 +7,7 @@ use App\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Game\Core\Services\CharacterService;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;

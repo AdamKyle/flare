@@ -4,7 +4,7 @@ namespace App\Flare\View\Livewire\Admin\Maps;
 
 use Livewire\Component;
 use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 
 class DataTable extends CoreDataTable
 {

@@ -8,6 +8,14 @@ use App\Flare\Models\Item;
 
 class DataTable extends CoreDataTable
 {
+    public $includeEquipped   = false;
+
+    public $includeQuestItems = false;
+
+    public $allowUnequipAll   = false;
+
+    public $allowInventoryManagement = false;
+
     public function mount() {
         $this->sortField = 'items.type';
 
@@ -18,14 +26,18 @@ class DataTable extends CoreDataTable
         $character = auth()->user()->character;
 
         $slots = $character->inventory->slots()->join('items', function($join) {
-            $join = $join->on('inventory_slots.item_id', '=', 'items.id')->where('type', '!=', 'quest');
+            $join = $join->on('inventory_slots.item_id', '=', 'items.id');
+            
+            if ($this->includeQuestItems) {
+                $join->where('type', '!=', 'quest');
+            }
 
             if ($this->search !== '') {
                 $join->where('items.name', 'like', '%'.$this->search.'%');
             }
 
             return $join;
-        })->where('equipped', false)
+        })->where('equipped', $this->includeEquipped)
           ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
           ->select('inventory_slots.*')
           ->get();

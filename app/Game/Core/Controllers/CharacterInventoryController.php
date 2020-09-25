@@ -4,11 +4,9 @@ namespace App\Game\Core\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\Character;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Game\Core\Services\EquipItemService;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\InventorySlot;
+use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
 use App\Game\Core\Requests\EquipItemValidation;
@@ -28,32 +26,6 @@ class CharacterInventoryController extends Controller {
         ]);
         $this->middleware('is.character.adventuring')->only([
             'compare', 'equipItem', 'destroy'
-        ]);
-    }
-
-    public function index(Character $character) {
-        $character = auth()->user()->character;
-        $inventory = $character->inventory->slots;
-
-        $equipped = $inventory->where('equipped', true)->load([
-                'item', 'item.itemPrefix', 'item.itemSuffix'
-            ])->transform(function($equippedItem) {
-                $equippedItem->item->max_damage = $equippedItem->item->getTotalDamage();
-
-                return $equippedItem;
-            });
-
-        $characterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-
-        return view('game.core.character.inventory', [
-            'inventory' => $inventory->where('equipped', false)->all(),
-            'equipped'  => $equipped,
-            'questItems' => $character->inventory->questItemSlots->load('item'),
-            'characterInfo' => [
-                'maxAttack'  => $characterInfo->buildAttack(),
-                'maxDefence' => $characterInfo->buildDefence(),
-                'maxHeal'    => $characterInfo->buildHealFor(),
-            ],
         ]);
     }
 
@@ -111,7 +83,7 @@ class CharacterInventoryController extends Controller {
                                    ->setCharacter(auth()->user()->character)
                                    ->equipItem();
 
-            return redirect()->to(route('game.character.inventory'))->with('success', $item->name . ' Equipped.');
+            return redirect()->to(route('game.character.sheet'))->with('success', $item->name . ' Equipped.');
 
         } catch(EquipItemException $e) {
             return redirect()->back()->with('error', $e->getMessage());

@@ -4,9 +4,16 @@
 
 <div class="container-fluid">
     <div class="container justify-content-center">
+        <div class="row page-titles">
+            <div class="col-md-6 align-self-right">
+                <h4 class="mt-2">{{$adventureLog->adventure->name}}</h4>
+            </div>
+            <div class="col-md-6 align-self-right">
+                <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">{{$adventureLog->adventure->name}}</h4>
                 <p>{{$adventureLog->adventure->description}}</p>
                 <hr />
 

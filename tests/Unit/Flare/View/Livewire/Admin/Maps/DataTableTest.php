@@ -6,7 +6,7 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Maps;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Maps\DataTable;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use Tests\TestCase;
 
 class DataTableTest extends TestCase

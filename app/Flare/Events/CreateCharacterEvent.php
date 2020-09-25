@@ -4,7 +4,7 @@ namespace App\Flare\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\User;

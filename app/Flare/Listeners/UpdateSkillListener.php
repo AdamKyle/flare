@@ -22,7 +22,7 @@ class UpdateSkillListener
      * @return void
      */
     public function handle(UpdateSkillEvent $event)
-    {
+    {   
         $event->skill->update([
             'xp' => $event->skill->xp + SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure),
         ]);

@@ -32,6 +32,10 @@
 @import 'game/components/livewire/form-wizard';
 @import 'game/components/livewire/data-tables';
 
+// Bootstrap Components:
+@import 'game/components/bootstrap/card';
+@import 'game/components/bootstrap/button';
+
 legend {
   font-size: 0.9rem;
 }
@@ -73,14 +77,6 @@ dd {
   top: -7px;
 }
 
-.card {
-  border: 0;
-  border-radius: 2px;
-  -webkit-box-shadow: 0px 0 2px 0px rgba(115, 115, 115, 0.55);
-  -moz-box-shadow: 0px 0 2px 0px rgba(115, 115, 115, 0.55);
-  box-shadow: 0px 0 2px 0px rgba(115, 115, 115, 0.55);
-}
-
 .progress {
   height: 15px;
 }
@@ -98,4 +94,8 @@ dd {
       max-width: 650px;
       margin: 1.75rem auto;
   }
+}
+
+.dropdown-menu {
+  box-shadow: 0 4px 20px 0 rgb(255 255 255 / 14%), 0 7px 10px -5px rgb(0 0 0 / 40%);
 }

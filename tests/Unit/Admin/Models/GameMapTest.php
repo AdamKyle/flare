@@ -4,7 +4,7 @@ namespace Tests\Unit\Admin\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use Tests\Setup\CharacterSetup;
 use Tests\Traits\CreateUser;
 use Tests\TestCase;

@@ -40,12 +40,6 @@ class CharacterInventoryControllerTest extends TestCase
         $this->character = null;
     }
 
-    public function testCanSeeCharacterInventory() {
-        $this->actingAs($this->character->user)
-                    ->visitRoute('game.character.inventory')
-                    ->see('Equiped Items'); 
-    }
-
     public function testCanUnEquipItem() {
         $this->actingAs($this->character->user)->post(route('game.inventory.unequip'), [
             'item_to_remove' => 1

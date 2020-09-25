@@ -20,6 +20,7 @@ class CreateAdventureNotificationListener
             'status'       => $event->adventureLog->complete ? 'success' : 'failed',
             'type'         => 'adventure',
             'url'          => route('game.current.adventure'),
+            'adventure_id' => $event->adventureLog->adventure->id,
         ]);
 
         event(new UpdateNotificationsBroadcastEvent($event->adventureLog->character->notifications()->where('read', false)->get(), $event->adventureLog->character->user));

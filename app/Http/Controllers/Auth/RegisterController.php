@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 
 class RegisterController extends Controller
 {

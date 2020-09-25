@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers;
 
 use Illuminate\Http\Request;
 use App\Flare\Models\AdventureLog;
+use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
@@ -24,7 +25,7 @@ class CharacterAdventureController extends Controller {
         $character = auth()->user()->character;
 
         return view('game.core.character.completed-adventures', [
-            'adventures' => $character->adventureLogs,
+            'logs' => $character->adventureLogs->load('adventure'),
         ]);
     }
 
@@ -76,12 +77,28 @@ class CharacterAdventureController extends Controller {
             'rewards' => null,
         ]);
 
+        // Update the coresponding notification:
+        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->first();
+
+        if (!is_null($notification)) {
+            $notification->update([
+                'read' => true,
+            ]);
+        }
+
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 
         if (empty($messages)) {
-            $messages = [
-                'You finished and now ready for the next adventure.'
-            ];
+
+            if ($character->is_dead) {
+                $messages = [
+                    'You are dead and cannot start your next adventure till you revive.'
+                ];
+            } else {
+                $messages = [
+                    'You are a ready for your next adventure!'
+                ];
+            }
         }
         
         return redirect()->to(route('game'))->with('success', $messages);

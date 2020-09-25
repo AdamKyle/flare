@@ -131,7 +131,7 @@ export default class AdeventureActions extends React.Component {
                 <div className="col-md-2">{adventure.name}</div>
                 <div className="col-md-5">
                     <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres || hasCollectedRewards} onClick={this.embarkShow.bind(this)}>Embark</button>
-                    <a href={'/adeventures/' + adventure.id} target="_blank" className="mr-2 btn btn-sm btn-primary">Details</a>
+                    <a href={'/adeventures/' + adventure.id} className="mr-2">Details</a>
                     
                     { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? <button className="mr-2 btn btn-sm btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel Adventure</button> : null : null }
                     { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? this.timeOutBar() : null : null }
@@ -173,12 +173,6 @@ export default class AdeventureActions extends React.Component {
         close={this.hideAdventure.bind(this)}
         otherClasses="p-3"
       >
-        {this.state.message !== null ? <div className="alert alert-success">
-          <button type="button" className="close" onClick={this.removeMessage.bind(this)}>
-            <span aria-hidden="true">&times;</span>
-          </button>
-          {this.state.message}
-        </div> : null}
         { hasCollectedRewards ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
         {this.adventures()}

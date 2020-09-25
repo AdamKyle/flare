@@ -9,7 +9,7 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Flare\Builders\CharacterBuilder;
 
 class CreateCharacterTest extends TestCase

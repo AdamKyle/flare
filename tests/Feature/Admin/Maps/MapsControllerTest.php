@@ -5,7 +5,7 @@ namespace Tests\Feature\Admin\Maps;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;

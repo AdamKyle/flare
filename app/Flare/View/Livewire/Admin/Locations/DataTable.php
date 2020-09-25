@@ -8,17 +8,18 @@ use App\Flare\Models\Location;
 
 class DataTable extends CoreDataTable
 {
+    public $adventureId = null;
+
     public function mount() {
         $this->sortField = 'name';
 
         $this->sortAsc   = false;
     }
     
-
     public function fetchLocations() {
 
         if ($this->sortField === 'game_maps.name') {
-            return Location::join('game_maps', function($join) {
+            $location = Location::dataTableSearch($this->search)->join('game_maps', function($join) {
                 $join = $join->on('locations.game_map_id', '=' ,'game_maps.id');
 
                 if ($this->search !== '') {
@@ -26,14 +27,40 @@ class DataTable extends CoreDataTable
                 }
 
                 return $join;
-            })
-            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-            ->select('locations.*')
-            ->paginate($this->perPage);
+            });
+
+            if (!is_null($this->adventureId)) {
+                $location = $location->join('adventure_location', function($join) {
+                    return $join->on('locations.id', '=', 'adventure_location.location_id')->where('adventure_location.adventure_id', $this->adventureId);
+                });
+            }
+
+            return $location->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+                            ->select('locations.*')
+                            ->paginate($this->perPage);
+        } else if ($this->sortField !== 'game_maps.name') {
+            $location = Location::dataTableSearch($this->search);
+
+            if (!is_null($this->adventureId)) {
+                $location = $location->join('adventure_location', function($join) {
+                    return $join->on('locations.id', '=', 'adventure_location.location_id')->where('adventure_location.adventure_id', $this->adventureId);
+                });
+            }
+
+            return $location->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+                            ->select('locations.*')
+                            ->paginate($this->perPage);
         }
 
-        return Location::dataTableSearch($this->search)
-                        ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+        $location = Location::dataTableSearch($this->search);
+        
+        if (!is_null($this->adventureId)) {
+            $location = $location->join('adventure_location', function($join) {
+                return $join->on('locations.id', '=', 'adventure_location.location_id')->where('adventure_location.adventure_id', $this->adventureId);
+            })->select('locations.*');
+        }
+
+        return $location->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                         ->paginate($this->perPage);
     }
 

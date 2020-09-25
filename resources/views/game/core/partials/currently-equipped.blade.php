@@ -1,4 +1,3 @@
-<h6>Item Details</h6>
 <dl>
     <dt>Damage:</dt>
     <dd>{{$details['slot']->item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
@@ -7,7 +6,6 @@
 </dl>
 <hr />
 
-<h6>Item Affixes</h6>
 @if (is_null($details['slot']->item->itemPrefix) && is_null($details['slot']->item->itemSuffix))
     <div class="alert alert-info">
         There are no affixes on this item.

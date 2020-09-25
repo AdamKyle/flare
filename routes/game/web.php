@@ -10,7 +10,6 @@ Route::post('/shop/sell/item', ['as' => 'game.shop.sell.item', 'uses' => 'ShopCo
 
 Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
 
-Route::get('/game/character/inventory', ['as' => 'game.character.inventory', 'uses' => 'CharacterInventoryController@index']);
 Route::get('/game/character/inventory/compare', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
 Route::post('/game/equip/item', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
 Route::post('/game/unequip/all', ['as' => 'game.unequip.all', 'uses' => 'CharacterInventoryController@unequipAll']);

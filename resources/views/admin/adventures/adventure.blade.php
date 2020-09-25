@@ -8,7 +8,11 @@
                 <h4 class="mt-2">{{$adventure->name}}</h4>
             </div>
             <div class="col-md-6 align-self-right">
-                <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
+                @if (auth()->user()->hasRole('Admin'))
+                    <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
+                @else
+                    <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+                @endif
             </div>
         </div>
         <div class="card">
@@ -36,7 +40,9 @@
             </div>
         </div>
         <h4>Found At:</h4>
-        @livewire('admin.locations.data-table')
+        @livewire('admin.locations.data-table', [
+            'adventureId' => $adventure->id,
+        ])
         <h4>With Monsters:</h4>
         <p class="text-muted mb-2" style="font-size: 12px;"><em>Monsters are selected at random for each adventure level.</em></p>
         @livewire('admin.monsters.data-table')

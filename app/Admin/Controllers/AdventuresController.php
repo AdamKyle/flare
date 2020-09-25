@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Item;

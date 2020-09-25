@@ -23,6 +23,7 @@ class Notification extends Model {
         'type',
         'read',
         'url',
+        'adventure_id',
     ];
 
     protected $casts = [
@@ -31,6 +32,10 @@ class Notification extends Model {
 
     public function character() {
         return $this->belongsTo(Charcater::class);
+    }
+
+    public function adventure() {
+        return $this->belongsTo(Adventure::class, 'id', 'adventure_id');
     }
 
     protected static function newFactory() {

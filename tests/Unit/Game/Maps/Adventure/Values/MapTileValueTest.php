@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\Maps\Adventure\Values;
 
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use App\Game\Maps\Adventure\Values\MapTileValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;

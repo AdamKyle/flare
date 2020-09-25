@@ -7,7 +7,7 @@
             <h4 class="mt-2">Character Sheet</h4>
         </div>
         <div class="col-md-6 align-self-right">
-            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+            <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Home</a>
         </div>
     </div>
     <hr />
@@ -68,23 +68,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <h4>Inventory</h4>
-                    <div class="card">
-                        <div class="card-body">
-                            <dl>
-                                <dt>Total gold:</dt>
-                                <dd>{{$character->gold}}</dd>
-                                <dt>Used / Max inventory space:</dt>
-                                <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
-                                <dt>Stat to focus on for max damage:</dt>
-                                <dd>{{$character->class->damage_stat}}</dd>
-                            </dl>
-                            <hr />
-                            <a href="{{route('game.character.inventory')}}" class="btn btn-primary">Inventory</a>
-                        </div>
-                    </div>
 
                     <h4>Skills</h4>
                     <div class="card mt-2">
@@ -138,6 +121,45 @@
                                     </dd>
                                 </dl>
                             @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4>Inventory</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <dl>
+                                <dt>Total gold:</dt>
+                                <dd>{{$character->gold}}</dd>
+                                <dt>Used / Max inventory space:</dt>
+                                <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
+                                <dt>Stat to focus on for max damage:</dt>
+                                <dd>{{$character->class->damage_stat}}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                            <li class="nav-item">
+                            <a class="nav-link active" id="pills-inventory-tab" data-toggle="pill" href="#pills-inventory" role="tab" aria-controls="pills-inventory" aria-selected="true">Inventory</a>
+                            </li>
+                            <li class="nav-item">
+                            <a class="nav-link" id="pills-equipped-tab" data-toggle="pill" href="#pills-equipped" role="tab" aria-controls="pills-equipped" aria-selected="false">Equipped</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="pills-inventory" role="tabpanel" aria-labelledby="pills-inventory-tab">
+                                @livewire('character.inventory.data-table', [
+                                    'includeQuestItems'        => true,
+                                    'allowInventoryManagement' => true,
+                                ])
+                            </div>
+                            <div class="tab-pane fade" id="pills-equipped" role="tabpanel" aria-labelledby="pills-equipped-tab">
+                                @livewire('character.inventory.data-table', [
+                                    'includeEquipped' => true,
+                                    'allowUnequipAll' => true,
+                                ])
+                            </div>
                         </div>
                     </div>
                 </div>

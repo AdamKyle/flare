@@ -5,7 +5,7 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Locations\Partials;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Locations\Partials\Location;
-use App\Admin\Models\GameMap;
+use App\Flare\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
 
