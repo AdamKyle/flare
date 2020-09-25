@@ -34,7 +34,7 @@ class UpdateCharacterListener
         $characterRewardService->distributeGoldAndXp($event->monster, $event->adventure);
 
         $character = $characterRewardService->getCharacter();
-        dump($character->xp, $event->character->xp_next);
+
         if ($character->xp >= $event->character->xp_next) {
             $this->characterService->levelUpCharacter($character);
 
