@@ -240,7 +240,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'spell',
             'slot_id'            => '2',
-        ])->see('Equipped')->see('Item Details');
+        ])->see('Equipped')->see($item->name);
     }
 
     public function testSeeComparePageForArmour() {
@@ -261,7 +261,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'slot_id'            => '2',
-        ])->see('Equipped')->see('Item Details');
+        ])->see('Equipped')->see($item->name);
     }
 
     public function testSeeComparePageForItemWithPrefixAndSuffix() {
@@ -294,7 +294,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($this->character->user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'gloves',
             'slot_id'            => '2',
-        ])->see('Equipped')->see('Item Details');
+        ])->see('Equipped')->see($item->name);
     }
 
     public function testCannotSeeComparePage() {
@@ -310,7 +310,7 @@ class CharacterInventoryControllerTest extends TestCase
             'equiped'      => false,
         ]);
 
-        $this->actingAs($this->character->user)->visitRoute('game.character.inventory')->visitRoute('game.inventory.compare', [
+        $this->actingAs($this->character->user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'apple-sauce',
             'slot_id'            => '2',
         ])->see('Error. Invalid Input.');
@@ -333,7 +333,7 @@ class CharacterInventoryControllerTest extends TestCase
     }
 
     public function testCannotSeeComparePageWithItemNotInYourInventory() {
-        $this->actingAs($this->character->user)->visitRoute('game.character.inventory')->visitRoute('game.inventory.compare', [
+        $this->actingAs($this->character->user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '10',
         ])->see('Item not found in your inventory.');

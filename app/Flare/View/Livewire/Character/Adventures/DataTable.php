@@ -19,11 +19,11 @@ class DataTable extends CoreDataTable
                 }
             })->all();
         }
-
+        
         if (is_array($logs)) {
             $logs = collect($logs);
         }
-
+  
         if ($this->sortAsc) {
             $logs = $logs->sortBy($this->sortField);
         } else {

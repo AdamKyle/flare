@@ -4,9 +4,13 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+            <div class="row page-titles">
+                <div class="col-md-6 align-self-right">
+                    <h4 class="mt-2">Register</h4>
+                </div>
+            </div>
 
+            <div class="card">
                 <div class="card-body">
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
@@ -47,10 +51,14 @@
                             </div>
                         </div>
 
-                        <h3 class="seperator">
-                            <span class="header"></span> Character Info
-                        </h3>
-                        <hr />
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-md-6">
+                                <h3>
+                                    <span class="header"></span> Character Info <i class="ra ra-muscle-up"></i>
+                                </h3>
+                                <hr />
+                            </div>
+                        </div>
 
                         <div class="form-group row">
                             <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Character Name') }}</label>

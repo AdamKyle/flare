@@ -170,7 +170,8 @@ export default class BattleAction extends React.Component {
 
         this.setState({
           characterCurrentHealth: health,
-          canAttack: false
+          battleMessages: [],
+          canAttack: false,
         });
       });
     }

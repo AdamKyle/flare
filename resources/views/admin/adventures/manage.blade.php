@@ -24,7 +24,7 @@
                             'monsters'     => $monsters,
                         ])
                         <hr />
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">{{ is_null($adventure) ? 'Create Adventure' : 'Update Adventure'}}</button>
                     </form>
                 </div>
             </div>

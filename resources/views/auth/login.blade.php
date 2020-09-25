@@ -4,9 +4,13 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+            <div class="row page-titles">
+                <div class="col-md-6 align-self-right">
+                    <h4 class="mt-2">Login</h4>
+                </div>
+            </div>
 
+            <div class="card">
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
                         @csrf

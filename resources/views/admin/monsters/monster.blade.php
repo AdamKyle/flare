@@ -53,7 +53,7 @@
                 </div>
                 <hr />
                 @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{route('monsters.edit', [
+                    <a href="{{route('monster.edit', [
                         'monster' => $monster->id,
                     ])}}" class="btn btn-primary mt-2">Edit Monster</a>
                 @endif

@@ -80,7 +80,7 @@
                             @include('layouts.partials.user-profile-nav')
                         @endguest
 
-                        <ul class="navbar-nav my-lg-0">
+                        <ul class="navbar-nav my-lg-0 text-align-right">
                             <!-- Authentication Links -->
                             @guest
                                 <li class="nav-item">

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\AdventureValidation;
 use App\Flare\Models\GameMap;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Adventure;
@@ -47,7 +48,7 @@ class AdventuresController extends Controller {
         ]);
     }
 
-    public function update(Request $request, Adventure $adventure) {
+    public function update(AdventureValidation $request, Adventure $adventure) {
         $requestForModel = $request->except(['_token', 'location_ids', 'monster_ids']);
 
         $adventure->update($requestForModel);
@@ -60,7 +61,7 @@ class AdventuresController extends Controller {
         ])->with('success', $adventure->name . ' updated!');
     }
 
-    public function store(Request $request) {
+    public function store(AdventureValidation $request) {
         $requestForModel = $request->except(['_token', 'location_ids', 'monster_ids']);
 
         $adventure = Adventure::create($requestForModel);
