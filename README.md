@@ -1,7 +1,5 @@
 # Flare
 
-![badge](https://action-badges.now.sh/AdamKyle/flare)
-
 Flare is intended to be a simple, old school game where you can chat, fight monsters and rule kingdoms.
 
 The goal of Flare is simple to replicate some of my favourite browser based games that I use to play when I was younger.
@@ -30,6 +28,11 @@ This game is heavily under development but some of the features that you will ge
 
 # Kingdoms
 
+> ## ATTN!
+>
+> This is a planned feature how ever the game may launch with out it for the initial
+> alpha phase 1.
+
 - Start off with a predefined kingdom on a giant map that can have over 250 thousand kingdoms!
 - Grow your kingdoms, store your gold, rule over other kingdoms in a time based way.
 - Start or Join a clan, conquer the map and farm the plundered villages for scraps of resources.
@@ -44,10 +47,16 @@ can all be gained in game with no need to spend out side money. This point was v
 ## Getting started with Development:
 
 - `git clone ...`
-- cp .env.example .env (see below on websockets)
+- cp .env.example .env (see below on websockets and redis)
 - `composer install && yarn && php artisan migrate --seed && php artisan create:admin email && yarn dev`
-- Log in as an admin (you will have to reset your password first), you will be known as "God" when chatting and will be able to view the dashboard.
+- start redis: eg, `redis-server /usr/local/etc/redis.conf`
+- start websockets: `php artisan websocket:serve`
+- listen for queues: `php artisan queue:work --queue=high,default --tries=1`
+- From there you cn register as a new player.
+  - Or since you ran the `create:admn` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
 - Regular players, who sign up, will only see the game section.
+
+<sup>*</sup> See setting up an email below.
 
 
 ## Redis
@@ -79,6 +88,10 @@ PUSHER_APP_KEY=test
 PUSHER_APP_SECRET=test
 PUSHER_APP_CLUSTER=mt1
 ```
+
+## Setting up Email:
+
+This game, for the admin section at the time of this writing, requires a way to send out emails. For example you can read [here](https://medium.com/@agavitalis/how-to-send-an-email-in-laravel-using-gmail-smtp-server-53d962f01a0c) about setting up gmail with laravel.
 
 ## Testing
 
