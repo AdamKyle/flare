@@ -94,7 +94,13 @@
         <div class="row justify-content-center">
             <div class="col-xl-7 col-lg-8">
                 <div class="snippit-section text-center">
-                    <h2>Put that credit card away!</h2>
+                    <h2>
+                        <span class="fa-stack">
+                            <i class="far fa-credit-card fa-stack-1x"></i>
+                            <i class="fas fa-ban fa-stack-2x text-danger"></i>
+                        </span>
+                        Put that credit card away!
+                    </h2>
                     <p>This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear, to the stongest kingdoms to abillity to travel from one plane to the next is all only attainable by playing the game.</p>
                 </div>
             </div>
