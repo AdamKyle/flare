@@ -564,7 +564,7 @@ class BattleControllerApiTest extends TestCase
             'xp_max'             => 100,
         ]);
 
-        $this->character->inventory->questItemSlots()->create([
+        $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $this->createItem([
                 'name' => 'Sample',

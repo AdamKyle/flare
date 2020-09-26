@@ -31,6 +31,7 @@ class InventorySlot extends Model
      */
     protected $casts = [
         'equipped' => 'boolean',
+        'item_id'  => 'integer',
     ];
 
     public function item() {

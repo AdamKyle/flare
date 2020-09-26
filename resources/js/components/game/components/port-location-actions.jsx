@@ -73,6 +73,7 @@ export default class PortLocationActions extends React.Component {
             canMove={this.state.portDetails.canMove}
             userId={this.props.userId}
             updatePlayerPosition={this.props.updatePlayerPosition}
+            updateAdventure={this.props.updateAdventure}
           />
         </div>
       </CardTemplate>

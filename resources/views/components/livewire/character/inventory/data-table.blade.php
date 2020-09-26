@@ -80,7 +80,7 @@
                                 <td>{{is_null($slot->item->base_damage) ? 'N/A' : $slot->item->base_damage}}</td>
                                 <td>{{is_null($slot->item->base_ac) ? 'N/A' : $slot->item->base_ac}}</td>
                                 <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
-                                <td>{{$slot->item->cost}}</td>
+                                <td>{{is_null($slot->item->Cost) ? 'N/A' : $slot->item->cost}}</td>
                                 <td>
                                     @if ($allowInventoryManagement)
                                         <div class="dropdown">

@@ -29,7 +29,7 @@ class LoginTest extends TestCase
              ->submitForm('Login', [
                 'email'    => $user->email,
                 'password' => 'password',
-             ])->see('You are logged in!');
+             ])->see('Admin');
     }
 
     public function testPlayerIsRedirectedToTheGame() {

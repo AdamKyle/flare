@@ -12,6 +12,7 @@ export default class SetSail extends React.Component {
       characterId: this.props.characterId,
       isDead: this.props.characterIsDead,
       canMove: this.props.canMove,
+      adventures: [],
     };
 
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
@@ -68,9 +69,12 @@ export default class SetSail extends React.Component {
       this.setState({
         currentPort: result.data.port_details.current_port,
         portList: result.data.port_details.port_list,
+        adventures: result.data.adventure_details,
         portId: "",
       }, () => {
         this.props.updatePlayerPosition(result.data.character_position_details);
+        console.log(this.state.adventures);
+        this.props.updateAdventure(this.state.adventures, [], null);
       });
     });
   }

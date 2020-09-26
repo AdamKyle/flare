@@ -156,8 +156,8 @@
                             </div>
                             <div class="tab-pane fade" id="pills-equipped" role="tabpanel" aria-labelledby="pills-equipped-tab">
                                 @livewire('character.inventory.data-table', [
-                                    'includeEquipped' => true,
-                                    'allowUnequipAll' => true,
+                                    'includeEquipped'   => true,
+                                    'allowUnequipAll'   => true,
                                 ])
                             </div>
                         </div>

@@ -200,12 +200,12 @@ class AdventureService {
 
         $rewardItemId = $adventureLog->adventure->reward_item_id;
 
-        $foundItem    = $this->character->inventory->questItemSlots->filter(function($slot) use ($rewardItemId) {
+        $foundItem    = $this->character->inventory->slots->filter(function($slot) use ($rewardItemId) {
             return $slot->item_id === $rewardItemId;
         })->first();
 
         if (is_null($foundItem)) {
-            $this->character->inventory->questItemSlots()->create([
+            $this->character->inventory->slots()->create([
                 'inventory_id' => $this->character->inventory->id,
                 'item_id'      => $rewardItemId,
             ]);

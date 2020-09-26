@@ -26,6 +26,8 @@ class CharacterSkillController extends Controller {
         $items      = item::where('can_craft', true)
                             ->where('crafting_type', strtolower($request->crafting_type))
                             ->where('skill_level_required', '<=', $foundSkill->level)
+                            ->where('item_prefix_id', null)
+                            ->where('item_suffix_id', null)
                             ->get();
 
         return response()->json([

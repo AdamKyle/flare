@@ -30,7 +30,7 @@ class SkillXPCalculator {
     protected function fetchSkilltrainingBonusFromQuestItems(Skill $skill): float {
         $totalSkillBonus = 0.0;
 
-        foreach ($skill->character->inventory->questItemSlots as $slot) {
+        foreach ($skill->character->inventory->slots as $slot) {
             $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
         }
 

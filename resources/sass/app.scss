@@ -1,5 +1,5 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 
 // Variables
 @import 'variables';
@@ -13,6 +13,9 @@
 
 // RPG Icons
 @import 'node_modules/rpg-awesome/scss/rpg-awesome';
+
+// Front page:
+@import 'front-page';
 
 // Game
 @import 'game/chat';
@@ -35,6 +38,11 @@
 // Bootstrap Components:
 @import 'game/components/bootstrap/card';
 @import 'game/components/bootstrap/button';
+
+body {
+  font-weight: lighter;
+  font-family: "Roboto", sans-serif;
+}
 
 legend {
   font-size: 0.9rem;
@@ -61,6 +69,11 @@ dd {
     margin-left: -40px;
     list-style: none;
   }
+}
+
+.force-right {
+  position: absolute;
+  right: 0;
 }
 
 .force-left {

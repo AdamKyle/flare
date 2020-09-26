@@ -1,100 +1,152 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-        <title>Laravel</title>
-
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
-
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Nunito', sans-serif;
-                font-weight: 200;
-                height: 100vh;
-                margin: 0;
-            }
-
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
-
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://vapor.laravel.com">Vapor</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+@section('content')
+    <div class="container welcome">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-11 col-md-12">
+                <div class="jumbotron">
+                    <h1>Planes of Tlessa</h1>
+                    <p>A world full of mystery and exploration.</p>
+                    <a class="btn btn-primary btn-lg hero-btn" href="#" role="button">Join Today!</a>
                 </div>
             </div>
         </div>
-    </body>
-</html>
+
+        <div class="alert alert-warning text-center"><i class="fas fa-exclamation-circle text-danger"></i> Right now Tlessa does not support devices smaller then a tablet. <i class="fas fa-exclamation-circle text-danger"></i></div>
+        
+        <div class="row justify-content-center mb-2 mt-2">
+            <div class="col-lg-12">
+                <img src="{{asset('promotion/game.png')}}" class="w-100" />
+            </div>
+        </div>
+        <div class="lg-padding">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 col-lg-8">
+                    <div class="snippit-section text-center">
+                        <h2>Stay logged in!</h2>
+                        <p>
+                            There is no set it and forget it. This game requires you be engaged. Timers and such only last minutes at best, with attack and movement timers being set to seconds.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center lg-padding">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="card game-feature-card">
+                            <div class="card-body">
+                                <div class="game-feature-icon">
+                                    <i class="ra ra-player"></i>
+                                </div>
+                                <div class="game-feature">
+                                    <h5>
+                                        <a href="#">Customize your character!</a>
+                                    </h5>
+                                    <p>Buy/sell weapons, armor, rings, artifacts and more and out fit your character for the road ahead. Who knows what beasties you might find!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="card game-feature-card">
+                            <div class="card-body">
+                                <div class="game-feature-icon">
+                                    <i class="ra ra-battered-axe"></i>
+                                </div>
+                                <div class="game-feature">
+                                    <h5>
+                                        <a href="#">Find powerful items!</a>
+                                    </h5>
+                                    <p>Fighting monsters and going on adventures have a chance to reward you with powerful items that can help you the road!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <div class="card game-feature-card">
+                            <div class="card-body">
+                                <div class="game-feature-icon">
+                                    <i class="ra ra-trail"></i>
+                                </div>
+                                <div class="game-feature">
+                                    <h5>
+                                        <a href="#">Go on adventures!</a>
+                                    </h5>
+                                    <p>Travel to new locations and find out their mysteries by partaking in location based adventures!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row map-feature">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-center snippit-section map-feature-text">
+                    <h2>See where you're going!</h2>
+                    <p>Adventure on a map by clicking the action buttons. Certian locations will have adventures and some you can set sail from, such as ports!</p>
+                    <a href="#" class="btn btn-primary map-btn">Learn more</a>
+                </div> 
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <img src="{{asset('promotion/map.png')}}" class="w-100 move-image-down" />
+                </div> 
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-8">
+                <div class="snippit-section text-center">
+                    <h2>Put that credit card away!</h2>
+                    <p>This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear, to the stongest kingdoms to abillity to travel from one plane to the next is all only attainable by playing the game.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center lg-padding">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card game-feature-card">
+                        <div class="card-body">
+                            <div class="game-feature-icon">
+                                <i class="ra ra-anvil"></i>
+                            </div>
+                            <div class="game-feature">
+                                <h5>
+                                    <a href="#">Crafting is simple</a>
+                                </h5>
+                                <p>No need to gather. You can just start crafting! Find tomes to get xp bonuses!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card game-feature-card">
+                        <div class="card-body">
+                            <div class="game-feature-icon">
+                                <i class="ra ra-forging"></i>
+                            </div>
+                            <div class="game-feature">
+                                <h5>
+                                    <a href="#">Enchanting is even easier</a>
+                                </h5>
+                                <p>All you need is to destroy an item with an affix on it for the recipe! How easy is that!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card game-feature-card">
+                        <div class="card-body">
+                            <div class="game-feature-icon">
+                                <i class="ra ra-scroll-unfurled"></i>
+                            </div>
+                            <div class="game-feature">
+                                <h5>
+                                    <a href="#">Quest items</a>
+                                </h5>
+                                <p>Quest items let you travel on water and so much more! They are even easy to complete!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

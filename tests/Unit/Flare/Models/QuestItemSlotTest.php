@@ -24,7 +24,7 @@ class QuestItemSlotTest extends TestCase
             'cost' => 0,
         ]);
 
-        $questSlot = $character->inventory->questItemSlots()->create([
+        $questSlot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id'      => Item::first()->id,
         ]);

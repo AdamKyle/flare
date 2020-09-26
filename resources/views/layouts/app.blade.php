@@ -80,9 +80,12 @@
                             @include('layouts.partials.user-profile-nav')
                         @endguest
 
-                        <ul class="navbar-nav my-lg-0 text-align-right">
+                        <ul class="navbar-nav my-lg-0 text-align-right force-right">
                             <!-- Authentication Links -->
                             @guest
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/">{{ __('Home') }}</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>

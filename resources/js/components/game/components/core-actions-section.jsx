@@ -107,6 +107,7 @@ export default class CoreActionsSection extends React.Component {
             isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
             changeCraftingType={this.changeCraftingType.bind(this)}
             updateCanCraft={this.updateCanCraft.bind(this)}
+			canAttack={this.props.canAttack}
           />
         </div>
       </CardTemplate>

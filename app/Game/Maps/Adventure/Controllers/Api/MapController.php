@@ -80,12 +80,12 @@ class MapController extends Controller {
             }
     
             if (!is_null($location->questRewardItem)) {
-                $item = $character->inventory->questItemSlots->filter(function($slot) use ($location) {
+                $item = $character->inventory->slots->filter(function($slot) use ($location) {
                     return $slot->item_id === $location->questRewardItem->id;
                 })->first();
     
                 if (is_null($item)) {
-                    $character->inventory->questItemSlots()->create([
+                    $character->inventory->slots()->create([
                         'inventory_id' => $character->inventory->id,
                         'item_id'      => $location->questRewardItem->id,
                     ]);
@@ -142,12 +142,12 @@ class MapController extends Controller {
         $this->portService->setSail($character, $location);
 
         if (!is_null($location->questRewardItem)) {
-            $item = $character->inventory->questItemSlots->filter(function($slot) use ($location) {
+            $item = $character->inventory->slots->filter(function($slot) use ($location) {
                 return $slot->item_id === $location->questRewardItem->id;
             })->first();
 
             if (is_null($item)) {
-                $character->inventory->questItemSlots()->create([
+                $character->inventory->slots()->create([
                     'inventory_id' => $character->inventory->id,
                     'item_id'      => $location->questRewardItem->id,
                 ]);
@@ -162,6 +162,7 @@ class MapController extends Controller {
         return response()->json([
             'character_position_details' => $character->map,
             'port_details'               => $this->portService->getPortDetails($character, $location),
+            'adventure_details'          => $location->adventures->isNotEmpty() ? $location->adventures : [],
         ]);
     }
 
@@ -170,7 +171,7 @@ class MapController extends Controller {
         $color = $this->mapTile->getTileColor($character, $request->character_position_x, $request->character_position_y);
 
         if ($this->mapTile->isWaterTile((int) $color)) {
-            $hasItem = $character->inventory->questItemSlots->filter(function($slot) {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';
             })->isNotEmpty();
 

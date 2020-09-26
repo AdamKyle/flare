@@ -27,20 +27,22 @@ class DataTable extends CoreDataTable
 
         $slots = $character->inventory->slots()->join('items', function($join) {
             $join = $join->on('inventory_slots.item_id', '=', 'items.id');
-            
-            if ($this->includeQuestItems) {
-                $join->where('type', '!=', 'quest');
-            }
 
             if ($this->search !== '') {
                 $join->where('items.name', 'like', '%'.$this->search.'%');
             }
 
+            if (!$this->includeQuestItems) {
+                $join->where('items.type', '!=', 'quest');
+            }
+
             return $join;
-        })->where('equipped', $this->includeEquipped)
-          ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-          ->select('inventory_slots.*')
-          ->get();
+        });
+        
+        $slots->where('equipped', $this->includeEquipped)
+              ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+              ->select('inventory_slots.*')
+              ->get();
         
         return $slots->paginate($this->perPage);
     }

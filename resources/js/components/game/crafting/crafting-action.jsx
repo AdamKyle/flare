@@ -16,6 +16,7 @@ export default class CraftingAction extends React.Component {
       showCrafting: true,
       chracterId: this.props.characterId,
       timeRemaining: this.props.timeRemaining,
+      showSuccess: false,
       gold: 0,
     }
 
@@ -40,7 +41,7 @@ export default class CraftingAction extends React.Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.showCrafting !== prevProps.showCrafting) {
       this.setState({
         showCrafting: this.props.showCrafting,
@@ -67,6 +68,18 @@ export default class CraftingAction extends React.Component {
       this.setState({
         gold: this.props.characterGold,
       });
+    }
+
+    if (prevState.itemsToCraft.length !== this.state.itemsToCraft.length && prevState.itemsToCraft.length !== 0) {
+      this.setState({
+        showSuccess: true
+      }, () => {
+        setTimeout( () => {
+          this.setState({
+            showSuccess: false
+          });
+        }, 3000);
+      })
     }
   }
 
@@ -116,6 +129,7 @@ export default class CraftingAction extends React.Component {
 
     this.setState({
       canCraft: false,
+      showSuccess: false,
     }, () => {
       this.props.updateCanCraft(event.canCraft);
       
@@ -184,29 +198,40 @@ export default class CraftingAction extends React.Component {
     }
 
     return (
-      <div className="form-group row">
-        <div className="col-md-8">
-          {this.renderCraftingDropDowns()}
+      <>
+        <div className={"container justify-content-center " + (!this.state.showSuccess ? 'hide' : '')}>
+          <div className="row">
+            <div className="col-md-10">
+              <div className="alert alert-success">You got new items to craft! Check the list.</div>
+            </div>
+          </div>
           
         </div>
-        <div className="col-md-1">
-          {this.renderCraftingButton()}
-        </div>
-        <div className="col-md-3">
-          <div className="ml-4 mt-3">
-            {this.state.itemToCraft !== 0 ?
-              <TimeOutBar 
-                cssClass={'character-timeout'}
-                readyCssClass={'character-ready'}
-                timeRemaining={this.state.timeRemaining}
-                channel={'show-crafting-timeout-bar-' + this.props.userId}
-                eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
-              />
-              : null
-            }
+        
+        <div className="form-group row">
+          <div className="col-md-8">
+            {this.renderCraftingDropDowns()}
+            
+          </div>
+          <div className="col-md-1">
+            {this.renderCraftingButton()}
+          </div>
+          <div className="col-md-3">
+            <div className="ml-4 mt-3">
+              {this.state.itemToCraft !== 0 ?
+                <TimeOutBar 
+                  cssClass={'character-timeout'}
+                  readyCssClass={'character-ready'}
+                  timeRemaining={this.state.timeRemaining}
+                  channel={'show-crafting-timeout-bar-' + this.props.userId}
+                  eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
+                />
+                : null
+              }
+            </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 } 

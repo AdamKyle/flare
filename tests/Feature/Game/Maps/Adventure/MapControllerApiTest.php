@@ -173,8 +173,8 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals($location->x, $this->character->map->character_position_x);
         $this->assertEquals($location->y, $this->character->map->character_position_y);
 
-        $questInventory = $this->character->inventory->questItemSlots;
-        
+        $questInventory = $this->character->inventory->slots;
+
         // Gained the item:
         $this->assertTrue($questInventory->isNotEmpty());
 
@@ -210,7 +210,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->inventory->questItemSlots()->create([
+        $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
         ]);
@@ -231,10 +231,10 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals($location->x, $this->character->map->character_position_x);
         $this->assertEquals($location->y, $this->character->map->character_position_y);
 
-        $questInventory = $this->character->inventory->questItemSlots;
+        $questInventory = $this->character->inventory->slots;
         
         // Did not gain the item again:
-        $this->assertEquals(1, $this->character->inventory->questItemSlots->count());
+        $this->assertEquals(1, $this->character->inventory->slots->count());
     }
 
     public function testMoveCharacterToPort() {
@@ -328,7 +328,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $this->character->inventory->questItemSlots()->create([
+        $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      =>  $this->createItem([
                 'name'           => 'Artifact',
@@ -545,7 +545,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status()); 
 
-        $questInventory = $this->character->inventory->questItemSlots;
+        $questInventory = $this->character->inventory->slots;
         
         // Gained the item:
         $this->assertTrue($questInventory->isNotEmpty());
@@ -586,7 +586,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->inventory->questItemSlots()->create([
+        $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
         ]);
@@ -608,10 +608,10 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status()); 
 
-        $questInventory = $this->character->inventory->questItemSlots;
+        $questInventory = $this->character->inventory->slots;
         
         // Did not gain the item again:
-        $this->assertEquals(1, $this->character->inventory->questItemSlots->count());
+        $this->assertEquals(1, $this->character->inventory->slots->count());
     }
 
     protected function setUpCharacter(array $options = []) {

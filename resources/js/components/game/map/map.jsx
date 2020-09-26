@@ -121,6 +121,12 @@ export default class Map extends React.Component {
     if (!_.isEmpty(this.props.position)) {
       this.updatePlayerPosition(this.props.position);
     }
+
+    if (this.props.adventures !== this.state.adventures) {
+      this.setState({
+        adventures: this.props.adventures
+      });
+    }
   }
 
   handleDrag(e, position) {

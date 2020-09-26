@@ -49,6 +49,7 @@ export default class BattleAction extends React.Component {
     }, () => {
       this.props.isCharacterDead(this.props.character.is_dead);
       this.props.isCharacterAdventuring(!this.props.character.can_adventure);
+      this.props.canAttack(this.state.canAttack);
     });
 
     this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
@@ -66,21 +67,23 @@ export default class BattleAction extends React.Component {
     this.timeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
       this.setState({
         canAttack:     event.canAttack,
+      }, () => {
+        this.props.canAttack(this.state.canAttack);
       });
     });
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       const character = this.state.character;
 
-      character.ac           =  event.characterSheet.data.ac,
-      character.attack       =  event.characterSheet.data.attack,
-      character.health       =  event.characterSheet.data.health,
-      character.gold         =  event.characterSheet.data.gold,
-      character.can_attack   =  this.state.character.can_attack,
-      character.id           =  this.state.character.id,
-      character.name         =  this.state.character.name,
-      character.show_message =  this.state.character.show_message,
-      character.skills       =  this.state.character.skills,
+      character.ac           =  event.characterSheet.data.ac;
+      character.attack       =  event.characterSheet.data.attack;
+      character.health       =  event.characterSheet.data.health;
+      character.gold         =  event.characterSheet.data.gold;
+      character.can_attack   =  this.state.character.can_attack;
+      character.id           =  this.state.character.id;
+      character.name         =  this.state.character.name;
+      character.show_message =  this.state.character.show_message;
+      character.skills       =  this.state.character.skills;
 
       this.setState({character: character});
     });

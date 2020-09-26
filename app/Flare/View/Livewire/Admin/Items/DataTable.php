@@ -23,6 +23,8 @@ class DataTable extends CoreDataTable
 
         return Item::dataTableSearch($this->search)
                        ->where('type', '!=', 'quest')
+                       ->where('item_suffix_id', null)
+                       ->where('item_prefix_id', null)
                        ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                        ->paginate($this->perPage);
     }
