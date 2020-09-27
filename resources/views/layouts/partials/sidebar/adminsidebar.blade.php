@@ -27,4 +27,11 @@
             <li><a href="{{route('monsters.create')}}">Create Monster</a></li>
         </ul>
     </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-sword"></i><span class="hide-menu">Manage Items</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('items.list')}}">Items</a></li>
+            <li><a href="{{route('items.create')}}">Create Item</a></li>
+        </ul>
+    </li>
 </ul>
