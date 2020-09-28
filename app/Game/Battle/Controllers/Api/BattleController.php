@@ -47,8 +47,6 @@ class BattleController extends Controller {
     public function battleResults(Request $request, Character $character) {
         if ($request->is_character_dead) {
 
-            broadcast(new ShowTimeOutEvent($character->user, true, false, 20));
-
             $character->update(['is_dead' => true]);
 
             $character = $character->refresh();
@@ -62,7 +60,6 @@ class BattleController extends Controller {
         }
 
         if ($request->is_defender_dead) {
-            broadcast(new ShowTimeOutEvent($character->user, true, false, 10));
 
             switch ($request->defender_type) {
                 case 'monster':
