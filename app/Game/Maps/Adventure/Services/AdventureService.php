@@ -2,17 +2,20 @@
 
 namespace App\Game\Maps\Adventure\Services;
 
-use RuntimeException;
+use Mail;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\AdventureLog;
+use App\Flare\Models\AdventureLog; 
+use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\CreateAdventureNotificationEvent;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
+use App\Game\Maps\Adventure\Mail\AdventureCompleted;
+
 
 class AdventureService {
 
@@ -119,19 +122,29 @@ class AdventureService {
 
         $this->character->refresh();
 
-        event(new ServerMessageEvent($this->character->user, 'dead_character'));
+        
         event(new AttackTimeOutEvent($this->character));
-        event(new CharacterIsDeadBroadcastEvent($this->character->user, true));
-        event(new UpdateTopBarEvent($this->character));
 
         $this->setLogs($adventureLog, $attackService);
 
         $this->updateAdventureLog($adventureLog, $level, true);
 
-        event(new UpdateAdventureLogsBroadcastEvent($this->character->refresh()->adventureLogs, $this->character->user));
-        event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
+        $character = $this->character->refresh();
+        
+        if (UserOnlineValue::isOnline($character->user)) {
+            event(new ServerMessageEvent($character->user, 'dead_character'));
+            event(new CharacterIsDeadBroadcastEvent($character->user, true));
+            event(new UpdateTopBarEvent($character));
+            event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
+            event(new ServerMessageEvent($character->user, 'adventure', 'You died while on your explortations! Check your Adventure logs for more information.'));
+        } else {
+            $character = $this->character->refresh();
 
-        event(new ServerMessageEvent($this->character->user, 'adventure', 'You died while on your explortations! Check your Adventure logs for more information.'));
+            Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
+        }
+
+       
+        event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
     } 
 
     protected function monsterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog) {
@@ -215,11 +228,14 @@ class AdventureService {
 
         $character = $this->character->refresh();
 
-        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+        if (UserOnlineValue::isOnline($this->character->user)) {
+            event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+            event(new ServerMessageEvent($this->character->user, 'adventure', 'Adventure completed! Check your logs for more details.'));
+        } else {
+            Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
+        }
 
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
-
-        event(new ServerMessageEvent($this->character->user, 'adventure', 'Adventure completed! Check your logs for more details.'));
     } 
 
     protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false) {

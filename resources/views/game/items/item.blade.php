@@ -17,7 +17,11 @@
             <div class="card">
                 <div class="card-body">
                     @include('game.items.partials.item-details', ['item' => $item])
-                    
+                    @if (auth()->user()->hasRole('Admin'))
+                        <a href="{{route('items.edit', [
+                            'item' => $item
+                        ])}}" class="btn btn-primary mt-3">Edit Item</a>
+                    @endif
                 </div>
             </div>
 

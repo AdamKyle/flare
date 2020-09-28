@@ -9,11 +9,11 @@ class Manage extends FormWizard
     
     public function mount() {
         $this->steps = [
-            'Item Details', 'Item Modifiers', 'Item Affixes',
+            'Item Details', 'Item Modifiers',
         ];
 
         $this->views = [
-            'item-details', 'item-modifiers', 'item-affixes',
+            'item-details', 'item-modifiers',
         ];
 
         $this->currentStep = 1;
