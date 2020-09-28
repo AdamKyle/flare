@@ -17,6 +17,7 @@ use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
+use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use Blade;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -62,6 +63,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterRewardService::class, function($app, $paramters) {
             return new CharacterRewardService($paramters['character']);
+        });
+
+        $this->app->bind(ItemValidator::class, function($app) {
+            return new ItemValidator;
         });
 
         $this->commands([CreateAdminAccount::class, UpdateCharacterSkills::class]);

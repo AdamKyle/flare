@@ -175,7 +175,7 @@ export default class AdeventureActions extends React.Component {
       >
         { hasCollectedRewards ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
-        { !this.props.canAdventure() ? <div className="alert alert-info">You must wait to be able to move in order to embark.</div> : null}
+        { !this.props.canAdventure() ? <div className="alert alert-info">You must wait to be able to move and attack in order to embark.</div> : null}
         {this.adventures()}
 
         {this.state.showEmbark ? <AdventureEmbark 

@@ -19,7 +19,7 @@
     @if ($item->type === 'quest')
         <dt>Affects Skill Name:</dt>
         <dd>{{is_null($item->skill_name) ? 'N/A' : $item->skill_name}}</dd>
-        <dt>Bonus When Training:</dt>
+        <dt>Bonus (XP) When Training:</dt>
         <dd>{{is_null($item->skill_training_bonus) ? 'N/A' : $item->skill_training_bonus * 100}}%</dd>
     @endif
 </dl>

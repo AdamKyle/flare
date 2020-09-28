@@ -13,7 +13,7 @@
                     </div>
             
                     <div class="col">
-                        <input wire:model="search" class="form-control" type="text" placeholder="Search adventures...">
+                        <input wire:model="search" class="form-control" type="text" placeholder="Search items...">
                     </div>
                 </div>
                 <table class="table table-bordered data-table">
@@ -75,24 +75,40 @@
                             <tr>
                                 <td><a href="{{route('items.item', [
                                     'item' => $item->id
-                                ])}}">{{$item->name}}</a></td>
+                                ])}}"><x-item-display-color :item="$item" /></a></td>
                                 <td>{{$item->type}}</td>
                                 <td>{{is_null($item->base_damage) ? 'N/A' : $item->base_damage}}</td>
                                 <td>{{is_null($item->base_ac) ? 'N/A' : $item->base_ac}}</td>
                                 <td>{{is_null($item->base_healing) ? 'N/A' : $item->base_healing}}</td>
-                                <td>{{$item->cost}}</td>
+                                <td>{{is_null($item->cost) ? 'N/A' : $item->cost}}</td>
                                 <td>
-                                    <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
-                                                    onclick="event.preventDefault();
-                                                    document.getElementById('shop-buy-form-item-{{$item->id}}').submit();">
-                                        {{ __('Buy') }}
-                                    </a>
+                                    @if(auth()->user()->hasRole('Admin'))
+                                        <a class="btn btn-danger" href="{{route('items.delete', [
+                                            'item' => $item->id
+                                        ])}}"
+                                                        onclick="event.preventDefault();
+                                                        document.getElementById('delete-item-{{$item->id}}').submit();">
+                                            {{ __('Delete') }}
+                                        </a>
 
-                                    <form id="shop-buy-form-item-{{$item->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
-                                        @csrf
+                                        <form id="delete-item-{{$item->id}}" action="{{route('items.delete', [
+                                            'item' => $item->id
+                                        ])}}" method="DELETE" style="display: none;">
+                                            @csrf
+                                        </form>
+                                    @else
+                                        <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
+                                                        onclick="event.preventDefault();
+                                                        document.getElementById('shop-buy-form-item-{{$item->id}}').submit();">
+                                            {{ __('Buy') }}
+                                        </a>
 
-                                        <input type="hidden" name="item_id" value={{$item->id}} />
-                                    </form>
+                                        <form id="shop-buy-form-item-{{$item->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
+                                            @csrf
+
+                                            <input type="hidden" name="item_id" value={{$item->id}} />
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
