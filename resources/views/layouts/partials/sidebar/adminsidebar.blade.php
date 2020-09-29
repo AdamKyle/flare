@@ -34,4 +34,11 @@
             <li><a href="{{route('items.create')}}">Create Item</a></li>
         </ul>
     </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-burning-embers"></i><span class="hide-menu">Manage Affixes</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('affixes.list')}}">Affixes</a></li>
+            <li><a href="{{route('affixes.create')}}">Create Affix</a></li>
+        </ul>
+    </li>
 </ul>

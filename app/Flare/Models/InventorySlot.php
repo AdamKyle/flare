@@ -38,6 +38,10 @@ class InventorySlot extends Model
         return $this->hasOne(Item::class, 'id', 'item_id');
     }
 
+    public function inventory() {
+        return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
+    }
+
     protected static function newFactory() {
         return InventorySlotFactory::new();
     }

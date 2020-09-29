@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Core\Events\BuyItemEvent;
 use App\Game\Core\Events\SellItemEvent;
 
@@ -73,10 +74,12 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'Item not found.');
         }
 
-        $name = $inventorySlot->item->name;
+        $item = $inventorySlot->item;
 
         event(new SellItemEvent($inventorySlot, $character));
+
+        $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
         
-        return redirect()->back()->with('success', 'Sold: ' . $name . '.');
+        return redirect()->back()->with('success', 'Sold: ' . $item->name . ' for: ' . $totalSoldFor . ' gold.');
     }
 }

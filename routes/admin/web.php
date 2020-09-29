@@ -29,5 +29,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/items/create', ['as' => 'items.create', 'uses' => 'ItemsController@create']);
     Route::get('/admin/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
     Route::get('/admin/items/{item}/edit', ['as' => 'items.edit', 'uses' => 'ItemsController@edit']);
-    Route::delete('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);
+    Route::post('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);
+
+    Route::get('/admin/affixes', ['as' => 'affixes.list', 'uses' => 'AffixesController@index']);
+    Route::get('/admin/affixes/create', ['as' => 'affixes.create', 'uses' => 'AffixesController@create']);
+    Route::get('/admin/affixes/{affix}', ['as' => 'affixes.affix', 'uses' => 'AffixesController@show']);
+    Route::get('/admin/affixes/{affix}/edit', ['as' => 'affixes.edit', 'uses' => 'AffixesController@edit']);
+    Route::post('/admin/affixes/{affix}/delete', ['as' => 'affixes.delete', 'uses' => 'AffixesController@delete']);
 });

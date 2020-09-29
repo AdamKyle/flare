@@ -28,6 +28,7 @@ class ItemAffix extends Model
         'chr_mod',
         'int_mod',
         'ac_mod',
+        'cost',
         'skill_name',
         'skill_training_bonus',
     ];
@@ -47,7 +48,13 @@ class ItemAffix extends Model
         'int_mod'              => 'float',
         'ac_mod'               => 'float',
         'skill_training_bonus' => 'float',
+        'cost'                 => 'integer',
     ];
+
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
 
     protected static function newFactory() {
         return ItemAffixFactory::new();

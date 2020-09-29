@@ -93,7 +93,7 @@
 
                                         <form id="delete-item-{{$item->id}}" action="{{route('items.delete', [
                                             'item' => $item->id
-                                        ])}}" method="DELETE" style="display: none;">
+                                        ])}}" method="POST" style="display: none;">
                                             @csrf
                                         </form>
                                     @else

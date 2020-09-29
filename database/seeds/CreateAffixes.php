@@ -29,6 +29,9 @@ class CreateAffixes extends Seeder
                 'ac_mod'               => '0.25',
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
+                'cost'                 => 500,
+                'created_at'           => now(),
+                'updated_at'           => null,
             ],
             [
                 'name'                 => 'Lords Blessing',
@@ -44,6 +47,9 @@ class CreateAffixes extends Seeder
                 'ac_mod'               => '0.25',
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
+                'cost'                 => 500,
+                'created_at'           => now(),
+                'updated_at'           => null,
             ],
             [
                 'name'                 => 'Demonic Sigil',
@@ -59,6 +65,9 @@ class CreateAffixes extends Seeder
                 'ac_mod'               => '0.00',
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
+                'cost'                 => 500,
+                'created_at'           => now(),
+                'updated_at'           => null,
             ],
             [
                 'name'                 => 'Vampric Blood',
@@ -72,8 +81,11 @@ class CreateAffixes extends Seeder
                 'chr_mod'              => '0.00',
                 'int_mod'              => '0.00',
                 'ac_mod'               => '0.15',
-                'skill_name'           => '0.00',
-                'skill_training_bonus' => '0.00',
+                'skill_name'           => null,
+                'skill_training_bonus' => null,
+                'cost'                 => 500,
+                'created_at'           => now(),
+                'updated_at'           => null,
             ],
             [
                 'name'                 => 'Hunters Trap',
@@ -89,6 +101,9 @@ class CreateAffixes extends Seeder
                 'ac_mod'               => '0.00',
                 'skill_name'           => null,
                 'skill_training_bonus' => null,
+                'cost'                 => 500,
+                'created_at'           => now(),
+                'updated_at'           => null,
             ],
         ]);
     }

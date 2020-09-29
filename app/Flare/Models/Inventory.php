@@ -38,6 +38,10 @@ class Inventory extends Model
         return $this->hasMany(QuestItemSlot::class);
     }
 
+    public function character() {
+        return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
     protected static function newFactory() {
         return InventoryFactory::new();
     }
