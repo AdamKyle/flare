@@ -10,6 +10,8 @@
             <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
         </div>
     </div>
-    
+    @livewire('admin.affixes.manage', [
+        'model' => $itemAffix
+    ])
 </div>
 @endsection

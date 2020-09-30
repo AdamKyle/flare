@@ -31,7 +31,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-default-position">Default Position: </label>
-                <select class="form-control" name="item-type" wire:model="item.default_position" {{in_array($item->type, $itemsWithOutDefaultPosition) ? 'disabled' : ''}}>
+                <select class="form-control" name="item-type" wire:model="item.default_position" {{(is_null($item->type) ? 'disabled' : in_array($item->type, $itemsWithOutDefaultPosition)) ? 'disabled' : ''}}>
                     <option value="">Please select</option>
                     @foreach($defaultPositions as $defaultPosition)
                         <option value={{$defaultPosition}}>{{$defaultPosition}}</option>

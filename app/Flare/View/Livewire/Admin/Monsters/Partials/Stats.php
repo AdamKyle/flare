@@ -32,6 +32,7 @@ class Stats extends Component
         'monster.health_range.required' => 'Health range must be set.',
         'monster.attack_range.required' => 'Attack range must be set.',
         'monster.drop_check.required'   => 'Drop Check must be set.',
+        'monster.damage_stat.required'  => 'Damage stat is missing',
     ];
 
     public $monster;

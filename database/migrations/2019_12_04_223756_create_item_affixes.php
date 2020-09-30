@@ -19,6 +19,7 @@ class CreateItemAffixes extends Migration
             $table->string('description')->nullable();
             $table->decimal('base_damage_mod')->nullable();
             $table->decimal('base_healing_mod')->nullable();
+            $table->decimal('base_ac_mod')->nullable();
             $table->decimal('str_mod')->nullable();
             $table->decimal('dur_mod')->nullable();
             $table->decimal('dex_mod')->nullable();
