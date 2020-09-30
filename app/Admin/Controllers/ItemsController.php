@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
@@ -43,13 +44,21 @@ class ItemsController extends Controller {
 
             $slot->delete();
 
-            $character->gold += $item->cost;
+            $gold = SellItemCalculator::fetchTotalSalePrice($item);
+
+            $character->gold += $gold;
             $character->save();
 
             $character = $character->refresh();
 
+            $forMessage = $name . ' has been removed from your inventory. You have been compensated in the amount of: ' . $gold;
+
             event(new ServerMessageEvent($character->user, 'deleted_item', $name));
             event(new UpdateTopBarEvent($character));
         }
+
+        $item->delete();
+
+        return redirect()->back()->with('success', $name . ' was deleted successfully.');
     }
 }

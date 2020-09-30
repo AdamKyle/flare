@@ -18,8 +18,41 @@ class RandomItemDropBuilder {
     }
 
     public function generateItem(Character $character): Item {
-        $item = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])->where('type', '!=', 'artifact')->where('type', '!=', 'quest')->get()->first();
+        $item          = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])->where('type', '!=', 'artifact')->where('type', '!=', 'quest')->get()->first();
+        $duplicateItem = $this->duplicateItem($item);
 
+        if ($this->shouldHaveItemAffix($character)) {
+            $affix = $this->fetchRandomItemAffix();
+            $this->attachAffix($duplicateItem, $affix);
+            // if (is_null($affix)) {
+            //     $duplicateItem->delete();
+
+            //     return $item;
+            // }
+            
+            // if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
+            //     $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
+                
+            //     if ($hasSameAffix) {
+            //         $duplicateItem->delete();
+
+            //         return $item;
+            //     } else {
+            //         $this->attachAffix($duplicateItem, $affix);
+            //     }
+            // } else {
+            //     $this->attachAffix($duplicateItem, $affix);
+            // }
+        } else {
+            $duplicateItem->delete();
+
+            return $item;
+        }
+
+        return $duplicateItem->refresh();
+    }
+
+    protected function duplicateItem(Item $item): Item {
         $duplicateItem = $item->replicate();
         $duplicateItem->save();
  
@@ -35,40 +68,7 @@ class RandomItemDropBuilder {
             ]);
         }
 
-        $duplicateItem->refresh()->load(['itemSuffix', 'itemPrefix']);
-
-        if ($this->shouldHaveItemAffix($character)) {
-            $affix = $this->fetchRandomItemAffix();
-
-            if (is_null($affix)) {
-                $duplicateItem->delete();
-
-                return $item;
-            }
-            
-            if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
-                $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
-                
-                if ($hasSameAffix) {
-                    $duplicateItem->delete();
-
-                    return $item;
-                } else {
-                    $duplicateItem = $this->attachAffix($duplicateItem, $affix);
-                }
-            } else {
-                $duplicateItem = $this->attachAffix($duplicateItem, $affix);
-            }
-        } else {
-            $duplicateItem->delete();
-
-            return $item;
-        }
-
-        $duplicateItem = $this->setItemName($duplicateItem);
-        $foundItems    = Item::where('name', '=', $duplicateItem->name)->get();
-
-        return $duplicateItem;
+        return $duplicateItem->refresh()->load(['itemSuffix', 'itemPrefix']);
     }
 
     protected function hasSameAffix(Item $duplicateItem, ItemAffix $affix): bool {
@@ -90,7 +90,8 @@ class RandomItemDropBuilder {
     protected function shouldHaveItemAffix(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return (rand(1, 100) + $lootingChance) > 50;
+        //return (rand(1, 100) + $lootingChance) > 50;
+        return true;
     }
 
     protected function fetchRandomItemAffix() {
@@ -101,25 +102,5 @@ class RandomItemDropBuilder {
         }
 
         return null;
-    }
-
-    private function setItemName(Item $item): Item {
-        $name      = array_map('trim', explode('*', $item->name));
-        $foundItem = Item::whereIn('name', $name)->first();
-
-        $name = $foundItem->name;
-
-        if (!is_null($item->itemSuffix)) {
-            $name = $name . ' *' . $item->itemSuffix->name . '*';
-        }
-
-        if (!is_null($item->itemPrefix)) {
-            $name = '*' . $item->itemPrefix->name . '* ' . $name;
-        }
-
-        $item->name = $name;
-        $item->save();
-
-        return $item->refresh();
     }
 }

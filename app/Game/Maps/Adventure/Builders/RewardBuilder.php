@@ -24,17 +24,21 @@ class RewardBuilder {
     }
 
     public function fetchDrops(Monster $monster, Character $character, Adventure $adventure) {
-        $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-
-        $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $adventure);
-
-        if ($hasDrop) {
-            return resolve(RandomItemDropBuilder::class)
+        return resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::all())
                         ->generateItem($character);
-        }
+                        
+        // $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return null;
+        // $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $adventure);
+        // dump($hasDrop);
+        // if ($hasDrop) {
+        //     return resolve(RandomItemDropBuilder::class)
+        //                 ->setItemAffixes(ItemAffix::all())
+        //                 ->generateItem($character);
+        // }
+
+        // return null;
     }
 
     public function fetchGoldRush(Monster $monster, Character $character, Adventure $adventure) {

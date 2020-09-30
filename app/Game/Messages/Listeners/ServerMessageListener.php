@@ -52,9 +52,9 @@ class ServerMessageListener
             case 'adventure':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'deleted_item':
-                $message = 'An item: '.$event->forMessage.' that may have been equipped was just deleted.';
-                
-                return broadcast(new ServerMessage($event->user, $message));
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'deleted_affix':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

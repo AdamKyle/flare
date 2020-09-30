@@ -86,6 +86,18 @@ class Item extends Model
         return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
     }
 
+    public function getNameAttribute($value) {
+        if (!is_null($this->item_suffix_id) && !is_null($this->item_prefix_id)) {
+            return '*' . $this->itemPrefix->name . '*' . ' ' . $value . ' ' .  '*' . $this->itemPrefix->name . '*';
+        } else if (!is_null($this->item_suffix_id)) {
+            return $value . ' ' .  '*' . $this->itemSuffix->name . '*';
+        } else if (!is_null($this->item_prefix_id)) {
+            return '*' . $this->itemPrefix->name . '*' . ' ' . $value;
+        }
+
+        return $value;
+    }
+
     public function scopeGetTotalDamage(): float {
         $baseDamage = is_null($this->base_damage) ? 1 : $this->base_damage;
         $damage     = $baseDamage;
