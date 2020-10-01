@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare\View\Livewire\Charcater\Adventures;
+namespace Tests\Unit\Flare\View\Livewire\Character\Adventures;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;

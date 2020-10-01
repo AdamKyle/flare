@@ -3,7 +3,7 @@
 namespace Tests\Setup;
 
 use App\Flare\Models\Adventure;
-use App\User;
+use App\Flare\Models\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;

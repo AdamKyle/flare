@@ -11,7 +11,7 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use App\User;
+use App\Flare\Models\User;
 
 class RegistrationTest extends TestCase
 {

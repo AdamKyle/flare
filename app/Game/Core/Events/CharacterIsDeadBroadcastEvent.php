@@ -8,7 +8,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\User;
+Use App\Flare\Models\User;
 
 class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
 {
@@ -20,7 +20,7 @@ class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
     /**
      * The user
      *
-     * @var \App\User $users
+     * @var \App\Flare\Models\User $users
      */
     public $user;
 

@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use App\Flare\Mail\GeneratedAdmin;
 use App\Flare\Models\Character;
 use App\Flare\Values\BaseSkillValue;
-use App\User;
+use App\Flare\Models\User;
 use DB;
 
 class UpdateCharacterSkills extends Command

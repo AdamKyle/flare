@@ -5,7 +5,7 @@ namespace App\Flare\Events;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Skill;
 use Illuminate\Queue\SerializesModels;
-use App\User;
+use App\Flare\Models\User;
 
 class UpdateSkillEvent
 {
@@ -21,7 +21,7 @@ class UpdateSkillEvent
     /**
      * Create a new event instance.
      *
-     * @param  \App\User $user
+     * @param  \App\Flare\Models\User $user
      * @return void
      */
     public function __construct(Skill $skill, Adventure $adventure = null)

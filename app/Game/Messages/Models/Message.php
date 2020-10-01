@@ -3,7 +3,7 @@
 namespace App\Game\Messages\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\User;
+use App\Flare\Models\User;
 
 class Message extends Model
 {

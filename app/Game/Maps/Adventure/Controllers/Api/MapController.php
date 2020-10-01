@@ -6,7 +6,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use Storage;
 use Illuminate\Http\Request;
-use App\User;
+use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;

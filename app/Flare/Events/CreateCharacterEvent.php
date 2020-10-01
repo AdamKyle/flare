@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
-use App\User;
+use App\Flare\Models\User;
 
 class CreateCharacterEvent
 {
@@ -16,7 +16,7 @@ class CreateCharacterEvent
     /**
      * The user.
      *
-     * @var \App\User
+     * @var \App\Flare\Models\User
      */
     public $user;
 
@@ -31,7 +31,7 @@ class CreateCharacterEvent
     /**
      * Create a new event instance.
      *
-     * @param  \App\User $user
+     * @param  \App\Flare\Models\User $user
      * @return void
      */
     public function __construct(User $user, GameMap $map, Request $request)

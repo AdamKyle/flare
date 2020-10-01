@@ -9,7 +9,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\User;
+Use App\Flare\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 class UpdateNotificationsBroadcastEvent implements ShouldBroadcastNow
@@ -21,7 +21,7 @@ class UpdateNotificationsBroadcastEvent implements ShouldBroadcastNow
     /**
      * The user
      *
-     * @var \App\User $users
+     * @var \App\Flare\Models\User $users
      */
     public $user;
 

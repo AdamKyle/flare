@@ -1,5 +1,11 @@
 <ul id="sidebarnav">
     <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="fas fa-users"></i><span class="hide-menu">Manage Users</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="#">Users</a></li>
+        </ul>
+    </li>
+    <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-scroll-unfurled"></i><span class="hide-menu">Manage Maps</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('maps')}}">Maps</a></li>

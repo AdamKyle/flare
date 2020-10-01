@@ -17,7 +17,7 @@ use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
-use App\User;
+use App\Flare\Models\User;
 
 class BattleController extends Controller {
 

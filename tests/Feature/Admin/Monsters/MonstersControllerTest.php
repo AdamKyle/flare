@@ -10,7 +10,7 @@ use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
 use Tests\Setup\CharacterSetup;
 
-class MonstersControllertest extends TestCase
+class MonstersControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateUser,

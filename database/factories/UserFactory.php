@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use App\User;
+use App\Flare\Models\User;
 
 class UserFactory extends Factory
 {

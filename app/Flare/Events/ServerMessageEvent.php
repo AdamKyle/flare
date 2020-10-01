@@ -6,7 +6,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
-use App\User;
+use App\Flare\Models\User;
 
 class ServerMessageEvent
 {
@@ -22,7 +22,7 @@ class ServerMessageEvent
     /**
      * User
      *
-     * @var \App\User $user
+     * @var \App\Flare\Models\User $user
      */
     public $user;
 
@@ -36,7 +36,7 @@ class ServerMessageEvent
     /**
      * Create a new event instance.
      *
-     * @param  \App\User $user
+     * @param  \App\Flare\Models\User $user
      * @return void
      */
     public function __construct(User $user, string $type, $forMessage = null)

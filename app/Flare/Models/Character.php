@@ -9,7 +9,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\Skill;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\EquippedItem;
-use App\User;
+use App\Flare\Models\User;
 use Database\Factories\CharacterFactory;
 
 class Character extends Model

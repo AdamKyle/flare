@@ -10,7 +10,7 @@ use App\Game\Messages\Events\PrivateMessageEvent;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
-use App\User;
+use App\Flare\Models\User;
 use Carbon\Carbon;
 
 class MessageController extends Controller {

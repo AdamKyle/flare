@@ -10,7 +10,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-use App\User;
+use App\Flare\Models\User;
 use App\Game\Messages\Models\Message;
 
 class MessageSentEvent implements ShouldBroadcastNow
@@ -20,7 +20,7 @@ class MessageSentEvent implements ShouldBroadcastNow
     /**
      * User that sent the message
      *
-     * @var \App\User $user
+     * @var \App\Flare\Models\User $user
      */
     public $user;
 

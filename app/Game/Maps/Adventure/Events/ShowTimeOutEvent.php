@@ -9,7 +9,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use App\User;
+use App\Flare\Models\User;
 
 class ShowTimeOutEvent implements ShouldBroadcastNow
 {
@@ -18,7 +18,7 @@ class ShowTimeOutEvent implements ShouldBroadcastNow
     /**
      * User that sent the message
      *
-     * @var \App\User
+     * @var \App\Flare\Models\User
      */
     public $user;
 

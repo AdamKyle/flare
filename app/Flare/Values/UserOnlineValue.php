@@ -3,7 +3,7 @@
 namespace App\Flare\Values;
 
 use App\Flare\Models\Session;
-use App\User;
+use App\Flare\Models\User;
 
 class UserOnlineValue {
 

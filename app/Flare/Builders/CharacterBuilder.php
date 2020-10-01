@@ -2,7 +2,7 @@
 
 namespace App\Flare\Builders;
 
-use App\User;
+use App\Flare\Models\User;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;

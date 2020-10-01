@@ -10,7 +10,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Database\Eloquent\Collection;
-Use App\User;
+Use App\Flare\Models\User;
 
 class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
 {
@@ -26,7 +26,7 @@ class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
     /**
      * The user
      *
-     * @var \App\User $users
+     * @var \App\Flare\Models\User $users
      */
     public $user;
 

@@ -7,7 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Http\Request;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
-use App\User;
+use App\Flare\Models\User;
 
 class DropsCheckEvent
 {
@@ -32,7 +32,7 @@ class DropsCheckEvent
     /**
      * Create a new event instance.
      *
-     * @param  \App\User $user
+     * @param  \App\Flare\Models\User $user
      * @return void
      */
     public function __construct(Character $character, Monster $monster, Adventure $adventure = null)

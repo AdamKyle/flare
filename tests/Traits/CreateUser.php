@@ -3,7 +3,7 @@
 namespace Tests\Traits;
 
 use Spatie\Permission\Models\Role;
-use App\User;
+use App\Flare\Models\User;
 
 trait CreateUser {
 
