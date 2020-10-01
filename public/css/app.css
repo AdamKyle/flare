@@ -21419,6 +21419,11 @@ a.link:focus {
   font-weight: bold;
 }
 
+.chat-box ul .god-message {
+  color: #f8e488;
+  font-weight: bold;
+}
+
 .health-meters {
   max-width: 300px;
   margin: 0 auto;

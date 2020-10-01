@@ -2,6 +2,7 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqBy from 'lodash/uniqBy';
 import {getServerMessage} from '../helpers/server_message'
+import { isEmpty } from 'lodash';
 
 export default class Chat extends React.Component {
 
@@ -17,16 +18,16 @@ export default class Chat extends React.Component {
     this.echo            = Echo.join('chat');
     this.serverMessages  = Echo.private('server-message-' + this.props.userId);
     this.privateMessages = Echo.private('private-message-' + this.props.userId);
-
-    // this.globalMessages = Echo.join('global-messages');
-    // this.dropMessage = Echo.private('drop-message-' + this.props.userId);
   }
 
   componentDidMount() {
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
-      const message    = event.message;
-      message['user']  = event.user;
-      message['name']  = event.name;
+      const message       = event.message;
+      message['user']     = event.user;
+      message['name']     = event.name;
+      message['from_god'] = this.isGod(event.user);
+
+      console.log(this.isGod(event.user));
 
       const messages = cloneDeep(this.state.messages);
 
@@ -40,11 +41,12 @@ export default class Chat extends React.Component {
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
       const messages = cloneDeep(this.state.messages);
       const message  = {
-        message: event.message,
-        type:    'server-message',
-        user:    event.user,
-        user_id: event.user.id,
-        id:      Math.random().toString(36).substring(7),
+        message:  event.message,
+        type:     'server-message',
+        user:     event.user,
+        user_id:  event.user.id,
+        id:       Math.random().toString(36).substring(7),
+        from_god: this.isGod(event.user),
       };
 
       messages.unshift(message);
@@ -72,6 +74,14 @@ export default class Chat extends React.Component {
       });
     });
   }
+
+  isGod(user) {
+    if (isEmpty(user.roles)) {
+       return false;
+    }
+
+    return user.roles.filter(r => r.name === 'Admin').length > 0
+  } 
 
   componentWillUnMount() {
     Echo.leave('chat');
@@ -113,19 +123,11 @@ export default class Chat extends React.Component {
               <div className="drop-message">{message.message}</div>
             </li>
           )
-        } else if (message.type === 'global-message') {
-          elements.push(
-            <li key={message.id + '_global-message'}>
-              <div className="global-message">
-                <h3 className="global-message">{message.message}</h3>
-              </div>
-            </li>
-          )
         } else if (message.from_god) {
           elements.push(
             <li key={message.id + '_god-message'}>
               <div className="god-message">
-                <strong>GOD</strong> {message.message}
+                <div className="god-message"><strong>The Creator</strong>: {message.message}</div> 
               </div>
             </li>
           )
@@ -145,12 +147,14 @@ export default class Chat extends React.Component {
   }
 
   postMessage() {
+    const message = this.state.message.replace(/(<([^>]+)>)/ig,"");
+
+    this.setState({
+      message: ''
+    });
+
     axios.post('api/public-message', {
-      message: this.state.message.replace(/(<([^>]+)>)/ig,"")
-    }).then((result) => {
-      this.setState({
-        message: ''
-      });
+      message: message
     }).catch((error) => {
       console.log(error);
     });

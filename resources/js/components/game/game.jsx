@@ -120,6 +120,7 @@ class Game extends React.Component {
 
 // Mount the app:
 const game      = document.getElementById('game');
+const adminChat = document.getElementById('admin-chat');
 const player    = document.head.querySelector('meta[name="player"]');
 const character = document.head.querySelector('meta[name="character"]');
 
@@ -127,6 +128,13 @@ if (game !== null) {
   ReactDOM.render(
       <Game userId={parseInt(player.content)} characterId={character.content}/>,
       game
+  );
+}
+
+if (adminChat !== null) {
+    ReactDOM.render(
+      <Chat userId={parseInt(player.content)} />,
+      adminChat
   );
 }
 

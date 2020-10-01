@@ -52,10 +52,14 @@ class CreateAdminAccount extends Command
             return $this->error('User with that email, already exists.');
         }
 
+        $token = Str::random(80);
+
         // Create the user:
         $user = User::create([
-            'email' => $this->argument('email'),
-            'password' => Hash::make(Str::random(10)),
+            'email'            => $this->argument('email'),
+            'password'         => Hash::make(Str::random(10)),
+            'game_key'         => hash('sha256', $token),
+            'private_game_key' => $token,
         ]);
 
         // Make them an admin

@@ -23,26 +23,26 @@ class RandomItemDropBuilder {
 
         if ($this->shouldHaveItemAffix($character)) {
             $affix = $this->fetchRandomItemAffix();
-            $this->attachAffix($duplicateItem, $affix);
-            // if (is_null($affix)) {
-            //     $duplicateItem->delete();
 
-            //     return $item;
-            // }
+            if (is_null($affix)) {
+                $duplicateItem->delete();
+
+                return $item;
+            }
             
-            // if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
-            //     $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
+            if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
+                $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
                 
-            //     if ($hasSameAffix) {
-            //         $duplicateItem->delete();
+                if ($hasSameAffix) {
+                    $duplicateItem->delete();
 
-            //         return $item;
-            //     } else {
-            //         $this->attachAffix($duplicateItem, $affix);
-            //     }
-            // } else {
-            //     $this->attachAffix($duplicateItem, $affix);
-            // }
+                    return $item;
+                } else {
+                    $this->attachAffix($duplicateItem, $affix);
+                }
+            } else {
+                $this->attachAffix($duplicateItem, $affix);
+            }
         } else {
             $duplicateItem->delete();
 
@@ -90,8 +90,7 @@ class RandomItemDropBuilder {
     protected function shouldHaveItemAffix(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        //return (rand(1, 100) + $lootingChance) > 50;
-        return true;
+        return (rand(1, 100) + $lootingChance) > 50;
     }
 
     protected function fetchRandomItemAffix() {
