@@ -52,7 +52,7 @@ class DropsCheckListener
                 'inventory_id' => $event->character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($event->character->user, 'gained_item', $item->name));
+            event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name));
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));
         }

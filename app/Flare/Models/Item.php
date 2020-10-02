@@ -74,6 +74,10 @@ class Item extends Model
         'skill_level_trivial'  => 'integer',
     ];
 
+    protected $appends = [
+        'affix_name',
+    ];
+
     public function itemSuffix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }
@@ -86,16 +90,16 @@ class Item extends Model
         return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
     }
 
-    public function getNameAttribute($value) {
+    public function getAffixNameAttribute() {
         if (!is_null($this->item_suffix_id) && !is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $value . ' ' .  '*' . $this->itemPrefix->name . '*';
+            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name . ' ' .  '*' . $this->itemPrefix->name . '*';
         } else if (!is_null($this->item_suffix_id)) {
-            return $value . ' ' .  '*' . $this->itemSuffix->name . '*';
+            return $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
         } else if (!is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $value;
+            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name;
         }
 
-        return $value;
+        return $this->name;
     }
 
     public function scopeGetTotalDamage(): float {

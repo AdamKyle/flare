@@ -22,11 +22,11 @@ class ItemAffixFactory extends Factory
     public function definition()
     {
         return [
-            'name'                 => null,
-            'base_damage_mod'      => null,
-            'type'                 => null,
-            'description'          => null,
-            'base_healing_mod'     => null,
+            'name'                 => 'Sample',
+            'base_damage_mod'      => 0.1,
+            'type'                 => 'suffix',
+            'description'          => 'Test',
+            'base_healing_mod'     => 0.1,
             'str_mod'              => null,
             'dur_mod'              => null,
             'dex_mod'              => null,

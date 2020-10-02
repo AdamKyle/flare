@@ -104,7 +104,7 @@ class CharacterSkillController extends Controller {
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'crafted', $item->name));
+            event(new ServerMessageEvent($character->user, 'crafted', $item->affix_name));
         } else {
             event(new ServerMessageEvent($character->user, 'inventory_full'));
         }

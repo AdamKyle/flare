@@ -83,7 +83,7 @@ class CharacterInventoryController extends Controller {
                                    ->setCharacter(auth()->user()->character)
                                    ->equipItem();
 
-            return redirect()->to(route('game.character.sheet'))->with('success', $item->name . ' Equipped.');
+            return redirect()->to(route('game.character.sheet'))->with('success', $item->affix_name . ' Equipped.');
 
         } catch(EquipItemException $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -139,7 +139,7 @@ class CharacterInventoryController extends Controller {
             return redirect()->back()->with('error', 'Cannot destory equipped item.');
         }
 
-        $name = $slot ->item->name;
+        $name = $slot ->item->affix_name;
 
         $slot->delete();
 

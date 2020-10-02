@@ -60,7 +60,7 @@ class ShopController extends Controller {
 
         event(new BuyItemEvent($item, $character));
         
-        return redirect()->back()->with('success', 'Purchased: ' . $item->name . '.');
+        return redirect()->back()->with('success', 'Purchased: ' . $item->affix_name . '.');
     }
 
     public function sell(Request $request) {
@@ -80,6 +80,6 @@ class ShopController extends Controller {
 
         $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
         
-        return redirect()->back()->with('success', 'Sold: ' . $item->name . ' for: ' . $totalSoldFor . ' gold.');
+        return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 }

@@ -13,7 +13,7 @@
                 <select wire:model="monster.quest_item_id" class="form-control">
                     <option>Please select</option>
                     @foreach ($this->questItemList as $item)
-                        <option value={{$item->id}}>{{$item->name}}</option>
+                        <option value={{$item->id}}>{{$item->affix_name}}</option>
                     @endforeach
                 </select>
             </div>

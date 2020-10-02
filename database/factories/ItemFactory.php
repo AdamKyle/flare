@@ -22,11 +22,11 @@ class ItemFactory extends Factory
     public function definition()
     {
         return [
-            'name'          => null,
-            'type'          => null,
-            'base_damage'   => null,
-            'cost'          => null,
-            'crafting_type' => null,
+            'name'          => 'test',
+            'type'          => 'weapon',
+            'base_damage'   => 10,
+            'cost'          => 100,
+            'crafting_type' => 'weapon',
         ];
     }
 }

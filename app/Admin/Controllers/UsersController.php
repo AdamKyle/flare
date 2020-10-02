@@ -46,6 +46,7 @@ class UsersController extends Controller {
         ]);
 
         $user = $user->refresh();
+
         $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' ('.(int) $request->silence_for.' Minutes server time) Making accounts to get around this is a bannable offense.';
         event(new ServerMessageEvent($user, 'silenced', $message));
 

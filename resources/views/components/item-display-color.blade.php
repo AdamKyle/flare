@@ -1,1 +1,1 @@
-<span class="{{$color}}">{{$item->name}}</span>
+<span class="{{$color}}">{{$item->affix_name}}</span>

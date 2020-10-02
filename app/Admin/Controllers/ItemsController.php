@@ -30,8 +30,8 @@ class ItemsController extends Controller {
     }
 
     public function delete(Item $item) {
-        $slots = InventorySlot::where('item_id', $item->id)->all();
-        $name  = $item->name;
+        $slots = InventorySlot::where('item_id', $item->id)->get();
+        $name  = $item->affix_name;
 
         if ($slots->isEmpty()) {
             $item->delete();

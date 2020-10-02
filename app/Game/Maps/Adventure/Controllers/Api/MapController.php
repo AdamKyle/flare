@@ -90,7 +90,7 @@ class MapController extends Controller {
                         'item_id'      => $location->questRewardItem->id,
                     ]);
     
-                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
+                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
                 }
             }
 
@@ -152,7 +152,7 @@ class MapController extends Controller {
                     'item_id'      => $location->questRewardItem->id,
                 ]);
 
-                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewardItem->name));
+                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
             }
         }
         
