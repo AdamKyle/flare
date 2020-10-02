@@ -28,7 +28,8 @@ class MessageThrottledHandler {
     }
 
     public function silence(): MessageThrottledHandler {
-        if ($this->user->message_throttle_count > 3) {
+
+        if ($this->user->message_throttle_count >= 3) {
             $canSpeakAgainAt = now()->addMinutes(5);
 
             $this->user->update([
