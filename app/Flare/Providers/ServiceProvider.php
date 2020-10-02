@@ -10,6 +10,7 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Console\Commands\UpdateCharacterSkills;
+use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\CheckApiTokenMiddleware;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Services\CharacterRewardService;
@@ -68,6 +69,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemValidator::class, function($app) {
             return new ItemValidator;
+        });
+
+        $this->app->bind(MessageThrottledHandler::class, function($app) {
+            return new MessageThrottledHandler;
         });
 
         $this->commands([CreateAdminAccount::class, UpdateCharacterSkills::class]);

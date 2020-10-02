@@ -44,6 +44,10 @@ class ServerMessageBuilder {
                 return 'This is far too easy to craft! You will get no experience for this item.';
             case 'something_went_wrong':
                 return 'A component was unable to render. Please try refreshing the page.';
+            case 'chatting_to_much':
+                return 'You can only chat so much in a two minute window. Slow down!';
+            case 'message_length_max':
+                return 'Your message is far too long.';
             default:
                 return '';
         }

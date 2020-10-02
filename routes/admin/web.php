@@ -39,4 +39,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/users', ['as' => 'users.list', 'uses' => 'UsersController@index']);
     Route::get('/admin/user/{user}', ['as' => 'users.user', 'uses' => 'UsersController@show']);
+    Route::post('/admin/user/{user}/reset-password', ['as' => 'user.reset.password', 'uses' => 'UsersController@resetPassword']);
+    Route::post('/admin/user/{user}/silence-user', ['as' => 'user.silence', 'uses' => 'UsersController@silenceUser']);
 });

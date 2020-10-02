@@ -21424,6 +21424,11 @@ a.link:focus {
   font-weight: bold;
 }
 
+.chat-box ul .error-message {
+  color: #fb3b3b;
+  font-size: 22px;
+}
+
 .health-meters {
   max-width: 300px;
   margin: 0 auto;

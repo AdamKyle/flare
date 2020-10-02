@@ -55,6 +55,8 @@ class ServerMessageListener
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'deleted_affix':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'silenced':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

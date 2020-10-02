@@ -1,8 +1,8 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import uniqBy from 'lodash/uniqBy';
 import {getServerMessage} from '../helpers/server_message'
 import { isEmpty } from 'lodash';
+import { DateTime } from "luxon";
 
 export default class Chat extends React.Component {
 
@@ -13,6 +13,7 @@ export default class Chat extends React.Component {
       messages: [],
       serverMessages: [],
       message: '',
+      user: {},
     }
 
     this.echo            = Echo.join('chat');
@@ -21,6 +22,13 @@ export default class Chat extends React.Component {
   }
 
   componentDidMount() {
+
+    axios.get('/api/user-chat-info/' + this.props.userId).then((result) => {
+      this.setState({
+        user: result.data.user,
+      });
+    })
+
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
       const message       = event.message;
       message['user']     = event.user;
@@ -46,13 +54,18 @@ export default class Chat extends React.Component {
         user:     event.user,
         user_id:  event.user.id,
         id:       Math.random().toString(36).substring(7),
-        from_god: this.isGod(event.user),
       };
 
       messages.unshift(message);
 
+      const user = cloneDeep(this.state.user);
+
+      user.is_silenced       = event.user.is_silenced;
+      user.can_talk_again_at = event.user.can_speak_again_at;
+
       this.setState({
-        messages: messages
+        messages: messages,
+        user: user,
       });
     });
 
@@ -82,6 +95,23 @@ export default class Chat extends React.Component {
 
     return user.roles.filter(r => r.name === 'Admin').length > 0
   } 
+
+  buildErrorMessage(customMessage) {
+      const messages = cloneDeep(this.state.messages);
+      
+      const message  = {
+        message:  customMessage,
+        type:     'error-message',
+        user_id:  this.props.userId,
+        id:       Math.random().toString(36).substring(7),
+      };
+
+      messages.unshift(message);
+
+      this.setState({
+        messages: messages,
+      });
+  }
 
   componentWillUnMount() {
     Echo.leave('chat');
@@ -123,6 +153,12 @@ export default class Chat extends React.Component {
               <div className="drop-message">{message.message}</div>
             </li>
           )
+        } else if (message.user_id === this.props.userId && message.type === 'error-message') {
+          elements.push(
+            <li key={message.id + 'error-message'}>
+              <div className="error-message">{message.message}</div>
+            </li>
+          )
         } else if (message.from_god) {
           elements.push(
             <li key={message.id + '_god-message'}>
@@ -147,6 +183,16 @@ export default class Chat extends React.Component {
   }
 
   postMessage() {
+    if (this.state.user.is_silenced) {
+      this.setState({
+        message: ''
+      });
+
+      const dt = DateTime.fromISO(this.state.user.can_talk_again_at).toLocaleString(DateTime.TIME_WITH_SHORT_OFFSET);
+
+      return this.buildErrorMessage('You cannot talk again until: ' + dt);
+    }
+
     const message = this.state.message.replace(/(<([^>]+)>)/ig,"");
 
     this.setState({
@@ -156,11 +202,25 @@ export default class Chat extends React.Component {
     axios.post('api/public-message', {
       message: message
     }).catch((error) => {
-      console.log(error);
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 429) {
+          getServerMessage('chatting_to_much');
+        }
+      }
     });
   }
 
   postPrivateMessage() {
+    if (this.state.user.is_silenced) {
+      this.setState({
+        message: ''
+      });
+
+      return this.buildErrorMessage('You cannot talk again until: ' + this.state.user.can_talk_again_at);
+    }
+
     const messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/)
 
     if (messageData == null) {

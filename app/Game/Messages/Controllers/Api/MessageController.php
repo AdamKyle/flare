@@ -23,6 +23,15 @@ class MessageController extends Controller {
         $this->serverMessage = $serverMessage;
     }
 
+    public function fetchUserInfo(Request $request, User $user) {
+        return response()->json([
+            'user' => [
+                'is_silenced'       => $user->is_silenced,
+                'can_talk_again_at' => $user->can_speak_again_at,
+            ]
+        ], 200);
+    }
+
     public function postPublicMessage(Request $request) {
         $message = auth()->user()->messages()->create([
             'message' => $request->message,

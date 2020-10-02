@@ -6,7 +6,7 @@ use Livewire\Component;
 
 class DataTable extends Component
 {
-    public $search;
+    public $search = '';
 
     public $sortField = 'id';
 

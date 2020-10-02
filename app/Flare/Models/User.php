@@ -19,8 +19,13 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 'password',
-        'game_key', 'private_game_key'
+        'email', 
+        'password',
+        'game_key', 
+        'private_game_key',
+        'message_throttle_count',
+        'can_speak_again_at',
+        'is_silenced',
     ];
 
     /**
@@ -38,7 +43,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at'      => 'datetime',
+        'can_speak_again_at'     => 'datetime',
+        'is_silenced'            => 'boolean',
+        'message_throttle_count' => 'integer',
     ];
 
     public function character() {
@@ -47,5 +55,10 @@ class User extends Authenticatable
 
     public function messages() {
         return $this->hasMany(Message::class);
+    }
+
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('id', 'like', '%'.$query.'%');
     }
 }

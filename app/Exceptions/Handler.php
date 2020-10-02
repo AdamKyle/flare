@@ -2,8 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Flare\Handlers\MessageThrottledHandler;
 use Throwable;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,6 +48,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof ThrottleRequestsException) {
+            $handler = resolve(MessageThrottledHandler::class);
+
+            $handler->forUser(auth()->user())->increaseThrottleCount()->silence();
+        }
+
         return parent::render($request, $exception);
     }
 }

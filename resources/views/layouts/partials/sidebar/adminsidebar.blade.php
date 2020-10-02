@@ -2,7 +2,7 @@
     <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="fas fa-users"></i><span class="hide-menu">Manage Users</span></a>
         <ul aria-expanded="false" class="collapse">
-            <li><a href="#">Users</a></li>
+            <li><a href="{{route('users.list')}}">Users</a></li>
         </ul>
     </li>
     <li>
