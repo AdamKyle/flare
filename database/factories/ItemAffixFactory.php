@@ -35,6 +35,7 @@ class ItemAffixFactory extends Factory
             'ac_mod'               => null,
             'skill_name'           => null,
             'skill_training_bonus' => null,
+            'cost'                 => 500,
         ];
     }
 }

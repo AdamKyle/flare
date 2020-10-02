@@ -276,12 +276,14 @@ class CharacterInventoryControllerTest extends TestCase
                 'base_healing_mod' => 0.10,
                 'str_mod' => 0.10,
                 'type' => 'suffix',
+                'cost' => 500,
             ])->id,
             'item_prefix_id'   => ItemAffix::create([
                 'name' => 'Sample',
                 'base_healing_mod' => 0.10,
                 'dex_mod' => 0.10,
                 'type' => 'prefix',
+                'cost' => 500,
             ])->id,
         ]);
 

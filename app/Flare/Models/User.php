@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Traits\HasRoles;
 use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
+use Database\Factories\UserFactory;
 
 class User extends Authenticatable
 {
@@ -60,5 +61,9 @@ class User extends Authenticatable
     public static function dataTableSearch($query) {
         return empty($query) ? static::query()
             : static::where('id', 'like', '%'.$query.'%');
+    }
+
+    protected static function newFactory() {
+        return UserFactory::new();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -133,7 +134,9 @@ class ShopControllerTest extends TestCase
             'slot_id' => $slot->id,
         ])->response;
 
-        $response->assertSessionHas('success', 'Sold: Rusty Dagger.');
+        $sellFor = SellItemCalculator::fetchTotalSalePrice($this->item);
+
+        $response->assertSessionHas('success', 'Sold: Rusty Dagger for: '.$sellFor.' gold.');
 
         $this->character->refresh();
 
@@ -161,7 +164,9 @@ class ShopControllerTest extends TestCase
             'slot_id' => $slot->id,
         ])->response;
 
-        $response->assertSessionHas('success', 'Sold: Rusty Dagger.');
+        $sellFor = SellItemCalculator::fetchTotalSalePrice($this->item);
+
+        $response->assertSessionHas('success', 'Sold: Rusty Dagger *'.$this->itemAffix->name.'* for: '.$sellFor.' gold.');
 
         $this->character->refresh();
 

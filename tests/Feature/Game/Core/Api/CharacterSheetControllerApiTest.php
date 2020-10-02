@@ -117,6 +117,7 @@ class CharacterSheetControllerApiTest extends TestCase {
                 'description'          => 'Sample',
                 'base_healing_mod'     => '0.10',
                 'str_mod'              => '0.10',
+                'cost'                 => 100,
             ])->id,
         ]);
 

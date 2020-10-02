@@ -211,7 +211,7 @@ class BattleControllerApiTest extends TestCase
         ]);
 
         $this->setUpCharacter([
-            'xp' => 90,
+            'xp' => 99,
             'level' => 1,
         ]);
 
@@ -355,38 +355,6 @@ class BattleControllerApiTest extends TestCase
         $this->character->refresh();
 
         $this->assertFalse($this->character->can_attack);
-    }
-
-    public function testCharacterGetsFullXPWhenMonsterMaxLevelIsZero() {
-        Queue::Fake();
-
-        Event::fake([
-            ServerMessageEvent::class,
-            DropsCheckEvent::class,
-            GoldRushCheckEvent::class,
-            ShowTimeOutEvent::class,
-            UpdateTopBarBroadcastEvent::class,
-        ]);
-
-        $this->setUpCharacter();
-
-        $this->monster->max_level = 0;
-        $this->monster->save();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
-                             'is_defender_dead' => true,
-                             'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
-                         ])
-                         ->response;
-
-        $this->assertEquals(200, $response->status());
-
-        $this->character->refresh();
-
-        $this->assertEquals(10, $this->character->xp);
-
     }
 
     public function testCharacterGetsFullXPWhenMonsterMaxLevelIsHigherThenCharacterLevel() {

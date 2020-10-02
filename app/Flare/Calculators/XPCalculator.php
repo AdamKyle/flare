@@ -8,7 +8,7 @@ class XPCalculator {
 
     public function fetchXPFromMonster(Monster $monster, int $characterLevel, float $xpReduction = 0.0) {
         $xp = 0;
-        
+
         if ($characterLevel < $monster->max_level) {
             // So the monster has a max exp level and the character is below it, so they get full xp.
             $xp = ($xpReduction !==  0.0 ? ($monster->xp - ($monster->xp * $xpReduction)) : $monster->xp);

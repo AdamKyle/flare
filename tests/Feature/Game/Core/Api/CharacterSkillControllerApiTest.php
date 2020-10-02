@@ -237,7 +237,8 @@ class CharacterSkillControllerApiTest extends TestCase {
             'name' => 'Sample-suffix',
             'skill_training_bonus' => 1.5,
             'skill_name' => 'Weapon Crafting',
-            'type' => 'suffix'
+            'type' => 'suffix',
+            'cost' => 100,
         ]);
 
         $prefix = ItemAffix::create([
@@ -245,6 +246,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'skill_training_bonus' => 1.5,
             'skill_name' => 'Weapon Crafting',
             'type' => 'prefix',
+            'cost' => 100,
         ]);
 
         $item = $this->createItem([
