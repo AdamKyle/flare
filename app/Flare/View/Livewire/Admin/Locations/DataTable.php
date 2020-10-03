@@ -23,7 +23,6 @@ class DataTable extends CoreDataTable
                 $join = $join->on('locations.game_map_id', '=' ,'game_maps.id');
 
                 if ($this->search !== '') {
-                    dump($this->search);
                     $join->where('game_maps.name', 'like', '%'.$this->search.'%');
                 }
 
