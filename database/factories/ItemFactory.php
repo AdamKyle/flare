@@ -27,6 +27,7 @@ class ItemFactory extends Factory
             'base_damage'   => 10,
             'cost'          => 100,
             'crafting_type' => 'weapon',
+            'description'   => 'sample'
         ];
     }
 }

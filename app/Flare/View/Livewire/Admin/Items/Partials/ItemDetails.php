@@ -65,7 +65,7 @@ class ItemDetails extends Component
         'item.base_healing'          => 'nullable',
         'item.can_craft'             => 'nullable',
         'item.crafting_type'         => 'nullable',
-        'item.cost'                  => 'nullable',
+        'item.cost'                  => 'required',
         'item.skill_level_required'  => 'nullable',
         'item.skill_level_trivial'   => 'nullable',
         'item.skill_name'            => 'nullable',
