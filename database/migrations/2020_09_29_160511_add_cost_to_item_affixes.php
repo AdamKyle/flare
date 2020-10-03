@@ -14,7 +14,7 @@ class AddCostToItemAffixes extends Migration
     public function up()
     {
         Schema::table('item_affixes', function (Blueprint $table) {
-            $table->integer('cost');
+            $table->integer('cost')->default(0);
         });
     }
 
