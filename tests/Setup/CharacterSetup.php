@@ -38,7 +38,7 @@ class CharacterSetup {
         ]);
 
         $this->character = $this->createCharacter([
-            'name'          => 'Sample',
+            'name'          => isset($options['name']) ? $options['name'] : 'Sample',
             'user_id'       => $user->id,
             'level'         => isset($options['level']) ? $options['level'] : 1,
             'xp'            => isset($options['xp']) ? $options['xp'] : 0,

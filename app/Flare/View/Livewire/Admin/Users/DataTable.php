@@ -54,7 +54,6 @@ class DataTable extends CoreDataTable
                             ->where('characters.name', 'like', '%'.$this->search.'%');
                      
             })
-            ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
             ->select('users.*')
             ->get();
 
@@ -72,8 +71,6 @@ class DataTable extends CoreDataTable
                     return collect($users)->paginate($this->perPage);
                 }
             }
-            
-            return $this->transformUsers($users)->paginate($this->perPage);
         }
 
         $users = $this->transformUsers($users);
