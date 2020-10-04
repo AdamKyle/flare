@@ -1,5 +1,5 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('//fonts.googleapis.com/css?family=Roboto:400,300,700,500,100');
 
 // Variables
 @import 'variables';
@@ -43,7 +43,6 @@
 @import 'game/components/bootstrap/button';
 
 body {
-  font-weight: lighter;
   font-family: "Roboto", sans-serif;
 }
 

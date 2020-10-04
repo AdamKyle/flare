@@ -60,3 +60,14 @@
 blockquote {
   background-color: #d5e6f3;
 }
+
+.menu-toggle {
+  font-size: 18px;
+  color: #b9b9b9;
+  cursor: pointer;
+  margin-left: 20px;
+
+  @media screen and (min-width: 768px) {
+    display: none;
+  }
+}

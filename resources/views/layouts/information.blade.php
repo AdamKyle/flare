@@ -27,6 +27,8 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
 
+    @livewireStyles
+
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
@@ -41,24 +43,57 @@
             </div>
             <div class="list-group list-group-flush text-right">
               <a href="#" class="{{$pageTitle === 'character-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Character Information</a>
+              <a href="#" class="{{$pageTitle === 'skill-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Skill Information</a>
             </div>
           </div>
         </div>
 
         <div id="page-content-wrapper">
+          <header class="topbar">
+            <nav class="navbar top-navbar navbar-expand-md navbar-light">
+                <!-- ============================================================== -->
+                <!-- Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-header">
+                  <i class="fas fa-bars menu-toggle" id="menu-toggle"></i>
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Logo -->
+                <!-- ============================================================== -->
+                <div class="navbar-collapse">
+                    <ul class="navbar-nav my-lg-0 text-align-right force-right">
+                        <!-- Authentication Links -->
+                        @guest
+                            <li class="nav-item">
+                                <a class="nav-link" href="/">{{ __('Home') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            </li>
+                            @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                </li>
+                            @endif
+                        @endguest
+                    </ul>
+                </div>
+            </nav>
+        </header>
+          {{-- <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+            <i class="fas fa-bars" id="menu-toggle"></i>
+          </nav> --}}
     
-          <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-          </nav>
-    
-          <div class="container">
+          <div class="container" style="margin-bottom: 100px;">
             @yield('content')
           </div>
         </div>
+
+        <footer class="footer"> © 2020 Flare </footer>
     
     </div>
+
+    @livewireScripts
 
     <script>
       $("#menu-toggle").click(function(e) {

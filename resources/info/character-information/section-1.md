@@ -1,13 +1,19 @@
 # Creating a character
 
-When you are registering for the first time, you also create your character.
+-----------------------
 
-Keeping your character creation simple, is priority number one, this is why you only name your character, select a race and class.
+Welcome to the Planes of Tlessa player. You are about to emabrk on an epic quest where you'll explore the various planes of existance. You will fight fearsome monsters, adventure deep caves, dungeons and other locations of interest to find rare treasures and gold.
+
+Before you can bgin this quest how ever, you will need to create a character. **That could not be easier**. Head on over to the [register page](/register) and fill out the login details, then you are presented with character creation.
+
+Choose your name, then select a race and a class for your character.
+
+From there, you have created your character. Time to adventure!
 
 ## Race
 
-When creating a character for the time, one thing to consider is the races. What race would you like tp play as? Each race modifies the character
-starting stats, so pick carefuly based on the type of class you want to play.
+Races in Tlessa affect your character stats. This combined with your class make you who you are. More about that in the classes section below.
+
 
 > ### ATTN!
 >

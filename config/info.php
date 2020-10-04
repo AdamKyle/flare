@@ -16,4 +16,8 @@ return [
         ]
     ],
 
+    'skill-information' => [
+        
+    ]
+
 ];

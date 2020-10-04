@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);@charset "UTF-8";
+@import url(//fonts.googleapis.com/css?family=Roboto:400,300,700,500,100);@charset "UTF-8";
 
 .color-gold {
   color: #ccab06;
@@ -21459,6 +21459,19 @@ blockquote {
   background-color: #d5e6f3;
 }
 
+.menu-toggle {
+  font-size: 18px;
+  color: #b9b9b9;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+@media screen and (min-width: 768px) {
+  .menu-toggle {
+    display: none;
+  }
+}
+
 .chat-box {
   background: #333;
   color: #fff;
@@ -21961,7 +21974,6 @@ blockquote {
 }
 
 body {
-  font-weight: lighter;
   font-family: "Roboto", sans-serif;
 }
 

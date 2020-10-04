@@ -29,6 +29,11 @@ class GameClass extends Model
         'deffense_mod',
     ];
 
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
+
     /**
      * The attributes that should be cast to native types.
      *
