@@ -23,4 +23,6 @@ Route::get('/', function () {
     return redirect()->route('game');
 });
 
+Route::get('/information/{pageName}', ['as' => 'info.page', 'uses' => 'InfoPageController@viewPage']);
+
 Auth::routes();

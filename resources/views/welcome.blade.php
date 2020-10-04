@@ -40,7 +40,9 @@
                                 </div>
                                 <div class="game-feature">
                                     <h5>
-                                        <a href="#">Customize your character!</a>
+                                        <a href="{{route('info.page', [
+                                            'pageName' => 'character-information'
+                                        ])}}">Customize your character!</a>
                                     </h5>
                                     <p>Buy/sell weapons, armor, rings, artifacts and more and out fit your character for the road ahead. Who knows what beasties you might find!</p>
                                 </div>
