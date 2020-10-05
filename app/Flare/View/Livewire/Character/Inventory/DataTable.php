@@ -16,6 +16,10 @@ class DataTable extends CoreDataTable
 
     public $allowInventoryManagement = false;
 
+    public $batchSell = false;
+
+    public $character;
+
     public function mount() {
         $this->sortField = 'items.type';
 
@@ -24,6 +28,10 @@ class DataTable extends CoreDataTable
 
     public function fetchSlots() {
         $character = auth()->user()->character;
+
+        if (!is_null($this->character)) {
+            $character = $this->character;
+        }
 
         $slots = $character->inventory->slots()->join('items', function($join) {
             $join = $join->on('inventory_slots.item_id', '=', 'items.id');

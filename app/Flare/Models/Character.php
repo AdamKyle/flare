@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Builders\CharacterInformationBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\GameRace;
@@ -107,6 +108,20 @@ class Character extends Model
 
     public function notifications() {
         return $this->hasMany(Notification::class, 'character_id', 'id');
+    }
+
+    /**
+     * Allows one to get specific information from a character.
+     *
+     * By returning the CharacterInformationBuilder class, we can allow you to get 
+     * multiple calulculated sets of data.
+     *  
+     * @return CharacterInformationBuilder
+     */
+    public function getInformation(): CharacterInformationBuilder {
+        $info = resolve(CharacterInformationBuilder::class);
+
+        return $info->setCharacter($this);
     }
 
     protected static function newFactory() {

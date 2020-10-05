@@ -44,7 +44,12 @@
         </div>
 
         <h4>Your Items To Sell</h4>
-        @livewire('character.inventory.data-table')
+        <div class="alert alert-warning">
+            Clicking "Sell All" will sell everything listed below. No quest items or currently equipped items will be sold.
+        </div>
+        @livewire('character.inventory.data-table', [
+            'batchSell' => true 
+        ])
     </div>    
 </div>
 

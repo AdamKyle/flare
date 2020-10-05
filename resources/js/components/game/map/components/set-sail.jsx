@@ -61,6 +61,10 @@ export default class SetSail extends React.Component {
 
     const foundPort = this.state.portList.filter(pl => pl.id === portId)[0];
 
+    this.setState({
+      portId: ""
+    });
+    
     axios.post('/api/map/set-sail/' + portId + '/' + this.props.characterId, {
       current_port_id: this.state.currentPort.id,
       cost: foundPort.cost,
@@ -70,7 +74,6 @@ export default class SetSail extends React.Component {
         currentPort: result.data.port_details.current_port,
         portList: result.data.port_details.port_list,
         adventures: result.data.adventure_details,
-        portId: "",
       }, () => {
         this.props.updatePlayerPosition(result.data.character_position_details);
         console.log(this.state.adventures);
@@ -131,7 +134,7 @@ export default class SetSail extends React.Component {
             <dd>{this.state.currentPort.x}/{this.state.currentPort.y}</dd>
             <dt>Set sail to:</dt>
             <dd>
-              <select value="" onChange={this.handlePortChange.bind(this)}>
+              <select value={this.state.portId} onChange={this.handlePortChange.bind(this)}>
                 <option value="">Please Select a port</option>
                 {this.dropDownList()}
               </select>

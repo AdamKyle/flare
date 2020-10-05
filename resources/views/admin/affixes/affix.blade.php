@@ -41,5 +41,8 @@
             </div>
         </div>
     </div>
+    @livewire('admin.items.data-table', [
+        'affixId' => $itemAffix->id
+    ])
 </div>
 @endsection

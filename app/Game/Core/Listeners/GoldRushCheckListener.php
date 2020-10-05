@@ -5,6 +5,7 @@ namespace App\Game\Core\Listeners;
 use Illuminate\Database\Eloquent\Collection;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 
 class GoldRushCheckListener
@@ -30,7 +31,10 @@ class GoldRushCheckListener
             $event->character->gold += $goldRush;
             $event->character->save();
 
-            event(new ServerMessageEvent($event->character->user, 'gold_rush', $goldRush));
+            $character = $event->character->refresh();
+
+            event(new ServerMessageEvent($character->user, 'gold_rush', $goldRush));
+            event(new UpdateTopBarEvent($character));
         }
     }
 

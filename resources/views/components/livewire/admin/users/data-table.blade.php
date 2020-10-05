@@ -52,7 +52,9 @@
                         @foreach($users as $user)
                             <tr>
                                 <td>{{$user->id}}</td>
-                                <td>{{is_null($user->character) ? 'Admin' : $user->character->name}}</td>
+                                <td><a href="{{route('users.user', [
+                                    'user' => $user->id
+                                ])}}">{{is_null($user->character) ? 'Admin' : $user->character->name}}</a></td>
                                 <td>{{$user->currently_online ? 'Yes' : 'No'}}</td>
                                 <td class="clearfix">
                                     @if (!is_null($user->character)) 

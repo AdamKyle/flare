@@ -167,6 +167,14 @@ export default class Chat extends React.Component {
               </div>
             </li>
           )
+        } else if (message.type === 'private-message-sent') {
+          elements.push(
+            <li key={message.id + '_private-message-sent'}>
+              <div className="private-message-sent">
+                <div className="private-message-sent">{message.message}</div> 
+              </div>
+            </li>
+          )
         } else {
           elements.push(
             <li key={message.id}>
@@ -227,14 +235,25 @@ export default class Chat extends React.Component {
       getServerMessage('invalid_command');
       return;
     }
+
+    const message = {
+      message: 'Sent to ' + messageData[1] + ': ' + messageData[2],
+      type:    'private-message-sent',
+      id:      Math.random().toString(36).substring(7),
+    }
+
+    const messages = cloneDeep(this.state.messages);
+
+    messages.unshift(message);
+
+    this.setState({
+      messages: messages,
+      message: '',
+    });
     
     axios.post('/api/private-message', {
       user_name: messageData[1],
       message: messageData[2],
-    }).then((result) => {
-      this.setState({
-        message: ''
-      });
     }).catch((error) => {
       console.log(error);
     });

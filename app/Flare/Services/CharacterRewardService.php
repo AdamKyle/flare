@@ -28,7 +28,7 @@ class CharacterRewardService {
             $this->trainSkill($currentSkill, $adventure);
         }
 
-        $this->character->xp += XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
+        $this->character->xp   += XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
         $this->character->gold += $monster->gold;
 
         $this->character->save();

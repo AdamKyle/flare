@@ -9,6 +9,7 @@
 /storage/*.key
 /public/css/app.css
 /public/css/default.css
+/public/mix-manifest.json
 /vendor
 /test-coverage
 .env

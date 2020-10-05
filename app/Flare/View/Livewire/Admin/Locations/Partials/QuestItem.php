@@ -28,6 +28,11 @@ class QuestItem extends Component
             $this->emitTo('manage', 'storeModel', $this->location->refresh());
             $this->emitTo('manage', $functionName, $index, true);
         }
+
+        $this->location->save();
+
+        $this->emitTo('manage', 'storeModel', $this->location->refresh());
+        $this->emitTo('manage', $functionName, $index, true);
     }
 
     public function mount() {

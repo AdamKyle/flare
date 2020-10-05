@@ -36,7 +36,7 @@ class UpdateSkillListener
 
                 $skill->update([
                     'level'       => $level,
-                    'xp_twoards'  => $skill->can_train ? rand(100, 150) : rand(50, 100),
+                    'xp_twoards'  => $skill->can_train ? rand(150, 200) : rand(50, 200),
                     'skill_bonus' => $skillBonus,
                     'xp'          => 0
                 ]);

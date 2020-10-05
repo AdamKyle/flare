@@ -41,6 +41,30 @@ class ShopController extends Controller {
         ]);
     }
 
+    public function shopSellAll() {
+        $character = auth()->user()->character;
+
+        $itemsToSell = $character->inventory->slots->filter(function($slot) {
+            return !$slot->equipped;
+        })->all();
+
+        $itemsToSell = collect($itemsToSell);
+
+        if ($itemsToSell->isEmpty()) {
+            return redirect()->back()->with('error', 'You have nothing that you can sell.');
+        }
+
+        $totalSoldFor = 0;
+
+        foreach ($itemsToSell as $itemSlot) {
+            $totalSoldFor += SellItemCalculator::fetchTotalSalePrice($itemSlot->item);
+
+            event(new SellItemEvent($itemSlot, $character));
+        }
+
+        return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
+    }
+
     public function buy(Request $request) {
         $character = auth()->user()->character;
 

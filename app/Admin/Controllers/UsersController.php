@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Mail\ResetPasswordEmail;
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
@@ -31,6 +32,17 @@ class UsersController extends Controller {
         Mail::to($user->email)->send(new ResetPasswordEmail($user, $token));
 
         return redirect()->back()->with('success', $user->character->name . ' password reset email sent.');
+    }
+
+    public function show(User $user) {
+
+        if ($user->hasRole('Admin')) {
+            return redirect()->back()->with('error', 'Admins do not have characters');
+        }
+
+        return view('admin.users.user', [
+            'character' => $user->character,
+        ]);
     }
 
     public function silenceUser(Request $request, User $user) {

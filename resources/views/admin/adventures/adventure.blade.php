@@ -45,7 +45,9 @@
         ])
         <h4>With Monsters:</h4>
         <p class="text-muted mb-2" style="font-size: 12px;"><em>Monsters are selected at random for each adventure level.</em></p>
-        @livewire('admin.monsters.data-table')
+        @livewire('admin.monsters.data-table', [
+            'adventureId' => $adventure->id
+        ])
         <h4>Rewards: {{$adventure->itemReward->name}}</h4>
         <em class="text-muted" style="font-size: 12px;">All quest items are rewarded once for completing the adventure the first time only.</em>
         <div class="card mt-2">

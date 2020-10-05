@@ -31,14 +31,18 @@ class QuestItem extends Component
         } elseif (!is_null($this->monster->quest_item_id) && !is_null($this->monster->quest_item_drop_chance)) {
             
             if ($this->monster->quest_item_drop_chance <= 0) {
-                $this->addError('missing', 'Drop chance cannot be belo 0.');
+                $this->addError('missing', 'Drop chance cannot be below or equal to 0.');
             } else {
                 $this->monster->save();
 
                 $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills', 'questItem'));
                 $this->emitTo('create', $functionName, $index, true);
-            }
-            
+            }   
+        } else {
+            $this->monster->save();
+
+            $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills', 'questItem'));
+            $this->emitTo('create', $functionName, $index, true);
         }
     }
 

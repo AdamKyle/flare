@@ -10,6 +10,18 @@
                             <option>15</option>
                             <option>25</option>
                         </select>
+                        @if ($batchSell)
+                            &nbsp;
+                            <a class="btn btn-primary btn-sm" href="{{route('game.shop.sell.all')}}"
+                                            onclick="event.preventDefault();
+                                            document.getElementById('shop-sell-all').submit();">
+                                {{ __('Sell All') }}
+                            </a>
+
+                            <form id="shop-sell-all" action="{{route('game.shop.sell.all')}}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        @endif
                     </div>
             
                     <div class="col">

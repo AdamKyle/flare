@@ -121,4 +121,13 @@
             </div>
         </div>
     </div>
+    <div clas="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="item-cost">Cost: </label>
+                <input type="number" class="form-control" id="item-cost" name="item-cost" wire:model="item.cost"> 
+                @error('item.cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
 </div>

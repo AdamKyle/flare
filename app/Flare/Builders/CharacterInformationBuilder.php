@@ -21,7 +21,6 @@ class CharacterInformationBuilder {
     }
 
     public function statMod(string $stat): float {
-
         $base = $this->character->{$stat};
 
         $equipped = $this->inventory->filter(function($slot) {

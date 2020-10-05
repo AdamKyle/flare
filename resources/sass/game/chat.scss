@@ -7,8 +7,12 @@
     list-style: none;
 
     .private-message {
-      color: #8b5696;
+      color: #b684c0;
       font-style: italic;
+
+      strong {
+        cursor: pointer;
+      }
     }
 
     .server-message {
@@ -24,6 +28,17 @@
     .error-message {
       color: #fb3b3b;
       font-size: 22px;
+    }
+
+    .private-message-sent {
+      color: #5065ff;
+      font-style: italic;
+    }
+
+    .message {
+      strong {
+        cursor: pointer;
+      }
     }
   }
 }

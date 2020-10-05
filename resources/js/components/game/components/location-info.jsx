@@ -1,4 +1,5 @@
-import React from 'react';
+import React   from 'react';
+import isEmpty from'lodash/isEmpty';
 
 export default class LocationInfo extends React.Component {
   constructor(props) {
@@ -19,10 +20,27 @@ export default class LocationInfo extends React.Component {
     return adventures;
   }
 
-  getRwards() {
+  showAdventures() {
+    if (!isEmpty(this.props.location.adventures)) {
+      return (
+        <>
+          <hr />
+          <h5>Adventures</h5>
+          <ul>
+            {this.adventures()}
+          </ul>
+        </>
+      )
+    }
+
+    return null;
+  }
+
+  getRewards() {
     if (this.props.location.quest_reward_item !== null) {
       return (
         <>
+          <hr />
           <h5>Quest Reward Items</h5>
           <div class="alert alert-info">Only handed out once, when you first visit the location.</div>
           <ul>
@@ -47,13 +65,8 @@ export default class LocationInfo extends React.Component {
         <div className="mb-2">
           <h5>Description</h5>
           <p>{location.description}</p>
-          <hr />
-          <h5>Adventures</h5>
-          <ul>
-            {this.adventures()}
-          </ul>
-          <hr />
-          {this.getRwards()}
+          {this.showAdventures()}
+          {this.getRewards()}
         </div>
       </div>
     );

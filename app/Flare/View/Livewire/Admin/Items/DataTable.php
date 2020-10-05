@@ -8,6 +8,8 @@ use App\Flare\Models\Item;
 
 class DataTable extends CoreDataTable
 {
+    public $affixId = null;
+    
     public function mount() {
         $this->sortField = 'type';
 
@@ -16,9 +18,15 @@ class DataTable extends CoreDataTable
 
     public function fetchItems() {
         if (auth()->user()->hasRole('Admin')) {
-            return Item::dataTableSearch($this->search)
-                       ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-                       ->paginate($this->perPage);
+            $items = Item::dataTableSearch($this->search);
+
+            if (!is_null($this->affixId)) {
+                $items = $items->where('item_suffix_id', $this->affixId)
+                               ->orWhere('item_prefix_id', $this->affixId);
+            }
+            
+            return $items->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+                         ->paginate($this->perPage);
         }
 
         return Item::dataTableSearch($this->search)

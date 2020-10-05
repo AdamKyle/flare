@@ -12,14 +12,8 @@
               You can only train one skill at a time. 
               If you would like to procede, please choose how much xp per fight is awarded to the training of the skill.
           </p>
-          <p>
-              Please note, if you select 100%, you will not gain any levels as all your exp is going towards skills. 
-              Skills also gain levels randomly. The more xp the more chance to gain a skill level. 
-              There are also items that speed up the process of skill leveling.
-          </p>
-
-          <div class="alert alert-info">
-            <strong>Attn!</strong>: Placing 100% of xp towards a skill does not automatically mean you will gain a skill level every fight.
+          <div class="alert alert-warning">
+              <strong>Please note</strong> if you select 100%, you will not gain any levels as all your exp is going towards skills.
           </div>
           <form action="{{route('train.skill')}}" id="train-skill-{{$skill->id}}" method="POST">
               @csrf

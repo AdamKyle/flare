@@ -21483,8 +21483,12 @@ blockquote {
 }
 
 .chat-box ul .private-message {
-  color: #8b5696;
+  color: #b684c0;
   font-style: italic;
+}
+
+.chat-box ul .private-message strong {
+  cursor: pointer;
 }
 
 .chat-box ul .server-message {
@@ -21500,6 +21504,15 @@ blockquote {
 .chat-box ul .error-message {
   color: #fb3b3b;
   font-size: 22px;
+}
+
+.chat-box ul .private-message-sent {
+  color: #5065ff;
+  font-style: italic;
+}
+
+.chat-box ul .message strong {
+  cursor: pointer;
 }
 
 .health-meters {
