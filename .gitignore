@@ -6,10 +6,8 @@
 /public/assets
 /public/fonts
 /public/images
-/storage/*.key
-/public/css/app.css
-/public/css/default.css
 /public/mix-manifest.json
+/storage/*.key
 /vendor
 /test-coverage
 .env
