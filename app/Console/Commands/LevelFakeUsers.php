@@ -4,9 +4,6 @@ namespace App\Console\Commands;
 
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Services\CharacterService;
 use Illuminate\Console\Command;
 
@@ -17,7 +14,7 @@ class LevelFakeUsers extends Command
      *
      * @var string
      */
-    protected $signature = 'level-up:fake-users {amount} {amountOfLevels} {monsterId}';
+    protected $signature = 'level-up:fake-users {amount} {amountOfLevels}';
 
     /**
      * The console command description.
@@ -53,13 +50,6 @@ class LevelFakeUsers extends Command
 
         if ($amountOfLevels <= 0) {
             $this->error('amount of levels must be greator then 0.');
-            return;
-        }
-
-        $monster = Monster::find($this->argument('monsterId'));
-
-        if (is_null($monster)) {
-            $this->error('Monster not found for id: ' . $id);
             return;
         }
 
