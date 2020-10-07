@@ -39,7 +39,7 @@
                         <dt>Skill XP Gained: </dt>
                         <dd>
                             @if (isset($adventureLog->rewards['skill']))
-                                For Skill: {{$adventureLog->rewards['skill']['skill']['name']}}, total: {{$adventureLog->rewards['skill']['exp']}}
+                                For Skill: {{$adventureLog->rewards['skill']['skill_name']}}, total: {{$adventureLog->rewards['skill']['exp']}}
                             @else
                                 None.
                             @endif

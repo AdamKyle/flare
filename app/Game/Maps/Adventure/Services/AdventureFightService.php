@@ -131,14 +131,25 @@ class AdventureFightService {
     }
 
     protected function canHit($attacker, $defender): bool {
-        $accuracyBonus = $attacker->skills->where('name', 'Accuracy')->first()->skill_bonus;
-        $dodgeBonus    = $defender->skills->where('name', 'Dodge')->first()->skill_bonus;
+        $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
+                $join->on('game_skills.id', 'skills.game_skill_id')
+                     ->where('game_skills.name', 'Accuracy');
+        })->first()->skill_bonus;
+
+        $dodgeBonus    = $defender->skills()->join('game_skills', function($join) {
+                $join->on('game_skills.id', 'skills.game_skill_id')
+                     ->where('game_skills.name', 'Dodge');
+        })->first()->skill_bonus;
 
         return (rand(1, 20) * (1 + $accuracyBonus)) > ($defender->ac * (1 + $dodgeBonus));
     }
 
     protected function blockedAttack($defender, $attacker): bool {
-        $accuracyBonus = $attacker->skills->where('name', 'Accuracy')->first()->skill_bonus;
+        $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('game_skills.name', 'Accuracy');
+        })->first()->skill_bonus;
+        
         $ac            = $defender->ac;
 
         if ($defender instanceof Character) {

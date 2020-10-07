@@ -80,9 +80,17 @@
                     <tbody>
                         @foreach($monsters as $monster)
                             <tr>
-                                <td><a href="{{route('monsters.monster', [
-                                    'monster' => $monster->id
-                                ])}}">{{$monster->name}}</a></td>
+                                <td>
+                                    @if (auth()->user()->hasRole('Admin'))))
+                                        <a href="{{route('monsters.monster', [
+                                            'monster' => $monster->id
+                                        ])}}">{{$monster->name}}</a>
+                                    @else
+                                        <a href="{{route('game.monsters.monster', [
+                                            'monster' => $monster->id
+                                        ])}}">{{$monster->name}}</a>
+                                    @endif
+                                </td>
                                 <td>{{$monster->max_level}}</td>
                                 <td>{{$monster->damage_stat}}</td>
                                 <td>{{$monster->health_range}}</td>

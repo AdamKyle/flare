@@ -17,7 +17,7 @@ class CreateAffixes extends Seeder
         ItemAffix::insert([
             [
                 'name'                 => 'Queens Blessing',
-                'base_damage_mod'      => '0.15',
+                'base_damage_mod'      => '0.05',
                 'type'                 => 'suffix',
                 'description'          => 'The queen has blessed this item.',
                 'base_healing_mod'     => null,
@@ -35,7 +35,7 @@ class CreateAffixes extends Seeder
             ],
             [
                 'name'                 => 'Lords Blessing',
-                'base_damage_mod'      => '0.25',
+                'base_damage_mod'      => '0.05',
                 'type'                 => 'prefix',
                 'description'          => 'A prayer has been answered in this item.',
                 'base_healing_mod'     => '0.50',
@@ -53,7 +53,7 @@ class CreateAffixes extends Seeder
             ],
             [
                 'name'                 => 'Demonic Sigil',
-                'base_damage_mod'      => '0.25',
+                'base_damage_mod'      => '0.05',
                 'type'                 => 'suffix',
                 'description'          => 'A demons sigil has been used on this item.',
                 'base_healing_mod'     => '0.00',
@@ -71,7 +71,7 @@ class CreateAffixes extends Seeder
             ],
             [
                 'name'                 => 'Vampric Blood',
-                'base_damage_mod'      => '0.30',
+                'base_damage_mod'      => '0.05',
                 'type'                 => 'prefix',
                 'description'          => 'Bathed in the blood of victims, this weapon radiates with power.',
                 'base_healing_mod'     => '0.00',
@@ -89,7 +89,7 @@ class CreateAffixes extends Seeder
             ],
             [
                 'name'                 => 'Hunters Trap',
-                'base_damage_mod'      => '0.20',
+                'base_damage_mod'      => '0.05',
                 'type'                 => 'suffix',
                 'description'          => 'Found in the middle of a hunters trap, this item helps with focus and determination in Rangers.',
                 'base_healing_mod'     => '0.00',

@@ -11,7 +11,7 @@
                 @if (auth()->user()->hasRole('Admin'))
                     <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
                 @else
-                    <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+                    <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Back</a>
                 @endif
             </div>
         </div>

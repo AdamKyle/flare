@@ -20,8 +20,8 @@ When a skill levels up you will see that in chat. If you are doing an adventure 
 
 When a skill levels there are two ways the next level xp is claculated. That is the xp needed to go fro level 2-3 for example.
 
-**For skills that can be trained**: This value is between 50 and 100 xp needed to level the skill.
-**For crafting skills**: This value is between 100 and 150xp needed to level that skill.
+**For skills that can be trained**: This value is between 100 and 150 xp needed to level the skill.
+**For crafting skills**: This value is between 100 and 200xp needed to level that skill.
 
 ## Skill Training Modifiers
 

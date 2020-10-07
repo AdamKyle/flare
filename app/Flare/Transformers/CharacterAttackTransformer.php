@@ -21,7 +21,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'has_affixes'         => $characterInformation->hasAffixes(),
             'has_damage_spells'   => $characterInformation->hasDamageSpells(),
             'heal_for'            => $characterInformation->buildHealFor(),
-            'skills'              => $character->skills,
+            'skills'              => $character->skills->load('baseSkill'),
             'can_attack'          => $character->can_attack,
             'can_attack_again_at' => $character->can_attack_again_at,
             'can_craft'           => $character->can_craft,

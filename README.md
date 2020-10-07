@@ -52,12 +52,14 @@ can all be gained in game with no need to spend out side money. This point was v
 - start redis: eg, `redis-server /usr/local/etc/redis.conf`
 - start websockets: `php artisan websocket:serve`
 - listen for queues: `php artisan queue:work --queue=high,default --tries=1`
+- Publish information section: `php artisan move:files` <sup>**</sup>
 - From there you cn register as a new player.
   - Or since you ran the `create:admn` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
 - Regular players, who sign up, will only see the game section.
 
 <sup>*</sup> See setting up an email below.
 
+<sup>**</sup> The information section is comprised of mark down files. This is very experiemental at the moment. It takes a series of mark down files, converts them into one document and displays it to the user. The information section is like a Help section.
 
 ## Redis
 

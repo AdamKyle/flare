@@ -28,7 +28,7 @@ class AddGameMapIdToMaps extends Migration
     public function down()
     {
         Schema::table('maps', function (Blueprint $table) {
-            $table->dropForeign('game_map_id');
+            $table->dropForeign('maps_game_map_id_foreign');
             $table->dropColumn('game_map_id');
         });
     }

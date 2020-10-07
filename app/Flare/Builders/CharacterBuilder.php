@@ -7,6 +7,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
@@ -72,9 +73,9 @@ class CharacterBuilder {
     }
 
     public function assignSkills(): CharacterBuilder {
-        foreach (config('game.skills') as $options) {
+        foreach (GameSkill::all() as $skill) {
             $this->character->skills()->create(
-                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $options)
+                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
             );
         }
 

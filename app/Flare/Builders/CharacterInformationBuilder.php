@@ -47,7 +47,7 @@ class CharacterInformationBuilder {
         $characterDamageStat = $this->statMod($this->character->damage_stat);
         $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
 
-        return round(($characterDamageStat + 10) + $this->getWeaponDamage());
+        return round($characterDamageStat + $this->getWeaponDamage());
     }
 
     public function buildDefence(): int {

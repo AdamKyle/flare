@@ -73,14 +73,14 @@ export default class Attack {
   }
 
   canHit(attacker, defender) {
-    const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
-    const defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+    const attackerAccuracy = attacker.skills.filter(s => s.base_skill.name === 'Accuracy')[0].skill_bonus;
+    const defenderDodge    = defender.skills.filter(s => s.base_skill.name === 'Dodge')[0].skill_bonus;
 
     return (randomNumber(1, 20) * (1 + attackerAccuracy)) > (10 * (1 + defenderDodge));
   }
 
   blockedAttack(defender, attacker) {
-    const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
+    const attackerAccuracy = attacker.skills.filter(s => s.base_skill.name === 'Accuracy')[0].skill_bonus;
 
     return (randomNumber(1, 20) * (1 + attackerAccuracy)) < defender.ac;
   }

@@ -9,7 +9,9 @@ use App\Flare\Models\Monster;
 class MonstersController extends Controller {
 
     public function __construct() {
-        //
+        $this->middleware('is.admin')->except([
+            'show'
+        ]);
     }
 
     public function index() {

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Flare\Models\GameSkill;
 use Illuminate\Database\Seeder;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
@@ -34,9 +35,9 @@ class CreateMonstersSeeder extends Seeder
         ]);
 
         foreach(Monster::all() as $monster) {
-            foreach(config('game.skills') as $options) {
-                if ($options['can_train']) {
-                    $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $options);
+            foreach(GameSkill::all() as $skill) {
+                if ($skill->can_train) {
+                    $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $skill);
                 }
                 
             }

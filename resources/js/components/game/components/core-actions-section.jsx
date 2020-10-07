@@ -28,6 +28,7 @@ export default class CoreActionsSection extends React.Component {
 				user_id: this.props.userId
 			}
 		}).then((result) => {
+			console.log(result.data.character);
 			this.setState({
 				character: result.data.character.data,
 				monsters: result.data.monsters,

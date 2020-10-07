@@ -64,7 +64,7 @@ class AdventureService {
 
         if (!is_null($skill)) {
             $this->rewards['skill'] = [
-                'skill' => $skill,
+                'skill_name' => $skill->name, 
                 'exp_towards' => $skill->xp_towards,
                 'exp'   => 0,
             ];
@@ -155,7 +155,12 @@ class AdventureService {
         if (isset($this->rewards['skill'])) {
             $xpReduction = $this->rewards['skill']['exp_towards'];
 
-            $this->rewards['skill']['exp'] += $this->rewardBuilder->fetchSkillXPReward($this->rewards['skill']['skill'], $this->adventure);
+            $foundSkill = $this->character->skills()->join('game_skills', function($join) {
+                $join->on('game_skills.id', 'skills.game_skill_id')
+                     ->where('game_skills.name', $this->rewards['skill']['skill_name']);
+            })->first();
+
+            $this->rewards['skill']['exp'] += $this->rewardBuilder->fetchSkillXPReward($foundSkill, $this->adventure);
         }
 
         $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction);

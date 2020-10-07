@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Monsters\Partials;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
 use Livewire\Component;
@@ -44,9 +45,9 @@ class Stats extends Component
 
         if ($this->monster->skills->isEmpty()) {
             // Get skills:
-            foreach(config('game.skills') as $options) {
-                if ($options['can_train']) {
-                    $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $options);
+            foreach(GameSkill::all() as $skill) {
+                if ($skill->can_train) {
+                    $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $skill);
                 }
             }
 

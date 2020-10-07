@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use CreateGameSkills;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,6 +18,7 @@ class DatabaseSeeder extends Seeder
             CreateRaces::class,
             CreateClasses::class,
             CreateItemsSeeder::class,
+            GameSkillsSeeder::class,
             CreateMonstersSeeder::class,
             CreatePortLocationsSeeder::class,
             CreateAffixes::class,

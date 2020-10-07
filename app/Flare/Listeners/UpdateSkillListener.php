@@ -31,14 +31,18 @@ class UpdateSkillListener
 
         if ($skill->xp >= $skill->xp_max) {
             if ($skill->level <= $skill->max_level) {
-                $level      = $skill->level + 1;
-                $skillBonus = $skill->skill_bonus + $skill->skill_bonus_per_level;
+                $level = $skill->level + 1;
 
                 $skill->update([
-                    'level'       => $level,
-                    'xp_twoards'  => $skill->can_train ? rand(150, 200) : rand(50, 200),
-                    'skill_bonus' => $skillBonus,
-                    'xp'          => 0
+                    'level'              => $level,
+                    'xp_max'             => $skill->can_train ? rand(100, 150) : rand(100, 200),
+                    'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
+                    'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
+                    'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
+                    'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
+                    'move_time_out_mod'  => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
+                    'skill_bonus'        => $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level,
+                    'xp'                 => 0,
                 ]);
 
                 event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));

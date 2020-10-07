@@ -4,52 +4,43 @@ namespace App\Flare\Values;
 
 use Illuminate\Support\Str;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 
 class BaseSkillValue {
 
-    public function getBaseCharacterSkillValue(Character $character, array $options): array {
-
+    public function getBaseCharacterSkillValue(Character $character, GameSkill $skill): array {
+        
        return [
-            'character_id'              => $character->id,
-            'monster_id'                => null,
-            'description'               => $options['description'],
-            'name'                      => $options['name'],
-            'currently_training'        => false,
-            'level'                     => 0,
-            'max_level'                 => $options['max_level'],
-            'xp'                        => 0,
-            'xp_max'                    => $options['xp_max'],
-            'base_damage_mod'           => $options['base_damage_mod'],
-            'base_healing_mod'          => $options['base_healing_mod'],
-            'base_ac_mod'               => $options['base_ac_mod'],
-            'fight_time_out_mod'        => $options['fight_time_out_mod'],
-            'move_time_out_mod'         => $options['move_time_out_mod'],
-            'skill_bonus'               => ($this->getCharacterSkillBonus($character, $options['name']) / 100) + 0.01,
-            'can_train'                 => $options['can_train'],
-            'skill_bonus_per_level'     => $options['skill_bonus_per_level'],
+            'character_id'       => $character->id,
+            'game_skill_id'      => $skill->id,
+            'currently_training' => false,
+            'level'              => 1,
+            'xp'                 => 0,
+            'xp_max'             => $skill->can_train ? rand(100, 150) : rand(100, 200),
+            'base_damage_mod'    => 0,
+            'base_healing_mod'   => 0,
+            'base_ac_mod'        => 0,
+            'fight_time_out_mod' => 0,
+            'move_time_out_mod'  => 0,
+            'skill_bonus'        => $this->getCharacterSkillBonus($character, $skill->name),
         ];
     }
 
-    public function getBaseMonsterSkillValue(Monster $monster, array $options): array {
+    public function getBaseMonsterSkillValue(Monster $monster, GameSkill $skill): array {
 
         return [
-            'character_id'              => null,
-            'monster_id'                => $monster->id,
-            'description'               => $options['description'],
-            'name'                      => $options['name'],
-            'currently_training'        => false,
-            'level'                     => 0,
-            'max_level'                 => 100,
-            'xp'                        => 0,
-            'xp_max'                    => rand(100, 350),
-            'base_damage_mod'           => $options['base_damage_mod'],
-            'base_healing_mod'          => $options['base_healing_mod'],
-            'base_ac_mod'               => $options['base_ac_mod'],
-            'fight_time_out_mod'        => $options['fight_time_out_mod'],
-            'move_time_out_mod'         => $options['move_time_out_mod'],
-            'skill_bonus'               => 0.01,
-            'skill_bonus_per_level'     => 0.01,
+            'monster_id'         => $monster->id,
+            'game_skill_id'      => $skill->id,
+            'currently_training' => false,
+            'level'              => 0,
+            'xp'                 => 0,
+            'base_damage_mod'    => 0,
+            'base_healing_mod'   => 0,
+            'base_ac_mod'        => 0,
+            'fight_time_out_mod' => 0,
+            'move_time_out_mod'  => 0,
+            'skill_bonus'        => 0.01,
         ];
     }
 

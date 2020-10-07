@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row page-titles">
         <div class="col-md-12 align-self-right">
-            <a href="{{route('locations.list')}}" class="btn btn-primary float-right ml-2">Back</a>
+            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
         </div>
     </div>
     <div class="row justify-content-center">
@@ -23,26 +23,33 @@
                         <dd>{{$location->is_port ? 'Yes' : 'No'}}</dd>
                     </dl>
                     <hr />
-                    <a href="{{route('location.edit', [
-                        'location' => $location->id,
-                    ])}}" class="btn btn-primary mt-2">Edit Location</a>
+                    @if (auth()->user()->hasRole('Admin'))
+                        <a href="{{route('location.edit', [
+                            'location' => $location->id,
+                        ])}}" class="btn btn-primary mt-2">Edit Location</a>
+                    @endif
+                    
                 </div>
             </div>
 
-            <div class="card mt-2">
-                <div class="card-body">
-                    <h4 class="card-title">Quest Item Reward</h4>
-                    <p>All quest items are rewarded for just visiting the location.</p>
-                    @if (!is_null($location->questRewardItem))
-                    @include('game.items.partials.item-details', ['item' => $location->questRewardItem])
-                    @include('game.core.partials.equip.details.item-stat-details', ['item' => $location->questRewardItem])
-                    @else
-                        <div class="alert alert-info"> This location has no quest item rewards. <a href="{{route('location.edit', [
-                            'location' => $location->id,
-                        ])}}">Assign one.</a> </div>
-                    @endif
+            @if (!is_null($location->questRewardItem))
+                <div class="card mt-2">
+                    <div class="card-body">
+                        <h4 class="card-title">Quest Item Reward</h4>
+                        <p>All quest items are rewarded for just visiting the location.</p>
+                        @if (!is_null($location->questRewardItem))
+                        @include('game.items.partials.item-details', ['item' => $location->questRewardItem])
+                        @include('game.core.partials.equip.details.item-stat-details', ['item' => $location->questRewardItem])
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))
+                                <div class="alert alert-info"> This location has no quest item rewards. <a href="{{route('location.edit', [
+                                    'location' => $location->id,
+                                ])}}">Assign one.</a> </div>
+                            @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>

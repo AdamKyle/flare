@@ -19,11 +19,9 @@ class Skill extends Model
     protected $fillable = [
         'character_id',
         'monster_id',
-        'description',
-        'name',
+        'game_skill_id',
         'currently_training',
         'level',
-        'max_level',
         'xp',
         'xp_max',
         'xp_towards',
@@ -32,9 +30,7 @@ class Skill extends Model
         'base_ac_mod',
         'fight_time_out_mod',
         'move_time_out_mod',
-        'can_train',
         'skill_bonus',
-        'skill_bonus_per_level',
     ];
 
     /**
@@ -45,7 +41,6 @@ class Skill extends Model
     protected $casts = [
         'currently_training'    => 'boolean',
         'level'                 => 'integer',
-        'max_level'             => 'integer',
         'xp'                    => 'integer',
         'xp_max'                => 'integer',
         'xp_towards'            => 'float',
@@ -54,10 +49,28 @@ class Skill extends Model
         'base_ac_mod'           => 'float',
         'fight_time_out_mod'    => 'float',
         'move_time_out_mod'     => 'float',
-        'can_train'             => 'boolean',
         'skill_bonus'           => 'float',
-        'skill_bonus_per_level' => 'float',
     ];
+
+    public function getNameAttribute() {
+        return $this->baseSkill->name;
+    }
+
+    public function getDescriptionAttribute() {
+        return $this->baseSkill->description;
+    }
+
+    public function getMaxLevelAttribute() {
+        return $this->baseSkill->max_level;
+    }
+
+    public function getCanTrainAttribute() {
+        return $this->baseSkill->can_train;
+    }
+
+    public function baseSkill() {
+        return $this->belongsTo(GameSkill::class, 'game_skill_id', 'id');
+    }
 
     public function character() {
         return $this->belongsTo(Character::class);
