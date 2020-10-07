@@ -4,23 +4,27 @@ namespace App\Console\Commands;
 
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Flare\Services\CharacterRewardService;
+use App\Game\Core\Events\UpdateCharacterEvent;
+use App\Game\Core\Services\CharacterService;
 use Illuminate\Console\Command;
 
-class LeavelUpSkillsOnFakeUsers extends Command
+class LevelFakeUsers extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'level-skills:fake-users {amount} {skillId} {amountOfLevels}';
+    protected $signature = 'level-up:fake-users {amount} {amountOfLevels} {monsterId}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Levels characters skills based on how many characters.';
+    protected $description = 'Levels characters based on how many characters and amount of levels.';
 
     /**
      * Create a new command instance.
@@ -40,7 +44,6 @@ class LeavelUpSkillsOnFakeUsers extends Command
     public function handle()
     {
         $amount         = $this->argument('amount');
-        $skillId        = $this->argument('skillId');
         $amountOfLevels = $this->argument('amountOfLevels');
 
         if ($amount <= 0) {
@@ -53,7 +56,14 @@ class LeavelUpSkillsOnFakeUsers extends Command
             return;
         }
 
-        $this->info('Leveling character skills');
+        $monster = Monster::find($this->argument('monsterId'));
+
+        if (is_null($monster)) {
+            $this->error('Monster not found for id: ' . $id);
+            return;
+        }
+
+        $this->info('Leveling character');
 
         $bar = $this->output->createProgressBar($amount);
 
@@ -67,33 +77,22 @@ class LeavelUpSkillsOnFakeUsers extends Command
                 continue;
             }
 
-            $skill = $character->skills()->where('game_skill_id', $skillId)->first();
+            for($j = 1; $j <= $amountOfLevels; $j++) {
+                $character->update([
+                    'xp' => 100
+                ]);
 
-            if (is_null($skill)) {
-                $this->error(' No skill was found for id: ' . $skillId . ' On character: ' . $character->id . '. Skill id should be the id of the Game Skill');
-                return;
-            }
-
-            for ($j = 1; $j <= (int) $amountOfLevels; $j++) {
-                $skill->refresh();
+                $character->refresh();
                 
-                if ($skill->can_train) {
-                    $skill->update([
-                        'currently_training' => true,
-                        'xp_towards' => 0.10,
-                        'xp' => 300,
-                        'xp_max' => 150,
-                    ]);
-                } else {
-                    $skill->update([
-                        'xp' => 300,
-                        'xp_max' => 200,
-                    ]);
+                $characterService = new CharacterService;
+                
+                if ($character->xp >= $character->xp_next) {
+                    $characterService->levelUpCharacter($character);
                 }
-    
-                event(new UpdateSkillEvent($skill->refresh()));
+
+                $character->refresh();
             }
-            
+
             $bar->advance();
         }
 

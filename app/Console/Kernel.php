@@ -9,7 +9,8 @@ use App\Console\Commands\CreateFakeUsers;
 use App\Console\Commands\CreateItem;
 use App\Console\Commands\GiveCharacterGold;
 use App\Console\Commands\GiveItem;
-use App\Console\Commands\LeavelUpSkillsOnFakeUsers;
+use App\Console\Commands\LevelFakeUsers;
+use App\Console\Commands\LevelUpSkillsOnFakeUsers;
 use App\Console\Commands\MoveInfoFiles;
 
 class Kernel extends ConsoleKernel
@@ -26,7 +27,8 @@ class Kernel extends ConsoleKernel
         CleanNotifications::class,
         MoveInfoFiles::class,
         CreateFakeUsers::class,
-        LeavelUpSkillsOnFakeUsers::class,
+        LevelUpSkillsOnFakeUsers::class,
+        LevelFakeUsers::class,
     ];
 
     /**
