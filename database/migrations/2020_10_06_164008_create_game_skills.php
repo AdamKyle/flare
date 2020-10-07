@@ -18,13 +18,13 @@ class CreateGameSkills extends Migration
             $table->string('description');
             $table->string('name');
             $table->integer('max_level');
-            $table->decimal('base_damage_mod_bonus_per_level')->nullable();
-            $table->decimal('base_healing_mod_bonus_per_level')->nullable();
-            $table->decimal('base_ac_mod_bonus_per_level')->nullable();
-            $table->decimal('fight_time_out_mod_bonus_per_level')->nullable();
-            $table->decimal('move_time_out_mod_bonus_per_level')->nullable();
+            $table->decimal('base_damage_mod_bonus_per_level', 5, 4)->nullable();
+            $table->decimal('base_healing_mod_bonus_per_level', 5, 4)->nullable();
+            $table->decimal('base_ac_mod_bonus_per_level', 5, 4)->nullable();
+            $table->decimal('fight_time_out_mod_bonus_per_level', 5, 4)->nullable();
+            $table->decimal('move_time_out_mod_bonus_per_level', 5, 4)->nullable();
             $table->boolean('can_train')->nullable()->default(true);
-            $table->decimal('skill_bonus_per_level')->nullable();
+            $table->decimal('skill_bonus_per_level', 5, 4)->nullable();
             $table->timestamps();
         });
     }

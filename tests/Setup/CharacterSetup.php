@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GameSkill;
 use App\Game\Core\Services\CharacterService;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;
@@ -27,15 +28,12 @@ class CharacterSetup {
 
     private $character;
 
-    public function setupCharacter(User $user, array $options = []): CharacterSetup {
+    public function setupCharacter(User $user, array $options = [], array $classOptions = []): CharacterSetup {
         $race = $this->createRace([
             'str_mod' => 3,
         ]);
 
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-        ]);
+        $class = $this->createClass($classOptions);
 
         $this->character = $this->createCharacter([
             'name'          => isset($options['name']) ? $options['name'] : 'Sample',

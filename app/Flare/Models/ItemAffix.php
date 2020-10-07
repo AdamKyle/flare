@@ -27,7 +27,6 @@ class ItemAffix extends Model
         'dex_mod',
         'chr_mod',
         'int_mod',
-        'ac_mod',
         'cost',
         'skill_name',
         'skill_training_bonus',
@@ -46,7 +45,6 @@ class ItemAffix extends Model
         'dex_mod'              => 'float',
         'chr_mod'              => 'float',
         'int_mod'              => 'float',
-        'ac_mod'               => 'float',
         'skill_training_bonus' => 'float',
         'cost'                 => 'integer',
     ];

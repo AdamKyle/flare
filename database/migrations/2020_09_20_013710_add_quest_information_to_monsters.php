@@ -17,7 +17,7 @@ class AddQuestInformationToMonsters extends Migration
             $table->bigInteger('quest_item_id')->unsigned()->nullable();
             $table->foreign('quest_item_id')
                 ->references('id')->on('items');
-            $table->float('quest_item_drop_chance')->nullable();
+            $table->decimal('quest_item_drop_chance', 5, 4)->nullable();
         });
     }
 

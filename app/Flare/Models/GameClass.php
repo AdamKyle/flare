@@ -29,26 +29,26 @@ class GameClass extends Model
         'deffense_mod',
     ];
 
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
-    }
-
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
     protected $casts = [
-        'str_mod'      => 'integer',
-        'dur_mod'      => 'integer',
-        'dex_mod'      => 'integer',
-        'chr_mod'      => 'integer',
-        'int_mod'      => 'integer',
-        'accuracy_mod' => 'integer',
-        'dodge_mod'    => 'integer',
-        'deffense_mod' => 'integer',
+        'str_mod'      => 'float',
+        'dur_mod'      => 'float',
+        'dex_mod'      => 'float',
+        'chr_mod'      => 'float',
+        'int_mod'      => 'float',
+        'accuracy_mod' => 'float',
+        'dodge_mod'    => 'float',
+        'deffense_mod' => 'float',
     ];
+
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
 
     protected static function newFactory() {
         return GameClassFactory::new();

@@ -5,9 +5,11 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CleanNotifications;
+use App\Console\Commands\CreateFakeUsers;
 use App\Console\Commands\CreateItem;
 use App\Console\Commands\GiveCharacterGold;
 use App\Console\Commands\GiveItem;
+use App\Console\Commands\LeavelUpSkillsOnFakeUsers;
 use App\Console\Commands\MoveInfoFiles;
 
 class Kernel extends ConsoleKernel
@@ -23,6 +25,8 @@ class Kernel extends ConsoleKernel
         GiveCharacterGold::class,
         CleanNotifications::class,
         MoveInfoFiles::class,
+        CreateFakeUsers::class,
+        LeavelUpSkillsOnFakeUsers::class,
     ];
 
     /**

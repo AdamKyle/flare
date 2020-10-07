@@ -47,4 +47,11 @@
             <li><a href="{{route('affixes.create')}}">Create Affix</a></li>
         </ul>
     </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-muscle-up"></i><span class="hide-menu">Manage Skills</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('skills.list')}}">Skills</a></li>
+            <li><a href="{{route('skills.create')}}">Create Skill</a></li>
+        </ul>
+    </li>
 </ul>

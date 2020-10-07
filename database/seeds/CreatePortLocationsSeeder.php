@@ -73,7 +73,7 @@ class CreatePortLocationsSeeder extends Seeder
                 'is_port'     => true,
                 'game_map_id' => $gameMap->id,
                 'x'           => 48,
-                'y'           => 288,
+                'y'           => 304,
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ],

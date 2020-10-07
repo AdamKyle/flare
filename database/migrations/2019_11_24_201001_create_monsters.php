@@ -25,7 +25,7 @@ class CreateMonsters extends Migration
             $table->Integer('max_level')->nullable()->default(0);
             $table->string('damage_stat');
             $table->integer('xp');
-            $table->float('drop_check');
+            $table->decimal('drop_check', 5, 4);
             $table->integer('gold')->nullable()->default(10);
             $table->string('health_range');
             $table->string('attack_range');

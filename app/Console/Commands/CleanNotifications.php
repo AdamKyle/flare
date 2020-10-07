@@ -13,7 +13,7 @@ class CleanNotifications extends Command
      *
      * @var string
      */
-    protected $signature = 'cleanr:notifications';
+    protected $signature = 'clean:notifications';
 
     /**
      * The console command description.

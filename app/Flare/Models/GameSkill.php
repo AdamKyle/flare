@@ -43,4 +43,9 @@ class GameSkill extends Model
         'skill_bonus_per_level'              => 'float',
         'can_train'                          => 'boolean',
     ];
+
+    public static function dataTableSearch($query) {
+        return empty($query) ? static::query()
+            : static::where('name', 'like', '%'.$query.'%');
+    }
 }

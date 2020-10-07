@@ -24,26 +24,26 @@ class BaseStatValue {
     }
 
     public function str() {
-        return ($this->race->str_mod + $this->class->str_mod) + 5;
+        return round(1 * (1 + ($this->race->str_mod + $this->class->str_mod)));
     }
 
     public function dex() {
-        return ($this->race->dex_mod + $this->class->dex_mod) + 5;
+        return round(1 * (1 + ($this->race->dex_mod + $this->class->dex_mod)));
     }
 
     public function dur() {
-        return ($this->race->dur_mod + $this->class->dur_mod) + 5;
+        return round(1 * (1 + ($this->race->dur_mod + $this->class->dur_mod)));
     }
 
     public function chr() {
-        return ($this->race->chr_mod + $this->class->chr_mod) + 5;
+        return round(1 * (1 + ($this->race->chr_mod + $this->class->chr_mod)));
     }
 
     public function int() {
-        return ($this->race->int_mod + $this->class->int_mod) + 5;
+        return round(1 * (1 + ($this->race->int_mod + $this->class->int_mod)));
     }
 
     public function ac() {
-        return ($this->race->deffense_mod + $this->class->deffense_mod) + 10;
+        return round(10 * (1 + ($this->race->deffense_mod + $this->class->deffense_mod)));
     }
 }

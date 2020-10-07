@@ -49,7 +49,7 @@ class BaseSkillValue {
       $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
 
       if (!is_null($raceSkillBonusValue) && !is_null($classSkillBonusValue)) {
-          return $raceSkillBonusValue + $classSkillBonusValue;
+          return round($raceSkillBonusValue + $classSkillBonusValue);
       }
 
       return 0;
