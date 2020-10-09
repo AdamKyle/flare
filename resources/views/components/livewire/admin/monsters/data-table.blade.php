@@ -81,10 +81,12 @@
                         @foreach($monsters as $monster)
                             <tr>
                                 <td>
-                                    @if (auth()->user()->hasRole('Admin'))
-                                        <a href="{{route('monsters.monster', [
-                                            'monster' => $monster->id
-                                        ])}}">{{$monster->name}}</a>
+                                    @if (!is_null(auth()->user()))
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('monsters.monster', [
+                                                'monster' => $monster->id
+                                            ])}}">{{$monster->name}}</a>
+                                        @endif
                                     @else
                                         <a href="{{route('game.monsters.monster', [
                                             'monster' => $monster->id

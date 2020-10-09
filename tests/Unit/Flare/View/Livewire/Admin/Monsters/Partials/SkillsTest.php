@@ -5,12 +5,19 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Monsters\Partials;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Monsters\Partials\Skills;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateMonster;
 
 class SkillsTest extends TestCase
 {
     use RefreshDatabase, CreateMonster;
+
+    public function setUp(): void {
+        parent::setUp();
+        
+        $this->seed(GameSkillsSeeder::class);
+    }
 
     public function testTheComponentLoads() {
         $monster = $this->createMonster()->load('skills');
@@ -29,12 +36,10 @@ class SkillsTest extends TestCase
 
         Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->set('selectedSkill', 1)
                                                                                ->call('editSkill')
-                                                                               ->set('monsterSkill.base_damage_mod', 20)
-                                                                               ->set('monsterSkill.base_healing_mod', 20)
-                                                                               ->set('monsterSkill.base_ac_mod', 20)
+                                                                               ->set('monsterSkill.level', 20)
                                                                                ->call('validateInput', 'nextStep', 2)->assertEmitted('nextStep', 2, true);
     
-        $found = $monster->refresh()->skills()->where('base_damage_mod', 20)->first();
+        $found = $monster->refresh()->skills()->where('level', 20)->first();
 
         $this->assertNotNull($found);
     }
@@ -50,12 +55,10 @@ class SkillsTest extends TestCase
         
         Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->set('selectedSkill', 1)
                                                                                ->call('editSkill')
-                                                                               ->set('monsterSkill.base_damage_mod', 20)
-                                                                               ->set('monsterSkill.base_healing_mod', 20)
-                                                                               ->set('monsterSkill.base_ac_mod', 20)
+                                                                               ->set('monsterSkill.level', 10)
                                                                                ->call('save');
 
-        $found = $monster->refresh()->skills()->where('base_damage_mod', 20)->first();
+        $found = $monster->refresh()->skills()->where('level', 10)->first();
 
         $this->assertNotNull($found);
     }

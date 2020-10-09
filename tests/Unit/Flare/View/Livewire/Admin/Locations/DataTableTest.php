@@ -6,6 +6,7 @@ use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Locations\DataTable;
 use App\Flare\Models\GameMap;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateLocation;
@@ -13,6 +14,12 @@ use Tests\Traits\CreateLocation;
 class DataTableTest extends TestCase
 {
     use RefreshDatabase, CreateLocation, CreateAdventure;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
+    }
 
     public function testTheComponentLoads()
     {

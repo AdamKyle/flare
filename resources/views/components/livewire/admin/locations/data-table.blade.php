@@ -57,10 +57,12 @@
                         @foreach($locations as $location)
                             <tr>
                                 <td>
-                                    @if (auth()->user()->hasRole('Admin'))
-                                        <a href="{{route('locations.location', [
-                                            'location' => $location->id
-                                        ])}}">{{$location->name}}</a>
+                                    @if (!is_null(auth()->user()))
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('locations.location', [
+                                                'location' => $location->id
+                                            ])}}">{{$location->name}}</a>
+                                        @endif
                                     @else
                                         <a href="{{route('game.locations.location', [
                                             'location' => $location->id

@@ -6,12 +6,19 @@ use App\Flare\Models\Monster;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Monsters\Partials\Stats;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateMonster;
 
 class StatsTest extends TestCase
 {
     use RefreshDatabase, CreateMonster;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
+    }
 
     public function testTheComponentLoads() {
         Livewire::test(Stats::class)->assertSee('Name')->assertDontSee('Previous');

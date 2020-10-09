@@ -79,7 +79,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MessageThrottledHandler;
         });
 
-        $this->commands([CreateAdminAccount::class, UpdateCharacterSkills::class]);
+        $this->commands([CreateAdminAccount::class]);
     }
 
     /**
