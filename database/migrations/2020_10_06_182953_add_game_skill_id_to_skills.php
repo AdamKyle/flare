@@ -14,7 +14,7 @@ class AddGameSkillIdToSkills extends Migration
     public function up()
     {
         Schema::table('skills', function (Blueprint $table) {
-            $table->bigInteger('game_skill_id')->unsigned();
+            $table->bigInteger('game_skill_id')->unsigned()->default(0);
             $table->foreign('game_skill_id')
                   ->references('id')->on('game_skills');
         });
