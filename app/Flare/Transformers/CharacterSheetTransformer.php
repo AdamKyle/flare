@@ -5,8 +5,12 @@ namespace App\Flare\Transformers;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Transformers\Traits\SkillsTrainsformerTrait;
+
 
 class CharacterSheetTransformer extends TransformerAbstract {
+
+    use SkillsTrainsformerTrait;
 
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
@@ -17,7 +21,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'attack'        => $characterInformation->buildAttack(),
             'health'        => $characterInformation->buildHealth(),
             'ac'            => $characterInformation->buildDefence(),
-            'skills'        => $character->skills->load('baseSkill'),
+            'skills'        => $this->fetchSkills($character->skills),
             'damage_stat'   => $character->damage_stat,
             'race'          => $character->race->name,
             'class'         => $character->class->name,
@@ -38,4 +42,6 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'gold'          => $character->gold,
         ];
     }
+
+
 }

@@ -11,11 +11,11 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Console\Commands\UpdateCharacterSkills;
 use App\Flare\Handlers\MessageThrottledHandler;
-use App\Flare\Middleware\CheckApiTokenMiddleware;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
+use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
@@ -53,6 +53,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterSheetTransformer::class, function($app){
             return new CharacterSheetTransformer();
+        });
+
+        $this->app->bind(MonsterTransfromer::class, function($app){
+            return new MonsterTransfromer();
         });
 
         $this->app->bind(BaseSkillValue::class, function($app) {

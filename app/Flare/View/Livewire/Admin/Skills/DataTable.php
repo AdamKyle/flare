@@ -27,6 +27,7 @@ class DataTable extends BaseDataTable
                         ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                         ->paginate($this->perPage);
     }
+    
     public function render()
     {
         return view('components.livewire.admin.skills.data-table', [

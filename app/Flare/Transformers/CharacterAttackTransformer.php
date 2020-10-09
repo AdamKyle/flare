@@ -5,8 +5,11 @@ namespace App\Flare\Transformers;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Transformers\Traits\SkillsTrainsformerTrait;
 
 class CharacterAttackTransformer extends TransformerAbstract {
+
+    use SkillsTrainsformerTrait;
 
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
@@ -21,7 +24,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'has_affixes'         => $characterInformation->hasAffixes(),
             'has_damage_spells'   => $characterInformation->hasDamageSpells(),
             'heal_for'            => $characterInformation->buildHealFor(),
-            'skills'              => $character->skills->load('baseSkill'),
+            'skills'              => $this->fetchSkills($character->skills),
             'can_attack'          => $character->can_attack,
             'can_attack_again_at' => $character->can_attack_again_at,
             'can_craft'           => $character->can_craft,

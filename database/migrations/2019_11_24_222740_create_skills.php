@@ -26,12 +26,6 @@ class CreateSkills extends Migration
             $table->integer('xp')->nullable();
             $table->integer('xp_max')->nullable();
             $table->decimal('xp_towards')->nullable();
-            $table->decimal('base_damage_mod', 5, 4)->nullable();
-            $table->decimal('base_healing_mod', 5, 4)->nullable();
-            $table->decimal('base_ac_mod', 5, 4)->nullable();
-            $table->decimal('fight_time_out_mod', 5, 4)->nullable();
-            $table->decimal('move_time_out_mod', 5, 4)->nullable();
-            $table->decimal('skill_bonus', 5, 4);
             $table->timestamps();
         });
     }

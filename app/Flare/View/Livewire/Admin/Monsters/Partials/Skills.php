@@ -16,10 +16,7 @@ class Skills extends Component
     public $monsterSkill  = null;
     
     protected $rules = [
-        'monsterSkill.base_damage_mod'  => 'nullable',
-        'monsterSkill.base_healing_mod' => 'nullable',
-        'monsterSkill.base_ac_mod'      => 'nullable',
-        'monsterSkill.skill_bonus'      => 'required',
+        'monsterSkill.level' => 'required',
     ];
 
     protected $listeners = ['validateInput'];

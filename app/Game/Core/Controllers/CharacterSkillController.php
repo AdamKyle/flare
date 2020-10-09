@@ -42,7 +42,7 @@ class CharacterSkillController extends Controller {
         $skill->update([
             'currently_training' => true,
             'xp_towards'         => $request->xp_percentage,
-            'xp_max'             => rand(100, 1000),
+            'xp_max'             => is_null($skill->xp_max) ? rand(100, 150) : $skill->xp_max,
         ]);
 
         return redirect()->back()->with('success', 'You are now training ' . $skill->name);

@@ -81,7 +81,7 @@
                         @foreach($monsters as $monster)
                             <tr>
                                 <td>
-                                    @if (auth()->user()->hasRole('Admin'))))
+                                    @if (auth()->user()->hasRole('Admin'))
                                         <a href="{{route('monsters.monster', [
                                             'monster' => $monster->id
                                         ])}}">{{$monster->name}}</a>

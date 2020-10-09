@@ -90,13 +90,14 @@ export default class BattleAction extends React.Component {
 
     this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event) => {
       this.setState({
-        character: event.attack.data,
-        characterMaxHealth: event.attack.data.health,
+        character: event.attack,
+        characterMaxHealth: event.attack.health,
         showMessage: false,
       });
     });
 
     this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log(event);
       this.setState({
         isAdventuring: event.isAdventuring,
       }, () => {

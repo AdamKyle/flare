@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Providers;
 
+use App\Flare\Transformers\Serializers\CoreSerializer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
@@ -21,7 +22,12 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
         $this->app->bind(Manager::class, function($app) {
-            return new Manager();
+            $manager = new Manager();
+
+            // Attach the serializer
+            $manager->setSerializer(new CoreSerializer());
+
+            return $manager;
         });
 
         $this->app->bind(EquipItemService::class, function($app) {

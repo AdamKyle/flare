@@ -19,14 +19,14 @@ export default class CharacterInfoTopBar extends React.Component {
     axios.get('/api/character-sheet/' + this.props.characterId)
       .then((result) => {
         this.setState({
-          characterSheet: result.data.sheet.data,
+          characterSheet: result.data.sheet,
           isLoading: false,
         });
       });
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       this.setState({
-        characterSheet: event.characterSheet.data,
+        characterSheet: event.characterSheet,
       });
     });
   }

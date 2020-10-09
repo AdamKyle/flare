@@ -26,33 +26,17 @@
                 {{ session('message') }}
             </div>
         @endif
+        <div class="alert alert-info">
+            By increasing the level, the stat skills will be calculated automatically.
+            If you wish, you can edit the individual base skills that all monsters and characters use
+            and change their values from there.
+        </div>
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
-                    <label for="base_ac_mod">Base AC Modifier: </label>
-                    <input type="number" step="0.01" class="form-control" name="base_ac_mod" value="" wire:model="monsterSkill.base_ac_mod"> 
-                    @error('monsterSkill.base_ac_mod') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="base_damage_mod">Base Damage Modifier: </label>
-                    <input type="number" step="0.01" class="form-control" name="base_damage_mod" value="" wire:model="monsterSkill.base_damage_mod"> 
-                    @error('monsterSkill.base_damage_mod') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="base_healing_mod">Base Healing Modifier: </label>
-                    <input type="number" step="0.01" class="form-control" name="base_healing_mod" value="" wire:model="monsterSkill.base_healing_mod"> 
-                    @error('monsterSkill.base_healing_mod') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label for="skill_bonus">Skill Bonus: </label>
-                    <input type="number" step="0.01" class="form-control" name="skill_bonus" value="" wire:model="monsterSkill.skill_bonus"> 
-                    @error('monsterSkill.skill_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+                    <label for="base_ac_mod">Level: </label>
+                    <input type="number" step="0.01" class="form-control" name="base_ac_mod" value="" wire:model="monsterSkill.level"> 
+                    @error('monsterSkill.level') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
             </div>
         </div>

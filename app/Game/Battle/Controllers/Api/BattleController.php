@@ -5,6 +5,7 @@ namespace App\Game\Battle\Controllers\Api;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -16,8 +17,8 @@ use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
-use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Flare\Models\User;
+use App\Flare\Transformers\MonsterTransfromer;
 
 class BattleController extends Controller {
 
@@ -25,21 +26,25 @@ class BattleController extends Controller {
 
     private $character;
 
-    public function __construct(Manager $manager, CharacterAttackTransformer $character) {
+    private $monster;
+
+    public function __construct(Manager $manager, CharacterAttackTransformer $character, MonsterTransfromer $monster) {
         $this->middleware('auth:api');
         $this->middleware('is.character.dead')->except(['revive', 'index']);
         $this->middleware('is.character.adventuring')->except(['index']);
 
         $this->manager   = $manager;
         $this->character = $character;
+        $this->monster   = $monster;
     }
 
     public function index(Request $request) {
         $character = User::find($request->user_id)->character;
         $character = new Item($character, $this->character);
+        $monsters  = new Collection(Monster::orderBy('max_level', 'asc')->get(), $this->monster);
 
         return response()->json([
-            'monsters'  => Monster::with(['skills', 'skills.baseSkill'])->orderBy('max_level', 'asc')->get(),
+            'monsters'  => $this->manager->createData($monsters)->toArray(),
             'character' => $this->manager->createData($character)->toArray()
         ], 200);
     }

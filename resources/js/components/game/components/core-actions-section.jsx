@@ -6,77 +6,76 @@ import ContentLoader, { Facebook } from 'react-content-loader';
 
 export default class CoreActionsSection extends React.Component {
 
-	constructor(props) {
-		super(props);
+  constructor(props) {
+    super(props);
 
-		this.state = {
-			isDead: false,
-			isAdventuring: false,
-			changeCraftingType: false,
-			showCrafting: false,
-			characterId: null,
-			isLoading: true,
-			character: null,
-			monsters: null,
-			canCraft: true,
-		};
-	}
+    this.state = {
+      isDead: false,
+      isAdventuring: false,
+      changeCraftingType: false,
+      showCrafting: false,
+      characterId: null,
+      isLoading: true,
+      character: null,
+      monsters: null,
+      canCraft: true,
+    };
+  }
 
-	componentDidMount() {
-		axios.get('/api/actions', {
-			params: {
-				user_id: this.props.userId
-			}
-		}).then((result) => {
-			console.log(result.data.character);
-			this.setState({
-				character: result.data.character.data,
-				monsters: result.data.monsters,
-				isLoading: false,
-				isDead: result.data.character.data.is_dead,
-			}, () => {
-				this.props.setCharacterId(this.state.character.id);
-			});
-		});
-	}
+  componentDidMount() {
+    axios.get('/api/actions', {
+      params: {
+        user_id: this.props.userId
+      }
+    }).then((result) => {
+      this.setState({
+        character: result.data.character,
+        monsters: result.data.monsters,
+        isLoading: false,
+        isDead: result.data.character.is_dead,
+      }, () => {
+        this.props.setCharacterId(this.state.character.id);
+      });
+    });
+  }
 
-	characterIsDead(isDead) {
-		this.setState({
-			isDead: isDead,
-		});
-	}
+  characterIsDead(isDead) {
+    this.setState({
+      isDead: isDead,
+    });
+  }
 
-	characterIsAdventuring(adventuring) {
-		this.setState({
-			isAdventuring: adventuring,
-		});
-	}
+  characterIsAdventuring(adventuring) {
+    this.setState({
+      isAdventuring: adventuring,
+    });
+  }
 
-	changeCraftingType(change) {
-		this.setState({
-			changeCraftingType: change,
-		});
-	}
+  changeCraftingType(change) {
+    this.setState({
+      changeCraftingType: change,
+    });
+  }
 
-	updateShowCrafting(show) {
-		this.setState({
-			showCrafting: show,
-		});
-	}
+  updateShowCrafting(show) {
+    this.setState({
+      showCrafting: show,
+    });
+  }
 
-	updateCanCraft(can) {
-		this.setState({
-			canCraft: can,
-		});
-	}
+  updateCanCraft(can) {
+    this.setState({
+      canCraft: can,
+    });
+  }
 
-	render() {
+  render() {
 
     if (this.state.isLoading) {
       return (
         <CardTemplate>
           <ContentLoader viewBox="0 0 380 30">
-            {/* Only SVG shapes */}    
+            {/* Only SVG shapes */}
             <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
             <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
             <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
@@ -85,7 +84,7 @@ export default class CoreActionsSection extends React.Component {
       );
     }
 
-		return (
+    return (
       <CardTemplate>
         <div className="row justify-content-center">
           <div className="col-md-2">
@@ -108,10 +107,10 @@ export default class CoreActionsSection extends React.Component {
             isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
             changeCraftingType={this.changeCraftingType.bind(this)}
             updateCanCraft={this.updateCanCraft.bind(this)}
-			canAttack={this.props.canAttack}
+            canAttack={this.props.canAttack}
           />
         </div>
       </CardTemplate>
-		);
-	}
+    );
+  }
 }
