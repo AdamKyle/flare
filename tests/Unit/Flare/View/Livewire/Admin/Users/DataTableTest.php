@@ -5,123 +5,122 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Users;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Users\DataTable;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Setup\CharacterSetup;
 
 class DataTableTest extends TestCase
 {
-    // use RefreshDatabase, CreateUser;
+    use RefreshDatabase, CreateUser;
 
-    // public function setUp(): void {
-    //     parent::setUp();
+    public function setUp(): void {
+        parent::setUp();
 
-    //     (new CharacterSetup)->setupCharacter($this->createUser(), ['name' => 'trox'])
-    //         ->levelCharacterUp(10)
-    //         ->setSkill('Accuracy', [
-    //             'skill_bonus' => 10,
-    //             'xp_towards' => 10,
-    //             'currently_training' => true
-    //         ])
-    //         ->setSkill('Dodge', [
-    //             'skill_bonus' => 10,
-    //         ])
-    //         ->setSkill('Looting', [
-    //             'skill_bonus' => 0,
-    //         ])
-    //         ->getCharacter();
+        $this->seed(GameSkillsSeeder::class);
 
-    //     (new CharacterSetup)->setupCharacter($this->createUser(), ['name' => 'Zex'])
-    //         ->levelCharacterUp(10)
-    //         ->setSkill('Accuracy', [
-    //             'skill_bonus' => 10,
-    //             'xp_towards' => 10,
-    //             'currently_training' => true
-    //         ])
-    //         ->setSkill('Dodge', [
-    //             'skill_bonus' => 10,
-    //         ])
-    //         ->setSkill('Looting', [
-    //             'skill_bonus' => 0,
-    //         ])
-    //         ->getCharacter();
-    // }
+        (new CharacterSetup)->setupCharacter($this->createUser(), ['name' => 'trox'])
+            ->levelCharacterUp(10)
+            ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                'xp_towards' => 10,
+            ], true)
+            ->setSkill('Dodge', [
+                'skill_bonus_per_level' => 10,
+            ])
+            ->setSkill('Looting', [
+                'skill_bonus_per_level' => 0,
+            ])
+            ->getCharacter();
 
-    // public function testTheComponentLoads() {
+        (new CharacterSetup)->setupCharacter($this->createUser(), ['name' => 'Zex'])
+            ->levelCharacterUp(10)
+            ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                'xp_towards' => 10,
+            ], true)
+            ->setSkill('Dodge', [
+                'skill_bonus_per_level' => 10,
+            ])
+            ->setSkill('Looting', [
+                'skill_bonus_per_level' => 0,
+            ])
+            ->getCharacter();
+    }
 
-    //     Livewire::test(DataTable::class)
-    //             ->assertSee('Zex')
-    //             ->assertSee('trox');
-    // }
+    public function testTheComponentLoads() {
 
-    // public function testTheComponentLoadsOppisiteOrder() {
+        Livewire::test(DataTable::class)
+                ->assertSee('Zex')
+                ->assertSee('trox');
+    }
 
-    //     Livewire::test(DataTable::class, [
-    //         'sortAsc' => false
-    //     ])
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox');
-    // }
+    public function testTheComponentLoadsOppisiteOrder() {
 
-    // public function testSortByCharacterName() {
+        Livewire::test(DataTable::class, [
+            'sortAsc' => false
+        ])
+        ->assertSee('Zex')
+        ->assertSee('trox');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->call('sortBy', 'characters.name');
-    // }
+    public function testSortByCharacterName() {
 
-    // public function testSortByCharacterNameWithSearch() {
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->call('sortBy', 'characters.name');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->call('sortBy', 'characters.name')
-    //     ->set('search', 'trox')
-    //     ->assertDontSee('Zex');
-    // }
+    public function testSortByCharacterNameWithSearch() {
 
-    // public function testSortByUserOnline() {
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->call('sortBy', 'characters.name')
+        ->set('search', 'trox')
+        ->assertDontSee('Zex');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->call('sortBy', 'user.currently_online');
-    // }
+    public function testSortByUserOnline() {
 
-    // public function testSortByUserOnlineInReverse() {
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->call('sortBy', 'user.currently_online');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->call('sortBy', 'user.currently_online')
-    //     ->call('sortBy', 'user.currently_online');
-    // }
+    public function testSortByUserOnlineInReverse() {
 
-    // public function testSearch() {
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->call('sortBy', 'user.currently_online')
+        ->call('sortBy', 'user.currently_online');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->set('search', 'trox')
-    //     ->assertDontSee('Zex');
-    // }
+    public function testSearch() {
 
-    // public function testSearchForNonExistantCharacter() {
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->set('search', 'trox')
+        ->assertDontSee('Zex');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->set('search', '9879879879')
-    //     ->assertDontSee('Zex')
-    //     ->assertDontSee('tox');
-    // }
+    public function testSearchForNonExistantCharacter() {
 
-    // public function testSearchForCharacterNotOnline() {
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->set('search', '9879879879')
+        ->assertDontSee('Zex')
+        ->assertDontSee('tox');
+    }
 
-    //     Livewire::test(DataTable::class)
-    //     ->assertSee('Zex')
-    //     ->assertSee('trox')
-    //     ->set('search', 'no');
-    // }
+    public function testSearchForCharacterNotOnline() {
+
+        Livewire::test(DataTable::class)
+        ->assertSee('Zex')
+        ->assertSee('trox')
+        ->set('search', 'no');
+    }
 }

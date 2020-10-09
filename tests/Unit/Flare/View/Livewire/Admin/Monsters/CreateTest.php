@@ -5,6 +5,7 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Monsters;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Monsters\Create;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateMonster;
 

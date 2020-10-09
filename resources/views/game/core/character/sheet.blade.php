@@ -114,7 +114,7 @@
                                                             @csrf
                                                         </form>
                                                     @endif
-                                                    @include('game.core.character.partials.skill-train-modal', ['skill' => $skill])
+                                                    @include('game.core.character.partials.skill-train-modal', ['skill' => $skill, 'character' => $character])
                                                 </div>
                                             @endif
                                         </div>

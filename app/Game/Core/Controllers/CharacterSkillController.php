@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Requests\TrainSkillValidation;
@@ -18,11 +19,9 @@ class CharacterSkillController extends Controller {
         ]);
     }
 
-    public function train(TrainSkillValidation $request) {
-        $character = auth()->user()->character;
-
+    public function train(TrainSkillValidation $request, Character $character) {
         // Find the skill we want to train.
-        $skill = $character->refresh()->skills->filter(function ($skill) use($request) {
+        $skill = $character->skills->filter(function ($skill) use($request) {
             return $skill->id === (int) $request->skill_id;
         })->first();
 
@@ -30,15 +29,18 @@ class CharacterSkillController extends Controller {
             return redirect()->back()->with('error', 'Invalid Input.');
         }
 
-        // Update all skills.
-        $character->skills->each(function($skill) {
-            $skill->update([
+        $skillCurrentlyTraining = $character->skills->filter(function($skill) {
+            return $skill->currently_training;
+        })->first();
+
+        if (!is_null($skillCurrentlyTraining)) {
+            $skillCurrentlyTraining->update([
                 'currently_training' => false,
                 'xp_twoards'         => 0.0,
             ]);
-        });
+        }
 
-        // Beggin training
+        // Begin training
         $skill->update([
             'currently_training' => true,
             'xp_towards'         => $request->xp_percentage,

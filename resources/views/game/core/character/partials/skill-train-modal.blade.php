@@ -15,7 +15,9 @@
           <div class="alert alert-warning">
               <strong>Please note</strong> if you select 100%, you will not gain any levels as all your exp is going towards skills.
           </div>
-          <form action="{{route('train.skill')}}" id="train-skill-{{$skill->id}}" method="POST">
+          <form action="{{route('train.skill', [
+            'character' => $character->id
+          ])}}" id="train-skill-{{$skill->id}}" method="POST">
               @csrf
 
               <input type="hidden" name="skill_id" value="{{$skill->id}}" />
@@ -39,7 +41,9 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <a class="btn btn-primary" href="{{route('train.skill')}}"
+            <a class="btn btn-primary" href="{{route('train.skill', [
+              'character' => $character->id
+            ])}}"
                 onclick="event.preventDefault();
                                 document.getElementById('train-skill-{{$skill->id}}').submit();">
                 {{ __('Train this skill') }}

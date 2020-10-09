@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Core\Api;
 
 use App\Flare\Models\ItemAffix;
+use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -11,131 +12,133 @@ use Tests\Setup\CharacterSetup;
 
 class CharacterSheetControllerApiTest extends TestCase {
 
-    // use RefreshDatabase,
-    //     CreateUser,
-    //     CreateItem;
+    use RefreshDatabase,
+        CreateUser,
+        CreateItem;
 
-    // private $character;
+    private $character;
 
-    // public function setUp(): void {
-    //     parent::setUp();
+    public function setUp(): void {
+        parent::setUp();
 
-    //     $user  = $this->createUser();
+        $this->seed(GameSkillsSeeder::class);
 
-    //     $item = $this->createItem([
-    //         'name' => 'Rusty Dagger',
-    //         'type' => 'weapon',
-    //         'base_damage' => 3,
-    //     ]);
+        $user  = $this->createUser();
 
-    //     $this->character = (new CharacterSetup)->setupCharacter($user)
-    //                                            ->giveItem($item)
-    //                                            ->equipRightHand()
-    //                                            ->setSkill('Looting', [])
-    //                                            ->getCharacter();
+        $item = $this->createItem([
+            'name' => 'Rusty Dagger',
+            'type' => 'weapon',
+            'base_damage' => 3,
+        ]);
 
-    //     $this->character->inventory->slots()->insert([
-    //        [
-    //            'inventory_id' => $this->character->inventory->id,
-    //            'item_id'      => $item->id
-    //        ],
-    //     ]);
-    // }
+        $this->character = (new CharacterSetup)->setupCharacter($user)
+                                               ->giveItem($item)
+                                               ->equipRightHand()
+                                               ->setSkill('Looting', [])
+                                               ->getCharacter();
 
-    // public function tearDown(): void {
-    //     parent::tearDown();
+        $this->character->inventory->slots()->insert([
+           [
+               'inventory_id' => $this->character->inventory->id,
+               'item_id'      => $item->id
+           ],
+        ]);
+    }
 
-    //     $this->character = null;
-    // }
+    public function tearDown(): void {
+        parent::tearDown();
 
-    // public function testGetCharacterInfo() {
-    //     $response = $this->actingAs($this->character->user, 'api')
-    //                      ->json('GET', '/api/character-sheet/' . $this->character->id)
-    //                      ->response;
+        $this->character = null;
+    }
 
-    //     $content = json_decode($response->content());
+    public function testGetCharacterInfo() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
 
-    //     $this->assertEquals(200, $response->status());
-    //     $this->assertFalse(empty($content->sheet->data->skills));
-    //     $this->assertEquals($this->character->name, $content->sheet->data->name);
-    // }
+        $content = json_decode($response->content());
 
-    // public function testGetCharacterInfoWithBothLeftAndRightWeapon() {
-    //     $response = $this->actingAs($this->character->user, 'api')
-    //                      ->json('GET', '/api/character-sheet/' . $this->character->id)
-    //                      ->response;
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->skills));
+        $this->assertEquals($this->character->name, $content->sheet->name);
+    }
 
-    //     $content = json_decode($response->content());
+    public function testGetCharacterInfoWithBothLeftAndRightWeapon() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
 
-    //     $this->assertEquals(200, $response->status());
-    //     $this->assertFalse(empty($content->sheet->data->skills));
-    //     $this->assertEquals($this->character->name, $content->sheet->data->name);
-    // }
+        $content = json_decode($response->content());
 
-    // public function testGetCharacterInfoWithRightHand() {
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->skills));
+        $this->assertEquals($this->character->name, $content->sheet->name);
+    }
 
-    //     $response = $this->actingAs($this->character->user, 'api')
-    //                      ->json('GET', '/api/character-sheet/' . $this->character->id)
-    //                      ->response;
+    public function testGetCharacterInfoWithRightHand() {
 
-    //     $content = json_decode($response->content());
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
 
-    //     $this->assertEquals(200, $response->status());
-    //     $this->assertFalse(empty($content->sheet->data->skills));
-    //     $this->assertEquals($this->character->name, $content->sheet->data->name);
-    // }
+        $content = json_decode($response->content());
 
-    // public function testGetCharacterInfoWithNoWeapon() {
-    //     $this->character->inventory->slots->each(function($slot){
-    //         $slot->update([
-    //             'position' => null,
-    //             'equipped' => false,
-    //         ]);
-    //     });
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->skills));
+        $this->assertEquals($this->character->name, $content->sheet->name);
+    }
 
-    //     $response = $this->actingAs($this->character->user, 'api')
-    //                      ->json('GET', '/api/character-sheet/' . $this->character->id)
-    //                      ->response;
+    public function testGetCharacterInfoWithNoWeapon() {
+        $this->character->inventory->slots->each(function($slot){
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
 
-    //     $content = json_decode($response->content());
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
 
-    //     $this->assertEquals(200, $response->status());
-    //     $this->assertFalse(empty($content->sheet->data->skills));
-    // }
+        $content = json_decode($response->content());
 
-    // public function testGetCharacterInfoWithModdedStat() {
+        $this->assertEquals(200, $response->status());
+        $this->assertFalse(empty($content->sheet->skills));
+    }
 
-    //     $item = $this->createItem([
-    //         'name' => 'sword',
-    //         'type' => 'weapon',
-    //         'str_mod' => 0.1,
-    //         'base_damage' => 6,
-    //         'item_prefix_id' => ItemAffix::create([
-    //             'name'                 => 'Sample 2',
-    //             'base_damage_mod'      => '0.10',
-    //             'type'                 => 'prefix',
-    //             'description'          => 'Sample',
-    //             'base_healing_mod'     => '0.10',
-    //             'str_mod'              => '0.10',
-    //             'cost'                 => 100,
-    //         ])->id,
-    //     ]);
+    public function testGetCharacterInfoWithModdedStat() {
 
-    //     $this->character->inventory->slots()->create([
-    //         'inventory_id' => $this->character->inventory->id,
-    //         'item_id'      => $item->id,
-    //         'equipped'     => true,
-    //         'position'     => 'left-hand',
-    //     ]);
+        $item = $this->createItem([
+            'name' => 'sword',
+            'type' => 'weapon',
+            'str_mod' => 0.1,
+            'base_damage' => 6,
+            'item_prefix_id' => ItemAffix::create([
+                'name'                 => 'Sample 2',
+                'base_damage_mod'      => '0.10',
+                'type'                 => 'prefix',
+                'description'          => 'Sample',
+                'base_healing_mod'     => '0.10',
+                'str_mod'              => '0.10',
+                'cost'                 => 100,
+            ])->id,
+        ]);
 
-    //     $this->character->refresh();
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equipped'     => true,
+            'position'     => 'left-hand',
+        ]);
 
-    //     $response = $this->actingAs($this->character->user, 'api')
-    //                      ->json('GET', '/api/character-sheet/' . $this->character->id)
-    //                      ->response;
+        $this->character->refresh();
 
-    //     $content = json_decode($response->content());
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character-sheet/' . $this->character->id)
+                         ->response;
 
-    //     $this->assertFalse($content->sheet->data->str_modded === $this->character->str);
-    // }
+        $content = json_decode($response->content());
+
+        $this->assertFalse($content->sheet->str_modded === $this->character->str);
+    }
 }

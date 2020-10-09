@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
@@ -115,18 +116,6 @@ class BattleControllerApiTest extends TestCase
     public function testCanGetActionsWithSkills() {
 
         $this->setUpCharacter();
-
-        $this->character->skills->where('name', 'Looting')->first()->update([
-            'base_damage_mod' => 0.5
-        ]);
-
-        $this->character->skills->where('name', 'Dodge')->first()->update([
-            'base_ac_mod' => 0.5
-        ]);
-
-        $this->character->skills->where('name', 'Accuracy')->first()->update([
-            'base_healing_mod' => 0.5
-        ]);
 
         $this->character->refresh();
 

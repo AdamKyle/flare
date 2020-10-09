@@ -61,9 +61,8 @@ class RandomItemDropBuilderTest extends TestCase
         ]);
 
         $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
-                                               ->setSkill('Looting', [
+                                               ->setSkill('Looting', ['skill_bonus_per_level' => 100], [
                                                    'level'       => 100,
-                                                   'skill_bonus' => 100,
                                                ])
                                                ->getCharacter();
     }
@@ -78,9 +77,13 @@ class RandomItemDropBuilderTest extends TestCase
         $randomItemGenerator = resolve(RandomItemDropBuilder::class)
                                     ->setItemAffixes(ItemAffix::all());
 
-        $looting = $this->character->skills->where('name', 'Looting')->first();
+        $looting = $this->character->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('name', 'Looting');
+        })->first();
+
         $looting->update([
-            'skill_bonus' => -100
+            'skill_bonus_per_level' => -100
         ]);
 
         $item = $randomItemGenerator->generateItem($this->character);
@@ -92,7 +95,11 @@ class RandomItemDropBuilderTest extends TestCase
         $randomItemGenerator = resolve(RandomItemDropBuilder::class)
                                     ->setItemAffixes(ItemAffix::all());
 
-        $looting = $this->character->skills->where('name', 'Looting')->first();
+        $looting = $this->character->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('name', 'Looting');
+        })->first();
+
         $looting->update([
             'skill_bonus' => 100
         ]);

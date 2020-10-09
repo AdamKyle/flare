@@ -3,7 +3,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 8.5.0.
+ * Generated for Laravel 8.8.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -2549,7 +2549,7 @@
          * Begin broadcasting an event.
          *
          * @param mixed|null $event
-         * @return \Illuminate\Broadcasting\PendingBroadcast|void 
+         * @return \Illuminate\Broadcasting\PendingBroadcast 
          * @static 
          */ 
         public static function event($event = null)
@@ -2967,8 +2967,6 @@
             /**
      * 
      *
-     * @method static \Illuminate\Contracts\Cache\Lock lock(string $name, int $seconds = 0, mixed $owner = null)
-     * @method static \Illuminate\Contracts\Cache\Lock restoreLock(string $name, string $owner)
      * @see \Illuminate\Cache\CacheManager
      * @see \Illuminate\Cache\Repository
      */ 
@@ -3538,6 +3536,33 @@
                         return $instance->macroCall($method, $parameters);
         }
                     /**
+         * Get a lock instance.
+         *
+         * @param string $name
+         * @param int $seconds
+         * @param string|null $owner
+         * @return \Illuminate\Contracts\Cache\Lock 
+         * @static 
+         */ 
+        public static function lock($name, $seconds = 0, $owner = null)
+        {
+                        /** @var \Illuminate\Cache\RedisStore $instance */
+                        return $instance->lock($name, $seconds, $owner);
+        }
+                    /**
+         * Restore a lock instance using the owner identifier.
+         *
+         * @param string $name
+         * @param string $owner
+         * @return \Illuminate\Contracts\Cache\Lock 
+         * @static 
+         */ 
+        public static function restoreLock($name, $owner)
+        {
+                        /** @var \Illuminate\Cache\RedisStore $instance */
+                        return $instance->restoreLock($name, $owner);
+        }
+                    /**
          * Remove all items from the cache.
          *
          * @return bool 
@@ -3545,30 +3570,42 @@
          */ 
         public static function flush()
         {
-                        /** @var \Illuminate\Cache\FileStore $instance */
+                        /** @var \Illuminate\Cache\RedisStore $instance */
                         return $instance->flush();
         }
                     /**
-         * Get the Filesystem instance.
+         * Get the Redis connection instance.
          *
-         * @return \Illuminate\Filesystem\Filesystem 
+         * @return \Illuminate\Redis\Connections\Connection 
          * @static 
          */ 
-        public static function getFilesystem()
+        public static function connection()
         {
-                        /** @var \Illuminate\Cache\FileStore $instance */
-                        return $instance->getFilesystem();
+                        /** @var \Illuminate\Cache\RedisStore $instance */
+                        return $instance->connection();
         }
                     /**
-         * Get the working directory of the cache.
+         * Set the connection name to be used.
          *
-         * @return string 
+         * @param string $connection
+         * @return void 
          * @static 
          */ 
-        public static function getDirectory()
+        public static function setConnection($connection)
         {
-                        /** @var \Illuminate\Cache\FileStore $instance */
-                        return $instance->getDirectory();
+                        /** @var \Illuminate\Cache\RedisStore $instance */
+                        $instance->setConnection($connection);
+        }
+                    /**
+         * Get the Redis database instance.
+         *
+         * @return \Illuminate\Contracts\Redis\Factory 
+         * @static 
+         */ 
+        public static function getRedis()
+        {
+                        /** @var \Illuminate\Cache\RedisStore $instance */
+                        return $instance->getRedis();
         }
                     /**
          * Get the cache key prefix.
@@ -3578,8 +3615,20 @@
          */ 
         public static function getPrefix()
         {
-                        /** @var \Illuminate\Cache\FileStore $instance */
+                        /** @var \Illuminate\Cache\RedisStore $instance */
                         return $instance->getPrefix();
+        }
+                    /**
+         * Set the cache key prefix.
+         *
+         * @param string $prefix
+         * @return void 
+         * @static 
+         */ 
+        public static function setPrefix($prefix)
+        {
+                        /** @var \Illuminate\Cache\RedisStore $instance */
+                        $instance->setPrefix($prefix);
         }
          
     }
@@ -13805,7 +13854,7 @@
                     /**
          * Start a component rendering process.
          *
-         * @param \Illuminate\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string $view
+         * @param \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string $view
          * @param array $data
          * @return void 
          * @static 
@@ -14243,6 +14292,435 @@
         class Str {
          
     }
+            /**
+     * 
+     *
+     */ 
+        class Collection {
+                    /**
+         * 
+         *
+         * @param mixed $currentItem
+         * @param mixed $fallback
+         * @static 
+         */ 
+        public static function after($currentItem, $fallback = null)
+        {
+                        return \Illuminate\Support\Collection::after($currentItem, $fallback);
+        }
+                    /**
+         * 
+         *
+         * @param mixed $index
+         * @static 
+         */ 
+        public static function at($index)
+        {
+                        return \Illuminate\Support\Collection::at($index);
+        }
+                    /**
+         * 
+         *
+         * @param mixed $currentItem
+         * @param mixed $fallback
+         * @static 
+         */ 
+        public static function before($currentItem, $fallback = null)
+        {
+                        return \Illuminate\Support\Collection::before($currentItem, $fallback);
+        }
+                    /**
+         * 
+         *
+         * @param \Closure $callback
+         * @param bool $preserveKeys
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function chunkBy($callback, $preserveKeys = false)
+        {
+                        return \Illuminate\Support\Collection::chunkBy($callback, $preserveKeys);
+        }
+                    /**
+         * 
+         *
+         * @param mixed $key
+         * @param mixed $default
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function collectBy($key, $default = null)
+        {
+                        return \Illuminate\Support\Collection::collectBy($key, $default);
+        }
+                    /**
+         * 
+         *
+         * @param int $chunkSize
+         * @param bool $preserveKeys
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function eachCons($chunkSize, $preserveKeys = false)
+        {
+                        return \Illuminate\Support\Collection::eachCons($chunkSize, $preserveKeys);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function eighth()
+        {
+                        return \Illuminate\Support\Collection::eighth();
+        }
+                    /**
+         * 
+         *
+         * @param mixed $keys
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function extract($keys)
+        {
+                        return \Illuminate\Support\Collection::extract($keys);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function fifth()
+        {
+                        return \Illuminate\Support\Collection::fifth();
+        }
+                    /**
+         * 
+         *
+         * @param callable $callback
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function filterMap($callback)
+        {
+                        return \Illuminate\Support\Collection::filterMap($callback);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function firstOrFail()
+        {
+                        return \Illuminate\Support\Collection::firstOrFail();
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function fourth()
+        {
+                        return \Illuminate\Support\Collection::fourth();
+        }
+                    /**
+         * 
+         *
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function fromPairs()
+        {
+                        return \Illuminate\Support\Collection::fromPairs();
+        }
+                    /**
+         * 
+         *
+         * @param string $pattern
+         * @param int $flags
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function glob($pattern, $flags = 0)
+        {
+                        return \Illuminate\Support\Collection::glob($pattern, $flags);
+        }
+                    /**
+         * 
+         *
+         * @param mixed $callback
+         * @param bool $preserveKeys
+         * @param mixed $modelKey
+         * @param mixed $itemsKey
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function groupByModel($callback, $preserveKeys = false, $modelKey = 0, $itemsKey = 1)
+        {
+                        return \Illuminate\Support\Collection::groupByModel($callback, $preserveKeys, $modelKey, $itemsKey);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function head()
+        {
+                        return \Illuminate\Support\Collection::head();
+        }
+                    /**
+         * 
+         *
+         * @param callable $callback
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function ifAny($callback)
+        {
+                        return \Illuminate\Support\Collection::ifAny($callback);
+        }
+                    /**
+         * 
+         *
+         * @param callable $callback
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function ifEmpty($callback)
+        {
+                        return \Illuminate\Support\Collection::ifEmpty($callback);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function ninth()
+        {
+                        return \Illuminate\Support\Collection::ninth();
+        }
+                    /**
+         * 
+         *
+         * @param mixed $key
+         * @param mixed $value
+         * @return bool 
+         * @static 
+         */ 
+        public static function none($key, $value = null)
+        {
+                        return \Illuminate\Support\Collection::none($key, $value);
+        }
+                    /**
+         * 
+         *
+         * @param int $perPage
+         * @param string $pageName
+         * @param int|null $page
+         * @param int|null $total
+         * @param array $options
+         * @return \Illuminate\Pagination\LengthAwarePaginator 
+         * @static 
+         */ 
+        public static function paginate($perPage = 15, $pageName = 'page', $page = null, $total = null, $options = [])
+        {
+                        return \Illuminate\Support\Collection::paginate($perPage, $pageName, $page, $total, $options);
+        }
+                    /**
+         * 
+         *
+         * @param callable $callback
+         * @param mixed $workers
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function parallelMap($callback, $workers = null)
+        {
+                        return \Illuminate\Support\Collection::parallelMap($callback, $workers);
+        }
+                    /**
+         * 
+         *
+         * @param mixed $value
+         * @param mixed $key
+         * @return array 
+         * @static 
+         */ 
+        public static function pluckToArray($value, $key = null)
+        {
+                        return \Illuminate\Support\Collection::pluckToArray($value, $key);
+        }
+                    /**
+         * 
+         *
+         * @param callable $callable
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function prioritize($callable)
+        {
+                        return \Illuminate\Support\Collection::prioritize($callable);
+        }
+                    /**
+         * 
+         *
+         * @param int $offset
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function rotate($offset)
+        {
+                        return \Illuminate\Support\Collection::rotate($offset);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function second()
+        {
+                        return \Illuminate\Support\Collection::second();
+        }
+                    /**
+         * 
+         *
+         * @param mixed $key
+         * @param bool $preserveKeys
+         * @param mixed $sectionKey
+         * @param mixed $itemsKey
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function sectionBy($key, $preserveKeys = false, $sectionKey = 0, $itemsKey = 1)
+        {
+                        return \Illuminate\Support\Collection::sectionBy($key, $preserveKeys, $sectionKey, $itemsKey);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function seventh()
+        {
+                        return \Illuminate\Support\Collection::seventh();
+        }
+                    /**
+         * 
+         *
+         * @param int $perPage
+         * @param string $pageName
+         * @param int|null $page
+         * @param array $options
+         * @return \Illuminate\Pagination\Paginator 
+         * @static 
+         */ 
+        public static function simplePaginate($perPage = 15, $pageName = 'page', $page = null, $options = [])
+        {
+                        return \Illuminate\Support\Collection::simplePaginate($perPage, $pageName, $page, $options);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function sixth()
+        {
+                        return \Illuminate\Support\Collection::sixth();
+        }
+                    /**
+         * 
+         *
+         * @param mixed $callback
+         * @param bool $preserveKeys
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function sliceBefore($callback, $preserveKeys = false)
+        {
+                        return \Illuminate\Support\Collection::sliceBefore($callback, $preserveKeys);
+        }
+                    /**
+         * 
+         *
+         * @param bool $preserveKeys
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function tail($preserveKeys = false)
+        {
+                        return \Illuminate\Support\Collection::tail($preserveKeys);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function tenth()
+        {
+                        return \Illuminate\Support\Collection::tenth();
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function third()
+        {
+                        return \Illuminate\Support\Collection::third();
+        }
+                    /**
+         * 
+         *
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function toPairs()
+        {
+                        return \Illuminate\Support\Collection::toPairs();
+        }
+                    /**
+         * 
+         *
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function transpose()
+        {
+                        return \Illuminate\Support\Collection::transpose();
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function try()
+        {
+                        return \Illuminate\Support\Collection::try();
+        }
+                    /**
+         * 
+         *
+         * @param mixed $callback
+         * @return bool 
+         * @static 
+         */ 
+        public static function validate($callback)
+        {
+                        return \Illuminate\Support\Collection::validate($callback);
+        }
+                    /**
+         * 
+         *
+         * @param int $size
+         * @return \Illuminate\Support\Collection 
+         * @static 
+         */ 
+        public static function withSize($size)
+        {
+                        return \Illuminate\Support\Collection::withSize($size);
+        }
+         
+    }
      
 }
 
@@ -14503,6 +14981,16 @@
         {
                         /** @var \Livewire\LivewireManager $instance */
                         return $instance->component($alias, $viewClass);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getAlias($class, $default = null)
+        {
+                        /** @var \Livewire\LivewireManager $instance */
+                        return $instance->getAlias($class, $default);
         }
                     /**
          * 

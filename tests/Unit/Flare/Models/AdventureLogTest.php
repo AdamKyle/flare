@@ -4,6 +4,7 @@ namespace Tests\Unit\Flare\Models;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\AdventureLog;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Setup\CharacterSetup;
