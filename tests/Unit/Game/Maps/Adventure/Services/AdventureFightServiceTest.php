@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
 use App\Game\Maps\Adventure\Services\AdventureFightService;
 use App\Game\Maps\Adventure\Services\AdventureService;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\Setup\AdventureSetup;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -34,6 +35,8 @@ class AdventureFightServiceTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
 
         $this->setUpBaseEnviroment();
 
@@ -158,15 +161,15 @@ class AdventureFightServiceTest extends TestCase
                                         ->equipSpellSlot(1, 'spell-one')
                                         ->equipSpellSlot(2, 'spell-two')
                                         ->equipArtifact(3)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus' => 10,
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10,],
+                                        [    
                                             'xp_towards' => 10,
                                         ], true)
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 0,
+                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->getCharacter();
     }

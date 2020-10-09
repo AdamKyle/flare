@@ -11,6 +11,7 @@ use App\Game\Maps\Adventure\Events\ShowTimeOutEvent;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Maps\Adventure\Listeners\EmbarkOnAdventureListener;
 use Cache;
+use Database\Seeders\GameSkillsSeeder;
 use Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -21,6 +22,12 @@ class EmbarkOnAdventureEventTest extends TestCase
 {
     use RefreshDatabase, CreateUser, CreateAdventure;
 
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
+    }
+
 
     public function testAllLevelsAtATime()
     {
@@ -30,15 +37,14 @@ class EmbarkOnAdventureEventTest extends TestCase
 
         $character = (new CharacterSetup)->setupCharacter($user)
                                          ->createAdventureLog($adventure)
-                                         ->setSkill('Accuracy', [
-                                                'skill_bonus' => 10,
+                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10],[
                                                 'xp_towards' => 10,
                                             ], true)
                                          ->setSkill('Dodge', [
-                                                'skill_bonus' => 10,
+                                                'skill_bonus_per_level' => 10,
                                             ])
                                          ->setSkill('Looting', [
-                                                'skill_bonus' => 0,
+                                                'skill_bonus_per_level' => 0,
                                             ])
                                          ->getCharacter();
         
@@ -62,15 +68,14 @@ class EmbarkOnAdventureEventTest extends TestCase
 
         $character = (new CharacterSetup)->setupCharacter($user)
                                          ->createAdventureLog($adventure)
-                                         ->setSkill('Accuracy', [
-                                                'skill_bonus' => 10,
+                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
                                                 'xp_towards' => 10,
                                             ], true)
                                          ->setSkill('Dodge', [
-                                                'skill_bonus' => 10,
+                                                'skill_bonus_per_level' => 10,
                                             ])
                                          ->setSkill('Looting', [
-                                                'skill_bonus' => 0,
+                                                'skill_bonus_per_level' => 0,
                                             ])
                                          ->getCharacter();
         
@@ -96,15 +101,14 @@ class EmbarkOnAdventureEventTest extends TestCase
                                          ->createAdventureLog($adventure, [
                                              'in_progress' => true
                                          ])
-                                         ->setSkill('Accuracy', [
-                                                'skill_bonus' => 10,
+                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
                                                 'xp_towards' => 10,
                                             ], true)
                                          ->setSkill('Dodge', [
-                                                'skill_bonus' => 10,
+                                                'skill_bonus_per_level' => 10,
                                             ])
                                          ->setSkill('Looting', [
-                                                'skill_bonus' => 0,
+                                                'skill_bonus_per_level' => 0,
                                             ])
                                          ->getCharacter();
         
@@ -131,15 +135,14 @@ class EmbarkOnAdventureEventTest extends TestCase
                                          ->createAdventureLog($adventure, [
                                              'in_progress' => true
                                          ])
-                                         ->setSkill('Accuracy', [
-                                                'skill_bonus' => 10,
+                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10,], [
                                                 'xp_towards' => 10,
                                             ], true)
                                          ->setSkill('Dodge', [
-                                                'skill_bonus' => 10,
+                                                'skill_bonus_per_level' => 10,
                                             ])
                                          ->setSkill('Looting', [
-                                                'skill_bonus' => 0,
+                                                'skill_bonus_per_level' => 0,
                                             ])
                                          ->getCharacter();
         

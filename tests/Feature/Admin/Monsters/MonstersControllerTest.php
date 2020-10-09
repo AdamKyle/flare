@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin\Monsters;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Flare\Models\Monster as Monster;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
@@ -22,6 +23,8 @@ class MonstersControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
 
         $role = $this->createAdminRole();
 

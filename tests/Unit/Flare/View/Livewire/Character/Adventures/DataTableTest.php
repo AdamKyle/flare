@@ -5,6 +5,7 @@ namespace Tests\Unit\Flare\View\Livewire\Character\Adventures;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Character\Adventures\DataTable;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateUser;
@@ -19,6 +20,8 @@ class DataTableTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
+        $this->seed(GameSkillsSeeder::class);
+
         $user = $this->createUser();
 
         $adventure = $this->createNewAdventure();
@@ -30,16 +33,15 @@ class DataTableTest extends TestCase
                                             'in_progress'          => false,
                                             'last_completed_level' => 1,
                                         ])
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus' => 10,
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
                                             'xp_towards' => 10,
                                             'currently_training' => true
                                         ])
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 0,
+                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->getCharacter();
     }

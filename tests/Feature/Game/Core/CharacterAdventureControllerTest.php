@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Core;
 
 use App\Flare\Models\ItemAffix;
+use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -25,6 +26,8 @@ class CharacterAdventureControllerTest extends TestCase
     {
         parent::setUp();
 
+        $this->seed(GameSkillsSeeder::class);
+
         $this->adventure = $this->createNewAdventure();
 
         $item = $this->createItem([
@@ -36,12 +39,18 @@ class CharacterAdventureControllerTest extends TestCase
 
         $this->character = (new CharacterSetup())
             ->setupCharacter($this->createUser())
-            ->setSkill('looting', [
+            ->setSkill('Looting', [], [
                 'level' => 0,
                 'xp_towards' => 0.10,
                 'currently_training' => true,
             ])
             ->getCharacter();
+
+
+        $skill = $this->character->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('name', 'Looting'); 
+        })->first();
 
         $this->character->adventureLogs()->create([
             'character_id'         => $this->character->id,
@@ -75,9 +84,9 @@ class CharacterAdventureControllerTest extends TestCase
                   ],
                 ],
                 "skill" => [
-                  "exp" => 1000,
-                  "skill" => $this->character->skills->where('name', 'looting')->first(),
-                  "exp_towards" => $this->character->skills->where('name', 'looting')->first()->xp_towards,
+                  "exp"         => 1000,
+                  "skill_name"  => $skill->name,
+                  "exp_towards" => $skill->xp_towards,
                 ],
               ]
         ]);
@@ -156,7 +165,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response->assertSessionHas('success', [
            'You gained a level! Now level: 2',
-           'Your skill: looting gained a level and is now level: 1',
+           'Your skill: Looting gained a level and is now level: 1',
            'You gained the item: Spear',
         ]); 
     }

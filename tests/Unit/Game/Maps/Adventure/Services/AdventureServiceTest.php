@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
 use App\Game\Maps\Adventure\Services\AdventureService;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\Setup\AdventureSetup;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -24,6 +25,8 @@ class AdventureServiceTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
+        $this->seed(GameSkillsSeeder::class);
+
         Queue::fake();
         Event::fake();
     }
@@ -38,15 +41,15 @@ class AdventureServiceTest extends TestCase
                                         ->levelCharacterUp(10)
                                         ->createAdventureLog($adventure)
                                         ->setSkill('Accuracy', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
+                                        ], [
                                             'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
+                                        ], true)
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 0,
+                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->getCharacter();
 
@@ -73,14 +76,15 @@ class AdventureServiceTest extends TestCase
                                         ->levelCharacterUp(10)
                                         ->createAdventureLog($adventure)
                                         ->setSkill('Accuracy', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
+                                        ], [
                                             'xp_towards' => 10,
                                         ], true)
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->getCharacter();
 
@@ -123,13 +127,13 @@ class AdventureServiceTest extends TestCase
         $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->setSkill('Accuracy', [
-                                            'skill_bonus' => 0,
+                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 0,
+                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 0,
+                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->getCharacter();
 
@@ -173,13 +177,13 @@ class AdventureServiceTest extends TestCase
                                             'logs' => [['adventure' => 'sample']],
                                         ])
                                         ->setSkill('Accuracy', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->getCharacter();
 
@@ -241,13 +245,13 @@ class AdventureServiceTest extends TestCase
                                             ],
                                         ])
                                         ->setSkill('Accuracy', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Dodge', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->setSkill('Looting', [
-                                            'skill_bonus' => 10,
+                                            'skill_bonus_per_level' => 10,
                                         ])
                                         ->getCharacter();
 

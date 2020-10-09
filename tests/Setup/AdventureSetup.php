@@ -3,6 +3,7 @@
 namespace Tests\Setup;
 
 use App\Flare\Models\Adventure;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
 use Tests\Traits\CreateAdventure;
@@ -16,8 +17,8 @@ class AdventureSetup {
     public function setMonster(Monster $monster, int $bonusIncrease = 0): AdventureSetup {
         $this->monster = $monster;
 
-        foreach(config('game.skills') as $options) {
-            $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $options);
+        foreach(GameSkill::all() as $gameSkill) {
+            $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $gameSkill);
         }
         
         if ($bonusIncrease !== 0) {

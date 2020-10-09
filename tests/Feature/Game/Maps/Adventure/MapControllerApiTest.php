@@ -14,6 +14,7 @@ use Tests\Setup\CharacterSetup;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Flare\Models\GameMap;
 use App\Game\Maps\Adventure\Values\MapTileValue;
+use Database\Seeders\GameSkillsSeeder;
 use Mockery;
 
 class MapControllerApiTest extends TestCase
@@ -29,6 +30,8 @@ class MapControllerApiTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
 
         Queue::fake();
 
