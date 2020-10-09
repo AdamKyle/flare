@@ -106,7 +106,6 @@ class AdventureFightServiceTest extends TestCase
             'dex_mod'              => '0.10',
             'chr_mod'              => '0.10',
             'int_mod'              => '0.10',
-            'ac_mod'               => '0.10',
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);
@@ -122,7 +121,6 @@ class AdventureFightServiceTest extends TestCase
             'dex_mod'              => '0.50',
             'chr_mod'              => '0.10',
             'int_mod'              => '0.10',
-            'ac_mod'               => '0.10',
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);

@@ -21,7 +21,7 @@ class CharacterRewardService {
     public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null) {
         $currentSkill = $this->fetchCurrentSkillInTraining();
         $xpReduction  = 0.0;
-
+        
         if (!is_null($currentSkill)) {
             $xpReduction = $currentSkill->xp_towards;
 
@@ -39,6 +39,7 @@ class CharacterRewardService {
     }
 
     public function fetchCurrentSkillInTraining() {
+        // dump($this->character->skills);
         return $this->character->skills->filter(function($skill) {
             return $skill->currently_training;
         })->first();

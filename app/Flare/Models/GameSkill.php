@@ -4,7 +4,7 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\SkillFactory;
+use Database\Factories\GameSkillFactory;
 
 class GameSkill extends Model
 {
@@ -47,5 +47,9 @@ class GameSkill extends Model
     public static function dataTableSearch($query) {
         return empty($query) ? static::query()
             : static::where('name', 'like', '%'.$query.'%');
+    }
+
+    protected static function newFactory() {
+        return GameSkillFactory::new();
     }
 }

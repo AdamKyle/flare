@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Database\Seeders\GameSkillsSeeder;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase

@@ -32,7 +32,6 @@ class ItemAffixFactory extends Factory
             'dex_mod'              => null,
             'chr_mod'              => null,
             'int_mod'              => null,
-            'ac_mod'               => null,
             'skill_name'           => null,
             'skill_training_bonus' => null,
             'cost'                 => 500,

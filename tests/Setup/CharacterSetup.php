@@ -16,6 +16,7 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMap;
+use Tests\Traits\CreateGameSkill;
 
 class CharacterSetup {
 
@@ -24,7 +25,8 @@ class CharacterSetup {
         CreateRace,
         CreateClass,
         CreateItem,
-        CreateMap;
+        CreateMap,
+        CreateGameSkill;
 
     private $character;
 
@@ -165,7 +167,7 @@ class CharacterSetup {
         return $this;
     }
 
-    public function setSkill(string $name, array $options = [], bool $currentlyTraining = false): CharacterSetup {
+    public function setSkill(string $name, array $baseOptions = [], array $skillOptions = [], bool $currentlyTraining = false): CharacterSetup {
         
         if ($currentlyTraining) {
             $found = $this->character->skills->filter(function($skill) {
@@ -173,20 +175,23 @@ class CharacterSetup {
             })->first();
 
             if (!is_null($found)) {
-                
+                throw new \Exception('You already have a skill set as currently training: ' . $found->name);
+            } else {
                 if (isset($options['xp_towards'])) {
                     throw new \Exception("you forgot to add xp_towards as an option for this skill: " . $found->name);
                 }
-
-                throw new \Exception('You already have a skill set as currently training: ' . $found->name);
             }
         }
+
+        $gameSkill = $this->createGameSkill(array_merge([
+            'name'         => $name,
+            'description'  => 'sample',
+        ], $baseOptions));
         
         $this->createSkill(array_merge([
-            'character_id' => $this->character->id,
-            'name' => $name,
-            'description' => 'sample',
-        ], $options));
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $gameSkill->id, 
+        ], $skillOptions));
 
         $this->character->refresh();
 

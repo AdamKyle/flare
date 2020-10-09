@@ -15,6 +15,7 @@ use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 use CreateMonstersSeeder;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -49,6 +50,8 @@ class BattleControllerApiTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
+        $this->seed(GameSkillsSeeder::class);
+
         $this->setUpMonsters();
 
         $this->createItemAffix([
@@ -62,7 +65,6 @@ class BattleControllerApiTest extends TestCase
             'dex_mod'              => '0.10',
             'chr_mod'              => '0.10',
             'int_mod'              => '0.10',
-            'ac_mod'               => '0.10',
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);
@@ -78,7 +80,6 @@ class BattleControllerApiTest extends TestCase
             'dex_mod'              => '0.10',
             'chr_mod'              => '0.10',
             'int_mod'              => '0.10',
-            'ac_mod'               => '0.10',
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);
@@ -107,8 +108,8 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
-        $this->assertEquals($this->character->name, $content->character->data->name);
-        $this->assertEquals(17, $content->character->data->attack);
+        $this->assertEquals($this->character->name, $content->character->name);
+        $this->assertEquals(7, $content->character->attack);
     }
 
     public function testCanGetActionsWithSkills() {
@@ -140,8 +141,8 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
-        $this->assertEquals($this->character->name, $content->character->data->name);
-        $this->assertEquals(18, $content->character->data->attack);
+        $this->assertEquals($this->character->name, $content->character->name);
+        $this->assertEquals(7, $content->character->attack);
     }
 
     public function testWhenNotLoggedInCannotGetActions() {
@@ -240,10 +241,7 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([], [
-            'level'       => 100,
-            'skill_bonus' => 100,
-        ]);
+        $this->setUpCharacter([], ['skill_bonus_per_level' => 100,], ['level' => 100,]);
 
         $currentGold = $this->character->gold;
 
@@ -273,8 +271,9 @@ class BattleControllerApiTest extends TestCase
         ]);
 
         $this->setUpCharacter([], [
-            'level'       => 100,
-            'skill_bonus' => 100,
+            'skill_bonus_per_level' => 0.01,
+        ], [
+            'level' => 100,
         ]);
 
         $this->character->update([
@@ -310,10 +309,7 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([], [
-            'level'       => 100,
-            'skill_bonus' => 100,
-        ]);
+        $this->setUpCharacter([], ['skill_bonus_per_level' => 100], [ 'level' => 100]);
 
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/battle-results/' . $this->character->id, [
@@ -526,12 +522,15 @@ class BattleControllerApiTest extends TestCase
 
         $this->setUpCharacter();
 
-        $this->character->skills()->where('name', 'Looting')->first()->update([
+        $this->character->skills()->join('game_skills', function($join){
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('name', 'Looting');
+        })->update([
             'currently_training' => true,
-            'xp'                 => 99,
-            'xp_max'             => 100,
+            'xp'                 => 100,
+            'xp_max'             => 100
         ]);
-
+        
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $this->createItem([
@@ -554,6 +553,8 @@ class BattleControllerApiTest extends TestCase
             'position' => 'body',
         ]);
 
+        $this->user->refresh();
+
         $response = $this->actingAs($this->user, 'api')
                          ->json('POST', '/api/battle-results/' . $this->user->character->id, [
                              'is_defender_dead' => true,
@@ -569,7 +570,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(2, $this->character->skills->where('name', 'Looting')->first()->level);
     }
 
-    protected function setUpCharacter(array $options = [], array $skillOptions = []): void {
+    protected function setUpCharacter(array $options = [], array $baseSkillOptions = [], array $skillOptions = []): void {
         $this->user = $this->createUser();
 
         $item = $this->createItem([
@@ -581,9 +582,9 @@ class BattleControllerApiTest extends TestCase
         $this->character = (new CharacterSetup)->setupCharacter($this->user, $options)
                                                ->giveItem($item)
                                                ->equipLeftHand()
-                                               ->setSkill('Looting', $skillOptions)
-                                               ->setSkill('Dodge', $skillOptions)
-                                               ->setSkill('Accuracy', $skillOptions)
+                                               ->setSkill('Looting', $baseSkillOptions, $skillOptions)
+                                               ->setSkill('Dodge', $baseSkillOptions, $skillOptions)
+                                               ->setSkill('Accuracy', $baseSkillOptions, $skillOptions)
                                                ->getCharacter();
     }
 

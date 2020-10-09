@@ -2,6 +2,7 @@
 
 namespace Tests\Traits;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
 
@@ -10,8 +11,10 @@ trait CreateMonster {
     public function createMonster(array $options = []): Monster {
         $monster = Monster::factory()->create($options);
 
-        foreach(config('game.skills') as $options) {
-            $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $options);
+        foreach (GameSkill::all() as $gameSkill) {
+            if ($gameSkill->can_train) {
+                $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $gameSkill);
+            }
         }
 
         $monster->skills()->insert($skills);

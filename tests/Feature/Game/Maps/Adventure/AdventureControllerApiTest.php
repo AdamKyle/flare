@@ -2,10 +2,9 @@
 
 namespace Tests\Feature\Game\Maps\Adventure;
 
+use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateUser;
@@ -25,6 +24,8 @@ class AdventureControllerApiTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
 
         Queue::fake();
 
