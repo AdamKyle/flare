@@ -9,7 +9,6 @@ use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Console\Commands\CreateAdminAccount;
-use App\Flare\Console\Commands\UpdateCharacterSkills;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Services\CharacterRewardService;

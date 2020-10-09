@@ -11,6 +11,9 @@ use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use App\Flare\Models\GameMap;
 use App\Flare\Builders\CharacterBuilder;
+use App\Flare\Models\Character;
+use App\Flare\Models\Skill;
+use Database\Seeders\GameSkillsSeeder;
 
 class CreateCharacterTest extends TestCase
 {
@@ -25,6 +28,8 @@ class CreateCharacterTest extends TestCase
 
     public function setUp(): void {
         parent::setup();
+
+        $this->seed(GameSkillsSeeder::class);
 
         $this->createItem([
             'name' => 'Rusty Dagger',
@@ -66,8 +71,8 @@ class CreateCharacterTest extends TestCase
                                                      ->character();
 
         $this->assertEquals('sample', $character->name);
-        $this->assertEquals(8, $character->str);
-        $this->assertEquals(8, $character->dex);
+        $this->assertEquals(4, $character->str);
+        $this->assertEquals(4, $character->dex);
         $this->assertEquals('dex', $character->damage_stat);
         $this->assertEquals($race->name, $character->race->name);
         $this->assertEquals($class->name, $character->class->name);
@@ -93,8 +98,16 @@ class CreateCharacterTest extends TestCase
                                                      ->createCharacter($this->createUser(), $this->gameMap, 'sample')
                                                      ->assignSkills()
                                                      ->character();
+        
 
-        $this->assertEquals('0.03', $character->skills()->where('name', '=', 'Accuracy')->first()->skill_bonus);
-        $this->assertEquals('0.04', $character->skills()->where('name', '=', 'Dodge')->first()->skill_bonus);
+        $this->assertEquals('2.0', $this->fetchSkill('Accuracy', $character)->skill_bonus);
+        $this->assertEquals('3.0', $this->fetchSkill('Dodge', $character)->skill_bonus);
+    }
+
+    protected function fetchSkill(string $name, Character $character): Skill {
+        return $character->skills()->join('game_skills', function($join) use($name){
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('name', $name);
+        })->first();
     }
 }

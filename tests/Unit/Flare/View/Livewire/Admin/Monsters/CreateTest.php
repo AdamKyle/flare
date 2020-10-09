@@ -12,6 +12,12 @@ class CreateTest extends TestCase
 {
     use RefreshDatabase, CreateMonster;
 
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->seed(GameSkillsSeeder::class);
+    }
+
     public function testTheComponentLoads()
     {
         Livewire::test(Create::class)->assertSee('Monster')->assertDontSee('Previous');

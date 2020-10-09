@@ -17,6 +17,8 @@ class AdventureLogTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
+        $this->seed(GameSkillsSeeder::class);
+
         $user = $this->createUser();
 
         $adventure = $this->createNewAdventure();
@@ -28,16 +30,14 @@ class AdventureLogTest extends TestCase
                                 'in_progress'          => false,
                                 'last_completed_level' => 1,
                             ])
-                            ->setSkill('Accuracy', [
-                                'skill_bonus' => 10,
+                            ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
                                 'xp_towards' => 10,
-                                'currently_training' => true
-                            ])
+                            ], true)
                             ->setSkill('Dodge', [
-                                'skill_bonus' => 10,
+                                'skill_bonus_per_level' => 10,
                             ])
                             ->setSkill('Looting', [
-                                'skill_bonus' => 0,
+                                'skill_bonus_per_level' => 0,
                              ])
                             ->getCharacter();
     }
