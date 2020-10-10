@@ -17,11 +17,6 @@ class XPCalculator {
             $xp = ($xpReduction !==  0.0 ? (3.3333 - (3.3333 * $xpReduction)) : 3.3333);
         }
 
-        // This way the player always gets at least 1 xp.
-        if ($xp <= 0) {
-            $xp = 1;
-        }
-
         return round($xp);
     }
 

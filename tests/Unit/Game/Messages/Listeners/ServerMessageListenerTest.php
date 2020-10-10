@@ -73,4 +73,34 @@ class ServerMessageListenerTest extends TestCase
 
         Event::assertDispatched(ServerMessageEvent::class);
     }
+
+    public function testServerMessageAdventure()
+    {
+        $user = $this->createUser();
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
+
+        event(new ServerMessageEvent($user, 'adventure', 'message'));
+
+        Event::fake();
+
+        event(new ServerMessageEvent($user, 'adventure', 'message'));
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function testServerMessageDeletedItem()
+    {
+        $user = $this->createUser();
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
+
+        event(new ServerMessageEvent($user, 'deleted_item', 'message'));
+
+        Event::fake();
+
+        event(new ServerMessageEvent($user, 'deleted_item', 'message'));
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
 }

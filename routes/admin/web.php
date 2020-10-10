@@ -44,7 +44,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/skills', ['as' => 'skills.list', 'uses' => 'SkillsController@index']);
     Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);
-    Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@manage']);
-    Route::get('/admin/skill/{skill}/edit', ['as' => 'skills.edit', 'uses' => 'SkillsController@manage']);
+    Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);
+    Route::get('/admin/skill/{skill}/edit', ['as' => 'skills.edit', 'uses' => 'SkillsController@edit']);
     
 });

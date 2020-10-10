@@ -12,6 +12,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use Tests\Traits\CreateItemAffix;
 
+use function PHPUnit\Framework\isTrue;
+
 class RandomItemDropBuilderTest extends TestCase
 {
 
@@ -124,15 +126,176 @@ class RandomItemDropBuilderTest extends TestCase
             'item_prefix_id' => ItemAffix::where('type', 'prefix')->first()->id,
         ]);
 
-        $randomItemGenerator = resolve(RandomItemDropBuilder::class)
-                                    ->setItemAffixes(ItemAffix::all());
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+             ->setMethods(array('hasSameAffix'))
+             ->getMock();
 
-        $item = $randomItemGenerator->generateItem($this->character);
+        $randomItemBuilder->expects($this->any())
+             ->method('hasSameAffix')
+             ->willReturn(true);
+             
+        
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $randomItemBuilder->generateItem($this->character);
 
         $this->assertEquals(Item::count(), 1);
     }
 
-    public function testCreateEnchantedItemWhenItemAlreadyHasSuffixAndPrefix() {
+    public function testCreateEnchantedItemWhenItemAlreadyHasSuffixAndPrefixOfTheSameType() {
+        Item::first()->delete();
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5
+        ]);
+
+        Item::first()->update([
+            'item_suffix_id' => ItemAffix::where('type', 'suffix')->first()->id,
+            'item_prefix_id' => ItemAffix::where('type', 'prefix')->first()->id,
+        ]);
+
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+             ->setMethods(array('hasSameAffix'))
+             ->getMock();
+
+        $randomItemBuilder->expects($this->any())
+             ->method('hasSameAffix')
+             ->willReturn(false);
+        
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $randomItemBuilder->generateItem($this->character);
+
+        $this->assertEquals(Item::count(), 2);
+    }
+
+    public function testCreateItemWithAffix() {
+        Item::first()->delete();
+
+        ItemAffix::truncate();
+
+        $affix = $this->createItemAffix([
+            'name' => 'Godly'
+        ]);
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5,
+        ]);
+
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+        ->setMethods(array('fetchRandomItemAffix', 'shouldHaveItemAffix'))
+        ->getMock();
+
+        $randomItemBuilder->expects($this->any())
+            ->method('fetchRandomItemAffix')
+            ->willReturn($affix);
+
+        $randomItemBuilder->expects($this->any())
+            ->method('shouldHaveItemAffix')
+            ->willReturn(true);
+        
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $randomItemBuilder->generateItem($this->character);
+
+        $this->assertEquals(Item::count(), 2);
+    }
+
+    public function testFailToCreateItemWithAffix() {
+        Item::first()->delete();
+
+        ItemAffix::truncate();
+
+        $affix = $this->createItemAffix();
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5,
+            'item_suffix_id' => $affix->id,
+        ]);
+
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+        ->setMethods(array('fetchRandomItemAffix', 'shouldHaveItemAffix'))
+        ->getMock();
+
+        $randomItemBuilder->expects($this->any())
+            ->method('fetchRandomItemAffix')
+            ->willReturn($affix);
+
+        $randomItemBuilder->expects($this->any())
+            ->method('shouldHaveItemAffix')
+            ->willReturn(true);
+        
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $randomItemBuilder->generateItem($this->character);
+
+        $this->assertEquals(Item::count(), 1);
+    }
+
+    public function testFailToCreateAffixWhenThereAreNone() {
+        Item::first()->delete();
+
+        ItemAffix::truncate();
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5,
+        ]);
+
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+        ->setMethods(array('shouldHaveItemAffix'))
+        ->getMock();
+
+        $randomItemBuilder->expects($this->any())
+            ->method('shouldHaveItemAffix')
+            ->willReturn(true);
+        
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $randomItemBuilder->generateItem($this->character);
+
+        $this->assertEquals(Item::count(), 1);
+    }
+
+    public function testFailToCreateAffixWhenItemShouldnt() {
+        Item::first()->delete();
+
+        ItemAffix::truncate();
+
+        $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'base_damage' => 10,
+            'cost' => 5,
+        ]);
+
+        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
+            ->setMethods(array('shouldHaveItemAffix'))
+            ->getMock();
+
+        $randomItemBuilder->expects($this->any())
+            ->method('shouldHaveItemAffix')
+            ->willReturn(false);
+        
+        $randomItemBuilder->setItemAffixes(ItemAffix::all());
+
+        $randomItemBuilder->generateItem($this->character);
+
+        $this->assertEquals(Item::count(), 1);
+    }
+
+    public function testFailToCreateItemWhenAffixIsNull() {
         Item::first()->delete();
 
         $this->createItem([
@@ -168,7 +331,7 @@ class RandomItemDropBuilderTest extends TestCase
 
         $randomItemBuilder->expects($this->any())
             ->method('fetchRandomItemAffix')
-            ->willReturn(ItemAffix::where('name', 'Sample 2')->first());
+            ->willReturn(null);
 
         $randomItemBuilder->expects($this->any())
             ->method('shouldHaveItemAffix')
@@ -176,8 +339,8 @@ class RandomItemDropBuilderTest extends TestCase
 
         $randomItemBuilder->setItemAffixes(ItemAffix::all());
 
-        $item = $randomItemBuilder->generateItem($this->character);
+        $randomItemBuilder->generateItem($this->character);
         
-        $this->assertEquals(Item::count(), 2);
+        $this->assertEquals(Item::count(), 1);
     }
 }

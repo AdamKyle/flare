@@ -23,7 +23,7 @@ class RandomItemDropBuilder {
 
         if ($this->shouldHaveItemAffix($character)) {
             $affix = $this->fetchRandomItemAffix();
-
+            
             if (is_null($affix)) {
                 $duplicateItem->delete();
 
@@ -73,10 +73,6 @@ class RandomItemDropBuilder {
 
     protected function hasSameAffix(Item $duplicateItem, ItemAffix $affix): bool {
         $foundAffix = $duplicateItem->{'item'.ucFirst($affix->type)};
-
-        if (is_null($foundAffix)) {
-            return false;
-        }
 
         return $foundAffix->name === $affix->name;
     }

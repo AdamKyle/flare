@@ -60,6 +60,20 @@ class UsersControllerTest extends TestCase
         $response->assertSessionHas('success', $this->character->name . ' password reset email sent.');
     }
 
+    public function testCanSeeShowForNonAdmin() {
+
+        $this->actingAs($this->user)->visit(route('users.user', [
+            'user' => $this->character->user
+        ]))->see($this->character->name);
+    }
+
+    public function testCantShowForAdmin() {
+
+        $this->actingAs($this->user)->visit(route('skills.list'))->visit(route('users.user', [
+            'user' => $this->user
+        ]))->see('Admins do not have characters');
+    }
+
     public function testCannotSilenceUser() {
         $response = $this->actingAs($this->user)->post(route('user.silence', [
             'user' => $this->character->user->id

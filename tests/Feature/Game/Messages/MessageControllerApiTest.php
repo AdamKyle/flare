@@ -26,6 +26,18 @@ class MessageControllerApiTest extends TestCase
         Event::fake();
     }
 
+    public function testFetchUserInfo() {
+        $user = $this->createUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('GET', '/api/user-chat-info/' . $user->id)
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertFalse($content->user->is_silenced);
+    }
+
     public function testUserCanSendMessage() {
         $race = $this->createRace([
             'str_mod' => 3,

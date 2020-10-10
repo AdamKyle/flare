@@ -121,4 +121,25 @@ class ServerMessageBuilderTest extends TestCase
 
         $this->assertEquals('You must wait for the timer (beside Craft) to state: Ready!', $message);
     }
+
+    public function testGetMessageSomethingsWrong()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('something_went_wrong');
+
+        $this->assertEquals('A component was unable to render. Please try refreshing the page.', $message);
+    }
+
+    public function testGetMessagesChattingTooMuch()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('chatting_to_much');
+
+        $this->assertEquals('You can only chat so much in a two minute window. Slow down!', $message);
+    }
+
+    public function testGetMessageMessageTooLong()
+    {
+        $message = resolve(ServerMessageBuilder::class)->build('message_length_max');
+
+        $this->assertEquals('Your message is far too long.', $message);
+    }
 }
