@@ -52,6 +52,14 @@
                                 </a>
                             </th>
                             <th>
+                                <a wire:click.prevent="sortBy('ip_address')" role="button" href="#">
+                                    IP Address
+                                    @include('admin.partials.data-table-icons', [
+                                        'field' => 'ip_address'
+                                    ])
+                                </a>
+                            </th>
+                            <th>
                                 <a wire:click.prevent="sortBy('user.currently_online')" role="button" href="#">
                                     Currently Online
                                     @include('admin.partials.data-table-icons', [
@@ -73,6 +81,7 @@
                                 ])}}">{{is_null($user->character) ? 'Admin' : $user->character->name}}</a></td>
                                 <td>{{$user->is_banned ? 'Yes' : 'No'}}</td>
                                 <td>{{$user->is_banned ? is_null($user->unbanned_at) ? 'Forever' : $user->unbanned_at->format('l jS \\of F Y h:i:s A') : 'N/A'}}</td>
+                                <td>{{$user->ip_address}}</td>
                                 <td>{{$user->currently_online ? 'Yes' : 'No'}}</td>
                                 <td class="clearfix">
                                     @if (!is_null($user->character) && !$user->is_banned) 
@@ -193,7 +202,22 @@
                                             </div>
                                         </div>
                                     @else
-                                        N/A
+                                        @if (!$user->hasRole('Admin'))
+                                            <a href="{{route('unban.user', [
+                                                'user' => $user->id
+                                            ])}}" class="btn btn-primary btn-sm"
+                                                onclick="event.preventDefault();
+                                                document.getElementById('{{'un-ban-user-' . $user->id}}').submit();"
+                                            >Remove Ban</a>
+
+                                            <form id="{{"un-ban-user-".$user->id}}" action="{{ route('unban.user', [
+                                                'user' => $user->id
+                                            ]) }}" method="POST" style="display: none;">
+                                                @csrf
+                                            </form>
+                                        @else
+                                            N/A
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

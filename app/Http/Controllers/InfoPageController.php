@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameRace;
 use Illuminate\Http\Request;
 use Storage;
 
@@ -47,6 +49,18 @@ class InfoPageController extends Controller
         return view('information.core', [
             'pageTitle' => $pageName,
             'sections'  => $sections,
+        ]);
+    }
+
+    public function viewRace(GameRace $race) {
+        return view('information.races.race', [
+            'race' => $race,
+        ]);
+    }
+
+    public function viewClass(GameClass $class) {
+        return view('information.classes.class', [
+            'class' => $class,
         ]);
     }
 }

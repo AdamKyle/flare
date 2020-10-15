@@ -74,8 +74,8 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label for="durabillity">Durabillity: </label>
-                <input type="number" class="form-control" name="durabillity" value="" wire:model="monster.dur"> 
+                <label for="durability">Durability: </label>
+                <input type="number" class="form-control" name="durability" value="" wire:model="monster.dur"> 
                 @error('monster.dur') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>

@@ -42,10 +42,21 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/user/{user}/reset-password', ['as' => 'user.reset.password', 'uses' => 'UsersController@resetPassword']);
     Route::post('/admin/user/{user}/silence-user', ['as' => 'user.silence', 'uses' => 'UsersController@silenceUser']);
     Route::post('/admin/users/{user}/ban-user', ['as' => 'ban.user', 'uses' => 'UsersController@banUser']);
+    Route::post('/admin/users/{user}/un-ban-user', ['as' => 'unban.user', 'uses' => 'UsersController@unBanUser']);
 
     Route::get('/admin/skills', ['as' => 'skills.list', 'uses' => 'SkillsController@index']);
     Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);
     Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);
     Route::get('/admin/skill/{skill}/edit', ['as' => 'skill.edit', 'uses' => 'SkillsController@edit']);
+
+    Route::get('/admin/races', ['as' => 'races.list', 'uses' => 'RacesController@index']);
+    Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);
+    Route::get('/admin/races/create', ['as' => 'races.create', 'uses' => 'RacesController@create']);
+    Route::get('/admin/races/{race}/edit', ['as' => 'races.edit', 'uses' => 'RacesController@edit']);
+
+    Route::get('/admin/classes', ['as' => 'classes.list', 'uses' => 'ClassesController@index']);
+    Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
+    Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
+    Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
     
 });

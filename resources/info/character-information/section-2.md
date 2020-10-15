@@ -5,7 +5,7 @@ Before we complete our character, we need to assign the character a class.
 Each class has its own damage stat, this is the stat you want to focus on the most when it comes out equipping your character
 with the best gear.
 
-For example if your select Vampire, your base damage stat is your durabillity. This would mean the best race would be Dark Dwarf or Centaur. Durability affects not just your health but also your damage in this particular case, so you will want to equip gear based on that durabillity stat to do the most damage.
+For example if your select Vampire, your base damage stat is your durability. This would mean the best race would be Dark Dwarf or Centaur. Durability affects not just your health but also your damage in this particular case, so you will want to equip gear based on that durability stat to do the most damage.
 
 ### Skill Modifiers
 

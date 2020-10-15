@@ -99,7 +99,7 @@ export default class CharacterInfoTopBar extends React.Component {
             <span className="title">Strength:</span> <span className="value">{Math.round(sheet.str_modded)}</span>
           </div>
           <div className="col-md-2">
-            <span className="title">Durabillity:</span> <span className="value">{Math.round(sheet.dur_modded)}</span>
+            <span className="title">Durability:</span> <span className="value">{Math.round(sheet.dur_modded)}</span>
           </div>
           <div className="col-md-2">
             <span className="title">Dexterity:</span> <span className="value">{Math.round(sheet.dex_modded)}</span>

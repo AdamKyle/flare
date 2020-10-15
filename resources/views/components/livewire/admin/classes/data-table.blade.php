@@ -45,7 +45,7 @@
                             </th>
                             <th>
                                 <a wire:click.prevent="sortBy('dur_mod')" role="button" href="#">
-                                    Durabillity Modifier
+                                    Durability Modifier
                                     @include('admin.partials.data-table-icons', [
                                         'field' => 'dur_mod'
                                     ])
@@ -75,45 +75,34 @@
                                     ])
                                 </a>
                             </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('accuracy_mod')" role="button" href="#">
-                                    Accuracy Skill Modifier
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'accuracy_mod'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('dodge_mod')" role="button" href="#">
-                                    Dodge Skill Modifier
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'dodge_mod'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('defense_mod')" role="button" href="#">
-                                    Deffense Modifier
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'defense_mod'
-                                    ])
-                                </a>
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($gameClasses as $class)
                             <tr>
-                                <td>{{$class->name}}</td>
+                                <td>
+                                    @if (!is_null(auth()->user()))
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('classes.class', [
+                                                'class' => $class->id
+                                            ])}}">
+                                                {{$class->name}}
+                                            </a>
+                                        @endif
+                                    @else
+                                        <a href="{{route('info.page.class', [
+                                            'class' => $class
+                                        ])}}">
+                                            {{$class->name}}
+                                        </a> 
+                                    @endif
+                                </td>
                                 <td>{{$class->damage_stat}}</td>
                                 <td>{{$class->str_mod}}</td>
                                 <td>{{$class->dur_mod}}</td>
                                 <td>{{$class->dex_mod}}</td>
                                 <td>{{$class->chr_mod}}</td>
                                 <td>{{$class->int_mod}}</td>
-                                <td>{{$class->accuracy_mod}}</td>
-                                <td>{{$class->dodge_mod}}</td>
-                                <td>{{$class->deffense_mod}}</td>
                             </tr>
                         @endforeach
                     </tbody>

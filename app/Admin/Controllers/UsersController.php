@@ -119,4 +119,15 @@ class UsersController extends Controller {
 
         return redirect()->back()->with('success', 'User has been banned');
     }
+
+    public function unBanUser(Request $request, User $user) {
+        $user->update([
+            'is_banned'   => false,
+            'unbanned_at' => null,
+        ]);
+
+        Mail::to($user->email)->send(new GenericMail($user, 'You are now unbanned and may log in again.', 'You have been unbanned'));
+
+        return redirect()->back()->with('success', 'User has been unbanned');
+    }
 }
