@@ -45,7 +45,7 @@ class Stats extends Component
 
         if ($this->monster->skills->isEmpty()) {
             // Get skills:
-            foreach(GameSkill::all() as $skill) {
+            foreach(GameSkill::where('specifically_assigned', false)->get() as $skill) {
                 if ($skill->can_train) {
                     $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $skill);
                 }

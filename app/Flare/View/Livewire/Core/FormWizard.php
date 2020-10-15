@@ -18,7 +18,11 @@ class FormWizard extends Component
 
     public $finishRoute  = '';
 
-    protected $listeners = ['storeModel', 'nextStep', 'finish'];
+    public $flasMessageType = '';
+
+    public $flashMessage = '';
+
+    protected $listeners = ['storeModel', 'nextStep', 'finish', 'redirectSessionMessage'];
 
     public function nextStep(int $index, bool $passed = false) {
         if (isset($this->views[$index - 1]) && !$passed) {
@@ -37,8 +41,15 @@ class FormWizard extends Component
         }
 
         if ($passed) {
+            session()->flash($this->flasMessageType, $this->flashMessage);
+
             redirect()->route($this->finishRoute);
         }
+    }
+
+    public function redirectSessionMessage(string $type, string $message) {
+        $this->flasMessageType = $type;
+        $this->flashMessage    = $message;
     }
 
     public function storeModel($model = null) {

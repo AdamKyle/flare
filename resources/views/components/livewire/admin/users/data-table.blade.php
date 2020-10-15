@@ -36,6 +36,22 @@
                                 </a>
                             </th>
                             <th>
+                                <a wire:click.prevent="sortBy('is_banned')" role="button" href="#">
+                                    Is Banned
+                                    @include('admin.partials.data-table-icons', [
+                                        'field' => 'is_banned'
+                                    ])
+                                </a>
+                            </th>
+                            <th>
+                                <a wire:click.prevent="sortBy('unbanned_at')" role="button" href="#">
+                                    Unbanned at
+                                    @include('admin.partials.data-table-icons', [
+                                        'field' => 'unbanned_at'
+                                    ])
+                                </a>
+                            </th>
+                            <th>
                                 <a wire:click.prevent="sortBy('user.currently_online')" role="button" href="#">
                                     Currently Online
                                     @include('admin.partials.data-table-icons', [
@@ -55,9 +71,11 @@
                                 <td><a href="{{route('users.user', [
                                     'user' => $user->id
                                 ])}}">{{is_null($user->character) ? 'Admin' : $user->character->name}}</a></td>
+                                <td>{{$user->is_banned ? 'Yes' : 'No'}}</td>
+                                <td>{{$user->is_banned ? is_null($user->unbanned_at) ? 'Forever' : $user->unbanned_at->format('l jS \\of F Y h:i:s A') : 'N/A'}}</td>
                                 <td>{{$user->currently_online ? 'Yes' : 'No'}}</td>
                                 <td class="clearfix">
-                                    @if (!is_null($user->character)) 
+                                    @if (!is_null($user->character) && !$user->is_banned) 
                                         <a class="btn btn-sm btn-primary float-left mr-2" href="{{ route('user.reset.password', [
                                             'user' => $user->id
                                         ]) }}"
@@ -128,9 +146,50 @@
                                             </a>
                                           
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                              <a class="dropdown-item" href="#">24 hours</a>
-                                              <a class="dropdown-item" href="#">1 week</a>
-                                              <a class="dropdown-item" href="#">permanently</a>
+                                                <a class="dropdown-item" href="{{ route('ban.user', [
+                                                    'user' => $user->id
+                                                ]) }}"
+                                                    onclick="event.preventDefault();
+                                                                document.getElementById('{{'ban-user-1d-' . $user->id}}').submit();">
+                                                    1 Day
+                                                </a>
+                        
+                                                <form id="{{"ban-user-1d-".$user->id}}" action="{{ route('ban.user', [
+                                                    'user' => $user->id
+                                                ]) }}" method="POST" style="display: none;">
+                                                    @csrf
+                                                    <input type="hidden" name="ban_for" value="one-day">
+                                                </form>
+
+                                                <a class="dropdown-item" href="{{ route('ban.user', [
+                                                    'user' => $user->id
+                                                ]) }}"
+                                                    onclick="event.preventDefault();
+                                                                document.getElementById('{{'ban-user-1w-' . $user->id}}').submit();">
+                                                    1 Week
+                                                </a>
+                        
+                                                <form id="{{"ban-user-1w-".$user->id}}" action="{{ route('ban.user', [
+                                                    'user' => $user->id
+                                                ]) }}" method="POST" style="display: none;">
+                                                    @csrf
+                                                    <input type="hidden" name="ban_for" value="one-week">
+                                                </form>
+
+                                                <a class="dropdown-item" href="{{ route('ban.user', [
+                                                    'user' => $user->id
+                                                ]) }}"
+                                                    onclick="event.preventDefault();
+                                                                document.getElementById('{{'ban-user-perm-' . $user->id}}').submit();">
+                                                    For ever
+                                                </a>
+                        
+                                                <form id="{{"ban-user-perm-".$user->id}}" action="{{ route('ban.user', [
+                                                    'user' => $user->id
+                                                ]) }}" method="POST" style="display: none;">
+                                                    @csrf
+                                                    <input type="hidden" name="ban_for" value="perm">
+                                                </form>
                                             </div>
                                         </div>
                                     @else

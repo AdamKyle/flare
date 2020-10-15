@@ -41,10 +41,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/user/{user}', ['as' => 'users.user', 'uses' => 'UsersController@show']);
     Route::post('/admin/user/{user}/reset-password', ['as' => 'user.reset.password', 'uses' => 'UsersController@resetPassword']);
     Route::post('/admin/user/{user}/silence-user', ['as' => 'user.silence', 'uses' => 'UsersController@silenceUser']);
+    Route::post('/admin/users/{user}/ban-user', ['as' => 'ban.user', 'uses' => 'UsersController@banUser']);
 
     Route::get('/admin/skills', ['as' => 'skills.list', 'uses' => 'SkillsController@index']);
     Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);
     Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);
-    Route::get('/admin/skill/{skill}/edit', ['as' => 'skills.edit', 'uses' => 'SkillsController@edit']);
+    Route::get('/admin/skill/{skill}/edit', ['as' => 'skill.edit', 'uses' => 'SkillsController@edit']);
     
 });

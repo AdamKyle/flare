@@ -57,6 +57,10 @@ class ServerMessageListener
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'silenced':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'new-skill':
+                $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $event->forMessage; 
+                
+                return broadcast(new ServerMessage($event->user, $message));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

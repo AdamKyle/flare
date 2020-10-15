@@ -8,6 +8,7 @@ import PortLocationActions from './components/port-location-actions';
 import AdeventureActions   from './components/adventure-actions';
 import AdventureMenu       from './components/menu/adventure-menu';
 import NotificationCenter  from './components/nav-bar/notification-center';
+import RefreshComponent    from './components/refresh-component';
 
 class Game extends React.Component {
   constructor(props) {
@@ -121,8 +122,16 @@ class Game extends React.Component {
 // Mount the app:
 const game      = document.getElementById('game');
 const adminChat = document.getElementById('admin-chat');
+const refresh   = document.getElementById('refresh');
 const player    = document.head.querySelector('meta[name="player"]');
 const character = document.head.querySelector('meta[name="character"]');
+
+if (refresh !== null) {
+  ReactDOM.render(
+      <RefreshComponent userId={parseInt(player.content)}/>,
+      refresh
+  );
+}
 
 if (game !== null) {
   ReactDOM.render(

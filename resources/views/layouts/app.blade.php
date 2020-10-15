@@ -149,6 +149,11 @@
             @else
                 <div class="page-wrapper">
                     <div class="container-fluid">
+
+                        @if(!auth()->user()->hasRole('Admin'))
+                            <div id="refresh"></div>
+                        @endif
+
                         @include('layouts.partials.alerts')
                         @yield('content')
                     </div>
@@ -165,14 +170,6 @@
 
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
-
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/r-2.2.5/datatables.min.js"></script>
-
-    {{-- <script>
-        $(document).ready( function () {
-            $('table').DataTable();
-        });
-    </script> --}}
 
     @stack('scripts')
 </body>

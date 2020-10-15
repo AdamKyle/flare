@@ -35,8 +35,6 @@ export default class Chat extends React.Component {
       message['name']     = event.name;
       message['from_god'] = this.isGod(event.user);
 
-      console.log(this.isGod(event.user));
-
       const messages = cloneDeep(this.state.messages);
 
       messages.unshift(message);

@@ -35,7 +35,7 @@ class CreateMonstersSeeder extends Seeder
         ]);
 
         foreach(Monster::all() as $monster) {
-            foreach(GameSkill::all() as $skill) {
+            foreach(GameSkill::where('specifically_assigned', false)->get() as $skill) {
                 if ($skill->can_train) {
                     $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $skill);
                 }

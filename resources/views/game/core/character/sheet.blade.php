@@ -72,17 +72,20 @@
                     <h4>Skills</h4>
                     <div class="card mt-2">
                         <div class="card-body character-skill-info">
-                            @foreach($character->skills as $skill)
+                            @foreach($character->skills->sortByDesc('can_train') as $skill)
                                 <dl>
                                     <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>
                                     <dd>
                                         <div class="row">
                                             <div class="col-md-4">
-                                                Level/Max: {{$skill->level}} / {{$skill->max_level}}
+                                                Level: {{$skill->level}} / {{$skill->max_level}}
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-2">
+                                                XP: {{$skill->xp}} / {{$skill->xp_max}}
+                                            </div>
+                                            <div class="col-md-2">
                                                 <div class="progress skill-training mb-2 text-center">
-                                                    <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->xp}}" aria-valuemin="0" style="width: {{$skill->xp}}%;">{{$skill->xp}} / {{$skill->xp_max}}</div>
+                                                    <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->xp}}" aria-valuemin="0" style="width: {{$skill->xp}}%;"></div>
                                                 </div>
                                             </div>
                                             @if ((bool) $skill->can_train)

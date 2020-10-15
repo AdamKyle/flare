@@ -168,7 +168,6 @@ class AdventureService {
         $drop = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
         
         if (!is_null($drop)) {
-            dump($drop, $drop->affix_name);
             $this->rewards['items'][] = [
                 'id' => $drop->id,
                 'name' => $drop->affix_name,

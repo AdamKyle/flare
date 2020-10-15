@@ -1,7 +1,7 @@
 <div>
     @error('missing')
         <div class="alert alert-danger mb-2">
-            <span class="text-danger">{{ $message }}</span>
+            {{ $message }}
         </div>
     @enderror
 

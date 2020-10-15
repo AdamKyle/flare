@@ -4,6 +4,7 @@ namespace App\Admin\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Admin\Middleware\IsAdminMiddleware;
+use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -17,6 +18,10 @@ class ServiceProvider extends ApplicationServiceProvider
     {
         $this->app->bind(ItemAffixService::class, function ($app) {
             return new ItemAffixService();
+        });
+
+        $this->app->bind(AssignSkillService::class, function ($app) {
+            return new AssignSkillService();
         });
     }
 

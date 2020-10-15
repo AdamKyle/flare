@@ -73,7 +73,7 @@ class CharacterBuilder {
     }
 
     public function assignSkills(): CharacterBuilder {
-        foreach (GameSkill::all() as $skill) {
+        foreach (GameSkill::where('specifically_assigned', false)->get() as $skill) {
             $this->character->skills()->create(
                 resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
             );

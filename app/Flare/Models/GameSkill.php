@@ -27,6 +27,7 @@ class GameSkill extends Model
         'move_time_out_mod_bonus_per_level',
         'can_train',
         'skill_bonus_per_level',
+        'specifically_assigned',
     ];
 
     /**
@@ -41,6 +42,7 @@ class GameSkill extends Model
         'fight_time_out_mod_bonus_per_level' => 'float',
         'move_time_out_mod_bonus_per_level'  => 'float',
         'skill_bonus_per_level'              => 'float',
+        'specifically_assigned'              => 'boolean',
         'can_train'                          => 'boolean',
     ];
 

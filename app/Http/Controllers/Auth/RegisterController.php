@@ -65,8 +65,17 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\Flare\Models\User
      */
-    protected function create(array $data)
+    protected function create(array $data, string $ip)
     {
+
+        $user = User::where('ip_address', $ip)->where('is_banned', true)->first();
+
+        if ($user) {
+            $until = !is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName . '.' : 'For ever.';
+
+            throw new \Exception('You has been banned until: ' . $until);
+        }
+        
         $token = Str::random(80);
 
         return User::create([
@@ -74,6 +83,7 @@ class RegisterController extends Controller
             'password'         => Hash::make($data['password']),
             'game_key'         => hash('sha256', $token),
             'private_game_key' => $token,
+            'ip_address'       => $ip,
         ]);
     }
 
@@ -93,7 +103,11 @@ class RegisterController extends Controller
 
         $this->validator($request->all())->validate();
 
-        $user = $this->create($request->all());
+        try {
+            $user = $this->create($request->all(), $request->ip());
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getmessage());
+        }
 
         event(new Registered($user));
 

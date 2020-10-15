@@ -43,9 +43,13 @@
                                     ])
                                 </a>
                             </th>
-                            <th>
-                                Actions
-                            </th>
+                            @if (!is_null(auth()->user()))
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <th>
+                                        Actions
+                                    </th>
+                                @endif
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -56,7 +60,13 @@
                                 ])}}">{{$gameSkill->name}}</a></td>
                                 <td>{{$gameSkill->max_level}}</td>
                                 <td>{{$gameSkill->can_train ? 'Yes' : 'No'}}</td>
-                                <td><a href="#" class="btn btn-primary btn-sm">Edit</a></td>
+                                @if (!is_null(auth()->user()))
+                                    @if (auth()->user()->hasRole('Admin'))
+                                        <td><a href="{{route('skill.edit', [
+                                            'skill' => $gameSkill->id
+                                        ])}}" class="btn btn-primary btn-sm">Edit</a></td>
+                                    @endif
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

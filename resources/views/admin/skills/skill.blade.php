@@ -30,18 +30,21 @@
                             <dt>Max Level:</dt>
                             <dd>{{$skill->max_level}}</dd>
                             <dt>Base Damage Mod:</dt>
-                            <dd>{{$skill->base_damage_mod * 100}}%</dd>
+                            <dd>{{$skill->base_damage_mod_bonus_per_level * 100}}%</dd>
                             <dt>Base Ac Mod:</dt>
-                            <dd>{{$skill->base_ac_mod * 100}}%</dd>
+                            <dd>{{$skill->base_ac_mod_bonus_per_level * 100}}%</dd>
                             <dt>Base Healing Mod:</dt>
-                            <dd>{{$skill->base_healing_mod * 100}}%</dd>
+                            <dd>{{$skill->base_healing_mod_bonus_per_level * 100}}%</dd>
                             <dt>Fight Timeout Mod:</dt>
-                            <dd>{{$skill->fight_time_out_mod * 100}}%</dd>
+                            <dd>{{$skill->fight_time_out_mod_bonus_per_level * 100}}%</dd>
                             <dt>Move Timeout Mod:</dt>
-                            <dd>{{$skill->move_time_out_mod * 100}}%</dd>
+                            <dd>{{$skill->move_time_out_mod_bonus_per_level * 100}}%</dd>
                             <dt>Skill Bonus</dt>
-                            <dd>{{$skill->skill_bonus * 100}}%</dd>
+                            <dd>{{$skill->skill_bonus_per_level * 100}}%</dd>
                         </dl>
+                        <a href="{{route('skill.edit', [
+                            'skill' => $skill
+                        ])}}" class="btn btn-primary mt-2">Edit</a>
                     </div>
                 </div>
             </div>

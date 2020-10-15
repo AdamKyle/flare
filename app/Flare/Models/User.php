@@ -27,6 +27,9 @@ class User extends Authenticatable
         'message_throttle_count',
         'can_speak_again_at',
         'is_silenced',
+        'is_banned',
+        'unbanned_at',
+        'ip_address',
     ];
 
     /**
@@ -48,6 +51,8 @@ class User extends Authenticatable
         'can_speak_again_at'     => 'datetime',
         'is_silenced'            => 'boolean',
         'message_throttle_count' => 'integer',
+        'is_banned'              => 'boolean',
+        'unbanned_at'            => 'datetime',
     ];
 
     public function character() {

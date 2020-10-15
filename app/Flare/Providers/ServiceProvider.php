@@ -11,6 +11,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
+use App\Flare\Middleware\IsPlayerBannedMiddleware;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
@@ -91,6 +92,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('is.character.dead', IsCharacterDeadMiddleware::class);
+        $router->aliasMiddleware('is.player.banned', IsPlayerBannedMiddleware::class);
 
         // Blade Components - Cross System:
         Blade::component('item-display-color', ItemDisplayColor::class);
