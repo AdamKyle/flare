@@ -18,21 +18,23 @@
                     <div class="card-body">
                         <dl>
                             <dt>Strength Mofidfier</dt>
-                            <dd>+ {{$class->str_mod}} pts.</dd>
+                            <dd>+ {{$class->str_mod}} %</dd>
                             <dt>Durability Modifier</dt>
-                            <dd>+ {{$class->dur_mod}} pts.</dd>
+                            <dd>+ {{$class->dur_mod}} %</dd>
                             <dt>Dexterity Modifier</dt>
-                            <dd>+ {{$class->dex_mod}} pts.</dd>
+                            <dd>+ {{$class->dex_mod}} %</dd>
                             <dt>Intelligence Modifier</dt>
-                            <dd>+ {{$class->int_mod}} pts.</dd>
+                            <dd>+ {{$class->int_mod}} %</dd>
                             <dt>Charsima Modifier</dt>
-                            <dd>+ {{$class->chr_mod}} pts.</dd>
+                            <dd>+ {{$class->chr_mod}} %</dd>
                             <dt>Accuracy Modifier</dt>
                             <dd>+ {{$class->accuracy_mod * 100}} %</dd>
                             <dt>Dodge Modifier</dt>
                             <dd>+ {{$class->dodge_mod * 100}} %</dd>
                             <dt>Looting Modifier</dt>
                             <dd>+ {{$class->looting_mod * 100}} %</dd>
+                            <dt>Defense Modifier</dt>
+                            <dd>+ {{$class->deffense_mod * 100}} %</dd>
                         </dl>
                         @if (!is_null(auth()->user()))
                             @if (auth()->user()->hasRole('Admin'))

@@ -559,6 +559,61 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(2, $this->character->skills->where('name', 'Looting')->first()->level);
     }
 
+    public function testSkillDoesNotLevelUpFromFight() {
+        Queue::fake();
+
+        $this->setUpCharacter();
+
+        $this->character->skills()->join('game_skills', function($join){
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                 ->where('name', 'Looting');
+        })->update([
+            'level'              => 500,
+            'currently_training' => true,
+            'xp'                 => 100,
+            'xp_max'             => 100
+        ]);
+        
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $this->createItem([
+                'name' => 'Sample',
+                'skill_name' => 'Looting',
+                'skill_training_bonus' => 1.0,
+                'type' => 'quest'
+            ])->id,
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $this->createItem([
+                'name' => 'Sample Item',
+                'skill_name' => 'Looting',
+                'skill_training_bonus' => 1.0,
+                'type' => 'weapon'
+            ])->id,
+            'equipped' => true,
+            'position' => 'body',
+        ]);
+
+        $this->user->refresh();
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->character->refresh();
+
+        // Skill Did Not Level Up:
+        $this->assertEquals(500, $this->character->skills->where('name', 'Looting')->first()->level);
+    }
+
     protected function setUpCharacter(array $options = [], array $baseSkillOptions = [], array $skillOptions = []): void {
         $this->user = $this->createUser();
 

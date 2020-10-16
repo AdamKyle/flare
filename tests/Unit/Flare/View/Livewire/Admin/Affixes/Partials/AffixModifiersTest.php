@@ -20,6 +20,12 @@ class AffixModifiersTest extends TestCase
         ])->assertSee('Str Mod:');
     }
 
+    public function testTheComponentCallsUpdate() {
+        $itemAffix = $this->createItemAffix();
+
+        Livewire::test(AffixModifier::class)->call('update', $itemAffix->id)->assertSet('itemAffix.name', $itemAffix->name);
+    }
+
     public function testValidationFails() {
         Livewire::test(AffixModifier::class, [
             'itemAffix' => $this->createItemAffix(),

@@ -25,7 +25,7 @@ class CreateClasses extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0.01,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 0,
+                'deffense_mod' => 5,
             ],
             [
                 'name'         => 'Vampire',
@@ -37,7 +37,7 @@ class CreateClasses extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0.01,
                 'dodge_mod'    => 0.01,
-                'deffense_mod' => 0,
+                'deffense_mod' => 2,
             ],
             [
                 'name'         => 'Ranger',

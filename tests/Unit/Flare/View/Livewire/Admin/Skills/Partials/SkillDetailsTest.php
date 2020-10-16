@@ -23,6 +23,15 @@ class SkillDetailsTest extends TestCase
         ]);
     }
 
+    public function testValidationFailsWhenMaxLevelIsBelowZero() {
+        Livewire::test(SkillDetails::class)
+            ->set('skill.name', 'sample')
+            ->set('skill.description', 'sample')
+            ->set('skill.max_level', -5)
+            ->call('validateInput', 'nextStep', 2)
+            ->assertHasErrors('gameSkill.max_level');
+    }
+
     public function testCreateSkill() {
         Livewire::test(SkillDetails::class)
             ->set('skill.name', 'Sample')

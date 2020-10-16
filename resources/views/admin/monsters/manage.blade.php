@@ -11,8 +11,20 @@
             <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
         </div>
     </div>
-    @livewire('admin.monsters.create', [
-        'model' => $monster
+    @livewire('core.form-wizard', [
+        'views' => [
+            'admin.monsters.partials.stats',
+            'admin.monsters.partials.skills',
+            'admin.monsters.partials.quest-item',
+        ],
+        'model'     => $monster,
+        'modelName' => 'monster',
+        'steps' => [
+            'Monster Base Stats',
+            'Monster Skill Modifications',
+            'Monster Quest Item Reward'
+        ],
+        'finishRoute' => 'monsters.list',
     ])
 </div>
 @endsection

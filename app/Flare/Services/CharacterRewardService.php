@@ -39,7 +39,6 @@ class CharacterRewardService {
     }
 
     public function fetchCurrentSkillInTraining() {
-        // dump($this->character->skills);
         return $this->character->skills->filter(function($skill) {
             return $skill->currently_training;
         })->first();

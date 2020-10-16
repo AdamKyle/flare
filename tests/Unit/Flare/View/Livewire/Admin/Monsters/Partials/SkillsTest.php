@@ -22,19 +22,25 @@ class SkillsTest extends TestCase
     public function testTheComponentLoads() {
         $monster = $this->createMonster()->load('skills');
 
-        Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->assertSee('Please select');
+        Livewire::test(Skills::class, ['monster' => $monster])->assertSee('Please select');
+    }
+
+    public function testTheComponentCallsUpdate() {
+        $monster = $this->createMonster()->load('skills');
+
+        Livewire::test(Skills::class)->call('update', $monster->id)->assertSet('monster.name', $monster->name);
     }
 
     public function testEmitWithOutSaving() {
         $monster = $this->createMonster()->load('skills');
 
-        Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->call('validateInput', 'nextStep', 2)->assertEmitted('nextStep', 2, true);
+        Livewire::test(Skills::class, ['monster' => $monster])->call('validateInput', 'nextStep', 2)->assertEmitted('nextStep', 2, true);
     }
 
     public function testEmitAfterSaving() {
         $monster = $this->createMonster()->load('skills');
 
-        Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->set('selectedSkill', 1)
+        Livewire::test(Skills::class, ['monster' => $monster])->set('selectedSkill', 1)
                                                                                ->call('editSkill')
                                                                                ->set('monsterSkill.level', 20)
                                                                                ->call('validateInput', 'nextStep', 2)->assertEmitted('nextStep', 2, true);
@@ -46,14 +52,14 @@ class SkillsTest extends TestCase
     public function testMonsterSkillShouldNotSet() {
         $monster = $this->createMonster()->load('skills');
 
-        Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->call('editSkill')
+        Livewire::test(Skills::class, ['monster' => $monster])->call('editSkill')
                                                                                ->assertSet('monsterSkill', null);
     }
 
     public function testSaveWasCalled() {
         $monster = $this->createMonster()->load('skills');
         
-        Livewire::test(Skills::class, ['monster' => $monster->getAttributes()])->set('selectedSkill', 1)
+        Livewire::test(Skills::class, ['monster' => $monster])->set('selectedSkill', 1)
                                                                                ->call('editSkill')
                                                                                ->set('monsterSkill.level', 10)
                                                                                ->call('save');

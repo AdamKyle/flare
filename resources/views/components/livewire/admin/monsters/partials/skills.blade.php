@@ -4,14 +4,16 @@
             <div class="form-group">
                 <label for="skills">Damage Stat: </label>
 
-                <select wire:model="selectedSkill" class="form-control">
-                    <option>Please select</option>
-                    @foreach ($this->monster->skills as $skill)
-                        <option value={{$skill->id}}>{{$skill->name}}</option>
-                    @endforeach
-                </select>
+                @if (!is_null($this->monster))
+                    <select wire:model="selectedSkill" class="form-control">
+                        <option>Please select</option>
+                        @foreach ($this->monster->skills as $skill)
+                            <option value={{$skill->id}}>{{$skill->name}}</option>
+                        @endforeach
+                    </select>
 
-                @error('skill') <span class="text-danger">{{ $message }}</span> @enderror
+                    @error('skill') <span class="text-danger">{{ $message }}</span> @enderror
+                @endif
 
                 <button wire:click="editSkill" class="btn btn-primary mt-2">Edit Skill</button>
             </div>

@@ -30,7 +30,7 @@ class SkillModifiers extends Component
         'skill.skill_bonus_per_level'              => 'nullable',
     ];
 
-    protected $listeners = ['validateInput'];
+    protected $listeners = ['validateInput', 'update'];
 
     public function validateInput(string $functionName, int $index) {
         $this->validate();
@@ -39,7 +39,7 @@ class SkillModifiers extends Component
             $this->addError('error', 'You must supply some kind of bonus per level.');
         } else if ($this->isBelowZero()) {
             $this->addError('error', 'No bonus may be below  or equal to: 0.');
-        } else if ($this->for === 'selected-monster' && is_null($this->monster)) {
+        } else if ($this->for === 'select-monster' && is_null($this->monster)) {
             $this->addError('monster', 'Monster must be selected.');
         } else {
             $this->skill->save();
@@ -48,11 +48,18 @@ class SkillModifiers extends Component
                 AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), $this->monster);
             }
 
-            $this->emitTo('manage', 'redirectSessionMessage', 'success', 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!');
+            $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';
 
-            $this->emitTo('manage', 'storeModel', $this->skill->refresh());
-            $this->emitTo('manage', $functionName, $index, true);
+            $this->emitTo('core.form-wizard', 'finish', $index, true, [
+                'type'    => 'success',
+                'message' => $message,
+            ]);
         }
+    }
+
+    public function update($id) {
+        $this->skill             = GameSkill::find($id);
+        $this->canNotAssignSkill = $this->canNotAssignSkill();
     }
 
     public function isMissing(): Bool {
@@ -74,13 +81,7 @@ class SkillModifiers extends Component
     }
 
     public function mount() {
-        if (is_array($this->skill)) {
-            $this->skill = GameSkill::find($this->skill['id']);
-        }
-
         $this->monsters = Monster::all();
-
-        $this->canNotAssignSkill = $this->canNotAssignSkill();
     }
     
 
@@ -90,6 +91,10 @@ class SkillModifiers extends Component
     }
 
     protected function canNotAssignSkill(): Bool {
+        if (is_null($this->skill)) {
+            return true;
+        }
+
         $monstersWithSkill = Monster::join('skills', function($join) {
             $join->on('skills.monster_id', 'monsters.id')
                  ->where('skills.game_skill_id', $this->skill->id);

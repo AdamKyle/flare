@@ -18,7 +18,7 @@ class QuestItem extends Component
         'monster.quest_item_drop_chance' => 'nullable',
     ];
 
-    protected $listeners = ['validateInput'];
+    protected $listeners = ['validateInput', 'update'];
 
     public function validateInput(string $functionName, int $index) {
 
@@ -35,25 +35,31 @@ class QuestItem extends Component
             } else {
                 $this->monster->save();
 
-                $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills', 'questItem'));
-                $this->emitTo('create', $functionName, $index, true);
+                $message = 'Created monster: ' . $this->monster->refresh()->name;
+
+                $this->emitTo('core.form-wizard', $functionName, $index, true, [
+                    'type'    => 'success',
+                    'message' => $message,
+                ]);
             }   
         } else {
             $this->monster->save();
 
-            $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills', 'questItem'));
-            $this->emitTo('create', $functionName, $index, true);
+            $message = 'Created monster: ' . $this->monster->refresh()->name;
+
+            $this->emitTo('core.form-wizard', $functionName, $index, true, [
+                'type'    => 'success',
+                'message' => $message,
+            ]);
         }
     }
 
+    public function update($id) {
+        $this->monster = Monster::find($id)->load('questItem');
+    }
+
     public function mount() {
-        if (!is_null($this->monster)) {
-            if (is_array($this->monster)) {
-                $this->monster = Monster::find($this->monster['id'])->load('questItem');
-            }
-            
-            $this->questItemList = Item::where('type', 'quest')->get();
-        }
+        $this->questItemList = Item::where('type', 'quest')->get();
     }
 
     public function render()

@@ -17,14 +17,13 @@ class SkillDetails extends Component
 
     protected $messages =[
         'skill.name.required'        => 'Name required.',
-        'skill_description.required' => 'Description required.',
-        'skill_max_level.required'   => 'Max Level is required.'
+        'skill.description.required' => 'Description required.',
+        'skill.max_level.required'   => 'Max Level is required.'
     ];
 
     protected $listeners = ['validateInput'];
 
     public function validateInput(string $functionName, int $index) {
-        
         $this->validate();
 
         if ($this->skill->max_level <= 0) {
@@ -33,8 +32,8 @@ class SkillDetails extends Component
 
         $this->skill->save();
 
-        $this->emitTo('manage', 'storeModel', $this->skill->refresh());
-        $this->emitTo('manage', $functionName, $index, true);
+        $this->emitTo('core.form-wizard', 'storeModel', $this->skill->refresh());
+        $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 
     public function mount() {

@@ -45,8 +45,8 @@ class Details extends Component
 
         $this->location->save();
 
-        $this->emitTo('manage', 'storeModel', $this->location->refresh());
-        $this->emitTo('manage', $functionName, $index, true);
+        $this->emitTo('core.form-wizard', 'storeModel', $this->location->refresh());
+        $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 
     public function render()

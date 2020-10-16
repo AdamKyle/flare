@@ -10,11 +10,15 @@ class FormWizard extends Component
 
     public $steps        = [];
 
-    public $currentStep  = 1;
+    public $currentStep  = 0;
 
     public $views        = [];
 
+    public $modelName    = null;
+
     public $model        = null;
+
+    public $viewData     = [];
 
     public $finishRoute  = '';
 
@@ -22,7 +26,7 @@ class FormWizard extends Component
 
     public $flashMessage = '';
 
-    protected $listeners = ['storeModel', 'nextStep', 'finish', 'redirectSessionMessage'];
+    protected $listeners = ['storeModel', 'nextStep', 'finish', 'sessionMessage'];
 
     public function nextStep(int $index, bool $passed = false) {
         if (isset($this->views[$index - 1]) && !$passed) {
@@ -31,29 +35,42 @@ class FormWizard extends Component
 
         if ($passed) {
             $this->currentStep = $index;
-            $this->emit('updateCurrentStep', $this->currentStep, $this->model);
+
+            $this->emitTo($this->views[$index], 'update', $this->model['id']);
         }
     }
 
-    public function finish(int $index, bool $passed = false) {
-        if (isset($this->views[$index - 1]) && !$passed) {
-            $this->emitTo($this->views[$index - 1], 'validateInput', 'finish', $index);
+    public function finish(int $index, bool $passed = false, $sessionMessage = []) {
+        if (isset($this->views[$index]) && !$passed) {
+            $this->emitTo($this->views[$index], 'validateInput', 'finish', $index);
         }
 
         if ($passed) {
-            session()->flash($this->flasMessageType, $this->flashMessage);
+
+            if (!empty($sessionMessage)) {
+                session()->flash($sessionMessage['type'], $sessionMessage['message']);
+            }
+            
 
             redirect()->route($this->finishRoute);
         }
     }
 
-    public function redirectSessionMessage(string $type, string $message) {
+    public function sessionMessage(string $type, string $message) {
         $this->flasMessageType = $type;
         $this->flashMessage    = $message;
     }
 
-    public function storeModel($model = null) {
+    public function storeModel($model = null, $refresh = false, $view = null) {
         $this->model = $model;
+
+        if ($refresh) {
+            $this->emitTo($view, 'update', $this->model['id']);
+        }
+    }
+
+    public function mount() {
+        $this->viewData[$this->modelName] = $this->model;
     }
 
     public function render()

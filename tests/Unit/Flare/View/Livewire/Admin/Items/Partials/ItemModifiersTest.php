@@ -19,6 +19,11 @@ class ItemModifiersTest extends TestCase
         ])->assertSee('Str Mod:');
     }
 
+    public function testTheComponentCallsUpdate() {
+        $item = $this->createItem();
+
+        Livewire::test(ItemModifiers::class)->call('update', $item->id)->assertSet('item.name', $item->name);
+    }
 
     public function testNoValidation() {
         Livewire::test(ItemModifiers::class, [

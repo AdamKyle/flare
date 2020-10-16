@@ -10,8 +10,18 @@
             <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
         </div>
     </div>
-    @livewire('admin.skills.manage', [
-        'model' => $skill
+    @livewire('core.form-wizard', [
+        'views' => [
+            'admin.skills.partials.skill-details',
+            'admin.skills.partials.skill-modifiers',
+        ],
+        'model'     => $skill,
+        'modelName' => 'skill',
+        'steps' => [
+            'Skill Details',
+            'Skill Modifiers',
+        ],
+        'finishRoute' => 'skills.list',
     ])
 </div>
 @endsection

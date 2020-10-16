@@ -14,7 +14,7 @@ class QuestItemTest extends TestCase
 {
     use RefreshDatabase, CreateItem, CreateLocation;
 
-    public function testComponentIsLoaded() {
+    public function testLocationQuestItemComponentIsLoaded() {
         $location = $this->createLocation([
             'name'                 => 'Apples',
             'game_map_id'          => GameMap::create([
@@ -35,9 +35,7 @@ class QuestItemTest extends TestCase
             'y'                    => 1,
         ]);
 
-        Livewire::test(QuestItem::class, [
-            'location' => $location->getAttributes(),
-        ])->assertSee('Select item as quest reward:');
+        Livewire::test(QuestItem::class)->call('update', $location->getAttributes())->assertSee('Select item as quest reward:');
     }
 
     public function testSetQuestItemOnLocation() {
@@ -62,13 +60,15 @@ class QuestItemTest extends TestCase
             'cost'          => null,
             'crafting_type' => null,
         ]);
+        
+        $message = 'Created location: ' . $location->refresh()->name;
 
         Livewire::test(QuestItem::class, [
-            'location' => $location->getAttributes(),
-        ])->assertSee('Select item as quest reward:')
-          ->set('location.quest_reward_item_id', $item->id)
-          ->call('validateInput', 'finish', 3)
-          ->assertEmitted('finish', 3, true);
+            'location' => $location
+        ])
+            ->assertSee('Select item as quest reward:')
+            ->set('location.quest_reward_item_id', $item->id)
+            ->call('validateInput', 'finish', 3);
 
         $this->assertNotNull($location->refresh()->quest_reward_item_id);
     }

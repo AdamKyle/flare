@@ -10,7 +10,7 @@ class AffixModifier extends Component
 
     public $itemAffix;
 
-    protected $listeners = ['validateInput'];
+    protected $listeners = ['validateInput' , 'update'];
 
     protected $rules = [
         'itemAffix.base_damage_mod'      => 'nullable',
@@ -24,11 +24,9 @@ class AffixModifier extends Component
         'itemAffix.skill_name'           => 'nullable',
         'itemAffix.skill_training_bonus' => 'nullable',
     ];
-    
-    public function mount() {
-        if (is_array($this->itemAffix)) {
-            $this->itemAffix = ItemAffix::find($this->itemAffix['id']);
-        }
+
+    public function update($id) {
+        $this->itemAffix = ItemAffix::find($id);
     }
 
     public function validateInput(string $functionName, int $index) {
@@ -39,8 +37,12 @@ class AffixModifier extends Component
         } else {
             $this->itemAffix->save();
 
-            $this->emitTo('manage', 'storeModel', $this->itemAffix->refresh());
-            $this->emitTo('manage', $functionName, $index, true);
+            $message = 'Created Affix: ' . $this->itemAffix->refresh()->name;
+
+            $this->emitTo('core.form-wizard', $functionName, $index, true, [
+                'type'    => 'success',
+                'message' => $message,
+            ]);
         }
     }
 

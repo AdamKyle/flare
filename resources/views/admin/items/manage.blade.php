@@ -10,8 +10,18 @@
             <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
         </div>
     </div>
-    @livewire('admin.items.manage', [
-        'model' => $item
+    @livewire('core.form-wizard', [
+        'views' => [
+            'admin.items.partials.item-details',
+            'admin.items.partials.item-modifiers',
+        ],
+        'model'     => $item,
+        'modelName' => 'item',
+        'steps' => [
+            'Item Details',
+            'Item Modifiers',
+        ],
+        'finishRoute' => 'items.list',
     ])
 </div>
 @endsection

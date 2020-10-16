@@ -22,7 +22,7 @@ class ItemModifiers extends Component
         'item.effect'           => 'nullable',
     ];
 
-    protected $listeners = ['validateInput'];
+    protected $listeners = ['validateInput', 'update'];
 
     public function mount() {
         if (is_array($this->item)) {
@@ -30,13 +30,21 @@ class ItemModifiers extends Component
         }
     }
 
+    public function update($id) {
+        $this->item = Item::find($id);
+    }
+
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
         $this->item->save();
 
-        $this->emitTo('manage', 'storeModel', $this->item->refresh());
-        $this->emitTo('manage', $functionName, $index, true);
+        $message = 'Created Item: ' . $this->item->refresh()->name;
+        
+        $this->emitTo('core.form-wizard', $functionName, $index, true, [
+            'type'    => 'success',
+            'message' => $message,
+        ]);
     }
 
     public function render()

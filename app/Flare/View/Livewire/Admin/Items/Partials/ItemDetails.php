@@ -24,6 +24,7 @@ class ItemDetails extends Component
         'spell-healing',
         'spell-damage',
         'artifact',
+        'quest',
     ];
 
     public $defaultPositions = [
@@ -53,8 +54,6 @@ class ItemDetails extends Component
         'artifact'
     ];
 
-    protected $listeners = ['validateInput'];
-
     protected $rules = [
         'item.name'                  => 'required',
         'item.type'                  => 'required',
@@ -77,19 +76,20 @@ class ItemDetails extends Component
         'item.type.required'        => 'Item type is required',
         'item.description.required' => 'Item description is required.',
     ];
-    
+
+    protected $listeners = ['validateInput'];
 
     public function validateInput(string $functionName, int $index) {
         $itemValidator = resolve(ItemValidator::class);
-        
+
         $this->validate();
 
         if ($itemValidator->validate($this, $this->item)) {
 
             $this->item->save();
 
-            $this->emitTo('manage', 'storeModel', $this->item->refresh());
-            $this->emitTo('manage', $functionName, $index, true);
+            $this->emitTo('core.form-wizard', 'storeModel', $this->item->refresh());
+            $this->emitTo('core.form-wizard', $functionName, $index, true);
         }
     }
 

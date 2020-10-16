@@ -55,8 +55,8 @@ class Stats extends Component
             $this->monster->skills()->insert($skills);
         }
 
-        $this->emitTo('create', 'storeModel', $this->monster);
-        $this->emitTo('create', $functionName, $index, true);
+        $this->emitTo('core.form-wizard', 'storeModel', $this->monster);
+        $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 
     public function mount() {

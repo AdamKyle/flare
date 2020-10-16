@@ -10,8 +10,18 @@
             <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
         </div>
     </div>
-    @livewire('admin.locations.manage', [
-        'model' => $location
+    @livewire('core.form-wizard', [
+        'views' => [
+            'admin.locations.partials.details',
+            'admin.locations.partials.quest-item',
+        ],
+        'model'     => $location,
+        'modelName' => 'location',
+        'steps' => [
+            'Location Details',
+            'Location Quest Item',
+        ],
+        'finishRoute' => 'locations.list',
     ])
 </div>
 @endsection

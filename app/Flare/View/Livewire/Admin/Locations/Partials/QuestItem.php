@@ -17,29 +17,26 @@ class QuestItem extends Component
         'location.quest_reward_item_id' => 'nullable'
     ];
 
-    protected $listeners = ['validateInput'];
+    protected $listeners = ['validateInput', 'update'];
+
+    public function update($id) {
+        $this->location = Location::find($id);
+    }
 
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
-        if (!is_null($this->location->quest_reward_item_id)) {
-            $this->location->save();
-
-            $this->emitTo('manage', 'storeModel', $this->location->refresh());
-            $this->emitTo('manage', $functionName, $index, true);
-        }
-
         $this->location->save();
 
-        $this->emitTo('manage', 'storeModel', $this->location->refresh());
-        $this->emitTo('manage', $functionName, $index, true);
+        $message = 'Created location: ' . $this->location->refresh()->name;
+
+        $this->emitTo('core.form-wizard', $functionName, $index, true, [
+            'type'    => 'success',
+            'message' => $message,
+        ]);
     }
 
     public function mount() {
-        if (is_array($this->location)) {
-            $this->location = Location::find($this->location['id']);
-        }
-
         $this->items = Item::where('type', 'quest')->pluck('name', 'id')->toArray();
     }
 

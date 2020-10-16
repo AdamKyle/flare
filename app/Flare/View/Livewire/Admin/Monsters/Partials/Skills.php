@@ -19,14 +19,10 @@ class Skills extends Component
         'monsterSkill.level' => 'required',
     ];
 
-    protected $listeners = ['validateInput'];
+    protected $listeners = ['validateInput', 'update'];
 
-    public function mount() {
-        if (!is_null($this->monster)) {
-            if (is_array($this->monster)) {
-                $this->monster = Monster::find($this->monster['id'])->load('skills');
-            }
-        }
+    public function update($id) {
+        $this->monster = Monster::find($id)->load('questItem');
     }
 
     public function validateInput(string $functionName, int $index) {
@@ -37,8 +33,8 @@ class Skills extends Component
             $this->monsterSkill->save();
         }
 
-        $this->emitTo('create', 'storeModel', $this->monster->refresh()->load('skills'));
-        $this->emitTo('create', $functionName, $index, true);
+        $this->emitTo('core.form-wizard', 'storeModel', $this->monster->refresh()->load('skills'));
+        $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 
     public function editSkill() {
@@ -56,7 +52,7 @@ class Skills extends Component
 
         session()->flash('message', 'Saved successfully.');
 
-        $this->emitTo('create', 'storeMonster', $this->monster->refresh()->load('skills'));
+        $this->emitTo('core.form.wizard', 'storeMonster', $this->monster->refresh()->load('skills'), true, 'admin.monsters.partials.skills');
     }
 
     public function render()

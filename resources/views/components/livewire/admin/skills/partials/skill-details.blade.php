@@ -18,7 +18,7 @@
             <div class="form-group">
                 <label for="skill-description">Description: </label>
                 <textarea class="form-control required" name="skill-description" wire:model="skill.description"></textarea>
-                @error('skill.description') <span class="skill-danger">{{ $message }}</span> @enderror
+                @error('skill.description') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

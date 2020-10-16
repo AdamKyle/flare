@@ -36,8 +36,8 @@ class AffixDetails extends Component
 
         $this->itemAffix->save();
 
-        $this->emitTo('manage', 'storeModel', $this->itemAffix->refresh());
-        $this->emitTo('manage', $functionName, $index, true);
+        $this->emitTo('core.form-wizard', 'storeModel', $this->itemAffix->refresh());
+        $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 
     public function mount() {
