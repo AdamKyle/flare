@@ -78,6 +78,10 @@ class UsersController extends Controller {
         $users  = User::where('ip_address', $user->ip_address)->get();
 
         foreach ($users as $user) {
+            if (is_null($user->character)) {
+                continue;
+            }
+
             $unBanAt = null;
 
             if ($request->ban_for !== 'perm') {
@@ -116,8 +120,7 @@ class UsersController extends Controller {
             Mail::to($user->email)->send(new GenericMail($user, $message, 'You have been banned!', true));
         }
         
-
-        return redirect()->back()->with('success', 'User has been banned');
+        return redirect()->back()->with('success', 'User has been banned.');
     }
 
     public function unBanUser(Request $request, User $user) {
@@ -128,6 +131,6 @@ class UsersController extends Controller {
 
         Mail::to($user->email)->send(new GenericMail($user, 'You are now unbanned and may log in again.', 'You have been unbanned'));
 
-        return redirect()->back()->with('success', 'User has been unbanned');
+        return redirect()->back()->with('success', 'User has been unbanned.');
     }
 }

@@ -7,7 +7,7 @@ use League\Fractal\Resource\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use App\Flare\Transformers\SkillsTransformer;
 
-trait SkillsTrainsformerTrait {
+trait SkillsTransformerTrait {
 
     protected function fetchSkills(SupportCollection $skills) {
         $manager = resolve(Manager::class);

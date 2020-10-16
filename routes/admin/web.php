@@ -50,13 +50,13 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/skill/{skill}/edit', ['as' => 'skill.edit', 'uses' => 'SkillsController@edit']);
 
     Route::get('/admin/races', ['as' => 'races.list', 'uses' => 'RacesController@index']);
-    Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);
     Route::get('/admin/races/create', ['as' => 'races.create', 'uses' => 'RacesController@create']);
+    Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);
     Route::get('/admin/races/{race}/edit', ['as' => 'races.edit', 'uses' => 'RacesController@edit']);
 
     Route::get('/admin/classes', ['as' => 'classes.list', 'uses' => 'ClassesController@index']);
-    Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
+    Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
     
 });

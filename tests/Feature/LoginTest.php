@@ -55,4 +55,30 @@ class LoginTest extends TestCase
                 'password' => 'password',
              ])->see('Manage Kingdoms');
     }
+
+    public function testPlayerIsNotAllowedToLogin() {
+        $user = $this->createUser([
+            'is_banned' => true,
+        ]);
+
+        $this->createRace([
+            'dex_mod' => 2,
+        ]);
+
+        $this->createClass([
+            'str_mod' => 2,
+            'damage_stat' => 'str',
+        ]);
+
+        $character = $this->createCharacter([
+            'name'    => 'Apples',
+            'user_id' => $user->id,
+        ]);
+
+        $this->visit('/login')
+             ->submitForm('Login', [
+                'email'    => $user->email,
+                'password' => 'password',
+             ])->see('You have been banned until: For ever.');
+    }
 }

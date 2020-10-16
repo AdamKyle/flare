@@ -3,13 +3,12 @@
 namespace App\Flare\Transformers;
 
 use League\Fractal\TransformerAbstract;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Monster;
-use App\Flare\Transformers\Traits\SkillsTrainsformerTrait;
+use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 
 class MonsterTransfromer extends TransformerAbstract {
 
-    use SkillsTrainsformerTrait;
+    use SkillsTransformerTrait;
 
     public function transform(Monster $monster) {
 

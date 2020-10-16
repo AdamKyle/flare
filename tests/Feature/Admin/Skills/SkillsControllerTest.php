@@ -53,7 +53,7 @@ class SkillsControllerTest extends TestCase
     }
 
     public function testCanSeeEditPage() {
-        $this->actingAs($this->user)->visit(route('skills.edit', [
+        $this->actingAs($this->user)->visit(route('skill.edit', [
             'skill' => $this->gameSkill->id,
         ]))->see('Edit skill: ' . $this->gameSkill->name);
     }

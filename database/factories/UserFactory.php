@@ -30,6 +30,9 @@ class UserFactory extends Factory
             'message_throttle_count' => 0,
             'is_silenced'            => false,
             'can_speak_again_at'     => null,
+            'is_banned'              => false,
+            'unbanned_at'            => null,
+            'ip_address'             => '127.0.0.1'
         ];
     }
 }
