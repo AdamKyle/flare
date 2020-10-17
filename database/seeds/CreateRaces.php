@@ -25,6 +25,7 @@ class CreateRaces extends Seeder
                 'accuracy_mod' => 0.01,
                 'dodge_mod'    => 0.01,
                 'deffense_mod' => 0.01,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'High Elf',
@@ -36,6 +37,7 @@ class CreateRaces extends Seeder
                 'accuracy_mod' => 0.10,
                 'dodge_mod'    => 0.05,
                 'deffense_mod' => 0,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Dark Dwarf',
@@ -46,7 +48,8 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 1,
+                'deffense_mod' => 0.05,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Centaur',
@@ -58,6 +61,7 @@ class CreateRaces extends Seeder
                 'accuracy_mod' => 0.10,
                 'dodge_mod'    => 0,
                 'deffense_mod' => 0.02,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Dryad',
@@ -66,9 +70,10 @@ class CreateRaces extends Seeder
                 'dex_mod'      => 2,
                 'chr_mod'      => 2,
                 'int_mod'      => 3,
-                'accuracy_mod' => 0.10,
-                'dodge_mod'    => 0.10,
+                'accuracy_mod' => 0.5,
+                'dodge_mod'    => 0.5,
                 'deffense_mod' => 0,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Orc',
@@ -80,6 +85,7 @@ class CreateRaces extends Seeder
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
                 'deffense_mod' => 0,
+                'looting_mod'  => 0.02,
             ]
         ]);
     }

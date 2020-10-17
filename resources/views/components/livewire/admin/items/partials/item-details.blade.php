@@ -105,8 +105,8 @@
                 <label for="item-affects-skill">Affects Skill: </label>
                 <select class="form-control" name="item-affects-skill" wire:model="item.skill_name">
                     <option value="">Please select</option>
-                    @foreach(config('game.skills') as $skill)
-                        <option value={{$skill['name']}}>{{$skill['name']}}</option>
+                    @foreach($skills as $skill)
+                        <option value={{$skill->name}}>{{$skill->name}}</option>
                     @endforeach
                 </select>
                 <span class="text-muted">Only needed when the item affects a skill.</span><br />

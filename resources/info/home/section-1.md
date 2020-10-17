@@ -1,8 +1,10 @@
 # Planes Of Tlessa
 
-Welcome to the planes of Telsa. This guide is means to help you the player get started, or maybe you need to reference something quickly. We have everything in this tome, from quests and their walk throughts to rewards for locations and adventures to monsters and their stats and everything in between.
+Welcome to the planes of Telsa. This guide is meant to help you the player get started, or maybe you need to reference something quickly. We have everything in this tome, from quests and their walk throughs to rewards for locations and adventures to monsters and their stats and everything in between.
 
-Tlessa is not a hard game to play, alas this is not a set it and forget it typ of game. While yes there are some timers in place, they are more meant to deter spam clicking. These timers are short, from 10 seconds for attacks, to a few minutes to sailing and adventuring.
+Tlessa is not a hard game to play, alas this is not a set it and forget it typ of  either. While yes there are some timers in place, they are more meant to deter spam clicking. These timers are short, from 10 seconds for attacks, to a few minutes for sailing and adventuring.
+
+You see more in [Time Gates]('/information/time-gates').
 
 Tlessa want's to keep you in the world, chatting, trading, going on adventures, settling kidngoms, finding epic loot and training skills.
 

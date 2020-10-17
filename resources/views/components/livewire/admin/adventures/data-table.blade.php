@@ -74,9 +74,9 @@
                             <tr>
                                 <td>
                                     @guest
-                                    <a href="{{route('info.page.adventure', [
-                                        'adventure' => $adventure->id
-                                    ])}}">{{$adventure->name}}</a>
+                                        <a href="{{route('info.page.adventure', [
+                                            'adventure' => $adventure->id
+                                        ])}}">{{$adventure->name}}</a>
                                     @else
                                         <a href="{{route('adventures.adventure', [
                                             'adventure' => $adventure->id

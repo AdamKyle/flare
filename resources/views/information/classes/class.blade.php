@@ -1,5 +1,5 @@
 @extends('layouts.information', [
-    'pageTitle' => $pageName
+    'pageTitle' => 'character-information'
 ])
 
 @section('content')

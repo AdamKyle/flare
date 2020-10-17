@@ -30,6 +30,9 @@ return [
             'livewire' => true,
             'view'     => 'admin.adventures.data-table',
         ]
-    ]
+    ],
+    'time-gates' => [],
+    'rules' => [],
+
 
 ];

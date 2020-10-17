@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Affixes\Partials;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\ItemAffix;
 use Livewire\Component;
 

@@ -18,15 +18,15 @@
                     <div class="card-body">
                         <dl>
                             <dt>Strength Mofidfier</dt>
-                            <dd>+ {{$class->str_mod}} %</dd>
+                            <dd>+ {{$class->str_mod}} pts.</dd>
                             <dt>Durability Modifier</dt>
-                            <dd>+ {{$class->dur_mod}} %</dd>
+                            <dd>+ {{$class->dur_mod}} pts.</dd>
                             <dt>Dexterity Modifier</dt>
-                            <dd>+ {{$class->dex_mod}} %</dd>
+                            <dd>+ {{$class->dex_mod}} pts.</dd>
                             <dt>Intelligence Modifier</dt>
-                            <dd>+ {{$class->int_mod}} %</dd>
+                            <dd>+ {{$class->int_mod}} pts.</dd>
                             <dt>Charsima Modifier</dt>
-                            <dd>+ {{$class->chr_mod}} %</dd>
+                            <dd>+ {{$class->chr_mod}} pts.</dd>
                             <dt>Accuracy Modifier</dt>
                             <dd>+ {{$class->accuracy_mod * 100}} %</dd>
                             <dt>Dodge Modifier</dt>

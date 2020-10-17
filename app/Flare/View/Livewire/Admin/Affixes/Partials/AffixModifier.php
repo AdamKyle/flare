@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Affixes\Partials;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\ItemAffix;
 use Livewire\Component;
 
@@ -9,6 +10,8 @@ class AffixModifier extends Component
 {
 
     public $itemAffix;
+
+    public $skills;
 
     protected $listeners = ['validateInput' , 'update'];
 
@@ -27,6 +30,10 @@ class AffixModifier extends Component
 
     public function update($id) {
         $this->itemAffix = ItemAffix::find($id);
+    }
+
+    public function mount() {
+        $this->skills = GameSkill::all();
     }
 
     public function validateInput(string $functionName, int $index) {

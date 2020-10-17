@@ -18,11 +18,8 @@ class InfoPageController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function viewPage(string $pageName)
+    public function viewPage(Request $request, string $pageName)
     {
-
-        Cache::put('pageName', $pageName, now()->addMinutes(5));
-
         $files = Storage::disk('info')->files($pageName);
 
         if (empty($files)) {
@@ -58,39 +55,28 @@ class InfoPageController extends Controller
         ]);
     }
 
-    public function viewRace(GameRace $race) {
-        $pageName = Cache::get('pageName');
-
+    public function viewRace(Request $request, GameRace $race) {
         return view('information.races.race', [
             'race' => $race,
-            'pageName' => $pageName,
         ]);
     }
 
-    public function viewClass(GameClass $class) {
-        $pageName = Cache::get('pageName');
-
+    public function viewClass(Request $request, GameClass $class) {
         return view('information.classes.class', [
             'class' => $class,
-            'pageName' => $pageName,
         ]);
     }
 
-    public function viewSkill(GameSkill $skill) {
-        $pageName = Cache::get('pageName');
-
+    public function viewSkill(Request $request, GameSkill $skill) {
         return view('information.skills.skill', [
             'skill' => $skill,
-            'pageName' => $pageName,
         ]);
     }
 
-    public function viewAdventure(Adventure $adventure) {
-        $pageName = Cache::get('pageName');
+    public function viewAdventure(Request $request, Adventure $adventure) {
 
         return view('information.adventures.adventure', [
             'adventure' => $adventure,
-            'pageName' => $pageName,
         ]);
     }
 }

@@ -9,7 +9,7 @@ For example if your select Vampire, your base damage stat is your durability. Th
 
 ### Skill Modifiers
 
-In the table below you will see some skill modifiers for Accuracy and Dodge. These particular skills are apat of a array of skills that you can train and advance. You can learn about skills in the [skills section](/information/skill-information).
+The table below is a simple display of how stats modify your abillities. Clicking on them allows you to see more details, such as the accuracy and dodge modification which is important when it comes to fights. You can learn more about skills in the [skills section](/information/skill-information).
 
 In this case:
 

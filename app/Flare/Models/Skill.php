@@ -90,25 +90,31 @@ class Skill extends Model
             // Monsters base skill:
             return ($this->baseSkill->skill_bonus_per_level * $this->level);
         }
+
+        $bonus = ($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level;
+
+        $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
+        $looting  = $this->getCharacterSkillBonus($this->character, 'Looting');
+        $dodge    = $this->getCharacterSkillBonus($this->character, 'Dodge');
         
         switch ($this->baseSkill->name) {
             case 'Accuracy':
-                return $this->getCharacterSkillBonus($this->character, 'Accuracy') + (($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level);
+                return $bonus + $accuracy;
             case 'Looting':
-                return $this->getCharacterSkillBonus($this->character, 'Looting') + (($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level);
+                return  $bonus + $looting;
             case 'Dodge':
-                return $this->getCharacterSkillBonus($this->character, 'Dodge') + (($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level);
+                return  $bonus + $dodge;
             default:
-            return ($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level;
+                return $bonus;
         }
     }
 
-    protected function getCharacterSkillBonus(Character $character, string $name): int {
+    protected function getCharacterSkillBonus(Character $character, string $name): float {
         $raceSkillBonusValue  = $character->race->{Str::snake($name . '_mod')};
         $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
-  
+        
         if (!is_null($raceSkillBonusValue) && !is_null($classSkillBonusValue)) {
-            return round($raceSkillBonusValue + $classSkillBonusValue);
+            return $raceSkillBonusValue + $classSkillBonusValue;
         }
   
         return 0;

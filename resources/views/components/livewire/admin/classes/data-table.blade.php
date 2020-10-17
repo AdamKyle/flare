@@ -98,11 +98,11 @@
                                     @endif
                                 </td>
                                 <td>{{$class->damage_stat}}</td>
-                                <td>{{$class->str_mod}}</td>
-                                <td>{{$class->dur_mod}}</td>
-                                <td>{{$class->dex_mod}}</td>
-                                <td>{{$class->chr_mod}}</td>
-                                <td>{{$class->int_mod}}</td>
+                                <td>{{$class->str_mod}} pts. </td>
+                                <td>{{$class->dur_mod}} pts. </td>
+                                <td>{{$class->dex_mod}} pts. </td>
+                                <td>{{$class->chr_mod}} pts. </td>
+                                <td>{{$class->int_mod}} pts. </td>
                             </tr>
                         @endforeach
                     </tbody>

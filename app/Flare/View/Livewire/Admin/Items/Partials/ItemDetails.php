@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Items\Partials;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use Livewire\Component;
@@ -54,6 +55,8 @@ class ItemDetails extends Component
         'artifact'
     ];
 
+    public $skills;
+
     protected $rules = [
         'item.name'                  => 'required',
         'item.type'                  => 'required',
@@ -98,6 +101,8 @@ class ItemDetails extends Component
         if (is_null($this->item)) {
             $this->item = new Item;
         }
+
+        $this->skills = GameSkill::all();
     }
 
     public function render()

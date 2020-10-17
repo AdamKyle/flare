@@ -36,6 +36,9 @@
                 'pageName' => 'home'
               ])}}" class="{{$pageTitle === 'home' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Home</a>
               <a href="{{route('info.page', [
+                'pageName' => 'rules'
+              ])}}" class="{{$pageTitle === 'rules' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Rules Of Tlessa</a>
+              <a href="{{route('info.page', [
                 'pageName' => 'character-information'
               ])}}" class="{{$pageTitle === 'character-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Character Information</a>
               <a href="{{route('info.page', [
@@ -44,6 +47,9 @@
               <a href="{{route('info.page', [
                 'pageName' => 'adventure'
               ])}}" class="{{$pageTitle === 'adventure' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Adventure</a>
+              <a href="{{route('info.page', [
+                'pageName' => 'time-gates'
+              ])}}" class="{{$pageTitle === 'time-gates' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Time Gates</a>
             </div>
           </div>
         </div>

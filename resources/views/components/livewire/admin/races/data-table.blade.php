@@ -89,11 +89,11 @@
                                         </a> 
                                     @endif
                                 </td>
-                                <td>{{$race->str_mod}}</td>
-                                <td>{{$race->dur_mod}}</td>
-                                <td>{{$race->dex_mod}}</td>
-                                <td>{{$race->chr_mod}}</td>
-                                <td>{{$race->int_mod}}</td>
+                                <td>{{$race->str_mod}} pts.</td>
+                                <td>{{$race->dur_mod}} pts.</td>
+                                <td>{{$race->dex_mod}} pts.</td>
+                                <td>{{$race->chr_mod}} pts.</td>
+                                <td>{{$race->int_mod}} pts.</td>
                             </tr>
                         @endforeach
                     </tbody>
