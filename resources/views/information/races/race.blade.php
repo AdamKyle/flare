@@ -1,5 +1,5 @@
 @extends('layouts.information', [
-    'pageTitle' => null
+    'pageTitle' => $pageName
 ])
 
 @section('content')

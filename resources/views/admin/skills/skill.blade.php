@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class={{isset($customClass) ? $customClass . ' container' : 'container'}}>
     <div class="container justify-content-center">
         <div class="row page-titles">
             <div class="col-md-6 align-self-right">

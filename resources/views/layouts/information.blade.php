@@ -32,8 +32,18 @@
               <span class="text-mute help-info">Help Center</span>
             </div>
             <div class="list-group list-group-flush text-right">
-              <a href="#" class="{{$pageTitle === 'character-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Character Information</a>
-              <a href="#" class="{{$pageTitle === 'skill-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Skill Information</a>
+              <a href="{{route('info.page', [
+                'pageName' => 'home'
+              ])}}" class="{{$pageTitle === 'home' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Home</a>
+              <a href="{{route('info.page', [
+                'pageName' => 'character-information'
+              ])}}" class="{{$pageTitle === 'character-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Character Information</a>
+              <a href="{{route('info.page', [
+                'pageName' => 'skill-information'
+              ])}}" class="{{$pageTitle === 'skill-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Skill Information</a>
+              <a href="{{route('info.page', [
+                'pageName' => 'adventure'
+              ])}}" class="{{$pageTitle === 'adventure' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Adventure</a>
             </div>
           </div>
         </div>

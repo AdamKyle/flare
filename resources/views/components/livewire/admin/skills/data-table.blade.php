@@ -55,9 +55,19 @@
                     <tbody>
                         @foreach($gameSkills as $gameSkill)
                             <tr>
-                                <td><a href="{{route('skills.skill', [
-                                    'skill' => $gameSkill->id
-                                ])}}">{{$gameSkill->name}}</a></td>
+                                <td>
+                                    @guest
+                                        <a href="{{route('info.page.skill', [
+                                            'skill' => $gameSkill->id
+                                        ])}}">{{$gameSkill->name}}</a>
+                                    @else
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('skills.skill', [
+                                                'skill' => $gameSkill->id
+                                            ])}}">{{$gameSkill->name}}</a>
+                                        @endif
+                                    @endguest
+                                </td>
                                 <td>{{$gameSkill->max_level}}</td>
                                 <td>{{$gameSkill->can_train ? 'Yes' : 'No'}}</td>
                                 @if (!is_null(auth()->user()))

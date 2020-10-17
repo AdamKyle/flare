@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Flare\Models\Adventure;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
+use App\Flare\Models\GameSkill;
+use Cache;
 use Illuminate\Http\Request;
 use Storage;
 
@@ -17,6 +20,9 @@ class InfoPageController extends Controller
      */
     public function viewPage(string $pageName)
     {
+
+        Cache::put('pageName', $pageName, now()->addMinutes(5));
+
         $files = Storage::disk('info')->files($pageName);
 
         if (empty($files)) {
@@ -53,14 +59,38 @@ class InfoPageController extends Controller
     }
 
     public function viewRace(GameRace $race) {
+        $pageName = Cache::get('pageName');
+
         return view('information.races.race', [
             'race' => $race,
+            'pageName' => $pageName,
         ]);
     }
 
     public function viewClass(GameClass $class) {
+        $pageName = Cache::get('pageName');
+
         return view('information.classes.class', [
             'class' => $class,
+            'pageName' => $pageName,
+        ]);
+    }
+
+    public function viewSkill(GameSkill $skill) {
+        $pageName = Cache::get('pageName');
+
+        return view('information.skills.skill', [
+            'skill' => $skill,
+            'pageName' => $pageName,
+        ]);
+    }
+
+    public function viewAdventure(Adventure $adventure) {
+        $pageName = Cache::get('pageName');
+
+        return view('information.adventures.adventure', [
+            'adventure' => $adventure,
+            'pageName' => $pageName,
         ]);
     }
 }

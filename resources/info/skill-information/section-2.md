@@ -10,11 +10,20 @@ For crafting skills, you have to physically craft items of that type. For exampl
 
 As you craft items you will train your crafting skill for that type.
 
+> ### ATTN!
+>
+> When you are training a skill, you are effectivly using that skill. How ever, when it comes to skills that are affecting things like looting or 
+> attacking, such as increasing your Base Damage with a modifer, the level you put in those specific skills will automatically be applied
+> even if you are not activly training that skill.
+>
+> For example if you start training Looting, after putting 5 levels into Accuracy, when you go to attack those five levels (of Accuracy) will be taken into account 
+> when determining if you can hit or not automatically. This makes training multiple skills to their max level benificial for creating optimized characters.
+
 ## Leveling Skills
 
 When a skill levels up you will see that in chat. If you are doing an adventure and you have logged out and have a skill training, you will see the new level when you collect your rewards from that adventure, assuming you have successfully completed the adventure and that the adventure rewards enough xp to level the skill.
 
-[Learn more about adventuring]().
+[Learn more about adventuring](/information/adventure).
 
 ## Skill XP
 

@@ -17,7 +17,19 @@ return [
     ],
 
     'skill-information' => [
-        
+        [
+            'livewire' => true,
+            'view'     => 'admin.skills.data-table',
+        ]
+    ],
+
+    'home' => [],
+
+    'adventure' => [
+        [
+            'livewire' => true,
+            'view'     => 'admin.adventures.data-table',
+        ]
     ]
 
 ];

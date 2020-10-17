@@ -72,9 +72,17 @@
                     <tbody>
                         @foreach($adventures as $adventure)
                             <tr>
-                                <td><a href="{{route('adventures.adventure', [
-                                    'adventure' => $adventure->id
-                                ])}}">{{$adventure->name}}</a></td>
+                                <td>
+                                    @guest
+                                    <a href="{{route('info.page.adventure', [
+                                        'adventure' => $adventure->id
+                                    ])}}">{{$adventure->name}}</a>
+                                    @else
+                                        <a href="{{route('adventures.adventure', [
+                                            'adventure' => $adventure->id
+                                        ])}}">{{$adventure->name}}</a>
+                                    @endif
+                                </td>
                                 <td>{{$adventure->levels}}</td>
                                 <td>{{$adventure->time_per_level}} Minutes</td>
                                 <td>{{$adventure->gold_rush_chance * 100}}%</td>

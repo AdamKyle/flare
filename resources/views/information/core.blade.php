@@ -5,7 +5,7 @@
 @section('content')
     <div class="mt-5">
         @foreach($sections as $section)
-            <div class="row justify-content-center mb-2 mt-3">
+            <div class="row justify-content-center mb-2 mt-3 text-lg">
                 <div class="col-xl-12">
                     @markdown($section['content'])
                 </div>

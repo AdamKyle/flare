@@ -4,8 +4,8 @@
 
 @section('content')
     <div class="mt-5">
-        @include('admin.classes.class', [
-            'class' => $class,
+        @include('admin.adventures.adventure', [
+            'adventure' => $adventure,
             'customClass' => 'mt-5'
         ])
     </div>

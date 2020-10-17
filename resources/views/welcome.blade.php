@@ -7,7 +7,8 @@
                 <div class="jumbotron">
                     <h1>Planes of Tlessa</h1>
                     <p>A world full of mystery and exploration.</p>
-                    <a class="btn btn-primary btn-lg hero-btn" href="#" role="button">Join Today!</a>
+                    <a class="btn btn-primary btn hero-btn" href="{{route('register')}}" role="button">Join Today!</a>
+                    <a class="btn btn-success btn hero-btn" href="{{route('info.page', ['pageName' => 'home'])}}" role="button">Learn More</a>
                 </div>
             </div>
         </div>

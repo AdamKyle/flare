@@ -8,11 +8,16 @@
                 <h4 class="mt-2">{{$adventure->name}}</h4>
             </div>
             <div class="col-md-6 align-self-right">
-                @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
+                @guest
+                    <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
                 @else
-                    <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Back</a>
-                @endif
+                    @if (auth()->user()->hasRole('Admin'))
+                        <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
+                    @else
+                        <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Back</a>
+                    @endif
+                    
+                @endGuest
             </div>
         </div>
         <div class="card">
@@ -32,11 +37,14 @@
                     <dd>{{$adventure->skill_exp_bonus * 100}}%</dd>
                 </dl>
                 <hr />
-                @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{route('adventure.edit', [
-                        'adventure' => $adventure->id,
-                    ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
-                @endif
+                @guest
+                @else
+                    @if (auth()->user()->hasRole('Admin'))
+                        <a href="{{route('adventure.edit', [
+                            'adventure' => $adventure->id,
+                        ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+                    @endif
+                @endguest
             </div>
         </div>
         <h4>Found At:</h4>
@@ -56,10 +64,15 @@
                     @if (!is_null($adventure->itemReward))
                         @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
                         @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
-                    @elseif (auth()->user->hasRole('Admin'))
-                        <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
-                            'adventure' => $adventure->id,
-                        ])}}">Assign one.</a> </div>
+                    @else
+                        @guest
+                        @else
+                            @if (auth()->user->hasRole('Admin'))
+                                <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
+                                    'adventure' => $adventure->id,
+                                ])}}">Assign one.</a> </div>
+                            @endif
+                        @endif
                     @endif
                 </div>
             </div>

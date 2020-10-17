@@ -14,7 +14,7 @@ Lets break down whats all in a skill:
 - **Base Healing Modifier**: This affects your healing amount when you use spells to heal. In battle these spells will trigger automatically assuming you have a healing spell equipped.
 - **Base AC Modifier**: This affects your deffense. This affects weather you block an attack or not. This combined with your base AC is used to determine if the monster can do damage.
 
-> ### ANNT!
+> ### ATTN!
 >
 > You will see these through out this guide. These three modifier attributes can also exist on artificats, quest items, enchanted items and even regular items them selves.
 
