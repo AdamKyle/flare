@@ -27,6 +27,7 @@ class GameClass extends Model
         'accuracy_mod',
         'dodge_mod',
         'deffense_mod',
+        'looting_mod',
     ];
 
     /**
@@ -43,6 +44,7 @@ class GameClass extends Model
         'accuracy_mod' => 'float',
         'dodge_mod'    => 'float',
         'deffense_mod' => 'float',
+        'looting_mod'  => 'float',
     ];
 
     public static function dataTableSearch($query) {

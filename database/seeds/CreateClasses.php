@@ -25,7 +25,8 @@ class CreateClasses extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0.01,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 5,
+                'deffense_mod' => 0.05,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Vampire',
@@ -38,6 +39,7 @@ class CreateClasses extends Seeder
                 'accuracy_mod' => 0.01,
                 'dodge_mod'    => 0.01,
                 'deffense_mod' => 2,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Ranger',
@@ -50,6 +52,7 @@ class CreateClasses extends Seeder
                 'accuracy_mod' => 0.03,
                 'dodge_mod'    => 0.03,
                 'deffense_mod' => 0,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Prophet',
@@ -62,6 +65,7 @@ class CreateClasses extends Seeder
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
                 'deffense_mod' => 0,
+                'looting_mod'  => 0,
             ],
             [
                 'name'         => 'Heretic',
@@ -69,11 +73,25 @@ class CreateClasses extends Seeder
                 'str_mod'      => 0,
                 'dur_mod'      => 0,
                 'dex_mod'      => 0,
-                'chr_mod'      => 0,
+                'chr_mod'      => 3,
                 'int_mod'      => 5,
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
                 'deffense_mod' => 0,
+                'looting_mod'  => 0,
+            ],
+            [
+                'name'         => 'Thief',
+                'damage_stat'  => 'dex',
+                'str_mod'      => 0,
+                'dur_mod'      => 0,
+                'dex_mod'      => 5,
+                'chr_mod'      => 0,
+                'int_mod'      => 1,
+                'accuracy_mod' => 0.01,
+                'dodge_mod'    => 0.01,
+                'deffense_mod' => 0,
+                'looting_mod'  => 0.05,
             ],
         ]);
     }

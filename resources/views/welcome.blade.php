@@ -73,7 +73,9 @@
                                 </div>
                                 <div class="game-feature">
                                     <h5>
-                                        <a href="#">Go on adventures!</a>
+                                        <a href="{{route('info.page', [
+                                            'pageName' => 'adventure',
+                                        ])}}">Go on adventures!</a>
                                     </h5>
                                     <p>Travel to new locations and find out their mysteries by partaking in location based adventures!</p>
                                 </div>

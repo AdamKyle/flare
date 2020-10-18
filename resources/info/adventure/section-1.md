@@ -1,4 +1,4 @@
-# Adventures
+# Adventure
 
 Adventures in Tlessa can only be triggered by being on a specific location.
 

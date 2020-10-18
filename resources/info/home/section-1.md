@@ -4,7 +4,7 @@ Welcome to the planes of Telsa. This guide is meant to help you the player get s
 
 Tlessa is not a hard game to play, alas this is not a set it and forget it typ of  either. While yes there are some timers in place, they are more meant to deter spam clicking. These timers are short, from 10 seconds for attacks, to a few minutes for sailing and adventuring.
 
-You see more in [Time Gates]('/information/time-gates').
+You see more in [Time Gates](/information/time-gates).
 
 Tlessa want's to keep you in the world, chatting, trading, going on adventures, settling kidngoms, finding epic loot and training skills.
 

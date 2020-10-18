@@ -63,3 +63,9 @@ This helps you, if you fail the adventure, to understand a little more about wha
 ## Repeating Adventures
 
 You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once.
+
+## Canceling Adventures
+
+At anytime during the adventuring process you can cancel the adventure. You will not get any rewards, other then the floors you have covered already assuming any floors have been covered.
+
+Your adventure will not be considered complete until you do all the floors.

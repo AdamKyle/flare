@@ -4,7 +4,7 @@ Tlessa does not want to stop you from playing the game. How ever, we recognize t
 
 Instead what Tlessa has implemented is timers. These are client side timers, fed by server side updates that happen in the background. You can switch pages, log out, log in - they are still running - assuming they have not finished.
 
-All timers will be visible to players. You can close a panel that has a timer and re open it and it will still be running.
+All timers will be visible to players. You can close a panel that has a timer and re-open it and it will still be running.
 
 ## Actions and Timers
 
@@ -14,7 +14,7 @@ All of these are seperate. So you can craft, kill a goblin, and move/set sail or
 
 Lets go over these:
 
-- Crafting: When you craft an item, weather you are sucessful or not, you will recieve a 10 second timer.
+- Crafting: When you craft an item, wether you are sucessful or not, you will recieve a 10 second timer.
 - Fighting: When fighting, all attacks are done client side. Once you or the creature are dead one of two timers can appear:
   - **If you die**: You will recieve a 20 second time out before you can revive.
     - You are considered dead and cannot do a lot of things. See [Character Information](/information/character-information).
@@ -25,15 +25,15 @@ Lets go over these:
 
 > ### ATTN!
 >
-> The Adventuring timer can stop unexpectly if you have died in the middle of an adventure. Each floor is processed per floor timer length. That is if a adventure has 10 floors at 2 minutes each, every two minutes we process a floor, so if you are expeting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died.
+> The Adventuring timer can stop unexpectly if you have died in the middle of an adventure. Each floor is processed per floor timer length. That is if a adventure has 10 floors at 2 minutes each, every two minutes we process a floor, so if you are expecting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died.
 
 ## Timers appear beside the action
 
 All timers will appear beside their coresponding action. Movement and setting sail will also have their own timer appearing beside their respecitve action button.
 
-Adevturing will also have its timer beside the adventure you ae embarking on as well as display notices that you cannot do anything till the adventure is over. Again there are stipulations on what you can do while adventuring, please see [Adventure](/information/adventure) section.
+Adevturing will also have its timer beside the adventure you are embarking on as well as display notices that you cannot do anything till the adventure is over. Again there are stipulations on what you can do while adventuring, please see [Adventure](/information/adventure) section.
 
-All actions will be disabled for the coresponding timer, for example if you kill a goblin and click "Again" - while the timer is still active, youll see a message in chat telling you to wait for the appropriate timer to complete.
+All actions will be disabled for the coresponding timer, for example if you kill a goblin and click "Atack" - while the timer is still active, youll see a message in chat telling you to wait for the appropriate timer to complete.
 
 ## Chat Throttling
 
@@ -45,6 +45,6 @@ The Creator, can also silence you for 10, 30 or 60 minutes.
 
 The time until you can talk again will be disaplyed in big bright red letters with your local time (client side) of when you can talk again.
 
-Upon being able to chat youll see a server message appear telling you can chat again.
+Upon being able to chat you'll see a server message appear telling you can chat again.
 
 
