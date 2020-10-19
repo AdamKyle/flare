@@ -58,10 +58,6 @@
                     </tbody>
                 </table>
                 <div class="row">
-                    <div class="col text-left text-muted">
-                        <sup>*</sup> This table is not real time.
-                    </div>
-
                     <div class="col">
                         {{ $maps->links() }}
                     </div>

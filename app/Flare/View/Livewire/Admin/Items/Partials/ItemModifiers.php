@@ -10,6 +10,10 @@ class ItemModifiers extends Component
 
     public $item;
 
+    public $effects = [
+        'walk-on-water',
+    ];
+
     protected $rules = [
         'item.base_damage_mod'  => 'nullable',
         'item.base_healing_mod' => 'nullable',
