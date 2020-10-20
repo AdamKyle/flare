@@ -94,7 +94,7 @@
                                 <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
                                 <td>{{is_null($slot->item->Cost) ? 'N/A' : $slot->item->cost}}</td>
                                 <td>
-                                    @if ($allowInventoryManagement)
+                                    @if ($allowInventoryManagement && $slot->item->type !== 'quest')
                                         <div class="dropdown">
                                             <button class="btn btn-primary dropdown-toggle" type="button" id="actionsButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Actions
@@ -134,17 +134,21 @@
                 
                                         @include('game.core.partials.destroy-modal', ['slot' => $slot])
                                     @else
-                                        <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"
-                                                        onclick="event.preventDefault();
-                                                        document.getElementById('shop-sell-form-slot-{{$slot->id}}').submit();">
-                                            {{ __('Sell') }}
-                                        </a>
+                                        @if ($slot->item->type !== 'quest')
+                                            <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"
+                                                            onclick="event.preventDefault();
+                                                            document.getElementById('shop-sell-form-slot-{{$slot->id}}').submit();">
+                                                {{ __('Sell') }}
+                                            </a>
 
-                                        <form id="shop-sell-form-slot-{{$slot->id}}" action="{{route('game.shop.sell.item')}}" method="POST" style="display: none;">
-                                            @csrf
+                                            <form id="shop-sell-form-slot-{{$slot->id}}" action="{{route('game.shop.sell.item')}}" method="POST" style="display: none;">
+                                                @csrf
 
-                                            <input type="hidden" name="slot_id" value={{$slot->id}} />
-                                        </form>
+                                                <input type="hidden" name="slot_id" value={{$slot->id}} />
+                                            </form>
+                                        @else
+                                            N/A
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

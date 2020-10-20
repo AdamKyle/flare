@@ -370,7 +370,7 @@ export default class Map extends React.Component {
          <div className="character-position mt-2">
           <div className="mb-2 mt-2 clearfix">
             <p className="float-left">Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
-            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-3 btn-sm" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
             { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
           </div>
          </div>

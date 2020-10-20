@@ -1396,9 +1396,14 @@ File: scss
   .boxed #main-wrapper .footer {
     display: none; }
 
-.page-wrapper {
-  background: #fff;
-  padding-bottom: 60px; }
+
+@media screen and (max-width: 768px) {
+  .page-wrapper {
+    background: #fff;
+    padding-bottom: 60px;
+    padding-top: 70px;
+  }
+}
 
 .container-fluid {
   padding: 25px 30px; }
@@ -6090,11 +6095,6 @@ File: scss
     left: 240px; } }
 
 @media (max-width: 1023px) {
-  .page-wrapper {
-    margin-left: 60px;
-    -webkit-transition: 0.2s ease-in;
-    -o-transition: 0.2s ease-in;
-    transition: 0.2s ease-in; }
   .footer {
     left: 60px; }
   .widget-app-columns {

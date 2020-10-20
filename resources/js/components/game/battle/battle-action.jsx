@@ -75,10 +75,10 @@ export default class BattleAction extends React.Component {
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       const character = this.state.character;
 
-      character.ac           =  event.characterSheet.data.ac;
-      character.attack       =  event.characterSheet.data.attack;
-      character.health       =  event.characterSheet.data.health;
-      character.gold         =  event.characterSheet.data.gold;
+      character.ac           =  event.characterSheet.ac;
+      character.attack       =  event.characterSheet.attack;
+      character.health       =  event.characterSheet.health;
+      character.gold         =  event.characterSheet.gold;
       character.can_attack   =  this.state.character.can_attack;
       character.id           =  this.state.character.id;
       character.name         =  this.state.character.name;
@@ -187,11 +187,11 @@ export default class BattleAction extends React.Component {
     
     axios.post('/api/battle-revive/' + this.state.character.id).then((result) => {
       this.setState({
-        character: result.data.character.data,
-        characterMaxHealth: result.data.character.data.health,
-        characterCurrentHealth: result.data.character.data.health,
+        character: result.data.character,
+        characterMaxHealth: result.data.character.health,
+        characterCurrentHealth: result.data.character.health,
       }, () => {
-        this.props.isCharacterDead(result.data.character.data.is_dead);
+        this.props.isCharacterDead(result.data.character.is_dead);
       });
     });
   }

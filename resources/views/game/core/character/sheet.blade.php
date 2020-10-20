@@ -77,10 +77,10 @@
                                     <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>
                                     <dd>
                                         <div class="row">
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 Level: {{$skill->level}} / {{$skill->max_level}}
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-3">
                                                 XP: {{$skill->xp}} / {{$skill->xp_max}}
                                             </div>
                                             <div class="col-md-2">

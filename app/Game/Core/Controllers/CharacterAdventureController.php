@@ -78,7 +78,7 @@ class CharacterAdventureController extends Controller {
         ]);
 
         // Update the coresponding notification:
-        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->first();
+        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->where('read', false)->first();
 
         if (!is_null($notification)) {
             $notification->update([

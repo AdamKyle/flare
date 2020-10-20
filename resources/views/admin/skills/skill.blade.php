@@ -42,9 +42,12 @@
                             <dt>Skill Bonus</dt>
                             <dd>{{$skill->skill_bonus_per_level * 100}}%</dd>
                         </dl>
-                        <a href="{{route('skill.edit', [
-                            'skill' => $skill
-                        ])}}" class="btn btn-primary mt-2">Edit</a>
+                        @guest
+                        @else
+                            <a href="{{route('skill.edit', [
+                                'skill' => $skill
+                            ])}}" class="btn btn-primary mt-2">Edit</a>
+                        @endguest
                     </div>
                 </div>
             </div>
