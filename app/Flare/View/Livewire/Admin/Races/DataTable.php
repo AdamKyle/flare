@@ -4,16 +4,36 @@ namespace App\Flare\View\Livewire\Admin\Races;
 
 use App\Flare\Models\GameRace;
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as BaseDataTable;
+use Livewire\WithPagination;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
-class DataTable extends BaseDataTable
+class DataTable extends Component
 {
+    use WithPagination, WithSorting;
+
+    public $search  = '';
+
+    public $sortField = 'name';
+
+    public $perPage = 10;
+
+    protected $paginationTheme = 'bootstrap';
+
+    public function fetchRaces() {
+        if ($this->search !== '') {
+            return GameRace::where('name', 'like', '%'.$this->search.'%')
+                           ->orderBy($this->sortField, $this->sortBy ? 'asc' : 'desc')
+                           ->paginate($this->perPage);
+        }
+
+        return GameRace::orderBy($this->sortField, $this->sortBy)
+                       ->paginate($this->perPage);
+    }
+
     public function render()
     {
         return view('components.livewire.admin.races.data-table', [
-            'races' => GameRace::dataTableSearch($this->search)
-                               ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-                               ->paginate($this->perPage),
+            'races' => $this->fetchRaces()
         ]);
     }
 }
