@@ -1,8 +1,9 @@
 @props([
     'formRoute',
     'formId',
-    'btnType' => 'primary',
     'buttonTitle',
+    'btnType' => 'primary',
+    'formMethod' => 'POST',
 ])
 
 <a href="{{$formRoute}}" {{$attributes}}
@@ -12,7 +13,7 @@
     {{$buttonTitle}}
 </a>
 
-<form id="{{$formId}}" action="{{$formRoute}}" method="POST" style="display: none;">
+<form id="{{$formId}}" action="{{$formRoute}}" method="{{$formMethod}}" style="display: none;">
     @csrf
 
     {{$slot}}

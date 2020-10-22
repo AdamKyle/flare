@@ -2,58 +2,47 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col form-inline">
-                        Per Page: &nbsp;
-                        <select wire:model="perPage" class="form-control">
-                            <option>10</option>
-                            <option>15</option>
-                            <option>25</option>
-                        </select>
-                    </div>
-            
-                    <div class="col">
-                        <input wire:model="search" class="form-control" type="text" placeholder="Search races...">
-                    </div>
+                <div class="row pb-2">
+                    <x-data-tables.per-page wire:model="perPage" />
+                    <x-data-tables.search wire:model="search" />
                 </div>
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <a wire:click.prevent="sortBy('name')" role="button" href="#">
-                                    Name
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'name'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('max_level')" role="button" href="#">
-                                    Max Level
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'max_level'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('can_train')" role="button" href="#">
-                                    Can train?
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'can_train'
-                                    ])
-                                </a>
-                            </th>
-                            @if (!is_null(auth()->user()))
-                                @if (auth()->user()->hasRole('Admin'))
-                                    <th>
-                                        Actions
-                                    </th>
-                                @endif
+                <x-data-tables.table :collection="$gameSkills">
+                    <x-data-tables.header>
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('name')" 
+                            header-text="Name" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="name"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('max_level')" 
+                            header-text="Max Level" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="max_level"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('can_train')" 
+                            header-text="Can Train" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="can_train"
+                        />
+
+                        @guest
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))
+                                <x-data-tables.header-row 
+                                    header-text="Actions" 
+                                />
                             @endif
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($gameSkills as $gameSkill)
+                        @endguest
+                    </x-data-tables.header>
+                    <x-data-tables.body>
+                        @forelse($gameSkills as $gameSkill)
                             <tr>
                                 <td>
                                     @guest
@@ -78,18 +67,17 @@
                                     @endif
                                 @endif
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="row">
-                    <div class="col">
-                        {{ $gameSkills->links() }}
-                    </div>
-            
-                    <div class="col text-right text-muted">
-                        Showing {{ $gameSkills->firstItem() }} to {{ $gameSkills->lastItem() }} out of {{ $gameSkills->total() }} results
-                    </div>
-                </div>
+                        @empty
+                            @guest
+                                <x-data-tables.no-results colspan="3" />
+                            @else
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <x-data-tables.no-results colspan="4" />
+                                @endif
+                            @endguest
+                        @endforelse
+                    </x-data-tables.body>
+                </x-data-tables.table>
             </div>
         </div>
     </div>
