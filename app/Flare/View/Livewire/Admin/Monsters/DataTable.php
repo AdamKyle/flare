@@ -3,17 +3,20 @@
 namespace App\Flare\View\Livewire\Admin\Monsters;
 
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
+use Livewire\WithPagination;
 use App\Flare\Models\Monster;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
-class DataTable extends CoreDataTable
+class DataTable extends Component
 {
+    use WithPagination, WithSorting;
 
     public $adventureId = null;
+    public $search      = '';
+    public $sortField   = 'max_level';
+    public $perPage     = 10;
 
-    public function mount() {
-        $this->sortField = 'max_level';
-    }
+    protected $paginationTheme = 'bootstrap';
 
     public function fetchMonsters() {
         $monsters = Monster::dataTableSearch($this->search);
@@ -25,7 +28,7 @@ class DataTable extends CoreDataTable
             })->select('monsters.*');
         }
 
-        return $monsters->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+        return $monsters->orderBy($this->sortField, $this->sortBy)
                         ->paginate($this->perPage);
     }
     

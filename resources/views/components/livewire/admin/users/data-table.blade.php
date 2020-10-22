@@ -180,9 +180,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="7" class="text-center">No Results</td>
-                            </tr>
+                            <x-data-tables.no-results colspan="7" />
                         @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>

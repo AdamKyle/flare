@@ -52,7 +52,7 @@
                         />
                     </x-data-tables.header>
                     <x-data-tables.body>
-                        @foreach($races as $race)
+                        @forelse($races as $race)
                             <tr>
                                 <td>
                                     @if (!is_null(auth()->user()))
@@ -77,7 +77,9 @@
                                 <td>{{$race->chr_mod}} pts.</td>
                                 <td>{{$race->int_mod}} pts.</td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <x-data-tables.no-results colspan="6" />
+                        @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>
             </div>

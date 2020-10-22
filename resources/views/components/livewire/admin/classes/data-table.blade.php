@@ -60,7 +60,7 @@
                         
                     </x-data-tables.header>
                     <x-data-tables.body>
-                        @foreach($gameClasses as $class)
+                        @forelse($gameClasses as $class)
                             <tr>
                                 <td>
                                     @if (!is_null(auth()->user()))
@@ -86,7 +86,9 @@
                                 <td>{{$class->chr_mod}} pts. </td>
                                 <td>{{$class->int_mod}} pts. </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <x-data-tables.no-results colspan="6" />
+                        @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>
             </div>
