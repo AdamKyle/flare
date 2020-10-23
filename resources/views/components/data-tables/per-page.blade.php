@@ -5,4 +5,6 @@
         <option>15</option>
         <option>25</option>
     </select>
+
+    {{$slot}}
 </div>

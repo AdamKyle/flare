@@ -63,7 +63,6 @@ class DataTableTest extends TestCase
         ->assertDontSee('Sample')
         ->set('search', '')
         ->assertSee('Sample')
-        ->set('sortAsc', false)
         ->call('sortBy', 'name')
         ->assertSee('Sample')
         ->set('search', 'Sample')

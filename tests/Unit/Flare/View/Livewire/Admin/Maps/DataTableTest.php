@@ -30,7 +30,6 @@ class DataTableTest extends TestCase
         Livewire::test(DataTable::class)
             ->assertSee('Apples')
             ->assertSee('Bananas')
-            ->set('sortAsc', true)
             ->set('search', 'Apples')
             ->assertSee('Apples')
             ->assertDontSee('Bananas');

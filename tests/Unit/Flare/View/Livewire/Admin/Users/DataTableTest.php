@@ -80,23 +80,6 @@ class DataTableTest extends TestCase
         ->assertDontSee('Zex');
     }
 
-    public function testSortByUserOnline() {
-
-        Livewire::test(DataTable::class)
-        ->assertSee('Zex')
-        ->assertSee('trox')
-        ->call('sortBy', 'user.currently_online');
-    }
-
-    public function testSortByUserOnlineInReverse() {
-
-        Livewire::test(DataTable::class)
-        ->assertSee('Zex')
-        ->assertSee('trox')
-        ->call('sortBy', 'user.currently_online')
-        ->call('sortBy', 'user.currently_online');
-    }
-
     public function testSearch() {
 
         Livewire::test(DataTable::class)

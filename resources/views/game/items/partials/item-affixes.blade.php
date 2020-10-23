@@ -4,15 +4,17 @@
     </div>
 @else
     @if (!is_null($item->itemPrefix))
-    <h6 class="mb-2">Prefix</h5>
+        <h5 class="mb-2">Prefix</h5>
         <p>{{$item->itemPrefix->description}}</p>
         <hr />
         <dl>
             <dt>Name:</dt>
             <dd>{{$item->itemPrefix->name}}</dd>
-            <dt>Base Damage:</dt>
+            <dt>Base Damage Modifier:</dt>
             <dd>{{$item->itemPrefix->base_damage_mod * 100}}%</dd>
-            <dt>Base Healing Mod:</dt>
+            <dt>Base AC Modifier:</dt>
+            <dd>{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
+            <dt>Base Healing Modifier:</dt>
             <dd>{{$item->itemPrefix->base_healing_mod * 100}}%</dd>
             <dt>Str Modifier:</dt>
             <dd>{{$item->itemPrefix->str_mod * 100}}%</dd>
@@ -32,15 +34,17 @@
         <hr/>
     @endif
     @if (!is_null($item->itemSuffix))
-        <h6 class="mb-2">Suffix</h5>
+        <h5 class="mb-2">Suffix</h5>
         <p>{{$item->itemSuffix->description}}</p>
         <hr />
         <dl>
             <dt>Name:</dt>
             <dd>{{$item->itemSuffix->name}}</dd>
-            <dt>Base Damage:</dt>
+            <dt>Base Damage Modifier:</dt>
             <dd>{{$item->itemSuffix->base_damage_mod * 100}}%</dd>
-            <dt>Base Healing Mod:</dt>
+            <dt>Base AC Modifier:</dt>
+            <dd>{{$item->itemSuffix->base_ac_mod * 100}}%</dd>
+            <dt>Base Healing Modifier:</dt>
             <dd>{{$item->itemSuffix->base_healing_mod * 100}}%</dd>
             <dt>Str Modifier:</dt>
             <dd>{{$item->itemSuffix->str_mod * 100}}%</dd>

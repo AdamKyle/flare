@@ -3,28 +3,32 @@
 namespace App\Flare\View\Livewire\Character\Inventory;
 
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
-use App\Flare\Models\Item;
+use Livewire\WithPagination;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
-class DataTable extends CoreDataTable
+class DataTable extends Component
 {
-    public $includeEquipped   = false;
+    use WithPagination, WithSorting;
 
-    public $includeQuestItems = false;
+    public $search                   = '';
 
-    public $allowUnequipAll   = false;
+    public $sortField                = 'items.type';
+
+    public $perPage                  = 10;
+
+    protected $paginationTheme       = 'bootstrap';
+
+    public $includeEquipped          = false;
+
+    public $includeQuestItems        = false;
+
+    public $allowUnequipAll          = false;
 
     public $allowInventoryManagement = false;
 
-    public $batchSell = false;
+    public $batchSell                = false;
 
     public $character;
-
-    public function mount() {
-        $this->sortField = 'items.type';
-
-        $this->sortAsc = false;
-    }
 
     public function fetchSlots() {
         $character = auth()->user()->character;
@@ -48,7 +52,7 @@ class DataTable extends CoreDataTable
         });
         
         $slots->where('equipped', $this->includeEquipped)
-              ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+              ->orderBy($this->sortField, $this->sortBy)
               ->select('inventory_slots.*')
               ->get();
         

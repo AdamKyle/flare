@@ -37,7 +37,7 @@
             </div>
 
             <h4>Item Affixes</h4>
-            <div class="card">
+            <div class="card" style="margin-bottom: 100px;">
                 <div class="card-body">
                     @include('game.items.partials.item-affixes', ['item' => $item])
                 </div>
