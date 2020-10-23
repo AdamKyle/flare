@@ -4,13 +4,14 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Skill;
 use Database\Factories\MonsterFactory;
+use App\Flare\Models\Skill;
+use App\Flare\Models\Traits\WithSearch;
 
 class Monster extends Model
 {
 
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -61,11 +62,6 @@ class Monster extends Model
 
     public function questItem() {
         return $this->hasOne(Item::class, 'id', 'quest_item_id');
-    }
-
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
     }
 
     protected static function newFactory() {

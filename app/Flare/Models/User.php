@@ -63,11 +63,6 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('id', 'like', '%'.$query.'%');
-    }
-
     protected static function newFactory() {
         return UserFactory::new();
     }

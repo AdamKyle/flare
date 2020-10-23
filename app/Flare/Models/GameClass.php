@@ -5,11 +5,12 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameClassFactory;
+use App\Flare\Models\Traits\WithSearch;
 
 class GameClass extends Model
 {
 
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -46,11 +47,6 @@ class GameClass extends Model
         'deffense_mod' => 'float',
         'looting_mod'  => 'float',
     ];
-
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
-    }
 
     protected static function newFactory() {
         return GameClassFactory::new();

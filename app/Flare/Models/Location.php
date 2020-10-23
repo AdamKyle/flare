@@ -4,12 +4,13 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\GameMap;
 use Database\Factories\LocationFactory;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Traits\WithSearch;
 
 class Location extends Model
 {
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -47,11 +48,6 @@ class Location extends Model
 
     public function adventures() {
         return $this->belongsToMany(Adventure::class);
-    }
-
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
     }
 
     protected static function newFactory() {
