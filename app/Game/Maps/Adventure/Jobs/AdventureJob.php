@@ -21,23 +21,23 @@ class AdventureJob implements ShouldQueue
 
     protected $adventure;
 
-    protected $levelsAtATime;
-
     protected $name;
 
     protected $repeatingAdventure;
+
+    protected $currentLevel;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Character $character, Adventure $adventure, $levelsAtATime = 'all', String $name)
+    public function __construct(Character $character, Adventure $adventure, String $name, int $currentLevel)
     {
         $this->character          = $character;
         $this->adventure          = $adventure;
-        $this->levelsAtATime      = $levelsAtATime;
         $this->name               = $name;
+        $this->currentLevel       = $currentLevel;
     }
 
     /**
@@ -53,16 +53,17 @@ class AdventureJob implements ShouldQueue
             return;
         }
 
-        Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+        if ($this->currentLevel === $this->adventure->levels) {
+            Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+        }
 
         $adevntureService = resolve(AdventureService::class, [
-            'character'           => $this->character,
+            'character'           => $this->character->refresh(),
             'adventure'           => $this->adventure,
             'rewardBuilder'       => $rewardBuilder,
-            'name'                => $this->name,
-            'levels_at_a_time'    => $this->levelsAtATime,
+            'name'                => $this->name
         ]);
 
-        $adevntureService->processAdventure();
+        $adevntureService->processAdventure($this->currentLevel);
     }
 }

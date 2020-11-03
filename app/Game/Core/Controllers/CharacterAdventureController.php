@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 
+use function PHPUnit\Framework\isEmpty;
+
 class CharacterAdventureController extends Controller {
 
     public function __construct() {
@@ -56,6 +58,23 @@ class CharacterAdventureController extends Controller {
         if (is_null($adventureLog)) {
             return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
         }
+
+        // Update the coresponding notification:
+        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->where('read', false)->first();
+
+        if (!is_null($notification)) {
+            $notification->update([
+                'read' => true,
+            ]);
+        }
+
+        if (empty($adventureLog->rewards)) {
+            $adventureLog->update([
+                'rewards' => null
+            ]);
+
+            event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
+        }
         
         return view('game.core.character.current-adventure', [
             'log'          => $adventureLog->logs[array_key_last($adventureLog->logs)],
@@ -76,15 +95,6 @@ class CharacterAdventureController extends Controller {
         $adventureLog->update([
             'rewards' => null,
         ]);
-
-        // Update the coresponding notification:
-        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->where('read', false)->first();
-
-        if (!is_null($notification)) {
-            $notification->update([
-                'read' => true,
-            ]);
-        }
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 

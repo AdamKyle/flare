@@ -11,15 +11,12 @@ class EmbarkOnAdventureEvent
 {
     use SerializesModels;
 
-    public $levelsAtATime;
-
     public $character;
 
     public $adventure;
 
-    public function __construct(Character $character, Adventure $adventure, $levelsAtATime = 'all')
+    public function __construct(Character $character, Adventure $adventure)
     {
-        $this->levelsAtATime      = $levelsAtATime;
         $this->character          = $character;
         $this->adventure          = $adventure;
     }

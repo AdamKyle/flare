@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        @if (!is_null($adventureLog->rewards))
+        @if (!is_null($adventureLog->rewards) && $adventureLog->complete)
             <div class="card mt-2">
                 <div class="card-body">
                     <h4 class="card-title">Rewards</h4>

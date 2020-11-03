@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Game\Maps\Adventure\Jobs\AdventureJob;
 use App\Game\Maps\Adventure\Events\EmbarkOnAdventureEvent;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
+use Illuminate\Support\Facades\Bus;
 
 class EmbarkOnAdventureListener
 {
@@ -18,69 +19,31 @@ class EmbarkOnAdventureListener
     {
         $jobName = Str::random(80);
 
-        if ($event->levelsAtATime === 'all') {
-            $timeTillFinished = now()->addMinutes($event->adventure->levels * $event->adventure->time_per_level);
-            $timeTillForget   = now()->addMinutes(($event->adventure->levels * $event->adventure->time_per_level) + 5);
+        $timeTillFinished = now()->addMinutes($event->adventure->levels * $event->adventure->time_per_level);
+        $timeTillForget   = now()->addMinutes(($event->adventure->levels * $event->adventure->time_per_level) + 5);
 
-            $event->character->update([
-                'can_adventure_again_at' => $timeTillFinished,
-            ]);
+        $event->character->update([
+            'can_adventure_again_at' => $timeTillFinished,
+        ]);
 
-            Cache::put('character_'.$event->character->id.'_adventure_'.$event->adventure->id, $jobName, $timeTillForget);
-            
-            $event->character->refresh();
+        Cache::put('character_'.$event->character->id.'_adventure_'.$event->adventure->id, $jobName, $timeTillForget);
+        
+        $event->character->refresh();
 
-            event(new UpdateAdventureLogsBroadcastEvent($event->character->adventureLogs, $event->character->user));
-
-            AdventureJob::dispatch($event->character, $event->adventure, $event->levelsAtATime, $jobName)->delay($timeTillFinished);
-        } else {
-            if (!is_numeric($event->levelsAtATime)) {
-                return $this->failedToInitializeAdvenute($event);
-            }
-
-            $levels = $event->adventure->levels - (int) $event->levelsAtATime;
-
-            if ($levels <= 0) {
-                $this->failedToInitializeAdvenute($event);
-            } else {
-                $timeTillFinished = now()->addMinutes($levels * $event->adventure->time_per_level);
-                $timeTillForget   = now()->addMinutes(($levels * $event->adventure->time_per_level) + 5);
-
-                $event->character->update([
-                    'can_adventure_again_at' => $timeTillFinished,
-                ]);
-    
-                Cache::put('character_'.$event->character->id.'_adventure_'.$event->adventure->id, $jobName, $timeTillForget);
-
-                $event->character->refresh();
-
-                event(new UpdateAdventureLogsBroadcastEvent($event->character->adventureLogs, $event->character->user));
-    
-                AdventureJob::dispatch($event->character->refresh(), $event->adventure, $levels, $jobName)->delay($timeTillFinished);
-            }
-        }
+        event(new UpdateAdventureLogsBroadcastEvent($event->character->adventureLogs, $event->character->user));
+        
+        $this->createJobs($event, $jobName);
     }
 
-    protected function failedToInitializeAdvenute($event) {
-        event(new ServerMessageEvent($event->character->user, 'adventure_error', 'Failed to initiate adventure. Invalid input'));
-
-        $adventure = $event->character->adventureLogs->where('in_progress', true)->first();
-
-        $adventure->update([
-            'in_progress' => false,
-        ]);
+    protected function createJobs(EmbarkOnAdventureEvent $event, string $jobName): void {
 
         $character = $event->character->refresh();
 
-        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $event->character->user));
+        for($i = 1; $i <= $event->adventure->levels; $i++) {
+            $delay            = $i === 1 ? $event->adventure->time_per_level : $i * $event->adventure->time_per_level;
+            $timeTillFinished = now()->addMinutes($delay);
 
-        $character->update([
-            'is_dead'                => false,
-            'can_move'               => true,
-            'can_attack'             => true,
-            'can_craft'              => true,
-            'can_adventure'          => true,
-            'can_adventure_again_at' => null,
-        ]);
+            AdventureJob::dispatch($character, $event->adventure, $jobName, $i)->delay($timeTillFinished);
+        }
     }
 }
