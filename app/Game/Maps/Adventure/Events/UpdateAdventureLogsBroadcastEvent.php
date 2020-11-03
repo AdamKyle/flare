@@ -34,17 +34,20 @@ class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
 
     public $isAdventuring;
 
+    public $canceled;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Collection $adventureLogs, User $user)
+    public function __construct(Collection $adventureLogs, User $user, bool $canceled = false)
     {
         $this->adventureLogs       = $adventureLogs;
         $this->canAdventureAgainAt = $user->character->can_adventure_again_at;
         $this->user                = $user;
         $this->isAdventuring       = !is_null($user->character->adventureLogs()->where('in_progress', true)->first());
+        $this->canceled            = $canceled
     }
 
     /**

@@ -56,15 +56,19 @@ class AdventureController extends Controller {
             'can_adventure_again_at' => null,
         ]);
 
-        $adventureLog = $character->adventureLogs->where('adventure_id', $adventure->id)->first();
+        $adventureLog = $character->adventureLogs
+                                  ->where('adventure_id', $adventure->id)
+                                  ->where('in_progress', true)
+                                  ->first();
 
         $adventureLog->update([
             'in_progress' => false,
+            'rewards'     => null,
         ]);
 
         Cache::forget('character_'.$character->id.'_adventure_'.$adventure->id);
 
-        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+        event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user, true));
 
         return response()->json([
             'message'        => 'Adventure canceled.',

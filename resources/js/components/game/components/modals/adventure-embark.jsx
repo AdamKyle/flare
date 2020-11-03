@@ -10,8 +10,6 @@ export default class AdventureEmbark extends React.Component {
     this.state = {
       adventure: null,
       isLoading: true,
-      levelsToComplete: '',
-      errorMessage: null,
     }
   }
 
@@ -22,33 +20,8 @@ export default class AdventureEmbark extends React.Component {
     });
   }
 
-  handleLevelSelect(event) {
-    this.setState({
-      levelsToComplete: event.target.value,
-      errorMessage: null,
-    });
-  }
-
-  buildOptions() {
-    const levels = this.state.adventure.levels;
-
-    if (levels % 10 === 0) {
-      return <option value="5">5 levels at a time</option>
-    } else if (levels % 5 === 0) {
-      return <option value="1">1 level at a time</option>
-    }
-
-    return null;
-  }
-
-  embark() {
-    if (this.state.levelsToComplete === '') {
-      return this.setState({errorMessage: 'Cannot embark when you have not selected how many levels at a time.'})
-    }
-    
-    axios.post('/api/character/'+this.props.characterId+'/adventure/' + this.state.adventure.id, {
-      levels_at_a_time: this.state.levelsToComplete
-    }).then((result) => {
+  embark() {    
+    axios.post('/api/character/'+this.props.characterId+'/adventure/' + this.state.adventure.id).then((result) => {
       this.props.updateMessage(result.data.message);
       this.props.updateCharacterAdventures(result.data.adventure_completed_at);
       this.props.embarkClose();
@@ -92,7 +65,6 @@ export default class AdventureEmbark extends React.Component {
             <Modal.Title>{this.state.adventure.name}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {this.state.errorMessage !== null ? <div className="alert alert-danger mb-2">{this.state.errorMessage}</div> : null}
             <div className="alert alert-info" role="alert">
               <h4 className="alert-heading">Before you set off.</h4>
               <p>
@@ -106,19 +78,6 @@ export default class AdventureEmbark extends React.Component {
               <hr />
               <p className="mb-0">Should you need additional help, please consider this resource on <a href="#">adventureing</a>.</p>
               <p className="text-muted" style={{fontSize: '12px'}}><sup>*</sup> You are free to logout. Any relevant details will be emailed to you should you have those settings enabled.</p>
-            </div>
-            <div className="row">
-              <div className="col-md-12">
-                <div className="form-group">
-                  <label htmlFor="adventure-levels-to-complete">How many levels at a time:</label>
-                  <select className="form-control" id="adventure-levels-to-complete" name="levels_to_complete" value={this.state.levelsToComplete} onChange={this.handleLevelSelect.bind(this)}>
-                    <option value="">Please select</option>
-                    {this.buildOptions()}
-                    <option value="all">All At Once</option>
-                  </select>
-                  <small id="adventure-levels-to-complete-help" className="form-text text-muted">There are a total of: {this.state.adventure.levels} Levels.</small>
-                </div>
-              </div>
             </div>
           </Modal.Body>
           <Modal.Footer>
