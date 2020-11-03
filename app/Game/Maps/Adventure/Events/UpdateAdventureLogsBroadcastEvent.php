@@ -47,7 +47,7 @@ class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
         $this->canAdventureAgainAt = $user->character->can_adventure_again_at;
         $this->user                = $user;
         $this->isAdventuring       = !is_null($user->character->adventureLogs()->where('in_progress', true)->first());
-        $this->canceled            = $canceled
+        $this->canceled            = $canceled;
     }
 
     /**

@@ -19,7 +19,7 @@
 
                             <x-data-tables.header-row 
                                 wire:click.prevent="sortBy('complete')" 
-                                header-text="Is Cmplete" 
+                                header-text="Is Complete" 
                                 sort-by="{{$sortBy}}"
                                 sort-field="{{$sortField}}"
                                 field="complete"

@@ -69,6 +69,8 @@ class AdventureController extends Controller {
         Cache::forget('character_'.$character->id.'_adventure_'.$adventure->id);
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user, true));
+        
+        $adventureLog->delete();
 
         return response()->json([
             'message'        => 'Adventure canceled.',
