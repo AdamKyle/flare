@@ -2,12 +2,23 @@
 
 namespace App\Flare\View\Livewire\Character\Adventures;
 
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
+use Livewire\WithPagination;
 
-class DataTable extends CoreDataTable
+class DataTable extends Component
 {
+    use WithSorting, WithPagination;
+    
     public $adventureLogs;
+
+    public $search             = '';
+
+    public $sortField          = 'items.type';
+
+    public $perPage            = 10;
+
+    protected $paginationTheme = 'bootstrap';
 
     public function fetchAdventureLogs() {
         $logs = $this->adventureLogs;
@@ -24,7 +35,7 @@ class DataTable extends CoreDataTable
             $logs = collect($logs);
         }
   
-        if ($this->sortAsc) {
+        if ($this->sortBy === 'asc') {
             $logs = $logs->sortBy($this->sortField);
         } else {
             $logs = $logs->sortByDesc($this->sortField);

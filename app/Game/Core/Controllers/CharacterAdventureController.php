@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
 
+use function PHPUnit\Framework\isEmpty;
+
 class CharacterAdventureController extends Controller {
 
     public function __construct() {
@@ -49,12 +51,23 @@ class CharacterAdventureController extends Controller {
     public function currentAdventure() {
         $character = auth()->user()->character;
 
-        $adventureLog = $character->adventureLogs->filter(function($log) {
-            return !is_null($log->rewards);
-        })->first();
+        $adventureLog = $character->adventureLogs()->orderBy('id', 'desc')->first();
         
         if (is_null($adventureLog)) {
             return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
+        }
+
+        // Update the coresponding notification:
+        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->where('read', false)->first();
+
+        if (!is_null($notification)) {
+            $notification->update([
+                'read' => true,
+            ]);
+        }
+
+        if (is_null($adventureLog->rewards)) {
+            event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
         }
         
         return view('game.core.character.current-adventure', [
@@ -76,15 +89,6 @@ class CharacterAdventureController extends Controller {
         $adventureLog->update([
             'rewards' => null,
         ]);
-
-        // Update the coresponding notification:
-        $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->first();
-
-        if (!is_null($notification)) {
-            $notification->update([
-                'read' => true,
-            ]);
-        }
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 

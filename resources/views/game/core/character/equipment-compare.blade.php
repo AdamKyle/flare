@@ -3,7 +3,15 @@
 @section('content')
 
 <div class="container-fluid">
-    <div class="row justify-content-center">
+    <div class="row page-titles">
+        <div class="col-md-6 align-self-right">
+            <h4 class="mt-2">Item Comparison</h4>
+        </div>
+        <div class="col-md-6 align-self-right">
+            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             @if (empty($details))
                 <div class="alert alert-info">

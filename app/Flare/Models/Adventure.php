@@ -5,11 +5,12 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\AdventureFactory;
+use App\Flare\Models\Traits\WithSearch;
 
 class Adventure extends Model
 {
 
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -50,11 +51,6 @@ class Adventure extends Model
 
     public function itemReward() {
         return $this->hasOne(Item::class, 'id', 'reward_item_id');
-    }
-
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
     }
 
     protected static function newFactory() {

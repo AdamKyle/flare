@@ -43,8 +43,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $parameters['character'], 
                 $parameters['adventure'], 
                 $parameters['rewardBuilder'],
-                $parameters['name'],
-                $parameters['levels_at_a_time'],
+                $parameters['name']
             );
         });
 

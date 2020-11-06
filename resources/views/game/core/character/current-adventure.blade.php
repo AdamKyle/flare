@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        @if (!is_null($adventureLog->rewards))
+        @if (!is_null($adventureLog->rewards) && $adventureLog->complete)
             <div class="card mt-2">
                 <div class="card-body">
                     <h4 class="card-title">Rewards</h4>
@@ -46,14 +46,16 @@
                         </dd>
                         <dt>Total Gold: </dt>
                         <dd>{{$adventureLog->rewards['gold']}}</dd>
-                        <dt>Adventure Reward Item<sup>*</sup>:</dt>
-                        <dd>
-                            <a href="{{route('items.item', [
-                                'item' => $adventureLog->adventure->itemReward->id
-                            ])}}">
-                                <x-item-display-color :item="$adventureLog->adventure->itemReward" />
-                            </a>
-                        </dd>
+                        @if (!is_null($adventureLog->adventure->itemReward))
+                            <dt>Adventure Reward Item<sup>*</sup>:</dt>
+                            <dd>
+                                <a href="{{route('items.item', [
+                                    'item' => $adventureLog->adventure->itemReward->id
+                                ])}}">
+                                    <x-item-display-color :item="$adventureLog->adventure->itemReward" />
+                                </a>
+                            </dd>
+                        @endif
                         <dt>Found Items: </dt>
                         @if (empty($adventureLog->rewards['items']))
                             <dd>No items were found.</dd>
@@ -69,7 +71,10 @@
                             </dd>
                         @endif
                     </dl>
-                    <p style="font-size: 12px" class="text-muted"><sup>*</sup> This item has already been awarded to you upon a <strong>successful</strong> completion of the adventure, once.</p>
+
+                    @if (!is_null($adventureLog->adventure->itemReward))
+                        <p style="font-size: 12px" class="text-muted"><sup>*</sup> This item has already been awarded to you upon a <strong>successful</strong> completion of the adventure, once.</p>
+                    @endif
                 </div>
                 <hr />
                 <div class="clearfix">

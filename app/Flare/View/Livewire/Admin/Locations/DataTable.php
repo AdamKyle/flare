@@ -3,18 +3,21 @@
 namespace App\Flare\View\Livewire\Admin\Locations;
 
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
 use App\Flare\Models\Location;
+use Livewire\WithPagination;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
-class DataTable extends CoreDataTable
+class DataTable extends Component
 {
+
+    use WithPagination, WithSorting;
+
     public $adventureId = null;
+    public $search      = '';
+    public $sortField   = 'name';
+    public $perPage     = 10;
 
-    public function mount() {
-        $this->sortField = 'name';
-
-        $this->sortAsc   = false;
-    }
+    protected $paginationTheme = 'bootstrap';
     
     public function fetchLocations() {
 
@@ -37,7 +40,7 @@ class DataTable extends CoreDataTable
 
             $column = ($this->sortField !== 'game_maps.name' ? 'locations.name' : 'game_maps.name');
             
-            return $location->orderBy($column, $this->sortAsc ? 'asc' : 'desc')
+            return $location->orderBy($column, $this->sortBy)
                             ->select('locations.*')
                             ->paginate($this->perPage);
         } else  {
@@ -52,7 +55,7 @@ class DataTable extends CoreDataTable
             $column = 'locations.' . $this->sortField;
             
 
-            return $location->orderBy($column, $this->sortAsc ? 'asc' : 'desc')
+            return $location->orderBy($column, $this->sortBy)
                             ->select('locations.*')
                             ->paginate($this->perPage);
         }

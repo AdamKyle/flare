@@ -56,27 +56,29 @@
         @livewire('admin.monsters.data-table', [
             'adventureId' => $adventure->id
         ])
-        <h4>Rewards: {{$adventure->itemReward->name}}</h4>
-        <em class="text-muted" style="font-size: 12px;">All quest items are rewarded once for completing the adventure the first time only.</em>
-        <div class="card mt-2">
-            <div class="card-body">
-                <div class="mt-2">
-                    @if (!is_null($adventure->itemReward))
-                        @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
-                        @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
-                    @else
-                        @guest
+        @if (!is_null($adventure->itemReward))
+            <h4>Rewards: {{$adventure->itemReward->name}}</h4>
+            <em class="text-muted" style="font-size: 12px;">All quest items are rewarded once for completing the adventure the first time only.</em>
+            <div class="card mt-2">
+                <div class="card-body">
+                    <div class="mt-2">
+                        @if (!is_null($adventure->itemReward))
+                            @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
+                            @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
                         @else
-                            @if (auth()->user->hasRole('Admin'))
-                                <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
-                                    'adventure' => $adventure->id,
-                                ])}}">Assign one.</a> </div>
+                            @guest
+                            @else
+                                @if (auth()->user->hasRole('Admin'))
+                                    <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
+                                        'adventure' => $adventure->id,
+                                    ])}}">Assign one.</a> </div>
+                                @endif
                             @endif
                         @endif
-                    @endif
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>
 @endsection

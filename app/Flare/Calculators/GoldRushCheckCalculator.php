@@ -10,7 +10,7 @@ class GoldRushCheckCalculator {
     public function fetchGoldRushChance(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null) {
         $adventureBonus = $this->getAdventureGoldrushChance($adventure);
 
-        return (rand(1, 100) * (1 + ($lootingChance + $adventureBonus))) > (100 - (100 * $monster->drop_check));
+        return (rand(1, 100) * (1 + ($lootingChance + $adventureBonus))) > ((100 * $monster->drop_check) + 100);
     }
 
     protected function getAdventureGoldrushChance(Adventure $adventure = null): float {

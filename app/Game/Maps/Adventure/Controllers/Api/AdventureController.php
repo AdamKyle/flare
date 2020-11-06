@@ -31,33 +31,15 @@ class AdventureController extends Controller {
             'can_adventure' => false,
         ]);
 
-        $foundAdventureLog  = $character->adventureLogs->where('adventure_id', $adventure->id)->first();
-
-        if (!is_null($foundAdventureLog)) {
-            $lastCompletedLevel = $foundAdventureLog->last_completed_level;
-
-            if (!is_null($lastCompletedLevel)) {
-                if ($lastCompletedLevel === $adventure->levels) {
-                    $lastCompletedLevel = null;
-                }
-            }
-
-            $foundAdventureLog->update([
-                'in_progress'          => true,
-                'complete'             => false,
-                'last_completed_level' => $lastCompletedLevel,
-            ]);
-        } else {
-            $character->adventureLogs()->create([
-                'character_id' => $character->id,
-                'adventure_id' => $adventure->id,
-                'in_progress'  => true,
-            ]);
-        }
+        $character->adventureLogs()->create([
+            'character_id' => $character->id,
+            'adventure_id' => $adventure->id,
+            'in_progress'  => true,
+        ]);
 
         $character = $character->refresh();
 
-        event(new EmbarkOnAdventureEvent($character, $adventure, $request->levels_at_a_time));
+        event(new EmbarkOnAdventureEvent($character, $adventure));
 
         return response()->json([
             'message'                => 'Adventure has started!',
@@ -74,15 +56,21 @@ class AdventureController extends Controller {
             'can_adventure_again_at' => null,
         ]);
 
-        $adventureLog = $character->adventureLogs->where('adventure_id', $adventure->id)->first();
+        $adventureLog = $character->adventureLogs
+                                  ->where('adventure_id', $adventure->id)
+                                  ->where('in_progress', true)
+                                  ->first();
 
         $adventureLog->update([
             'in_progress' => false,
+            'rewards'     => null,
         ]);
 
         Cache::forget('character_'.$character->id.'_adventure_'.$adventure->id);
 
-        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
+        event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user, true));
+        
+        $adventureLog->delete();
 
         return response()->json([
             'message'        => 'Adventure canceled.',

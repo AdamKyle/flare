@@ -2,76 +2,66 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col form-inline">
-                        Per Page: &nbsp;
-                        <select wire:model="perPage" class="form-control">
-                            <option>10</option>
-                            <option>15</option>
-                            <option>25</option>
-                        </select>
-                    </div>
-            
-                    <div class="col">
-                        <input wire:model="search" class="form-control" type="text" placeholder="Search items...">
-                    </div>
+                <div class="row pb-2">
+                    <x-data-tables.per-page wire:model="perPage" />
+                    <x-data-tables.search wire:model="search" />
                 </div>
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <a wire:click.prevent="sortBy('name')" role="button" href="#">
-                                    Name
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'name'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('type')" role="button" href="#">
-                                    Type
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'type'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('base_damage')" role="button" href="#">
-                                    Base Damage
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'base_damage'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('base_ac')" role="button" href="#">
-                                    Base AC
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'base_ac'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('base_healing')" role="button" href="#">
-                                    Base Healing
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'base_healing'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('cost')" role="button" href="#">
-                                    Cost
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'cost'
-                                    ])
-                                </a>
-                            </th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($items as $item)
+                <x-data-tables.table :collection="$items">
+                    <x-data-tables.header>
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('name')" 
+                            header-text="Name" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="name"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('type')" 
+                            header-text="Type" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="type"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('base_damage')" 
+                            header-text="Base Damage" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="base_damage"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('base_ac')" 
+                            header-text="Base AC" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="base_ac"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('base_ac')" 
+                            header-text="Base AC" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="base_ac"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('cost')" 
+                            header-text="Cost" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="cost"
+                        />
+
+                        <x-data-tables.header-row 
+                            header-text="Actions" 
+                        />
+                    </x-data-tables.header>
+                    <x-data-tables.body>
+                        @forelse($items as $item)
                             <tr>
                                 <td><a href="{{route('items.item', [
                                     'item' => $item->id
@@ -83,46 +73,40 @@
                                 <td>{{is_null($item->cost) ? 'N/A' : $item->cost}}</td>
                                 <td>
                                     @if(auth()->user()->hasRole('Admin'))
-                                        <a class="btn btn-danger" href="{{route('items.delete', [
-                                            'item' => $item->id
-                                        ])}}"
-                                                        onclick="event.preventDefault();
-                                                        document.getElementById('delete-item-{{$item->id}}').submit();">
-                                            {{ __('Delete') }}
-                                        </a>
+                                        <x-forms.button-with-form
+                                            form-route="{{route('items.edit', [
+                                                'item' => $item->id
+                                            ])}}"
+                                            form-id="{{'edit-item-'.$item->id}}"
+                                            button-title="Edit"
+                                            class="btn btn-primary btn-sm"
+                                        /> 
 
-                                        <form id="delete-item-{{$item->id}}" action="{{route('items.delete', [
-                                            'item' => $item->id
-                                        ])}}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
+                                        <x-forms.button-with-form
+                                            form-route="{{route('items.delete', [
+                                                'item' => $item->id
+                                            ])}}"
+                                            form-id="{{'delete-item-'.$item->id}}"
+                                            button-title="Delete"
+                                            class="btn btn-danger btn-sm"
+                                        /> 
                                     @else
-                                        <a class="btn btn-primary" href="{{route('game.shop.buy.item')}}"
-                                                        onclick="event.preventDefault();
-                                                        document.getElementById('shop-buy-form-item-{{$item->id}}').submit();">
-                                            {{ __('Buy') }}
-                                        </a>
-
-                                        <form id="shop-buy-form-item-{{$item->id}}" action="{{route('game.shop.buy.item')}}" method="POST" style="display: none;">
-                                            @csrf
-
+                                        <x-forms.button-with-form
+                                            form-route="{{route('game.shop.buy.item')}}"
+                                            form-id="{{'shop-buy-form-item-'.$item->id}}"
+                                            button-title="Buy"
+                                            class="btn btn-primary btn-sm"
+                                        >
                                             <input type="hidden" name="item_id" value={{$item->id}} />
-                                        </form>
+                                        </x-forms.button-with-form> 
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="row">
-                    <div class="col">
-                        {{ $items->links() }}
-                    </div>
-            
-                    <div class="col text-right text-muted">
-                        Showing {{ $items->firstItem() }} to {{ $items->lastItem() }} out of {{ $items->total() }} results
-                    </div>
-                </div>
+                        @empty
+                            <x-data-tables.no-results colspan="7"/>
+                        @endforelse
+                    </x-data-tables.body>
+                </x-data-tables.table>
             </div>
         </div>
     </div>

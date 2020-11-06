@@ -34,7 +34,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="x-position"> X: <span class="danger">*</span> </label>
-                        <select class="custom-select form-control required" id="x-position" name="x_position" {{!is_null($location) ? ($location->is_port ? 'disabled' : '') : ''}} wire:model="location.x">
+                        <select class="custom-select form-control required" id="x-position" name="x_position" wire:model="location.x">
                             <option value="">Select X Position</option>
                             @foreach($coordinates['x'] as $coordinate)
                                 <option value="{{$coordinate}}">{{$coordinate}}</option>
@@ -46,7 +46,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="y-position"> Y: <span class="danger">*</span> </label>
-                        <select class="custom-select form-control required" id="y-position" name="y_position" {{!is_null($location) ? ($location->is_port ? 'disabled' : '') : ''}} wire:model="location.y">
+                        <select class="custom-select form-control required" id="y-position" name="y_position" wire:model="location.y">
                             <option value="">Select Y Position</option>
                             @foreach($coordinates['y'] as $coordinate)
                                 <option value="{{$coordinate}}">{{$coordinate}}</option>

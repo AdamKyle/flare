@@ -15,6 +15,8 @@ export default class AdeventureActions extends React.Component {
       showEmbark: false,
       adventure: null,
       message: null,
+      failed: false,
+      canceled: false,
       characterAdventureLogs: [],
       canAdventureAgainAt: null,
     }
@@ -31,10 +33,26 @@ export default class AdeventureActions extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      const lastLog = event.adventureLogs[event.adventureLogs.length - 1];
+      let failed    = false;
+      let canceled  = false;
+
+      if (typeof lastLog !== 'undefined') {
+        if (!lastLog.in_progress && !event.canceled) {
+          failed = !lastLog.complete // if true then we didnt fail, if false, we did.
+        }
+
+        if (event.canceled) {
+          canceled = true;
+        }
+      }
+
       this.setState({
         characterAdventureLogs: event.adventureLogs,
         canAdventureAgainAt: event.canAdventureAgainAt,
         message: null,
+        failed: failed,
+        canceled: canceled,
       }, () => {
         this.props.updateAdventure(this.state.adventureDetails, this.state.characterAdventureLogs, this.state.canAdventureAgainAt);
       });
@@ -173,6 +191,8 @@ export default class AdeventureActions extends React.Component {
         close={this.hideAdventure.bind(this)}
         otherClasses="p-3"
       >
+        { this.state.failed ? <div className="alert alert-danger">You have died. Maybe checking the logs might help you. You can do so <a href="/current-adventure/">here</a>.</div> : null}
+        { this.state.canceled ? <div className="alert alert-success">Adventure canceled. You gained no rewards.</div> : null}
         { hasCollectedRewards ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
         { !this.props.canAdventure() ? <div className="alert alert-info">You must wait to be able to move and attack in order to embark.</div> : null}

@@ -2,88 +2,84 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col form-inline">
-                        Per Page: &nbsp;
-                        <select wire:model="perPage" class="form-control">
-                            <option>10</option>
-                            <option>15</option>
-                            <option>25</option>
-                        </select>
+                <div class="row pb-2">
+                    <x-data-tables.per-page wire:model="perPage">
                         @if ($batchSell)
-                            &nbsp;
-                            <a class="btn btn-primary btn-sm" href="{{route('game.shop.sell.all')}}"
-                                            onclick="event.preventDefault();
-                                            document.getElementById('shop-sell-all').submit();">
-                                {{ __('Sell All') }}
-                            </a>
-
-                            <form id="shop-sell-all" action="{{route('game.shop.sell.all')}}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
+                            <x-forms.button-with-form
+                                form-route="{{route('game.shop.sell.all')}}"
+                                form-id='shop-sell-all'
+                                button-title="Sell All"
+                                class="btn btn-primary btn-sm ml-2"
+                            />
                         @endif
-                    </div>
-            
-                    <div class="col">
-                        <input wire:model="search" class="form-control" type="text" placeholder="Search inventory...">
-                    </div>
+
+                        @if ($allowUnequipAll)
+                            <x-forms.button-with-form
+                                form-route="{{ route('game.unequip.all') }}"
+                                form-id='unequip-all'
+                                button-title="Unequip All"
+                                class="btn btn-danger btn-sm ml-2"
+                            />
+                        @endif
+                    </x-data-tables.per-page>
+                    <x-data-tables.search wire:model="search" />
                 </div>
-                <table class="table table-bordered data-table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <a wire:click.prevent="sortBy('items.name')" role="button" href="#">
-                                    Name
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'items.name'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('items.type')" role="button" href="#">
-                                    Type
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'items.type'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('items.base_damage')" role="button" href="#">
-                                    Base Damage
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'items.base_damage'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('items.base_ac')" role="button" href="#">
-                                    Base AC
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'items.base_ac'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('items.base_healing')" role="button" href="#">
-                                    Base Healing
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'items.base_healing'
-                                    ])
-                                </a>
-                            </th>
-                            <th>
-                                <a wire:click.prevent="sortBy('items.cost')" role="button" href="#">
-                                    Cost
-                                    @include('admin.partials.data-table-icons', [
-                                        'field' => 'items.cost'
-                                    ])
-                                </a>
-                            </th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($slots as $slot)
+                <x-data-tables.table :collection="$slots">
+                    <x-data-tables.header>
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('items.name')" 
+                            header-text="Name" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="items.name"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('items.type')" 
+                            header-text="Type" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="items.type"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('items.base_damage')" 
+                            header-text="Base Damage" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="items.base_damage"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('items.base_ac')" 
+                            header-text="Base AC" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="items.base_ac"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('items.base_healing')" 
+                            header-text="Base Healing" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="items.base_healing"
+                        />
+
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('items.cost')" 
+                            header-text="Cost" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="items.cost"
+                        />
+
+                        <x-data-tables.header-row 
+                            header-text="Actions" 
+                        />
+                    </x-data-tables.header>
+                    <x-data-tables.body>
+                        @forelse($slots as $slot)
                             <tr>
                                 <td><a href="{{route('items.item', [
                                     'item' => $slot->item->id
@@ -94,7 +90,7 @@
                                 <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
                                 <td>{{is_null($slot->item->Cost) ? 'N/A' : $slot->item->cost}}</td>
                                 <td>
-                                    @if ($allowInventoryManagement)
+                                    @if ($allowInventoryManagement && $slot->item->type !== 'quest')
                                         <div class="dropdown">
                                             <button class="btn btn-primary dropdown-toggle" type="button" id="actionsButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Actions
@@ -134,47 +130,30 @@
                 
                                         @include('game.core.partials.destroy-modal', ['slot' => $slot])
                                     @else
-                                        <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"
-                                                        onclick="event.preventDefault();
-                                                        document.getElementById('shop-sell-form-slot-{{$slot->id}}').submit();">
-                                            {{ __('Sell') }}
-                                        </a>
+                                        @if ($slot->item->type !== 'quest')
+                                            <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"
+                                                            onclick="event.preventDefault();
+                                                            document.getElementById('shop-sell-form-slot-{{$slot->id}}').submit();">
+                                                {{ __('Sell') }}
+                                            </a>
 
-                                        <form id="shop-sell-form-slot-{{$slot->id}}" action="{{route('game.shop.sell.item')}}" method="POST" style="display: none;">
-                                            @csrf
+                                            <form id="shop-sell-form-slot-{{$slot->id}}" action="{{route('game.shop.sell.item')}}" method="POST" style="display: none;">
+                                                @csrf
 
-                                            <input type="hidden" name="slot_id" value={{$slot->id}} />
-                                        </form>
+                                                <input type="hidden" name="slot_id" value={{$slot->id}} />
+                                            </form>
+                                        @else
+                                            N/A
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="row">
-                    @if ($allowUnequipAll)
-                        <div class="col text-align-right">
-                            <a class="btn btn-danger btn-sm" href="{{ route('logout') }}"
-                                onclick="event.preventDefault();
-                                            document.getElementById('unequip-all').submit();"
-                            >
-                                Unequip All
-                            </a>
-
-                            <form id="unequip-all" action="{{ route('game.unequip.all') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
-                        </div>
-                    @endif
-
-                    <div class="col">
-                        {{ $slots->links() }}
-                    </div>
-            
-                    <div class="col text-right text-muted">
-                        Showing {{ $slots->firstItem() }} to {{ $slots->lastItem() }} out of {{ $slots->total() }} results
-                    </div>
-                </div>
+                        @empty
+                            <x-data-tables.no-results colspan="6" />
+                        @endforelse
+                    </x-data-tables.body>
+                </x-data-tables.table>
+                
             </div>
         </div>
     </div>

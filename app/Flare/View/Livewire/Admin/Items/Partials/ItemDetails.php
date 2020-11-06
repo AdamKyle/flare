@@ -30,7 +30,7 @@ class ItemDetails extends Component
 
     public $defaultPositions = [
         'body',
-        'legs',
+        'leggings',
         'feet',
         'hands',
         'sleeves',
@@ -45,6 +45,25 @@ class ItemDetails extends Component
         'artifact',
         'spell-damage',
         'spell-healing',
+    ];
+
+    public $typesThatCanAffectAC = [
+        'shield',
+        'ring',
+        'artifact',
+        'body',
+        'leggings',
+        'feet',
+        'hands',
+        'sleeves',
+        'helmet',
+        'gloves',
+    ];
+
+    public $typesForBaseHealing = [
+        'spell-healing',
+        'ring',
+        'artifact',
     ];
 
     public $craftingTypes = [
@@ -67,7 +86,7 @@ class ItemDetails extends Component
         'item.base_healing'          => 'nullable',
         'item.can_craft'             => 'nullable',
         'item.crafting_type'         => 'nullable',
-        'item.cost'                  => 'required',
+        'item.cost'                  => 'nullable',
         'item.skill_level_required'  => 'nullable',
         'item.skill_level_trivial'   => 'nullable',
         'item.skill_name'            => 'nullable',

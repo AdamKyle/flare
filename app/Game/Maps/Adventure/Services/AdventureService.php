@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Adventure\Services;
 
 use Mail;
+use Cache;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
@@ -23,8 +24,6 @@ class AdventureService {
 
     private $adventure;
 
-    private $levelsAtATime;
-
     private $rewardBuilder;
 
     private $name;
@@ -39,22 +38,18 @@ class AdventureService {
         Character $character, 
         Adventure $adventure, 
         RewardBuilder $rewardBuilder,
-        string $name,
-        $levelsAtATime = 'all') 
+        string $name) 
     {
         $this->character          = $character;
         $this->adventure          = $adventure;
-        $this->levelsAtATime      = $levelsAtATime;
         $this->rewardBuilder      = $rewardBuilder; 
         $this->name               = $name;
 
         $this->createSkillRewardSection();
     }
 
-    public function processAdventure() {
-        if ($this->levelsAtATime === 'all') {
-            $this->processAllLevels();
-        }
+    public function processAdventure(int $currentLevel) {
+        $this->processLevel($currentLevel);
     }
 
     protected function createSkillRewardSection(): void {
@@ -71,46 +66,48 @@ class AdventureService {
         }
     }
 
-    protected function processAllLevels(): void {
+    protected function processLevel(int $currentLevel): void {
         $attackService = resolve(AdventureFightService::class, [
             'character' => $this->character,
             'adventure' => $this->adventure,
         ]);
 
-        $adventureLog = $this->character->adventureLogs->where('adventure_id', $this->adventure->id)->first();
+        $adventureLog = $this->character
+                             ->adventureLogs
+                             ->where('adventure_id', $this->adventure->id)
+                             ->where('in_progress', true)
+                             ->first();
 
-        $startingLevel = 1;
+        $attackService->processBattle();
 
-        if (!is_null($adventureLog->last_completed_level)) {
-            $startingLevel = $adventureLog->last_completed_level;
-        }
-
-        for ($i = $startingLevel; $i <= $this->adventure->levels; $i++) {
-            $attackService->processBattle();
-
-            if ($attackService->isCharacterDead()) {
-                $this->characterIsDead($attackService, $adventureLog, $i);
-
-                break;
-            }
-
-            if ($attackService->isMonsterDead()) {
-                $this->monsterIsDead($attackService, $adventureLog);
-
-                if ($this->adventure->levels === $i) {
-                    $this->adventureIsOver($adventureLog, $i);
-
-                    break;
-                }
-            }
+        if ($attackService->isCharacterDead()) {
+            $this->characterIsDead($attackService, $adventureLog, $currentLevel);
 
             $attackService->resetLogInfo();
+
+            return;
         }
+
+        if ($attackService->isMonsterDead()) {
+            $this->monsterIsDead($attackService, $adventureLog);
+
+            if ($this->adventure->levels === $currentLevel) {
+                $this->adventureIsOver($adventureLog, $currentLevel);
+
+                $attackService->resetLogInfo();
+
+                return;
+            }
+        }
+
+        $attackService->resetLogInfo();
 
         return;
     }
 
     protected function characterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog, int $level) {
+        Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+
         $this->character->update([
             'can_move'               => true,
             'can_attack'             => true,
@@ -122,7 +119,6 @@ class AdventureService {
 
         $this->character->refresh();
 
-        
         event(new AttackTimeOutEvent($this->character));
 
         $this->setLogs($adventureLog, $attackService);
@@ -138,8 +134,6 @@ class AdventureService {
             event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
             event(new ServerMessageEvent($character->user, 'adventure', 'You died while on your explortations! Check your Adventure logs for more information.'));
         } else {
-            $character = $this->character->refresh();
-
             Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
         }
 
@@ -218,17 +212,19 @@ class AdventureService {
 
         $rewardItemId = $adventureLog->adventure->reward_item_id;
 
-        $foundItem    = $this->character->inventory->slots->filter(function($slot) use ($rewardItemId) {
-            return $slot->item_id === $rewardItemId;
-        })->first();
-
-        if (is_null($foundItem)) {
-            $this->character->inventory->slots()->create([
-                'inventory_id' => $this->character->inventory->id,
-                'item_id'      => $rewardItemId,
-            ]);
-
-            event(new ServerMessageEvent($this->character->user, 'found_item', $adventureLog->adventure->itemReward->name));
+        if (!is_null($rewardItemId)) {
+            $foundItem    = $this->character->inventory->slots->filter(function($slot) use ($rewardItemId) {
+                return $slot->item_id === $rewardItemId;
+            })->first();
+    
+            if (is_null($foundItem)) {
+                $this->character->inventory->slots()->create([
+                    'inventory_id' => $this->character->inventory->id,
+                    'item_id'      => $rewardItemId,
+                ]);
+    
+                event(new ServerMessageEvent($this->character->user, 'found_item', $adventureLog->adventure->itemReward->name));
+            }
         }
 
         $character = $this->character->refresh();
@@ -248,7 +244,7 @@ class AdventureService {
             $adventureLog->update([
                 'in_progress'          => false,
                 'last_completed_level' => $level,
-                'rewards'              => $this->rewards,
+                'rewards'              => null,
             ]);
         } else {
             $adventureLog->update([

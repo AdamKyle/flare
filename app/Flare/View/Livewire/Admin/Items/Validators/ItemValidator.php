@@ -36,6 +36,11 @@ class ItemValidator {
             }
         }
 
+        if ($item->type !== 'quest' && is_null($item->cost)) {
+            $component->addError('item.cost', 'How much does this item cost?');
+            $isValid = false;
+        }
+
         return $isValid;
     }
 }

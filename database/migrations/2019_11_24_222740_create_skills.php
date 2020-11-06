@@ -23,7 +23,7 @@ class CreateSkills extends Migration
                 ->references('id')->on('monsters');
             $table->boolean('currently_training')->nullable()->default(false);
             $table->integer('level');
-            $table->integer('xp')->nullable();
+            $table->integer('xp')->nullable()->default(0);
             $table->integer('xp_max')->nullable();
             $table->decimal('xp_towards')->nullable();
             $table->timestamps();

@@ -13,7 +13,7 @@
             </div>
 
             <div class="col-md-6">
-                <p><strong>If equipped as second item:</strong></p>
+                <p class="mt-4">If equipped as second item:</p>
                 @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
             </div>
         </div>

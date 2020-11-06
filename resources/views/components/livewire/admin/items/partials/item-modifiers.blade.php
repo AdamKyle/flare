@@ -57,7 +57,12 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="item-int-mod">Effects: </label>
-                <input type="text" class="form-control" id="item-effects" name="item-effects" wire:model="item.effect" {{(is_null($item) ? 'disabled' : $item->type === 'quest') ? '' : 'disabled'}}>
+                <select class="form-control" name="item-type" wire:model="item.effect" {{is_null($item) || $item->type !== 'quest' ? 'disabled' : ''}}>
+                    <option value="">Please select</option>
+                    @foreach($effects as $effect)
+                        <option value="{{$effect}}">{{$effect}}</option>
+                    @endforeach
+                </select>
                 <span class="text-muted">Only available for items that are of type: Quest</span> 
             </div>
         </div>

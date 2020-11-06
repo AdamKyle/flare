@@ -17,7 +17,7 @@ class CreateAdventures extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->bigInteger('reward_item_id')->unsigned();
+            $table->bigInteger('reward_item_id')->unsigned()->nullable();
             $table->integer('levels');
             $table->integer('time_per_level');
             $table->float('gold_rush_chance', 5, 4)->nullable()->default(0);

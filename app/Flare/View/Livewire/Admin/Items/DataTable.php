@@ -3,18 +3,21 @@
 namespace App\Flare\View\Livewire\Admin\Items;
 
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
+use Livewire\WithPagination;
 use App\Flare\Models\Item;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
-class DataTable extends CoreDataTable
+class DataTable extends Component
 {
+    use WithPagination, WithSorting;
+    
     public $affixId = null;
     
-    public function mount() {
-        $this->sortField = 'type';
+    public $search      = '';
+    public $sortField   = 'type';
+    public $perPage     = 10;
 
-        $this->sortAsc = false;
-    }
+    protected $paginationTheme = 'bootstrap';
 
     public function fetchItems() {
         if (auth()->user()->hasRole('Admin')) {
@@ -25,7 +28,7 @@ class DataTable extends CoreDataTable
                                ->orWhere('item_prefix_id', $this->affixId);
             }
             
-            return $items->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+            return $items->orderBy($this->sortField, $this->sortBy)
                          ->paginate($this->perPage);
         }
 
@@ -33,7 +36,7 @@ class DataTable extends CoreDataTable
                        ->where('type', '!=', 'quest')
                        ->where('item_suffix_id', null)
                        ->where('item_prefix_id', null)
-                       ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
+                       ->orderBy($this->sortField, $this->sortBy)
                        ->paginate($this->perPage);
     }
 

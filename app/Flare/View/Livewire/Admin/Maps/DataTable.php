@@ -3,16 +3,19 @@
 namespace App\Flare\View\Livewire\Admin\Maps;
 
 use Livewire\Component;
-use App\Flare\View\Livewire\Core\DataTable as CoreDataTable;
+use Livewire\WithPagination;
 use App\Flare\Models\GameMap;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
-class DataTable extends CoreDataTable
+class DataTable extends Component
 {
-    public function mount() {
-        $this->sortField = 'name';
+    use WithPagination, WithSorting;
 
-        $this->sortAsc   = false;
-    }
+    public $search    = '';
+    public $sortField = 'name';
+    public $perPage   = 10;
+
+    protected $paginationTheme = 'bootstrap';
 
     public function fetchMaps() {
         $maps = GameMap::dataTableSearch($this->search)->get();
@@ -23,7 +26,7 @@ class DataTable extends CoreDataTable
             return $map;
         });
 
-        if ($this->sortAsc) {
+        if ($this->sortBy === 'asc') {
             return $maps->sortBy($this->sortField)->paginate($this->perPage);
         }
 

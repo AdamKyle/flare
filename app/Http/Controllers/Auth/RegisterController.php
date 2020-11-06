@@ -75,6 +75,10 @@ class RegisterController extends Controller
 
             throw new \Exception('You has been banned until: ' . $until);
         }
+
+        if (User::where('ip_address', $ip)->count >= 10) {
+            throw new \Exception('You cannot register anymore characters.');
+        }
         
         $token = Str::random(80);
 

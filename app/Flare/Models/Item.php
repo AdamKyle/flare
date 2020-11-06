@@ -4,13 +4,14 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\ItemAffix;
 use Database\Factories\ItemFactory;
+use App\Flare\Models\ItemAffix;
+use App\Flare\Models\Traits\WithSearch;
 
 class Item extends Model
 {
 
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -101,7 +102,7 @@ class Item extends Model
     }
 
     public function scopeGetTotalDamage(): float {
-        $baseDamage = is_null($this->base_damage) ? 1 : $this->base_damage;
+        $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
         $damage     = $baseDamage;
 
         if (!is_null($this->itemPrefix)) {
@@ -112,16 +113,11 @@ class Item extends Model
             $damage += ($baseDamage * (1 + $this->itemSuffix->base_damage_mod));
         }
 
-        // If the damage was never increased, lets set it to 0.
-        if ($damage === 1) {
-            $damage = 0;
-        }
-
         return round($damage);
     }
 
     public function scopeGetTotalDefence(): float {
-        $baseAc = is_null($this->base_ac) ? 1 : $this->base_ac;
+        $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
         $ac     = $baseAc;
 
         if (!is_null($this->itemPrefix)) {
@@ -132,16 +128,11 @@ class Item extends Model
             $ac += ($baseAc * (1 + $this->itemSuffix->base_ac_mod));
         }
 
-        // If the ac was never increased, lets set it to 0.
-        if ($ac === 1) {
-            $ac = 0;
-        }
-
         return round($ac);
     }
 
     public function scopeGetTotalHealing(): float {
-        $baseHealing = is_null($this->base_healing) ? 1 : $this->base_healing;
+        $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
         $healFor     = $baseHealing;
 
         if (!is_null($this->itemPrefix)) {
@@ -150,11 +141,6 @@ class Item extends Model
 
         if (!is_null($this->itemSuffix)) {
             $healFor += ($baseHealing * (1 + $this->itemSuffix->base_heal_mod));
-        }
-
-        // If the healFor was never increased, lets set it to 0.
-        if ($healFor === 1) {
-            $healFor = 0;
         }
 
         return round($healFor);
@@ -201,11 +187,6 @@ class Item extends Model
         }
 
         return $baseSkillTraining;
-    }
-
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
     }
 
     protected static function newFactory() {

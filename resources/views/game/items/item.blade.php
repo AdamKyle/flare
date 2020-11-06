@@ -28,17 +28,18 @@
                 </div>
             </div>
 
-            <h4>Item Affixes</h4>
-            <div class="card">
-                <div class="card-body">
-                    @include('game.items.partials.item-affixes', ['item' => $item])
-                </div>
-            </div>
-
             <h4>Base Equip Stats</h4>
             <div class="card">
                 <div class="card-body">
+                    <p class="text-muted mb-2 mt-2" style="font-size: 12px; font-style: italic;">All values include any attached affixes and any additional modifiers.</p>
                     @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
+                </div>
+            </div>
+
+            <h4>Item Affixes</h4>
+            <div class="card" style="margin-bottom: 100px;">
+                <div class="card-body">
+                    @include('game.items.partials.item-affixes', ['item' => $item])
                 </div>
             </div>
         </div>

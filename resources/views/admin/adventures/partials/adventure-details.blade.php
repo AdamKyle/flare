@@ -35,8 +35,9 @@
     </div>
     <div class="col-md-4">
         <div class="form-group">
-            <label for="adventure-item-reward"> Reward Item : <span class="danger">*</span> </label>
-            <select class="custom-select form-control required" id="adventure-item-reward" name="reward_item_id">
+            <label for="adventure-item-reward"> Reward Item : </label>
+            <select class="custom-select form-control" id="adventure-item-reward" name="reward_item_id">
+                    <option value="">Please select</option>
                 @foreach($items as $id => $name)
                     <option {{!is_null($adventure) ? ($adventure->itemReward->id === $id ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
                 @endforeach

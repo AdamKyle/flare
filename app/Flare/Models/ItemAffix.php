@@ -5,10 +5,11 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\ItemAffixFactory;
+use App\Flare\Models\Traits\WithSearch;
 
 class ItemAffix extends Model
 {
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -48,11 +49,6 @@ class ItemAffix extends Model
         'skill_training_bonus' => 'float',
         'cost'                 => 'integer',
     ];
-
-    public static function dataTableSearch($query) {
-        return empty($query) ? static::query()
-            : static::where('name', 'like', '%'.$query.'%');
-    }
 
     protected static function newFactory() {
         return ItemAffixFactory::new();

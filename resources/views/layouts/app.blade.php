@@ -33,30 +33,13 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
-
-    
 </head>
 <body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">
         <div id="app">
             <header class="topbar">
                 <nav class="navbar top-navbar navbar-expand-md navbar-light">
-                    <!-- ============================================================== -->
-                    <!-- Logo -->
-                    <!-- ============================================================== -->
-                    <div class="navbar-header">
-                        <a class="navbar-brand" href="index.html">
-                            <!-- Logo icon --><b>
-                                <!-- Logo Icon-->
-                            </b>
-                            <!--End Logo icon -->
-                            <!-- Logo text --><span> <!-- Logo Goes Here --> </span> </a>
-                    </div>
-                    <!-- ============================================================== -->
-                    <!-- End Logo -->
-                    <!-- ============================================================== -->
                     <div class="navbar-collapse">
-
                         @guest
                         @else
                             <!-- ============================================================== -->
@@ -64,7 +47,7 @@
                             <!-- ============================================================== -->
                             <ul class="navbar-nav mr-auto mt-md-0 ">
                                 <li class="nav-item"> 
-                                    <a class="nav-link sidebartoggler hidden-sm-down text-muted" href="javascript:void(0)">
+                                    <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
                                         <i class="fas fa-bars"></i>
                                     </a> 
                                 </li>
