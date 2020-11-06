@@ -32,10 +32,8 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
-    <script src="{{ asset('js/custom.js') }}"></script>
-    <script src="{{ asset('js/jquery.slimscroll.js') }}"></script>
-    <script src="{{ asset('js/sidebarmenu.js') }}"></script>
-    <script src="{{ asset('js/waves.js') }}"></script>
+    <script src="{{ asset('js/manifest.js') }}"></script>
+
     
 </head>
 <body class="fix-header fix-sidebar card-no-border mini-sidebar">
