@@ -51,9 +51,7 @@ class CharacterAdventureController extends Controller {
     public function currentAdventure() {
         $character = auth()->user()->character;
 
-        $adventureLog = $character->adventureLogs->filter(function($log) {
-            return !is_null($log->rewards);
-        })->first();
+        $adventureLog = $character->adventureLogs()->orderBy('id', 'desc')->first();
         
         if (is_null($adventureLog)) {
             return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
@@ -68,11 +66,7 @@ class CharacterAdventureController extends Controller {
             ]);
         }
 
-        if (empty($adventureLog->rewards)) {
-            $adventureLog->update([
-                'rewards' => null
-            ]);
-
+        if (is_null($adventureLog->rewards)) {
             event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
         }
         
