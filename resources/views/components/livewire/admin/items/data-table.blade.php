@@ -6,25 +6,28 @@
                     <x-data-tables.per-page wire:model="perPage" />
                     <x-data-tables.search wire:model="search" />
                 </div>
-                <div class="float-right pb-2">
-                    <x-forms.button-with-form
-                        form-route="{{route('game.shop.buy.bulk')}}"
-                        form-id="{{'shop-buy-form-item-in-bulk'}}"
-                        button-title="Buy All"
-                        class="btn btn-primary btn-sm"
-                    >
-                        @forelse( $selected as $item)
-                            <input type="hidden" name="items[]" value="{{$item}}" />
-                        @empty
-                            <input type="hidden" name="items[]" value="" />
-                        @endforelse
-                        
-                    </x-forms.button-with-form>
-                </div>
+                @empty ($selected)
+                @else
+                    <div class="float-right pb-2">
+                        <x-forms.button-with-form
+                            form-route="{{route('game.shop.buy.bulk')}}"
+                            form-id="{{'shop-buy-form-item-in-bulk'}}"
+                            button-title="Buy All"
+                            class="btn btn-primary btn-sm"
+                        >
+                            @forelse( $selected as $item)
+                                <input type="hidden" name="items[]" value="{{$item}}" />
+                            @empty
+                                <input type="hidden" name="items[]" value="" />
+                            @endforelse
+                            
+                        </x-forms.button-with-form>
+                    </div>
+                @endempty
                 <x-data-tables.table :collection="$items">
                     <x-data-tables.header>
                         <x-data-tables.header-row>
-                            <input type="checkbox" />
+                            <input type="checkbox" wire:model="pageSelected"/>
                         </x-data-tables.header-row>
 
                         <x-data-tables.header-row 
@@ -80,10 +83,24 @@
                         </x-data-tables.header-row>
                     </x-data-tables.header>
                     <x-data-tables.body>
+                        @if ($pageSelected)
+                            <tr>
+                                <td colspan="8">
+                                    @unless($selectAll)
+                                        <div>
+                                            <span>You have selected <strong>{{$items->count()}}</strong> items of <strong>{{$items->total()}}</strong>. Would you like to select all?</span>
+                                            <button class="btn btn-link" wire:click="selectAll">Select all</button>
+                                        </div>
+                                    @else
+                                        <span>You are currently selecting all <strong>{{$items->total()}}</strong> items.</span>
+                                    @endunless
+                                </td>
+                            </tr>
+                        @endif
                         @forelse($items as $item)
                             <tr wire:key="items-table-{{$item->id}}">
                                 <td>
-                                <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
+                                    <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
                                 </td>
                                 <td><a href="{{route('items.item', [
                                     'item' => $item->id
@@ -123,7 +140,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <x-data-tables.no-results colspan="7"/>
+                            <x-data-tables.no-results colspan="8"/>
                         @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>

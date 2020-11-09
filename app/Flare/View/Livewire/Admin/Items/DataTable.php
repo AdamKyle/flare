@@ -6,21 +6,21 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\Item;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
+use App\Flare\View\Livewire\Core\DataTables\WithSelectAll;
 
 class DataTable extends Component
 {
-    use WithPagination, WithSorting;
+    use WithPagination, WithSorting, WithSelectAll;
     
     public $affixId = null;
     
-    public $search      = '';
-    public $sortField   = 'type';
-    public $perPage     = 10;
-    public $selected    = [];
+    public $search       = '';
+    public $sortField    = 'type';
+    public $perPage      = 10;
 
     protected $paginationTheme = 'bootstrap';
 
-    public function fetchItems() {
+    public function getDataProperty() {
         if (auth()->user()->hasRole('Admin')) {
             $items = Item::dataTableSearch($this->search);
 
@@ -41,8 +41,17 @@ class DataTable extends Component
                        ->paginate($this->perPage);
     }
 
+    
+
+    public function fetchItems() {
+        return $this->data;
+    }
+
     public function render()
     {
+
+        $this->selectAllRenderHook();
+
         return view('components.livewire.admin.items.data-table', [
             'items' => $this->fetchItems(),
         ]);

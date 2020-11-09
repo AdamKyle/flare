@@ -82,13 +82,13 @@ class ShopController extends Controller {
             $character = $character->refresh();
 
             if ($item->cost > $character->gold) {
-                return redirect()->back()->with('error', 'You do not have enough gold to buy: ' . $item->name);
+                return redirect()->back()->with('error', 'You do not have enough gold to buy: ' . $item->name . '. Anything before this item in the list was purchased.');
             }
 
             event(new BuyItemEvent($item, $character));
         }
 
-        return redirect()->back()->with('success', 'puchased all items.');
+        return redirect()->back()->with('success', 'puchased all selected items.');
 
     }
 
@@ -132,5 +132,27 @@ class ShopController extends Controller {
         $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
         
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
+    }
+
+    public function shopSellBulk(Request $request) {
+        $character = auth()->user()->character;
+
+        $inventorySlots = $character->inventory->slots()->findMany($request->slots);
+
+        if ($inventorySlots->isEmpty()) {
+            return redirect()->back()->with('error', 'No items could be found. Did you select any?');
+        }
+
+        $totalSoldFor = 0;
+
+        foreach ($inventorySlots as $slot) {
+            $character = $character->refresh();
+
+            event(new SellItemEvent($slot, $character));
+
+            $totalSoldFor += SellItemCalculator::fetchTotalSalePrice($slot->item);
+        }
+
+        return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
     }
 }

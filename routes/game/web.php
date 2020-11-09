@@ -10,6 +10,7 @@ Route::middleware('is.player.banned')->group(function() {
     Route::post('/shop/sell-all', ['as' => 'game.shop.sell.all', 'uses' => 'ShopController@shopSellAll']);
     Route::post('/shop/buy-bulk', ['as' => 'game.shop.buy.bulk', 'uses' => 'ShopController@shopBuyBulk']);
     Route::post('/shop/buy/item', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
+    Route::post('/shop/sell-bulk', ['as' => 'game.shop.sell.bulk', 'uses' => 'ShopController@shopSellBulk']);
     Route::post('/shop/sell/item', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
     
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);

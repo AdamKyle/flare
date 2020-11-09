@@ -5,10 +5,11 @@ namespace App\Flare\View\Livewire\Character\Inventory;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
+use App\Flare\View\Livewire\Core\DataTables\WithSelectAll;
 
 class DataTable extends Component
 {
-    use WithPagination, WithSorting;
+    use WithPagination, WithSorting, WithSelectAll;
 
     public $search                   = '';
 
@@ -30,7 +31,7 @@ class DataTable extends Component
 
     public $character;
 
-    public function fetchSlots() {
+    public function getDataProperty() {
         $character = auth()->user()->character;
 
         if (!is_null($this->character)) {
@@ -57,6 +58,10 @@ class DataTable extends Component
               ->get();
         
         return $slots->paginate($this->perPage);
+    }
+
+    public function fetchSlots() {
+        return $this->data;
     }
 
     public function render()
