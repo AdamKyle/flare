@@ -76,8 +76,13 @@ export default class AdventureEmbark extends React.Component {
                 an advisor.
               </p>
               <hr />
-              <p className="mb-0">Should you need additional help, please consider this resource on <a href="#">adventureing</a>.</p>
+              <p className="mb-0">Should you need additional help, please consider this resource on <a href="/information/adventure" target="_blank">adventureing</a>.</p>
               <p className="text-muted" style={{fontSize: '12px'}}><sup>*</sup> You are free to logout. Any relevant details will be emailed to you should you have those settings enabled.</p>
+            </div>
+            <div className="mt-2">
+              <span className="text-muted"><strong>Total Levels</strong>: {this.state.adventure.levels}</span>
+              <br />
+              <span className="text-muted"><strong>Total Time</strong>: {this.state.adventure.levels * this.state.adventure.time_per_level}</span>
             </div>
           </Modal.Body>
           <Modal.Footer>

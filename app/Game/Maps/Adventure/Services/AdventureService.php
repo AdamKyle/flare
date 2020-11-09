@@ -48,8 +48,9 @@ class AdventureService {
         $this->createSkillRewardSection();
     }
 
-    public function processAdventure(int $currentLevel) {
-        $this->processLevel($currentLevel);
+    public function processAdventure(int $currentLevel, int $maxLevel) {
+        dump('processing levels ...');
+        $this->processLevel($currentLevel, $maxLevel);
     }
 
     protected function createSkillRewardSection(): void {
@@ -66,7 +67,7 @@ class AdventureService {
         }
     }
 
-    protected function processLevel(int $currentLevel): void {
+    protected function processLevel(int $currentLevel, int $maxLevel): void {
         $attackService = resolve(AdventureFightService::class, [
             'character' => $this->character,
             'adventure' => $this->adventure,
@@ -78,12 +79,14 @@ class AdventureService {
                              ->where('in_progress', true)
                              ->first();
 
+        dump('Adventure id: ' . $adventureLog->id);
+
+        dump('processing battle ...');
+
         $attackService->processBattle();
 
         if ($attackService->isCharacterDead()) {
             $this->characterIsDead($attackService, $adventureLog, $currentLevel);
-
-            $attackService->resetLogInfo();
 
             return;
         }
@@ -94,10 +97,16 @@ class AdventureService {
             if ($this->adventure->levels === $currentLevel) {
                 $this->adventureIsOver($adventureLog, $currentLevel);
 
-                $attackService->resetLogInfo();
-
                 return;
             }
+        }
+
+        if ($currentLevel === $maxLevel && $attackService->tooLong()) {
+            $this->adventureTookToLong($attackService, $adventureLog);
+
+            $this->adventureIsOver($adventureLog, $currentLevel, true);
+
+            return;
         }
 
         $attackService->resetLogInfo();
@@ -105,8 +114,37 @@ class AdventureService {
         return;
     }
 
+    protected function adventureTookToLong(AdventureFightService $attackService, AdventureLog $adventureLog) {
+        Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+
+        dump('Adventure took too long');
+
+        $this->character->update([
+            'can_move'               => true,
+            'can_attack'             => true,
+            'can_craft'              => true,
+            'can_adventure'          => true,
+            'can_adventure_again_at' => null,
+        ]);
+
+        $this->setLogs($adventureLog, $attackService);
+
+        $this->character->refresh();
+
+        $character = $this->character->refresh();
+
+        if (UserOnlineValue::isOnline($character->user)) {
+            event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
+            event(new ServerMessageEvent($character->user, 'adventure', 'The adventure took too long per floor. Check the logs for more info.'));
+        } else {
+            Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
+        }
+    }
+
     protected function characterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog, int $level) {
         Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+
+        dump('Cache forgotten ...');
 
         $this->character->update([
             'can_move'               => true,
@@ -117,9 +155,9 @@ class AdventureService {
             'can_adventure_again_at' => null,
         ]);
 
-        $this->character->refresh();
-
         event(new AttackTimeOutEvent($this->character));
+        
+        dump('Died on level: ' . $level);
 
         $this->setLogs($adventureLog, $attackService);
 
@@ -170,11 +208,16 @@ class AdventureService {
 
         $this->rewards['gold'] += $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
 
+        dump('Monster is dead, rewards below: ');
+        dump($this->rewards);
+
         $this->setLogs($adventureLog, $attackService);
     }
 
     protected function setLogs(AdventureLog $adventureLog, AdventureFightService $attackService) {
         $logs = $adventureLog->logs;
+
+        dump($attackService->getLogInformation());
 
         if (empty($logs)) {
 
@@ -198,8 +241,8 @@ class AdventureService {
         }
     }
 
-    protected function adventureIsOver(AdventureLog $adventureLog, int $level) {
-        $this->updateAdventureLog($adventureLog, $level);
+    protected function adventureIsOver(AdventureLog $adventureLog, int $level, bool $tookTooLong = false) {
+        $this->updateAdventureLog($adventureLog, $level, false, $tookTooLong);
 
         $this->character->update([
             'can_move'               => true,
@@ -239,12 +282,19 @@ class AdventureService {
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
     } 
 
-    protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false) {
+    protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false, bool $tookTooLong = false) {
         if ($isDead) {
             $adventureLog->update([
                 'in_progress'          => false,
                 'last_completed_level' => $level,
                 'rewards'              => null,
+            ]);
+        } else if ($tookTooLong) {
+            $adventureLog->update([
+                'in_progress'          => false,
+                'last_completed_level' => $level,
+                'rewards'              => null,
+                'took_to_long'         => true,
             ]);
         } else {
             $adventureLog->update([

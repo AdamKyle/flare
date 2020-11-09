@@ -1,7 +1,6 @@
 @extends('layouts.minimum')
 
 @section('content')
-<div class="container justify-content-center">
     <div class="row page-titles">
         <div class="col-md-6 align-self-right">
             <h4 class="mt-2">{{$genericSubject}}</h4>
@@ -12,7 +11,7 @@
             </div>
         @endif
     </div>
-    
+
     <div class="card" style="padding: 5px">
         @if ($user->hasRole('Admin'))
         <p>Hello Administrator,</p>
@@ -25,5 +24,4 @@
         <p class="text-muted">Do not reply to this email. This was an automated message.</p>
         <p class="text-muted">Your email is safe with us, we never use it for anything other then game related information.</p>
     </div>
-</div>
 @endsection

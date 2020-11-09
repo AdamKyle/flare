@@ -60,12 +60,18 @@ Under each adventure details is a detailed log, the same one you see when you fi
 
 This helps you, if you fail the adventure, to understand a little more about what might have caused that.
 
+### Failing the adventure gives you no rewards.
+
+Doesnt matter where you died in the adventure be it level one or level 10. You have died and its assumed you were robbed of all the treasures that you had found. 
+
+### The adventure took to long.
+
+This can happen in some instances where you and the enemy have bad RNG and you either both miss, both block - over and over again. To solve this issue we only allow the floor to take so long, ten rounds at most. If all the floors in the adventure "take too long" then you essentially bail out of that floor. This can also result in no rewards as you never defeated your foe.
+
 ## Repeating Adventures
 
-You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once.
+You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once should the adventure have one.
 
 ## Canceling Adventures
 
-At anytime during the adventuring process you can cancel the adventure. You will not get any rewards, other then the floors you have covered already assuming any floors have been covered.
-
-Your adventure will not be considered complete until you do all the floors.
+At anytime during the adventuring process you can cancel the adventure. You will not get any rewards. 

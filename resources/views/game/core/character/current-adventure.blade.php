@@ -1,17 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-
-<div class="container-fluid">
-    <div class="container justify-content-center">
-        <div class="row page-titles">
-            <div class="col-md-6 align-self-right">
-                <h4 class="mt-2">{{$adventureLog->adventure->name}}</h4>
-            </div>
-            <div class="col-md-6 align-self-right">
-                <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
-            </div>
-        </div>
+        <x-core.page-title 
+            title="{{$adventureLog->adventure->name}}"
+            route="{{url()->previous()}}"
+            link="Back"
+            color="success"
+        ></x-core.page-title>
         <div class="card">
             <div class="card-body">
                 <p>{{$adventureLog->adventure->description}}</p>
@@ -94,8 +89,7 @@
         </div>
     @endif
 
-    <div class="container justify-content-center">
+    <div class="justify-content-center">
         <x-adventure-logs :logs="$log" />
     </div>
-</div>
 @endsection

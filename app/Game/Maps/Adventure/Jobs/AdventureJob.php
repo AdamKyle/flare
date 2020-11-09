@@ -48,13 +48,14 @@ class AdventureJob implements ShouldQueue
     public function handle(RewardBuilder $rewardBuilder)
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+        
+        dump('In Job');
+        dump('-------');
+        dump('name: ' . $this->name);
+        dump('foundName: ' . $name);
 
         if (is_null($name) || $name !== $this->name) {
             return;
-        }
-
-        if ($this->currentLevel === $this->adventure->levels) {
-            Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
         }
 
         $adevntureService = resolve(AdventureService::class, [
@@ -64,6 +65,10 @@ class AdventureJob implements ShouldQueue
             'name'                => $this->name
         ]);
 
-        $adevntureService->processAdventure($this->currentLevel);
+        $adevntureService->processAdventure($this->currentLevel, $this->adventure->levels);
+
+        if ($this->currentLevel === $this->adventure->levels) {
+            Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+        }
     }
 }

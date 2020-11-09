@@ -16,6 +16,7 @@ export default class AdeventureActions extends React.Component {
       adventure: null,
       message: null,
       failed: false,
+      tookToLong: false,
       canceled: false,
       characterAdventureLogs: [],
       canAdventureAgainAt: null,
@@ -36,15 +37,18 @@ export default class AdeventureActions extends React.Component {
       const lastLog = event.adventureLogs[event.adventureLogs.length - 1];
       let failed    = false;
       let canceled  = false;
+      let tooLong   = false;
 
       if (typeof lastLog !== 'undefined') {
         if (!lastLog.in_progress && !event.canceled) {
-          failed = !lastLog.complete // if true then we didnt fail, if false, we did.
+          failed = !lastLog.complete && !lastLog.took_to_long ? true : false;
         }
 
         if (event.canceled) {
           canceled = true;
         }
+
+        tooLong = lastLog.took_to_long;
       }
 
       this.setState({
@@ -53,6 +57,7 @@ export default class AdeventureActions extends React.Component {
         message: null,
         failed: failed,
         canceled: canceled,
+        tookToLong: tooLong
       }, () => {
         this.props.updateAdventure(this.state.adventureDetails, this.state.characterAdventureLogs, this.state.canAdventureAgainAt);
       });
@@ -149,7 +154,7 @@ export default class AdeventureActions extends React.Component {
                 <div className="col-md-2">{adventure.name}</div>
                 <div className="col-md-5">
                     <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres || hasCollectedRewards || !this.props.canAdventure()} onClick={this.embarkShow.bind(this)}>Embark</button>
-                    <a href={'/adeventures/' + adventure.id} className="mr-2">Details</a>
+                    <a href={'/adeventures/' + adventure.id} target="_blank" className="mr-2">Details</a>
                     
                     { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? <button className="mr-2 btn btn-sm btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel Adventure</button> : null : null }
                     { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? this.timeOutBar() : null : null }
@@ -191,6 +196,7 @@ export default class AdeventureActions extends React.Component {
         close={this.hideAdventure.bind(this)}
         otherClasses="p-3"
       >
+        { this.state.tookToLong ? <div className="alert alert-info">Your adventure took too long, you decided to flee. You gained no items or loot. You can review the logs <a href="/current-adventure/">here</a>.</div> : null}
         { this.state.failed ? <div className="alert alert-danger">You have died. Maybe checking the logs might help you. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         { this.state.canceled ? <div className="alert alert-success">Adventure canceled. You gained no rewards.</div> : null}
         { hasCollectedRewards ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}

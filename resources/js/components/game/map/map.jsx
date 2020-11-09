@@ -219,7 +219,7 @@ export default class Map extends React.Component {
       return getServerMessage('cannot_move_down');
     }
 
-    if (x > 496) {
+    if (x > 386) {
       return getServerMessage('cannot_move_right');
     }
 

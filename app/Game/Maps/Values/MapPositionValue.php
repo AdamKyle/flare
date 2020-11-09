@@ -21,6 +21,6 @@ class MapPositionValue {
             return 0;
         }
 
-        return -150;
+        return -25;
     }
 }

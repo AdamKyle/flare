@@ -27,6 +27,9 @@ class AdventureFightService {
     // Used to stop recursive issues with attack.
     private $counter = 0;
 
+    // Used to stop the adventure from never finishing.
+    private $tookTooLong = false;
+
     public function __construct(Character $character, Adventure $adventure) {
 
         $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
@@ -44,6 +47,11 @@ class AdventureFightService {
         $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
 
         $this->attack($this->character, $this->monster);
+
+        dump('Adventure Fight Service');
+        dump($this->getLogInformation());
+        dump($this->isCharacterDead());
+        dump($this->isMonsterDead());
         
         return;
     }
@@ -68,6 +76,10 @@ class AdventureFightService {
         return $this->currentMonsterHealth <= 0;
     }
 
+    public function tooLong(): bool {
+        return $this->tookTooLong;
+    }
+
     protected function attack($attacker, $defender) {
         if ($this->isCharacterDead() || $this->isMonsterDead()) {
             return;
@@ -80,6 +92,8 @@ class AdventureFightService {
                 'message'    => 'Floor took too long.',
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
+
+            $this->tookTooLong = true;
 
             $this->counter = 0;
 
@@ -126,6 +140,8 @@ class AdventureFightService {
 
             return $this->attack($defender, $attacker);
         }
+
+        $this->tookTooLong = false;
 
         return;        
     }

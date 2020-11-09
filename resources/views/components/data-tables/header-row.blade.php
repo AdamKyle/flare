@@ -7,7 +7,7 @@
 
 <th>
     @if (!$field && !$sortBy && !$sortField)
-        {{$headerText}}
+        {{$slot}}
     @else
         <a {{$attributes}} href="#">
             {{$headerText}}

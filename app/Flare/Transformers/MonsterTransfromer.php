@@ -25,6 +25,7 @@ class MonsterTransfromer extends TransformerAbstract {
             'health_range' => $monster->health_range,
             'attack_range' => $monster->attack_range,
             'skills'       => $this->fetchSkills($monster->skills),
+            'base_stat'    => $monster->{$monster->damage_stat},
         ];
     }
 }

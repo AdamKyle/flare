@@ -58,7 +58,7 @@
 
                         <x-data-tables.header-row 
                             wire:click.prevent="sortBy('gold')" 
-                            header-text="XP" 
+                            header-text="Gold" 
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="gold"

@@ -18,6 +18,8 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'id'                  => $character->id,
             'ac'                  => $characterInformation->buildDefence(),
             'name'                => $character->name,
+            'dex'                 => $character->dex,
+            'base_stat'           => $character->{$character->class->damage_stat},
             'attack'              => $characterInformation->buildAttack(),
             'health'              => $characterInformation->buildHealth(),
             'has_artifacts'       => $characterInformation->hasArtifacts(),

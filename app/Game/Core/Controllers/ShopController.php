@@ -65,6 +65,33 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
 
+    public function shopBuyBulk(Request $request) {
+        $character = auth()->user()->character;
+
+        if ($character->gold === 0) {
+            return redirect()->back()->with('error', 'You do not have enough gold.');
+        }
+
+        $items = Item::findMany($request->items);
+
+        if ($items->isEmpty()) {
+            return redirect()->back()->with('error', 'No items could be found. Did you select any?');
+        }
+
+        foreach ($items as $item) {
+            $character = $character->refresh();
+
+            if ($item->cost > $character->gold) {
+                return redirect()->back()->with('error', 'You do not have enough gold to buy: ' . $item->name);
+            }
+
+            event(new BuyItemEvent($item, $character));
+        }
+
+        return redirect()->back()->with('success', 'puchased all items.');
+
+    }
+
     public function buy(Request $request) {
         $character = auth()->user()->character;
 

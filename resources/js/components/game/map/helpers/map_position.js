@@ -11,11 +11,11 @@ export const getNewYPosition = (characterY, mapPositionY) => {
 }
 
 export const getNewXPosition = (characterX, mapPositionX) => {
-  if (characterX <= 464) {
+  if (characterX <= 368) {
     return 0;
   }
 
-  if (characterX > 464) {
+  if (characterX > 368) {
     return -25;
   }
 

@@ -1,15 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">Character Sheet</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Home</a>
-        </div>
-    </div>
+    <x-core.page-title 
+        title="Character Sheet"
+        route="{{route('game')}}"
+        link="Home"
+    ></x-core.page-title>
     <hr />
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -169,5 +165,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection

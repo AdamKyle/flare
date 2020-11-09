@@ -10,6 +10,10 @@ class DropCheckCalculator {
     public function fetchDropCheckChance(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null) {
         $adventureBonus = $this->getAdventureBonus($adventure);
 
+        if ($adventureBonus >= 1) {
+            return true;
+        }
+
         return (rand(1, 100) * (1 + ($lootingChance + $adventureBonus)))  > (100 - (100 * $monster->drop_check));
     }
 

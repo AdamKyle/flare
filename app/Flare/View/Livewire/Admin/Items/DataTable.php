@@ -16,6 +16,7 @@ class DataTable extends Component
     public $search      = '';
     public $sortField   = 'type';
     public $perPage     = 10;
+    public $selected    = [];
 
     protected $paginationTheme = 'bootstrap';
 

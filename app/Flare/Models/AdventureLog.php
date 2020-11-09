@@ -21,6 +21,7 @@ class AdventureLog extends Model
         'adventure_id',
         'complete',
         'in_progress',
+        'took_to_long',
         'last_completed_level',
         'logs',
         'rewards'
@@ -34,6 +35,7 @@ class AdventureLog extends Model
     protected $casts = [
         'complete'             => 'boolean',
         'in_progress'          => 'boolean',
+        'took_to_long'         => 'boolean',
         'last_completed_level' => 'integer',
         'logs'                 => 'array',
         'rewards'              => 'array',

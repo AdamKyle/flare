@@ -9,7 +9,7 @@ export default class Monster {
   health() {
     const healthRange = this.monster.health_range.split('-');
 
-    return randomNumber(healthRange[0], healthRange[1]) + 10;
+    return randomNumber(healthRange[0], healthRange[1]) + 10 + this.monster.dur;
   }
 
   attack() {

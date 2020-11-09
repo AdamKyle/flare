@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
     <div class="row page-titles">
         <div class="col-md-6 align-self-right">
             <h4 class="mt-2">{{$itemAffix->name}}</h4>
@@ -44,5 +43,4 @@
     @livewire('admin.items.data-table', [
         'affixId' => $itemAffix->id
     ])
-</div>
 @endsection

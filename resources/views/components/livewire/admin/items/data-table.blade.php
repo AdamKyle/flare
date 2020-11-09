@@ -6,8 +6,27 @@
                     <x-data-tables.per-page wire:model="perPage" />
                     <x-data-tables.search wire:model="search" />
                 </div>
+                <div class="float-right pb-2">
+                    <x-forms.button-with-form
+                        form-route="{{route('game.shop.buy.bulk')}}"
+                        form-id="{{'shop-buy-form-item-in-bulk'}}"
+                        button-title="Buy All"
+                        class="btn btn-primary btn-sm"
+                    >
+                        @forelse( $selected as $item)
+                            <input type="hidden" name="items[]" value="{{$item}}" />
+                        @empty
+                            <input type="hidden" name="items[]" value="" />
+                        @endforelse
+                        
+                    </x-forms.button-with-form>
+                </div>
                 <x-data-tables.table :collection="$items">
                     <x-data-tables.header>
+                        <x-data-tables.header-row>
+                            <input type="checkbox" />
+                        </x-data-tables.header-row>
+
                         <x-data-tables.header-row 
                             wire:click.prevent="sortBy('name')" 
                             header-text="Name" 
@@ -56,13 +75,16 @@
                             field="cost"
                         />
 
-                        <x-data-tables.header-row 
-                            header-text="Actions" 
-                        />
+                        <x-data-tables.header-row>
+                            Actions
+                        </x-data-tables.header-row>
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($items as $item)
-                            <tr>
+                            <tr wire:key="items-table-{{$item->id}}">
+                                <td>
+                                <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
+                                </td>
                                 <td><a href="{{route('items.item', [
                                     'item' => $item->id
                                 ])}}"><x-item-display-color :item="$item" /></a></td>
@@ -73,14 +95,12 @@
                                 <td>{{is_null($item->cost) ? 'N/A' : $item->cost}}</td>
                                 <td>
                                     @if(auth()->user()->hasRole('Admin'))
-                                        <x-forms.button-with-form
-                                            form-route="{{route('items.edit', [
-                                                'item' => $item->id
-                                            ])}}"
-                                            form-id="{{'edit-item-'.$item->id}}"
-                                            button-title="Edit"
-                                            class="btn btn-primary btn-sm"
-                                        /> 
+
+                                        <a href="{{route('items.edit', [
+                                            'item' => $item->id
+                                        ])}}" class="btn btn-sm btn-primary">
+                                            Edit
+                                        </a> 
 
                                         <x-forms.button-with-form
                                             form-route="{{route('items.delete', [
