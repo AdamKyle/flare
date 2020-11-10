@@ -79,10 +79,6 @@ class AdventureService {
                              ->where('in_progress', true)
                              ->first();
 
-        dump('Adventure id: ' . $adventureLog->id);
-
-        dump('processing battle ...');
-
         $attackService->processBattle();
 
         if ($attackService->isCharacterDead()) {

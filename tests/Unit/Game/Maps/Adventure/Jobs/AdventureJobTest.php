@@ -48,12 +48,16 @@ class AdventureJobTest extends TestCase
         $jobName = Str::random(80);
 
         Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, $jobName, now()->addMinutes(5));
+        
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            AdventureJob::dispatch($character, $adventure, $jobName, $i);
 
-        AdventureJob::dispatch($character, $adventure, 'all', $jobName);
+            $character->refresh();
 
-        $character->refresh();
-
-        $this->assertTrue(!empty($character->adventureLogs->first()->logs));
+            $this->assertTrue(!empty($character->adventureLogs->first()->logs));
+        
+        }
+        
     }
 
     public function testAdventureJobDoesNotExecuteWhenNameDoesntMatch()
@@ -81,10 +85,12 @@ class AdventureJobTest extends TestCase
 
         Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, 'sample', now()->addMinutes(5));
 
-        AdventureJob::dispatch($character, $adventure, 'all', $jobName);
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            AdventureJob::dispatch($character, $adventure, $jobName, $i);
 
-        $character->refresh();
+            $character->refresh();
 
-        $this->assertTrue(empty($character->adventureLogs->first()->logs));
+            $this->assertTrue(empty($character->adventureLogs->first()->logs));
+        }
     }
 }

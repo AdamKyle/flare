@@ -178,7 +178,7 @@ class CharacterSetup {
                 throw new \Exception('You already have a skill set as currently training: ' . $found->name);
             } else {
                 if (isset($options['xp_towards'])) {
-                    throw new \Exception("you forgot to add xp_towards as an option for this skill: " . $found->name);
+                    throw new \Exception("you forgot to add xp_towards as an option for this skill.");
                 }
             }
         }
@@ -201,6 +201,7 @@ class CharacterSetup {
     public function createAdventureLog(Adventure $adventure, array $options = []): CharacterSetup {
 
         $log = array_merge([
+            'in_progress'  => true,
             'character_id' => $this->character->id,
             'adventure_id' => $adventure->id,
         ], $options);

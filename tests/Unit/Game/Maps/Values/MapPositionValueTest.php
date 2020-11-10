@@ -42,7 +42,7 @@ class MapPositionValueTest extends TestCase
         ];
 
         $expected = [
-            0, -150
+            0, -25
         ];
 
         for ($i = 0; $i < count($values); $i++) {

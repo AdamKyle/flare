@@ -17,11 +17,23 @@ class EmbarkOnAdventureListener
 
     public function handle(EmbarkOnAdventureEvent $event)
     {
+
+        $adventureInProgress = $event->character->adventureLogs->filter(function($log) {
+            return $log->in_progress;
+        })->first();
+
+        if (!is_null($adventureInProgress)) {
+
+            $event->character->adventureLogs()->orderBy('id', 'desc')->first()->delete;
+
+            return;
+        }
+
         $jobName = Str::random(80);
 
         $timeTillFinished = now()->addMinutes($event->adventure->levels * $event->adventure->time_per_level);
         $timeTillForget   = now()->addMinutes(($event->adventure->levels * $event->adventure->time_per_level) + 5);
-
+        
         $event->character->update([
             'can_adventure_again_at' => $timeTillFinished,
         ]);
