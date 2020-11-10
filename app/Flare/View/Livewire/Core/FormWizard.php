@@ -8,25 +8,25 @@ use Livewire\Component;
 class FormWizard extends Component
 {
 
-    public $steps        = [];
+    public $steps           = [];
 
-    public $currentStep  = 0;
+    public $currentStep     = 0;
 
-    public $views        = [];
+    public $views           = [];
 
-    public $modelName    = null;
+    public $modelName       = null;
 
-    public $model        = null;
+    public $model           = null;
 
-    public $viewData     = [];
+    public $viewData        = [];
 
-    public $finishRoute  = '';
+    public $finishRoute     = '';
 
     public $flasMessageType = '';
 
-    public $flashMessage = '';
+    public $flashMessage    = '';
 
-    protected $listeners = ['storeModel', 'nextStep', 'finish', 'sessionMessage'];
+    protected $listeners    = ['storeModel', 'nextStep', 'finish', 'sessionMessage'];
 
     public function nextStep(int $index, bool $passed = false) {
         if (isset($this->views[$index - 1]) && !$passed) {
@@ -38,6 +38,10 @@ class FormWizard extends Component
 
             $this->emitTo($this->views[$index], 'update', $this->model['id']);
         }
+    }
+
+    public function previousStep($index) {
+        $this->currentStep = $index;
     }
 
     public function finish(int $index, bool $passed = false, $sessionMessage = []) {

@@ -29,7 +29,9 @@ trait WithSelectAll {
 
     public function selectAllRenderHook() {
         if ($this->selectAll) {
-            $this->selected = $this->data->pluck('id')->map(fn($id) => (string) $id);
+            $this->selected = $this->dataQuery->pluck('id')->map(fn($id) => (string) $id);
+
+            dump($this->selected);
         }
     }
 }

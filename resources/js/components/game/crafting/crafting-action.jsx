@@ -71,6 +71,7 @@ export default class CraftingAction extends React.Component {
     }
 
     if (prevState.itemsToCraft.length !== this.state.itemsToCraft.length && prevState.itemsToCraft.length !== 0) {
+      console.log(prevState.itemsToCraft, this.state.itemsToCraft);
       this.setState({
         showSuccess: true
       }, () => {

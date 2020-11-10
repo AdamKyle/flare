@@ -41,6 +41,10 @@ class ItemModifiers extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
+        if (is_null($this->item)) {
+            return session()->flash('message', 'Cannot save empty model.');
+        }
+
         $this->item->save();
 
         $message = 'Created Item: ' . $this->item->refresh()->name;

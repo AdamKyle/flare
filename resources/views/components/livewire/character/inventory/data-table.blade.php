@@ -44,6 +44,7 @@
                         </div>
                     @endempty
                 @endif
+
                 <x-data-tables.table :collection="$slots">
                     <x-data-tables.header>
                         @if ($batchSell)
@@ -120,7 +121,7 @@
                             </tr>
                         @endif
                         @forelse($slots as $slot)
-                            <tr>
+                            <tr wire:key="slots-table-{{$slot->id}}">
                                 @if ($batchSell)
                                     <td>
                                         <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>

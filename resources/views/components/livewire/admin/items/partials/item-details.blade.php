@@ -115,7 +115,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="item-skill-training-bonus">Skill Training Bonus: </label>
-                <input type="number" steps="0.01" class="form-control" id="item-skill-training-bonus" name="item-skill-training-bonus" wire:model="item.skill_training_bonus" {{!is_null($item->skill_name) ? '' : 'disabled'}}> 
+                <input type="number" steps="0.01" class="form-control" id="item-skill-training-bonus" name="item-skill-training-bonus" wire:model="item.skill_training_bonus" {{is_null($item->skill_name) || $item->skill_name === "" ? 'disabled' : ''}}> 
                 <span class="text-muted">Only needed when the item affects a skill.</span><br />
                 @error('skill_training_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>

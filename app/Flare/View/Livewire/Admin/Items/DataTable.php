@@ -21,6 +21,10 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function getDataProperty() {
+        return $this->dataQuery->paginate($this->perPage);
+    }
+
+    public function getDataQueryProperty() {
         if (auth()->user()->hasRole('Admin')) {
             $items = Item::dataTableSearch($this->search);
 
@@ -29,16 +33,14 @@ class DataTable extends Component
                                ->orWhere('item_prefix_id', $this->affixId);
             }
             
-            return $items->orderBy($this->sortField, $this->sortBy)
-                         ->paginate($this->perPage);
+            return $items->orderBy($this->sortField, $this->sortBy);
         }
 
         return Item::dataTableSearch($this->search)
                        ->where('type', '!=', 'quest')
                        ->where('item_suffix_id', null)
                        ->where('item_prefix_id', null)
-                       ->orderBy($this->sortField, $this->sortBy)
-                       ->paginate($this->perPage);
+                       ->orderBy($this->sortField, $this->sortBy);
     }
 
     

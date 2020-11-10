@@ -31,7 +31,7 @@ class DataTable extends Component
 
     public $character;
 
-    public function getDataProperty() {
+    public function getDataQueryProperty() {
         $character = auth()->user()->character;
 
         if (!is_null($this->character)) {
@@ -52,12 +52,14 @@ class DataTable extends Component
             return $join;
         });
         
-        $slots->where('equipped', $this->includeEquipped)
-              ->orderBy($this->sortField, $this->sortBy)
-              ->select('inventory_slots.*')
-              ->get();
+        return $slots->select('inventory_slots.*')
+              ->where('equipped', $this->includeEquipped)
+              ->orderBy($this->sortField, $this->sortBy);
+    }
+
+    public function getDataProperty() {
         
-        return $slots->paginate($this->perPage);
+        return $this->dataQuery->paginate($this->perPage);
     }
 
     public function fetchSlots() {
@@ -66,6 +68,7 @@ class DataTable extends Component
 
     public function render()
     {
+        $this->selectAllRenderHook();
         
         return view('components.livewire.character.inventory.data-table', [
             'slots' => $this->fetchSlots(),
