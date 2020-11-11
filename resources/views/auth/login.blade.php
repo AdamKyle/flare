@@ -54,6 +54,10 @@
                                         {{ __('Forgot Your Password?') }}
                                     </a>
                                 @endif
+
+                                <a class="ml-2" href="{{ route('password.request') }}">
+                                    {{ __('Banned Unfairly?') }}
+                                </a>
                             </div>
                         </div>
                     </form>

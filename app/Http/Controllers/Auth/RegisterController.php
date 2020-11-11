@@ -51,11 +51,15 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'name' => ['required', 'string', 'min:3', 'unique:characters'],
-            'race' => ['required'],
-            'class' => ['required'],
+            'email'        => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'     => ['required', 'string', 'min:10', 'confirmed'],
+            'name'         => ['required', 'string', 'min:5', 'max:15', 'unique:characters', 'regex:/^[a-z\d]+$/i'],
+            'race'         => ['required'],
+            'class'        => ['required'],
+            'question_one' => ['required'],
+            'question_two' => ['required'],
+            'answer_one'   => ['required', 'min:4'],
+            'answer_two'   => ['required', 'min:4'],
         ]);
     }
 
@@ -91,6 +95,27 @@ class RegisterController extends Controller
         ]);
     }
 
+    protected function createSecurityQuestions(Request $request, User $user): User {
+        $user->securityQuestions()->insert([
+            [
+                'user_id'    => $user->id,
+                'question'   => $request->question_one,
+                'answer'     => Hash::make($request->answer_one),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id'    => $user->id,
+                'question'   => $request->question_two,
+                'answer'     => Hash::make($request->answer_two),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+
+        return $user->refresh();
+    }
+
     /**
      * Handle a registration request for the application.
      *
@@ -107,11 +132,21 @@ class RegisterController extends Controller
 
         $this->validator($request->all())->validate();
 
+        if ($request->question_one === $request->question_two) {
+            return redirect()->back()->with('error', 'Security questions need to be unique.');
+        }
+
+        if ($request->answer_one === $request->answer_two) {
+            return redirect()->back()->with('error', 'Security questions answers need to be unique.');
+        }
+
         try {
             $user = $this->create($request->all(), $request->ip());
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getmessage());
+            return redirect()->back()->with('error', $e->getMessage());
         }
+
+        $user = $this->createSecurityQuestions($request, $user);        
 
         event(new Registered($user));
 

@@ -28,5 +28,9 @@ Route::get('/information/race/{race}', ['as' => 'info.page.race', 'uses' => 'Inf
 Route::get('/information/class/{class}', ['as' => 'info.page.class', 'uses' => 'InfoPageController@viewClass']);
 Route::get('/information/skill/{skill}', ['as' => 'info.page.skill', 'uses' => 'InfoPageController@viewSkill']);
 Route::get('/information/adventure/{adventure}', ['as' => 'info.page.adventure', 'uses' => 'InfoPageController@viewAdventure']);
+Route::get('/security-questions/{user}', ['as' => 'user.security.questions', 'uses' => 'Auth\ForgotPasswordController@answerSecurityQuestions']);
+Route::get('/reset-security-questions/{user}', ['as' => 'user.reset.security.questions', 'uses' => 'Auth\ResetPasswordController@resetSecuityQuestions']);
+Route::post('/security-questions/{user}/answers', ['as' => 'user.security.questions.answers', 'uses' => 'Auth\ForgotPasswordController@securityQuestionsAnswers']);
+Route::post('/reset-security-questions/{user}/answers', ['as' => 'user.reset.security.questions.answers', 'uses' => 'Auth\ResetPasswordController@updateSecurityQuestions']);
 
 Auth::routes();

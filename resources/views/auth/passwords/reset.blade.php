@@ -9,6 +9,7 @@
                     <h4 class="mt-2">Reset Password</h4>
                 </div>
             </div>
+
             <div class="card">
                 <div class="card-body">
                     <form method="POST" action="{{ route('password.update') }}">

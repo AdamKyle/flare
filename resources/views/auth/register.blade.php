@@ -54,7 +54,87 @@
                         <div class="row justify-content-center mb-3">
                             <div class="col-md-6">
                                 <h3>
-                                    <span class="header"></span> Character Info <i class="ra ra-muscle-up"></i>
+                                    <span class="header"></span> Security Questions <i class="fas fa-lock ml-2"></i>
+                                </h3>
+                                <span class="text-muted">All security answers are encrypted.</span>
+                                <hr />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="question_one" class="col-md-4 col-form-label text-md-right">{{ __('Question One') }}</label>
+
+                            <div class="col-md-6">
+                                <select name="question_one" id="question_one" class="form-control" required>
+                                    <option value="Whats your favourite movie?">Whats your favourite movie?</option>
+                                    <option value="Whats the name of the town you grew up in?">Whats the name of the town you grew up in?</option>
+                                    <option value="Whats the brand of your car? (Eg, Ford)">Whats the brand of your car? (Eg, Ford)</option>
+                                    <option value="Whats the name of your best friends street?">Whats the name of your best friends street?</option>
+                                    <option value="Whats the name of your mothers father?">Whats the name of your mothers father?</option>
+                                    <option value="Where was the last place you went on vacation?">Where was the last place you went on vacation?</option>
+                                </select>
+
+                                @error('question_one')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="answer_one" class="col-md-4 col-form-label text-md-right">{{ __('Answer One') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="answer_one" type="text" class="form-control @error('answer_one') is-invalid @enderror" name="answer_one" value="{{ old('answer_one') }}" required autofocus>
+
+                                @error('answer_one')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="question_two" class="col-md-4 col-form-label text-md-right">{{ __('Question Two') }}</label>
+
+                            <div class="col-md-6">
+                                <select name="question_two" id="question_two" class="form-control" required>
+                                    <option value="Whats your favourite movie?">Whats your favourite movie?</option>
+                                    <option value="Whats the name of the town you grew up in?">Whats the name of the town you grew up in?</option>
+                                    <option value="Whats the brand of your car? (Eg, Ford)">Whats the brand of your car? (Eg, Ford)</option>
+                                    <option value="Whats the name of your best friends street?">Whats the name of your best friends street?</option>
+                                    <option value="Whats the name of your mothers father?">Whats the name of your mothers father?</option>
+                                    <option value="Where was the last place you went on vacation?">Where was the last place you went on vacation?</option>
+                                </select>
+
+                                @error('question_two')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="answer_two" class="col-md-4 col-form-label text-md-right">{{ __('Answer One') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="answer_two" type="text" class="form-control @error('answer_two') is-invalid @enderror" name="answer_two" value="{{ old('answer_two') }}" required autofocus>
+
+                                @error('answer_two')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center mb-3">
+                            <div class="col-md-6">
+                                <h3>
+                                    <span class="header"></span> Character Info <i class="ra ra-muscle-up ml-2"></i>
                                 </h3>
                                 <hr />
                             </div>
