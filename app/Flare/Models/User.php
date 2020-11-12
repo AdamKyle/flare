@@ -30,6 +30,8 @@ class User extends Authenticatable
         'is_banned',
         'unbanned_at',
         'ip_address',
+        'banned_reason',
+        'un_ban_request',
     ];
 
     /**

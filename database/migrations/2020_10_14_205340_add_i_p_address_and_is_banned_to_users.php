@@ -17,6 +17,8 @@ class AddIPAddressAndIsBannedToUsers extends Migration
             $table->string('ip_address')->nullable()->default('0.0.0.0');
             $table->boolean('is_banned')->nullable()->default(false);
             $table->dateTime('unbanned_at')->nullable();
+            $table->string('banned_reason')->nullable();
+            $table->string('un_ban_request')->nullable();
         });
     }
 
@@ -31,6 +33,8 @@ class AddIPAddressAndIsBannedToUsers extends Migration
             $table->dropColumn('ip_address');
             $table->dropColumn('is_banned');
             $table->dropColumn('unbanned_at');
+            $table->dropColumn('banned_reason');
+            $table->dropColumn('un_ban_request');
         });
     }
 }

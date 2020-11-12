@@ -62,12 +62,12 @@
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($users as $user)
-                            <tr wire:loading.class.delay="text-muted">
+                            <tr wire:loading.class.delay="text-muted" class="{{!is_null($user->un_ban_request) ? 'un-ban-request' : ''}}">
                                 <td>{{$user->id}}</td>
                                 <td>
                                     <a href="{{route('users.user', [
                                         'user' => $user->id
-                                    ])}}">{{$user->character->name}}</a>
+                                    ])}}">{{$user->character->name}} @if (!is_null($user->un_ban_request)) <i class="fas fa-envelope"></i> @endif</a>
                                 </td>
                                 <td>{{$user->is_banned ? 'Yes' : 'No'}}</td>
                                 <td>

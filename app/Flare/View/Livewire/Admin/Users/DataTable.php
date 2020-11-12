@@ -32,7 +32,7 @@ class DataTable extends Component
                 $join->on('users.id', 'characters.user_id');
             })->orderBy($this->sortField, $this->sortBy)->select('users.*'); 
         } else {
-            $users = $users->orderBy($this->sortField, $this->sortBy);
+            $users = $users->orderBy('un_ban_request', $this->sortBy)->orderBy($this->sortField, $this->sortBy);
         }
 
         return $users->paginate($this->perPage);

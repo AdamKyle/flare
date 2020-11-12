@@ -11,6 +11,7 @@ use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Game\Messages\Events\MessageSentEvent;
 use App\Http\Controllers\Controller;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -75,6 +76,20 @@ class UsersController extends Controller {
             return redirect()->back()->with('error', 'Invalid input.');
         }
 
+        return redirect()->to(route('ban.reason', [
+            'user' => $user,
+            'for'  => $request->ban_for,
+        ]));
+    }
+
+    public function banReason(User $user, string $for) {
+        return view('admin.users.user-ban-reason', [
+            'user' => $user,
+            'for'  => $for,
+        ]);
+    }
+
+    public function submitBanReason(Request $request, User $user) {
         $users  = User::where('ip_address', $user->ip_address)->get();
 
         foreach ($users as $user) {
@@ -84,8 +99,8 @@ class UsersController extends Controller {
 
             $unBanAt = null;
 
-            if ($request->ban_for !== 'perm') {
-                switch($request->ban_for) {
+            if ($request->for !== 'perm') {
+                switch($request->for) {
                     case 'one-day':
                         $unBanAt = now()->addMinutes(1); //now()->addDays(1);
                         UpdateBannedUserJob::dispatch($user)->delay($unBanAt);
@@ -98,7 +113,7 @@ class UsersController extends Controller {
                         return redirect()->back()->with('error', 'Invalid input for ban length.');
                 }
             } else {
-                $message = $user->character->name . ' Has been stuck down by the Hand of the Lord! No longer shall they be apart of this world.';
+                $message = $user->character->name . ' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
     
                 $message = auth()->user()->messages()->create([
                     'message' => $message,
@@ -110,16 +125,17 @@ class UsersController extends Controller {
             $user->update([
                 'is_banned'   => true,
                 'unbanned_at' => $unBanAt,
+                'banned_reason' => $request->reason,
             ]);
     
             event(new BannedUserEvent($user));
     
             $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'For ever.';
-            $message    = 'You have been banned until: ' . $unBannedAt;
+            $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $request->reason;
     
             Mail::to($user->email)->send(new GenericMail($user, $message, 'You have been banned!', true));
         }
-        
+
         return redirect()->back()->with('success', 'User has been banned.');
     }
 

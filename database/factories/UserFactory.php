@@ -32,7 +32,9 @@ class UserFactory extends Factory
             'can_speak_again_at'     => null,
             'is_banned'              => false,
             'unbanned_at'            => null,
-            'ip_address'             => '127.0.0.1'
+            'ip_address'             => '127.0.0.1',
+            'banned_reason'          => null,
+            'un_ban_request'         => null
         ];
     }
 }

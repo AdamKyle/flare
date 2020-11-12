@@ -13,6 +13,24 @@
             </div>
         </div>
 
+        @if ($character->user->is_banned)
+            <h4 class="mt-3 ml-1">Banned Until: {{is_null($character->user->unbanned_at) ? 'For ever' : $character->user->unbanned_at->format('l jS \\of F Y h:i:s A')}} </h4>
+            <div class="card">
+                <div class="card-body">
+                    <p><strong>Banned Because: </strong> {{$character->user->banned_reason}}</p>
+
+                    @if (!is_null($character->user->un_ban_request))
+                        <p><strong>Request: </strong> {{$character->user->un_ban_request}}</p>
+                    @endif
+                    <hr />
+                    
+                    <a href="#" class="btn btn-primary float-right ml-2">Respond</a>
+                    <a href="#" class="btn btn-success float-right ml-2">Unban</a>
+                    <a href="#" class="btn btn-danger float-right ml-2">Ignore</a>
+                </div>
+            </div>
+        @endif
+
         <div class="card">
             <div class="card-body">
                 <div class="row mb-3">

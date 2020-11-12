@@ -55,7 +55,7 @@
                                     </a>
                                 @endif
 
-                                <a class="ml-2" href="{{ route('password.request') }}">
+                                <a class="ml-2" href="{{ route('un.ban.request') }}">
                                     {{ __('Banned Unfairly?') }}
                                 </a>
                             </div>
