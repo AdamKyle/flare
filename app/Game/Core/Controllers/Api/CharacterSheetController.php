@@ -7,6 +7,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterSheetTransformer;
+use Illuminate\Http\Request;
 
 class CharacterSheetController extends Controller {
 
@@ -28,5 +29,18 @@ class CharacterSheetController extends Controller {
         return response()->json([
             'sheet' => $sheet,
         ], 200);
+    }
+
+    public function nameChange(Request $request, Character $character) {
+        $request->validate([
+            'name' => ['required', 'string', 'min:5', 'max:15', 'unique:characters', 'regex:/^[a-z\d]+$/i', 'unique:characters'],
+        ]);
+
+        $character->update([
+            'name'              => $request->name,
+            'force_name_change' => false,
+        ]);
+
+        return response()->json([], 200);
     }
 }

@@ -45,6 +45,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/users/{user}/ban-user', ['as' => 'ban.user', 'uses' => 'UsersController@banUser']);
     Route::post('/admin/users/{user}/un-ban-user', ['as' => 'unban.user', 'uses' => 'UsersController@unBanUser']);
     Route::post('/admin/users/{user}/submit-reason', ['as' => 'ban.user.with.reason', 'uses' => 'UsersController@submitBanReason']);
+    Route::post('/admin/users/{user}/ingore-unban-request', ['as' => 'user.ignore.unban.request', 'uses' => 'UsersController@ignoreUnBanRequest']);
+    Route::post('/admin/users/{user}/force-name-change', ['as' => 'user.force.passworname.changed', 'uses' => 'UsersController@forceNameChange']);
 
     Route::get('/admin/skills', ['as' => 'skills.list', 'uses' => 'SkillsController@index']);
     Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);

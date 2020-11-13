@@ -2,7 +2,6 @@
     'formRoute',
     'formId',
     'buttonTitle',
-    'btnType'    => 'primary',
     'formMethod' => 'POST',
 ])
 

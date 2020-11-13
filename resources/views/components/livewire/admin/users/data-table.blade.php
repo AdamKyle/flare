@@ -98,6 +98,13 @@
                                             class="btn btn-primary btn-sm"
                                         /> 
 
+                                        <x-forms.button-with-form
+                                            form-route="{{route('user.force.passworname.changed', ['user' => $user->id])}}"
+                                            form-id="{{'force-name-change-' . $user->id}}"
+                                            button-title="Force Name Change"
+                                            class="btn btn-primary btn-sm"
+                                        /> 
+
                                         <x-forms.drop-downs.base
                                             float-left={{true}}
                                             btn-type="danger"

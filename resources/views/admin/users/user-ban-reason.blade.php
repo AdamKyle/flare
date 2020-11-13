@@ -25,7 +25,8 @@
 
                     <div class="col-md-6">
                         <textarea id="reason" type="reason" class="form-control @error('reason') is-invalid @enderror" name="reason" value="{{ $email ?? old('reason') }}" required autofocus></textarea>
-
+                        <small id="reasonHelp" class="form-text text-muted">This reason will be emailed to the user as a reason why.</small>
+                        
                         @error('reason')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

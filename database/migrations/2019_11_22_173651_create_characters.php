@@ -24,7 +24,7 @@ class CreateCharacters extends Migration
                 ->references('id')->on('game_classes');
             $table->foreign('user_id')
                 ->references('id')->on('users');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('damage_stat');
             $table->bigInteger('level')->nullable()->default(1);
             $table->bigInteger('xp');

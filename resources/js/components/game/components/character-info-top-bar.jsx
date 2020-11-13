@@ -1,5 +1,6 @@
 import React from 'react';
 import CardTemplate from './templates/card-template';
+import ForcedNameChange from './modals/forced-name-change';
 import ContentLoader, { Facebook } from 'react-content-loader';
 
 export default class CharacterInfoTopBar extends React.Component {
@@ -10,9 +11,11 @@ export default class CharacterInfoTopBar extends React.Component {
     this.state = {
       characterSheet: null,
       isLoading: true,
+      forceNameChange: false,
     }
 
-    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
+    this.forceNameChange = Echo.private('force-name-change-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -21,12 +24,19 @@ export default class CharacterInfoTopBar extends React.Component {
         this.setState({
           characterSheet: result.data.sheet,
           isLoading: false,
+          forceNameChange: result.data.sheet.force_name_change,
         });
       });
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       this.setState({
         characterSheet: event.characterSheet,
+      });
+    });
+
+    this.forceNameChange.listen('Admin.Events.ForceNameChangeEvent', (event) => {
+      this.setState({
+        forceNameChange: event.character.force_name_change,
       });
     });
   }
@@ -111,6 +121,10 @@ export default class CharacterInfoTopBar extends React.Component {
             <span className="title">Charisma:</span> <span className="value">{Math.round(sheet.chr_modded)}</span>
           </div>
         </div>
+
+        { this.state.forceNameChange
+          ? <ForcedNameChange characterId={this.props.characterId}/> : null
+        }
       </CardTemplate>
     )
   }

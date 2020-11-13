@@ -37,17 +37,23 @@ Names containing racial slurs or offensive terms will be asked to rename their c
 
 ## Getting Banned
 
-There are three types of bans in Tlessa. All of them will ban all characters that share the same IP address. Any attempts to get around this such as VPN's and other services that spoof your IP will result in another permananent ban.
+There are three types of bans in Tlessa.
 
-Users who are banned fall into three categories: 1 day ban, 1 week ban and For ever.
+Users who are banned fall into three categories: 
 
-If you think you were banned unfailrly, you can click on the "I was banned" link on the login page. You will "login" and provide a reason why you think you were banned unfairly.
+- 1 day ban 
+- 1 week ban 
+- For ever.
+
+If you think you were banned unfailrly, you can click on the "banned unfairly" link on the login page. You will "login" and provide a reason why you think you were banned unfairly.
+
+From here you will enter your email, security questions and provide a reason why you think you were banned unfairy.
+
+The administrator will then be alerted and process your request.
 
 > ### ATTN!
 >
-> Because multiple people from the same household might be playing on the same IP, they can use the same steps and provide their character name, the reason they think they were banned unfairly, their security questions and submit the form. From there The Creator will review the details and get back to you in 24 hours with a response. You'll either get an automated message telling you that you were unbanned or message that states why you will not be unbanned.
->
-> Further attempts to get your character unbanned after getting banned (and being told you will not be unbanned) will be ignored.
+> Repeated requests to be unbanned will be ignored by the system. All decisions are final.
 
 
 

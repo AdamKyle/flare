@@ -23,10 +23,21 @@
                         <p><strong>Request: </strong> {{$character->user->un_ban_request}}</p>
                     @endif
                     <hr />
-                    
-                    <a href="#" class="btn btn-primary float-right ml-2">Respond</a>
-                    <a href="#" class="btn btn-success float-right ml-2">Unban</a>
-                    <a href="#" class="btn btn-danger float-right ml-2">Ignore</a>
+                    <x-forms.button-with-form
+                        form-route="{{route('unban.user', [
+                            'user' => $character->user->id
+                        ])}}"
+                        form-id="{{$character->user->id}}-unban"
+                        button-title="Unban"
+                        class="btn btn-success float-right ml-2"
+                    />
+                    @if (!is_null($character->user->un_ban_request))
+                        <button class="btn btn-danger float-right ml-2" data-toggle="modal" data-target="#are-you-sure-"{{$character->user->id}}>Ignore</button>
+
+                        @include('admin.users.modals.are-you-sure', [
+                            'character' => $character
+                        ])
+                    @endif
                 </div>
             </div>
         @endif
