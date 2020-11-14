@@ -82,7 +82,7 @@ export default class Attack {
   blockedAttack(defender, attacker) {
     const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
 
-    return (attacker.base_stat * (1 + attackerAccuracy)) < defender.ac;
+    return (attacker.base_stat * (1 + attackerAccuracy)) + 10 < defender.ac;
   }
 
   isMonsterDead() {

@@ -26,31 +26,31 @@ class BaseStatValue {
     public function str() {
         $modifier = $this->race->str_mod + $this->class->str_mod;
 
-        return round(1 + $modifier);
+        return round(10 + $modifier);
     }
 
     public function dex() {
         $modifier = $this->race->dex_mod + $this->class->dex_mod;
 
-        return round(1 + $modifier);
+        return round(10 + $modifier);
     }
 
     public function dur() {
         $modifier = $this->race->dur_mod + $this->class->dur_mod;
 
-        return round(1 + $modifier);
+        return round(10 + $modifier);
     }
 
     public function chr() {
         $modifier = $this->race->chr_mod + $this->class->chr_mod;
         
-        return round(1 + $modifier);
+        return round(10 + $modifier);
     }
 
     public function int() {
         $modifier = $this->race->int_mod + $this->class->int_mod;
 
-        return round(1 + $modifier);
+        return round(10 + $modifier);
     }
 
     public function ac() {
