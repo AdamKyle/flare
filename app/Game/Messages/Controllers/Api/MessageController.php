@@ -32,6 +32,19 @@ class MessageController extends Controller {
         ], 200);
     }
 
+    public function fetchMessages() {
+        return response()->json(
+            Message::with(['user', 'user.roles', 'user.character'])
+                ->where('from_user', null)
+                ->where('to_user', null)
+                ->where('created_at', '>=', now()->subHour())
+                ->orderBy('created_at', 'desc')
+                ->take(15)
+                ->get(),
+            200
+        );
+    }
+
     public function postPublicMessage(Request $request) {
         $message = auth()->user()->messages()->create([
             'message' => $request->message,

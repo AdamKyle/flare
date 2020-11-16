@@ -25,6 +25,10 @@ class Skills extends Component
         $this->monster = Monster::find($id)->load('questItem');
     }
 
+    public function updatedSelectedSkill() {
+        $this->monsterSkill = null;
+    }
+
     public function validateInput(string $functionName, int $index) {
         // This page is optional:
         if (!is_null($this->selectedSkill)) {

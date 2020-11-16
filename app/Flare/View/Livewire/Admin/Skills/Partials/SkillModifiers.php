@@ -4,8 +4,10 @@ namespace App\Flare\View\Livewire\Admin\Skills\Partials;
 
 use App\Admin\Jobs\AssignSkillsJob;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class SkillModifiers extends Component
@@ -16,7 +18,11 @@ class SkillModifiers extends Component
 
     public $monsters;
 
-    public $monster;
+    public $gameClasses;
+
+    public $selectedMonsters = [];
+
+    public $selectedClass = null;
 
     public $canNotAssignSkill;
 
@@ -39,13 +45,25 @@ class SkillModifiers extends Component
             $this->addError('error', 'You must supply some kind of bonus per level.');
         } else if ($this->isBelowZero()) {
             $this->addError('error', 'No bonus may be below  or equal to: 0.');
-        } else if ($this->for === 'select-monster' && is_null($this->monster)) {
+        } else if ($this->for === 'select-monster' && empty($this->selectedMonsters)) {
             $this->addError('monster', 'Monster must be selected.');
+        } else if ($this->for === 'select-class' && (is_null($this->selectedClass) || $this->selectedClass === '')) {
+            $this->addError('class', 'Class must be selected.');
         } else {
             $this->skill->save();
 
             if (!$this->canNotAssignSkill) {
-                AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), $this->monster);
+
+                if (empty($this->selectedMonsters)) {
+                    dump($this->selectedClass);
+                    AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), null, $this->selectedClass);
+                } else {
+                    foreach ($this->selectedMonsters as $monsterId) {
+                        AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), $monsterId);
+                    }
+                }
+
+                
             }
 
             $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';
@@ -59,7 +77,7 @@ class SkillModifiers extends Component
 
     public function update($id) {
         $this->skill             = GameSkill::find($id);
-        $this->canNotAssignSkill = $this->canNotAssignSkill();
+        $this->for               = $this->forValue();
     }
 
     public function isMissing(): Bool {
@@ -81,7 +99,8 @@ class SkillModifiers extends Component
     }
 
     public function mount() {
-        $this->monsters = Monster::all();
+        $this->monsters    = Monster::all();
+        $this->gameClasses = GameClass::all();
     }
     
 
@@ -90,21 +109,45 @@ class SkillModifiers extends Component
         return view('components.livewire.admin.skills.partials.skill-modifiers');
     }
 
-    protected function canNotAssignSkill(): Bool {
+    protected function forValue() : string {
+        $for = '';
+        
         if (is_null($this->skill)) {
-            return true;
+            return $for;
         }
 
         $monstersWithSkill = Monster::join('skills', function($join) {
             $join->on('skills.monster_id', 'monsters.id')
                  ->where('skills.game_skill_id', $this->skill->id);
-        })->get();
+        })->select('monsters.*')->get();
 
         $charactersWithSkill = Character::join('skills', function($join) {
             $join->on('skills.character_id', 'characters.id')
                  ->where('skills.game_skill_id', $this->skill->id);
-        })->get();
+        })->select('characters.*')->get();
 
-        return $monstersWithSkill->isNotEmpty() || $charactersWithSkill->isNotEmpty();
+        if ($monstersWithSkill->isNotEmpty() && $charactersWithSkill->isNotEmpty()) {
+            $for = 'all';
+
+            $this->canNotAssignSkill = true;
+        }
+
+        if ($monstersWithSkill->isNotEmpty() && $charactersWithSkill->isEmpty()) {
+            $for = 'select-monsters';
+
+            $this->selectedMonsters = $monstersWithSkill->pluck('id')->toArray();
+
+            $this->canNotAssignSkill = true;
+        }
+
+        if ($charactersWithSkill->isNotEmpty()) {
+            $for = 'selected-class';
+            
+            $this->selectedClass = $charactersWithSkill->first()->character->class->id;
+
+            $this->canNotAssignSkill = true;
+        }
+
+        return $for;
     }
 }

@@ -63,6 +63,9 @@
                             sort-field="{{$sortField}}"
                             field="gold"
                         />
+                        <x-data-tables.header-row>
+                            Actions
+                        </x-data-tables.header-row>
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($monsters as $monster)
@@ -88,6 +91,11 @@
                                 <td>{{$monster->attack_range}}</td>
                                 <td>{{$monster->xp}}</td>
                                 <td>{{$monster->gold}}</td>
+                                <td>
+                                    <a href="{{route('monster.edit', [
+                                        'monster' => $monster->id,
+                                    ])}}" class="btn btn-primary mt-2">Edit</a>
+                                </td>
                             </tr>
                         @empty
                             <x-data-tables.no-results colspan="7" />

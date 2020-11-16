@@ -61,7 +61,11 @@
     </div>
     @if ($canNotAssignSkill)
         <div class="alert alert-info">
-            This skill already belongs to either creatures or players or both, and cannot be reassigned.
+            This skill is currently being used and cannot be removed from selected indivuals.
+        </div>
+    @else
+        <div class="alert alert-warning">
+            Once your selection is made, you wont be able to edit who the skill belongs to.
         </div>
     @endif
     <div class="row">
@@ -71,22 +75,38 @@
                 <select class="form-control" name="skill_for" wire:model="for" {{$canNotAssignSkill ? 'disabled': ''}}>
                     <option value="">Please select</option>
                     <option value="all">Both Monsters and Characters</option>
-                    <option value="select-monster">Select Monsters</option>
+                    <option value="select-monsters">Select Monsters</option>
+                    <option value="select-class">Select Class</option>
                 </select>
                 @error('for') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="skill-for-monster">Monster: </label>
-                <select class="form-control" name="skill_for_monster" wire:model="monster" {{$for !== 'select-monster' ? 'disabled' : ''}}>
-                    <option value="">Please select</option>
-                    @foreach($monsters as $monster)
-                        <option value={{$monster->id}}>{{$monster->name}}</option>
-                    @endforeach
-                </select>
-                @error('monster') <span class="text-danger">{{ $message }}</span> @enderror
+        @if ($for === 'select-monsters')
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="skill-for-monster">Monsters: </label>
+                    <select class="form-control" name="skill_for_monster" wire:model="selectedMonsters" {{$for !== 'select-monsters' ? 'disabled' : ''}} multiple>
+                        @foreach($monsters as $monster)
+                            <option value={{$monster->id}} {{in_array($monster->id, $selectedMonsters) ? 'selected' : ''}}>{{$monster->name}}</option>
+                        @endforeach
+                    </select>
+                    @error('monster') <span class="text-danger">{{ $message }}</span> @enderror
+                </div>
             </div>
-        </div>
+        @elseif ($for === 'select-class') 
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="skill-for-class">Class: </label>
+                    <select class="form-control" name="skill_for_class" wire:model="selectedClass" {{$for !== 'select-class' ? 'disabled' : ''}}>
+                        <option value="">Please Select</option>
+                        @foreach($gameClasses as $gameClass)
+                            <option value={{$gameClass->id}} {{$gameClass->id === $selectedClass ? 'selected' : ''}}>{{$gameClass->name}}</option>
+                        @endforeach
+                    </select>
+                    @error('class') <span class="text-danger">{{ $message }}</span> @enderror
+                </div>
+            </div>
+        @else
+        @endif
     </div>
 </div>

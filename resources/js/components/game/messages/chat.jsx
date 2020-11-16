@@ -29,6 +29,24 @@ export default class Chat extends React.Component {
       });
     })
 
+    axios.get('/api/last-chats/').then((result) => {
+      let messages = [];
+
+      result.data.forEach((message) => {
+        let newMessage = message;
+
+        newMessage['name'] = null;
+        newMessage['from_god'] = this.isGod(message.user);
+
+        messages.push(newMessage);
+      });
+
+      this.setState({
+        messages: messages
+      });
+
+    });
+
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
       const message       = event.message;
       message['user']     = event.user;

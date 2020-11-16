@@ -25,6 +25,8 @@ class AssignSkillsJob implements ShouldQueue
 
     public $monsterId;
 
+    public $classId;
+
     public $adminUser;
 
     /**
@@ -32,11 +34,12 @@ class AssignSkillsJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $for, GameSkill $skill, User $adminUser, int $monsterId = null)
+    public function __construct(string $for, GameSkill $skill, User $adminUser, int $monsterId = null, int $classId = null)
     {
         $this->for       = $for;
         $this->skill     = $skill;
         $this->monsterId = $monsterId;
+        $this->classId   = $classId;
         $this->adminUser = $adminUser;
     }
 
@@ -48,7 +51,7 @@ class AssignSkillsJob implements ShouldQueue
     public function handle(AssignSkillService $service)
     {
         try {
-            $service->assignSkill($this->for, $this->skill, $this->monsterId);
+            $service->assignSkill($this->for, $this->skill, $this->monsterId, $this->classId);
         } catch (\Exception $e) {
             $message = 'Something went wrong trying to assign the skills: ' . $e->getMessage();
 
