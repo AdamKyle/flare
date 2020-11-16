@@ -9,4 +9,15 @@
             <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
         </div>
     </div>
+    @livewire('core.form-wizard', [
+        'views' => [
+            'admin.classes.partials.game-class',
+        ],
+        'model'     => $class,
+        'modelName' => 'gameClass',
+        'steps' => [
+            'Details'
+        ],
+        'finishRoute' => 'classes.list',
+    ])
 @endsection

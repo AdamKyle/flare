@@ -61,6 +61,10 @@ class ServerMessageListener
                 $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $event->forMessage; 
                 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'new-damage-stat':
+                $message = 'The Creator has changed your classes damage stat to: ' . $event->forMessage . '. Please adjust your gear accordingly for maximum damage.'; 
+                
+                return broadcast(new ServerMessage($event->user, $message));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

@@ -47,11 +47,6 @@ class AdventureFightService {
         $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
 
         $this->attack($this->character, $this->monster);
-
-        dump('Adventure Fight Service');
-        dump($this->getLogInformation());
-        dump($this->isCharacterDead());
-        dump($this->isMonsterDead());
         
         return;
     }

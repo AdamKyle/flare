@@ -48,11 +48,6 @@ class AdventureJob implements ShouldQueue
     public function handle(RewardBuilder $rewardBuilder)
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
-        
-        dump('In Job');
-        dump('-------');
-        dump('name: ' . $this->name);
-        dump('foundName: ' . $name);
 
         if (is_null($name) || $name !== $this->name) {
             return;

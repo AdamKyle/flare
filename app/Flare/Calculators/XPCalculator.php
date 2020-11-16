@@ -10,7 +10,6 @@ class XPCalculator {
         $xp = 0;
 
         if ($characterLevel < $monster->max_level) {
-            dump('in here');
             // So the monster has a max exp level and the character is below it, so they get full xp.
             $xp = ($xpReduction !==  0.0 ? ($monster->xp - ($monster->xp * $xpReduction)) : $monster->xp);
         } else if ($characterLevel >= $monster->max_level) {

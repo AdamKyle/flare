@@ -10,6 +10,16 @@
             <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
         </div>
     </div>
-
+    @livewire('core.form-wizard', [
+        'views' => [
+            'admin.races.partials.race',
+        ],
+        'model'     => $race,
+        'modelName' => 'race',
+        'steps' => [
+            'Details'
+        ],
+        'finishRoute' => 'races.list',
+    ])
 </div>
 @endsection

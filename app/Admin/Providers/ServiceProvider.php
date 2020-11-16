@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
+use App\Admin\Services\UpdateCharacterStatsService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -22,6 +23,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(AssignSkillService::class, function ($app) {
             return new AssignSkillService();
+        });
+
+        $this->app->bind(UpdateCharacterStatsService::class, function ($app) {
+            return new UpdateCharacterStatsService();
         });
     }
 
