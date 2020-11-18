@@ -27,10 +27,10 @@ class BaseStatValueTest extends TestCase
 
         $baseStat = resolve(BaseStatValue::class)->setRace($race)->setClass($class);
 
-        $this->assertEquals(4, $baseStat->str());
-        $this->assertEquals(4, $baseStat->dex());
-        $this->assertEquals(1, $baseStat->int());
-        $this->assertEquals(1, $baseStat->dur());
-        $this->assertEquals(1, $baseStat->chr());
+        $this->assertEquals(13.0, $baseStat->str());
+        $this->assertEquals(13.0, $baseStat->dex());
+        $this->assertEquals(10, $baseStat->int());
+        $this->assertEquals(10, $baseStat->dur());
+        $this->assertEquals(10, $baseStat->chr());
     }
 }

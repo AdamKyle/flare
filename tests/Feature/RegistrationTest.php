@@ -76,14 +76,18 @@ class RegistrationTest extends TestCase
                  'email'                 => 'a@example.net',
                  'password'              => 'TestExamplePassword',
                  'password_confirmation' => 'TestExamplePassword',
-                 'name'                  => 'bob',
+                 'name'                  => 'bobtest',
                  'race'                  => $race->id,
                  'class'                 => $class->id,
+                 'question_one'          => 'Whats your favourite movie?',
+                 'question_two'          => 'Whats the name of the town you grew up in?', 
+                 'answer_one'            => 'test',
+                 'answer_two'            => 'test2',
              ])->dontSee('The name has already been taken.');
 
       $user = User::first();
 
-      $this->assertEquals('bob', $user->character->name);
+      $this->assertEquals('bobtest', $user->character->name);
       $this->assertEquals($race->name, $user->character->race->name);
       $this->assertEquals($class->name, $user->character->class->name);
     }

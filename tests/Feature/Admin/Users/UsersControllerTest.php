@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Users;
 
+use App\Admin\Mail\GenericMail;
 use App\Admin\Mail\ResetPasswordEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,6 +14,7 @@ use App\Flare\Models\User;
 use Event;
 use Mail;
 use Queue;
+use Str;
 use Tests\Setup\CharacterSetup;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
@@ -101,14 +103,31 @@ class UsersControllerTest extends TestCase
         $response->assertSessionHas('success', $this->character->name . ' Has been silenced for: ' . 10 . ' minutes');
     }
 
-    public function testCanBanUserForOneDay() {
-        Queue::fake();
-        Event::fake();
-        
+    public function testBanUserRedirects() {
         $response = $this->actingAs($this->user)->post(route('ban.user', [
             'user' => $this->character->user->id
         ]), [
             'ban_for' => 'one-day'
+        ])->response;
+
+        $this->assertEquals(302, $response->status());
+    }
+
+    public function testBanReasonForm() {
+        $this->actingAs($this->user)->visit(route('ban.reason', [
+            'user' => $this->character->user,
+            'for'  => 'one-day',
+        ]))->see('Reason For Ban');
+    }
+
+    public function testCanBanUserForOneDay() {
+        Mail::Fake();
+        
+        $response = $this->actingAs($this->user)->post(route('ban.user.with.reason', [
+            'user' => $this->character->user->id
+        ]), [
+            'for' => 'one-day',
+            'reason' => 'sample reason',
         ])->response;
 
         $user = $this->character->refresh()->user;
@@ -123,10 +142,11 @@ class UsersControllerTest extends TestCase
         Queue::fake();
         Event::fake();
         
-        $response = $this->actingAs($this->user)->post(route('ban.user', [
+        $response = $this->actingAs($this->user)->post(route('ban.user.with.reason', [
             'user' => $this->character->user->id
         ]), [
-            'ban_for' => 'one-week'
+            'for' => 'one-week',
+            'reason' => 'sample reason',
         ])->response;
 
         $user = $this->character->refresh()->user;
@@ -143,79 +163,19 @@ class UsersControllerTest extends TestCase
 
         $user = $this->character->user;
         
-        $response = $this->actingAs($this->user)->post(route('ban.user', [
-            'user' => $user->id
-        ]), [
-            'ban_for' => 'perm'
-        ])->response;
-
-        $user = $user->refresh();
-
-        $this->assertTrue($user->is_banned);
-        $this->assertNull($user->unbanned_at);
-
-        $response->assertSessionHas('success', 'User has been banned.');
-    }
-
-    public function testCanBanUserAllCharactersAreBanned() {
-        Queue::fake();
-        Event::fake();
-
-        $userIds = $this->createMultipleCharacters(10, '134.0.0.1');
-
-        $user = User::find($userIds[rand(0, (count($userIds) - 1))]);
-        
-        $response = $this->actingAs($this->user)->post(route('ban.user', [
-            'user' => $user->id
-        ]), [
-            'ban_for' => 'perm'
-        ])->response;
-
-        $user = $user->refresh();
-
-        $this->assertTrue($user->is_banned);
-        $this->assertNull($user->unbanned_at);
-
-        $response->assertSessionHas('success', 'User has been banned.');
-
-        foreach($userIds as $id) {
-            $user = User::find($id);
-            
-            $this->assertTrue($user->is_banned);
-            $this->assertNull($user->unbanned_at);
-        }
-    }
-
-    protected function createMultipleCharacters(int $amount = 1, string $ip): array {
-        $characterIds = [];
-
-        for($i = 1; $i <= $amount; $i++) {
-            $characterIds[] = (new CharacterSetup)->setupCharacter($this->createUser(
-                ['ip_address' => $ip],
-            ))
-            ->setSkill('Looting')
-            ->setSkill('Dodge')
-            ->setSkill('Accuracy')
-            ->getCharacter()->user->id;
-        }
-
-        return $characterIds;
-    }
-
-    public function testCannotBanUser() {
-        Queue::fake();
-        Event::fake();
-        
-        $response = $this->actingAs($this->user)->post(route('ban.user', [
+        $response = $this->actingAs($this->user)->post(route('ban.user.with.reason', [
             'user' => $this->character->user->id
-        ]))->response;
+        ]), [
+            'for' => 'perm',
+            'reason' => 'sample reason',
+        ])->response;
 
-        $user = $this->character->refresh()->user;
+        $user = $user->refresh();
 
-        $this->assertFalse($user->is_banned);
+        $this->assertTrue($user->is_banned);
         $this->assertNull($user->unbanned_at);
 
-        $response->assertSessionHas('error', 'Invalid input.');
+        $response->assertSessionHas('success', 'User has been banned.');
     }
 
     public function testCannotBanUserUnknownLength() {
@@ -224,16 +184,14 @@ class UsersControllerTest extends TestCase
         
         $response = $this->actingAs($this->user)->post(route('ban.user', [
             'user' => $this->character->user->id
-        ]), [
-            'ban_for' => 'test'
-        ])->response;
+        ]), [])->response;
 
         $user = $this->character->refresh()->user;
 
         $this->assertFalse($user->is_banned);
         $this->assertNull($user->unbanned_at);
 
-        $response->assertSessionHas('error', 'Invalid input for ban length.');
+        $response->assertSessionHas('error', 'Invalid input.');
     }
 
     public function testCanUnBanUser() {
@@ -255,5 +213,53 @@ class UsersControllerTest extends TestCase
         $this->assertNull($user->unbanned_at);
 
         $response->assertSessionHas('success', 'User has been unbanned.');
+    }
+
+    public function testIgnoreUnBanRequest() {
+        Mail::fake();
+
+        $this->character->user()->update([
+            'is_banned' => true,
+            'un_ban_request' => 'Sample request.',
+            'banned_reason'  => 'Sample reason.'
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $response = $this->actingAs($this->user)->post(route('user.ignore.unban.request', [
+            'user' => $this->character->user->id
+        ]))->response;
+
+        $response->assertSessionHas('success', 'User request to be unbanned was ignored. Email has been sent.');
+
+        Mail::assertSent(GenericMail::class, 1);
+    }
+
+    public function testForceNameChange() {
+        Event::fake();
+
+        $response = $this->actingAs($this->user)->post(route('user.force.name.change', [
+            'user' => $this->character->user->id
+        ]))->response;
+
+        $response->assertSessionHas('success', $this->character->name . ' forced to change their name.');
+    }
+
+    protected function createMultipleCharacters(int $amount = 1, string $ip): array {
+        $characterIds = [];
+
+        for($i = 1; $i <= $amount; $i++) {
+            $characterIds[] = (new CharacterSetup)->setupCharacter($this->createUser(
+                [
+                    'ip_address' => $ip,
+                ],
+            ))
+            ->setSkill('Looting')
+            ->setSkill('Dodge')
+            ->setSkill('Accuracy')
+            ->getCharacter()->user->id;
+        }
+
+        return $characterIds;
     }
 }

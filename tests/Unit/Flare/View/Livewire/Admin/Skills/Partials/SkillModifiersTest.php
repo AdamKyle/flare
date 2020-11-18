@@ -155,9 +155,9 @@ class SkillModifiersTest extends TestCase
 
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
-        ])->set('for', 'select-monster')
+        ])->set('for', 'select-monsters')
           ->call('validateInput', 'nextStep', 2)
-          ->assertSee('Monster must be selected.');
+          ->assertSee('At least one or more monsters must be selected.');
           
 
         // Assert skill was not applied:
@@ -198,6 +198,120 @@ class SkillModifiersTest extends TestCase
         // Assert skill was applied:
         $this->assertNotNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
         $this->assertNotNull($monster->refresh()->skills()->where('game_skill_id', $skill->id)->first());
+    }
+
+    public function testDontAssignToAllWhenBothHaveTheSkill() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $user = $this->createUser();
+
+        $monster = $this->createMonster();
+
+        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+
+        $skill = $this->createGameSkill();
+
+        $monster->skills()->create([
+            'monster_id' => $monster->id,
+            'game_skill_id' => $skill->id,
+            'level' => 1,
+            'xp_max' => 999,
+        ]);
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
+                                        ])
+                                        ->setSkill('Dodge', [
+                                            'skill_bonus_per_level' => 10,
+                                        ])
+                                        ->setSkill('Looting', [
+                                            'skill_bonus_per_level' => 0,
+                                        ])
+                                        ->setSkill($skill->name, [
+                                            'skill_bonus_per_level' => 0
+                                        ])
+                                        ->getCharacter();
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->set('for', 'all')
+          ->call('validateInput', 'nextStep', 2);
+          
+
+        // Assert skill was applied:
+        $this->assertEquals(1, $character->refresh()->skills()->where('game_skill_id', $skill->id)->count());
+        $this->assertEquals(1, $monster->refresh()->skills()->where('game_skill_id', $skill->id)->count());
+    }
+
+    public function testAssignToClasses() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $user = $this->createUser();
+
+        $monster = $this->createMonster();
+
+        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
+                                        ])
+                                        ->setSkill('Dodge', [
+                                            'skill_bonus_per_level' => 10,
+                                        ])
+                                        ->setSkill('Looting', [
+                                            'skill_bonus_per_level' => 0,
+                                        ])
+                                        ->getCharacter();
+        $skill = $this->createGameSkill();
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->set('for', 'select-class')
+          ->set('selectedClass', $character->game_class_id)
+          ->call('validateInput', 'nextStep', 2);
+
+        $this->assertNotNull($character->skills->where('game_skill_id', $skill->id)->first());
+    }
+
+    public function testDontAssignToClassesWhenClassesHaveSkill() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $user = $this->createUser();
+
+        $monster = $this->createMonster();
+
+        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+
+        $skill = $this->createGameSkill();
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
+                                        ])
+                                        ->setSkill('Dodge', [
+                                            'skill_bonus_per_level' => 10,
+                                        ])
+                                        ->setSkill('Looting', [
+                                            'skill_bonus_per_level' => 0,
+                                        ])
+                                        ->setSkill($skill->name, [
+                                            'skill_bonus_per_level' => 0
+                                        ])
+                                        ->getCharacter();
+        
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->set('for', 'select-class')
+          ->set('selectedClass', $character->game_class_id)
+          ->call('validateInput', 'nextStep', 2);
+
+        $this->assertEquals(1, $character->skills->where('game_skill_id', $skill->id)->count());
     }
 
     public function testAssignToAllWhenUserIsLoggedIn() {
@@ -269,14 +383,40 @@ class SkillModifiersTest extends TestCase
 
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
-        ])->set('for', 'select-monster')
-          ->set('monster', $monster->id)
+        ])->set('for', 'select-monsters')
+          ->set('selectedMonsters', [$monster->id])
           ->call('validateInput', 'nextStep', 2);
           
 
         // Assert skill was applied:
         $this->assertNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
         $this->assertNotNull($monster->refresh()->skills()->where('game_skill_id', $skill->id)->first());
+    }
+
+    public function testDontAssignToMonsterWhenMonsterHasSkill() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $monster = $this->createMonster();
+
+        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+
+        $skill = $this->createGameSkill();
+
+        $monster->skills()->create([
+            'monster_id' => $monster->id,
+            'game_skill_id' => $skill->id,
+            'level' => 1,
+            'xp_max' => 999,
+        ]);
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->set('for', 'select-monsters')
+          ->set('selectedMonsters', [$monster->id])
+          ->call('validateInput', 'nextStep', 2);
+          
+
+        $this->assertEquals(1, $monster->refresh()->skills()->where('game_skill_id', $skill->id)->count());
     }
 
     public function testFailToAssignToUnknownMonster() {
@@ -290,13 +430,12 @@ class SkillModifiersTest extends TestCase
 
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
-        ])->set('for', 'select-monster')
-          ->set('monster', 1)
+        ])->set('for', 'select-monsters')
+          ->set('selectedMonsters', [9999])
           ->call('validateInput', 'nextStep', 2);
 
-        Mail::assertSent(function (GenericMail $mail) {
-            return $mail->genericMessage === 'Something went wrong trying to assign the skills: Monster not found for id: 1';
-        }, 1);
+        // No monster exists for this id.
+        // An email should be sent.
     }
 
     public function testInitialSkillIsArray() {

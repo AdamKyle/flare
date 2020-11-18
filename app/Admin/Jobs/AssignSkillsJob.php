@@ -54,7 +54,7 @@ class AssignSkillsJob implements ShouldQueue
             $service->assignSkill($this->for, $this->skill, $this->monsterId, $this->classId);
         } catch (\Exception $e) {
             $message = 'Something went wrong trying to assign the skills: ' . $e->getMessage();
-
+            
             Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, $message, 'Failed to assign skill'));
         }
     }

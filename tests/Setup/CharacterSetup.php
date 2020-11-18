@@ -10,6 +10,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Game\Core\Services\CharacterService;
+use Str;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -38,7 +39,7 @@ class CharacterSetup {
         $class = $this->createClass($classOptions);
 
         $this->character = $this->createCharacter([
-            'name'          => isset($options['name']) ? $options['name'] : 'Sample',
+            'name'          => isset($options['name']) ? $options['name'] : Str::random(10),
             'user_id'       => $user->id,
             'level'         => isset($options['level']) ? $options['level'] : 1,
             'xp'            => isset($options['xp']) ? $options['xp'] : 0,
@@ -183,10 +184,14 @@ class CharacterSetup {
             }
         }
 
-        $gameSkill = $this->createGameSkill(array_merge([
-            'name'         => $name,
-            'description'  => 'sample',
-        ], $baseOptions));
+        $gameSkill = GameSkill::where('name', $name)->first();
+
+        if (is_null($gameSkill)) {
+            $gameSkill = $this->createGameSkill(array_merge([
+                'name'         => $name,
+                'description'  => 'sample',
+            ], $baseOptions));
+        }
         
         $this->createSkill(array_merge([
             'character_id'  => $this->character->id,

@@ -27,6 +27,16 @@ class AssignSkillService {
         }
     }
 
+    protected function alertUser(Character $character, GameSkill $skill): void {
+        if (UserOnlineValue::isOnline($character->user)) {
+            event(new ServerMessageEvent($character->user, 'new-skill', $skill->name));
+        } else {
+            $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $skill->name;
+
+            Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'New character skill'));
+        }
+    }
+
     protected function assignSkillToClasses(GameSkill $skill, int $classId) {
         Character::where('game_class_id', $classId)->chunkById(1000, function($characters) use($skill) {
             foreach ($characters as $character) {
@@ -45,24 +55,20 @@ class AssignSkillService {
                     'xp_max' => $skill->can_train ? rand(100, 150) : rand(100, 200),
                 ]);
 
-                if (UserOnlineValue::isOnline($character->user)) {
-                    event(new ServerMessageEvent($character->user, 'new-skill', $skill->name));
-                } else {
-                    $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $skill->name;
-
-                    Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'New character skill'));
-                }
+                $this->alertUser($character, $skill);
             }
         });
     }
 
     protected function assignSkillToCharacters(GameSkill $skill) {
+        dump('called');
         Character::chunkById(1000, function($characters) use ($skill) {
             foreach ($characters as $character) {
 
                 $foundSkill = $character->skills->where('game_skill_id', $skill->id)->first();
-
+                dump($foundSkill);
                 if (!is_null($foundSkill)) {
+                    dump('in here?');
                     continue;
                 }
 
@@ -74,13 +80,7 @@ class AssignSkillService {
                     'xp_max' => $skill->can_train ? rand(100, 150) : rand(100, 200),
                 ]);
 
-                if (UserOnlineValue::isOnline($character->user)) {
-                    event(new ServerMessageEvent($character->user, 'new-skill', $skill->name));
-                } else {
-                    $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $skill->name;
-
-                    Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'New character skill'));
-                }
+                $this->alertUser($character, $skill);
             }
         });
     } 

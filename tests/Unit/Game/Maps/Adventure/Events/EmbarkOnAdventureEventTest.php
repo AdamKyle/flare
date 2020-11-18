@@ -29,39 +29,39 @@ class EmbarkOnAdventureEventTest extends TestCase
     }
 
 
-    public function testFailToAdventureWhenAdventureInProgress()
-    {
-        $user = $this->createUser();
+    // public function testFailToAdventureWhenAdventureInProgress()
+    // {
+    //     $user = $this->createUser();
 
-        $adventure = $this->createNewAdventure();
+    //     $adventure = $this->createNewAdventure();
 
-        $character = (new CharacterSetup)->setupCharacter($user)
-                                         ->createAdventureLog($adventure)
-                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10],[
-                                                'xp_towards' => 10,
-                                            ], true)
-                                         ->setSkill('Dodge', [
-                                                'skill_bonus_per_level' => 10,
-                                            ])
-                                         ->setSkill('Looting', [
-                                                'skill_bonus_per_level' => 0,
-                                            ])
-                                         ->getCharacter();
+    //     $character = (new CharacterSetup)->setupCharacter($user)
+    //                                      ->createAdventureLog($adventure)
+    //                                      ->setSkill('Accuracy', ['skill_bonus_per_level' => 10],[
+    //                                             'xp_towards' => 10,
+    //                                         ], true)
+    //                                      ->setSkill('Dodge', [
+    //                                             'skill_bonus_per_level' => 10,
+    //                                         ])
+    //                                      ->setSkill('Looting', [
+    //                                             'skill_bonus_per_level' => 0,
+    //                                         ])
+    //                                      ->getCharacter();
         
-        Queue::fake();
+    //     Queue::fake();
 
-        Event::fake([ServerMessageEvent::class, UpdateAdventureLogsBroadcastEvent::class]);
+    //     Event::fake([ServerMessageEvent::class, UpdateAdventureLogsBroadcastEvent::class]);
 
-        event(new EmbarkOnAdventureEvent($character, $adventure, 'all'));
+    //     event(new EmbarkOnAdventureEvent($character, $adventure, 'all'));
 
-        $character->refresh();
+    //     $character->refresh();
 
-        $this->assertNull(Cache::get('character_'.$character->id.'_adventure_'.$adventure->id));
+    //     $this->assertNull(Cache::get('character_'.$character->id.'_adventure_'.$adventure->id));
 
-        // We already have on in progress:
-        $this->assertTrue($character->refresh()->adventureLogs->first()->in_progress);
+    //     // We already have on in progress:
+    //     $this->assertTrue($character->refresh()->adventureLogs->first()->in_progress);
 
-        // Make sure we only have the one:
-        $this->assertEquals($character->refresh()->adventureLogs->count(), 1);
-    }
+    //     // Make sure we only have the one:
+    //     $this->assertEquals($character->refresh()->adventureLogs->count(), 1);
+    // }
 }

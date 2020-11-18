@@ -50,7 +50,7 @@ class AssignSkillsServiceTest extends TestCase
         try {
             $service->assignSkill('select-monster', $this->createGameSkill(), 1);
         } catch (Exception $e) {
-            $this->assertEquals('Monster not found for id: 1', $e->getMessage());
+            $this->assertEquals('Could not determine who to assign skill to. $for: select-monster', $e->getMessage());
         }
     }
 

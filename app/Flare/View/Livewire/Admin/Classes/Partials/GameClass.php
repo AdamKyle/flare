@@ -3,6 +3,7 @@
 namespace App\Flare\View\Livewire\Admin\Classes\Partials;
 
 use App\Admin\Services\UpdateCharacterStatsService;
+use App\Flare\Models\GameClass as GameClassModel;
 use Cache;
 use Livewire\Component;
 
@@ -34,7 +35,7 @@ class GameClass extends Component
 
     public function mount() {
         if (is_null($this->gameClass)) {
-            $this->gameClass = new GameClass();
+            $this->gameClass = new GameClassModel;
         } else {
             Cache::put('class-' . $this->gameClass->id, $this->gameClass->replicate());
         }

@@ -45,8 +45,8 @@ class SkillModifiers extends Component
             $this->addError('error', 'You must supply some kind of bonus per level.');
         } else if ($this->isBelowZero()) {
             $this->addError('error', 'No bonus may be below  or equal to: 0.');
-        } else if ($this->for === 'select-monster' && empty($this->selectedMonsters)) {
-            $this->addError('monster', 'Monster must be selected.');
+        } else if ($this->for === 'select-monsters' && empty($this->selectedMonsters)) {
+            $this->addError('monster', 'At least one or more monsters must be selected.');
         } else if ($this->for === 'select-class' && (is_null($this->selectedClass) || $this->selectedClass === '')) {
             $this->addError('class', 'Class must be selected.');
         } else {

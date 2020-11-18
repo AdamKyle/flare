@@ -71,8 +71,8 @@ class CreateCharacterTest extends TestCase
                                                      ->character();
 
         $this->assertEquals('sample', $character->name);
-        $this->assertEquals(4, $character->str);
-        $this->assertEquals(4, $character->dex);
+        $this->assertEquals(13.0, $character->str);
+        $this->assertEquals(13, $character->dex);
         $this->assertEquals('dex', $character->damage_stat);
         $this->assertEquals($race->name, $character->race->name);
         $this->assertEquals($class->name, $character->class->name);
