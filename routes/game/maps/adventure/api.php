@@ -10,6 +10,8 @@ Route::post('/move/{character}', ['uses' => 'Api\MapController@move']);
 // Set Sail:
 Route::post('/map/set-sail/{location}/{character}', ['uses' => 'Api\MapController@setSail']);
 
+Route::post('/map/teleport/{character}', ['uses' => 'Api\MapController@teleport']);
+
 // Adventure:
 Route::post('/character/{character}/adventure/{adventure}', ['uses' => 'Api\AdventureController@adventure']);
 Route::post('/character/{character}/adventure/{adventure}/cancel', ['uses' => 'Api\AdventureController@cancelAdventure']);

@@ -18,11 +18,16 @@
 .character-timeout {
   float: left;
   margin-top: -10px;
-  margin-left: -20px;
+  margin-left: -40px;
 
   .timer {
     font-size: 12px;
   }
+}
+
+.character-ready {
+  position: relative;
+  left: -40px;
 }
 
 .character-map-timeout {

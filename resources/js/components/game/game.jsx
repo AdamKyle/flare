@@ -2,6 +2,7 @@ import React               from 'react';
 import ReactDOM            from 'react-dom';
 import Chat                from './messages/chat';
 import Map                 from './map/map';
+import Teleport            from './map/components/teleport';
 import CharacterInfoTopBar from './components/character-info-top-bar';
 import CoreActionsSection  from './components/core-actions-section';
 import PortLocationActions from './components/port-location-actions';
@@ -27,11 +28,15 @@ class Game extends React.Component {
       adventureDetails: [],
       adventureLogs: [],
       position: {},
+      teleportLocations: {},
       openPortDetails: false,
       openAdventureDetails: false,
+      openTeleportDetails: false,
       characterId: null,
       canAdventureAgainAt: null,
       canAttack: true,
+      current_x: null,
+      current_y: null,
     }
   }
 
@@ -53,10 +58,19 @@ class Game extends React.Component {
     this.setState({position: position});
   }
 
+  updateTeleportLoations(locations, currentX, currentY) {
+    this.setState({
+      teleportLocations: locations,
+      current_x: currentX,
+      current_y: currentY,
+    });
+  }
+
   openPortDetails(open) {
     this.setState({
       openPortDetails: open,
       openAdventureDetails: false,
+      openTeleportDetails: false,
     });
   }
 
@@ -64,6 +78,15 @@ class Game extends React.Component {
     this.setState({
       openPortDetails: false,
       openAdventureDetails: open,
+      openTeleportDetails: false,
+    });
+  }
+
+  openTeleportDetails(open) {
+    this.setState({
+      openTeleportDetails: open,
+      openPortDetails: false,
+      openAdventureDetails: false,
     });
   }
 
@@ -92,6 +115,7 @@ class Game extends React.Component {
                 <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} setCharacterId={this.setCharacterId.bind(this)} canAttack={this.setCanAttack.bind(this)} />
                 {this.state.openPortDetails ? <PortLocationActions updateAdventure={this.updateAdventure.bind(this)} portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
                 {this.state.openAdventureDetails ? <AdeventureActions canAdventure={this.canAdventure.bind(this)} updateAdventure={this.updateAdventure.bind(this)} adventureDetails={this.state.adventureDetails} userId={this.props.userId} characterId={this.state.characterId} openAdventureDetails={this.openAdventureDetails.bind(this)} adventureAgainAt={this.state.canAdventureAgainAt} adventureLogs={this.state.adventureLogs} /> : null}
+                {this.state.openTeleportDetails ? <Teleport teleportLocations={this.state.teleportLocations} openTeleportDetails={this.openTeleportDetails.bind(this)} currentX={this.state.current_x} currentY={this.state.current_y} characterId={this.props.characterId}/> : null}
               </div>
               <div className="col-md-3">
                 <Map 
@@ -104,6 +128,8 @@ class Game extends React.Component {
                   openPortDetails={this.openPortDetails.bind(this)}
                   openAdventureDetails={this.openAdventureDetails.bind(this)}
                   updateAdventure={this.updateAdventure.bind(this)}
+                  updateTeleportLoations={this.updateTeleportLoations.bind(this)}
+                  openTeleportDetails={this.openTeleportDetails.bind(this)}
                 />
               </div>
             </div>

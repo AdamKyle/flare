@@ -76,7 +76,6 @@ export default class SetSail extends React.Component {
         adventures: result.data.adventure_details,
       }, () => {
         this.props.updatePlayerPosition(result.data.character_position_details);
-        console.log(this.state.adventures);
         this.props.updateAdventure(this.state.adventures, [], null);
       });
     });

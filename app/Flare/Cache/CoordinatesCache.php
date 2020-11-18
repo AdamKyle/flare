@@ -7,12 +7,18 @@ use Cache;
 class CoordinatesCache {
 
     public function getFromCache(): array {
-        return Cache::rememberForever('coordinates', function() {
-            return [
-                'x' => $this->buildXCoordinates(),
-                'y' => $this->buildYCoordinates(),
-            ];
-        });
+        $coordinates = Cache::get('coordinates');
+
+        if (is_null($coordinates)) {
+            return Cache::rememberForever('coordinates', function() {
+                return [
+                    'x' => $this->buildXCoordinates(),
+                    'y' => $this->buildYCoordinates(),
+                ];
+            });
+        }
+
+        return $coordinates;
     }
 
     public function buildXCoordinates(): array {

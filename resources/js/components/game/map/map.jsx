@@ -39,6 +39,7 @@ export default class Map extends React.Component {
       adventures: [],
       portList: [],
       adventureLogs: [],
+      teleportLocations: [],
       canAdventureAgainAt: null,
       timeRemaining: null,
       isDead: false,
@@ -48,6 +49,7 @@ export default class Map extends React.Component {
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
+    this.updateMap = Echo.private('update-map-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -74,7 +76,8 @@ export default class Map extends React.Component {
         isDead: result.data.is_dead,
         adventureLogs: result.data.adventure_logs,
         canAdventureAgainAt: result.data.adventure_completed_at,
-        isAdventuring: !_.isEmpty(result.data.adventure_logs.filter(al => al.in_progress))
+        isAdventuring: !_.isEmpty(result.data.adventure_logs.filter(al => al.in_progress)),
+        teleportLocations: result.data.teleport
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -85,6 +88,8 @@ export default class Map extends React.Component {
         });
 
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
+
+        this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
       });
     });
 
@@ -113,6 +118,36 @@ export default class Map extends React.Component {
     this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
       this.setState({
         isAdventuring: event.isAdventuring,
+      });
+    });
+
+    this.updateMap.listen('Game.Maps.Adventure.Events.UpdateMapDetailsBroadcast', (event) => {
+      this.updatePlayerPosition(event.map);
+
+      console.log(event);
+
+      this.setState({
+        currentPort: event.portDetails.current_port,
+        portList: event.portDetails.port_list,
+        adventures: event.adventureDetails
+      }, () => {
+        this.props.updateAdventure(event.adventureDetails, [], null);
+
+        this.props.updatePort({
+          currentPort: event.portDetails.hasOwnProperty('current_port') ? event.portDetails.current_port : null,
+          portList: event.portDetails.hasOwnProperty('port_list') ? event.portDetails.port_list : [],
+          characterId: this.state.characterId,
+          characterIsDead: this.state.isDead,
+          canMove: this.state.canMove,
+        });
+
+        if (_.isEmpty(event.portDetails)) {
+          this.props.openPortDetails(false);
+        }
+
+        if (_.isEmpty(event.adventureDetails)) {
+          this.props.openAdventureDetails(false);
+        }
       });
     });
   }
@@ -187,8 +222,6 @@ export default class Map extends React.Component {
     const movement  = e.target.getAttribute('data-direction');
     let x           = this.state.characterPosition.x;
     let y           = this.state.characterPosition.y;
-    let mapX        = 0;
-    let mapY        = 0;
 
     switch (movement) {
         case 'north':
@@ -241,7 +274,6 @@ export default class Map extends React.Component {
             character_position_x: this.state.characterPosition.x,
             character_position_y: this.state.characterPosition.y,
           }).then((result) => {
-            console.log(result);
             this.setState({
               currentPort: result.data.port_details.hasOwnProperty('current_port') ? result.data.port_details.current_port : null,
               portList: result.data.port_details.hasOwnProperty('port_list') ? result.data.port_details.port_list : [],
@@ -254,6 +286,8 @@ export default class Map extends React.Component {
                 characterIsDead: this.state.isDead,
                 canMove: this.state.canMove,
               });
+
+              this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 
               this.props.updateAdventure(this.state.adventures, [], null);
 
@@ -329,6 +363,10 @@ export default class Map extends React.Component {
     this.props.openAdventureDetails(true);
   }
 
+  openTeleport() {
+    this.props.openTeleportDetails(true);
+  }
+
   render() {
     if (this.state.isLoading) {
       return (
@@ -370,7 +408,8 @@ export default class Map extends React.Component {
          <div className="character-position mt-2">
           <div className="mb-2 mt-2 clearfix">
             <p className="float-left">Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
-            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-3 btn-sm" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+            <button type="button" className="float-right btn btn-primary btn-sm" data-direction="teleport" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openTeleport.bind(this)}>Teleport</button>
+            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
             { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
           </div>
          </div>
@@ -387,10 +426,10 @@ export default class Map extends React.Component {
            : 
            null
            }
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>North</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>South</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>East</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.move.bind(this)}>West</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>North</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>South</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>East</button>
+           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>West</button>
            <TimeOutBar
               eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
               channel={'show-timeout-move-' + this.props.userId}

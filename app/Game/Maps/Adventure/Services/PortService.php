@@ -45,7 +45,7 @@ class PortService {
             'character_position_x' => $newPort->x,
             'character_position_y' => $newPort->y,
             'position_x'           => $this->mapPositionValue->fetchXPosition($character->map->character_position_x, $character->map->position_x),
-            'position_x'           => $this->mapPositionValue->fetchYPosition($character->map->character_position_y),
+            'position_y'           => $this->mapPositionValue->fetchYPosition($character->map->character_position_y),
         ]);
 
         return $character->refresh();
