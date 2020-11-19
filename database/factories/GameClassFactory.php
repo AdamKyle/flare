@@ -24,6 +24,7 @@ class GameClassFactory extends Factory
         return [
             'name'        => 'Sample Class',
             'damage_stat' => 'str',
+            'str_mod'     => 0,
         ];
     }
 }

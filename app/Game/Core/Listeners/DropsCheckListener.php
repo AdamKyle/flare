@@ -30,14 +30,14 @@ class DropsCheckListener
     public function handle(DropsCheckEvent $event)
     {
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        
+    
         $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $event->adventure);
 
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::all())
                         ->generateItem($event->character);
-            
+
             if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {
                 $this->attemptToPickUpItem($event, $drop);
             }

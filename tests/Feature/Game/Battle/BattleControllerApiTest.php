@@ -230,7 +230,7 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([], ['skill_bonus_per_level' => 100,], ['level' => 100,]);
+        $this->setUpCharacter([], ['skill_bonus_per_level' => 1000,], ['level' => 1000,]);
 
         $currentGold = $this->character->gold;
 
@@ -242,11 +242,11 @@ class BattleControllerApiTest extends TestCase
                          ])
                          ->response;
 
-        $this->character->refresh();
+        $character = $this->character->refresh();
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue($currentGold !== $this->character->gold);
-        $this->assertTrue(count($this->character->inventory->slots) > 1);
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue(count($character->inventory->slots) > 1);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterCannotGainItemBecauseInventoryIsFull() {

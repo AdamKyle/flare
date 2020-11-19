@@ -141,8 +141,8 @@ class SkillModifiers extends Component
 
         if ($charactersWithSkill->isNotEmpty()) {
             $for = 'selected-class';
-            
-            $this->selectedClass = $charactersWithSkill->first()->character->class->id;
+
+            $this->selectedClass = $charactersWithSkill->first()->class->id;
 
             $this->canNotAssignSkill = true;
         }

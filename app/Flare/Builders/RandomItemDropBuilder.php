@@ -86,7 +86,7 @@ class RandomItemDropBuilder {
     protected function shouldHaveItemAffix(Character $character): bool {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-        return (rand(1, 100) + $lootingChance) > 50;
+        return (rand(1, 100) * (1 + $lootingChance)) > 50;
     }
 
     protected function fetchRandomItemAffix() {

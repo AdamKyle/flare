@@ -17,11 +17,11 @@ class CreateGameClasses extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('damage_stat');
-            $table->decimal('str_mod', 5, 4)->nullable()->default(0);
-            $table->decimal('dur_mod', 5, 4)->nullable()->default(0);
-            $table->decimal('dex_mod', 5, 4)->nullable()->default(0);
-            $table->decimal('chr_mod', 5, 4)->nullable()->default(0);
-            $table->decimal('int_mod', 5, 4)->nullable()->default(0);
+            $table->integer('str_mod')->nullable()->default(0);
+            $table->integer('dur_mod')->nullable()->default(0);
+            $table->integer('dex_mod')->nullable()->default(0);
+            $table->integer('chr_mod')->nullable()->default(0);
+            $table->integer('int_mod')->nullable()->default(0);
             $table->decimal('accuracy_mod', 5, 4)->nullable()->default(0);
             $table->decimal('dodge_mod', 5, 4)->nullable()->default(0);
             $table->decimal('deffense_mod', 5, 4)->nullable()->default(0);

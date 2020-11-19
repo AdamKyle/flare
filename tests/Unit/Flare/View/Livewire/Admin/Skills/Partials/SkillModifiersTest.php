@@ -40,10 +40,100 @@ class SkillModifiersTest extends TestCase
         Livewire::test(SkillModifiers::class)->call('update', $skill->id)->assertSet('skill.name', $skill->name);
     }
 
+    public function testCompnentLoadsWithCharacterContainingSkill() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $user = $this->createUser();
+
+        $skill = $this->createGameSkill();
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
+                                        ])
+                                        ->setSkill('Dodge', [
+                                            'skill_bonus_per_level' => 10,
+                                        ])
+                                        ->setSkill('Looting', [
+                                            'skill_bonus_per_level' => 0,
+                                        ])
+                                        ->setSkill($skill->name, [
+                                            'skill_bonus_per_level' => 0
+                                        ])
+                                        ->getCharacter();
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->call('update', $skill->id)->assertSee('Base Damage Modifier Per level:');
+    }
+
+    public function testCompnentLoadsWithMonsterContainingSkill() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $monster = $this->createMonster();
+
+        $skill = $this->createGameSkill();
+
+        $monster->skills()->create([
+            'monster_id' => $monster->id,
+            'game_skill_id' => $skill->id,
+            'level' => 1,
+            'xp_max' => 999,
+        ]);
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->call('update', $skill->id)->assertSee('Base Damage Modifier Per level:');
+    }
+
+    public function testCompnentLoadsWithMonsterAndCharacterContainingSkill() {
+        $this->seed(GameSkillsSeeder::class);
+
+        $user = $this->createUser();
+
+        $monster = $this->createMonster();
+
+        $skill = $this->createGameSkill();
+
+        $monster->skills()->create([
+            'monster_id' => $monster->id,
+            'game_skill_id' => $skill->id,
+            'level' => 1,
+            'xp_max' => 999,
+        ]);
+
+        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
+                                        ])
+                                        ->setSkill('Dodge', [
+                                            'skill_bonus_per_level' => 10,
+                                        ])
+                                        ->setSkill('Looting', [
+                                            'skill_bonus_per_level' => 0,
+                                        ])
+                                        ->setSkill($skill->name, [
+                                            'skill_bonus_per_level' => 0
+                                        ])
+                                        ->getCharacter();
+
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $skill,
+        ])->call('update', $skill->id)->assertSee('Base Damage Modifier Per level:');
+    }
+
     public function testTheComponentCallsUpdateWithNull() {
         $skill = $this->createGameSkill();
 
         Livewire::test(SkillModifiers::class)->call('update', null)->assertNotSet('skill.name', $skill->name);
+    }
+
+    public function testFailValidationWhenClassIsNotSelected() {
+        Livewire::test(SkillModifiers::class, [
+            'skill' => $this->createGameSkill(),
+        ])->set('for', 'select-class')->call('validateInput', 'nextStep', 2)->assertSee('Class must be selected.');
     }
 
     public function testFailToSaveModifierWhenMofiersAreEmpty() {

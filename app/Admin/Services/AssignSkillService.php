@@ -61,14 +61,12 @@ class AssignSkillService {
     }
 
     protected function assignSkillToCharacters(GameSkill $skill) {
-        dump('called');
         Character::chunkById(1000, function($characters) use ($skill) {
             foreach ($characters as $character) {
 
                 $foundSkill = $character->skills->where('game_skill_id', $skill->id)->first();
-                dump($foundSkill);
+
                 if (!is_null($foundSkill)) {
-                    dump('in here?');
                     continue;
                 }
 

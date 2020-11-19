@@ -28,14 +28,14 @@ class ItemDetailsTest extends TestCase
         ->set('item.name', 'Sample')
         ->set('item.type', 'weapon')
         ->set('item.description', 'test')
-        ->set('item.cost', 100)
         ->set('item.can_craft', true)
         ->set('item.skill_name', 'Looting')
         ->call('validateInput', 'nextStep', 2)
         ->assertSee('Cannot be empty when you said this item is craftable.')
         ->assertSee('Must have a skill level required to craft.')
         ->assertSee('Must have a skill trivial level.')
-        ->assertSee('You cannot say this item affects skill training and not say by how much.');
+        ->assertSee('You cannot say this item affects skill training and not say by how much.')
+        ->assertSee('How much does this item cost?');
     }
 
     public function testCreateValidItem() {

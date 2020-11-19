@@ -6,6 +6,7 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\User;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
@@ -36,7 +37,15 @@ class CharacterSetup {
             'str_mod' => 3,
         ]);
 
-        $class = $this->createClass($classOptions);
+        if (isset($classOptions['name'])) {
+            $class = GameClass::where('name', $classOptions['name'])->first();
+
+            if (is_null($class)) {
+                $class = $this->createClass($classOptions);
+            }
+        } else {
+            $class = $this->createClass($classOptions);
+        }
 
         $this->character = $this->createCharacter([
             'name'          => isset($options['name']) ? $options['name'] : Str::random(10),
@@ -47,6 +56,9 @@ class CharacterSetup {
             'can_move'      => isset($options['can_move']) ? $options['can_move'] : true,
             'inventory_max' => 75,
             'gold'          => isset($options['gold']) ? $options['gold'] : 10,
+            'str'           => isset($options['str']) ? $options['str'] : 1,
+            'game_class_id' => $class->id,
+            'game_race_id'  => $race->id,
         ]);
 
         // Create Empty Inventory:
