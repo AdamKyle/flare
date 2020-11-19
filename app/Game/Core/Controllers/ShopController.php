@@ -45,7 +45,7 @@ class ShopController extends Controller {
         $character = auth()->user()->character;
 
         $itemsToSell = $character->inventory->slots->filter(function($slot) {
-            return !$slot->equipped;
+            return !$slot->equipped && $slot->item->type !== 'quest';
         })->all();
 
         $itemsToSell = collect($itemsToSell);
@@ -88,7 +88,7 @@ class ShopController extends Controller {
             event(new BuyItemEvent($item, $character));
         }
 
-        return redirect()->back()->with('success', 'puchased all selected items.');
+        return redirect()->back()->with('success', 'Puchased all selected items.');
 
     }
 

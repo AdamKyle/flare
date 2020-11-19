@@ -188,4 +188,182 @@ class ShopControllerTest extends TestCase
 
         $this->assertFalse($this->character->gold > 0);
     }
+
+    public function testCannotSellAllWhenAllEquipped() {
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
+
+        $response->assertSessionHas('error', 'You have nothing that you can sell.');
+    }
+
+    public function testSellAllItems() {
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $this->item->id,
+            'equipped'     => false,
+            'position'     => null,
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
+
+        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 18 gold.');
+    }
+
+    public function testSellAllItemsButQuestItems() {
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'quest',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $weapon = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $item->id,
+                'equipped'     => false,
+                'position'     => null,
+            ],
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $weapon->id,
+                'equipped'     => false,
+                'position'     => null,
+            ]
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
+
+        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 18 gold.');
+
+        $questItems = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest';
+        })->all();
+
+        $this->assertFalse(empty($questItems));
+    }
+
+    public function testFailToBulkBuyWhenNoGold() {
+        $this->character->update([
+            'gold' => 0
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+            'items' => [$this->item->id]
+        ]))->response;
+
+        $response->assertSessionHas('error', 'You do not have enough gold.');
+    }
+
+    public function testFailToBulkBuyWhenNoItems() {
+        $this->character->update([
+            'gold' => 100
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+            'items' => []
+        ]))->response;
+
+        $response->assertSessionHas('error', 'No items could be found. Did you select any?');
+    }
+
+    public function testNotEnoughGold() {
+        $this->character->update([
+            'gold' => 10
+        ]);
+
+        $weapon = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+            'items' => [$this->item->id, $weapon->id]
+        ]))->response;
+
+        $response->assertSessionHas('error', 'You do not have enough gold to buy: ' . $this->item->name . '. Anything before this item in the list was purchased.');
+
+        $count = $this->character->refresh()->inventory->slots->count();
+        
+        $this->assertEquals($count, 2);
+    }
+
+    public function testBuyAllSelectedItems() {
+        $this->character->update([
+            'gold' => 1000
+        ]);
+
+        $weapon = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+            'items' => [$this->item->id, $weapon->id]
+        ]))->response;
+
+        $response->assertSessionHas('success', 'Puchased all selected items.');
+
+        $count = $this->character->refresh()->inventory->slots->count();
+        
+        $this->assertEquals($count, 3);
+    }
+
+    public function testFailToSellInBulk() {
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.bulk', [
+            'slots' => []
+        ]))->response;
+
+        $response->assertSessionHas('error', 'No items could be found. Did you select any?');
+    }
+
+    public function testSellInBulk() {
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'quest',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $weapon = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $this->character->inventory->slots()->insert([
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $item->id,
+                'equipped'     => false,
+                'position'     => null,
+            ],
+            [
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $weapon->id,
+                'equipped'     => false,
+                'position'     => null,
+            ]
+        ]);
+
+        
+        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.bulk', [
+            'slots' => $this->character->refresh()->inventory->slots->filter(function($slot) {
+                return !$slot->equipped && $slot->item->type !== 'quest';
+            })->pluck('id')->toArray(),
+        ]))->response;
+
+        $response->assertSessionHas('success', 'Sold selected items for: 18 gold.');
+    }
 }

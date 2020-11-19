@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\ItemAffix;
 use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,13 +11,15 @@ use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use Tests\Setup\CharacterSetup;
 use Tests\Traits\CreateAdventure;
+use Tests\Traits\CreateNotification;
 
 class CharacterAdventureControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateAdventure,
         CreateItem,
-        CreateUser;
+        CreateUser,
+        CreateNotification;
 
     private $character;
 
@@ -78,17 +81,17 @@ class CharacterAdventureControllerTest extends TestCase
                 "exp" => 100,
                 "gold" => 75,
                 "items" => [
-                  [
+                    [
                     "id" => $item->id,
                     "name" => $item->name,
-                  ],
+                    ],
                 ],
                 "skill" => [
-                  "exp"         => 1000,
-                  "skill_name"  => $skill->name,
-                  "exp_towards" => $skill->xp_towards,
+                    "exp"         => 1000,
+                    "skill_name"  => $skill->name,
+                    "exp_towards" => $skill->xp_towards,
                 ],
-              ]
+            ]
         ]);
 
         $this->character->refresh();
@@ -106,6 +109,36 @@ class CharacterAdventureControllerTest extends TestCase
         $this->actingAs($this->character->user)
              ->visitRoute('game.current.adventure')
              ->see('Collect Rewards');
+    }
+
+    public function testCharacterCanSeeLatestAdventureWithNotification()
+    {
+
+        $this->createNotification([
+            'character_id' => $this->character->id,
+            'title'        => 'Sample',
+            'message'      => 'Sample',
+            'status'       => 'success',
+            'type'         => 'message',
+            'read'         => false,
+            'url'          => 'url',
+            'adventure_id' => $this->character->adventureLogs()->first()->adventure_id,
+        ]);
+
+        $this->actingAs($this->character->user)
+             ->visitRoute('game.current.adventure')
+             ->see('Collect Rewards');
+    }
+
+    public function testCharacterCanSeeLatestAdventureWithNoRewards() {
+
+        $this->character->adventureLogs()->first()->update([
+            'rewards' => null
+        ]);
+
+        $this->actingAs($this->character->user)
+             ->visitRoute('game.current.adventure')
+             ->dontSee('Collect Rewards');
     }
 
     public function testCharacterCanSeeAllAdventures() {
@@ -182,6 +215,28 @@ class CharacterAdventureControllerTest extends TestCase
 
 
         $response->assertSessionHas('error', "You are dead and must revive before trying to do that. Dead people can't do things."); 
+    }
+
+    public function testShowDifferentSuccessWhenThereIsNoReward() {
+        $this->character->adventureLogs()->first()->update([
+            'rewards' => [
+                "exp" => 1,
+                "gold" => 1,
+                "items" => [],
+                "skill" => [
+                    "exp"         => 1,
+                    "skill_name"  => 'Looting',
+                    "exp_towards" => 10,
+                ],
+            ]
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+             ->post(route('game.current.adventure.reward', [
+                 'adventureLog' => 1,
+             ]))->response;
+
+        $response->assertSessionHas('success', ['You are a ready for your next adventure!']);
     }
 
     public function testCannotGiveOutRewardsWhenThereAreNone() {

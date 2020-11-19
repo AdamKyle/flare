@@ -93,16 +93,9 @@ class CharacterAdventureController extends Controller {
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 
         if (empty($messages)) {
-
-            if ($character->is_dead) {
-                $messages = [
-                    'You are dead and cannot start your next adventure till you revive.'
-                ];
-            } else {
-                $messages = [
-                    'You are a ready for your next adventure!'
-                ];
-            }
+            $messages = [
+                'You are a ready for your next adventure!'
+            ];
         }
         
         return redirect()->to(route('game'))->with('success', $messages);

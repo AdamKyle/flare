@@ -249,6 +249,39 @@ class BattleControllerApiTest extends TestCase
         $this->assertTrue(count($character->inventory->slots) > 1);
     }
 
+    public function testBattleResultsCharacterCannotPickUpItem() {
+        Queue::Fake();
+
+        Event::fake([
+            ServerMessageEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+        ]);
+
+        $this->setUpCharacter([], ['skill_bonus_per_level' => 1000,], ['level' => 1000,]);
+
+        $currentGold = $this->character->gold;
+
+        $this->character->update([
+            'inventory_max' => 1,
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/battle-results/' . $this->character->id, [
+                             'is_defender_dead' => true,
+                             'defender_type' => 'monster',
+                             'monster_id' => $this->monster->id,
+                         ])
+                         ->response;
+
+        $character = $this->character->refresh();
+
+        $this->assertEquals(200, $response->status());
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue(count($character->inventory->slots) === 1);
+    }
+
     public function testBattleResultsMonsterIsDeadAndCharacterCannotGainItemBecauseInventoryIsFull() {
         Queue::Fake();
 

@@ -141,4 +141,17 @@ class CharacterSheetControllerApiTest extends TestCase {
 
         $this->assertFalse($content->sheet->str_modded === $this->character->str);
     }
+
+    public function testForceNameChange() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('POST', '/api/character-sheet/'.$this->character->id.'/name-change', [
+                             'name' => 'Apples'
+                         ])
+                         ->response;
+
+        json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals('Apples', $this->character->refresh()->name);
+    }
 }

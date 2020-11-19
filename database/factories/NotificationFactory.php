@@ -29,6 +29,7 @@ class NotificationFactory extends Factory
             'type'         => null,
             'read'         => null,
             'url'          => null,
+            'adventure_id' => null,
         ];
     }
 }
