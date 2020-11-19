@@ -35,7 +35,7 @@ class FormWizard extends Component
 
         if ($passed) {
             $this->currentStep = $index;
-
+            
             $this->emitTo($this->views[$index], 'update', $this->model['id']);
         }
     }

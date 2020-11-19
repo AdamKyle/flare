@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Mail;
+namespace App\Admin\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;

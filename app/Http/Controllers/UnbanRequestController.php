@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Flare\Mail\UnBanRequest;
+use App\Admin\Mail\UnbanRequest;
 use App\Flare\Models\User;
 use Cache;
 use Hash;

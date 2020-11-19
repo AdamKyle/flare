@@ -34,10 +34,6 @@ class Inventory extends Model
         return $this->hasMany(InventorySlot::class);
     }
 
-    public function questItemSlots() {
-        return $this->hasMany(QuestItemSlot::class);
-    }
-
     public function character() {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }

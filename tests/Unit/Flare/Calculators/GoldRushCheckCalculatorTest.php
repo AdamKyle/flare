@@ -3,13 +3,13 @@
 namespace Tests\Unit\Flare\Calculators;
 
 use Database\Seeders\GameSkillsSeeder;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateMonster;
 
-class DropCheckCalculatorTest extends TestCase
+class GoldRushCheckCalculatorTest extends TestCase
 {
     use RefreshDatabase, CreateAdventure, CreateMonster;
 
@@ -19,24 +19,15 @@ class DropCheckCalculatorTest extends TestCase
         $this->seed(GameSkillsSeeder::class);
     }
 
-    public function testDropCheckCalculator()
-    {
-        $chance = DropCheckCalculator::fetchDropCheckChance(
-            $this->createMonster(), 100, $this->createNewAdventure()
-        );
-
-        $this->assertTrue($chance);
-    }
-
-    public function testDropCheckCalculatorDefaultTrue()
+    public function testGoldDropRushCheck()
     {
         $adventure = $this->createNewAdventure();
 
         $adventure->update([
-            'item_find_chance' => 2,
+            'gold_rush_chance' => 2
         ]);
         
-        $chance = DropCheckCalculator::fetchDropCheckChance(
+        $chance = GoldRushCheckCalculator::fetchGoldRushChance(
             $this->createMonster(), 100, $adventure->refresh()
         );
 

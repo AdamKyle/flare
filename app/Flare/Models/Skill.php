@@ -113,11 +113,7 @@ class Skill extends Model
         $raceSkillBonusValue  = $character->race->{Str::snake($name . '_mod')};
         $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
         
-        if (!is_null($raceSkillBonusValue) && !is_null($classSkillBonusValue)) {
-            return $raceSkillBonusValue + $classSkillBonusValue;
-        }
-  
-        return 0;
+        return $raceSkillBonusValue + $classSkillBonusValue;
     }
 
     protected static function newFactory() {

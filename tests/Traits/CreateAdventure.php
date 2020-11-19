@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
+use Database\Seeders\GameSkillsSeeder;
 use Tests\Traits\CreateItem;
 use Tests\traits\CreateMonster;
 
@@ -60,6 +61,10 @@ trait CreateAdventure {
     }
 
     protected function createMonsterForAdventure(): Monster {
+        if (GameSkill::all()->isEmpty()) {
+            $this->seed(GameSkillsSeeder::class);
+        }
+
         $monster = Monster::factory()->create([
             'name' => 'Monster',
             'damage_stat' => 'str',

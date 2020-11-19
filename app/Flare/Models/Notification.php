@@ -31,11 +31,11 @@ class Notification extends Model {
     ];
 
     public function character() {
-        return $this->belongsTo(Charcater::class);
+        return $this->belongsTo(Character::class);
     }
 
     public function adventure() {
-        return $this->belongsTo(Adventure::class, 'id', 'adventure_id');
+        return $this->belongsTo(Adventure::class, 'adventure_id', 'id');
     }
 
     protected static function newFactory() {

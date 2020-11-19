@@ -49,7 +49,7 @@
                     <x-data-tables.header>
                         @if ($batchSell)
                             <x-data-tables.header-row>
-                                <input type="checkbox" wire:model="pageSelected"/>
+                                <input type="checkbox" wire:model="pageSelected" id="select-all" />
                             </x-data-tables.header-row>
                         @endif
 
@@ -120,6 +120,7 @@
                                 </td>
                             </tr>
                         @endif
+                        
                         @forelse($slots as $slot)
                             <tr wire:key="slots-table-{{$slot->id}}">
                                 @if ($batchSell)

@@ -1,19 +1,20 @@
 <?php
 
-namespace Tests\Unit\Flare\View\Livewire\Character\Adventures;
+namespace Tests\Unit\Flare\View\Livewire\Character\Items;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\View\Livewire\Character\Adventures\DataTable;
 use Database\Seeders\GameSkillsSeeder;
+use App\Flare\View\Livewire\Character\Inventory\DataTable;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateUser;
 use Tests\Setup\CharacterSetup;
+use Tests\Traits\CreateItem;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase, CreateAdventure, CreateUser;
+    use RefreshDatabase, CreateAdventure, CreateUser, CreateItem;
 
     private $character;
 
@@ -24,10 +25,18 @@ class DataTableTest extends TestCase
 
         $user = $this->createUser();
 
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => '6'
+        ]);
+
         $adventure = $this->createNewAdventure();
 
         $this->character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
                                         ->levelCharacterUp(10)
+                                        ->giveItem($item)
+                                        ->givePlayerLocation()
                                         ->createAdventureLog($adventure, [
                                             'complete'             => true,
                                             'in_progress'          => false,
@@ -54,19 +63,16 @@ class DataTableTest extends TestCase
 
     public function testTheComponentLoads()
     {
+        $this->actingAs($this->character->user);
         
         Livewire::test(DataTable::class, [
-            'adventureLogs' => $this->character->adventureLogs->load('adventure'),
-        ])
-        ->assertSee('Sample')
-        ->set('search', 'Apples')
-        ->assertDontSee('Sample')
-        ->set('search', '')
-        ->assertSee('Sample')
-        ->call('sortBy', 'adventure.name')
-        ->assertSee('Sample')
-        ->set('search', 'Sample')
-        ->set('sortBy', 'desc')
-        ->assertSee('Sample');
+            'batchSell' => true,
+        ])->set('selected', [1])
+          ->call('selectAll')
+          ->set('search', 'Rusty Dagger');
+    }
+
+    public function testSelectAll() {
+        $this->actingAs($this->character->user)->visit(route('game.shop.sell'))->check('select-all');
     }
 }

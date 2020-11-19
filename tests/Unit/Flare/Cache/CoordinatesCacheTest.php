@@ -12,9 +12,16 @@ class CoordinatesCacheTest extends TestCase
 
     public function testCacheisCreated()
     {
-        $coordinatesCache = resolve(CoordinatesCache::class)->getFromCache();
+        $coordinatesCache = resolve(CoordinatesCache::class);
+        
+        $coordinates = $coordinatesCache->getFromCache();
 
-        $this->assertTrue(!empty($coordinatesCache['x']));
-        $this->assertTrue(!empty($coordinatesCache['y']));
+        // Fetch again - this time from the cache.
+        $coordinates = $coordinatesCache->getFromCache();
+
+        $this->assertTrue(!empty($coordinates['x']));
+        $this->assertTrue(!empty($coordinates['y']));
+
+
     }
 }
