@@ -54,17 +54,13 @@ class ResetPasswordController extends Controller
 
         if (!$user->hasRole('Admin')) {
 
-            if ($response == Password::PASSWORD_RESET) {
-                Auth::logout();
+            Auth::logout();
 
-                Cache::put('user-' . $user->id, '', now()->addMinutes(5));
+            Cache::put('user-' . $user->id, '', now()->addMinutes(5));
 
-                return redirect()->to(route('user.reset.security.questions', [
-                    'user' => $user
-                ]));
-            }
-
-            return redirect()->back()->with('errors', 'Unable to complete password reset. Please try again. Make sure your passwords match.');
+            return redirect()->to(route('user.reset.security.questions', [
+                'user' => $user
+            ]));
         }
 
         // If the password was successfully reset, we will redirect the user back to
@@ -82,9 +78,7 @@ class ResetPasswordController extends Controller
     }
 
     public function updateSecurityQuestions(Request $request, User $user) {
-        $validReset = Cache::pull('user-' . $user->id);
-
-        if (is_null($validReset)) {
+        if (!Cache::has('user-' . $user->id)) {
             return redirect()->to('/')->with('error', 'Unable to process password reset. Please start again by following the forgot password link on the login page.');
         }
 

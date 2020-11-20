@@ -34,6 +34,16 @@ class ForgotPasswordController extends Controller
         if (is_null($user)) {
             return redirect()->back()->with('error', 'This email does not match our records.');
         }
+        
+        if ($user->hasRole('Admin')) {
+            $response = $this->broker()->sendResetLink(
+                $this->credentials($request)
+            );
+
+            return $response == Password::RESET_LINK_SENT
+                        ? redirect()->to('/')->with('success', 'Sent you an email to begin the reset process.')
+                        : redirect()->to('/')->with('error', 'Failed to send link.');
+        }
 
         Cache::put($user->id . '-email', $request->email, now()->addMinutes(5));
 
@@ -43,9 +53,7 @@ class ForgotPasswordController extends Controller
     }
 
     public function answerSecurityQuestions(Request $request, User $user) {
-        $email = Cache::get($user->id . '-email');
-
-        if (is_null($email)) {
+        if (!Cache::has($user->id . '-email')) {
             return redirect()->to('/')->with('error', 'Your time expired. Please try again.');
         }
 
@@ -55,9 +63,7 @@ class ForgotPasswordController extends Controller
     }
 
     public function securityQuestionsAnswers(Request $request, User $user) {
-        $email = Cache::get($user->id . '-email');
-
-        if (is_null($email)) {
+        if (!Cache::has($user->id . '-email')) {
             return redirect()->to('/')->with('error', 'Your time expired. Please try again.');
         }
 

@@ -6,7 +6,7 @@
         <div class="col-md-8">
             <div class="row page-titles">
                 <div class="col-md-6 align-self-right">
-                    <h4 class="mt-2">Security Questions</h4>
+                    <h4 class="mt-2">New Security Questions</h4>
                 </div>
             </div>
 
