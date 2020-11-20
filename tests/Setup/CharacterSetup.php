@@ -57,6 +57,7 @@ class CharacterSetup {
             'inventory_max' => 75,
             'gold'          => isset($options['gold']) ? $options['gold'] : 10,
             'str'           => isset($options['str']) ? $options['str'] : 1,
+            'dex'           => isset($options['dex']) ? $options['dex'] : 1,
             'game_class_id' => $class->id,
             'game_race_id'  => $race->id,
         ]);
@@ -208,6 +209,8 @@ class CharacterSetup {
         $this->createSkill(array_merge([
             'character_id'  => $this->character->id,
             'game_skill_id' => $gameSkill->id, 
+            'currently_training' => $currentlyTraining,
+            'level' => isset($baseOptions['level']) ? $baseOptions['level'] : 1,
         ], $skillOptions));
 
         $this->character->refresh();

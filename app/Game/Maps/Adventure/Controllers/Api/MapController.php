@@ -194,7 +194,7 @@ class MapController extends Controller {
         if ($character->gold < $request->cost) {
             return response()->json([
                 'message' => 'Not enough gold.'
-            ]);
+            ], 422);
         }
 
         $coordinates = $this->coordinatesCache->getFromCache();
@@ -202,7 +202,7 @@ class MapController extends Controller {
         if (!in_array($request->x, $coordinates['x']) && !in_array($request->x, $coordinates['y'])) {
             return response()->json([
                 'message' => 'Invalid input.'
-            ]);
+            ], 422);
         }
 
         $location = Location::where('x', $request->x)->where('y', $request->y)->first();

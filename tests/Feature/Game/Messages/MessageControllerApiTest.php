@@ -38,6 +38,16 @@ class MessageControllerApiTest extends TestCase
         $this->assertFalse($content->user->is_silenced);
     }
 
+    public function testFetchMessages() {
+        $user = $this->createUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('GET', '/api/last-chats/')
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+    }
+
     public function testUserCanSendMessage() {
         $race = $this->createRace([
             'str_mod' => 3,

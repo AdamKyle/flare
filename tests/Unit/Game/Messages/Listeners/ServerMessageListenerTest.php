@@ -59,6 +59,21 @@ class ServerMessageListenerTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
+    public function testServerMessageNewDamageSat()
+    {
+        $user = $this->createUser();
+
+        (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
+
+        event(new ServerMessageEvent($user, 'new-damage-stat', 'str'));
+
+        Event::fake();
+
+        event(new ServerMessageEvent($user, 'new-damage-stat', 'str'));
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
     public function testServerMessageEventUnKnownType()
     {
         $user = $this->createUser();

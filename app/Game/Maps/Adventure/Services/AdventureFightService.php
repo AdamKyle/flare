@@ -121,24 +121,20 @@ class AdventureFightService {
             return $this->attack($defender, $attacker);
         }
 
-        $messages      = $this->completeAttack($attacker, $defender);
+        $messages          = $this->completeAttack($attacker, $defender);
+        
+        $this->counter     = 0;
 
-        $this->counter = 0;
+        $this->tookTooLong = false; 
 
-        if (!empty($messages)) {
-            $this->logInformation[] = [
-                'attacker'   => $attacker->name,
-                'defender'   => $defender->name,
-                'messages'   => $messages,
-                'is_monster' => $attacker instanceof Character ? false : true
-            ];
+        $this->logInformation[] = [
+            'attacker'   => $attacker->name,
+            'defender'   => $defender->name,
+            'messages'   => $messages,
+            'is_monster' => $attacker instanceof Character ? false : true
+        ];  
 
-            return $this->attack($defender, $attacker);
-        }
-
-        $this->tookTooLong = false;
-
-        return;        
+        return $this->attack($defender, $attacker);  
     }
 
     protected function canHit($attacker, $defender): bool {
@@ -172,10 +168,6 @@ class AdventureFightService {
 
     protected function completeAttack($attacker, $defender): array {
         $messages = [];
-
-        if ($this->isCharacterDead() || $this->isMonsterDead()) {
-            return $messages;
-        }
 
         if ($attacker instanceof Character) {
             

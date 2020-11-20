@@ -203,7 +203,7 @@ class AdventureService {
     protected function setLogs(AdventureLog $adventureLog, AdventureFightService $attackService) {
         $logs = $adventureLog->logs;
 
-        if (empty($logs)) {
+        if (is_null($logs)) {
 
             $logDetails              = [];
             $logDetails[$this->name] = [$attackService->getLogInformation()];
@@ -212,12 +212,7 @@ class AdventureService {
                 'logs' => $logDetails,
             ]);
         } else {
-
-            if (isset($logs[$this->name])) {
-                $logs[$this->name][] = $attackService->getLogInformation();
-            } else {
-                $logs[$this->name] = [$attackService->getLogInformation()];
-            }
+            $logs[$this->name][] = $attackService->getLogInformation();
             
             $adventureLog->update([
                 'logs' => $logs,

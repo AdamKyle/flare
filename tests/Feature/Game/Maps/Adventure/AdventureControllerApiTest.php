@@ -49,6 +49,14 @@ class AdventureControllerApiTest extends TestCase
                     ->see($this->adventure->name); 
     }
 
+    public function testGetAdventureLogs() {
+        $response = $this->actingAs($this->character->user, 'api')
+                         ->json('GET', '/api/character/adventure/logs')
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+    }
+
     public function testEmbarkAdventure() {
         $response = $this->actingAs($this->character->user, 'api')
                          ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [

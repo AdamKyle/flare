@@ -317,6 +317,84 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals(422, $response->status());
     }
 
+    public function testCannotTeleportToWater() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(true);
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/map/teleport/' . $this->character->id, [
+                             'x' => 160,
+                             'y' => 64,
+                         ])
+                         ->response;
+
+        $this->assertEquals(422, $response->status());
+    }
+
+    public function testCannotTeleportNotEnoughGold() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $this->character->update([
+            'gold' => 0,
+        ]);
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/map/teleport/' . $this->character->id, [
+                             'x' => 160,
+                             'y' => 64,
+                             'cost' => 10000,
+                         ])
+                         ->response;
+
+        $this->assertEquals(422, $response->status());
+    }
+
+    public function testCannotTeleportLocationsDoNotExist() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        $response = $this->actingAs($this->user, 'api')
+                         ->json('POST', '/api/map/teleport/' . $this->character->id, [
+                             'x' => 860,
+                             'y' => 864,
+                             'cost' => 0,
+                         ])
+                         ->response;
+
+        $this->assertEquals(422, $response->status());
+    }
+
     public function testIsWaterWithItem() {
         Event::fake([
             MoveTimeOutEvent::class,
@@ -346,6 +424,43 @@ class MapControllerApiTest extends TestCase
                             ->json('GET', '/api/is-water/' . $this->character->id, [
                                 'character_position_x' => 176,
                                 'character_position_y' => 64,
+                            ])
+                            ->response;
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testTeleportToWaterWithItem() {
+        Event::fake([
+            MoveTimeOutEvent::class,
+        ]);
+
+        $this->setUpCharacter();
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(true);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      =>  $this->createItem([
+                'name'           => 'Artifact',
+                'type'           => 'artifact',
+                'base_damage'    => 10,
+                'cost'           => 10,
+                'effect'         => 'walk-on-water',
+            ])->id,
+        ]);
+
+        $response = $this->actingAs($this->user, 'api')
+                            ->json('POST', '/api/map/teleport/' . $this->character->id, [
+                                'x' => 176,
+                                'y' => 64,
+                                'cost' => 0,
+                                'timeout' => 1,
                             ])
                             ->response;
 
@@ -561,6 +676,70 @@ class MapControllerApiTest extends TestCase
         $this->assertFalse(is_null($item));
     }
 
+    public function testCanTeleportAndGetReward() {
+        $this->createLocation([
+            'name'        => 'Sample',
+            'description' => 'Port',
+            'is_port'     => true,
+            'x'           => 64,
+            'y'           => 64,
+        ]);
+
+        $location = $this->createLocation([
+            'name'        => 'Sample 2',
+            'description' => 'Port',
+            'is_port'     => true,
+            'x'           => 32,
+            'y'           => 32,
+        ]);
+
+        $item = $location->questRewardItem()->create([
+            'name'           => 'Artifact',
+            'type'           => 'artifact',
+            'base_damage'    => 10,
+            'cost'           => 10,
+        ]);
+
+        $location->update([
+            'quest_reward_item_id' => $item->id,
+        ]);
+
+        $this->character->gold = 1000;
+        $this->character->save();
+
+        $this->character->refresh();
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        $response = $this->actingAs($this->user, 'api')
+            ->json('POST', '/api/map/teleport/' . $this->character->id, [
+                'x' => 32,
+                'y'  => 32,
+                'cost' => 100,
+                'timeout' => 1
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status()); 
+
+        $questInventory = $this->character->inventory->slots;
+        
+        // Gained the item:
+        $this->assertTrue($questInventory->isNotEmpty());
+
+        // Check the item matches:
+        $item = $questInventory->filter(function($slot) use($location) {
+            return $slot->item_id === $location->questRewardItem->id;
+        })->first();
+
+        $this->assertFalse(is_null($item));
+    }
+
     public function testCanSetSailAndNotGetReward() {
         $this->createLocation([
             'name'        => 'Sample',
@@ -604,6 +783,70 @@ class MapControllerApiTest extends TestCase
                 'current_port_id' => 1,
                 'time_out_value'  => 1,
                 'cost'            => 100,
+            ])
+            ->response;
+        
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status()); 
+
+        $questInventory = $this->character->inventory->slots;
+        
+        // Did not gain the item again:
+        $this->assertEquals(1, $this->character->inventory->slots->count());
+    }
+
+    public function testCanTeleportAndNotGetReward() {
+        $this->createLocation([
+            'name'        => 'Sample',
+            'description' => 'Port',
+            'is_port'     => true,
+            'x'           => 64,
+            'y'           => 64,
+        ]);
+
+        $location = $this->createLocation([
+            'name'        => 'Sample 2',
+            'description' => 'Port',
+            'is_port'     => true,
+            'x'           => 32,
+            'y'           => 32,
+        ]);
+
+        $item = $location->questRewardItem()->create([
+            'name'           => 'Artifact',
+            'type'           => 'artifact',
+            'base_damage'    => 10,
+            'cost'           => 10,
+        ]);
+
+        $location->update([
+            'quest_reward_item_id' => $item->id,
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+        ]);
+
+        $this->character->gold = 1000;
+        $this->character->save();
+
+        $this->character->refresh();
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        $response = $this->actingAs($this->user, 'api')
+            ->json('POST', '/api/map/teleport/' . $this->character->id, [
+                'x' => 32,
+                'y'  => 32,
+                'cost' => 10,
+                'timeout' => 1,
             ])
             ->response;
         

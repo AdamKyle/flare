@@ -62,11 +62,6 @@ class LevelFakeUsers extends Command
         for ($i = 1; $i <= (int) $amount; $i++) {
             $character = Character::find($i);
 
-            if (is_null($character)) {
-                // We just don't care.
-                continue;
-            }
-
             for($j = 1; $j <= $amountOfLevels; $j++) {
                 $character->update([
                     'xp' => 100

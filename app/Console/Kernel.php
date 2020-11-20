@@ -6,7 +6,6 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CleanNotifications;
 use App\Console\Commands\CreateFakeUsers;
-use App\Console\Commands\CreateItem;
 use App\Console\Commands\GiveCharacterGold;
 use App\Console\Commands\GiveItem;
 use App\Console\Commands\LevelFakeUsers;
@@ -22,7 +21,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         GiveItem::class,
-        CreateItem::class,
         GiveCharacterGold::class,
         CleanNotifications::class,
         MoveInfoFiles::class,

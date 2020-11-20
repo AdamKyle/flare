@@ -62,11 +62,6 @@ class LevelUpSkillsOnFakeUsers extends Command
         for ($i = 1; $i <= (int) $amount; $i++) {
             $character = Character::find($i);
 
-            if (is_null($character)) {
-                // We just don't care.
-                continue;
-            }
-
             $skill = $character->skills()->where('game_skill_id', $skillId)->first();
 
             if (is_null($skill)) {
@@ -77,7 +72,7 @@ class LevelUpSkillsOnFakeUsers extends Command
             for ($j = 1; $j <= (int) $amountOfLevels; $j++) {
                 $skill->refresh();
                 
-                if ($skill->can_train) {
+                if ($skill->baseSkill->can_train) {
                     $skill->update([
                         'currently_training' => true,
                         'xp_towards' => 0.10,

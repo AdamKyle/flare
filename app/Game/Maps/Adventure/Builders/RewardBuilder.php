@@ -5,6 +5,7 @@ namespace App\Game\Maps\Adventure\Builders;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
@@ -38,8 +39,8 @@ class RewardBuilder {
     }
 
     public function fetchGoldRush(Monster $monster, Character $character, Adventure $adventure) {
-        $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-
+        $lootingChance = $character->skills()->where('game_skill_id', GameSkill::where('name', 'Looting')->first()->id)->first()->skill_bonus;
+       
         $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $lootingChance, $adventure);
 
         if ($hasGoldRush) {
