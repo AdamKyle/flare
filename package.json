@@ -20,8 +20,8 @@
         "laravel-mix": "^5.0.5",
         "lodash": "^4.17.15",
         "popper.js": "^1.14.3",
-        "react": "^16.13.0",
-        "react-dom": "^16.13.0",
+        "react": "^17.0.*",
+        "react-dom": "^17.0.*",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.26.10",
         "sass-loader": "7.*"
