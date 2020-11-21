@@ -1,36 +1,33 @@
 # Planes Of Tlessa
 
-Welcome to the planes of Telsa. This guide is meant to help you the player get started, or maybe you need to reference something quickly. We have everything in this tome, from quests and their walk throughs to rewards for locations and adventures to monsters and their stats and everything in between.
+Welcome to the planes of Tlessa. This guide is meant to help you the player get started. We have everything in this tome, from quests and their walk throughs to rewards for locations and adventures to monsters and their stats and everything in between.
 
-Tlessa is not a hard game to play, alas this is not a set it and forget it typ of  either. While yes there are some timers in place, they are more meant to deter spam clicking. These timers are short, from 10 seconds for attacks, to a few minutes for sailing and adventuring.
+Planes of Tlessa is a game where one can be anything they want. The simplicity of the interface allows the user to move freely from task to task as they fight monsters, craft items, enchant items, go on and adventures, settle kingdoms and more.
 
-You see more in [Time Gates](/information/time-gates).
-
-Tlessa want's to keep you in the world, chatting, trading, going on adventures, settling kidngoms, finding epic loot and training skills.
 
 ## The biggest selling points
 
-- No Timeuts/Daily Limits<sup>*</sup>.
+- No Timeouts/Daily Limits<sup>*</sup>.
 - No Set it and forget it.
 - Nothing in game can be baught.
 - Simple and easy game to learn and play.
 
-<sup>*</sup> There are timers, these do not last long. You can read about these in [Time Gates]()
+<sup>*</sup> There are timers, these do not last long. You can read about these in [Time Gates](/information/time-gates).
 
 ## Progression while offline
 
-If you are on and adventure, and you log out - don't worry. We got you! You'll get an email when the adventure is over. Of course we know you might not want us to email you, thats why you can turn that off in the settings section for your account.
+If you are on and adventure, and you log out - don't worry. We got you! You'll get an email when the adventure is over. Of course, we know you might not want us to email you, that’s why you can turn that off in the settings section for your account.
 
-Any event that takes longer then a few miliseconds will carry on in the background. All timers, even if you close the coresponding section holding the timer, will also pick right back up where it was, assuming it's not finished.
-
-## Client Side Actions
-
-Tlessa is game that tries to do as much as we can on the client side. What this means for those with slower internet connections is that things may take longer, timers might take a few extra miliseconds to appear.
-
-But don't worry, we got you. We are not a heavy javascript game. Most of the game is simple forms and html. The game section, what you see when you login, is the javascript part. We got you with loaders, so you're not sitting around waiting for things to load. We modularized that.
+Any event that takes longer than a few milliseconds will carry on in the background. All timers, even if you close the corresponding section holding the timer, will also pick right back up where it was, assuming it's not finished.
 
 ## Community Driven
 
-Tlessa is a community driven game. The chat is where we show you notifications, server side messages as well as allowing you to chat and private message with other players.
+Tlessa is a community driven game. The chat is where we show you notifications, server-side messages as well as allowing you to chat and private message with other players.
 
-The entire game is also open source, you can clone it, reskin it, release it as your own game.
+We have minimum notifications, for example completing adventures will email you if you are not online.
+
+The chat section is where all the action really is. This is where characters can chat to each other, but beware – chatting while standing in your kingdom gives away your position – making it easy for players to swoop in and take your kingdoms.
+
+Players are encouraged to chat and trade with each other via the market boards and journey together through the world exploring the various adventures.
+
+Last but not least, don't forget the [rules](/information/rules) before chatting.

@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="google" content="notranslate">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -15,97 +17,93 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
     @livewireStyles
 
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
+    <script src="{{ asset('js/vendor.js') }}"></script>
+    <script src="{{ asset('js/manifest.js') }}"></script>
 </head>
-<body>
-    <div class="d-flex" id="wrapper">
-
-        <div class="bg-light border-right" id="sidebar-wrapper">
-          <div class="side-bar">
-            <div class="sidebar-heading text-center">
-              <h3>Information</h3>
-              <span class="text-mute help-info">Help Center</span>
-            </div>
-            <div class="list-group list-group-flush text-right">
-              <a href="{{route('info.page', [
-                'pageName' => 'home'
-              ])}}" class="{{$pageTitle === 'home' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Home</a>
-              <a href="{{route('info.page', [
-                'pageName' => 'rules'
-              ])}}" class="{{$pageTitle === 'rules' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Rules Of Tlessa</a>
-              <a href="{{route('info.page', [
-                'pageName' => 'character-information'
-              ])}}" class="{{$pageTitle === 'character-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Character Information</a>
-              <a href="{{route('info.page', [
-                'pageName' => 'skill-information'
-              ])}}" class="{{$pageTitle === 'skill-information' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Skill Information</a>
-              <a href="{{route('info.page', [
-                'pageName' => 'adventure'
-              ])}}" class="{{$pageTitle === 'adventure' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Adventure</a>
-              <a href="{{route('info.page', [
-                'pageName' => 'time-gates'
-              ])}}" class="{{$pageTitle === 'time-gates' ? 'list-group-item list-group-item-action bg-light viewing' : 'list-group-item list-group-item-action bg-light'}}">Time Gates</a>
-            </div>
-          </div>
-        </div>
-
-        <div id="page-content-wrapper">
-          <header class="topbar">
-            <nav class="navbar top-navbar navbar-expand-md navbar-light">
-                <!-- ============================================================== -->
-                <!-- Logo -->
-                <!-- ============================================================== -->
-                <div class="navbar-header">
-                  <i class="fas fa-bars menu-toggle" id="menu-toggle"></i>
-                </div>
-                <!-- ============================================================== -->
-                <!-- End Logo -->
-                <!-- ============================================================== -->
-                <div class="navbar-collapse">
-                    <ul class="navbar-nav my-lg-0 text-align-right force-right">
-                        <!-- Authentication Links -->
+<body class="fix-header fix-sidebar card-no-border">
+    <div id="main-wrapper">
+        <div id="app">
+            <header class="topbar">
+                <nav class="navbar top-navbar navbar-expand-md navbar-light">
+                    <div class="navbar-collapse">
+                        <!-- ============================================================== -->
+                        <!-- toggle and nav items -->
+                        <!-- ============================================================== -->
+                        <ul class="navbar-nav mr-auto mt-md-0 ">
+                          <li class="nav-item"> 
+                              <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
+                                  <i class="fas fa-bars"></i>
+                              </a> 
+                          </li>
+                        </ul>
+                        <!-- ============================================================== -->
+                        <!-- User profile -->
+                        <!-- ============================================================== -->
                         @guest
-                            <li class="nav-item">
-                                <a class="nav-link" href="/">{{ __('Home') }}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
+                        @else
+                            @include('layouts.partials.user-profile-nav')
                         @endguest
-                    </ul>
-                </div>
-            </nav>
-        </header>
-          {{-- <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-            <i class="fas fa-bars" id="menu-toggle"></i>
-          </nav> --}}
-    
-          <div class="container" style="margin-bottom: 100px;">
-            @yield('content')
-          </div>
+
+                        <ul class="navbar-nav my-lg-0 text-align-right force-right">
+                            <!-- Authentication Links -->
+                            @guest
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/">{{ __('Home') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                </li>
+                                @if (Route::has('register'))
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                    </li>
+                                @endif
+                            @endguest
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <aside class="left-sidebar">
+              <!-- Sidebar scroll-->
+              <div class="scroll-sidebar">
+                  <!-- Sidebar navigation-->
+                  <nav class="sidebar-nav info-nav">
+                    @include('layouts.partials.sidebar.informationsidebar')
+                  </nav>
+                  <!-- End Sidebar navigation -->
+              </div>
+              <!-- End Sidebar scroll-->
+              <!-- Bottom points-->
+              <div class="sidebar-footer">
+                  
+              </div>
+              <!-- End Bottom points-->
+          </aside>
+
+          <div class="page-wrapper page">
+            <div class="container">
+                @yield('content')
+            </div>
         </div>
 
         <footer class="footer"> © 2020 Flare </footer>
-    
+        </div>
     </div>
+
+    <!-- Scripts -->
 
     @livewireScripts
 
-    <script>
-      $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-      });
-    </script>
+    <script src="{{ asset('js/manifest.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+
+    @stack('scripts')
 </body>
 </html>

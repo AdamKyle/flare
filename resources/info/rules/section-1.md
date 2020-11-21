@@ -3,8 +3,9 @@
 Tlessa doesn't have many rules. How ever the few rules we do have, need to be followed or they can result in a permanent ban. Lets discuss what those rules are shall we?
 
 - 1. Multiple accounts are allowed. 
-  - 1a. All accounts are linked by IP. This means that if any account is banned for any length of time all accounts tied to that IP are also banned for that length of time. Any attempt to circumvent this is a bannable offense.
-    - **Exception**: If you or your spouse or family member all play this game, and one of you gets banned - since all bans are IP based and in this situation we assume you all share the same IP, if any other person is able to verify they are not linked to the banned account, that is via email and character name as well as other security measures - That particular character may be unbanned.
+  - 1a. All accounts are linked by IP.
+    - Users are limited to 10 accounts per IP. Use of any third part tool or service to sppof your ip to get around 
+      this is a bannable offense.
   - 1b. Multi boxing is allowed.
     - Players may not send more then one request per action to each box.
       - Failure to heed the above rule so will result in a permanent ban. 
@@ -16,24 +17,47 @@ Tlessa doesn't have many rules. How ever the few rules we do have, need to be fo
 - 3. Character selling is a bannable offense.
 - 4. Using any third party service to get around a "For ever" ban (see Getting Banned below) will also result in another ban.
 
+## Security Questions:
+
+For an added extra layer of security when you create your character you will be asked to select security questions. These must be unique questions and so must their answers.
+
+The answers must also be at least 4 characters long.
+
+**Do not post these in chat. You will put your account security at risk.**
+
+These security questions will never be asked for by any Admin or moderator of the system, in any form. The only time they are asked for is by the following forms:
+
+- Password Reset
+- Requesting an Unban
+
+Never forget your security questions answers.
 
 ## Character Creation Rules:
 
 Names containing racial slurs or offensive terms will be asked to rename their character (which The Creator will do with the provided name) or will be banned permantly.
 
 - 1. Character names may not have special characters in them.
+- 2. Character names may not have spaces
+- 3. Character names must be between 5 and 15 characters long.
+- 4. Charcater names may only container Letters of any case and numbers.
+
+If a name is deemed offensive The Creator can force a name change, this will show a popup modal to the user immediatly and cannot be dismissed.
+
+Even if you log out. The second you login again the forced name change modal will be there.
+
+Any use of scripts or third party tools to hide or remove the box and continue on playing will result in a permananent ban.
 
 ## Chat Rules:
 
 - 1. Do not post any private data. That includes, but not limited to: Your real name, address, email address, phone number, credit cards, log in details.
   - 1a. The Creator, or any other admin of the game, will never EVER ask you for any of this information, in any form be it email or other wise.
-    - **Exception**: If the event one member of your house hold using the same IP, was recently banned, you will be asked to fill out a form on the site and from there based on those details you provide the character will either be unbanned or not. How ever at no time will you recieve an email asking you for any personal details or account details. (*see below in Getting Banned*).
 - 2. Racial Slurs, Threats of death, Personal character attacks or attacks on the person of any kind, be it their race, sexual identity, heritiage, ectra... Will not be tolerated and will start with a 10 minute silence and progress to a permananet ban at The Creator's disgrestion.
-- 3. **Chat is self moderated**. Chat will for the most part, aside from rules written here, moderate themselves. How ever it should be noted that all chat history is kept and unencrypted. The Admin can at any time see any message including private messages. While we will not jump in and moderate chat we will be looking for suspicious activity and applying the appropriate punishments if needed.
+- 3. **Chat is self moderated**. Chat will for the most part, aside from rules written here, moderate themselves. How ever it should be noted that all chat history is kept and unencrypted. The Admin can, at any time, see any message including private messages. While we will not jump in and moderate chat we will be looking for suspicious activity and applying the appropriate punishments if needed.
 - 4. You can only send 25 messages every two minutes. Failure to heed this will result in the game self silencing you for five minutes.
   - 4a. The Creator can silence you for 10, 30 and 60 minutes. During this time you will not be able to chat at all.
   - 4b. When the time out is finished you will see a message in chat telling you, you can chat again.
 - 5. No auction is to take place in chat, you want to sell something, use the market board. Failure to heed this, will result in 10 minute chat time outs followed by bans for repeated offenses.
+- 6. **NEVER** Give away your secret answers for your security questions. The Creator will never ask for these in any form.
 
 ## Getting Banned
 

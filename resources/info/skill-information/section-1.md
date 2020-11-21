@@ -18,7 +18,7 @@ Lets break down whats all in a skill:
 >
 > You will see these through out this guide. These three modifier attributes can also exist on artificats, quest items, enchanted items and even regular items them selves.
 
-- **Fight Timeout Modifier**: With every kill, comes a timeout of 10 seconds, 20 if the enemy has killed you. These modifiers take a specific percentage off your timer. [Learn more about timers]()
+- **Fight Timeout Modifier**: With every kill, comes a timeout of 10 seconds, 20 if the enemy has killed you. These modifiers take a specific percentage off your timer. [Learn more about timers](/information/time-gates)
 - **Can Train**: Can this skill be trained? See the skill table below.
 - **Skill Bonus Per Level**: The percentage bonus applied per level up.
 

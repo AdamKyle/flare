@@ -4,6 +4,7 @@ Youre character can die in a few ways. Fighting monsters and dying in an adventu
 
 - Move
 - Attack
+- Teleport
 - Set Sail
 - Adventure
 - Craft
