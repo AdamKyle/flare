@@ -14,7 +14,7 @@ use Tests\Setup\CharacterSetup;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
-class GiveCharacterGold extends TestCase
+class GiveCharacterGoldTest extends TestCase
 {
     use RefreshDatabase, CreateUser;
 

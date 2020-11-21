@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Admin\Mail\UnbanRequest;
+use App\Admin\Mail\UnBanRequestMail;
 use App\Flare\Models\User;
 use Cache;
 use Hash;
@@ -33,7 +33,7 @@ class UnbanRequestController extends Controller
     }
 
     public function securityForm(User $user) {
-        if (is_null(Cache::get('user-temp-' . $user->id))) {
+        if (!Cache::has('user-temp-' . $user->id)) {
             return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
         }
 
@@ -43,7 +43,7 @@ class UnbanRequestController extends Controller
     }
 
     public function securityCheck(Request $request, User $user) {
-        if (is_null(Cache::get('user-temp-' . $user->id))) {
+        if (!Cache::has('user-temp-' . $user->id)) {
             return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
         }
 
@@ -51,10 +51,6 @@ class UnbanRequestController extends Controller
             'answer_one' => 'required',
             'answer_two' => 'required',
         ]);
-        
-        if (is_null(Cache::get('user-temp-' . $user->id))) {
-            return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
-        }
 
         $firstAnswer  = $user->securityQuestions()->where('question', $request->question_one)->first()->answer;
         $secondAnswer = $user->securityQuestions()->where('question', $request->question_two)->first()->answer;
@@ -69,7 +65,7 @@ class UnbanRequestController extends Controller
     }
 
     public function requestForm(User $user) {
-        if (is_null(Cache::get('user-temp-' . $user->id))) {
+        if (!Cache::has('user-temp-' . $user->id)) {
             return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
         }
 
@@ -79,7 +75,7 @@ class UnbanRequestController extends Controller
     }
 
     public function submitRequest(Request $request, User $user) {
-        if (is_null(Cache::get('user-temp-' . $user->id))) {
+        if (!Cache::has('user-temp-' . $user->id)) {
             return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
         }
         
@@ -91,10 +87,12 @@ class UnbanRequestController extends Controller
             $user->update([
                 'un_ban_request' => $request->unban_message
             ]);
-
+            
             foreach (User::role('Admin')->get() as $adminUser) {
-                Mail::to($adminUser->email)->send(new UnBanRequest($user));
+                Mail::to($adminUser->email)->send(new UnBanRequestMail($user));
             }
+
+            Cache::delete('user-temp-' . $user->id);
 
             return redirect()->to('/')->with('success', 'Request submitted. We will contact you in the next 72 hours.');
         }

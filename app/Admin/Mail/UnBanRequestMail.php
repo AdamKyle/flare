@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Flare\Models\User;
 
-class UnBanRequest extends Mailable
+class UnBanRequestMail extends Mailable
 {
     use Queueable, SerializesModels;
 

@@ -45,7 +45,7 @@ class UpdateCharacterStatsService {
 
                 if ($oldClass->damage_stat !== $newClass->damage_stat) {
                     $totalToAdjust = ($character->level - 1) * 2;
-
+                    
                     if ($character->level > 1) {
                         $character->{$oldClass->damage_stat} -= $totalToAdjust;
                         $character->{$oldClass->damage_stat} += $character->level - 1;
