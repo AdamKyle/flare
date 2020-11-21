@@ -5,4 +5,26 @@
   blockquote {
     background-color: lighten(#009efb, 45);
   }
+
+  @media only screen and (max-width: 768px) {
+    margin-top: 0px;
+  }
+}
+
+.info-sidebar {
+  @media only screen and (max-width: 1027px) {
+    display: none;
+  }
+}
+
+.info-sidebar-toggler {
+  display: none;
+
+  @media only screen and (max-width: 1027px) {
+    display: block !important;
+  }
+}
+
+.showSidebar {
+  display: block !important;
 }

@@ -35,9 +35,9 @@
                         <!-- ============================================================== -->
                         <!-- toggle and nav items -->
                         <!-- ============================================================== -->
-                        <ul class="navbar-nav mr-auto mt-md-0 ">
+                        <ul class="navbar-nav mr-auto mt-md-0 info-sidebar-toggler">
                           <li class="nav-item"> 
-                              <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
+                              <a class="nav-link infoSidebarToggler text-muted" href="javascript:void(0)" onclick="showSideBar()">
                                   <i class="fas fa-bars"></i>
                               </a> 
                           </li>
@@ -70,7 +70,7 @@
                 </nav>
             </header>
 
-            <aside class="left-sidebar">
+            <aside class="left-sidebar info-sidebar" id="info-left-sidebar">
               <!-- Sidebar scroll-->
               <div class="scroll-sidebar">
                   <!-- Sidebar navigation-->
@@ -103,6 +103,13 @@
 
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
+
+    <script>
+        function showSideBar() {
+            foundSideBar = document.querySelector('#info-left-sidebar');
+            foundSideBar.classList.toggle('showSidebar');
+        }
+    </script>
 
     @stack('scripts')
 </body>
