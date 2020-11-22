@@ -10,7 +10,9 @@ use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
 use App\Game\Core\Requests\EquipItemValidation;
+use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Values\ValidEquipPositionsValue;
+use Cache;
 
 class CharacterInventoryController extends Controller {
 
@@ -21,60 +23,62 @@ class CharacterInventoryController extends Controller {
         $this->equipItemService = $equipItemService;
 
         $this->middleware('auth');
+
         $this->middleware('is.character.dead')->only([
             'compare', 'equipItem', 'destroy'
         ]);
+
         $this->middleware('is.character.adventuring')->only([
             'compare', 'equipItem', 'destroy'
         ]);
     }
 
-    public function compare(ComparisonValidation $request, ValidEquipPositionsValue $validPositions) {
-        $character   = auth()->user()->character;
+    public function compare(
+        ComparisonValidation $request, 
+        ValidEquipPositionsValue $validPositions, 
+        CharacterInventoryService $characterInventoryService
+    ) {
+
         $itemToEquip = InventorySlot::find($request->slot_id);
 
         if (is_null($itemToEquip)) {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
-        $positions = $validPositions->getPositions($itemToEquip->item);
+        $service = $characterInventoryService->setCharacter(auth()->user()->character)
+                                             ->setInventorySlot($itemToEquip)
+                                             ->setPositions($validPositions->getPositions($itemToEquip->item))
+                                             ->setInventory($request);
+
+        $viewData = [
+            'details'     => [],
+            'itemToEquip' => $itemToEquip->item,
+            'type'        => $service->getType($request, $itemToEquip->item),
+            'slotId'      => $itemToEquip->id,
+        ];
+
+        if ($service->inventory()->isNotEmpty()) {
+            $viewData = [
+                'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory()),
+                'itemToEquip'  => $itemToEquip->item,
+                'type'         => $service->getType($request, $itemToEquip->item),
+                'slotId'       => $itemToEquip->id,
+                'slotPosition' => $itemToEquip->position,
+            ];
+        }
         
-        if (empty($positions)) {
-            $inventory = $character->inventory->slots->filter(function($slot) use($request) {
-                return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
-            });
-        } else {
-            $inventory = $character->inventory->slots->filter(function ($slot) use ($positions) {
-                return in_array($slot->position, $positions) && $slot->equipped;
-            });
+
+        Cache::put(auth()->user()->id . '-compareItemDetails', $viewData, now()->addMinutes(5));
+
+        return redirect()->to(route('game.inventory.compare-items'));
+    }
+
+    public function compareItem() {
+        if (!Cache::has(auth()->user()->id . '-compareItemDetails')) {
+            redirect()->to('/')->with('error', 'Item comparison expired.');
         }
 
-        $slotId        = $itemToEquip->id;
-        $slotPosition  = $itemToEquip->position;
-        $itemToEquip   = $itemToEquip->item->load(['itemPrefix', 'itemSuffix', 'slot']);
-
-        if ($request->has('item_to_equip_type')) {
-            $type = $this->fetchType($request->item_to_equip_type);
-        } else {
-            $type = $itemToEquip->crafting_type;
-        }
-        
-        if ($inventory->isEmpty()) {
-            return view('game.core.character.equipment-compare', [
-                'details'     => [],
-                'itemToEquip' => $itemToEquip,
-                'type'        => $type,
-                'slotId'      => $slotId,
-            ]);
-        }
-        
-        return view('game.core.character.equipment-compare', [
-            'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip, $inventory),
-            'itemToEquip'  => $itemToEquip,
-            'type'         => $type,
-            'slotId'       => $slotId,
-            'slotPosition' => $slotPosition
-        ]);
+        return view('game.core.character.equipment-compare', Cache::pull(auth()->user()->id . '-compareItemDetails'));
     }
 
     public function equipItem(EquipItemValidation $request) {
@@ -146,17 +150,5 @@ class CharacterInventoryController extends Controller {
         $character->refresh();
 
         return redirect()->back()->with('success', 'Destroyed ' . $name . '.');
-    }
-
-    protected function fetchType(string $type): string {
-        $acceptedTypes = [
-            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour'
-        ];
-
-        if (in_array($type, $acceptedTypes)) {
-            return $type;
-        }
-
-        return 'armour';
     }
 }

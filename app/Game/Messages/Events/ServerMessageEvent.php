@@ -18,22 +18,20 @@ class ServerMessageEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
-     *
-     * @var \App\Flare\Models\User
+     * @var User $user
      */
     public $user;
 
     /**
-     * Message details
-     *
-     * @var string
+     * @var string message
      */
     public $message;
 
     /**
      * Create a new event instance.
      *
+     * @param User $user
+     * @param string $message
      * @return void
      */
     public function __construct(User $user, string $message)

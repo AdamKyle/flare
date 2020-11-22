@@ -2,19 +2,30 @@
 
 namespace App\Admin\Services;
 
-use App\Admin\Events\ForceRefreshEvent;
+use Mail;
+use Facades\App\Flare\Values\UserOnlineValue;
 use App\Admin\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
-use Facades\App\Flare\Values\UserOnlineValue;
-use Mail;
 
 class UpdateCharacterStatsService {
 
-    public function updateRacialStats(GameRace $oldRace, GameRace $newRace) {
+    /**
+     * Updates the characters racial stats.
+     * 
+     * Will update all characters with their racial stats. We start by subtracting the old race modifier and apply the new racial modifier.
+     * Because racial modifiers only get applied once, we don thave to worry about the characters stats being messed up.
+     * 
+     * Characters do not get told of racial stat adjustments, how ever their top bar will be updated.
+     * 
+     * @param GameRace $oldRace
+     * @param GameRace $newRace
+     * @return void
+     */
+    public function updateRacialStats(GameRace $oldRace, GameRace $newRace): void {
         Character::where('game_race_id', $newRace->id)->chunkById(1000, function($characters) use($oldRace, $newRace) {
             foreach ($characters as $character) {
                 $character->update([
@@ -31,7 +42,19 @@ class UpdateCharacterStatsService {
         });
     }
 
-    public function updateClassStats(GameClass $oldClass, GameClass $newClass) {
+    /**
+     * Update the characters class stats.
+     * 
+     * When a characters class is modifierd we will update the states, buy subtracting old and adding new.
+     * 
+     * The only time we alert the player of a change to their character class is if the base damage stat changes.
+     * Once that happens we update the user via server message or mail if they are not logged in.
+     * 
+     * @param GameClass $oldClass
+     * @param GameClass $newClass
+     * @return void
+     */
+    public function updateClassStats(GameClass $oldClass, GameClass $newClass): void {
         Character::where('game_class_id', $newClass->id)->chunkById(1000, function($characters) use($oldClass, $newClass) {
             foreach ($characters as $character) {
                 $character->update([

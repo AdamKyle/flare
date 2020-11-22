@@ -2,18 +2,19 @@
 
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
-use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
 use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
+use App\Flare\Cache\CoordinatesCache;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
+use App\Game\Maps\Adventure\Services\MovementService;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\Game\Maps\Adventure\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
@@ -40,7 +41,7 @@ class MapController extends Controller {
         $this->middleware('is.character.dead')->except(['index']);
     }
 
-    public function index(Request $request, User $user) {
+    public function index(User $user) {
         $location         = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->first();
         $portDetails      = null;
         $adventureDetails = null;
@@ -70,7 +71,7 @@ class MapController extends Controller {
         ]);
     }
 
-    public function move(Request $request, Character $character) {
+    public function move(Request $request, Character $character, MovementService $service) {
 
         $character->map->update([
             'character_position_x' => $request->character_position_x,
@@ -79,35 +80,9 @@ class MapController extends Controller {
             'position_y'           => $request->position_y,
         ]);
 
-        $location        = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->first();
+        $location = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->first();
         
-        $portDetails = [];
-        $adventureDetails = [];
-
-        if (!is_null($location)) {
-            if ($location->is_port) {
-                $portDetails = $this->portService->getPortDetails($character, $location);
-            }
-    
-            if (!is_null($location->questRewardItem)) {
-                $item = $character->inventory->slots->filter(function($slot) use ($location) {
-                    return $slot->item_id === $location->questRewardItem->id;
-                })->first();
-    
-                if (is_null($item)) {
-                    $character->inventory->slots()->create([
-                        'inventory_id' => $character->inventory->id,
-                        'item_id'      => $location->questRewardItem->id,
-                    ]);
-    
-                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
-                }
-            }
-
-            if ($location->adventures->isNotEmpty()) {
-                $adventureDetails = $location->adventures;
-            }
-        }
+        $service->processLocation($location, $character, $this->portService);
         
         $character->update([
             'can_move'          => false,
@@ -117,12 +92,12 @@ class MapController extends Controller {
         event(new MoveTimeOutEvent($character));
 
         return response()->json([
-            'port_details' => $portDetails,
-            'adventure_details' => $adventureDetails,
+            'port_details'      => $service->portDetails(),
+            'adventure_details' => $service->adventureDetails(),
         ], 200);
     }
 
-    public function setSail(SetSailValidation $request, Location $location, Character $character) {
+    public function setSail(SetSailValidation $request, Location $location, Character $character, MovementService $service ) {
         $fromPort = Location::where('id', $request->current_port_id)->where('is_port', true)->first();
 
         if (is_null($fromPort)) {
@@ -151,20 +126,7 @@ class MapController extends Controller {
 
         $this->portService->setSail($character, $location);
 
-        if (!is_null($location->questRewardItem)) {
-            $item = $character->inventory->slots->filter(function($slot) use ($location) {
-                return $slot->item_id === $location->questRewardItem->id;
-            })->first();
-
-            if (is_null($item)) {
-                $character->inventory->slots()->create([
-                    'inventory_id' => $character->inventory->id,
-                    'item_id'      => $location->questRewardItem->id,
-                ]);
-
-                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
-            }
-        }
+        $service->giveQuestReward($location, $character);
         
         event(new MoveTimeOutEvent($character, $request->time_out_value, true));
         event(new UpdateTopBarEvent($character));
@@ -176,7 +138,7 @@ class MapController extends Controller {
         ]);
     }
 
-    public function teleport(Request $request, Character $character) {
+    public function teleport(Request $request, Character $character, MovementService $service) {
         $color = $this->mapTile->getTileColor($character, $request->x, $request->y);
 
         if ($this->mapTile->isWaterTile((int) $color)) {
@@ -206,29 +168,14 @@ class MapController extends Controller {
         }
 
         $location = Location::where('x', $request->x)->where('y', $request->y)->first();
+        
+        $service->processLocation($location, $character, $this->portService);
 
         $character->update([
             'can_move'          => false,
             'gold'              => $character->gold - $request->cost,
             'can_move_again_at' => now()->addMinutes($request->time),
         ]);
-
-        if (!is_null($location)) {
-            if (!is_null($location->questRewardItem)) {
-                $item = $character->inventory->slots->filter(function($slot) use ($location) {
-                    return $slot->item_id === $location->questRewardItem->id;
-                })->first();
-    
-                if (is_null($item)) {
-                    $character->inventory->slots()->create([
-                        'inventory_id' => $character->inventory->id,
-                        'item_id'      => $location->questRewardItem->id,
-                    ]);
-    
-                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
-                }
-            }
-        }
         
         $character->map()->update([
             'character_position_x' => $request->x,
@@ -242,10 +189,7 @@ class MapController extends Controller {
         event(new MoveTimeOutEvent($character, $request->timeout, true));
         event(new UpdateTopBarEvent($character));
 
-        $portDetails      = !is_null($location) ? $this->portService->getPortDetails($character, $location) : [];
-        $adventureDetails = (!is_null($location) ? $location->adventures->isNotEmpty() : []) ? $location->adventures->toArray() : [];
-
-        event(new UpdateMapDetailsBroadcast($character->map, $character->user, $portDetails, $adventureDetails));
+        event(new UpdateMapDetailsBroadcast($character->map, $character->user, $service->portDetails(), $service->adventureDetails()));
 
         return response()->json([], 200);
     }

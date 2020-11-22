@@ -6,8 +6,16 @@ use App\Flare\Models\Item;
 
 class SellItemCalculator {
 
-    public function fetchTotalSalePrice(Item $item) {
-        return round($item->cost + ($item->cost - ($item->cost * 0.25))) + $this->costForAffixes($item);
+    /**
+     * Fetches the item total sale price.
+     * 
+     * Adds 25% of the item cost to the cost for any additional affixes on the item.
+     * 
+     * @param Item $item
+     * @return int
+     */
+    public function fetchTotalSalePrice(Item $item): int {
+        return round(($item->cost - ($item->cost * 0.25))) + $this->costForAffixes($item);
     }
 
     protected function costForAffixes(Item $item): int {

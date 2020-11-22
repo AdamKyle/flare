@@ -16,22 +16,20 @@ class UpdateShopInventoryBroadcastEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * the character sheet
-     *
      * @var array
      */
     public $inventory;
 
     /**
-     * The user
-     *
-     * @var \App\Flare\Models\User $users
+     * @var User $user
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
+     * @param aray $inventory
+     * @param User $user
      * @return void
      */
     public function __construct(array $inventory, User $user)

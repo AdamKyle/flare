@@ -16,6 +16,7 @@ Route::middleware('is.player.banned')->group(function() {
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
     
     Route::get('/game/character/inventory/compare', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
+    Route::get('/game/character/inventory/compare-items', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
     Route::post('/game/equip/item', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
     Route::post('/game/unequip/all', ['as' => 'game.unequip.all', 'uses' => 'CharacterInventoryController@unequipAll']);
     Route::post('/game/unequip/item', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);

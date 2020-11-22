@@ -8,14 +8,28 @@ use App\Flare\Models\User;
 
 class MessageThrottledHandler {
 
+    /**
+     * @var User $user
+     */
     private $user;
 
+    /**
+     * Throttle for user
+     * 
+     * @param User $user
+     * @return MessageThrottledHandler
+     */
     public function forUser(User $user): MessageThrottledHandler {
         $this->user = $user;
 
         return $this;
     }
 
+    /**
+     * Increase the users throttle count by one.
+     * 
+     * @return MessageThrottledHandler
+     */
     public function increaseThrottleCount(): MessageThrottledHandler {
 
         $this->user->update([
@@ -27,6 +41,12 @@ class MessageThrottledHandler {
         return $this;
     }
 
+    /**
+     * Silence the user if their throttle count is
+     * above or equal to 3.
+     * 
+     * @return MessageThrottledHandler
+     */
     public function silence(): MessageThrottledHandler {
 
         if ($this->user->message_throttle_count >= 3) {

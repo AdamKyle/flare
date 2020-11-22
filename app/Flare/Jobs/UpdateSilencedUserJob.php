@@ -9,12 +9,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
 use App\Flare\Events\ServerMessageEvent;
-use Cache;
 
 class UpdateSilencedUserJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var User $user
+     */
     protected $user;
 
     /**

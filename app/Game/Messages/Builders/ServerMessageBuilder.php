@@ -4,6 +4,12 @@ namespace App\Game\Messages\Builders;
 
 class ServerMessageBuilder {
 
+    /**
+     * Build the server message
+     * 
+     * @param string $type
+     * @return string
+     */
     public function build(string $type): string {
         switch ($type) {
             case 'message_length_0':
@@ -19,7 +25,7 @@ class ServerMessageBuilder {
             case 'dead_character':
                 return 'You are dead. Please revive your self by clicking revive.';
             case 'inventory_full':
-                return 'Your inventory is full, you cannot pick up this drop!';
+                return 'Your inventory is full, you cannot pick up this item!';
             case 'cant_attack':
                 return 'Please wait for the timer (beside Again!) to state: Ready!';
             case 'cant_move':

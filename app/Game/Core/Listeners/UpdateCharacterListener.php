@@ -12,8 +12,17 @@ use App\Game\Core\Services\CharacterService;
 class UpdateCharacterListener
 {
 
+    /**
+     * @var CharacterService $characterService
+     */
     private $characterService;
 
+    /**
+     * Constructor
+     * 
+     * @param CharacterService $characterService
+     * @return void
+     */
     public function __construct(CharacterService $characterService) {
         $this->characterService = $characterService;
     }

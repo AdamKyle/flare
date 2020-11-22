@@ -4,7 +4,6 @@ namespace App\Game\Messages\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -18,22 +17,16 @@ class MessageSentEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
-     *
-     * @var \App\Flare\Models\User $user
+     * @var User $user
      */
     public $user;
 
     /**
-     * Message details
-     *
-     * @var \App\Game\Messages\Models\Message $message
+     * @var Message $message
      */
     public $message;
 
     /**
-     * Character name
-     *
      * @var string $name
      */
     public $name;
@@ -41,6 +34,8 @@ class MessageSentEvent implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
+     * @param User $user
+     * @param Message $message
      * @return void
      */
     public function __construct(User $user, Message $message)

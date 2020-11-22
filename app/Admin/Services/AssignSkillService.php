@@ -11,7 +11,20 @@ use Facades\App\Flare\Values\UserOnlineValue;
 use Mail;
 
 class AssignSkillService {
-
+    
+    /**
+     * Assign the skill or throw an exception.
+     * 
+     * `$for` should be of: `all`, `select-monsters` or `select-class`
+     * anything else, throws an error.
+     * 
+     * @param string $for
+     * @param GameSkill $skill
+     * @param int $monsterId | null
+     * @param int $classId | null
+     * @throws Exception
+     * @return void
+     */
     public function assignSkill(string $for, GameSkill $skill, int $monsterId = null, int $classId = null) {
         switch($for) {
             case 'all':
@@ -19,9 +32,11 @@ class AssignSkillService {
                 $this->assignSkillToMonsters($skill);
                 return;
             case 'select-monsters':
-                return $this->assignSkillToMonster($skill, $monsterId);
+                $this->assignSkillToMonster($skill, $monsterId);
+                return;
             case 'select-class':
-                return $this->assignSkillToClasses($skill, $classId);
+                $this->assignSkillToClasses($skill, $classId);
+                return; 
             default:
                 throw new \Exception('Could not determine who to assign skill to. $for: ' . $for);
         }
@@ -36,7 +51,7 @@ class AssignSkillService {
             Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'New character skill'));
         }
     }
-
+    
     protected function assignSkillToClasses(GameSkill $skill, int $classId) {
         Character::where('game_class_id', $classId)->chunkById(1000, function($characters) use($skill) {
             foreach ($characters as $character) {

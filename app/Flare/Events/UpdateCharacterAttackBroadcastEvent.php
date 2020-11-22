@@ -23,15 +23,15 @@ class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
     public $attack;
 
     /**
-     * The user
-     *
-     * @var \App\Flare\Models\User $users
+     * @var User $users
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
+     * @param array $attack
+     * @param User $user
      * @return void
      */
     public function __construct(array $attack, User $user)

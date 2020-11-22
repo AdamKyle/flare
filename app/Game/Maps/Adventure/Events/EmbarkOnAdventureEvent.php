@@ -2,19 +2,31 @@
 
 namespace App\Game\Maps\Adventure\Events;
 
-use App\Flare\Models\Adventure;
 use Illuminate\Queue\SerializesModels;
+use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
-use App\Flare\Models\Item;
 
 class EmbarkOnAdventureEvent
 {
     use SerializesModels;
 
+    /**
+     * @var Character $character
+     */
     public $character;
 
+    /**
+     * @var Adventure $adventure
+     */
     public $adventure;
 
+    /**
+     * Constructor
+     * 
+     * @param Character $character
+     * @param Adventure $adventure
+     * @return void
+     */
     public function __construct(Character $character, Adventure $adventure)
     {
         $this->character          = $character;

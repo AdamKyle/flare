@@ -10,10 +10,23 @@ class BuyItemEvent
 {
     use SerializesModels;
 
+    /**
+     * @var Item $item
+     */
     public $item;
 
+    /**
+     * @var Character $character
+     */
     public $character;
 
+    /**
+     * Constructor
+     * 
+     * @param Item $item
+     * @param Character $character
+     * @return void
+     */
     public function __construct(Item $item, Character $character)
     {
         $this->item      = $item;

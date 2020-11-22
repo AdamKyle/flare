@@ -2,24 +2,26 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Events\BannedUserEvent;
-use App\Admin\Events\ForceNameChangeEvent;
-use App\Admin\Mail\GenericMail;
-use App\Admin\Mail\ResetPasswordEmail;
-use App\Flare\Events\ServerMessageEvent;
-use App\Admin\Jobs\UpdateBannedUserJob;
-use App\Flare\Jobs\UpdateSilencedUserJob;
-use App\Flare\Models\User;
-use App\Game\Messages\Events\MessageSentEvent;
-use App\Http\Controllers\Controller;
-use Cache;
+use Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Mail;
-use Validator;
+use App\Http\Controllers\Controller;
+use App\Flare\Jobs\UpdateSilencedUserJob;
+use App\Flare\Models\User;
+use App\Flare\Events\ServerMessageEvent;
+use App\Admin\Events\ForceNameChangeEvent;
+use App\Admin\Mail\GenericMail;
+use App\Admin\Mail\ResetPasswordEmail;
+use App\Admin\Services\UserService;
 
 class UsersController extends Controller {
+
+    private $userService;
+
+    public function __construct(UserService $userService) {
+        $this->userService = $userService;
+    }
 
     public function index() {
         return view('admin.users.users');
@@ -52,9 +54,9 @@ class UsersController extends Controller {
     }
 
     public function silenceUser(Request $request, User $user) {
-        if (!$request->has('silence_for')) {
-            return redirect()->back()->with('error', 'Invalid input.');
-        }
+        $request->validate([
+            'silence_for' => 'required',
+        ]);
 
         $canSpeakAgainAt = now()->addMinutes((int) $request->silence_for);
 
@@ -63,9 +65,10 @@ class UsersController extends Controller {
             'can_speak_again_at' => $canSpeakAgainAt,
         ]);
 
-        $user = $user->refresh();
+        $user   = $user->refresh();
 
         $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' ('.(int) $request->silence_for.' Minutes server time) Making accounts to get around this is a bannable offense.';
+        
         event(new ServerMessageEvent($user, 'silenced', $message));
 
         UpdateSilencedUserJob::dispatch($user)->delay($canSpeakAgainAt);
@@ -101,26 +104,13 @@ class UsersController extends Controller {
         $unBanAt = null;
 
         if ($request->for !== 'perm') {
-            switch($request->for) {
-                case 'one-day':
-                    $unBanAt = now()->addMinutes(1); //now()->addDays(1);
-                    UpdateBannedUserJob::dispatch($user)->delay($unBanAt);
-                    break;
-                case 'one-week':
-                    $unBanAt = now()->addMinutes(1); //now()->addWeeks(1);
-                    UpdateBannedUserJob::dispatch($user)->delay($unBanAt);
-                    break;
-                default:
-                    return redirect()->back()->with('error', 'Invalid input for ban length.');
+            $unBanAt = $this->userService->fetchUnBanAt($user, $request->for);
+
+            if (is_null($unBanAt)) {
+                redirect()->back()->with('error', 'Invalid input for ban length.');
             }
         } else {
-            $message = $user->character->name . ' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
-
-            $message = auth()->user()->messages()->create([
-                'message' => $message,
-            ]);
-            
-            broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();
+            $this->userService->broadCastAdminMessage($user);
         }
 
         $user->update([
@@ -129,12 +119,7 @@ class UsersController extends Controller {
             'banned_reason' => $request->reason,
         ]);
 
-        event(new BannedUserEvent($user));
-
-        $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'For ever.';
-        $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $request->reason;
-
-        Mail::to($user->email)->send(new GenericMail($user, $message, 'You have been banned!', true));
+        $this->userService->sendUserMail($user, $unBanAt);
 
         return redirect()->to(route('users.user', [
             'user' => $user->id

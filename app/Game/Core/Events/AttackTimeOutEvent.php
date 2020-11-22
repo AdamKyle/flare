@@ -13,16 +13,14 @@ class AttackTimeOutEvent
     use SerializesModels;
 
     /**
-     * The character.
-     *
-     * @var \App\Flare\Models\Monster;
+     * @var Charcater $character
      */
     public $character;
 
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param  Character $charactr
      * @return void
      */
     public function __construct(Character $character)

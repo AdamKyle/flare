@@ -10,6 +10,11 @@ class MonsterTransfromer extends TransformerAbstract {
 
     use SkillsTransformerTrait;
 
+    /**
+     * Fetches the monster response data
+     * 
+     * @param Monster $monster
+     */
     public function transform(Monster $monster) {
 
         return [

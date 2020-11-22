@@ -11,6 +11,12 @@ class CharacterAttackTransformer extends TransformerAbstract {
 
     use SkillsTransformerTrait;
 
+    /**
+     * creates response data for character attack data.
+     * 
+     * @param Character $character
+     * @return mixed
+     */
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 

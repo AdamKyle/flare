@@ -6,7 +6,14 @@ use App\Flare\Models\Character;
 
 class LevelUpValue {
 
-
+    /**
+     * Create the level up value object.
+     * 
+     * Increases core stats.
+     * 
+     * @param Character $character
+     * @return array
+     */
     public function createValueObject(Character $character) {
         return [
             'level' => $character->level + 1,
@@ -19,6 +26,15 @@ class LevelUpValue {
         ];
     }
 
+    /**
+     * Add the new value to the character stat.
+     * 
+     * Regular stats get +1 and the damage stat gets a +2
+     * 
+     * @param Character $character
+     * @param string $currentStat
+     * @return int 
+     */
     private function addValue(Character $character, string $currenStat): int {
         if ($character->damage_stat === $currenStat) {
             return $character->{$currenStat} += 2;

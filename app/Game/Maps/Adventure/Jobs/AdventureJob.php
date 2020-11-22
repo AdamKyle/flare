@@ -17,19 +17,33 @@ class AdventureJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var Character $character
+     */
     protected $character;
 
+    /**
+     * @var Adventure $adventure
+     */
     protected $adventure;
 
+    /**
+     * @var string $name
+     */
     protected $name;
 
-    protected $repeatingAdventure;
-
+    /**
+     * @var int $currentLevel
+     */
     protected $currentLevel;
 
     /**
      * Create a new job instance.
      *
+     * @param Character $character
+     * @param Adventure $adventure
+     * @param string $name
+     * @param int $curentLevel
      * @return void
      */
     public function __construct(Character $character, Adventure $adventure, String $name, int $currentLevel)

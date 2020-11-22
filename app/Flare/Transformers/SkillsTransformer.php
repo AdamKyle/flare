@@ -7,6 +7,11 @@ use App\Flare\Models\Skill;
 
 class SkillsTransformer extends TransformerAbstract {
 
+    /**
+     * Fetches skill data for a response.
+     * 
+     * @param Skill $skill
+     */
     public function transform(Skill $skill) {
 
         return [

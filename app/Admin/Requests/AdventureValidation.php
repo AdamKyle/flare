@@ -33,6 +33,11 @@ class AdventureValidation extends FormRequest
         ];
     }
 
+    /**
+     * Messages for the validation.
+     * 
+     * @return array
+     */
     public function messages() {
         return [
             'name.required'             => 'Adventure name is required.',

@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Bus;
 class EmbarkOnAdventureListener
 {
 
-    public function __construct() {}
-
     public function handle(EmbarkOnAdventureEvent $event)
     {
         $jobName = Str::random(80);

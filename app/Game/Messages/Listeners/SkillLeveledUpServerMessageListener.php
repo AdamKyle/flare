@@ -3,19 +3,10 @@
 namespace App\Game\Messages\Listeners;
 
 use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
-use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 
 class SkillLeveledUpServerMessageListener
 {
-
-    private $serverMessage;
-
-    public function __construct(ServerMessageBuilder $serverMessage) {
-
-        $this->serverMessage = $serverMessage;
-    }
-
     /**
      * Handle the event.
      *

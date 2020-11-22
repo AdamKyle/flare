@@ -2,13 +2,18 @@
 
 namespace App\Game\Core\Comparison;
 
-use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Game\Core\Exceptions\EquipItemException;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison {
 
+    /**
+     * Fetch Comparison Details for an item of the same type currently equipped.
+     * 
+     * @param Item $toCompare
+     * @param Collection $inventorySlots
+     * @return array
+     */
     public function fetchDetails(Item $toCompare, Collection $inventorySlots): array {
         $comparison = [];
 
@@ -19,6 +24,141 @@ class ItemComparison {
         }
 
         return $comparison;
+    }
+
+    /**
+     * Get Total Damage Increase
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @return int
+     */
+    public function getDamageIncrease(Item $toCompare, Item $equipped): int {
+        $totalDamageForEquipped = $equipped->getTotalDamage();
+        $totalDamageForCompare  = $toCompare->getTotalDamage();
+
+        return $totalDamageForCompare - $totalDamageForEquipped;
+    }
+
+    /**
+     * Get Total Damage Decrease
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @return int
+     */
+    public function getDamageDecrease(Item $toCompare, Item $equipped): int {
+        $totalDamageForEquipped = $equipped->getTotalDamage();
+        $totalDamageForCompare  = $toCompare->getTotalDamage();
+
+        if ($totalDamageForCompare < $totalDamageForEquipped) {
+            return $totalDamageForCompare - $totalDamageForEquipped;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get Total Ac Increase
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @return int
+     */
+    public function getAcIncrease(Item $toCompare, Item $equipped): int {
+        $totalDefenceForEquipped = $equipped->getTotalDefence();
+        $totalDefenceForCompare  = $toCompare->getTotalDefence();
+
+        if ($totalDefenceForEquipped === 0.0) {
+            return 0;
+        }
+
+        return $totalDefenceForCompare - $totalDefenceForEquipped;
+    }
+
+    /**
+     * Get Total Ac Decrease
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @return int
+     */
+    public function getAcDecrease(Item $toCompare, Item $equipped): int {
+        $totalDefenceForEquipped = $equipped->getTotalDefence();
+        $totalDefenceForCompare  = $toCompare->getTotalDefence();
+
+        if ($totalDefenceForCompare < $totalDefenceForEquipped) {
+            return $totalDefenceForCompare - $totalDefenceForEquipped;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get Total Heal Increase
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @return int
+     */
+    public function getHealIncrease(Item $toCompare, Item $equipped): int {
+        $totalHealForEquipped = $equipped->getTotalHealing();
+        $totalHealForCompare  = $toCompare->getTotalHealing();
+
+        return $totalHealForCompare - $totalHealForEquipped;
+    }
+
+    /**
+     * Get Total Heal Decrease
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @return int
+     */
+    public function getHealDecrease(Item $toCompare, Item $equipped): int {
+        $totalHealForEquipped = $equipped->getTotalHealing();
+        $totalHealForCompare  = $toCompare->getTotalHealing();
+
+        if ($totalHealForCompare < $totalHealForEquipped) {
+            return $totalHealForCompare - $totalHealForEquipped;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get Total Stat Increase
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @param string $stat
+     * @return int
+     */
+    public function getStatIncrease(Item $toCompare, Item $equipped, string $stat): float {
+        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
+        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
+
+        return $totalPercentageForCompare - $totalPercentageForEquipped;
+    }
+
+
+    /**
+     * Get Total Stat Decrease
+     * 
+     * @param Item $toCompare
+     * @param Item $equipped
+     * @param string $stat
+     * @return int
+     */
+    public function getStatDecrease(Item $toCompare, Item $equipped, string $stat): float {
+        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
+        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
+
+        if ($totalPercentageForCompare < $totalPercentageForEquipped) {
+            return $totalPercentageForCompare - $totalPercentageForEquipped;
+        }
+
+        return 0.0;
     }
 
     protected function fetchHandComparison(Item $toCompare, Collection $inventorySlots, string $hand): array {
@@ -58,82 +198,6 @@ class ItemComparison {
                 'int_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'int'),
             ];
         }
-    }
-
-    public function getDamageIncrease(Item $toCompare, Item $equipped): int {
-        $totalDamageForEquipped = $equipped->getTotalDamage();
-        $totalDamageForCompare  = $toCompare->getTotalDamage();
-
-        return $totalDamageForCompare - $totalDamageForEquipped;
-    }
-
-    public function getDamageDecrease(Item $toCompare, Item $equipped): int {
-        $totalDamageForEquipped = $equipped->getTotalDamage();
-        $totalDamageForCompare  = $toCompare->getTotalDamage();
-
-        if ($totalDamageForCompare < $totalDamageForEquipped) {
-            return $totalDamageForCompare - $totalDamageForEquipped;
-        }
-
-        return 0;
-    }
-
-    public function getAcIncrease(Item $toCompare, Item $equipped): int {
-        $totalDefenceForEquipped = $equipped->getTotalDefence();
-        $totalDefenceForCompare  = $toCompare->getTotalDefence();
-
-        if ($totalDefenceForEquipped === 0.0) {
-            return 0;
-        }
-
-        return $totalDefenceForCompare - $totalDefenceForEquipped;
-    }
-
-    public function getAcDecrease(Item $toCompare, Item $equipped): int {
-        $totalDefenceForEquipped = $equipped->getTotalDefence();
-        $totalDefenceForCompare  = $toCompare->getTotalDefence();
-
-        if ($totalDefenceForCompare < $totalDefenceForEquipped) {
-            return $totalDefenceForCompare - $totalDefenceForEquipped;
-        }
-
-        return 0;
-    }
-
-    public function getHealIncrease(Item $toCompare, Item $equipped): int {
-        $totalHealForEquipped = $equipped->getTotalHealing();
-        $totalHealForCompare  = $toCompare->getTotalHealing();
-
-        return $totalHealForCompare - $totalHealForEquipped;
-    }
-
-    public function getHealDecrease(Item $toCompare, Item $equipped): int {
-        $totalHealForEquipped = $equipped->getTotalHealing();
-        $totalHealForCompare  = $toCompare->getTotalHealing();
-
-        if ($totalHealForCompare < $totalHealForEquipped) {
-            return $totalHealForCompare - $totalHealForEquipped;
-        }
-
-        return 0;
-    }
-
-    public function getStatIncrease(Item $toCompare, Item $equipped, string $stat): float {
-        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
-        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
-
-        return $totalPercentageForCompare - $totalPercentageForEquipped;
-    }
-
-    public function getStatDecrease(Item $toCompare, Item $equipped, string $stat): float {
-        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
-        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
-
-        if ($totalPercentageForCompare < $totalPercentageForEquipped) {
-            return $totalPercentageForCompare - $totalPercentageForEquipped;
-        }
-
-        return 0.0;
     }
 
     protected function isItemBetter(Item $toCompare, Item $equipped): bool {

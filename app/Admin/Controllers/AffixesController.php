@@ -2,14 +2,10 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\ItemAffixService;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
-use App\Flare\Models\ItemAffix;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Admin\Services\ItemAffixService;
+use App\Flare\Models\ItemAffix;
 
 class AffixesController extends Controller {
 

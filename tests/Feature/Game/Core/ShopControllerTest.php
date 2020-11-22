@@ -205,7 +205,7 @@ class ShopControllerTest extends TestCase
 
         $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
 
-        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 18 gold.');
+        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 8 gold.');
     }
 
     public function testSellAllItemsButQuestItems() {
@@ -240,7 +240,7 @@ class ShopControllerTest extends TestCase
 
         $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
 
-        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 18 gold.');
+        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 8 gold.');
 
         $questItems = $this->character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest';
@@ -364,6 +364,6 @@ class ShopControllerTest extends TestCase
             })->pluck('id')->toArray(),
         ]))->response;
 
-        $response->assertSessionHas('success', 'Sold selected items for: 18 gold.');
+        $response->assertSessionHas('success', 'Sold selected items for: 8 gold.');
     }
 }

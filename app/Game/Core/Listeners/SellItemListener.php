@@ -10,8 +10,6 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 class SellItemListener
 {
 
-    public function __construct() {}
-
     public function handle(SellItemEvent $event)
     {
         $item = $event->inventorySlot->item;

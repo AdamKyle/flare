@@ -10,6 +10,7 @@ use App\Game\Maps\Adventure\Services\AdventureService;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
 use App\Game\Maps\Adventure\Mail\AdventureCompleted;
 use App\Game\Maps\Adventure\Services\AdventureFightService;
+use Database\Seeders\CreateAffixes;
 use Database\Seeders\GameSkillsSeeder;
 use DB;
 use Mail;
@@ -31,6 +32,7 @@ class AdventureServiceTest extends TestCase
         parent::setUp();
 
         $this->seed(GameSkillsSeeder::class);
+        $this->seed(CreateAffixes::class);
 
         Queue::fake();
         Event::fake();

@@ -16,31 +16,32 @@ class ShowTimeOutEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
-     *
-     * @var \App\Flare\Models\User
+     * @var User $user
      */
     public $user;
 
     /**
-     * show the bar
-     *
      * @var bool $activateBar
      */
     public $activatebar;
 
     /**
-     * can the player attack
-     *
      * @var bool $canAttack
      */
     public $canAttack;
 
+    /**
+     * @var int $forLength
+     */
     public $forLength;
 
     /**
      * Create a new event instance.
      *
+     * @param User $user
+     * @param bool $activatebar
+     * @param bool $canAttack
+     * @param int $forLength | 0
      * @return void
      */
     public function __construct(User $user, bool $activatebar, bool $canAttack, int $forLength = 0)

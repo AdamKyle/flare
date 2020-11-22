@@ -17,16 +17,31 @@ class AssignSkillsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $service;
-
+    /**
+     * Who is the skill for?
+     * 
+     * @var String $for
+     */
     public $for;
 
+    /**
+     * @var GameSkill $skill
+     */
     public $skill;
 
+    /**
+     * @var int $monsterId | null
+     */
     public $monsterId;
 
+    /**
+     * @var int $classId | null
+     */
     public $classId;
 
+    /**
+     * @var User $adminUser
+     */
     public $adminUser;
 
     /**
@@ -44,8 +59,12 @@ class AssignSkillsJob implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Attempt to assign the skill.
+     * 
+     * If the skill should fail to be asigned to the intended target for any reason, we email
+     * the administrator with the error message.
      *
+     * @param AssignSkillService $service
      * @return void
      */
     public function handle(AssignSkillService $service)

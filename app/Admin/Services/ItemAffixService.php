@@ -11,7 +11,17 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ItemAffixService {
     
-    public function deleteAffix(ItemAffix $affix) {
+    /**
+     * Delete the Affix.
+     * 
+     * We also remove the affix from any addition items it might be attached to.
+     * 
+     * Once done, we delete the affix.
+     * 
+     * @param ItemAffix $affix
+     * @return void
+     */
+    public function deleteAffix(ItemAffix $affix): void {
         $column             = 'item_'.$affix->type.'_id';
         $name               = $affix->name;
         $itemsWithThisAffix = Item::where($column, $affix->id)->get();

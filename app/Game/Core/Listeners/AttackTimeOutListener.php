@@ -6,13 +6,8 @@ use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Jobs\AttackTimeOutJob;
 
-
 class AttackTimeOutListener
 {
-
-    public function __construct() {
-    }
-
     /**
      * Handle the event.
      *

@@ -7,6 +7,18 @@ use App\Flare\Models\Monster;
 
 class GoldRushCheckCalculator {
 
+    /**
+     * Fetches the gold rush check chance.
+     * 
+     * Fecthes the adventure bonus if applies and applies it to the looting bonus agains the monsters drop check.
+     * 
+     * If true, the check passed and the character should be rewarded.
+     * 
+     * @param Monster $monster
+     * @param float $lootingChance | 0.0
+     * @param Adaventure $adventure | null
+     * @return bool
+     */
     public function fetchGoldRushChance(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null) {
         $adventureBonus = $this->getAdventureGoldrushChance($adventure);
 

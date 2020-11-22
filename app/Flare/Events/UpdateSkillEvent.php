@@ -12,7 +12,7 @@ class UpdateSkillEvent
     use SerializesModels;
 
     /**
-     * @var \App\Flare\Models\Skill
+     * @var Skill $skill
      */
     public $skill;
 
@@ -21,7 +21,8 @@ class UpdateSkillEvent
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param Skill $skill
+     * @param Adaventure $adventure | null
      * @return void
      */
     public function __construct(Skill $skill, Adventure $adventure = null)

@@ -7,6 +7,15 @@ use App\Flare\Models\Skill;
 
 class SkillXPCalculator {
 
+    /**
+     * Fetches the total skill exp.
+     * 
+     * Applies equipment, quest item, adventure bonuses and percentage of xp towards, to skill exp which starts at a
+     * a base of 10.
+     * 
+     * @param Skill $skill
+     * @param Adventure $adventure | null
+     */
     public function fetchSkillXP(Skill $skill, Adventure $adventure = null) {
         $equipmentBonus = $this->fetchSkilltrainingBonusFromEquipment($skill);
         $questItemBonus = $this->fetchSkilltrainingBonusFromQuestItems($skill);

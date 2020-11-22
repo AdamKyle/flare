@@ -20,15 +20,11 @@ class ServerMessageEvent
     public $type;
 
     /**
-     * User
-     *
-     * @var \App\Flare\Models\User $user
+     * @var User $user
      */
     public $user;
 
     /**
-     * mixed string
-     *
      * @var mixed $forMessage
      */
     public $forMessage;
@@ -36,7 +32,9 @@ class ServerMessageEvent
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param  User $user
+     * @param string $type
+     * @param mixed $forMessage | null
      * @return void
      */
     public function __construct(User $user, string $type, $forMessage = null)

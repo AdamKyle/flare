@@ -14,23 +14,20 @@ class SkillLeveledUpServerMessageEvent
     use SerializesModels;
 
     /**
-     * Type of server messsage.
-     *
-     * @var string $type
+     * @var Skill $skill
      */
     public $skill;
 
     /**
-     * User
-     *
-     * @var \App\Flare\Models\User $user
+     * @var User $user
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param  User $user
+     * @param Skill $skill
      * @return void
      */
     public function __construct(User $user, Skill $skill)

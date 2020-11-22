@@ -8,9 +8,6 @@ use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 
 class CreateAdventureNotificationListener
 {
-
-    public function __construct() {}
-
     public function handle(CreateAdventureNotificationEvent $event)
     {
         Notification::create([

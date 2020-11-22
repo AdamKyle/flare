@@ -9,8 +9,17 @@ class CraftedItemTimeOutEvent
 {
     use SerializesModels;
 
+    /**
+     * @var Character $character
+     */
     public $character;
 
+    /**
+     * Constructor
+     * 
+     * @param Character $character
+     * @return void
+     */
     public function __construct(Character $character)
     {
         $this->character = $character;

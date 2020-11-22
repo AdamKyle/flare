@@ -29,6 +29,11 @@ class MapUploadValidation extends FormRequest
         ];
     }
 
+    /**
+     * Messages for the validation.
+     * 
+     * @return array
+     */
     public function messages() {
         return [
             'name.required'  => 'Map name is required.',

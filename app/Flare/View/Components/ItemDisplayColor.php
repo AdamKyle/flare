@@ -2,13 +2,20 @@
 
 namespace App\Flare\View\Components;
 
+use App\Flare\Models\Item;
 use Illuminate\View\Component;
 
 class ItemDisplayColor extends Component
 {
 
+    /**
+     * @var mixed $item
+     */
     public $item;
 
+    /**
+     * @var string
+     */
     public $color;
 
     /**

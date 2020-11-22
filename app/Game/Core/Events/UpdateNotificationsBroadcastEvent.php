@@ -16,18 +16,21 @@ class UpdateNotificationsBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @param Collection $notifications
+     */
     public $notifications;
 
     /**
-     * The user
-     *
-     * @var \App\Flare\Models\User $users
+     * @param User $user
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
+     * @param Collection $notifications
+     * @param User $user
      * @return void
      */
     public function __construct(Collection $notifications, User $user)

@@ -8,9 +8,6 @@ use App\Game\Core\Jobs\CraftTimeOutJob;
 
 class CraftedItemTimeOutListener
 {
-
-    public function __construct() {}
-
     public function handle(CraftedItemTimeOutEvent $event)
     {
         $event->character->update([

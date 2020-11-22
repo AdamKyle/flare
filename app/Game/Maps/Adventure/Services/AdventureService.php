@@ -20,20 +20,43 @@ use App\Game\Maps\Adventure\Mail\AdventureCompleted;
 
 class AdventureService {
 
+    /**
+     * @var Character $character
+     */
     private $character;
 
+    /**
+     * @var Adventure $adventure
+     */
     private $adventure;
 
+    /**
+     * @var RewardBuilder $rewardBuilder
+     */
     private $rewardBuilder;
 
+    /**
+     * @var string $name
+     */
     private $name;
 
+    /**
+     * @var array $rewards
+     */
     private $rewards = [
         'gold'  => 0,
         'exp'   => 0,
         'items' => [],
     ];
 
+    /**
+     * Constructor
+     * 
+     * @param Character $character
+     * @param Adventure $adventure
+     * @param RewardBuilder $rewardbuilder
+     * @param string $name
+     */
     public function __construct(
         Character $character, 
         Adventure $adventure, 
@@ -48,7 +71,14 @@ class AdventureService {
         $this->createSkillRewardSection();
     }
 
-    public function processAdventure(int $currentLevel, int $maxLevel) {
+    /**
+     * Process the adventure.
+     * 
+     * @param int $currentLevel
+     * @param int $maxLevel
+     * @return void
+     */
+    public function processAdventure(int $currentLevel, int $maxLevel): void {
         $this->processLevel($currentLevel, $maxLevel);
     }
 

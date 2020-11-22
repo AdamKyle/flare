@@ -6,6 +6,14 @@ use Storage;
 
 class ImageBuilder {
 
+    /**
+     * Turn the image into a file and store the image in a specified location.
+     * 
+     * @param mixed $image
+     * @param string $storageDisk | public
+     * @param string $fileName
+     * @return void
+     */
     public static function buildAndStoreImage($image, string $storageDisk = 'public', string $fileName): void {
         ob_start();
 

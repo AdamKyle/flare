@@ -14,24 +14,36 @@ class CreateCharacterEvent
     use SerializesModels;
 
     /**
-     * The user.
-     *
-     * @var \App\Flare\Models\User
+     * @var User $user
      */
     public $user;
 
+    /**
+     * @var GameClass $class
+     */
     public $class;
 
+    /**
+     * @var GameRace $race
+     */
     public $race;
 
+    /**
+     * @var string $characterName
+     */
     public $characterName;
 
+    /**
+     * @var GameMap $map
+     */
     public $map;
 
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param  User $user
+     * @param GameMap $map
+     * @param Request $request
      * @return void
      */
     public function __construct(User $user, GameMap $map, Request $request)

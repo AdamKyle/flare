@@ -6,6 +6,11 @@ use Cache;
 
 class CoordinatesCache {
 
+    /**
+     * Fetches the coordinates from cache or builds them into cache.
+     * 
+     * @return array
+     */
     public function getFromCache(): array {
         $coordinates = Cache::get('coordinates');
 
@@ -21,6 +26,11 @@ class CoordinatesCache {
         return $coordinates;
     }
 
+    /**
+     * Builds the x coordinates
+     * 
+     * @return array
+     */
     public function buildXCoordinates(): array {
         
         $start = 0;
@@ -38,6 +48,11 @@ class CoordinatesCache {
         return $coordinates;
     }
 
+    /**
+     * Builds the y coordinates
+     * 
+     * @return array
+     */
     public function buildYCoordinates(): array {
         
         $start = 16;

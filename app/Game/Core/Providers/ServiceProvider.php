@@ -8,9 +8,11 @@ use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Middleware\IsCharacterAdventuringMiddleware;
 use App\Game\Core\Services\AdventureRewardService;
+use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\EquipItemService;
+use App\Game\Core\Services\ShopService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -44,6 +46,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(AdventureRewardService::class, function($app) {
             return new AdventureRewardService(new CharacterService);
+        });
+
+        $this->app->bind(CharacterInventoryService::class, function($app) {
+            return new CharacterInventoryService(); 
+        });
+
+        $this->app->bind(ShopService::class, function($app) {
+            return new ShopService();
         });
     }
 

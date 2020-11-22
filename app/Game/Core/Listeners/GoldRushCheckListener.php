@@ -11,8 +11,6 @@ use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 class GoldRushCheckListener
 {
 
-    public function __construct() {}
-
     /**
      * Handle the event.
      *

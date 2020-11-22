@@ -3,16 +3,11 @@
 namespace App\Admin\Controllers;
 
 use Storage;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameMap;
 use App\Admin\Requests\MapUploadValidation;
 
 class MapsController extends Controller {
-
-    public function __construct() {
-        //
-    }
 
     public function index() {
         return view('admin.maps.maps', [

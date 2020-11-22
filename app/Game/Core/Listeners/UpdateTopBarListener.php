@@ -11,10 +11,23 @@ use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 class UpdateTopBarListener
 {
 
+    /**
+     * @var Manager $manager
+     */
     private $manager;
 
+    /**
+     * @var CharacterSheetTransformer $characterSheetTransformer
+     */
     private $characterSheetTransformer;
 
+    /**
+     * Constructor
+     * 
+     * @param Manager $manager
+     * @param CharacterSheetTransformer $characterSheetTransformer
+     * @return void
+     */
     public function __construct(Manager $manager, CharacterSheetTransformer $characterSheetTransformer) {
         $this->manager                   = $manager;
         $this->characterSheetTransformer = $characterSheetTransformer;

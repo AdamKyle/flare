@@ -5,31 +5,66 @@ namespace App\Game\Maps\Adventure\Services;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
-use App\Game\Core\Exceptions\CharacterIsDeadException;
-use App\Game\Core\Exceptions\MonsterIsDeadException;
+use App\Flare\Models\Monster;
 
 class AdventureFightService {
 
+    /**
+     * @var Character $character
+     */
     private $character;
 
+    /**
+     * @var Adventure $adventure
+     */
     private $adventure;
 
+    /**
+     * @var Monster $monster
+     */
     private $monster;
 
+    /**
+     * @var array $logInformation
+     */
     private $logInformation = [];
 
+    /**
+     * @var int $currentCharacterhealth
+     */
     private $currentCharacterHealth = 0;
 
+    /**
+     * @var int $currentMonsterHealth
+     */
     private $currentMonsterHealth   = 0;
 
+    /**
+     * @var CharacterInformationBuilder $characterInformation
+     */
     private $characterInformation;
 
-    // Used to stop recursive issues with attack.
+    /**
+     * Used to stop adventures from going on too long.
+     * 
+     * @var int $counter
+     */
     private $counter = 0;
 
-    // Used to stop the adventure from never finishing.
+    /**
+     * used to stop adventures from going on too long.
+     * 
+     * @var bool $tookTooLong
+     */
     private $tookTooLong = false;
 
+    /**
+     * Constructor
+     * 
+     * @param Character $character
+     * @param Adventure $adventure
+     * @return void
+     */
     public function __construct(Character $character, Adventure $adventure) {
 
         $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
@@ -40,37 +75,70 @@ class AdventureFightService {
         $this->currentCharacterHealth = $this->characterInformation->buildHealth();
     }
 
-    public function processBattle() {
+    /**
+     * Process the battle
+     * 
+     * @return void
+     */
+    public function processBattle(): void {
         $this->monster              = $this->adventure->monsters()->inRandomOrder()->first();
         $healthRange                = explode('-', $this->monster->health_range);
 
         $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
 
         $this->attack($this->character, $this->monster);
-        
-        return;
     }
 
-    public function getLogInformation() {
+    /**
+     * Get the log information.
+     * 
+     * @return array
+     */
+    public function getLogInformation(): array {
         return $this->logInformation;
     }
 
-    public function resetLogInfo() {
+    /**
+     * Reset the log information
+     * 
+     * @return void
+     */
+    public function resetLogInfo(): void {
         $this->logInformation = [];
     }
 
-    public function getMonster() {
+    /**
+     * Get the monster.
+     * 
+     * @return Monster
+     */
+    public function getMonster(): Monster {
         return $this->monster;
     }
 
+    /**
+     * Is the character dead?
+     * 
+     * @return bool
+     */
     public function isCharacterDead(): bool {
         return $this->currentCharacterHealth <= 0;
     }
 
+    /**
+     * Is the monster dead?
+     * 
+     * @return bool
+     */
     public function isMonsterDead(): bool {
         return $this->currentMonsterHealth <= 0;
     }
 
+    /**
+     * Did the adventure take too long?
+     * 
+     * @return bool
+     */
     public function tooLong(): bool {
         return $this->tookTooLong;
     }

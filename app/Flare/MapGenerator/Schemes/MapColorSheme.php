@@ -10,7 +10,15 @@ use ChristianEssl\LandmapGeneration\Enum\FillType;
 
 class MapColorSheme extends DefaultColorScheme {
 
-    public function __construct(ShaderInterface $shader = null, Color $land = null, Color $water = null) {
+    /**
+     * Constrctor
+     * 
+     * @param ShaderInterface $shader | null
+     * @param mixed $land | null
+     * @param mixed $water | null
+     * @return void
+     */
+    public function __construct(ShaderInterface $shader = null, $land = null, $water = null) {
         if (is_null($land)) {
             $this->colors[FillType::LAND] = new Color(2, 98, 6);
         } else {

@@ -10,6 +10,7 @@ use App\Game\Maps\Adventure\Builders\RewardBuilder;
 use App\Game\Maps\Adventure\Services\AdventureFightService;
 use App\Game\Maps\Adventure\Services\AdventureService;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Maps\Adventure\Services\MovementService;
 use App\Game\Maps\Adventure\Values\MapTileValue;
 use App\Game\Maps\Adventure\Values\WaterValue;
 
@@ -49,6 +50,9 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MapTileValue::class, function($app) {
             return new MapTileValue();
+        });
+        $this->app->bind(MovementService::class, function($app) {
+            return new MovementService();
         });
     }
 

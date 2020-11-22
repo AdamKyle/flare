@@ -13,25 +13,26 @@ class UpdateCharacterEvent
     use SerializesModels;
 
     /**
-     * The character.
-     *
-     * @var \App\Flare\Models\Monster;
+     * @var Character $character
      */
     public $character;
 
     /**
-     * The monster.
-     *
-     * @var \App\Flare\Models\Monster;
+     * @var Monster $monster
      */
     public $monster;
 
+    /**
+     * @var Adventure $adventure
+     */
     public $dventure;
 
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param Character $character
+     * @param Monster $monster
+     * @param Adventure $adventure | null
      * @return void
      */
     public function __construct(Character $character, Monster $monster, Adventure $adventure = null)

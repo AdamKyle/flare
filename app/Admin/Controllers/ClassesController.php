@@ -2,10 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\GameClass;
-use Illuminate\Http\Request;
-use App\Flare\Models\GameRace;
 use App\Http\Controllers\Controller;
+use App\Flare\Models\GameClass;
 
 class ClassesController extends Controller {
 

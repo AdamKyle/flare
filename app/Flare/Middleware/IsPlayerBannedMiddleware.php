@@ -20,7 +20,7 @@ class IsPlayerBannedMiddleware
         $user = auth()->user();
 
         /**
-         * User kight not be logged in, but looking at a 
+         * User might not be logged in, but looking at a 
          * specific route we said they dont have to be logged in for.
          */
         if (is_null($user)) {

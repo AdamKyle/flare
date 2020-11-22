@@ -6,6 +6,17 @@ use App\Flare\Models\Monster;
 
 class XPCalculator {
 
+    /**
+     * Calculates the total xp
+     * 
+     * If the character is above the max level, we return the monster xp minus any reductions for skill training.
+     * 
+     * If the character is over the max level, we return 3.333 xp minus any reductions for skill training.
+     * 
+     * @param Monster $monster
+     * @param int $characterLevel
+     * @param float $xpReduction | 0.0
+     */
     public function fetchXPFromMonster(Monster $monster, int $characterLevel, float $xpReduction = 0.0) {
         $xp = 0;
 

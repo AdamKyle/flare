@@ -94,7 +94,7 @@ class MapControllerApiTest extends TestCase
                          ->response;
 
         $this->assertEquals(200, $response->status());
-
+        
         $this->character->refresh();
 
         $this->assertEquals(0, $this->character->map->position_x);

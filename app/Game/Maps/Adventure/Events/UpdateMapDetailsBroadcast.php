@@ -15,14 +15,34 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @var Map $map
+     */
     public $map;
+
+    /**
+     * @var array $portDetails
+     */
     public $portDetails;
+
+    /**
+     * @var array $adventureDetails
+     */
     public $adventureDetails;
 
+    /**
+     * @var User $user
+     */
+
     private $user;
+    
     /**
      * Create a new event instance.
      *
+     * @param Map $map
+     * @param User $user
+     * @param array $portDetails
+     * @param array $adventureDetails
      * @return void
      */
     public function __construct(Map $map, User $user, array $portDetails, array $adventureDetails)

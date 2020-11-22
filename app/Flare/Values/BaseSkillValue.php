@@ -2,13 +2,19 @@
 
 namespace App\Flare\Values;
 
-use Illuminate\Support\Str;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 
 class BaseSkillValue {
 
+    /**
+     * Get the base character skill value for a character.
+     * 
+     * @param Charcater $character
+     * @param GameSkill $skill
+     * @return array 
+     */
     public function getBaseCharacterSkillValue(Character $character, GameSkill $skill): array {
         
        return [
@@ -21,6 +27,13 @@ class BaseSkillValue {
         ];
     }
 
+    /**
+     * Get the base character skill value for a monster.
+     * 
+     * @param Monster $monster
+     * @param GameSkill $skill
+     * @return array 
+     */
     public function getBaseMonsterSkillValue(Monster $monster, GameSkill $skill): array {
 
         return [

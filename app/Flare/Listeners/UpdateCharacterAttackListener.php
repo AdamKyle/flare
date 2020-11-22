@@ -12,10 +12,23 @@ use App\Flare\Values\MaxDamageForItemValue;
 class UpdateCharacterAttackListener
 {
 
+    /**
+     * @var Manager $manager
+     */
     private $manager;
 
+    /**
+     * @var CharacterAttackTransformer $characterAttackTransformer
+     */
     private $characterAttackTransformer;
 
+    /**
+     * Constructor
+     * 
+     * @param Manager $manager
+     * @param CharacterAttackTransformer $characterAttackTransformer
+     * @return void
+     */
     public function __construct(Manager $manager, CharacterAttackTransformer $characterAttackTransformer) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;

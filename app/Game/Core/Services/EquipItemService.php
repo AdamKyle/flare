@@ -2,40 +2,55 @@
 
 namespace App\Game\Core\Services;
 
-use App;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
-use App\Flare\Models\InventorySlot;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Events\UpdateCharacterSheetEvent;
-use App\Flare\Events\UpdateCharacterInventoryEvent;
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Models\EquippedItem;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Exceptions\EquipItemException;
-use Illuminate\Database\Eloquent\Collection;
 
 class EquipItemService {
 
+    /**
+     * @var Request $request
+     */
     private $request;
 
+    /**
+     * @var Character $character
+     */
     private $character;
 
+    /**
+     * Set the request
+     * 
+     * @param Request $request
+     * @return EquipItemService
+     */
     public function setRequest(Request $request): EquipItemService {
         $this->request = $request;
 
         return $this;
     }
 
+    /**
+     * Set the character
+     * 
+     * @param Charactr $character
+     * @return EquipItemService
+     */
     public function setCharacter(Character $character): EquipItemService {
         $this->character = $character;
 
         return $this;
     }
 
+    /**
+     * Equip the item
+     * 
+     * @return Item
+     */
     public function equipItem(): Item {
 
         $characterSlot = $this->character->inventory->slots->filter(function($slot) {
@@ -67,6 +82,13 @@ class EquipItemService {
         return $characterSlot->item;
     }
 
+    /**
+     * Get Item stats
+     * 
+     * @param Item $toCompare
+     * @param Colection $inventorySlots
+     * @return array
+     */
     public function getItemStats(Item $toCompare, Collection $inventorySlots): array {
        return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots);
     }

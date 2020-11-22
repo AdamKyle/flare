@@ -2,21 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Admin\Requests\AdventureValidation;
-use App\Flare\Models\GameMap;
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Item;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 
 class AdventuresController extends Controller {
-
-    public function __construct() {
-        //
-    }
 
     public function index() {
         return view('admin.adventures.adventures', [

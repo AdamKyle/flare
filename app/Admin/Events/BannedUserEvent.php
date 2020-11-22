@@ -5,7 +5,6 @@ namespace App\Admin\Events;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -17,15 +16,16 @@ class BannedUserEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
+     * User to be banned.
      *
-     * @var \App\Flare\Models\User $user
+     * @var User $user
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
+     * @param User $user
      * @return void
      */
     public function __construct(User $user)

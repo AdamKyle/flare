@@ -2,26 +2,29 @@
 
 namespace App\Admin\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
-use App\Flare\Events\ServerMessageEvent;
-use Cache;
-use Mail;
+use App\Admin\Mail\GenericMail;
+
 
 class UpdateBannedUserJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var User $user
+     */
     protected $user;
 
     /**
      * Create a new job instance.
      *
+     * @param User $user
      * @return void
      */
     public function __construct(User $user)
@@ -30,7 +33,9 @@ class UpdateBannedUserJob implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Update the user from being banned to not banned.
+     * 
+     * Email the user telling them they are unbanned.
      *
      * @return void
      */

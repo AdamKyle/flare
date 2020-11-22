@@ -14,11 +14,15 @@ class CraftTimeOutJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var Character $character
+     */
     protected $character;
 
     /**
      * Create a new job instance.
      *
+     * @param Character $character
      * @return void
      */
     public function __construct(Character $character)

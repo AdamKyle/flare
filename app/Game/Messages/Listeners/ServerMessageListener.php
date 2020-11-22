@@ -9,8 +9,17 @@ use App\Game\Messages\Builders\ServerMessageBuilder;
 class ServerMessageListener
 {
 
+    /**
+     * @var ServerMessage $serverMessage
+     */
     private $serverMessage;
 
+    /**
+     * Constructor
+     * 
+     * @param ServerMessage $serverMessage
+     * @return void
+     */
     public function __construct(ServerMessageBuilder $serverMessage) {
 
         $this->serverMessage = $serverMessage;

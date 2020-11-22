@@ -10,9 +10,8 @@ use Tests\Setup\CharacterSetup;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use Database\Seeders\CreateAffixes;
 use Tests\Traits\CreateItemAffix;
-
-use function PHPUnit\Framework\isTrue;
 
 class RandomItemDropBuilderTest extends TestCase
 {
@@ -26,6 +25,8 @@ class RandomItemDropBuilderTest extends TestCase
 
     public function setUp(): void {
         parent::setup();
+
+        $this->seed(CreateAffixes::class);
 
         $this->createItem([
             'name' => 'Rusty Dagger',
@@ -238,109 +239,6 @@ class RandomItemDropBuilderTest extends TestCase
 
         $randomItemBuilder->generateItem($this->character);
 
-        $this->assertEquals(Item::count(), 1);
-    }
-
-    public function testFailToCreateAffixWhenThereAreNone() {
-        Item::first()->delete();
-
-        ItemAffix::truncate();
-
-        $this->createItem([
-            'name' => 'something',
-            'type' => 'weapon',
-            'base_damage' => 10,
-            'cost' => 5,
-        ]);
-
-        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
-        ->setMethods(array('shouldHaveItemAffix'))
-        ->getMock();
-
-        $randomItemBuilder->expects($this->any())
-            ->method('shouldHaveItemAffix')
-            ->willReturn(true);
-        
-        $randomItemBuilder->setItemAffixes(ItemAffix::all());
-
-        $randomItemBuilder->generateItem($this->character);
-
-        $this->assertEquals(Item::count(), 1);
-    }
-
-    public function testFailToCreateAffixWhenItemShouldnt() {
-        Item::first()->delete();
-
-        ItemAffix::truncate();
-
-        $this->createItem([
-            'name' => 'something',
-            'type' => 'weapon',
-            'base_damage' => 10,
-            'cost' => 5,
-        ]);
-
-        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
-            ->setMethods(array('shouldHaveItemAffix'))
-            ->getMock();
-
-        $randomItemBuilder->expects($this->any())
-            ->method('shouldHaveItemAffix')
-            ->willReturn(false);
-        
-        $randomItemBuilder->setItemAffixes(ItemAffix::all());
-
-        $randomItemBuilder->generateItem($this->character);
-
-        $this->assertEquals(Item::count(), 1);
-    }
-
-    public function testFailToCreateItemWhenAffixIsNull() {
-        Item::first()->delete();
-
-        $this->createItem([
-            'name' => 'something',
-            'type' => 'weapon',
-            'base_damage' => 10,
-            'cost' => 5
-        ]);
-
-        Item::first()->update([
-            'item_suffix_id' => ItemAffix::where('type', 'suffix')->first()->id,
-            'item_prefix_id' => ItemAffix::where('type', 'prefix')->first()->id,
-        ]);
-
-        $this->createItemAffix([
-            'name'                 => 'Sample 2',
-            'base_damage_mod'      => '0.10',
-            'type'                 => 'suffix',
-            'description'          => 'Sample',
-            'base_healing_mod'     => '0.10',
-            'str_mod'              => '0.10',
-            'dur_mod'              => '0.10',
-            'dex_mod'              => '0.10',
-            'chr_mod'              => '0.10',
-            'int_mod'              => '0.10',
-            'skill_name'           => null,
-            'skill_training_bonus' => null,
-        ]);
-
-        $randomItemBuilder = $this->getMockBuilder(RandomItemDropBuilder::class)
-             ->setMethods(array('fetchRandomItemAffix', 'shouldHaveItemAffix'))
-             ->getMock();
-
-        $randomItemBuilder->expects($this->any())
-            ->method('fetchRandomItemAffix')
-            ->willReturn(null);
-
-        $randomItemBuilder->expects($this->any())
-            ->method('shouldHaveItemAffix')
-            ->willReturn(true);
-
-        $randomItemBuilder->setItemAffixes(ItemAffix::all());
-
-        $randomItemBuilder->generateItem($this->character);
-        
         $this->assertEquals(Item::count(), 1);
     }
 }

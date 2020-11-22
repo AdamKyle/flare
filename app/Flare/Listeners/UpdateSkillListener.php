@@ -2,29 +2,22 @@
 
 namespace App\Flare\Listeners;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\Adventure;
-use App\Flare\Models\Skill;
+use Facades\App\Flare\Calculators\SkillXPCalculator;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
-use Facades\App\Flare\Calculators\SkillXPCalculator;
 
 class UpdateSkillListener
 {
 
-    public function __construct() {
-    }
-
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Battle\UpdateSkillEvent  $event
+     * @param  UpdateSkillEvent $event
      * @return void
      */
     public function handle(UpdateSkillEvent $event)
     {   
         if ($event->skill->max_level <= $event->skill->level) {
-            
             return;
         }
 

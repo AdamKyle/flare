@@ -2,23 +2,37 @@
 
 namespace App\Game\Core\Services;
 
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\AdventureRewardsEvent;
 use App\Game\Core\Services\CharacterService;
 
 class AdventureRewardService {
 
+    /**
+     * @var CharacterService $characterService
+     */
     private $characterService;
 
+    /**
+     * @var array $messages
+     */
     private $messages = [];
 
+    /**
+     * @param CharacterService $characterService
+     * @return void
+     */
     public function __construct(CharacterService $characterService) {
 
         $this->characterService = $characterService;
     }
 
+    /**
+     * Distribute the rewards
+     * 
+     * @param array $rewards
+     * @param Character $character
+     * @return AdventureRewardService
+     */
     public function distributeRewards(array $rewards, Character $character): AdventureRewardService {
         $character->gold += $rewards['gold'];
         $character->save();
@@ -30,6 +44,11 @@ class AdventureRewardService {
         return $this;
     }
 
+    /**
+     * Get messages for display
+     * 
+     * @return array
+     */
     public function getMessages(): array {
         return $this->messages;
     }

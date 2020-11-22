@@ -11,6 +11,12 @@ class CharacterSheetTransformer extends TransformerAbstract {
 
     use SkillsTransformerTrait;
 
+    /**
+     * Gets the response data for the character sheet
+     * 
+     * @param Character $character
+     * @return mixed
+     */
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 

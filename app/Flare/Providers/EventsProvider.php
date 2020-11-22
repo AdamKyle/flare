@@ -1,8 +1,6 @@
 <?php
 namespace App\Flare\Providers;
 
-use App\Flare\Console\Commands\UpdateCharacterSkills;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;

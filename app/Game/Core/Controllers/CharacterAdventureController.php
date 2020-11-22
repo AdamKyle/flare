@@ -15,9 +15,11 @@ class CharacterAdventureController extends Controller {
 
     public function __construct() {
         $this->middleware('auth');
+
         $this->middleware('is.character.dead')->only([
             'collectReward'
         ]);
+        
         $this->middleware('is.character.adventuring')->only([
             'collectReward'
         ]);

@@ -51,8 +51,6 @@ class ItemsController extends Controller {
 
             $character = $character->refresh();
 
-            $forMessage = $name . ' has been removed from your inventory. You have been compensated in the amount of: ' . $gold;
-
             event(new ServerMessageEvent($character->user, 'deleted_item', $name));
             event(new UpdateTopBarEvent($character));
         }

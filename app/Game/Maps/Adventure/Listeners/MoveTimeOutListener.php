@@ -8,9 +8,6 @@ use App\Game\Maps\Adventure\Jobs\MoveTimeOutJob;
 
 class MoveTimeOutListener
 {
-
-    public function __construct() {}
-
     /**
      * Handle the event.
      *

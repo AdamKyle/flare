@@ -2,24 +2,15 @@
 
 namespace App\Game\Core\Listeners;
 
-use Illuminate\Database\Eloquent\Collection;
 use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Services\CharacterService;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class DropsCheckListener
 {
-
-    private $characterService;
-
-    public function __construct(CharacterService $characterService) {
-        $this->characterService = $characterService;
-    }
 
     /**
      * Handle the event.

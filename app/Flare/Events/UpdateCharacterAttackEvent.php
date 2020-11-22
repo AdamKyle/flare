@@ -10,16 +10,14 @@ class UpdateCharacterAttackEvent
     use SerializesModels;
 
     /**
-     * The character.
-     *
-     * @var \App\Flare\Models\Character;
+     * @var Character $character;
      */
     public $character;
 
     /**
      * Create a new event instance.
      *
-     * @param  \App\Flare\Models\User $user
+     * @param Character $character
      * @return void
      */
     public function __construct(Character $character)

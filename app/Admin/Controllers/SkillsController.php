@@ -2,17 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Mail\ResetPasswordEmail;
-use App\Flare\Builders\CharacterInformationBuilder;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Jobs\UpdateSilencedUserJob;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Mail;
+use App\Flare\Models\GameSkill;
 
 class SkillsController extends Controller {
 
@@ -37,6 +28,4 @@ class SkillsController extends Controller {
             'skill' => $skill,
         ]);
     }
-
-    
 }

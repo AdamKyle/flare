@@ -9,6 +9,7 @@ use App\Flare\Models\Location;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Core\Events\BuyItemEvent;
 use App\Game\Core\Events\SellItemEvent;
+use App\Game\Core\Services\ShopService;
 
 class ShopController extends Controller {
 
@@ -41,25 +42,13 @@ class ShopController extends Controller {
         ]);
     }
 
-    public function shopSellAll() {
+    public function shopSellAll(ShopService $service) {
         $character = auth()->user()->character;
 
-        $itemsToSell = $character->inventory->slots->filter(function($slot) {
-            return !$slot->equipped && $slot->item->type !== 'quest';
-        })->all();
+        $totalSoldFor = $service->sellAllItemsInInventory($character);
 
-        $itemsToSell = collect($itemsToSell);
-
-        if ($itemsToSell->isEmpty()) {
+        if ($totalSoldFor === 0) {
             return redirect()->back()->with('error', 'You have nothing that you can sell.');
-        }
-
-        $totalSoldFor = 0;
-
-        foreach ($itemsToSell as $itemSlot) {
-            $totalSoldFor += SellItemCalculator::fetchTotalSalePrice($itemSlot->item);
-
-            event(new SellItemEvent($itemSlot, $character));
         }
 
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
@@ -117,6 +106,7 @@ class ShopController extends Controller {
     public function sell(Request $request) {
         
         $character     = auth()->user()->character;
+
         $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === (int) $request->slot_id && !$slot->equipped;
         })->first();
@@ -134,7 +124,7 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
-    public function shopSellBulk(Request $request) {
+    public function shopSellBulk(Request $request, ShopService $service) {
         $character = auth()->user()->character;
 
         $inventorySlots = $character->inventory->slots()->findMany($request->slots);
@@ -143,15 +133,7 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'No items could be found. Did you select any?');
         }
 
-        $totalSoldFor = 0;
-
-        foreach ($inventorySlots as $slot) {
-            $character = $character->refresh();
-
-            event(new SellItemEvent($slot, $character));
-
-            $totalSoldFor += SellItemCalculator::fetchTotalSalePrice($slot->item);
-        }
+        $totalSoldFor = $service->fetchTotalSoldFor($inventorySlots, $character);
 
         return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
     }

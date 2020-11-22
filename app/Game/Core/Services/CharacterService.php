@@ -8,7 +8,13 @@ use App\Game\Core\Values\LevelUpValue;
 
 class CharacterService
 {
-    public function levelUpCharacter(Character $character)
+    /**
+     * Level up the charater.
+     * 
+     * @param Character $character
+     * @return void
+     */
+    public function levelUpCharacter(Character $character): void
     {
         $character->update(resolve(LevelUpValue::class)->createValueObject($character));
     }

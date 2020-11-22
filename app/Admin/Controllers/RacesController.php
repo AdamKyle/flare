@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use Illuminate\Http\Request;
 use App\Flare\Models\GameRace;
 use App\Http\Controllers\Controller;
 

@@ -6,27 +6,25 @@ use App\Flare\Models\Character;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-
-use App\Flare\Models\User;
 
 class ForceNameChangeEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
+     * Character whos name is being changed.
      *
-     * @var \App\Flare\Models\User $user
+     * @var Character $character
      */
     public $character;
 
     /**
      * Create a new event instance.
      *
+     * @param Character $character
      * @return void
      */
     public function __construct(Character $character)

@@ -17,28 +17,36 @@ class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * the character sheet
-     *
-     * @var array
+     * @var Collection $adventureLogs
      */
     public $adventureLogs;
 
     /**
-     * The user
-     *
-     * @var \App\Flare\Models\User $users
+     * @var User $user
      */
     public $user;
 
+    /**
+     * @var mixed $canAdventureAgainAt
+     */
     public $canAdventureAgainAt;
 
+    /**
+     * @var Collection $adventureLogs
+     */
     public $isAdventuring;
 
+    /**
+     * @var bool $cancled | false
+     */
     public $canceled;
 
     /**
      * Create a new event instance.
      *
+     * @param Collection $adventureLogs
+     * @param User $user
+     * @param bool $cancled
      * @return void
      */
     public function __construct(Collection $adventureLogs, User $user, bool $canceled = false)

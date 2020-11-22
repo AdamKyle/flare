@@ -3,7 +3,6 @@
 namespace App\Flare\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 
 class IsCharacterDeadMiddleware
 {

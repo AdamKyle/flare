@@ -10,17 +10,40 @@ use App\Game\Maps\Values\MapPositionValue;
 
 class PortService {
 
+    /**
+     * @var DistanceCalculation $distanceCalculation
+     */
     private $distanceCalculator;
 
+    /**
+     * @var MapPositionValue $mapPositionValue
+     */
     private $mapPositionValue;
 
+    /**
+     * @var array $portDetails
+     */
     private $portDetails = [];
 
+    /**
+     * Constructor
+     * 
+     * @param DistanceCalculation $distanceCalculation
+     * @param MapPositionValue $mapPositionValue
+     * @return void
+     */
     public function __construct(DistanceCalculation $distanceCalculation, MapPositionValue $mapPositionValue) {
         $this->distanceCalculator = $distanceCalculation;
         $this->mapPositionValue   = $mapPositionValue;
     }
 
+    /**
+     * Get the port details
+     * 
+     * @param Character $character
+     * @param Location $location
+     * @return array
+     */
     public function getPortDetails(Character $character, Location $location): array {
 
         $this->portDetails['current_port'] = $location->getAttributes();
@@ -30,6 +53,16 @@ class PortService {
         return $this->portDetails;
     }
 
+    /**
+     * Does the port match?
+     * 
+     * @param Character $character
+     * @param Location $from
+     * @param Location $to
+     * @param int $timeOut
+     * @param int $cost
+     * @return bool
+     */
     public function doesMatch(Character $character, Location $from, Location $to, int $timeOut, int $cost): bool {
         $ports = $this->fetchOtherPorts($character, $from);
 
@@ -40,6 +73,13 @@ class PortService {
         return $foundPort->time === $timeOut && $foundPort->cost === $cost;
     }
 
+    /**
+     * Set sail
+     * 
+     * @param Character $character
+     * @param Location $newPort
+     * @return Character
+     */
     public function setSail(Character $character, Location $newPort): Character {
         $character->map()->update([
             'character_position_x' => $newPort->x,

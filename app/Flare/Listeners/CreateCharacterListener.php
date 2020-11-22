@@ -8,8 +8,17 @@ use App\Flare\Builders\CharacterBuilder;
 class CreateCharacterListener
 {
 
+    /**
+     * @var CharacterBuilder $characterBuilder
+     */
     private $characterBuilder;
 
+    /**
+     * Constructor
+     * 
+     * @param CharacterBuilder $characterBuilder
+     * @return void
+     */
     public function __construct(CharacterBuilder $characterBuilder) {
         $this->characterBuilder = $characterBuilder;
     }
@@ -17,7 +26,7 @@ class CreateCharacterListener
     /**
      * Handle the event.
      *
-     * @param  \App\Flare\Events\CreateCharacterEvent  $event
+     * @param  CreateCharacterEvent $event
      * @return void
      */
     public function handle(CreateCharacterEvent $event)

@@ -10,10 +10,23 @@ class SellItemEvent
 {
     use SerializesModels;
 
+    /**
+     * @var InventorySlot $inventorySlot
+     */
     public $inventorySlot;
 
+    /**
+     * @var Character $character
+     */
     public $character;
 
+    /**
+     * Constructor
+     * 
+     * @param InventorySlot $inventorySlot
+     * @param Character $character
+     * @return void
+     */
     public function __construct(InventorySlot $inventorySlot, Character $character)
     {
         $this->inventorySlot      = $inventorySlot;

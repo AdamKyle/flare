@@ -16,22 +16,16 @@ class ShowCraftingTimeOutEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * User that sent the message
-     *
-     * @var \App\Flare\Models\User
+     * @var User $user
      */
     public $user;
 
     /**
-     * show the bar
-     *
      * @var bool $activateBar
      */
     public $activatebar;
 
     /**
-     * can the player craft
-     *
      * @var bool $canCraft
      */
     public $canCraft;
@@ -40,6 +34,9 @@ class ShowCraftingTimeOutEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      *
+     * @param User $user
+     * @param bool $activateBar
+     * @param $bool $canCraft
      * @return void
      */
     public function __construct(User $user, bool $activatebar, bool $canCraft)

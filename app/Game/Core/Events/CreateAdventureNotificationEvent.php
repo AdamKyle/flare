@@ -10,8 +10,17 @@ class CreateAdventureNotificationEvent
 {
     use SerializesModels;
 
+    /**
+     * @var AdventureLog $adventureLog
+     */
     public $adventureLog;
 
+    /**
+     * Constructor
+     * 
+     * @param AdventureLog $adventureLog
+     * @return void
+     */
     public function __construct(AdventureLog $adventureLog)
     {
         $this->adventureLog = $adventureLog;

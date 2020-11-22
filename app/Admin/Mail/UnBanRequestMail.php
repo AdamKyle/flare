@@ -12,11 +12,15 @@ class UnBanRequestMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * @var User $user
+     */
     public $user;
 
     /**
      * Create a new message instance.
      *
+     * @param User $user
      * @return void
      */
     public function __construct(User $user)

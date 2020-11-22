@@ -59,30 +59,9 @@ class CharacterSkillController extends Controller {
             ], 422);
         }
 
-        $character->update([
-            'gold' => $character->gold - $item->cost,
-        ]);
+        $craftingSkill->updateCharacterGold($character, $item);
 
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        if ($currentSkill->level < $item->skill_level_required) {
-            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
-        } else if ($currentSkill->level >= $item->skill_level_trivial) { 
-            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
-
-            $this->attemptToPickUpItem($character->refresh(), $item);
-        } else {
-            $dcCheck       = $craftingSkill->fetchDCCheck($currentSkill);
-            $characterRoll = $craftingSkill->fetchCharacterRoll($currentSkill);
-
-            if ($characterRoll > $dcCheck) {
-                $this->attemptToPickUpItem($character->refresh(), $item);
-
-                event(new UpdateSkillEvent($currentSkill));
-            } else {
-                event(new ServerMessageEvent($character->user, 'failed_to_craft'));
-            }
-        }
+        $craftingSkill->sendOffServerMessage($currentSkill, $item, $character);
 
         $items = Item::where('can_craft', true)
                     ->where('crafting_type', strtolower($request->type))
@@ -96,19 +75,5 @@ class CharacterSkillController extends Controller {
         return response()->json([
             'items' => $items,
         ], 200);
-    }
-
-    protected function attemptToPickUpItem(Character $character, Item $item) {
-        if ($character->inventory->slots->count() !== $character->inventory_max) {
-
-            $character->inventory->slots()->create([
-                'item_id'      => $item->id,
-                'inventory_id' => $character->inventory->id,
-            ]);
-
-            event(new ServerMessageEvent($character->user, 'crafted', $item->affix_name));
-        } else {
-            event(new ServerMessageEvent($character->user, 'inventory_full'));
-        }
     }
 }

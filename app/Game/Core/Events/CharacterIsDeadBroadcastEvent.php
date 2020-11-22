@@ -18,15 +18,15 @@ class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
     public $isDead = false;
 
     /**
-     * The user
-     *
-     * @var \App\Flare\Models\User $users
+     * @var User $users
      */
     public $user;
 
     /**
      * Create a new event instance.
      *
+     * @param User $user
+     * @param bool $isDead | false
      * @return void
      */
     public function __construct(User $user, bool $isDead = false)
