@@ -35,6 +35,9 @@ class ItemAffixFactory extends Factory
             'skill_name'           => null,
             'skill_training_bonus' => null,
             'cost'                 => 500,
+            'int_required'         => 1,
+            'skill_level_required' => 1,
+            'skill_level_trivial'  => 100,
         ];
     }
 }

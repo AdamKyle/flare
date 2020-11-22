@@ -7,6 +7,7 @@ use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
 
 class CraftingSkillService {
@@ -80,11 +81,71 @@ class CraftingSkillService {
     }
 
     /**
+     * Update the characters gold when enchanting.
+     * 
+     * Subtract cost from gold.
+     * 
+     * @param Character $character
+     * @param ItemAffix $affix
+     * @return void
+     */
+    public function updateCharacterGoldForEnchanting(Character $character, ItemAffix $affix): void {
+        $character->update([
+            'gold' => $character->gold - $affix->cost,
+        ]);
+
+        event(new UpdateTopBarEvent($character->refresh()));
+    }
+
+    /**
+     * Send off the right server message.
+     * 
+     * - Server message for too hard, as in the character skill level is too low
+     * - Server message for too easy, as in the character skill level is too high, but you still enchant the item.
+     * - Server message for gaining enchanting the item.
+     * 
+     * @param Skill $currentSkill
+     * @param Item $item
+     * @param ItemAffix $itemAffix
+     * @param Character $character
+     * @return void
+     */
+    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, Item $item, ItemAffix $affix, Character $character): void {
+        if ($enchantingSkill->level < $item->skill_level_required) {
+            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+        } else if ($enchantingSkill->level >= $item->skill_level_trivial) { 
+            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+            
+            $this->attemptToPickUpItem($character->refresh(), $item);
+        } else {
+            $dcCheck       = $this->fetchDCCheck($enchantingSkill);
+            $characterRoll = $this->fetchCharacterRoll($enchantingSkill);
+
+            if ($characterRoll > $dcCheck) {
+                $this->enchantItem($item, $affix);
+
+                $message = 'Item: ' . $item->name . ' has had the enchantment: ' . $affix->name . ' applied!'; 
+
+                event(new ServerMessageEvent($character->user, 'enchanted', $message));
+
+                event(new UpdateSkillEvent($enchantingSkill));
+            } else {
+
+                $character->inventory->slots->where('item_id', $item->id)->first()->delete();
+                
+                $message = 'You failed to apply: ' . $affix->name . ' To item: ' . $item->name . '. You lost the investment and the item.';
+
+                event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
+            }
+        }
+    }
+
+    /**
      * Send off the right server message.
      * 
      * - Server message for too hard, as in the character skill level is too low
      * - Server message for too easy, as in the character skill level is too high, but you still get the item.
-     * - Server message for gaining he item.
+     * - Server message for gaining the item.
      * 
      * @param Skill $currentSkill
      * @param Item $item
@@ -120,9 +181,15 @@ class CraftingSkillService {
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'crafted', $item->affix_name));
+            event(new ServerMessageEvent($character->user, 'crafted', $item->name));
         } else {
             event(new ServerMessageEvent($character->user, 'inventory_full'));
         }
+    }
+
+    protected function enchantItem(Item $item, ItemAffix $itemAffix) {
+        $item->{'item_' . $itemAffix->type . '_id'} = $itemAffix->id;
+
+        $item->save();
     }
 }

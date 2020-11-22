@@ -54,6 +54,10 @@ class ServerMessageListener
                 $message = 'You crafted a: ' . $event->forMessage . '!';
 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'enchanted':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'enchantment_failed':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'failed_to_craft':
                 $message = 'You failed to craft the item! You lost the investment.';
 

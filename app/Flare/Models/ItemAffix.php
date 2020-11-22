@@ -31,6 +31,9 @@ class ItemAffix extends Model
         'cost',
         'skill_name',
         'skill_training_bonus',
+        'int_required',
+        'skill_level_required',
+        'skill_level_trivial',
     ];
 
     /**
@@ -48,6 +51,9 @@ class ItemAffix extends Model
         'int_mod'              => 'float',
         'skill_training_bonus' => 'float',
         'cost'                 => 'integer',
+        'int_required'         => 'integer',
+        'skill_level_required' => 'integer',
+        'skill_level_trivial'  => 'integer',
     ];
 
     protected static function newFactory() {

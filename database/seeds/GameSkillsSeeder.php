@@ -111,6 +111,18 @@ class GameSkillsSeeder extends Seeder
                 'max_level'                          => 400,
                 'skill_bonus_per_level'              => 0.0025
              ],
+             [
+               'name'                               => 'Enchanting',
+               'description'                        => 'A skill used in enchanting items.',
+               'base_damage_mod_bonus_per_level'    => 0.0,
+               'base_healing_mod_bonus_per_level'   => 0.0,
+               'base_ac_mod_bonus_per_level'        => 0.0,
+               'fight_time_out_mod_bonus_per_level' => 0.0,
+               'move_time_out_mod_bonus_per_level'  => 0.0,
+               'can_train'                          => false,
+               'max_level'                          => 400,
+               'skill_bonus_per_level'              => 0.0025
+            ],
         ]);
     }
 }

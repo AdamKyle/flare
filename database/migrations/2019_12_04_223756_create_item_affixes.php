@@ -25,6 +25,9 @@ class CreateItemAffixes extends Migration
             $table->decimal('dex_mod', 5, 4)->nullable();
             $table->decimal('chr_mod', 5, 4)->nullable();
             $table->decimal('int_mod', 5, 4)->nullable();
+            $table->integer('int_required')->nullable()->default(1);
+            $table->integer('skill_level_required')->nullable();
+            $table->integer('skill_level_trivial')->nullable();
             $table->string('skill_name')->nullable();
             $table->decimal('skill_training_bonus', 5, 4)->nullable();
             $table->string('type');

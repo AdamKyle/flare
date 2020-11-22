@@ -2,12 +2,13 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Models\ItemAffix;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Services\CraftingSkillService;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class CharacterSkillController extends Controller {
 
     public function fetchItemsToCraft(Request $request, Character $character) {
         $foundSkill = $character->skills->where('name', $request->crafting_type . ' Crafting')->first();
-        $items      = item::where('can_craft', true)
+        $items      = Item::where('can_craft', true)
                             ->where('crafting_type', strtolower($request->crafting_type))
                             ->where('skill_level_required', '<=', $foundSkill->level)
                             ->where('item_prefix_id', null)
@@ -33,6 +34,53 @@ class CharacterSkillController extends Controller {
         return response()->json([
             'items' => $items,
         ], 200);
+    }
+
+    public function fetchAffixes(Character $character, CharacterInformationBuilder $builder) {
+
+        $builder = $builder->setCharacter($character);
+        $enchatingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
+        
+        return response()->json([
+            'affixes' => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
+                                  ->where('skill_level_required', '<=', $enchatingSkill->level)
+        ]);
+    }
+
+    public function trainEnchanting(Request $request, Character $character, CharacterInformationBuilder $builder, CraftingSkillService $craftingService) {
+        $request->validate([
+            'item_id' => 'required',
+            'affix_id' => 'required',
+        ]);
+
+        $builder        = $builder->setCharacter($character);
+        $enchatingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
+
+        $affix = ItemAffix::find($request->affix_id);
+        $item  = Item::find($request->item_id);
+
+        if (is_null($affix) || is_null($item)) {
+            return response()->json([
+                'message' => 'Invalid input.'
+            ], 422);
+        }
+
+        if ($affix->cost > $character->gold) {
+            event(new ServerMessageEvent($character->user, 'not_enough_gold'));
+
+            return response()->json([], 200);
+        }
+
+        $craftingService->updateCharacterGoldForEnchanting($character, $affix);
+
+        $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $item, $affix, $character);
+
+        event(new CraftedItemTimeOutEvent($character->refresh()));
+
+        return response()->json([
+            'affixes' => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
+                                  ->where('skill_level_required', '<=', $enchatingSkill->level)
+        ]);
     }
 
     public function trainCrafting(CraftingSkillService $craftingSkill, Request $request, Character $character) {
