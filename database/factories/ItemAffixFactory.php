@@ -37,7 +37,7 @@ class ItemAffixFactory extends Factory
             'cost'                 => 500,
             'int_required'         => 1,
             'skill_level_required' => 1,
-            'skill_level_trivial'  => 100,
+            'skill_level_trivial'  => 10,
         ];
     }
 }

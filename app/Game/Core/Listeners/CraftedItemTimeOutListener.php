@@ -15,8 +15,21 @@ class CraftedItemTimeOutListener
             'can_craft_again_at' => now()->addSeconds(10),
         ]);
 
-        broadcast(new ShowCraftingTimeOutEvent($event->character->user, true, false, 10));
+        $timeOut = 10;
 
-        CraftTimeOutJob::dispatch($event->character)->delay(now()->addSeconds(10));
+        if (!is_null($event->extraTime)) {
+            switch($event->extraTime) {
+                case 'double':
+                    $timeOut = 20;
+                    return;
+                case 'tripple':
+                    $timeOut = 30;
+                    return;
+            }
+        }
+
+        broadcast(new ShowCraftingTimeOutEvent($event->character->user, true, false, $timeOut));
+
+        CraftTimeOutJob::dispatch($event->character)->delay(now()->addSeconds($timeOut));
     }
 }

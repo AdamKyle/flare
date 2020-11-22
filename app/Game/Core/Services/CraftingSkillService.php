@@ -9,6 +9,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
+use Illuminate\Database\Eloquent\Collection;
 
 class CraftingSkillService {
 
@@ -50,7 +51,7 @@ class CraftingSkillService {
     public function fetchDCCheck(Skill $skill): int {
         $dcCheck = rand(0, $skill->max_level);
         
-        return $dcCheck !== 0 ? $dcCheck - $skill->level : $dcCheck;
+        return $dcCheck !== 0 ? $dcCheck - $skill->level : 1;
     }
 
     /**
@@ -86,12 +87,12 @@ class CraftingSkillService {
      * Subtract cost from gold.
      * 
      * @param Character $character
-     * @param ItemAffix $affix
+     * @param int $cost
      * @return void
      */
-    public function updateCharacterGoldForEnchanting(Character $character, ItemAffix $affix): void {
+    public function updateCharacterGoldForEnchanting(Character $character, int $cost): void {
         $character->update([
-            'gold' => $character->gold - $affix->cost,
+            'gold' => $character->gold - $cost,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));
@@ -110,34 +111,49 @@ class CraftingSkillService {
      * @param Character $character
      * @return void
      */
-    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, Item $item, ItemAffix $affix, Character $character): void {
-        if ($enchantingSkill->level < $item->skill_level_required) {
-            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
-        } else if ($enchantingSkill->level >= $item->skill_level_trivial) { 
-            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
-            
-            $this->attemptToPickUpItem($character->refresh(), $item);
-        } else {
-            $dcCheck       = $this->fetchDCCheck($enchantingSkill);
-            $characterRoll = $this->fetchCharacterRoll($enchantingSkill);
-
-            if ($characterRoll > $dcCheck) {
+    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, Item $item, Collection $affixes, Character $character): void {
+        forEach($affixes as $affix) {
+            if ($enchantingSkill->level < $affix->skill_level_required) {
+                event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+            } else if ($enchantingSkill->level >= $affix->skill_level_trivial) { 
+                event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+                
                 $this->enchantItem($item, $affix);
-
-                $message = 'Item: ' . $item->name . ' has had the enchantment: ' . $affix->name . ' applied!'; 
-
+    
+                $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
+    
                 event(new ServerMessageEvent($character->user, 'enchanted', $message));
-
+    
                 event(new UpdateSkillEvent($enchantingSkill));
             } else {
+                $dcCheck       = $this->fetchDCCheck($enchantingSkill);
+                $characterRoll = $this->fetchCharacterRoll($enchantingSkill);
 
-                $character->inventory->slots->where('item_id', $item->id)->first()->delete();
-                
-                $message = 'You failed to apply: ' . $affix->name . ' To item: ' . $item->name . '. You lost the investment and the item.';
+                if (!is_null($item->{'item_' . $affix->type . '_id'})) {
+                    $dcCheck += 10;
+                }
+    
+                if ($characterRoll > $dcCheck) {
+                    $this->enchantItem($item, $affix);
+    
+                    $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
+    
+                    event(new ServerMessageEvent($character->user, 'enchanted', $message));
+    
+                    event(new UpdateSkillEvent($enchantingSkill));
+                } else {
+    
+                    $character->inventory->slots->where('item_id', $item->id)->first()->delete();
+                    
+                    $message = 'You failed to apply enchantments to: ' . $item->name . '. The item shatters before you. You lost the investment.';
+    
+                    event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
 
-                event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
+                    return;
+                }
             }
         }
+        
     }
 
     /**
@@ -162,7 +178,7 @@ class CraftingSkillService {
         } else {
             $dcCheck       = $this->fetchDCCheck($currentSkill);
             $characterRoll = $this->fetchCharacterRoll($currentSkill);
-
+            dump($dcCheck, $characterRoll);
             if ($characterRoll > $dcCheck) {
                 $this->attemptToPickUpItem($character->refresh(), $item);
 
@@ -187,8 +203,8 @@ class CraftingSkillService {
         }
     }
 
-    protected function enchantItem(Item $item, ItemAffix $itemAffix) {
-        $item->{'item_' . $itemAffix->type . '_id'} = $itemAffix->id;
+    protected function enchantItem(Item $item, $affix) {
+        $item->{'item_' . $affix->type . '_id'} = $affix->id;
 
         $item->save();
     }

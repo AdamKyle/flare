@@ -49,33 +49,37 @@ class CharacterSkillController extends Controller {
 
     public function trainEnchanting(Request $request, Character $character, CharacterInformationBuilder $builder, CraftingSkillService $craftingService) {
         $request->validate([
-            'item_id' => 'required',
-            'affix_id' => 'required',
+            'item_id'   => 'required',
+            'affix_ids' => 'required',
+            'cost'      => 'required',
+            'extraTime' => 'nullable|in:double,tripple'
         ]);
 
         $builder        = $builder->setCharacter($character);
         $enchatingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
 
-        $affix = ItemAffix::find($request->affix_id);
-        $item  = Item::find($request->item_id);
-
-        if (is_null($affix) || is_null($item)) {
+        $affixes  = ItemAffix::findMany($request->affix_ids);
+        $itemSlot = $character->inventory->slots->where('item_id', $request->item_id)->where('equipped', false)->first();
+        
+        if ($affixes->isEmpty() || is_null($itemSlot)) {
             return response()->json([
                 'message' => 'Invalid input.'
             ], 422);
         }
 
-        if ($affix->cost > $character->gold) {
+        $item = $itemSlot->item;
+
+        if ($request->cost > $character->gold) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold'));
 
             return response()->json([], 200);
         }
 
-        $craftingService->updateCharacterGoldForEnchanting($character, $affix);
+        $craftingService->updateCharacterGoldForEnchanting($character, $request->cost);
 
-        $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $item, $affix, $character);
+        $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $item, $affixes, $character);
 
-        event(new CraftedItemTimeOutEvent($character->refresh()));
+        event(new CraftedItemTimeOutEvent($character->refresh()), $request->extraTime);
 
         return response()->json([
             'affixes' => ItemAffix::where('int_required', '<=', $builder->statMod('int'))

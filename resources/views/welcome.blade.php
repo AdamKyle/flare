@@ -4,7 +4,7 @@
     <div class="container welcome">
         <div class="row justify-content-center">
             <div class="col-xl-8 col-lg-11 col-md-12">
-                <div class="jumbotron">
+                <div class="jumbotron  mt-5">
                     <h1>Planes of Tlessa</h1>
                     <p>A world full of mystery and exploration.</p>
                     <a class="btn btn-primary btn hero-btn" href="{{route('register')}}" role="button">Join Today!</a>
@@ -12,8 +12,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="alert alert-warning text-center"><i class="fas fa-exclamation-circle text-danger"></i> Right now Tlessa does not support devices smaller then a tablet. <i class="fas fa-exclamation-circle text-danger"></i></div>
         
         <div class="row justify-content-center mb-2 mt-2">
             <div class="col-lg-12">

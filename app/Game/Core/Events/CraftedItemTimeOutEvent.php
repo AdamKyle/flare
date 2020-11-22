@@ -15,13 +15,20 @@ class CraftedItemTimeOutEvent
     public $character;
 
     /**
+     * @var string $extraTime
+     */
+    public $extraTime;
+
+    /**
      * Constructor
      * 
      * @param Character $character
+     * @param string $extraTime | null
      * @return void
      */
-    public function __construct(Character $character)
+    public function __construct(Character $character, string $extraTime = null)
     {
         $this->character = $character;
+        $this->extraTime = $extraTime;
     }
 }
