@@ -47,7 +47,9 @@
                         <!-- ============================================================== -->
                         @guest
                         @else
+                        <div style="position: absolute; right: 10px;">
                             @include('layouts.partials.user-profile-nav')
+                        </div>
                         @endguest
 
                         <ul class="navbar-nav my-lg-0 text-align-right force-right">

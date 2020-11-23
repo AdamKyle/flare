@@ -21,6 +21,10 @@
                 'pageName' => 'map'
               ])}}">Map</a></li>
     <li class="nav-devider"></li>
+    <li><a href="{{route('info.page', [
+        'pageName' => 'adventure'
+      ])}}">Adventure</a></li>
+    <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
             'pageName' => 'skill-information'

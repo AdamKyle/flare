@@ -16,6 +16,13 @@
   @media only screen and (max-width: 1027px) {
     display: none;
   }
+
+  ul li.nav-devider {
+    height: 1px;
+    background: rgba(120, 130, 140, 0.13);
+    display: block;
+    margin: 10px 0;
+  }
 }
 
 .info-sidebar-toggler {
