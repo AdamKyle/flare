@@ -13,11 +13,13 @@
         ])}}">Core Rules</a>
     </li>
     <li class="nav-devider"></li>
-    <li>
-        <a href="{{route('info.page', [
-            'pageName' => 'character-information'
-          ])}}">Character Information</a>
-    </li>
+    <li><a href="{{route('info.page', [
+                'pageName' => 'character-information'
+              ])}}">Character Information</a></li>
+    <li class="nav-devider"></li>
+    <li><a href="{{route('info.page', [
+                'pageName' => 'map'
+              ])}}">Map</a></li>
     <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
@@ -27,8 +29,20 @@
     <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
-            'pageName' => 'adventure'
-          ])}}">Adventure</a>
+            'pageName' => 'crafting'
+          ])}}">Crafting</a>
+    </li>
+    <li class="nav-devider"></li>
+    <li>
+        <a href="{{route('info.page', [
+            'pageName' => 'enchanting'
+          ])}}">Enchanting</a>
+    </li>
+    <li class="nav-devider"></li>
+    <li>
+        <a href="{{route('info.page', [
+            'pageName' => 'monsters'
+          ])}}">Monsters List</a>
     </li>
     <li class="nav-devider"></li>
     <li>

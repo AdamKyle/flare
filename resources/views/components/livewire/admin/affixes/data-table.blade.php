@@ -71,24 +71,27 @@
                                 <td>{{is_null($itemAffix->base_healing) ? 'N/A' : $itemAffix->base_healing}}</td>
                                 <td>{{is_null($itemAffix->cost) ? 'N/A' : $itemAffix->cost}}</td>
                                 <td>
-                                    @if(auth()->user()->hasRole('Admin'))
-                                        <x-buttons.simple-button
-                                            button-route="{{route('affixes.edit', [
-                                                'affix' => $itemAffix->id
-                                            ])}}"
-                                            button-title="Edit"
-                                            class="btn btn-primary btn-sm"
-                                        /> 
+                                    @guest
+                                    @else
+                                        @if(auth()->user()->hasRole('Admin'))
+                                            <x-buttons.simple-button
+                                                button-route="{{route('affixes.edit', [
+                                                    'affix' => $itemAffix->id
+                                                ])}}"
+                                                button-title="Edit"
+                                                class="btn btn-primary btn-sm"
+                                            /> 
 
-                                        <x-forms.button-with-form
-                                            form-route="{{route('affixes.delete', [
-                                                'affix' => $itemAffix->id
-                                            ])}}"
-                                            form-id="{{'delete-item-affix-'.$itemAffix->id}}"
-                                            button-title="Delete"
-                                            class="btn btn-danger btn-sm"
-                                        />
-                                    @endif
+                                            <x-forms.button-with-form
+                                                form-route="{{route('affixes.delete', [
+                                                    'affix' => $itemAffix->id
+                                                ])}}"
+                                                form-id="{{'delete-item-affix-'.$itemAffix->id}}"
+                                                button-title="Delete"
+                                                class="btn btn-danger btn-sm"
+                                            />
+                                        @endif
+                                    @endguest
                                 </td>
                             </tr>
                         @endforeach

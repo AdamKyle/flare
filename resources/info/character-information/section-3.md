@@ -8,6 +8,7 @@ Youre character can die in a few ways. Fighting monsters and dying in an adventu
 - Set Sail
 - Adventure
 - Craft
+- Enchant
 - Equip/Unequip
 - Sell/Buy from either the shop or maret board.
 - Destroy items

@@ -123,8 +123,6 @@ class CraftingSkillService {
                 $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
     
                 event(new ServerMessageEvent($character->user, 'enchanted', $message));
-    
-                event(new UpdateSkillEvent($enchantingSkill));
             } else {
                 $dcCheck       = $this->fetchDCCheck($enchantingSkill);
                 $characterRoll = $this->fetchCharacterRoll($enchantingSkill);

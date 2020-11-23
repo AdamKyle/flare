@@ -13,7 +13,9 @@
 
             @if (!is_null($section['view']))
                 @if ($section['livewire'])
-                    @livewire($section['view'])
+                    @livewire($section['view'], [
+                        'only' => $section['only']
+                    ])
                 @else
                     false
                 @endif

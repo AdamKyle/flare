@@ -34,19 +34,24 @@ class InfoPageController extends Controller
 
         for ($i = 0; $i < count($files); $i++) {
 
-            $view    = null;
-            $livewire = false;
+            if (explode('.', $files[$i])[1] === 'md') {
+                $view    = null;
+                $livewire = false;
+                $only    = null;
 
-            if (isset(config('info.' . $pageName)[$i])) {
-                $view     = config('info.' . $pageName)[$i]['view'];
-                $livewire = config('info.' . $pageName)[$i]['livewire'];
+                if (isset(config('info.' . $pageName)[$i])) {
+                    $view     = config('info.' . $pageName)[$i]['view'];
+                    $livewire = config('info.' . $pageName)[$i]['livewire'];
+                    $only     = config('info.' . $pageName)[$i]['only'];
+                }
+
+                $sections[] = [
+                    'content'  => Storage::disk('info')->get($files[$i]),
+                    'view'     => $view,
+                    'livewire' => $livewire,
+                    'only'     => $only,
+                ];
             }
-
-            $sections[] = [
-                'content'  => Storage::disk('info')->get($files[$i]),
-                'view'     => $view,
-                'livewire' => $livewire,
-            ];
         }
 
         return view('information.core', [

@@ -17,6 +17,7 @@ class DataTable extends Component
     public $search       = '';
     public $sortField    = 'type';
     public $perPage      = 10;
+    public $only         = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -25,6 +26,21 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
+        if (is_null(auth()->user())) {
+            
+            $item = Item::dataTableSearch($this->search);
+      
+            if ($this->only === 'quest-items-book') {
+                $item = $item->where('type', 'quest')->where('name', 'like', '%Book%');
+            } else {
+                $item = $item->where('type', '!=', 'quest');
+            }
+            
+            return $item->where('item_suffix_id', null)
+                        ->where('item_prefix_id', null)
+                        ->orderBy($this->sortField, $this->sortBy);
+        }
+        
         if (auth()->user()->hasRole('Admin')) {
             $items = Item::dataTableSearch($this->search);
 

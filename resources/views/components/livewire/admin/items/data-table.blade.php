@@ -26,9 +26,12 @@
                 @endempty
                 <x-data-tables.table :collection="$items">
                     <x-data-tables.header>
-                        <x-data-tables.header-row>
-                            <input type="checkbox" wire:model="pageSelected"/>
-                        </x-data-tables.header-row>
+                        @guest
+                        @else
+                            <x-data-tables.header-row>
+                                <input type="checkbox" wire:model="pageSelected"/>
+                            </x-data-tables.header-row>
+                        @endguest
 
                         <x-data-tables.header-row 
                             wire:click.prevent="sortBy('name')" 
@@ -78,9 +81,12 @@
                             field="cost"
                         />
 
-                        <x-data-tables.header-row>
-                            Actions
-                        </x-data-tables.header-row>
+                        @guest
+                        @else
+                            <x-data-tables.header-row>
+                                Actions
+                            </x-data-tables.header-row>
+                        @endGuest
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @if ($pageSelected)
@@ -99,9 +105,12 @@
                         @endif
                         @forelse($items as $item)
                             <tr wire:key="items-table-{{$item->id}}">
-                                <td>
-                                    <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
-                                </td>
+                                @guest
+                                @else
+                                    <td>
+                                        <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
+                                    </td>
+                                @endguest
                                 <td><a href="{{route('items.item', [
                                     'item' => $item->id
                                 ])}}"><x-item-display-color :item="$item" /></a></td>
@@ -110,34 +119,36 @@
                                 <td>{{is_null($item->base_ac) ? 'N/A' : $item->base_ac}}</td>
                                 <td>{{is_null($item->base_healing) ? 'N/A' : $item->base_healing}}</td>
                                 <td>{{is_null($item->cost) ? 'N/A' : $item->cost}}</td>
-                                <td>
-                                    @if(auth()->user()->hasRole('Admin'))
-
-                                        <a href="{{route('items.edit', [
-                                            'item' => $item->id
-                                        ])}}" class="btn btn-sm btn-primary">
-                                            Edit
-                                        </a> 
-
-                                        <x-forms.button-with-form
-                                            form-route="{{route('items.delete', [
+                                @guest
+                                @else
+                                    <td>
+                                        @if(auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('items.edit', [
                                                 'item' => $item->id
-                                            ])}}"
-                                            form-id="{{'delete-item-'.$item->id}}"
-                                            button-title="Delete"
-                                            class="btn btn-danger btn-sm"
-                                        /> 
-                                    @else
-                                        <x-forms.button-with-form
-                                            form-route="{{route('game.shop.buy.item')}}"
-                                            form-id="{{'shop-buy-form-item-'.$item->id}}"
-                                            button-title="Buy"
-                                            class="btn btn-primary btn-sm"
-                                        >
-                                            <input type="hidden" name="item_id" value={{$item->id}} />
-                                        </x-forms.button-with-form> 
-                                    @endif
-                                </td>
+                                            ])}}" class="btn btn-sm btn-primary">
+                                                Edit
+                                            </a> 
+
+                                            <x-forms.button-with-form
+                                                form-route="{{route('items.delete', [
+                                                    'item' => $item->id
+                                                ])}}"
+                                                form-id="{{'delete-item-'.$item->id}}"
+                                                button-title="Delete"
+                                                class="btn btn-danger btn-sm"
+                                            /> 
+                                        @else
+                                            <x-forms.button-with-form
+                                                form-route="{{route('game.shop.buy.item')}}"
+                                                form-id="{{'shop-buy-form-item-'.$item->id}}"
+                                                button-title="Buy"
+                                                class="btn btn-primary btn-sm"
+                                            >
+                                                <input type="hidden" name="item_id" value={{$item->id}} />
+                                            </x-forms.button-with-form> 
+                                        @endif
+                                    </td>
+                                @endguest
                             </tr>
                         @empty
                             <x-data-tables.no-results colspan="8"/>
