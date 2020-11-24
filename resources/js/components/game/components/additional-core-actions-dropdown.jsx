@@ -9,6 +9,7 @@ export default class AdditionalCoreActionsDropDown extends React.Component {
       
       this.state = {
         showCrafting: false,
+        ahowEnchanting: false,
       }
     }
 
@@ -18,9 +19,25 @@ export default class AdditionalCoreActionsDropDown extends React.Component {
       }
 
       this.setState({
-        showCrafting: this.state.showCrafting ? false : true,
+        showCrafting: !this.state.showCrafting,
+        showEnchanting: false,
       }, () => {
         this.props.updateShowCrafting(this.state.showCrafting);
+        this.props.updateShowEnchanting(this.state.showEnchanting);
+      });
+    }
+
+    addEnchantingAction() {
+      if (!this.props.canCraft) {
+        return getServerMessage('cant_enchant');
+      }
+
+      this.setState({
+        showEnchanting: !this.state.showEnchanting,
+        showCrafting: false,
+      }, () => {
+        this.props.updateShowCrafting(this.state.showCrafting);
+        this.props.updateShowEnchanting(this.state.showEnchanting);
       });
     }
 
@@ -41,6 +58,7 @@ export default class AdditionalCoreActionsDropDown extends React.Component {
 
             <Dropdown.Menu>
             <Dropdown.Item onClick={this.addCraftingAction.bind(this)}>{this.state.showCrafting ? 'Remove Crafting' : 'Craft'}</Dropdown.Item>
+            <Dropdown.Item onClick={this.addEnchantingAction.bind(this)}>{this.state.showEnchanting ? 'Remove Enchanting' : 'Enchant'}</Dropdown.Item>
             {this.state.showCrafting
               ?
               <Dropdown.Item onClick={this.changeType.bind(this)}>Change Type</Dropdown.Item>

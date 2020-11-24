@@ -38,6 +38,23 @@
                     </dl>
                 </div>
             </div>
+
+            <h2 class="mt-2 mb-2">Enchanting Information</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <dl>
+                        <dt>Base Cost:</dt>
+                        <dd>{{$itemAffix->cost}} gold</dd>
+                        <dt>Intelligence Required:</dt>
+                        <dd>{{$itemAffix->int_required}}</dd>
+                        <dt>Level Required:</dt>
+                        <dd>{{$itemAffix->skill_level_required}}</dd>
+                        <dt>Level Becomes To Easy:</dt>
+                        <dd>{{$itemAffix->skill_level_trivial}}</dd>
+                    </dl>
+                </div>
+            </div>
         </div>
     </div>
     @livewire('admin.items.data-table', [

@@ -38,12 +38,21 @@ class CharacterSkillController extends Controller {
 
     public function fetchAffixes(Character $character, CharacterInformationBuilder $builder) {
 
-        $builder = $builder->setCharacter($character);
+        $builder        = $builder->setCharacter($character);
         $enchatingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
-        
+
+        $inventory      = $character->inventory->slots->filter(function($slot) {
+            if ($slot->item->type !== 'quest' && !$slot->equipped) {
+                return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+            }
+
+        })->all();
+
         return response()->json([
             'affixes' => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
                                   ->where('skill_level_required', '<=', $enchatingSkill->level)
+                                  ->get(),
+            'character_inventory' => array_values($inventory),
         ]);
     }
 

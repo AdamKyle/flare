@@ -63,6 +63,12 @@ export default class CoreActionsSection extends React.Component {
     });
   }
 
+  updateShowEnchanting(show) {
+    this.setState({
+      showEnchanting: show,
+    });
+  }
+
   updateCanCraft(can) {
     this.setState({
       canCraft: can,
@@ -93,6 +99,7 @@ export default class CoreActionsSection extends React.Component {
               isAdventuring={this.state.isAdventuring}
               changeCraftingType={this.changeCraftingType.bind(this)}
               updateShowCrafting={this.updateShowCrafting.bind(this)}
+              updateShowEnchanting={this.updateShowEnchanting.bind(this)}
               canCraft={this.state.canCraft}
             />
           </div>
@@ -101,6 +108,7 @@ export default class CoreActionsSection extends React.Component {
             character={this.state.character}
             monsters={this.state.monsters}
             showCrafting={this.state.showCrafting}
+            showEnchanting={this.state.showEnchanting}
             isDead={this.state.isDead}
             shouldChangeCraftingType={this.state.changeCraftingType}
             isCharacterDead={this.characterIsDead.bind(this)}

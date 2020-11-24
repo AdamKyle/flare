@@ -4,6 +4,7 @@ import Attack from './attack/attack';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
 import CraftingAction from '../crafting/crafting-action';
+import EnchantingAction from '../enchanting/enchanting-action';
 
 export default class BattleAction extends React.Component {
 
@@ -286,6 +287,17 @@ export default class BattleAction extends React.Component {
           isDead={this.state.character.is_dead}
           characterId={this.state.character.id}
           showCrafting={this.props.showCrafting}
+          shouldChangeCraftingType={this.props.shouldChangeCraftingType}
+          changeCraftingType={this.props.changeCraftingType}
+          userId={this.props.userId}
+          characterGold={this.state.character.gold}
+          timeRemaining={this.props.character.can_craft_again_at}
+          updateCanCraft={this.props.updateCanCraft}
+        />
+        <EnchantingAction
+          isDead={this.state.character.is_dead}
+          characterId={this.state.character.id}
+          showEnchanting={this.props.showEnchanting}
           shouldChangeCraftingType={this.props.shouldChangeCraftingType}
           changeCraftingType={this.props.changeCraftingType}
           userId={this.props.userId}
