@@ -240,12 +240,14 @@ class AdventureService {
 
             $adventureLog->update([
                 'logs' => $logDetails,
+                'rewards' => $this->getRewards($adventureLog),
             ]);
         } else {
             $logs[$this->name][] = $attackService->getLogInformation();
             
             $adventureLog->update([
                 'logs' => $logs,
+                'rewards' => $this->getRewards($adventureLog),
             ]);
         }
     }
@@ -306,12 +308,42 @@ class AdventureService {
                 'took_to_long'         => true,
             ]);
         } else {
-            $adventureLog->update([
-                'in_progress'          => false,
-                'last_completed_level' => $level,
-                'complete'             => true,
-                'rewards'              => $this->rewards,
-            ]);
+            if(empty($adventureLog->rewards)) {
+                $adventureLog->update([
+                    'in_progress'          => false,
+                    'last_completed_level' => $level,
+                    'complete'             => true,
+                    'rewards'              => $this->rewards,
+                ]);
+            } else {
+                $adventureLog->update([
+                    'in_progress'          => false,
+                    'last_completed_level' => $level,
+                    'complete'             => true,
+                    'rewards'              => $this->getRewards($adventureLog),
+                ]);
+            }
+            
+        }
+    }
+
+    private function getRewards(AdventureLog $adventureLog): array {
+        if(empty($adventureLog->rewards)) {
+            return $this->rewards;
+        } else {
+            $rewards = $adventureLog->rewards;
+            
+            $rewards['gold'] += $this->rewards['gold'];
+            $rewards['exp']  += $this->rewards['exp'];
+            
+
+            if (isset($rewards['skill'])) {
+                $rewards['skill']['exp'] += $this->rewards['skill']['exp'];
+            }
+
+            $rewards['items'] = array_merge($rewards['items'], $this->rewards['items']);
+
+            return $rewards;
         }
     }
 }

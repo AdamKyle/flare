@@ -18,3 +18,4 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .DS_Store
+**/.DS_Store
