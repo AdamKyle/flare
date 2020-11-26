@@ -18,10 +18,15 @@ class CreateNotifications extends Migration
             $table->bigInteger('character_id')->unsigned();
             $table->foreign('character_id')
                   ->references('id')->on('characters');
+            $table->bigInteger('adventure_id')->unsigned()->nullable();
+            $table->foreign('adventure_id')
+                ->references('id')->on('adventures');
             $table->string('title');
             $table->string('message');
             $table->string('status');
             $table->string('type');
+            $table->boolean('read')->nullable()->default(false);
+            $table->string('url')->default('');
             $table->timestamps();
         });
     }

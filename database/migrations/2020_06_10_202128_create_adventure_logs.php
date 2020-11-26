@@ -23,6 +23,8 @@ class CreateAdventureLogs extends Migration
             $table->boolean('complete')->nullable()->default(false);
             $table->integer('last_completed_level')->nullable();
             $table->json('logs')->nullable();
+            $table->json('rewards')->nullable();
+            $table->boolean('took_to_long')->nullable()->default(false);
             $table->timestamps();
         });
     }

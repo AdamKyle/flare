@@ -46,6 +46,7 @@ class CreateCharacters extends Migration
             $table->dateTime('can_attack_again_at')->nullable();
             $table->dateTime('can_craft_again_at')->nullable();
             $table->dateTime('can_adventure_again_at')->nullable();
+            $table->boolean('force_name_change')->nullable()->default(false);
             $table->timestamps();
         });
     }

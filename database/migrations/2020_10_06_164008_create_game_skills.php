@@ -25,6 +25,7 @@ class CreateGameSkills extends Migration
             $table->decimal('move_time_out_mod_bonus_per_level', 5, 4)->nullable();
             $table->boolean('can_train')->nullable()->default(true);
             $table->decimal('skill_bonus_per_level', 5, 4)->nullable();
+            $table->boolean('specifically_assigned')->nullable()->default(false);
             $table->timestamps();
         });
     }

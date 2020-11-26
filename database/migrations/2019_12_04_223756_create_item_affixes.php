@@ -30,6 +30,7 @@ class CreateItemAffixes extends Migration
             $table->integer('skill_level_trivial')->nullable();
             $table->string('skill_name')->nullable();
             $table->decimal('skill_training_bonus', 5, 4)->nullable();
+            $table->integer('cost')->default(0);
             $table->string('type');
             $table->timestamps();
         });

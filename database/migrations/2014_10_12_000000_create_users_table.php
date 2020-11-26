@@ -20,6 +20,14 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('game_key')->unique()->nullable()->default(null);
             $table->string('private_game_key')->unique()->nullable()->default(null);
+            $table->integer('message_throttle_count')->nullable()->default(0);
+            $table->dateTime('can_speak_again_at')->nullable();
+            $table->boolean('is_silenced')->nullable()->default(false);
+            $table->string('ip_address')->nullable()->default('0.0.0.0');
+            $table->boolean('is_banned')->nullable()->default(false);
+            $table->dateTime('unbanned_at')->nullable();
+            $table->string('banned_reason')->nullable();
+            $table->string('un_ban_request')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

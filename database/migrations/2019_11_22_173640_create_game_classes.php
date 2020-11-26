@@ -25,6 +25,7 @@ class CreateGameClasses extends Migration
             $table->decimal('accuracy_mod', 5, 4)->nullable()->default(0);
             $table->decimal('dodge_mod', 5, 4)->nullable()->default(0);
             $table->decimal('deffense_mod', 5, 4)->nullable()->default(0);
+            $table->decimal('looting_mod', 5, 4)->nullable()->default(0);
             $table->timestamps();
         });
     }
