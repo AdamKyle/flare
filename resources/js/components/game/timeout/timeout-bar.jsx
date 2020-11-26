@@ -121,7 +121,7 @@ export default class TimeOutBar extends React.Component {
     } else {
       return (
         <div className={this.props.cssClass}>
-          <div className="float-left">
+          <div className="float-left ml-3">
             <CountdownCircleTimer
               isPlaying={this.state.active}
               duration={maxTimeOut}

@@ -59,4 +59,12 @@ class ItemAffix extends Model
     protected static function newFactory() {
         return ItemAffixFactory::new();
     }
+
+    public function scopeGetOppisiteType() {
+        if ($this->type === 'suffix')  {
+            return 'prefix';
+        }
+
+        return 'suffix';
+    }
 }

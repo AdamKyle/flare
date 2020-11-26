@@ -17,10 +17,13 @@ class AffixDetails extends Component
     ];
 
     protected $rules = [
-        'itemAffix.name'        => 'required',
-        'itemAffix.type'        => 'required',
-        'itemAffix.description' => 'required',
-        'itemAffix.cost'        => 'required',
+        'itemAffix.name'                 => 'required',
+        'itemAffix.type'                 => 'required',
+        'itemAffix.description'          => 'required',
+        'itemAffix.cost'                 => 'required',
+        'itemAffix.int_required'         => 'required',
+        'itemAffix.skill_level_required' => 'required',
+        'itemAffix.skill_level_trivial'  => 'required',
     ];
 
     protected $messages = [
@@ -28,6 +31,9 @@ class AffixDetails extends Component
         'itemAffix.type.required'        => 'Type is required.',
         'itemAffix.description.required' => 'Description is required.',
         'itemAffix.cost.required'        => 'Cost is required.',
+        'itemAffix.int_required'         => 'Intelligence Required is required',
+        'itemAffix.skill_level_required' => 'Skill Level Required is required',
+        'itemAffix.skill_level_trivial'  => 'Skill Level Trivial is required',
     ];
 
     protected $listeners = ['validateInput'];

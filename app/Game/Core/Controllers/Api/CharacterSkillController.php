@@ -58,17 +58,16 @@ class CharacterSkillController extends Controller {
 
     public function trainEnchanting(Request $request, Character $character, CharacterInformationBuilder $builder, CraftingSkillService $craftingService) {
         $request->validate([
-            'item_id'   => 'required',
+            'slot_id'   => 'required',
             'affix_ids' => 'required',
             'cost'      => 'required',
-            'extraTime' => 'nullable|in:double,tripple'
         ]);
 
         $builder        = $builder->setCharacter($character);
         $enchatingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
 
         $affixes  = ItemAffix::findMany($request->affix_ids);
-        $itemSlot = $character->inventory->slots->where('item_id', $request->item_id)->where('equipped', false)->first();
+        $itemSlot = $character->inventory->slots->where('id', $request->slot_id)->where('equipped', false)->first();
         
         if ($affixes->isEmpty() || is_null($itemSlot)) {
             return response()->json([
@@ -81,18 +80,29 @@ class CharacterSkillController extends Controller {
         if ($request->cost > $character->gold) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold'));
 
-            return response()->json([], 200);
+            return response()->json([], 422);
         }
+
+        $totalTime = $craftingService->timeForEnchanting($item, $request->affix_ids[0], count($request->affix_ids));
 
         $craftingService->updateCharacterGoldForEnchanting($character, $request->cost);
 
-        $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $item, $affixes, $character);
+        $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $itemSlot, $affixes, $character);
 
-        event(new CraftedItemTimeOutEvent($character->refresh()), $request->extraTime);
+        event(new CraftedItemTimeOutEvent($character->refresh()), $totalTime);
+
+        $inventory      = $character->refresh()->inventory->slots->filter(function($slot) {
+            if ($slot->item->type !== 'quest' && !$slot->equipped) {
+                return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+            }
+
+        })->all();
 
         return response()->json([
-            'affixes' => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
-                                  ->where('skill_level_required', '<=', $enchatingSkill->level)
+            'affixes'             => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
+                                             ->where('skill_level_required', '<=', $enchatingSkill->refresh()->level)
+                                             ->get(),
+            'character_inventory' => array_values($inventory),
         ]);
     }
 

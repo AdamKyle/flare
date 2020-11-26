@@ -129,8 +129,8 @@ export default class NotificationCenter extends React.Component {
     return (
       <div className="notification-center">
         <Dropdown>
-          <Dropdown.Toggle as={this.customDropDown()} id="dropdown-custom-components">
-            Custom toggle
+          <Dropdown.Toggle as={this.customDropDown()} variant="success" id="dropdown-custom-components">
+            Dropdown Button
           </Dropdown.Toggle>
 
           <Dropdown.Menu as={this.customMenu()} className="notification-center">

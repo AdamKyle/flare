@@ -41,6 +41,11 @@ export default class AdventureMenu extends React.Component {
 
   hasRewardsToCollect() {
     if (!_.isEmpty(this.state.logs)) {
+
+      if (this.state.logs.filter((l) => l.in_progress).length > 0) {
+        return false;
+      }
+
       let hasUnCollectedReward = false;
 
       this.state.logs.forEach((log) => {

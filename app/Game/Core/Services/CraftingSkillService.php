@@ -6,6 +6,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
@@ -17,6 +18,11 @@ class CraftingSkillService {
      * @var Character $character
      */
     private $character;
+
+    /**
+     * @var Item $item
+     */
+    private $item;
 
     /**
      * Set the character
@@ -99,6 +105,33 @@ class CraftingSkillService {
     }
 
     /**
+     * Timeout value.
+     * 
+     * Possible return values:
+     * 
+     * - Double is 20 seconds instead of ten. Item has at least one prefix or suffix.
+     * - Tripple is 30 seconds instead of ten.
+     * - null - item does not have eiher suffix or prefix. Default to 10 seconds.
+     * 
+     * @param Item $item
+     * @param int $affixId
+     * @return mixed string | null
+     */
+    public function timeForEnchanting(Item $item, int $affixId, int $affixLength) {
+        $affix = ItemAffix::find($affixId);
+        
+        if ($affixLength === 2 && !is_null($item->{'item_'.$affix->type.'_id'}) && !is_null($item->{'item_'.$affix->getOppisiteType().'_id'})) {
+            return 'tripple';
+        }
+        
+        if (!is_null($item->{'item_'.$affix->type.'_id'})) {
+            return 'double';
+        }
+
+        return null;
+    }
+
+    /**
      * Send off the right server message.
      * 
      * - Server message for too hard, as in the character skill level is too low
@@ -106,19 +139,21 @@ class CraftingSkillService {
      * - Server message for gaining enchanting the item.
      * 
      * @param Skill $currentSkill
-     * @param Item $item
+     * @param InventorySlot $slot
      * @param ItemAffix $itemAffix
      * @param Character $character
      * @return void
      */
-    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, Item $item, Collection $affixes, Character $character): void {
+    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, InventorySlot $slot, Collection $affixes, Character $character): void {
         forEach($affixes as $affix) {
+            $item = $slot->refresh()->item;
+
             if ($enchantingSkill->level < $affix->skill_level_required) {
                 event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
             } else if ($enchantingSkill->level >= $affix->skill_level_trivial) { 
                 event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
                 
-                $this->enchantItem($item, $affix);
+                $this->enchantItem($slot, $item, $affix);
     
                 $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
     
@@ -132,26 +167,27 @@ class CraftingSkillService {
                 }
     
                 if ($characterRoll > $dcCheck) {
-                    $this->enchantItem($item, $affix);
+                    $this->enchantItem($slot, $item, $affix);
     
-                    $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
+                    $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->affix_name; 
     
                     event(new ServerMessageEvent($character->user, 'enchanted', $message));
     
                     event(new UpdateSkillEvent($enchantingSkill));
                 } else {
     
-                    $character->inventory->slots->where('item_id', $item->id)->first()->delete();
+                    $slot->delete();
+
+                    if (!is_null($this->item)) {
+                        $this->item->delete();
+                    }
                     
                     $message = 'You failed to apply enchantments to: ' . $item->name . '. The item shatters before you. You lost the investment.';
     
                     event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
-
-                    return;
                 }
             }
         }
-        
     }
 
     /**
@@ -176,7 +212,7 @@ class CraftingSkillService {
         } else {
             $dcCheck       = $this->fetchDCCheck($currentSkill);
             $characterRoll = $this->fetchCharacterRoll($currentSkill);
-            dump($dcCheck, $characterRoll);
+
             if ($characterRoll > $dcCheck) {
                 $this->attemptToPickUpItem($character->refresh(), $item);
 
@@ -201,9 +237,26 @@ class CraftingSkillService {
         }
     }
 
-    protected function enchantItem(Item $item, $affix) {
-        $item->{'item_' . $affix->type . '_id'} = $affix->id;
+    protected function enchantItem(InventorySlot $slot, Item $item, $affix) {
 
-        $item->save();
+        if (!is_null($this->item)) {
+            $this->item->{'item_' . $affix->type . '_id'} = $affix->id;
+
+            $this->item->save();
+
+            return;
+        }
+
+        $clonedItem = $item->duplicate();
+        
+        $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
+
+        $clonedItem->save();
+
+        $this->item = $clonedItem;
+
+        $slot->update([
+            'item_id' => $clonedItem->id,
+        ]);
     }
 }

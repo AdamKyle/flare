@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.2",
         "beyondcode/laravel-websockets": "^1.7",
+        "bkwld/cloner": "^3.9",
         "christianessl/landmap-generation": "^1.0",
         "fideloper/proxy": "^4.0",
         "graham-campbell/markdown": "^13.1",

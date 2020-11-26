@@ -169,7 +169,7 @@ export default class CraftingAction extends React.Component {
         <select className="form-control ml-3 mt-2" id="crafting" name="crafting"
           value={this.state.itemToCraft !== null ? this.state.itemToCraft : 1}
           onChange={this.setItemToCraft.bind(this)}
-          disabled={this.state.isDead || !this.state.canCraft}>
+          disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
           {this.buildCraftableItemsOptions()}
         </select>
       );

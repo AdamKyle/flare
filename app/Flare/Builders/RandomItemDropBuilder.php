@@ -60,20 +60,7 @@ class RandomItemDropBuilder {
     }
 
     protected function duplicateItem(Item $item): Item {
-        $duplicateItem = $item->replicate();
-        $duplicateItem->save();
- 
-        if (!is_null($item->itemSuffix)) {
-            $duplicateItem->update([
-                'item_suffix_id' => $item->itemSuffix->id,
-            ]);
-        }
-
-        if (!is_null($item->itemPrefix)) {
-            $duplicateItem->update([
-                'item_prefix_id' => $item->itemPrefix->id,
-            ]);
-        }
+        $duplicateItem = $item->duplicate();
 
         return $duplicateItem->refresh()->load(['itemSuffix', 'itemPrefix']);
     }

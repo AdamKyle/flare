@@ -36,4 +36,15 @@ Enchanting is not cheap and should be considered like a gold sink. Enchantments 
 
 Enchanted items cannot be sold via the shop. They can be destroyed and traded as well as sold on the market board. This provides a great way for the player to make some money.
 
+## Double enchanting with faliure
+
+Sometimes when applying two enchants you might see something like this:
+
+![chat](/storage/info/enchanting/images/enchanting-failure.png)
+
+What this means is:
+
+- The first enchant worked, you were awarded EXP.
+- The second enchant failed, thus you lost the item and the investment and got no EXP for the second enchantment.
+
 # List Of Enchants

@@ -119,7 +119,7 @@ class ServerMessageBuilderTest extends TestCase
     {
         $message = resolve(ServerMessageBuilder::class)->build('cant_craft');
 
-        $this->assertEquals('You must wait for the timer (beside Craft) to state: Ready!', $message);
+        $this->assertEquals('You must wait for the timer (beside Craft/Enchant) to state: Ready!', $message);
     }
 
     public function testGetMessageSomethingsWrong()

@@ -4,12 +4,15 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Traits\WithSearch;
 
 class Item extends Model
 {
+
+    use Cloneable;
 
     use HasFactory, WithSearch;
 
@@ -45,6 +48,8 @@ class Item extends Model
         'skill_level_trivial',
         'crafting_type',
     ];
+
+    //protected $cloneable_relations = ['itemSuffix', 'itemPrefix'];
 
     /**
      * The attributes that should be cast to native types.

@@ -199,9 +199,9 @@ export default class AdeventureActions extends React.Component {
         { this.state.tookToLong ? <div className="alert alert-info">Your adventure took too long, you decided to flee. You gained no items or loot. You can review the logs <a href="/current-adventure/">here</a>.</div> : null}
         { this.state.failed ? <div className="alert alert-danger">You have died. Maybe checking the logs might help you. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         { this.state.canceled ? <div className="alert alert-success">Adventure canceled. You gained no rewards.</div> : null}
-        { hasCollectedRewards ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
+        { hasCollectedRewards && !hasAdventureInProgres ? <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         { hasAdventureInProgres ? <div className="alert alert-info">You may only embark on one adventure at a time</div> : null }
-        { !this.props.canAdventure() ? <div className="alert alert-info">You must wait to be able to move and attack in order to embark.</div> : null}
+        { !this.props.canAdventure() && !hasAdventureInProgres ? <div className="alert alert-info">You must wait to be able to move and attack in order to embark.</div> : null}
         {this.adventures()}
 
         {this.state.showEmbark ? <AdventureEmbark 

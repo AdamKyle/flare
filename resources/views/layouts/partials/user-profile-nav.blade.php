@@ -8,6 +8,17 @@
         <div class="dropdown-menu dropdown-menu-right animated flipInY">
             <ul class="dropdown-user">
                 <li>
+                    @if (\Request::route()->getName() === 'info.page')
+                        <a href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    @else
+                        <a href="{{route('info.page', ['pageName' => 'home'])}}">
+                            <i class="fas fa-question-circle"></i> Help
+                        </a>
+                    @endif
+                    
+
                     <a class="link" href="{{ route('logout') }}"
                         data-toggle="tooltip"
                         title="Logout"

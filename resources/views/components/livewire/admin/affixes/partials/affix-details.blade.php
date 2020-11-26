@@ -28,6 +28,29 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-affix-intelligence-required">Intelligence Required: </label>
+                <input type="number" class="form-control required" id="item-affix-intelligence-required" name="int-required" wire:model="itemAffix.int_required"> 
+                @error('itemAffix.int_required') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-affix-skill-level-required">Skill Level Required: </label>
+                <input type="number" class="form-control required" id="item-affix-skill-level-required" name="skill-level-required" wire:model="itemAffix.skill_level_required"> 
+                @error('itemAffix.skill_level_required') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-affix-description">Skill Level Trivial: </label>
+                <input type="number" class="form-control required" id="item-affix-skill-level-trivial" name="skill-level-trivial" wire:model="itemAffix.skill_level_trivial"> 
+                @error('itemAffix.skill_level_trivial') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-12">
             <div class="form-group">
                 <label for="item-affix-cost">Cost: </label>

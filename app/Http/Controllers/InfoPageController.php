@@ -46,7 +46,7 @@ class InfoPageController extends Controller
                 }
 
                 $sections[] = [
-                    'content'  => Storage::disk('info')->get($files[$index]),
+                    'content'  => Storage::disk('info')->get($files[$i]),
                     'view'     => $view,
                     'livewire' => $livewire,
                     'only'     => $only,

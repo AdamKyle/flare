@@ -29,6 +29,9 @@ class AffixDetailsTest extends TestCase
                                     ->set('itemAffix.description', 'something')
                                     ->set('itemAffix.type', 10)
                                     ->set('itemAffix.cost', 10)
+                                    ->set('itemAffix.int_required', 1)
+                                    ->set('itemAffix.skill_level_required', 2)
+                                    ->set('itemAffix.skill_level_trivial', 4)
                                     ->call('validateInput', 'nextStep', 2);
 
         // Assert Affix was created:

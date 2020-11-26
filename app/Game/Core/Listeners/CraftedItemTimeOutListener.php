@@ -10,10 +10,6 @@ class CraftedItemTimeOutListener
 {
     public function handle(CraftedItemTimeOutEvent $event)
     {
-        $event->character->update([
-            'can_craft'          => false,
-            'can_craft_again_at' => now()->addSeconds(10),
-        ]);
 
         $timeOut = 10;
 
@@ -27,6 +23,11 @@ class CraftedItemTimeOutListener
                     return;
             }
         }
+
+        $event->character->update([
+            'can_craft'          => false,
+            'can_craft_again_at' => now()->addSeconds($timeOut),
+        ]);
 
         broadcast(new ShowCraftingTimeOutEvent($event->character->user, true, false, $timeOut));
 

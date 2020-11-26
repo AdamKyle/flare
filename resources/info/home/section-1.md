@@ -4,6 +4,14 @@ Welcome to the planes of Tlessa. This guide is meant to help you the player get 
 
 Planes of Tlessa is a game where one can be anything they want. The simplicity of the interface allows the user to move freely from task to task as they fight monsters, craft items, enchant items, go on and adventures, settle kingdoms and more.
 
+> ### ATTN!
+>
+> At any time you may come back to this help section, while logged in.
+>
+> Simple click the help in the drop down menu at the top right:
+>
+> ![help](/storage/info/home/images/help.png)
+
 
 ## The biggest selling points
 

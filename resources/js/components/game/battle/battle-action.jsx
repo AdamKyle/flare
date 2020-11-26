@@ -246,7 +246,7 @@ export default class BattleAction extends React.Component {
         {this.state.isAdventuring
          ?
          <div className="alert alert-warning" role="alert">
-          You are currently adventuring and cannot fight any monsters or craft.
+          You are currently adventuring and cannot fight any monsters or craft/enchant.
         </div>
          : 
          null
@@ -293,18 +293,25 @@ export default class BattleAction extends React.Component {
           characterGold={this.state.character.gold}
           timeRemaining={this.props.character.can_craft_again_at}
           updateCanCraft={this.props.updateCanCraft}
+          isAdventuring={this.state.isAdventuring}
         />
-        <EnchantingAction
-          isDead={this.state.character.is_dead}
-          characterId={this.state.character.id}
-          showEnchanting={this.props.showEnchanting}
-          shouldChangeCraftingType={this.props.shouldChangeCraftingType}
-          changeCraftingType={this.props.changeCraftingType}
-          userId={this.props.userId}
-          characterGold={this.state.character.gold}
-          timeRemaining={this.props.character.can_craft_again_at}
-          updateCanCraft={this.props.updateCanCraft}
-        />
+        {
+          this.props.showEnchanting
+          ?
+          <EnchantingAction
+            isDead={this.state.character.is_dead}
+            characterId={this.state.character.id}
+            showEnchanting={this.props.showEnchanting}
+            shouldChangeCraftingType={this.props.shouldChangeCraftingType}
+            changeCraftingType={this.props.changeCraftingType}
+            userId={this.props.userId}
+            characterGold={this.state.character.gold}
+            timeRemaining={this.props.character.can_craft_again_at}
+            updateCanCraft={this.props.updateCanCraft}
+            isAdventuring={this.state.isAdventuring}
+          />
+          : null
+        }
         <hr />
         <div className="battle-section text-center">
           {this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead

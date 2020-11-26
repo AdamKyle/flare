@@ -26,6 +26,12 @@
       ])}}">Adventure</a></li>
     <li class="nav-devider"></li>
     <li>
+      <a href="{{route('info.page', [
+          'pageName' => 'notifications'
+        ])}}">Notifications</a>
+    </li>
+    <li class="nav-devider"></li>
+    <li>
         <a href="{{route('info.page', [
             'pageName' => 'skill-information'
           ])}}">Skill Information</a>
