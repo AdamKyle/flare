@@ -21,6 +21,9 @@ require('../vendor/monster/theme/js/custom.js');
  */
 
 require('./components/game/game');
+require('./components/marketboard/board');
+require('./components/marketboard/item-board');
+require('./components/marketboard/item-history');
 
 /**
  *  Next, we will require any additional jquery code we need.

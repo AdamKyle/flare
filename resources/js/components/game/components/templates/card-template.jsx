@@ -1,4 +1,5 @@
 import React from 'react';
+import { Dropdown } from 'react-bootstrap';
 
 export default class CardTemplate extends React.Component {
 
@@ -6,12 +7,45 @@ export default class CardTemplate extends React.Component {
     super(props);
   }
 
+  changeType(event) {
+    this.props.onChange(event.target.dataset.type);
+  }
+
+  buildDropDownOptions() {
+    return this.props.buttons.map((button) => {
+      return <Dropdown.Item onClick={this.changeType.bind(this)} data-type={button} key={"button-" + button}>{button}</Dropdown.Item>
+    })
+  }
+
+  buildDropDown() {
+    return (
+      <div className="float-right">
+        <Dropdown size="sm">
+          <Dropdown.Toggle variant="primary" id="dropdown-basic">
+            {this.props.buttonTitle}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            {this.buildDropDownOptions()}
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+    )
+  }
+
+  buildCustomButton() {
+    if (this.props.customButtonType === 'drop-down') {
+      return this.buildDropDown();
+    }
+  }
+
   renderTitle() {
     return (
       <>
         <div className="clearfix">
           <h4 className="card-title float-left">{this.props.cardTitle}</h4>
-          <button className="float-right btn btn-sm btn-danger" onClick={this.props.close}>Close</button>
+          { this.props.hasOwnProperty('close') ? <button className="float-right btn btn-sm btn-danger" onClick={this.props.close}>Close</button> : null }
+          { this.props.hasOwnProperty('customButtonType') ? this.buildCustomButton() : null}
         </div>
         <hr />
       </>

@@ -35,4 +35,7 @@ Route::middleware('is.player.banned')->group(function() {
     Route::get('/completed-adventure/{adventureLog}', ['as' => 'game.completed.adventure', 'uses' => 'CharacterAdventureController@completedAdventure']);
     Route::get('/completed-adventure/{adventureLog}/logs/{name}', ['as' => 'game.completed.adventure.logs', 'uses' => 'CharacterAdventureController@completedAdventureLogs']);
     Route::post('/current-adventure/{adventureLog}/distribute-rewards', ['as' => 'game.current.adventure.reward', 'uses' => 'CharacterAdventureController@collectReward']);
+
+    Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
+    Route::get('/market/sell', ['as' => 'game.market.sell', 'uses' => 'MarketController@sell']);
 });

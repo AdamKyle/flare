@@ -38,8 +38,8 @@
     <li>
         <a class="has-arrow " href="#" aria-expanded="false"><i class="ra ra-wooden-sign"></i><span class="hide-menu">Market</span></a>
         <ul aria-expanded="false" class="collapse">
-            <li><a href="layout-single-column.html">Buy</a></li>
-            <li><a href="layout-fix-header.html">Sell</a></li>
+            <li><a href="{{route('game.market')}}">Visit the market</a></li>
+            <li><a href="{{route('game.market.sell')}}">Sell items</a></li>
         </ul>
     </li>
 </ul>

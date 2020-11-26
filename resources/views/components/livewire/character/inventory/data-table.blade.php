@@ -176,6 +176,14 @@
                                         </div>
                 
                                         @include('game.core.partials.destroy-modal', ['slot' => $slot])
+                                    @elseif ($marketBoard)
+                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#slot-id-{{$slot->id}}">
+                                            Sell On Market
+                                        </button>
+
+                                        @include('components.livewire.character.inventory.partials.market-sell-modal', [
+                                            'slot' => $slot
+                                        ])
                                     @else
                                         @if ($slot->item->type !== 'quest')
                                             <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"

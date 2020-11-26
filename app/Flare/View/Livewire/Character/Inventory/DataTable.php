@@ -29,6 +29,8 @@ class DataTable extends Component
 
     public $batchSell                = false;
 
+    public $marketBoard              = false;
+
     public $character;
 
     public function getDataQueryProperty() {
@@ -47,6 +49,11 @@ class DataTable extends Component
 
             if (!$this->includeQuestItems) {
                 $join->where('items.type', '!=', 'quest');
+            }
+
+            if ($this->marketBoard) {
+                $join->where('items.item_suffix_id', '!=', null)
+                     ->where('items.item_prefix_id', '!=', null);
             }
 
             return $join;
