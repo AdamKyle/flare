@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import ReactDatatable from '@ashvin27/react-datatable';
 import CardTemplate from '../game/components/templates/card-template';
 import MarketHistory from './market-history';
+import PurchaseModal from './purchase-modal';
 
 class Board extends Component {
   constructor(props) {
@@ -14,62 +15,85 @@ class Board extends Component {
         sortable: true
       },
       {
-        key: "address",
-        text: "Address",
+        key: "type",
+        text: "Item Type",
         sortable: true
       },
       {
-        key: "postcode",
-        text: "Postcode",
+        key: "character_name",
+        text: "Listed By",
         sortable: true
       },
       {
-        key: "rating",
-        text: "Rating",
+        key: "listed_price",
+        text: "Listed For",
         sortable: true
       },
-      {
-        key: "type_of_food",
-        text: "Type of Food"
-      }
     ];
 
     this.config = {
       page_size: 10,
-      length_menu: [10, 20, 50],
+      length_menu: [10, 25, 50, 100],
       show_filter: true,
       show_pagination: true,
       pagination: 'advance',
-      button: {
-        excel: false,
-        print: false
-      }
     }
     this.state = {
-      records: [
-        {
-          id: 3,
-          name: 'Sample',
-          address: '1234 test',
-          postcode: '1234',
-          rating: 5,
-          type_of_food: 'sample food',
-        }
-      ],
+      records: [],
+      showModal: false,
+      modalData: {},
     }
+  }
+
+  componentDidMount() {
+    axios.get('/api/market-board/items').then((result) => {
+      this.setState({
+        records: result.data
+      });
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   rowClickedHandler(event, data, rowIndex) {
-    console.log("event", event);
-    console.log("row data", data);
-    console.log("row index", rowIndex);
+    this.setState({
+      modalData: data,
+      showModal: true,
+    });
+  }
+
+  closeModal() {
+    this.setState({
+      modalData: {},
+      showModal: false,
+    });
   }
 
   typeChange(type) {
-    console.log(type);
+    let params = {};
+
+    if (type !== 'reset') {
+      params = {
+        params: {
+          type: type
+        }
+      };
+    }
+
+    axios.get('/api/market-board/items', params).then((result) => {
+      this.setState({
+        records: result.data,
+      });
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   render() {
+    if (_.isEmpty(this.state.records)) {
+      return null;
+    }
+
     return (
       <CardTemplate
         OtherCss="p-3"
@@ -77,10 +101,19 @@ class Board extends Component {
         customButtonType="drop-down"
         buttonTitle="Types"
         buttons={[
-          'weapons',
-          'armour',
-          'artifacts',
-          'spells',
+          { type:'reset', name: 'Reset Filter'},
+          { type:'weapon', name: 'Weapon'},
+          { type:'body', name: 'Body'},
+          { type:'shield', name: 'Shield'},
+          { type:'feet', name: 'Feet'},
+          { type:'leggings', name: 'Leggings'},
+          { type:'sleeves', name: 'Sleeves'},
+          { type:'helmet', name: 'Helmet'},
+          { type:'gloves', name: 'Gloves'},
+          { type:'spell-damage', name: 'Spell Damage'},
+          { type:'spell-healing', name: 'Spell Healing'},
+          { type:'ring', name: 'Ring'},
+          { type:'artifact', name: 'Artifact'},
         ]}
         onChange={this.typeChange.bind(this)}
       >
@@ -90,8 +123,16 @@ class Board extends Component {
           config={this.config}
           records={this.state.records}
           columns={this.columns}
-          onRowClicked={this.rowClickedHandler}
+          onRowClicked={this.rowClickedHandler.bind(this)}
         />
+
+        {this.state.showModal ? 
+          <PurchaseModal 
+            closeModal={this.closeModal.bind(this)}
+            showModal={this.state.showModal}
+            modalData={this.state.modalData}
+          /> : null
+        }
       </CardTemplate>
     );
   }

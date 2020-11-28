@@ -131,7 +131,7 @@
                 <footer class="footer" style="left: 0;"> © 2020 Flare </footer>
             @else
                 <div class="page-wrapper">
-                    <div class="container-fluid">
+                    <div class="container-fluid mb-5">
 
                         @if(!auth()->user()->hasRole('Admin'))
                             <div id="refresh"></div>

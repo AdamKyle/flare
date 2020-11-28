@@ -17,6 +17,7 @@ class CreateItems extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('item_suffix_id')->unsigned()->nullable();
             $table->bigInteger('item_prefix_id')->unsigned()->nullable();
+            $table->boolean('market_sellable')->nullable()->default(false);
             $table->string('name');
             $table->string('type');
             $table->string('description')->nullable();

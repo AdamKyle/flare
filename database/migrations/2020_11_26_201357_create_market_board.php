@@ -15,10 +15,10 @@ class CreateMarketBoard extends Migration
     {
         Schema::create('market_board', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('character_id')->unassigned();
-            $table->foreign('character_id')
+            $table->unsignedBigInteger('character_id');
+            $table->foreign('character_id', 'mb_character')
                   ->references('id')->on('characters');
-            $table->bigInteger('item_id')->unassigned();
+            $table->unsignedBigInteger('item_id')->unassigned();
             $table->foreign('item_id')
                   ->references('id')->on('items');
             $table->integer('listed_price');

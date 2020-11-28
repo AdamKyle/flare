@@ -11,7 +11,9 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            @include('components.livewire.character.inventory.partials.market-form')
+            @include('components.livewire.character.inventory.partials.market-form', [
+              'slot' => $slot,
+            ])
           </div>
           <div class="mb-3">
             <p>Please note that all transactions come with a 5% tax. This tax is applied when you buy and item

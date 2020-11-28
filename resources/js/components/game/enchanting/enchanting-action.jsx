@@ -41,7 +41,7 @@ export default class EnchantingAction extends React.Component {
       console.log(event);
       this.setState({
         canCraft:      event.canCraft,
-        timeRemaining: event.canCraft ? 0 : 10,
+        timeRemaining: event.canCraft ? 0 : event.timeout,
       }, () => {
         this.props.updateCanCraft(event.canCraft);
       });

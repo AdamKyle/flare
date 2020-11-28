@@ -61,7 +61,7 @@ export default class ForcedNameChange extends React.Component {
 
     return (
       <>
-        <Modal show={true}>
+        <Modal show={true} keyboard={false} backdrop="static">
           <Modal.Header>
             <Modal.Title>Forced Name Change</Modal.Title>
           </Modal.Header>

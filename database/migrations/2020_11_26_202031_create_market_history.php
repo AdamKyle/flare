@@ -15,8 +15,8 @@ class CreateMarketHistory extends Migration
     {
         Schema::create('market_history', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('item_id')->unassigned();
-            $table->foreign('item_id')
+            $table->unsignedBigInteger('item_id');
+            $table->foreign('item_id', 'mh_item')
                   ->references('id')->on('items');
             $table->integer('sold_for');
             $table->timestamps();

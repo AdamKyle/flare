@@ -13,7 +13,7 @@ export default class CardTemplate extends React.Component {
 
   buildDropDownOptions() {
     return this.props.buttons.map((button) => {
-      return <Dropdown.Item onClick={this.changeType.bind(this)} data-type={button} key={"button-" + button}>{button}</Dropdown.Item>
+      return <Dropdown.Item onClick={this.changeType.bind(this)} data-type={button.type} key={"button-" + button.type}>{button.name}</Dropdown.Item>
     })
   }
 

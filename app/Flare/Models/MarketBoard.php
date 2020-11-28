@@ -12,6 +12,8 @@ class MarketBoard extends Model
 
     use HasFactory, WithSearch;
 
+    protected $table = 'market_board';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -33,11 +35,11 @@ class MarketBoard extends Model
     ];
 
     public function item() {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class, 'item_id', 'id');
     }
 
     public function character() {
-        return $this->hasOne(Character::class);
+        return $this->hasOne(Character::class, 'id', 'character_id');
     }
 
     protected static function newFactory() {

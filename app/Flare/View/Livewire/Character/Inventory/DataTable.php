@@ -52,8 +52,7 @@ class DataTable extends Component
             }
 
             if ($this->marketBoard) {
-                $join->where('items.item_suffix_id', '!=', null)
-                     ->where('items.item_prefix_id', '!=', null);
+                $join->where('items.market_sellable', true);
             }
 
             return $join;

@@ -47,6 +47,7 @@ class Item extends Model
         'skill_level_required',
         'skill_level_trivial',
         'crafting_type',
+        'market_sellable',
     ];
 
     //protected $cloneable_relations = ['itemSuffix', 'itemPrefix'];
@@ -74,6 +75,7 @@ class Item extends Model
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',
         'can_craft'            => 'boolean',
+        'market_sellable'      => 'boolean',
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',
     ];

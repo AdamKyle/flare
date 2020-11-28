@@ -250,6 +250,7 @@ class CraftingSkillService {
         $clonedItem = $item->duplicate();
         
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
+        $clonedItem->market_sellable = true;
 
         $clonedItem->save();
 

@@ -56,6 +56,10 @@ class RandomItemDropBuilder {
             $this->attachAffix($duplicateItem, $affix);
         }
 
+        $duplicateItem->update([
+            'market_sellable' => true,
+        ]);
+
         return $duplicateItem->refresh();
     }
 

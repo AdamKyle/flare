@@ -12,6 +12,8 @@ class MarketHistory extends Model
 
     use HasFactory, WithSearch;
 
+    protected $table= 'market_history';
+
     /**
      * The attributes that are mass assignable.
      *

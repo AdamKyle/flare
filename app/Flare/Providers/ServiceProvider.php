@@ -15,6 +15,8 @@ use App\Flare\Middleware\IsPlayerBannedMiddleware;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
+use App\Flare\Transformers\ItemTransfromer;
+use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
@@ -57,6 +59,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MonsterTransfromer::class, function($app){
             return new MonsterTransfromer();
+        });
+
+        $this->app->bind(MarketItemsTransfromer::class, function($app){
+            return new MarketItemsTransfromer();
+        });
+
+        $this->app->bind(ItemTransfromer::class, function($app) {
+            return new ItemTransfromer();
         });
 
         $this->app->bind(BaseSkillValue::class, function($app) {
