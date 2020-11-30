@@ -188,6 +188,19 @@ class CraftingSkillService {
                 }
             }
         }
+
+        $item = Item::where('name', $this->item->name)
+            ->where('item_prefix_id', $this->item->item_prefix_id)
+            ->where('item_suffix_id', $this->item->item_suffix_id)
+            ->first();
+
+        if (!is_null($item)) {
+            $slot->update([
+                'item_id' => $item->id,
+            ]);
+
+            $this->item->delete();
+        }
     }
 
     /**
@@ -237,7 +250,7 @@ class CraftingSkillService {
         }
     }
 
-    protected function enchantItem(InventorySlot $slot, Item $item, $affix) {
+    protected function enchantItem(InventorySlot $slot, Item $item, ItemAffix $affix) {
 
         if (!is_null($this->item)) {
             $this->item->{'item_' . $affix->type . '_id'} = $affix->id;
@@ -255,9 +268,5 @@ class CraftingSkillService {
         $clonedItem->save();
 
         $this->item = $clonedItem;
-
-        $slot->update([
-            'item_id' => $clonedItem->id,
-        ]);
     }
 }

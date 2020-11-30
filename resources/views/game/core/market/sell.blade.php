@@ -10,13 +10,9 @@
                 color="success"
             ></x-core.page-title>
 
-            <div class="card">
-                <div class="card-body">
-                    @livewire('character.inventory.data-table', [
-                        'marketBoard' => true,
-                    ])
-                </div>
-            </div>
+            @livewire('character.inventory.data-table', [
+                'marketBoard' => true,
+            ])
         </div>
     </div>
 @endsection
