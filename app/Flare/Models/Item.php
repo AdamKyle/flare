@@ -98,7 +98,7 @@ class Item extends Model
 
     public function getAffixNameAttribute() {
         if (!is_null($this->item_suffix_id) && !is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name . ' ' .  '*' . $this->itemPrefix->name . '*';
+            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
         } else if (!is_null($this->item_suffix_id)) {
             return $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
         } else if (!is_null($this->item_prefix_id)) {

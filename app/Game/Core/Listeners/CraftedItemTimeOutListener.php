@@ -17,10 +17,10 @@ class CraftedItemTimeOutListener
             switch($event->extraTime) {
                 case 'double':
                     $timeOut = 20;
-                    return;
+                    break;
                 case 'tripple':
                     $timeOut = 30;
-                    return;
+                    break;
             }
         }
 

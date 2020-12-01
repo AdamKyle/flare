@@ -167,7 +167,7 @@ class CraftingSkillService {
                 }
     
                 if ($characterRoll > $dcCheck) {
-                    $this->enchantItem($slot, $item, $affix);
+                    $this->enchantItem($item, $affix);
     
                     $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->affix_name; 
     
@@ -180,6 +180,8 @@ class CraftingSkillService {
 
                     if (!is_null($this->item)) {
                         $this->item->delete();
+
+                        $this->item = null;
                     }
                     
                     $message = 'You failed to apply enchantments to: ' . $item->name . '. The item shatters before you. You lost the investment.';
@@ -189,18 +191,32 @@ class CraftingSkillService {
             }
         }
 
-        $item = Item::where('name', $this->item->name)
-            ->where('item_prefix_id', $this->item->item_prefix_id)
-            ->where('item_suffix_id', $this->item->item_suffix_id)
-            ->first();
+        if (!is_null($this->item)) {
+            $items = Item::where('name', $this->item->name)
+                        ->where('item_prefix_id', $this->item->item_prefix_id)
+                        ->where('item_suffix_id', $this->item->item_suffix_id);
 
-        if (!is_null($item)) {
-            $slot->update([
-                'item_id' => $item->id,
-            ]);
+                        
+            if ($items->count() > 1) {
+                $item = $this->item;
 
-            $this->item->delete();
-        }
+                $this->item->delete();
+                $this->item = null;
+
+                $foundItem = Item::where('name', $item->name)
+                                 ->where('item_prefix_id', $item->item_prefix_id)
+                                 ->where('item_suffix_id', $item->item_suffix_id)
+                                 ->first();
+
+                $slot->update([
+                    'item_id' => $foundItem->id,
+                ]);
+            } else {
+                $slot->update([
+                    'item_id' => $this->item->id,
+                ]);
+            }
+        } 
     }
 
     /**
@@ -250,8 +266,8 @@ class CraftingSkillService {
         }
     }
 
-    protected function enchantItem(InventorySlot $slot, Item $item, ItemAffix $affix) {
-
+    protected function enchantItem(Item $item, ItemAffix $affix) {
+        dump($affix->type, $affix->name, $affix->id);
         if (!is_null($this->item)) {
             $this->item->{'item_' . $affix->type . '_id'} = $affix->id;
 

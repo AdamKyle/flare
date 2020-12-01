@@ -38,7 +38,6 @@ export default class EnchantingAction extends React.Component {
     });
 
     this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
-      console.log(event);
       this.setState({
         canCraft:      event.canCraft,
         timeRemaining: event.canCraft ? 0 : event.timeout,

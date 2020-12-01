@@ -89,7 +89,7 @@ class CharacterSkillController extends Controller {
 
         $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $itemSlot, $affixes, $character);
 
-        event(new CraftedItemTimeOutEvent($character->refresh()), $totalTime);
+        event(new CraftedItemTimeOutEvent($character->refresh(), $totalTime));
 
         $inventory      = $character->refresh()->inventory->slots->filter(function($slot) {
             if ($slot->item->type !== 'quest' && !$slot->equipped) {
