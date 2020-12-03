@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
 use Illuminate\Http\Request;
@@ -92,6 +94,17 @@ class MarketBoardController extends Controller {
             'item_id'  => $listing->item_id,
             'sold_for' => $listing->listed_price,
         ]);
+
+        $listing->character->update([
+            'gold' => $listing->character->gold + ($listing->listed_price - ($listing->listed_price * 0.05)),
+        ]);
+
+        event(new UpdateTopBarEvent($listing->character->refresh()));
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax).';
+
+        event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
 
         $listing->delete();
         

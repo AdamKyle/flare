@@ -5,16 +5,27 @@ namespace App\Game\Core\Controllers;
 use Illuminate\Http\Request;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use App\Http\Controllers\Controller;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class MarketController extends Controller {
 
-    public function __construct() {
+    private $manager;
+
+    private $transfer;
+
+    public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
         $this->middleware('auth');
 
         $this->middleware('is.character.dead');
         
         $this->middleware('is.character.adventuring');
+
+        $this->manager     = $manager;
+        $this->transformer = $transformer;
     }
 
     public function index() {
@@ -37,6 +48,12 @@ class MarketController extends Controller {
         ]);
 
         $slot->delete();
+        
+        $items = MarketBoard::all();
+        $items = new Collection($items, $this->transformer);
+        $items = $this->manager->createData($items)->toArray();
+
+        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
         
         return redirect()->to(route('game.market.sell'))->with('success', 'Item listed');
     }

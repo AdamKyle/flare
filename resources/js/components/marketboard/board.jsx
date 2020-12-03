@@ -69,12 +69,12 @@ class Board extends Component {
         hasId = _.isEmpty(event.marketListings.filter((ml) => ml.id === this.state.modalData.id));
       }
 
-      if (this.state.showModal && !hasId) {
+      if (this.state.showModal && hasId) {
         this.closeModal();
 
         this.setState({
           message: 'Sorry, that item was sold.',
-          type: 'info',
+          messageType: 'info',
         });
       }
 
@@ -191,6 +191,7 @@ class Board extends Component {
             modalData={this.state.modalData}
             characterId={this.props.characterId}
             updateMessage={this.updateMessage.bind(this)}
+            characterGold={this.state.gold}
           /> : null
         }
       </CardTemplate>

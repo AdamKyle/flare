@@ -78,6 +78,8 @@ class ServerMessageListener
                 $message = 'The Creator has changed your classes damage stat to: ' . $event->forMessage . '. Please adjust your gear accordingly for maximum damage.'; 
                 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'sold_item':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }
