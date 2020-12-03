@@ -73,6 +73,10 @@ class MarketController extends Controller {
     }
 
     public function editCurrentListings(MarketBoard $marketBoard) {
+        if (auth()->user()->character->id !== $marketBoard->character_id) {
+            return redirect()->back()->with('error', 'You are not allowed to do that.');
+        }
+
         return view('game.core.market.edit-current-listing', [
             'marketBoard' => $marketBoard
         ]);
@@ -83,12 +87,42 @@ class MarketController extends Controller {
             'listed_price' => 'required|integer'
         ]);
 
+        if (auth()->user()->character->id !== $marketBoard->character_id) {
+            return redirect()->back()->with('error', 'You are not allowed to do that.');
+        }
+
         if ($request->listed_price <= 0) {
             return redirect()->back()->with('error', 'Listed price cannot be below or equal to 0.');
         }
 
         $marketBoard->update($request->all());
 
+        $items = MarketBoard::all();
+        $items = new Collection($items, $this->transformer);
+        $items = $this->manager->createData($items)->toArray();
+
+        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
+
         return redirect()->back()->with('success', 'Listing for: ' . $marketBoard->item->affix_name . ' updated.');
+    }
+
+    public function delist(Request $request, MarketBoard $marketBoard) {
+        $character = auth()->user()->character;
+
+        if ($character->id !== $marketBoard->character_id) {
+            return redirect()->back()->with('error', 'You are not allowed to do that.');
+        }
+
+        $itemName = $marketBoard->item->affix_name;
+
+        $marketBoard->delete();
+
+        $items = MarketBoard::all();
+        $items = new Collection($items, $this->transformer);
+        $items = $this->manager->createData($items)->toArray();
+
+        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
+
+        return redirect()->back()->with('success', 'Delisted: ' . $itemName);
     }
 }

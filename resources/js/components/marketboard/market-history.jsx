@@ -1,5 +1,5 @@
 import React from 'react';
-import { DateTime } from 'luxon';
+import ReactDOM from 'react-dom';
 import { Line } from 'react-chartjs-2';
 
 export default class MarketHistory extends React.Component {
@@ -78,4 +78,13 @@ export default class MarketHistory extends React.Component {
       </div>
     );
   }
+}
+
+const marketHistory = document.getElementById('admin-market-history');
+
+if (marketHistory !== null) {
+  ReactDOM.render(
+    <MarketHistory />,
+    marketHistory
+  );
 }

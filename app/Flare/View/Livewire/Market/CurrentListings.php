@@ -22,7 +22,7 @@ class CurrentListings extends Component
     protected $paginationTheme = 'bootstrap';
     
     public function getDataQueryProperty() {
-        $marketBoard = MarketBoard::join('characters', function($join) {
+        $marketBoard = MarketBoard::where('character_id', $this->character->id)->join('characters', function($join) {
             $join->on('characters.id', '=', 'market_board.character_id');
         })->join('items', function($join) {
             $join->on('items.id', '=', 'market_board.item_id');

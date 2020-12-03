@@ -37,17 +37,22 @@
                                 <td>{{$item->item->type}}</td>
                                 <td>{{$item->listed_price}}</td>
                                 <td>
+                                    @dump($item)
                                     <a href="{{route('game.edit.current-listings', [
                                         'marketBoard' => $item->id
                                     ])}}" class="btn btn-primary">Edit Price</a>
-                                    <a href="#" class="btn btn-danger">Delist</a>
+                                    <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#mb-item-id-{{$item->item_id}}">Delist</a>
                                 </td>
                             </tr>
+                            @include('components.livewire.market.partials.confirmation-modal', [
+                                'marketBoard' => $item
+                            ])
                         @empty
                             <x-data-tables.no-results colspan="4" />
                         @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>
+                <p class="text-muted mt-3">This table is not live and may not reflect the markets.</p>
             </div>
         </div>
     </div>

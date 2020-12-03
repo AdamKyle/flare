@@ -107,6 +107,10 @@ dd {
   }
 }
 
+.page-wrapper {
+  min-height: 100vh
+}
+
 @media (min-width: 576px) {
   .modal-dialog {
       max-width: 650px;

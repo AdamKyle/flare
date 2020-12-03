@@ -17,6 +17,11 @@ class IsCharacterAdventuringMiddleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
+
+        if (auth()->user()->hasRole('Admin')) {
+            return $next($request);
+        }
+        
         $isAdventuring = auth()->user()->character->adventureLogs->where('in_progress', true)->isNotEmpty();
 
         if ($request->wantsJson()) {
