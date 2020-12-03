@@ -40,6 +40,9 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('game.market')}}">Visit the market</a></li>
             <li><a href="{{route('game.market.sell')}}">Sell items</a></li>
+            <li><a href="{{route('game.current-listings', [
+                'character' => auth()->user()->character->id
+            ])}}">My Listings</a></li>
         </ul>
     </li>
 </ul>

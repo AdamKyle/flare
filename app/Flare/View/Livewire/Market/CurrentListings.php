@@ -3,20 +3,21 @@
 namespace App\Flare\View\Livewire\Market;
 
 use App\Flare\Models\MarketBoard;
+use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Flare\View\Livewire\Core\DataTables\WithSorting;
-use App\Flare\View\Livewire\Core\DataTables\WithSelectAll;
 
-class ItemBoard extends Component
+class CurrentListings extends Component
 {
-    use WithPagination, WithSorting, WithSelectAll;
+    use WithPagination, WithSorting;
+
+    public $search             = '';
 
     public $sortField          = 'listed_price';
 
     public $perPage            = 10;
 
-    public $itemId             = null;
+    public $character          = null;
 
     protected $paginationTheme = 'bootstrap';
     
@@ -25,7 +26,7 @@ class ItemBoard extends Component
             $join->on('characters.id', '=', 'market_board.character_id');
         })->join('items', function($join) {
             $join->on('items.id', '=', 'market_board.item_id');
-        })->where('item_id', $this->itemId)->select('market_board.*');
+        })->select('market_board.*');
         
         return $marketBoard->orderBy($this->sortField, $this->sortBy);
     }
@@ -40,9 +41,7 @@ class ItemBoard extends Component
 
     public function render()
     {
-        $this->selectAllRenderHook();
-        
-        return view('components.livewire.market.item-board', [
+        return view('components.livewire.market.current-listings', [
             'items' => $this->fetchData(),
         ]);
     }

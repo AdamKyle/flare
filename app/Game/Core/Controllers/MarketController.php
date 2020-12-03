@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Models\Character;
 use Illuminate\Http\Request;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
@@ -56,5 +57,38 @@ class MarketController extends Controller {
         event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
         
         return redirect()->to(route('game.market.sell'))->with('success', 'Item listed');
+    }
+
+    public function currentListings(Character $character) {
+
+        if ($character->id !== auth()->user()->character->id) {
+            return redirect()->to(route('game.current-listings', [
+                'character' => auth()->user()->character->id
+            ]))->with('error', 'You are not allowed to do that.');
+        }
+
+        return view('game.core.market.current-listings', [
+            'character' => $character
+        ]);
+    }
+
+    public function editCurrentListings(MarketBoard $marketBoard) {
+        return view('game.core.market.edit-current-listing', [
+            'marketBoard' => $marketBoard
+        ]);
+    }
+
+    public function updateCurrentListing(Request $request, MarketBoard $marketBoard) {
+        $request->validate([
+            'listed_price' => 'required|integer'
+        ]);
+
+        if ($request->listed_price <= 0) {
+            return redirect()->back()->with('error', 'Listed price cannot be below or equal to 0.');
+        }
+
+        $marketBoard->update($request->all());
+
+        return redirect()->back()->with('success', 'Listing for: ' . $marketBoard->item->affix_name . ' updated.');
     }
 }

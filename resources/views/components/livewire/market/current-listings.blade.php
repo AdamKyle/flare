@@ -2,8 +2,8 @@
     <div class="col-md-12">
         <div class="card item-board-card">
             <div class="card-body">
-                <div class="row pb-2 ml-2 text-muted">
-                    This table may not reflect the marketboard at all times as it is not live updated.
+                <div class="row pb-2">
+                    <x-data-tables.search wire:model="search" />
                 </div>
                 <x-data-tables.table :collection="$items">
                     <x-data-tables.header>
@@ -20,28 +20,28 @@
                         />
 
                         <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('characters.name')" 
-                            header-text="Character" 
-                            sort-by="{{$sortBy}}"
-                            sort-field="{{$sortField}}"
-                            field="characters.name"
-                        />
-
-                        <x-data-tables.header-row 
                             wire:click.prevent="sortBy('listed_price')" 
                             header-text="Listed For" 
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="listed_price"
                         />
+                        <x-data-tables.header-row>
+                            Actions
+                        </x-data-tables.header-row>
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($items as $item)
                             <tr wire:key="items-table-{{$item->id}}">
-                                <td><x-item-display-color :item="$item->item" /></td>
+                                <td><x-item-display-color :item="$item->item" /> </td>
                                 <td>{{$item->item->type}}</td>
-                                <td>{{$item->character->name}}</td>
                                 <td>{{$item->listed_price}}</td>
+                                <td>
+                                    <a href="{{route('game.edit.current-listings', [
+                                        'marketBoard' => $item->id
+                                    ])}}" class="btn btn-primary">Edit Price</a>
+                                    <a href="#" class="btn btn-danger">Delist</a>
+                                </td>
                             </tr>
                         @empty
                             <x-data-tables.no-results colspan="4" />
