@@ -1,4 +1,5 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import { Line } from 'react-chartjs-2';
 
 export default class MarketHistory extends React.Component {
@@ -6,11 +7,12 @@ export default class MarketHistory extends React.Component {
     super(props);
 
     this.state = {
+      loading: true,
       data: {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
         datasets: [
           {
-            label: 'My First dataset',
+            label: 'Market History (Last 30 days)',
             fill: false,
             lineTension: 0.1,
             backgroundColor: 'rgba(75,192,192,0.4)',
@@ -32,11 +34,43 @@ export default class MarketHistory extends React.Component {
           }
         ]
       }
-
     }
+
+    this.update = Echo.join('update-market');
+  }
+
+  componentDidMount() {
+    this.fetchMarketHistory();
+
+    this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
+      this.fetchMarketHistory();
+    });
+  }
+
+  fetchMarketHistory() {
+    axios.get('/api/market-board/history').then((result) => {
+      
+      let dataset = {...this.state.data};
+
+      dataset.labels           = result.data.labels;
+      dataset.datasets[0].data = result.data.data;
+
+      this.setState({
+        data: dataset,
+        loading: false,
+      });
+
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   render() {
+
+    if (this.state.loading) {
+      return (<div className="mb-4 text-center">Please wait...</div>);
+    }
+
     return (
       <div className="mb-4">
         <h6>Market History</h6>

@@ -25,12 +25,10 @@
           </button>
         </h5>
       </div>
-    <div id="collapse-market-prices-{{$item->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion-{{$item->id}}">
-        <div class="card-body">
-          @livewire('market.item-board', [
-              'itemId' => $item->id
-          ])
-        </div>
+      <div id="collapse-market-prices-{{$item->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion-{{$item->id}}">
+        @livewire('market.item-board', [
+            'itemId' => $item->id
+        ])
       </div>
     </div>
   </div>

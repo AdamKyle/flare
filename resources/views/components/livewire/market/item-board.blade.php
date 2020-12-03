@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <div class="card">
+        <div class="card item-board-card">
             <div class="card-body">
                 <div class="row pb-2">
                     <x-data-tables.search wire:model="search" />
@@ -20,28 +20,28 @@
                         />
 
                         <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('items.character')" 
+                            wire:click.prevent="sortBy('characters.name')" 
                             header-text="Character" 
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
-                            field="items.character"
+                            field="characters.name"
                         />
 
                         <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('cost')" 
+                            wire:click.prevent="sortBy('listed_price')" 
                             header-text="Listed For" 
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
-                            field="cost"
+                            field="listed_price"
                         />
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($items as $item)
                             <tr wire:key="items-table-{{$item->id}}">
-                                <td>Item name</td>
-                                <td>Item Type</td>
-                                <td>Listed By</td>
-                                <td>Listed For</td>
+                                <td>{{$item->item->affix_name}}</td>
+                                <td>{{$item->item->type}}</td>
+                                <td>{{$item->character->name}}</td>
+                                <td>{{$item->listed_price}}</td>
                             </tr>
                         @empty
                             <x-data-tables.no-results colspan="4" />

@@ -22,9 +22,12 @@ class ItemBoard extends Component
 
     protected $paginationTheme = 'bootstrap';
     
-
     public function getDataQueryProperty() {
-        $marketBoard = MarketBoard::where('item_id', $this->itemId);
+        $marketBoard = MarketBoard::join('characters', function($join) {
+            $join->on('characters.id', '=', 'market_board.character_id');
+        })->join('items', function($join) {
+            $join->on('items.id', '=', 'market_board.item_id');
+        })->where('item_id', $this->itemId)->select('market_board.*');
         
         return $marketBoard->orderBy($this->sortField, $this->sortBy);
     }

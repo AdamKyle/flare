@@ -15,3 +15,5 @@ Route::post('/notifications/{notification}/clear', ['uses' => 'Api\Notifications
 
 Route::get('/market-board/items', ['uses' => 'Api\MarketBoardController@index']);
 Route::get('/market-board/{item}/listing-details', ['uses' => 'Api\MarketBoardController@fetchItemDetails']);
+Route::get('/market-board/history', ['uses' => 'Api\MarketBoardController@history']);
+Route::post('/market-board/purchase/{character}', ['uses' => 'Api\MarketBoardController@purchase']);

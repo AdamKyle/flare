@@ -8,6 +8,7 @@ import PurchaseModal from './purchase-modal';
 class Board extends Component {
   constructor(props) {
     super(props);
+
     this.columns = [
       {
         key: "name",
@@ -38,20 +39,49 @@ class Board extends Component {
       show_pagination: true,
       pagination: 'advance',
     }
+
     this.state = {
       records: [],
+      gold: 0,
       showModal: false,
       modalData: {},
+      message: null,
+      messageType: null,
     }
+
+    this.update = Echo.join('update-market');
   }
 
   componentDidMount() {
     axios.get('/api/market-board/items').then((result) => {
       this.setState({
-        records: result.data
+        records: result.data.items,
+        gold: result.data.gold,
       });
     }).catch((error) => {
       console.error(error);
+    });
+
+    this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
+      let hasId = false;
+
+      if (!_.isEmpty(this.state.modalData)) {
+        hasId = _.isEmpty(event.marketListings.filter((ml) => ml.id === this.state.modalData.id));
+      }
+
+      if (this.state.showModal && !hasId) {
+        this.closeModal();
+
+        this.setState({
+          message: 'Sorry, that item was sold.',
+          type: 'info',
+        });
+      }
+
+      this.setState({
+        records: event.marketListings,
+        gold: event.characterGold,
+      });
     });
   }
 
@@ -66,6 +96,13 @@ class Board extends Component {
     this.setState({
       modalData: {},
       showModal: false,
+    });
+  }
+
+  updateMessage(message, messageType) {
+    this.setState({
+      message: message,
+      messageType: messageType,
     });
   }
 
@@ -89,15 +126,34 @@ class Board extends Component {
     });
   }
 
-  render() {
-    if (_.isEmpty(this.state.records)) {
-      return null;
-    }
+  getGoldText() {
+    return 'Your Gold: ' + this.state.gold;
+  }
 
+  closeMessage() {
+    this.setState({
+      message: null,
+      messageType: null,
+    });
+  }
+
+  renderMessage() {
+    return (
+      <div className={"alert alert-" + this.state.messageType} role="alert">
+        {this.state.message}
+        <button type="button" className="close" onClick={this.closeMessage.bind(this)}>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    )
+  }
+
+  render() {
     return (
       <CardTemplate
         OtherCss="p-3"
         cardTitle="Market Board"
+        textBesideButton={this.getGoldText()}
         customButtonType="drop-down"
         buttonTitle="Types"
         buttons={[
@@ -117,6 +173,8 @@ class Board extends Component {
         ]}
         onChange={this.typeChange.bind(this)}
       >
+        { this.state.message !== null ? this.renderMessage() : null }
+
         <MarketHistory />
 
         <ReactDatatable
@@ -131,6 +189,8 @@ class Board extends Component {
             closeModal={this.closeModal.bind(this)}
             showModal={this.state.showModal}
             modalData={this.state.modalData}
+            characterId={this.props.characterId}
+            updateMessage={this.updateMessage.bind(this)}
           /> : null
         }
       </CardTemplate>

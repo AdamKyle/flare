@@ -25,8 +25,15 @@ export default class PurchaseModal extends React.Component {
          });
   }
 
-  handleClose() {
-    this.props.closeModal();
+  purchase() {
+    axios.post('/api/market-board/purchase/' + this.props.characterId, {
+      market_board_id: this.props.modalData.id
+    }).then((result) => {
+      this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
+      this.props.closeModal();
+    }).catch((error) => {
+      console.error(error);
+    });
   }
 
   render() {
@@ -49,7 +56,7 @@ export default class PurchaseModal extends React.Component {
           <Button variant="danger" onClick={this.props.closeModal}>
             Close
           </Button>
-          <Button variant="primary" onClick={this.props.closeModal}>
+          <Button variant="primary" onClick={this.purchase.bind(this)}>
             Purchase
           </Button>
         </Modal.Footer>

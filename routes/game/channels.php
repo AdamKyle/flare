@@ -16,3 +16,7 @@ Broadcast::channel('update-adventure-logs-{userId}', function($user, $userId) {
 Broadcast::channel('update-notifications-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });
+
+Broadcast::channel('update-market', function($user) {
+	return $user;
+});

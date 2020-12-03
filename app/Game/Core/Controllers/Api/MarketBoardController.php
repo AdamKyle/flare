@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -9,8 +10,11 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Models\MarketHistory;
 use App\Flare\Transformers\ItemTransfromer;
 use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
+use Carbon\Carbon;
 
 class MarketBoardController extends Controller {
 
@@ -46,7 +50,10 @@ class MarketBoardController extends Controller {
         $items = new Collection($items, $this->transformer);
         $items = $this->manager->createData($items)->toArray();
 
-        return response()->json($items, 200);
+        return response()->json([
+            'items' => $items,
+            'gold'  => auth()->user()->character->gold,
+        ], 200);
     }
 
     public function fetchItemDetails(ItemModel $item, ItemTransfromer $itemTransfromer) {
@@ -55,5 +62,56 @@ class MarketBoardController extends Controller {
         $item = $this->manager->createData($item)->toArray();
 
         return response()->json($item, 200);
+    }
+
+    public function purchase(Request $request, Character $character) {
+        $request->validate([
+            'market_board_id' => 'required'
+        ]);
+
+        $listing = MarketBoard::find($request->market_board_id);
+
+        if (is_null($listing)) {
+            return response()->json(['message' => 'Invalid Input.'], 422);
+        }
+
+        if (!($character->inventory->slots()->count() < $character->inventory_max)) {
+            return response()->json(['message' => 'Inventory is full.']);
+        }
+
+        $character->update([
+            'gold' => $character->gold - ($listing->listed_price * 1.05),
+        ]);
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $listing->item_id,
+        ]);
+
+        MarketHistory::create([
+            'item_id'  => $listing->item_id,
+            'sold_for' => $listing->listed_price,
+        ]);
+
+        $listing->delete();
+        
+        $items = MarketBoard::all();
+        $items = new Collection($items, $this->transformer);
+        $items = $this->manager->createData($items)->toArray();
+        
+        $character = $character->refresh();
+
+        event(new UpdateMarketBoardBroadcastEvent($character->user, $items, $character->gold));
+
+        return response()->json([], 200);
+    }
+
+    public function history() {
+        return response()->json([
+            'labels' => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->map(function($mh) {
+                return $mh->created_at->format('y-m-d');
+            }),
+            'data'   => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->pluck('sold_for'),
+        ]);
     }
 }

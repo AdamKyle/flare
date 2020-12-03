@@ -19,6 +19,7 @@ export default class CardTemplate extends React.Component {
 
   buildDropDown() {
     return (
+      <>
       <div className="float-right">
         <Dropdown size="sm">
           <Dropdown.Toggle variant="primary" id="dropdown-basic">
@@ -30,6 +31,13 @@ export default class CardTemplate extends React.Component {
           </Dropdown.Menu>
         </Dropdown>
       </div>
+      {
+        this.props.hasOwnProperty('textBesideButton') ?
+        <div className="float-right mr-2 mt-2">
+          <strong>{this.props.textBesideButton}</strong>
+        </div> : null
+      }
+      </>
     )
   }
 
