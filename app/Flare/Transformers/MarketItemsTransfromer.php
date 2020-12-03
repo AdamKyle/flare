@@ -17,6 +17,7 @@ class MarketItemsTransfromer extends TransformerAbstract {
 
         return [
             'id'             => $marketListing->id,
+            'character_id'   => $marketListing->character_id,
             'item_id'        => $marketListing->item_id,
             'name'           => $marketListing->item->affix_name,
             'listed_price'   => $marketListing->listed_price,

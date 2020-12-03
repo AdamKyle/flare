@@ -29,6 +29,10 @@ export default class PurchaseModal extends React.Component {
     return (this.props.characterGold - (this.props.modalData.listed_price * 1.05)) > 0;
   }
 
+  belongsToCharacter() {
+    return parseInt(this.props.characterId) === this.props.modalData.character_id;
+  }
+
   purchase() {
     axios.post('/api/market-board/purchase/' + this.props.characterId, {
       market_board_id: this.props.modalData.id
@@ -54,7 +58,11 @@ export default class PurchaseModal extends React.Component {
         </Modal.Header>
         <Modal.Body>
           {
-            !this.hasEnoughGold() ? <div className="alert alert-danger mb-2 mt-2">You do not have enough gold to buy this.</div> : null
+            !this.hasEnoughGold() && !this.belongsToCharacter() ? <div className="alert alert-danger mb-2 mt-2">You do not have enough gold to buy this.</div> : null
+          }
+
+          {
+            this.belongsToCharacter() ? <div className="alert alert-danger mb-2 mt-2">You cannot purchase your own item.</div> : null
           }
           <p>Is this the item you would like to purchase? It will <strong>cost</strong>: {this.props.modalData.listed_price * 1.05} Gold (incl. 5% tax)</p>
           { this.state.loading ? 'Loading please wait ...' : <ItemDetails item={this.state.item} /> }
@@ -66,7 +74,7 @@ export default class PurchaseModal extends React.Component {
           <Button 
             variant="primary" 
             onClick={this.purchase.bind(this)}
-            disabled={!this.hasEnoughGold()}
+            disabled={!this.hasEnoughGold() || this.belongsToCharacter()}
           >
             Purchase
           </Button>
