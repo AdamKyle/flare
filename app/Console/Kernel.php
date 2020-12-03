@@ -40,6 +40,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
+        $schedule->command('clean:notifications')->monthly();
+        
         $schedule->command('clean:market-history')->cron('0 0 1 */3 *');
     }
 
