@@ -153,7 +153,7 @@ class CraftingSkillService {
             } else if ($enchantingSkill->level >= $affix->skill_level_trivial) { 
                 event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
                 
-                $this->enchantItem($slot, $item, $affix);
+                $this->enchantItem($item, $affix);
     
                 $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
     
@@ -184,7 +184,7 @@ class CraftingSkillService {
                         $this->item = null;
                     }
                     
-                    $message = 'You failed to apply enchantments to: ' . $item->name . '. The item shatters before you. You lost the investment.';
+                    $message = 'You failed to apply '.$affix->name.' to: ' . $item->name . '. The item shatters before you. You lost the investment.';
     
                     event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
                 }

@@ -533,7 +533,6 @@ class CharacterSkillControllerApiTest extends TestCase {
                             'extraTime' => 'double'
                          ])->response;
 
-
         $this->assertEquals(200, $response->status());
         $this->assertFalse($currentGold === $this->character->refresh()->gold);
         $this->assertNotNull($slot->refresh()->item->item_suffix_id);
