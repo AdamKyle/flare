@@ -25,7 +25,7 @@ class MapUploadValidation extends FormRequest
     {
         return [
             'name' => 'required',
-            'map'  => 'required|image|mimes:jpeg|max:2000'
+            'map'  => 'required|image|max:2000'
         ];
     }
 
@@ -39,7 +39,6 @@ class MapUploadValidation extends FormRequest
             'name.required'  => 'Map name is required.',
             'map.required'   => 'Map upload is required.',
             'map.image'      => 'Map must be an image.',
-            'map.mimes:jpeg' => 'Map must be of type Jpeg.',
             'map.max:2000'   => 'Map must be be smaller. Max upload is 2 Mbs.'
         ];
     }

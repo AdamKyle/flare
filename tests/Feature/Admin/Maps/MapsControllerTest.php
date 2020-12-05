@@ -54,7 +54,7 @@ class MapsControllerTest extends TestCase
              ->visit(route('maps.upload'))
              ->type('Surface', 'name')
              ->select('yes', 'default')
-             ->attach(UploadedFile::fake()->image('avatar.jpg'), 'map')
+             ->attach(UploadedFile::fake()->image('avatar.jpeg'), 'map')
              ->press('Submit')
              ->see('Surface');
 
