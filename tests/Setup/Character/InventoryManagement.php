@@ -1,0 +1,127 @@
+<?php
+
+namespace Tests\Setup\Character;
+
+use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
+
+class InventoryManagement {
+
+    private $character;
+
+    /**
+     * Constructor
+     * 
+     * @param Character $character
+     */
+    public function __construct(Character $character) {
+        $this->character = $character;
+    }
+
+    /**
+     * Equip the left hand with an item that isn't already equipped.
+     * 
+     * @param int $slotId | 1
+     * @return InventoryManagement
+     */
+    public function equipLeftHand(int $slotId = 1): InventoryManagement {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => 'left-hand',
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Equip the right hand.
+     * 
+     * @param int $slotId | 1
+     * @return InventoryManagement
+     */
+    public function equipRightHand(int $slotId = 1): InventoryManagement {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => 'right-hand',
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Equip the Spell slot
+     * 
+     * Accepted: spell-one, spell-two
+     * 
+     * @param int $slotId | 1
+     * @param string $position | spell-one, spell-two
+     * @return InventoryManagement
+     */
+    public function equipSpellSlot(int $slotId = 1, string $position = 'spell-one'): InventoryManagement {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => $position,
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Equip an artifact.
+     * 
+     * @param int $slotId
+     * @param string $position | artifact-one, artifact-two
+     * @return InventoryManagement
+     */
+    public function equipArtifact(int $slotId = 1, string $position = 'artifact-one'): InventoryManagement {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => $position,
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Get the character back.
+     * 
+     * @return Character
+     */
+    public function getCharacter(): Character {
+        return $this->character->refresh();
+    }
+
+    protected function fetchSlot(int $slotId): InventorySlot {
+        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($slotId) {
+            return $slot->id === $slotId && !$slot->equipped;
+         })->first();
+ 
+         if (is_null($foundMatching)) {
+             throw new \Exception('Item is not in inventory or is already equipped');
+         }
+ 
+         $slot = $this->character->inventory->slots->find($slotId);
+ 
+         if (is_null($slot)) {
+             throw new \Exception('Slot is not found, did you give the item to the player?');
+         }
+
+         return $slot;
+    }
+}
