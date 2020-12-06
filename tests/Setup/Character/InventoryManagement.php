@@ -4,18 +4,22 @@ namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 
 class InventoryManagement {
 
     private $character;
+
+    private $characterFactory;
 
     /**
      * Constructor
      * 
      * @param Character $character
      */
-    public function __construct(Character $character) {
-        $this->character = $character;
+    public function __construct(Character $character, CharacterFactory $characterFactory = null) {
+        $this->character        = $character;
+        $this->characterFactory = $characterFactory;
     }
 
     /**
@@ -96,6 +100,48 @@ class InventoryManagement {
         $this->character->refresh();
 
         return $this;
+    }
+
+    /**
+     * Give item to the character.
+     * 
+     * Ignores the inventory max limit.
+     * 
+     * @param Item $item
+     * @return InventoryManagement
+     */
+    public function giveItem(Item $item): InventoryManagement {
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Unequip all items.
+     * 
+     * @return InventoryManagement
+     */
+    public function unequipAll(): InventoryManagement {
+        $this->character->inventory->slots->each(function($slot) {
+            $slot->update([
+                'position' => null,
+                'equipped' => false,
+            ]);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Get the character factory.
+     * 
+     * @return CharacterFactory
+     */
+    public function getCharacterFactory(): CharacterFactory {
+        return $this->characterFactory;
     }
 
     /**

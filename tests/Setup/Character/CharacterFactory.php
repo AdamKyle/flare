@@ -4,6 +4,8 @@ namespace Tests\Setup\Character;
 
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\User;
 use App\Game\Core\Services\CharacterService;
 use Str;
 use Tests\Traits\CreateCharacter;
@@ -67,6 +69,10 @@ class CharacterFactory {
         return $this;
     }
 
+    public function inventoryManagement(): InventoryManagement {
+        return new InventoryManagement($this->character, $this);
+    }
+
     /**
      * Lets you update the character
      * 
@@ -75,6 +81,8 @@ class CharacterFactory {
      */
     public function updateCharacter(array $changes = []): CharacterFactory {
         $this->character->update($changes);
+
+        $this->character = $this->character->refresh();
 
         return $this;
     }
@@ -96,7 +104,8 @@ class CharacterFactory {
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
-            'equiped'      => false,
+            'equipped'     => true,
+            'position'     => 'right-hand'
         ]);
 
         return $this;
@@ -148,6 +157,75 @@ class CharacterFactory {
     }
 
     /**
+     * Update a specific skill associated with a character.
+     * 
+     * @param string $name
+     * @param array $changes | []
+     * @return CharacterFactory
+     */
+    public function updateSkill(string $name, array $changes = []): CharacterFactory {
+        $skill = $this->character->skills->filter(function($skill) use($name) {
+            return $skill->name === $name;
+        })->first();
+
+        if (is_null($skill)) {
+            throw new \Exception($name . ' not found.');
+        }
+
+        $skill->update($changes);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Assign a new skill to a character.
+     * 
+     * @param GameSkill $skill
+     * @return characterFactory
+     */
+    public function assignSkill(GameSkill $skill): CharacterFactory {
+        $this->character->skills()->create([
+            'game_skill_id' => $skill->id,
+            'character_id'  => $this->character->id,
+            'level'         => 1,
+            'xp'            => 0,
+            'xp_max'        => 100,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Train a skill.
+     * 
+     * Sets a skill to training, assuming no other skill is currently being trained.
+     * 
+     * @param string $name
+     * @return CharacterFactory
+     */
+    public function trainSkill(string $name): CharacterFactory {
+        $skill = $this->character->skills->filter(function($skill) {
+            return $skill->currently_training;
+        })->first();
+
+        if (!is_null($skill)) {
+            throw new \Exception('Already have a skill in training.');
+        }
+
+        $this->character->skills->each(function($skill) use($name) {
+            if ($skill->name === $name) {
+                $skill->update([
+                    'currently_training' => true
+                ]);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
      * Create an adventure log based on an adventure.
      * 
      * You can pass in additional options for the log
@@ -176,6 +254,15 @@ class CharacterFactory {
      */
     public function getCharacter(): Character {
         return $this->character->refresh();
+    }
+
+    /**
+     * Get the user.
+     * 
+     * @return User
+     */
+    public function getUser(): User {
+        return $this->character->user;
     }
 
     protected function createInventory() {

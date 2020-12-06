@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Game\Core\Api;
 
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNotification;
-use Tests\Setup\CharacterSetup;
 
 
 class NotificationsControllerTest extends TestCase {
@@ -23,12 +22,7 @@ class NotificationsControllerTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-
-        $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
-                                               ->setSkill('Looting', [])
-                                               ->setSkill('Weapon Crafting', [])
-                                               ->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter();
     }
 
     public function tearDown(): void {
@@ -38,8 +32,11 @@ class NotificationsControllerTest extends TestCase {
     }
 
     public function testHasNotifications() {
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
         $this->createNotification([
-            'character_id' => $this->character->id,
+            'character_id' => $character->id,
             'title'        => 'Sample',
             'message'      => 'Sample',
             'status'       => 'success',
@@ -48,7 +45,7 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ]);
 
-        $response = $this->actingAs($this->character->user, 'api')
+        $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/notifications')
                          ->response;
 
@@ -57,11 +54,15 @@ class NotificationsControllerTest extends TestCase {
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content);
         $this->assertEquals($content[0]->status, 'success');
+        $this->assertTrue($character->refresh()->notifications->isNotEmpty());
     }
 
     public function testHasNoNotifications() {
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
         $this->createNotification([
-            'character_id' => $this->character->id,
+            'character_id' => $character->id,
             'title'        => 'Sample',
             'message'      => 'Sample',
             'status'       => 'success',
@@ -71,7 +72,7 @@ class NotificationsControllerTest extends TestCase {
         ]);
 
 
-        $response = $this->actingAs($this->character->user, 'api')
+        $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/notifications')
                          ->response;
 
@@ -82,8 +83,11 @@ class NotificationsControllerTest extends TestCase {
     }
 
     public function testClearAllNotifications() {
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
         $this->createNotification([
-            'character_id' => $this->character->id,
+            'character_id' => $character->id,
             'title'        => 'Sample',
             'message'      => 'Sample',
             'status'       => 'success',
@@ -92,42 +96,19 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ]);
 
-        $response = $this->actingAs($this->character->user, 'api')
+        $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/notifications/clear')
                          ->response;
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue(
-            $this->character->notifications()->where('read', false)->get()->isEmpty()
+            $character->refresh()->notifications()->where('read', false)->get()->isEmpty()
         );
     }
 
     public function testClearNotification() {
-        $this->createNotifications([
-            'character_id' => $this->character->id,
-            'title'        => 'Sample',
-            'message'      => 'Sample',
-            'status'       => 'success',
-            'type'         => 'adventure',
-            'read'         => false,
-            'url'          => 'somthing.com',
-        ], 2);
-
-        $response = $this->actingAs($this->character->user, 'api')
-                         ->json('POST', '/api/notifications/1/clear')
-                         ->response;
-
-        $this->assertEquals(200, $response->status());
-        $this->assertEquals(
-            $this->character->notifications()->where('read', false)->count(), 1
-        );
-    }
-
-    public function testFailToClearNotification() {
-        $character = (new CharacterSetup)->setupCharacter($this->createUser())
-                                         ->setSkill('Looting', [])
-                                         ->setSkill('Weapon Crafting', [])
-                                         ->getCharacter();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
 
         $this->createNotifications([
             'character_id' => $character->id,
@@ -139,7 +120,32 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ], 2);
 
-        $response = $this->actingAs($this->character->user, 'api')
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/notifications/1/clear')
+                         ->response;
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals(
+            $character->refresh()->notifications()->where('read', false)->count(), 1
+        );
+    }
+
+    public function testFailToClearNotification() {
+        $character = $this->character->getCharacter();
+
+        $this->createNotifications([
+            'character_id' => $character->id,
+            'title'        => 'Sample',
+            'message'      => 'Sample',
+            'status'       => 'success',
+            'type'         => 'adventure',
+            'read'         => false,
+            'url'          => 'somthing.com',
+        ], 2);
+
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
+
+        $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/notifications/1/clear')
                          ->response;
 

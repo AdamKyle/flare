@@ -44,7 +44,7 @@ class CraftingSkillService {
      */
     public function getCurrentSkill(string $type) {
         return $this->character->skills->filter(function($skill) use($type) {
-            return $skill->name === $type . ' Crafting';
+            return $skill->name === ucfirst($type) . ' Crafting';
         })->first();
     }
 
@@ -267,7 +267,6 @@ class CraftingSkillService {
     }
 
     protected function enchantItem(Item $item, ItemAffix $affix) {
-        dump($affix->type, $affix->name, $affix->id);
         if (!is_null($this->item)) {
             $this->item->{'item_' . $affix->type . '_id'} = $affix->id;
 

@@ -7,16 +7,13 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\Monster;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
-use CreateMonstersSeeder;
-use Database\Seeders\GameSkillsSeeder;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -26,7 +23,7 @@ use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateSkill;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Monster\MonsterFactory;
 use Tests\Traits\CreateItemAffix;
 
 class BattleControllerApiTest extends TestCase
@@ -51,9 +48,10 @@ class BattleControllerApiTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->equipStartingEquipment();
 
-        $this->setUpMonsters();
+        $this->monster   = (new MonsterFactory)->buildMonster();
 
         $this->createItemAffix([
             'name'                 => 'Sample',
@@ -89,48 +87,47 @@ class BattleControllerApiTest extends TestCase
     public function tearDown(): void {
         parent::tearDown();
 
-        $this->user      = null;
         $this->character = null;
         $this->monster   = null;
     }
 
     public function testCanGetActions() {
 
-        $this->setUpCharacter();
+        $user     = $this->character->getUser();
 
-        $response = $this->actingAs($this->user, 'api')
+        $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/actions', [
-                             'user_id' => $this->user->id
+                             'user_id' => $user->id
                          ])
                          ->response;
 
-        $content = json_decode($response->content());
+        $content   = json_decode($response->content());
+        $character = $this->character->getCharacter();
 
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
-        $this->assertEquals($this->character->name, $content->character->name);
+        $this->assertEquals($character->name, $content->character->name);
         $this->assertEquals(7, $content->character->attack);
     }
 
     public function testCanGetActionsWithSkills() {
 
-        $this->setUpCharacter();
+        $user     = $this->character->getUser();
 
-        $this->character->refresh();
-
-        $response = $this->actingAs($this->user, 'api')
+        $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/actions', [
-                             'user_id' => $this->user->id
+                             'user_id' => $user->id
                          ])
                          ->response;
 
-        $content = json_decode($response->content());
+        $content   = json_decode($response->content());
+        $character = $this->character->getCharacter();
 
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
-        $this->assertEquals($this->character->name, $content->character->name);
+        $this->assertEquals($character->name, $content->character->name);
         $this->assertEquals(7, $content->character->attack);
     }
 
@@ -148,10 +145,11 @@ class BattleControllerApiTest extends TestCase
 
         Event::fake([ServerMessageEvent::class, UpdateTopBarBroadcastEvent::class]);
 
-        $this->setUpCharacter();
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_character_dead' => true
                          ])
                          ->response;
@@ -170,23 +168,23 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+        $monster   = $this->monster->getMonster();
 
-        $currentGold = $this->character->gold;
+        $currentGold = $character->gold;
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
-                             'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'defender_type'    => 'monster',
+                             'monster_id'       => $monster->id,
                          ])
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
-
-        $this->assertTrue($currentGold !== $this->character->gold);
+        $this->assertTrue($currentGold !== $this->character->getCharacter()->gold);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterLevelUp() {
@@ -200,24 +198,23 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([
-            'xp' => 99,
-            'level' => 1,
-        ]);
+        $character = $this->character->updateCharacter(['xp' => 99])->getCharacter();
+        $user      = $this->character->getUser();
+        $monster   = $this->monster->getMonster();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type'    => 'monster',
-                             'monster_id'       => $this->monster->id,
+                             'monster_id'       => $monster->id,
                          ])
                          ->response;
 
-        $this->character->refresh();
+        $character = $this->character->getCharacter();
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals(2, $this->character->level);
-        $this->assertEquals(0, $this->character->xp);
+        $this->assertEquals(2, $character->level);
+        $this->assertEquals(0, $character->xp);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedItem() {
@@ -230,19 +227,20 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([], ['skill_bonus_per_level' => 1000,], ['level' => 1000,]);
+        $character   = $this->character->updateSkill('Looting', ['level' => 100])->getCharacter();
+        $user        = $this->character->getUser();
+        $monster     = $this->monster->getMonster();
 
-        $currentGold = $this->character->gold;
+        $currentGold = $character->gold;
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
-
-        $character = $this->character->refresh();
+        $character = $this->character->getCharacter();
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue($currentGold !== $character->gold);
@@ -259,66 +257,27 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([], ['skill_bonus_per_level' => 1000,], ['level' => 1000,]);
+        $character   = $this->character->updateSkill('Looting', ['level' => 100])
+                                       ->updateCharacter(['inventory_max' => 1])
+                                       ->getCharacter();
+        $user        = $this->character->getUser();
+        $monster     = $this->monster->getMonster();
 
-        $currentGold = $this->character->gold;
+        $currentGold = $character->gold;
 
-        $this->character->update([
-            'inventory_max' => 1,
-        ]);
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
-        $character = $this->character->refresh();
+        $character = $this->character->getCharacter();
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue($currentGold !== $character->gold);
         $this->assertTrue(count($character->inventory->slots) === 1);
-    }
-
-    public function testBattleResultsMonsterIsDeadAndCharacterCannotGainItemBecauseInventoryIsFull() {
-        Queue::Fake();
-
-        Event::fake([
-            ServerMessageEvent::class,
-            GoldRushCheckEvent::class,
-            AttackTimeOutEvent::class,
-            UpdateTopBarBroadcastEvent::class,
-        ]);
-
-        $this->setUpCharacter([], [
-            'skill_bonus_per_level' => 0.01,
-        ], [
-            'level' => 100,
-        ]);
-
-        $this->character->update([
-            'inventory_max' => 1,
-        ]);
-
-        $currentGold = $this->character->gold;
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->character->id, [
-                             'is_defender_dead' => true,
-                             'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
-                         ])
-                         ->response;
-
-        $this->character->refresh();
-
-        $this->assertEquals(200, $response->status());
-        $this->assertEquals(1, $this->character->level);
-        $this->assertTrue($currentGold !== $this->character->gold);
-        
-        $this->assertFalse(count($this->character->inventory->slots) > 1);
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {
@@ -331,20 +290,23 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([], ['skill_bonus_per_level' => 100], [ 'level' => 100]);
+        $character   = $this->character->updateSkill('Looting', ['level' => 100])
+                                       ->getCharacter();
+        $user        = $this->character->getUser();
+        $monster     = $this->monster->getMonster();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
-        $this->character->refresh();
+        $character = $this->character->getCharacter();
 
         $this->assertEquals(200, $response->status());
-        $this->assertNotEquals(0, $this->character->gold);
+        $this->assertNotEquals(0, $character->gold);
     }
 
     public function testBattleResultsMonsterIsDeadCannotAttackAgain() {
@@ -358,21 +320,21 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+        $monster   = $this->monster->getMonster();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
-
-        $this->assertFalse($this->character->can_attack);
+        $this->assertFalse($this->character->getCharacter()->can_attack);
     }
 
     public function testCharacterGetsFullXPWhenMonsterMaxLevelIsHigherThenCharacterLevel() {
@@ -386,24 +348,23 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->getCharacter();
+        $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
+        $user      = $this->character->getUser();
 
-        $this->monster->max_level = 5;
-        $this->monster->save();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
+        $character = $this->character->getCharacter();
 
-        $this->assertEquals(10, $this->character->xp);
+        $this->assertEquals(10, $character->xp);
     }
 
     public function testCharacterGetsOneThirdXPWhenMonsterMaxLevelIsLowerThenCharacterLevel() {
@@ -417,26 +378,21 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([
-            'level' => 100,
-        ]);
+        $character = $this->character->updateCharacter(['level' => 500])->getCharacter();
+        $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
+        $user      = $this->character->getUser();
 
-        $this->monster->max_level = 5;
-        $this->monster->save();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
-
-        $this->assertEquals(3, $this->character->xp);
+        $this->assertEquals(3, $this->character->getCharacter()->xp);
     }
 
     public function testCharacterSeesErrorForUnknownType() {
@@ -450,18 +406,15 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $this->setUpCharacter([
-            'level' => 100,
-        ]);
+        $character = $this->character->updateCharacter(['level' => 500])->getCharacter();
+        $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
+        $user      = $this->character->getUser();
 
-        $this->monster->max_level = 5;
-        $this->monster->save();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'apple-sauce',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
@@ -481,13 +434,9 @@ class BattleControllerApiTest extends TestCase
         Queue::fake();
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
-        $this->setUpCharacter();
-        
-        $this->character->update([
-            'is_dead' => true
-        ]);
+        $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
 
-        $response = $this->json('POST', '/api/battle-revive/' . $this->user->character->id)
+        $response = $this->json('POST', '/api/battle-revive/' . $character->id)
                          ->response;
         
         $this->assertEquals(401, $response->status());
@@ -497,20 +446,15 @@ class BattleControllerApiTest extends TestCase
         Queue::fake();
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
-        $this->setUpCharacter();
-        
-        $this->character->update([
-            'is_dead' => true
-        ]);
+        $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
+        $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
+        $user      = $this->character->getUser();
 
-        $this->monster->max_level = 5;
-        $this->monster->save();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'apple-sauce',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
         
@@ -522,164 +466,97 @@ class BattleControllerApiTest extends TestCase
         Queue::fake();
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
-        $this->setUpCharacter();
-        
-        $this->character->update([
-            'is_dead' => true
-        ]);
+        $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
+        $user      = $this->character->getUser();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-revive/' . $this->character->id)
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-revive/' . $character->id)
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
-
-        $this->assertFalse($this->character->is_dead); 
+        $this->assertFalse($this->character->getCharacter()->is_dead); 
     }
 
     public function testSkillLevelUpFromFight() {
         Queue::fake();
 
-        $this->setUpCharacter();
-
-        $this->character->skills()->join('game_skills', function($join){
-            $join->on('game_skills.id', 'skills.game_skill_id')
-                 ->where('name', 'Looting');
-        })->update([
-            'currently_training' => true,
-            'xp'                 => 100,
-            'xp_max'             => 100
-        ]);
+        $character = $this->character->updateSkill('Looting', [
+            'xp'                 => 99,
+            'xp_max'             => 100,
+            'currently_training' => true
+        ])->inventoryManagement()
+        ->giveItem($this->createItem([
+            'name' => 'Sample',
+            'skill_name' => 'Looting',
+            'skill_training_bonus' => 1.0,
+            'type' => 'quest'
+        ]))->giveItem($this->createItem([
+            'name' => 'Sample',
+            'skill_name' => 'Looting',
+            'skill_training_bonus' => 1.0,
+            'type' => 'quest'
+        ]))->getCharacterFactory()->getCharacter();
         
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->createItem([
-                'name' => 'Sample',
-                'skill_name' => 'Looting',
-                'skill_training_bonus' => 1.0,
-                'type' => 'quest'
-            ])->id,
-        ]);
+        $user    = $this->character->getUser();
+        $monster = $this->monster->getMonster();
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->createItem([
-                'name' => 'Sample Item',
-                'skill_name' => 'Looting',
-                'skill_training_bonus' => 1.0,
-                'type' => 'weapon'
-            ])->id,
-            'equipped' => true,
-            'position' => 'body',
-        ]);
-
-        $this->user->refresh();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
+        $skill = $this->character->getCharacter()->skills->filter(function($skill) {
+            return $skill->name === 'Looting';
+        })->first();
 
-        $this->assertEquals(2, $this->character->skills->where('name', 'Looting')->first()->level);
+        $this->assertEquals(2, $skill->level);
     }
 
     public function testSkillDoesNotLevelUpFromFight() {
         Queue::fake();
 
-        $this->setUpCharacter();
-
-        $this->character->skills()->join('game_skills', function($join){
-            $join->on('game_skills.id', 'skills.game_skill_id')
-                 ->where('name', 'Looting');
-        })->update([
-            'level'              => 500,
-            'currently_training' => true,
-            'xp'                 => 100,
-            'xp_max'             => 100
-        ]);
+        $character = $this->character->updateSkill('Looting', [
+            'level'              => 100,
+            'xp'                 => 99,
+            'xp_max'             => 100,
+            'currently_training' => true
+        ])->inventoryManagement()
+        ->giveItem($this->createItem([
+            'name' => 'Sample',
+            'skill_name' => 'Looting',
+            'skill_training_bonus' => 1.0,
+            'type' => 'quest'
+        ]))->giveItem($this->createItem([
+            'name' => 'Sample',
+            'skill_name' => 'Looting',
+            'skill_training_bonus' => 1.0,
+            'type' => 'quest'
+        ]))->getCharacterFactory()->getCharacter();
         
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->createItem([
-                'name' => 'Sample',
-                'skill_name' => 'Looting',
-                'skill_training_bonus' => 1.0,
-                'type' => 'quest'
-            ])->id,
-        ]);
+        $user    = $this->character->getUser();
+        $monster = $this->monster->getMonster();
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->createItem([
-                'name' => 'Sample Item',
-                'skill_name' => 'Looting',
-                'skill_training_bonus' => 1.0,
-                'type' => 'weapon'
-            ])->id,
-            'equipped' => true,
-            'position' => 'body',
-        ]);
-
-        $this->user->refresh();
-
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/battle-results/' . $this->user->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
-                             'monster_id' => $this->monster->id,
+                             'monster_id' => $monster->id,
                          ])
                          ->response;
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
+        $skill = $this->character->getCharacter()->skills->filter(function($skill) {
+            return $skill->name === 'Looting';
+        })->first();
 
         // Skill Did Not Level Up:
-        $this->assertEquals(500, $this->character->skills->where('name', 'Looting')->first()->level);
-    }
-
-    protected function setUpCharacter(array $options = [], array $baseSkillOptions = [], array $skillOptions = []): void {
-        $this->user = $this->createUser();
-
-        $item = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'weapon',
-            'base_damage' => '6'
-        ]);
-
-        $this->character = (new CharacterSetup)->setupCharacter($this->user, $options)
-                                               ->giveItem($item)
-                                               ->equipLeftHand()
-                                               ->setSkill('Looting', $baseSkillOptions, $skillOptions)
-                                               ->setSkill('Dodge', $baseSkillOptions, $skillOptions)
-                                               ->setSkill('Accuracy', $baseSkillOptions, $skillOptions)
-                                               ->getCharacter();
-    }
-
-    protected function setUpMonsters(): void {
-        $this->monster = $this->createMonster([
-            'name'         => 'Goblin',
-            'damage_stat'  => 'str',
-            'xp'           => 10,
-            'str'          => 1,
-            'dur'          => 6,
-            'dex'          => 7,
-            'chr'          => 8,
-            'int'          => 8,
-            'ac'           => 6,
-            'health_range' => '8-20',
-            'attack_range' => '2-8',
-            'gold'         => 25,
-            'drop_check'   => 0.10,
-        ]);
+        $this->assertEquals(100, $skill->level);
     }
 }
