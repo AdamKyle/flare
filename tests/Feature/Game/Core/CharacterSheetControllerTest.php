@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class CharacterSheetControllerTest extends TestCase
 {
@@ -25,11 +25,9 @@ class CharacterSheetControllerTest extends TestCase
             'base_damage' => '6',
         ]);
 
-        $this->character = (new CharacterSetup())
-                                ->setupCharacter($this->createUser())
-                                ->giveItem($item)
-                                ->equipLeftHand()
-                                ->getCharacter();
+        $this->character = (new CharacterFactory)
+                                ->createBaseCharacter()
+                                ->equipStartingEquipment();
     }
 
     public function tearDown(): void {
@@ -38,9 +36,12 @@ class CharacterSheetControllerTest extends TestCase
         $this->character = null;
     }
     public function testCanSeeCharacterSheet() {
-        $this->actingAs($this->character->user)
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $this->actingAs($user)
                     ->visitRoute('game.character.sheet')
                     ->see('Character Name')
-                    ->see($this->character->name);
+                    ->see($character->name);
     }
 }

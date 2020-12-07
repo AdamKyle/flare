@@ -103,6 +103,26 @@ class InventoryManagement {
     }
 
     /**
+     * Equip an item.
+     * 
+     * @param int $slotId | 1
+     * @param string $position
+     * @return InventoryManagement
+     */
+    public function equipItem(int $slotId = 1, string $position): InventoryManagement {
+        $slot = $this->fetchSlot($slotId);
+
+        $slot->update([
+            'equipped' => true,
+            'position' => 'position',
+        ]);
+
+        $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
      * Give item to the character.
      * 
      * Ignores the inventory max limit.

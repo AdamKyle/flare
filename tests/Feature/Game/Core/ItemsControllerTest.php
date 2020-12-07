@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Core;
 
-use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -14,14 +13,22 @@ class ItemsControllerTest extends TestCase
         CreateItem,
         CreateItemAffix;
 
+    private $item;
+
     public function setUp(): void {
         parent::setUp();
 
-        $this->createItem([
+        $this->item = $this->createItem([
             'name'        => 'Rusty Dagger',
             'type'        => 'weapon',
             'base_damage' => '6',
         ]);
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+
+        $this->item = null;
     }
 
     public function testCanSeeItemDetails() {
@@ -29,8 +36,7 @@ class ItemsControllerTest extends TestCase
     }
 
     public function testCanColorForOneAffix() {
-        $item = Item::first();
-        $item->item_suffix_id = $this->createItemAffix([
+        $this->item->item_suffix_id = $this->createItemAffix([
             'name'                 => 'sample',
             'base_damage_mod'      => 0.10,
             'type'                 => 'suffix',
@@ -45,14 +51,13 @@ class ItemsControllerTest extends TestCase
             'skill_training_bonus' => 0.10,
         ])->id;
 
-        $item->save();
+        $this->item->save();
 
         $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger')->see('one-enchant');
     }
 
     public function testCanColorForTwoAffix() {
-        $item = Item::first();
-        $item->item_suffix_id = $this->createItemAffix([
+        $this->item->item_suffix_id = $this->createItemAffix([
             'name'                 => 'sample',
             'base_damage_mod'      => 0.10,
             'type'                 => 'suffix',
@@ -67,7 +72,7 @@ class ItemsControllerTest extends TestCase
             'skill_training_bonus' => 0.10,
         ])->id;
 
-        $item->item_prefix_id = $this->createItemAffix([
+        $this->item->item_prefix_id = $this->createItemAffix([
             'name'                 => 'sample',
             'base_damage_mod'      => 0.10,
             'type'                 => 'suffix',
@@ -82,15 +87,14 @@ class ItemsControllerTest extends TestCase
             'skill_training_bonus' => 0.10,
         ])->id;
 
-        $item->save();
+        $this->item->save();
 
         $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger')->see('two-enchant');
     }
 
     public function testColorForQuestItem() {
-        $item = Item::first();
-        $item->type = 'quest';
-        $item->save();
+        $this->item->type = 'quest';
+        $this->item->save();
 
         $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger')->see('quest-item');
     }

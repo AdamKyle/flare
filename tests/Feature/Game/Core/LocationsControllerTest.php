@@ -2,23 +2,20 @@
 
 namespace Tests\Feature\Game\Core;
 
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
-use Tests\Traits\CreateUser;
 
 class LocationsControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateLocation, CreateUser;
+    use RefreshDatabase, CreateLocation;
 
     public function testCanSeeLocationName() {
-        $this->seed(GameSkillsSeeder::class);
 
-        $character = (new CharacterSetup())
-                        ->setupCharacter($this->createUser())
-                        ->getCharacter();
+        $user = (new CharacterFactory)->createBaseCharacter()
+                                      ->givePlayerLocation()
+                                      ->getUser();
 
         $location  = $this->createLocation([
             'name'        => 'Sample',
@@ -28,7 +25,7 @@ class LocationsControllerTest extends TestCase
             'y'           => 32,
         ]);
 
-        $this->actingAs($character->user)->visitRoute('game.locations.location', [
+        $this->actingAs($user)->visitRoute('game.locations.location', [
             'location' => $location,
         ])->see($location->name);
     }

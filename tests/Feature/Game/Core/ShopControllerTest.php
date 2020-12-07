@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Game\Core;
 
-use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateItemAffix;
 
 class ShopControllerTest extends TestCase
@@ -47,14 +47,14 @@ class ShopControllerTest extends TestCase
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);
-        
 
-        $this->character = (new CharacterSetup())
-                                ->setupCharacter($this->createUser())
+        $this->character = (new CharacterFactory)
+                                ->createBaseCharacter()
                                 ->givePlayerLocation()
+                                ->inventoryManagement()
                                 ->giveItem($this->item)
                                 ->equipLeftHand()
-                                ->getCharacter();
+                                ->getCharacterFactory();
     }
 
     public function tearDown(): void {
@@ -68,11 +68,15 @@ class ShopControllerTest extends TestCase
     }
 
     public function testCanSeeShop() {
-        $this->actingAs($this->character->user)->visitRoute('game.shop.buy')->see('Buying');
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)->visitRoute('game.shop.buy')->see('Buying');
     }
 
     public function testCanBuyItem() {
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.item'), [
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
             'item_id' => $this->item->id,
         ])->response;
 
@@ -80,7 +84,9 @@ class ShopControllerTest extends TestCase
     }
 
     public function testCannotBuyUnknownItem() {
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.item'), [
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
             'item_id' => 6,
         ])->response;
 
@@ -88,11 +94,10 @@ class ShopControllerTest extends TestCase
     }
 
     public function testCannotBuyItemNotEnoughGold() {
-        $this->character->update([
-            'gold' => 0,
-        ]);
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.item'), [
+        $user = $this->character->updateCharacter(['gold' => 0])->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
             'item_id' => 6,
         ])->response;
 
@@ -106,7 +111,9 @@ class ShopControllerTest extends TestCase
 
         $this->item->refresh();
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.item'), [
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
             'item_id' => $this->item->id,
         ])->response;
 
@@ -114,96 +121,88 @@ class ShopControllerTest extends TestCase
     }
 
     public function testCanSeeSellPage() {
-        $this->actingAs($this->character->user)->visitRoute('game.shop.sell')->see('Inventory');
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)->visitRoute('game.shop.sell')->see('Inventory');
     }
 
     public function testCanSellItem() {
-        $this->character->update([
-            'gold' => 0,
-        ]);
 
-        $slot = $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->item->id,
-            'equipped'     => false,
-            'position'     => null,
-        ]);
+        $user = $this->character->inventoryManagement()
+                                ->unequipAll()
+                                ->getCharacterFactory()
+                                ->updateCharacter([
+                                    'gold' => 0
+                                ])
+                                ->getUser();
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.item'), [
-            'slot_id' => $slot->id,
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item'), [
+            'slot_id' => 1,
         ])->response;
 
         $sellFor = SellItemCalculator::fetchTotalSalePrice($this->item);
 
         $response->assertSessionHas('success', 'Sold: Rusty Dagger for: '.$sellFor.' gold.');
 
-        $this->character->refresh();
-
-        $this->assertTrue($this->character->gold > 0);
+        $this->assertTrue($this->character->getCharacter()->gold > 0);
     }
 
     public function testCanSellItemWithArtifactAndAfixes() {
-        $this->character->update([
-            'gold' => 0,
-        ]);
+        $user = $this->character->inventoryManagement()
+                                ->unequipAll()
+                                ->getCharacterFactory()
+                                ->updateCharacter([
+                                    'gold' => 0
+                                ])
+                                ->getUser();
 
 
         $this->item->update([
             'item_suffix_id' => $this->itemAffix->id,
         ]);
 
-        $slot = $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->item->id,
-            'equipped'     => false,
-            'position'     => null,
-        ]);
-
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.item'), [
-            'slot_id' => $slot->id,
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item'), [
+            'slot_id' => 1,
         ])->response;
 
         $sellFor = SellItemCalculator::fetchTotalSalePrice($this->item);
 
         $response->assertSessionHas('success', 'Sold: Rusty Dagger *'.$this->itemAffix->name.'* for: '.$sellFor.' gold.');
 
-        $this->character->refresh();
-
-        $this->assertTrue($this->character->gold > 0);
+        $this->assertTrue($this->character->getCharacter()->gold > 0);
     }
 
 
     public function testCannotSellIteYouDontHave() {
-        $this->character->update([
-            'gold' => 0,
-        ]);
+        $user = $this->character->updateCharacter([
+                                    'gold' => 0
+                                ])
+                                ->getUser();
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item'), [
             'slot_id' => '10',
         ])->response;
 
         $response->assertSessionHas('error', 'Item not found.');
 
-        $this->character->refresh();
-
-        $this->assertFalse($this->character->gold > 0);
+        $this->assertFalse($this->character->getCharacter()->gold > 0);
     }
 
     public function testCannotSellAllWhenAllEquipped() {
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all'))->response;
 
         $response->assertSessionHas('error', 'You have nothing that you can sell.');
     }
 
     public function testSellAllItems() {
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $this->item->id,
-            'equipped'     => false,
-            'position'     => null,
-        ]);
+        $user = $this->character->inventoryManagement()
+                                ->unequipAll()
+                                ->getCharacterFactory()
+                                ->getUser();
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all'))->response;
 
         $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 8 gold.');
     }
@@ -223,26 +222,18 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $this->character->inventory->slots()->insert([
-            [
-                'inventory_id' => $this->character->inventory->id,
-                'item_id'      => $item->id,
-                'equipped'     => false,
-                'position'     => null,
-            ],
-            [
-                'inventory_id' => $this->character->inventory->id,
-                'item_id'      => $weapon->id,
-                'equipped'     => false,
-                'position'     => null,
-            ]
-        ]);
+        $user = $this->character->inventoryManagement()
+                                ->giveItem($item)
+                                ->giveItem($weapon)
+                                ->getCharacterFactory()
+                                ->getUser();
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.all'))->response;
+
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all'))->response;
 
         $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 8 gold.');
 
-        $questItems = $this->character->inventory->slots->filter(function($slot) {
+        $questItems = $this->character->getCharacter()->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest';
         })->all();
 
@@ -250,11 +241,10 @@ class ShopControllerTest extends TestCase
     }
 
     public function testFailToBulkBuyWhenNoGold() {
-        $this->character->update([
-            'gold' => 0
-        ]);
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+        $user = $this->character->updateCharacter(['gold' => 0])->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
             'items' => [$this->item->id]
         ]))->response;
 
@@ -262,11 +252,9 @@ class ShopControllerTest extends TestCase
     }
 
     public function testFailToBulkBuyWhenNoItems() {
-        $this->character->update([
-            'gold' => 100
-        ]);
+        $user = $this->character->getUser();
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
             'items' => []
         ]))->response;
 
@@ -274,9 +262,7 @@ class ShopControllerTest extends TestCase
     }
 
     public function testNotEnoughGold() {
-        $this->character->update([
-            'gold' => 10
-        ]);
+        $user = $this->character->updateCharacter(['gold' => 10])->getUser();
 
         $weapon = $this->createItem([
             'name'        => 'Rusty Dagger',
@@ -285,21 +271,19 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
             'items' => [$this->item->id, $weapon->id]
         ]))->response;
 
         $response->assertSessionHas('error', 'You do not have enough gold to buy: ' . $this->item->name . '. Anything before this item in the list was purchased.');
 
-        $count = $this->character->refresh()->inventory->slots->count();
+        $count = $this->character->getCharacter()->inventory->slots->count();
         
         $this->assertEquals($count, 2);
     }
 
     public function testBuyAllSelectedItems() {
-        $this->character->update([
-            'gold' => 1000
-        ]);
+        $user = $this->character->updateCharacter(['gold' => 10])->getUser();
 
         $weapon = $this->createItem([
             'name'        => 'Rusty Dagger',
@@ -308,19 +292,19 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
             'items' => [$this->item->id, $weapon->id]
         ]))->response;
 
-        $response->assertSessionHas('success', 'Puchased all selected items.');
-
-        $count = $this->character->refresh()->inventory->slots->count();
+        $count = $this->character->getCharacter()->inventory->slots->count();
         
-        $this->assertEquals($count, 3);
+        $this->assertEquals($count, 2);
     }
 
     public function testFailToSellInBulk() {
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.bulk', [
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', [
             'slots' => []
         ]))->response;
 
@@ -341,25 +325,17 @@ class ShopControllerTest extends TestCase
             'base_damage' => 6,
             'cost'        => 10,
         ]);
-
-        $this->character->inventory->slots()->insert([
-            [
-                'inventory_id' => $this->character->inventory->id,
-                'item_id'      => $item->id,
-                'equipped'     => false,
-                'position'     => null,
-            ],
-            [
-                'inventory_id' => $this->character->inventory->id,
-                'item_id'      => $weapon->id,
-                'equipped'     => false,
-                'position'     => null,
-            ]
-        ]);
+        
+        $user      = $this->character->inventoryManagement()
+                                ->giveItem($item)
+                                ->giveItem($weapon)
+                                ->getCharacterFactory()
+                                ->getUser();
+        $character = $this->character->getCharacter();
 
         
-        $response = $this->actingAs($this->character->user)->post(route('game.shop.sell.bulk', [
-            'slots' => $this->character->refresh()->inventory->slots->filter(function($slot) {
+        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', [
+            'slots' => $character->inventory->slots->filter(function($slot) {
                 return !$slot->equipped && $slot->item->type !== 'quest';
             })->pluck('id')->toArray(),
         ]))->response;

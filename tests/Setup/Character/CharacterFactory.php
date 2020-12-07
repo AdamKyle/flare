@@ -69,8 +69,22 @@ class CharacterFactory {
         return $this;
     }
 
+    /**
+     * Fetch the inventory management class.
+     * 
+     * @return InventoryManagement
+     */
     public function inventoryManagement(): InventoryManagement {
         return new InventoryManagement($this->character, $this);
+    }
+
+    /**
+     * Fetch the adventure management class.
+     * 
+     * @return AdventureManagement
+     */
+    public function adventureManagement(): AdventureManagement {
+        return new AdventureManagement($this->character, $this);
     }
 
     /**

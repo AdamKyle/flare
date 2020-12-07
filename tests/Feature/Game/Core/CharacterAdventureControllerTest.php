@@ -2,14 +2,11 @@
 
 namespace Tests\Feature\Game\Core;
 
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\ItemAffix;
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateNotification;
 
@@ -29,72 +26,28 @@ class CharacterAdventureControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-
         $this->adventure = $this->createNewAdventure();
 
-        $item = $this->createItem([
-            'name' => 'Spear',
-            'base_damage' => 6,
-            'type' => 'weapon',
-            'crafting_type' => 'weapon',
-        ]);
+        $item            = $this->createItem([
+                               'name' => 'Spear',
+                               'base_damage' => 6,
+                               'type' => 'weapon',
+                               'crafting_type' => 'weapon',
+                           ]);
 
-        $this->character = (new CharacterSetup())
-            ->setupCharacter($this->createUser())
-            ->setSkill('Looting', [], [
-                'level' => 0,
-                'xp_towards' => 0.10,
-                'currently_training' => true,
-            ])
-            ->getCharacter();
-
-
-        $skill = $this->character->skills()->join('game_skills', function($join) {
-            $join->on('game_skills.id', 'skills.game_skill_id')
-                 ->where('name', 'Looting'); 
-        })->first();
-
-        $this->character->adventureLogs()->create([
-            'character_id'         => $this->character->id,
-            'adventure_id'         => $this->adventure->id,
-            'complete'             => true,
-            'in_progress'          => false,
-            'last_completed_level' => 1,
-            'logs'                 => 
-            [
-                "vcCBZhAOqy3Dg9V6a1MRWCthCGFNResjhH7ttUsFFpREdVoH9oNqyrjVny3cX8McbjyGHZYeJ8txcTov" => [
-                    [
-                        [
-                        "attacker" => "Kyle Adams",
-                        "defender" => "Goblin",
-                        "messages" => [
-                            "Kyle Adams hit for 30",
-                        ],
-                        "is_monster" => false,
-                        ],
-                    ],
-                ]
-            ],
-            'rewards'              => 
-            [
-                "exp" => 100,
-                "gold" => 75,
-                "items" => [
-                    [
-                    "id" => $item->id,
-                    "name" => $item->name,
-                    ],
-                ],
-                "skill" => [
-                    "exp"         => 1000,
-                    "skill_name"  => $skill->name,
-                    "exp_towards" => $skill->xp_towards,
-                ],
-            ]
-        ]);
-
-        $this->character->refresh();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->updateSkill('Looting', [
+                                                     'xp_towards'         => 0.10,
+                                                     'level'              => 0,
+                                                     'currently_training' => true,
+                                                 ])
+                                                 ->adventureManagement()
+                                                 ->assignLog(
+                                                     $this->adventure,
+                                                     $item,
+                                                     'Looting'
+                                                 )
+                                                 ->getCharacterFactory();
     }
 
     public function tearDown(): void
@@ -102,11 +55,14 @@ class CharacterAdventureControllerTest extends TestCase
         parent::tearDown();
 
         $this->character = null;
+        $this->adventure = null;
     }
 
     public function testCharacterCanSeeLatestAdventure()
     {
-        $this->actingAs($this->character->user)
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)
              ->visitRoute('game.current.adventure')
              ->see('Collect Rewards');
     }
@@ -114,53 +70,65 @@ class CharacterAdventureControllerTest extends TestCase
     public function testCharacterCanSeeLatestAdventureWithNotification()
     {
 
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
         $this->createNotification([
-            'character_id' => $this->character->id,
+            'character_id' => $character->id,
             'title'        => 'Sample',
             'message'      => 'Sample',
             'status'       => 'success',
             'type'         => 'message',
             'read'         => false,
             'url'          => 'url',
-            'adventure_id' => $this->character->adventureLogs()->first()->adventure_id,
+            'adventure_id' => $character->adventureLogs()->first()->adventure_id,
         ]);
 
-        $this->actingAs($this->character->user)
+        $this->actingAs($user)
              ->visitRoute('game.current.adventure')
              ->see('Collect Rewards');
     }
 
     public function testCharacterCanSeeLatestAdventureWithNoRewards() {
 
-        $this->character->adventureLogs()->first()->update([
-            'rewards' => null
-        ]);
+        $user = $this->character->adventureManagement()
+                                     ->updateLog(['rewards' => null])
+                                     ->getCharacterFactory()
+                                     ->getUser();
 
-        $this->actingAs($this->character->user)
+        $this->actingAs($user)
              ->visitRoute('game.current.adventure')
              ->dontSee('Collect Rewards');
     }
 
     public function testCharacterCanSeeAllAdventures() {
-        $this->actingAs($this->character->user)
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)
              ->visitRoute('game.completed.adventures')
              ->see('Previous Adventures')
              ->see($this->adventure->name);
     }
 
     public function testCharacterCanSeeAllLogsForAdventure() {
-        $this->actingAs($this->character->user)
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $this->actingAs($user)
              ->visitRoute('game.completed.adventure', [
-                 'adventureLog' => $this->character->adventureLogs->first()->id,
+                 'adventureLog' => $character->adventureLogs->first()->id,
              ])
              ->see($this->adventure->name)
              ->see('Log Entry 1');
     }
 
     public function testCharacterCanSeeSpecificLogForAdventure() {
-        $this->actingAs($this->character->user)
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $this->actingAs($user)
              ->visitRoute('game.completed.adventure.logs', [
-                 'adventureLog' => $this->character->adventureLogs->first()->id,
+                 'adventureLog' => $character->adventureLogs->first()->id,
                  'name'         => 'vcCBZhAOqy3Dg9V6a1MRWCthCGFNResjhH7ttUsFFpREdVoH9oNqyrjVny3cX8McbjyGHZYeJ8txcTov'
              ])
              ->see($this->adventure->name)
@@ -168,10 +136,13 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testCharacterCannotSeeSpecificLogForAdventureInvalidName() {
-        $this->actingAs($this->character->user)
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $this->actingAs($user)
              ->visitRoute('game') // come here first, for a place to come back too
              ->visitRoute('game.completed.adventure.logs', [
-                 'adventureLog' => $this->character->adventureLogs->first()->id,
+                 'adventureLog' => $character->adventureLogs->first()->id,
                  'name'         => 'xxxx'
              ])
              ->dontSee($this->adventure->name)
@@ -181,16 +152,21 @@ class CharacterAdventureControllerTest extends TestCase
 
     public function testCharacterCannotSeeLatestAdventure()
     {
-        $this->character->adventureLogs->first()->delete();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
 
-        $this->actingAs($this->character->user)
+        $character->adventureLogs->first()->delete();
+
+        $this->actingAs($user)
              ->visitRoute('game') // So we have some where to redirect back too
              ->visitRoute('game.current.adventure')
              ->see('You have no currently completed adventure. Check your completed adventures for more details.');
     }
 
     public function testDistributeRewards() {
-        $response = $this->actingAs($this->character->user)
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => 1,
              ]))->response;
@@ -204,11 +180,9 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testCannotDistributeRewardsWhenDead() {
-        $this->character->update([
-            'is_dead' => true,
-        ]);
+        $user = $this->character->updateCharacter(['is_dead' => true])->getUser();
 
-        $response = $this->actingAs($this->character->user)
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => 1,
              ]))->response;
@@ -218,7 +192,8 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testShowDifferentSuccessWhenThereIsNoReward() {
-        $this->character->adventureLogs()->first()->update([
+
+        $user = $this->character->adventureManagement()->updateLog([
             'rewards' => [
                 "exp" => 1,
                 "gold" => 1,
@@ -229,9 +204,9 @@ class CharacterAdventureControllerTest extends TestCase
                     "exp_towards" => 10,
                 ],
             ]
-        ]);
+        ])->getCharacterFactory()->getUser();
 
-        $response = $this->actingAs($this->character->user)
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => 1,
              ]))->response;
@@ -240,11 +215,11 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testCannotGiveOutRewardsWhenThereAreNone() {
-        $this->character->adventureLogs->first()->update([
+        $user = $this->character->adventureManagement()->updateLog([
             'rewards' => null
-        ]);
+        ])->getCharacterFactory()->getUser();
 
-        $response = $this->actingAs($this->character->user)
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => 1,
              ]))->response;
@@ -254,11 +229,11 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testCannotDistributeRewardsWhenAdventureing() {
-        $this->character->adventureLogs->first()->update([
-            'in_progress' => true,
-        ]);
+        $user = $this->character->adventureManagement()->updateLog([
+            'in_progress' => true
+        ])->getCharacterFactory()->getUser();
 
-        $response = $this->actingAs($this->character->user)
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => 1,
              ]))->response;
@@ -268,11 +243,11 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testCannotDistributeRewardsWhenThereAreNoRewards() {
-        $this->character->adventureLogs->first()->update([
+        $user = $this->character->adventureManagement()->updateLog([
             'rewards' => null
-        ]);
+        ])->getCharacterFactory()->getUser();
 
-        $response = $this->actingAs($this->character->user)
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => 1,
              ]))->response;

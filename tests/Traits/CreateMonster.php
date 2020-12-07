@@ -2,12 +2,15 @@
 
 namespace Tests\Traits;
 
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
-use Illuminate\Database\Eloquent\Collection;
+use Tests\Traits\CreateGameSkill;
 
 trait CreateMonster {
+
+    use CreateGameSkill;
 
     public function createMonster(array $options = []): Monster {
         $monster     = Monster::factory()->create($options);
