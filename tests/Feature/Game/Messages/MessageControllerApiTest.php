@@ -5,29 +5,30 @@ namespace Tests\Feature\Game\Messages;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use Tests\Traits\CreateRace;
-use Tests\Traits\CreateClass;
-use Tests\Traits\CreateCharacter;
-use Tests\Traits\CreateUser;
-use Tests\Traits\CreateRole;
+use Tests\Setup\Character\CharacterFactory;
 
 class MessageControllerApiTest extends TestCase
 {
-    use RefreshDatabase,
-        CreateUser,
-        CreateRole,
-        CreateRace,
-        CreateClass,
-        CreateCharacter;
+    use RefreshDatabase;
+
+    private $character;
 
     public function setUp(): void {
         parent::setUp();
 
+        $this->character = (new CharacterFactory)->createBaseCharacter();
+
         Event::fake();
     }
 
+    public function tearDown(): void {
+        parent::tearDown();
+
+        $this->character= null;
+    }
+
     public function testFetchUserInfo() {
-        $user = $this->createUser();
+        $user = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/user-chat-info/' . $user->id)
@@ -39,7 +40,7 @@ class MessageControllerApiTest extends TestCase
     }
 
     public function testFetchMessages() {
-        $user = $this->createUser();
+        $user = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/last-chats/')
@@ -49,21 +50,7 @@ class MessageControllerApiTest extends TestCase
     }
 
     public function testUserCanSendMessage() {
-        $race = $this->createRace([
-            'str_mod' => 3,
-        ]);
-
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-        ]);
-
-        $user = $this->createUser();
-
-        $character = $this->createCharacter([
-            'name' => 'Sample',
-            'user_id' => $user->id,
-        ]);
+        $user = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/public-message', [
@@ -84,7 +71,7 @@ class MessageControllerApiTest extends TestCase
     }
 
     public function testGetServerMesssageForType() {
-        $user = $this->createUser();
+        $user = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/server-message', [
@@ -106,59 +93,28 @@ class MessageControllerApiTest extends TestCase
     }
 
     public function testSendPrivateMesssage() {
-        $race = $this->createRace([
-            'str_mod' => 3,
-        ]);
-
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-        ]);
-
-        $user = $this->createUser();
-
-        $character = $this->createCharacter([
-            'name' => 'Sample',
-            'user_id' => $user->id,
-        ]);
-
-        $userSecond = $this->createUser();
-
-        $characterSecond = $this->createCharacter([
-            'name' => 'Sample2',
-            'user_id' => $user->id,
-        ]);
+        $user = $this->character->getUser();
+        $character = (new CharacterFactory)->createBaseCharacter();
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/private-message', [
                              'message' => 'sample',
-                             'user_name' => $characterSecond->name
+                             'user_name' => $character->getCharacter()->name
                          ])
                          ->response;
 
+        $user      = $this->character->getUser();
+        $character = $character->getCharacter();
+
         $this->assertEquals($user->messages->first()->fromUser->id, $user->id);
-        $this->assertEquals($user->messages->first()->toUser->id, $characterSecond->user->id);
+        $this->assertEquals($user->messages->first()->toUser->id, $character->user->id);
         $this->assertEquals($user->messages->first()->message, 'sample');
 
         $this->assertEquals(200, $response->status());
     }
 
     public function testCannotFindPlayerForPrivateMesssage() {
-        $race = $this->createRace([
-            'str_mod' => 3,
-        ]);
-
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-        ]);
-
-        $user = $this->createUser();
-
-        $character = $this->createCharacter([
-            'name' => 'Sample',
-            'user_id' => $user->id,
-        ]);
+        $user = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/private-message', [

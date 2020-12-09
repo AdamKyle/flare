@@ -2,14 +2,13 @@
 
 namespace Tests\Feature\Game\Maps\Adventure;
 
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class AdventureControllerApiTest extends TestCase
 {
@@ -25,13 +24,12 @@ class AdventureControllerApiTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-
         Queue::fake();
 
         $this->adventure = $this->createNewAdventure();
-        $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
-                                               ->getCharacter();
+
+        $this->character = (new CharacterFactory)
+                                ->createBaseCharacter();
     }
 
     public function tearDown(): void {
@@ -42,7 +40,9 @@ class AdventureControllerApiTest extends TestCase
     }
 
     public function testGetAdventureDetails() {
-        $this->actingAs($this->character->user)
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)
                     ->visitRoute('map.adventures.adventure', [
                         'adventure' => $this->adventure->id,
                     ])
@@ -50,7 +50,9 @@ class AdventureControllerApiTest extends TestCase
     }
 
     public function testGetAdventureLogs() {
-        $response = $this->actingAs($this->character->user, 'api')
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
                          ->json('GET', '/api/character/adventure/logs')
                          ->response;
 
@@ -58,8 +60,11 @@ class AdventureControllerApiTest extends TestCase
     }
 
     public function testEmbarkAdventure() {
-        $response = $this->actingAs($this->character->user, 'api')
-                         ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id, [
                              'levels_at_a_time' => 'all'
                          ])
                          ->response;
@@ -71,10 +76,13 @@ class AdventureControllerApiTest extends TestCase
     }
 
     public function testEmbarkAlreadyStartedAdventure() {
-        $this->createLog($this->character, $this->adventure, false, 1);
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->character->user, 'api')
-                         ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [
+        $this->createLog($character, $this->adventure, false, 1);
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id, [
                              'levels_at_a_time' => 'all'
                          ])
                          ->response;
@@ -87,19 +95,19 @@ class AdventureControllerApiTest extends TestCase
 
     public function testCannotAdvenutreWhenOneIsInProgress() {
 
-        // Set up an inprogress adventure:
-        $this->character->update([
+        $user      = $this->character->getUser();
+        $character = $this->character->updateCharacter([
             'can_attack'             => false,
             'can_move'               => false,
             'can_craft'              => false,
             'can_adventure'          => false,
             'can_adventure_again_at' => now()->addMinutes(10),
-        ]);
+        ])->getCharacter();
 
-        $this->createLog($this->character, $this->adventure, true, 1);
+        $this->createLog($character, $this->adventure, true, 1);
 
-        $response = $this->actingAs($this->character->user, 'api')
-                            ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id, [
+        $response = $this->actingAs($user, 'api')
+                            ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id, [
                                 'levels_at_a_time' => 'all'
                             ])
                             ->response;
@@ -113,19 +121,19 @@ class AdventureControllerApiTest extends TestCase
 
     public function testCancelAdventure() {
 
-        // Set up an inprogress adventure:
-        $this->character->update([
+        $user      = $this->character->getUser();
+        $character = $this->character->updateCharacter([
             'can_attack'             => false,
             'can_move'               => false,
             'can_craft'              => false,
             'can_adventure'          => false,
             'can_adventure_again_at' => now()->addMinutes(10),
-        ]);
+        ])->getCharacter();
 
-        $this->createLog($this->character, $this->adventure, true, 1);
+        $this->createLog($character, $this->adventure, true, 1);
 
-        $response = $this->actingAs($this->character->user, 'api')
-                         ->json('POST', 'api/character/'.$this->character->id.'/adventure/' . $this->adventure->id . '/cancel')
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id . '/cancel')
                          ->response;
 
         $content = json_decode($response->content());
@@ -133,7 +141,9 @@ class AdventureControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertEquals("Adventure canceled.", $content->message);
 
-        $this->assertTrue($this->character->refresh()->can_attack);
-        $this->assertNull($this->character->refresh()->can_adventure_again_at);
+        $character = $this->character->getCharacter();
+
+        $this->assertTrue($character->can_attack);
+        $this->assertNull($character->can_adventure_again_at);
     }
 }

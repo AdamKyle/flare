@@ -2,61 +2,54 @@
 
 namespace Tests\Feature\Game\Maps\Adventure;
 
+use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
+use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
+use App\Game\Maps\Adventure\Values\MapTileValue;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
-use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
-use Tests\Setup\CharacterSetup;
-use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
-use App\Flare\Models\GameMap;
-use App\Game\Maps\Adventure\Values\MapTileValue;
-use Database\Seeders\GameSkillsSeeder;
-use Mockery;
+use Tests\Setup\Character\CharacterFactory;
 
 class MapControllerApiTest extends TestCase
 {
     use RefreshDatabase,
         CreateLocation,
-        CreateUser,
         CreateAdventure;
-
-    private $user;
 
     private $character;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-
         Queue::fake();
 
-        $this->setUpCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation();
     }
 
     public function tearDown(): void {
         parent::tearDown();
 
-        $this->user      = null;
         $this->character = null;
         $this->monster   = null;
     }
 
     public function testGetMap() {
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('GET', '/api/map/' . $this->user->id)
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('GET', '/api/map/' . $user->id)
                          ->response;
 
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals(0, $content->character_map->position_x);
-        $this->assertEquals(32, $content->character_map->character_position_x);
+        $this->assertEquals(16, $content->character_map->position_x);
+        $this->assertEquals(16, $content->character_map->character_position_x);
     }
 
     public function testGetMapWithPort() {
@@ -64,12 +57,14 @@ class MapControllerApiTest extends TestCase
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
-            'x'           => 32,
-            'y'           => 32,
+            'x'           => 16,
+            'y'           => 16,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('GET', '/api/map/' . $this->user->id)
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+            ->json('GET', '/api/map/' . $user->id)
             ->response;
         
         $content = json_decode($response->content());
@@ -84,8 +79,11 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/move/' . $this->character->id, [
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 48,
                              'character_position_y' => 48,
                              'position_x'           => 0,
@@ -95,11 +93,11 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         
-        $this->character->refresh();
+        $character = $this->character->getCharacter();
 
-        $this->assertEquals(0, $this->character->map->position_x);
-        $this->assertEquals(48, $this->character->map->character_position_x);
-        $this->assertEquals(48, $this->character->map->character_position_y);
+        $this->assertEquals(0, $character->map->position_x);
+        $this->assertEquals(48, $character->map->character_position_x);
+        $this->assertEquals(48, $character->map->character_position_y);
     }
 
     public function testMoveCharacterToLocationWithAdventure() {
@@ -119,8 +117,11 @@ class MapControllerApiTest extends TestCase
 
         $location->adventures()->attach($adventure->id);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/move/' . $this->character->id, [
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => $location->x,
                              'character_position_y' => $location->y,
                              'position_x'           => 0,
@@ -160,8 +161,11 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/move/' . $this->character->id, [
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => $location->x,
                              'character_position_y' => $location->y,
                              'position_x'           => 0,
@@ -171,12 +175,12 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
+        $character = $this->character->getCharacter();
 
-        $this->assertEquals($location->x, $this->character->map->character_position_x);
-        $this->assertEquals($location->y, $this->character->map->character_position_y);
+        $this->assertEquals($location->x, $character->map->character_position_x);
+        $this->assertEquals($location->y, $character->map->character_position_y);
 
-        $questInventory = $this->character->inventory->slots;
+        $questInventory = $character->inventory->slots;
 
         // Gained the item:
         $this->assertTrue($questInventory->isNotEmpty());
@@ -213,13 +217,15 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $item->id,
-        ]);
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacterFactory()
+                                     ->getCharacter();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/move/' . $this->character->id, [
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => $location->x,
                              'character_position_y' => $location->y,
                              'position_x'           => 0,
@@ -229,15 +235,13 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $this->character->refresh();
+        $character = $this->character->getCharacter();
 
-        $this->assertEquals($location->x, $this->character->map->character_position_x);
-        $this->assertEquals($location->y, $this->character->map->character_position_y);
-
-        $questInventory = $this->character->inventory->slots;
+        $this->assertEquals($location->x, $character->map->character_position_x);
+        $this->assertEquals($location->y, $character->map->character_position_y);
         
         // Did not gain the item again:
-        $this->assertEquals(1, $this->character->inventory->slots->count());
+        $this->assertEquals(1, $character->inventory->slots->count());
     }
 
     public function testMoveCharacterToPort() {
@@ -253,8 +257,11 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/move/' . $this->character->id, [
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 64,
                              'character_position_y' => 64,
                              'position_x'           => 0,
@@ -281,10 +288,11 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $this->setUpCharacter();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('GET', '/api/is-water/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('GET', '/api/is-water/' . $character->id, [
                              'character_position_x' => 336,
                              'character_position_y' => 288,
                          ])
@@ -298,7 +306,8 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -307,8 +316,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('GET', '/api/is-water/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('GET', '/api/is-water/' . $character->id, [
                              'character_position_x' => 160,
                              'character_position_y' => 64,
                          ])
@@ -322,7 +331,8 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -331,8 +341,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/map/teleport/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/map/teleport/' . $character->id, [
                              'x' => 160,
                              'y' => 64,
                          ])
@@ -346,11 +356,8 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $this->setUpCharacter();
-
-        $this->character->update([
-            'gold' => 0,
-        ]);
+        $character = $this->character->updateCharacter(['gold' => 0])->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -359,8 +366,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/map/teleport/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/map/teleport/' . $character->id, [
                              'x' => 160,
                              'y' => 64,
                              'cost' => 10000,
@@ -375,7 +382,8 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -384,8 +392,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($this->user, 'api')
-                         ->json('POST', '/api/map/teleport/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/map/teleport/' . $character->id, [
                              'x' => 860,
                              'y' => 864,
                              'cost' => 0,
@@ -400,7 +408,16 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($this->createItem([
+                                        'name'           => 'Artifact',
+                                        'type'           => 'artifact',
+                                        'base_damage'    => 10,
+                                        'cost'           => 10,
+                                        'effect'         => 'walk-on-water',
+                                    ]))
+                                     ->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -409,19 +426,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      =>  $this->createItem([
-                'name'           => 'Artifact',
-                'type'           => 'artifact',
-                'base_damage'    => 10,
-                'cost'           => 10,
-                'effect'         => 'walk-on-water',
-            ])->id,
-        ]);
-
-        $response = $this->actingAs($this->user, 'api')
-                            ->json('GET', '/api/is-water/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                            ->json('GET', '/api/is-water/' . $character->id, [
                                 'character_position_x' => 176,
                                 'character_position_y' => 64,
                             ])
@@ -435,7 +441,16 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $this->setUpCharacter();
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($this->createItem([
+                                        'name'           => 'Artifact',
+                                        'type'           => 'artifact',
+                                        'base_damage'    => 10,
+                                        'cost'           => 10,
+                                        'effect'         => 'walk-on-water',
+                                    ]))
+                                     ->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -444,19 +459,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      =>  $this->createItem([
-                'name'           => 'Artifact',
-                'type'           => 'artifact',
-                'base_damage'    => 10,
-                'cost'           => 10,
-                'effect'         => 'walk-on-water',
-            ])->id,
-        ]);
-
-        $response = $this->actingAs($this->user, 'api')
-                            ->json('POST', '/api/map/teleport/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+                            ->json('POST', '/api/map/teleport/' . $character->id, [
                                 'x' => 176,
                                 'y' => 64,
                                 'cost' => 0,
@@ -468,6 +472,9 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCannotSetSailUnrecognizedPort() {
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
         $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
@@ -476,8 +483,8 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/1/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 3,
                 'time_out_value'  => 1,
                 'cost'            => 3000,
@@ -507,8 +514,11 @@ class MapControllerApiTest extends TestCase
             'y'           => 32,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/1/' . $this->character->id, [
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 2,
                 'time_out_value'  => 1,
                 'cost'            => 3000,
@@ -530,8 +540,11 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/1/' . $this->character->id, [])
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/1/' . $character->id, [])
             ->response;
         
         $content = json_decode($response->content());
@@ -560,8 +573,11 @@ class MapControllerApiTest extends TestCase
             'y'           => 32,
         ]);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/1/' . $this->character->id, [
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 2,
                 'time_out_value'  => 0,
                 'cost'            => 0,
@@ -592,13 +608,11 @@ class MapControllerApiTest extends TestCase
             'y'           => 32,
         ]);
 
-        $this->character->gold = 1000;
-        $this->character->save();
+        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
+        $user      = $this->character->getUser();
 
-        $this->character->refresh();
-
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/1/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 2,
                 'time_out_value'  => 1,
                 'cost'            => 100,
@@ -612,7 +626,7 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals(64, $content->character_position_details->character_position_x);
         $this->assertEquals(64, $content->character_position_details->character_position_y);
 
-        $character = $this->character->refresh();
+        $character = $this->character->getCharacter();
 
         $this->assertNotNull($character->can_move_again_at);
         $this->assertFalse($character->can_move);
@@ -646,30 +660,28 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->gold = 1000;
-        $this->character->save();
+        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
+        $user      = $this->character->getUser();
 
-        $this->character->refresh();
-
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/2/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/2/' . $character->id, [
                 'current_port_id' => 1,
                 'time_out_value'  => 1,
                 'cost'            => 100,
             ])
             ->response;
-        
-        $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status()); 
 
-        $questInventory = $this->character->inventory->slots;
+        $character = $this->character->getCharacter();
+
+        $slots = $character->inventory->slots;
         
         // Gained the item:
-        $this->assertTrue($questInventory->isNotEmpty());
+        $this->assertTrue($slots->isNotEmpty());
 
         // Check the item matches:
-        $item = $questInventory->filter(function($slot) use($location) {
+        $item = $slots->filter(function($slot) use($location) {
             return $slot->item_id === $location->questRewardItem->id;
         })->first();
 
@@ -704,10 +716,8 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->gold = 1000;
-        $this->character->save();
-
-        $this->character->refresh();
+        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -716,8 +726,8 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/teleport/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/teleport/' . $character->id, [
                 'x' => 32,
                 'y'  => 32,
                 'cost' => 100,
@@ -727,13 +737,15 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status()); 
 
-        $questInventory = $this->character->inventory->slots;
+        $character = $this->character->getCharacter();
+
+        $slots = $character->inventory->slots;
         
         // Gained the item:
-        $this->assertTrue($questInventory->isNotEmpty());
+        $this->assertTrue($slots->isNotEmpty());
 
         // Check the item matches:
-        $item = $questInventory->filter(function($slot) use($location) {
+        $item = $slots->filter(function($slot) use($location) {
             return $slot->item_id === $location->questRewardItem->id;
         })->first();
 
@@ -768,32 +780,23 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $item->id,
-        ]);
+        $character = $this->character->updateCharacter([
+            'gold' => 1000,
+        ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter();
+        $user      = $this->character->getUser();
 
-        $this->character->gold = 1000;
-        $this->character->save();
-
-        $this->character->refresh();
-
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/set-sail/2/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/set-sail/2/' . $character->id, [
                 'current_port_id' => 1,
                 'time_out_value'  => 1,
                 'cost'            => 100,
             ])
             ->response;
-        
-        $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status()); 
-
-        $questInventory = $this->character->inventory->slots;
         
         // Did not gain the item again:
-        $this->assertEquals(1, $this->character->inventory->slots->count());
+        $this->assertEquals(1, $this->character->getCharacter()->inventory->slots->count());
     }
 
     public function testCanTeleportAndNotGetReward() {
@@ -824,15 +827,10 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => $item->id,
-        ]);
-
-        $this->character->gold = 1000;
-        $this->character->save();
-
-        $this->character->refresh();
+        $character = $this->character->updateCharacter([
+            'gold' => 1000,
+        ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter();
+        $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class);
 
@@ -841,40 +839,18 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($this->user, 'api')
-            ->json('POST', '/api/map/teleport/' . $this->character->id, [
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/teleport/' . $character->id, [
                 'x' => 32,
                 'y'  => 32,
                 'cost' => 10,
                 'timeout' => 1,
             ])
             ->response;
-        
-        $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status()); 
-
-        $questInventory = $this->character->inventory->slots;
         
         // Did not gain the item again:
-        $this->assertEquals(1, $this->character->inventory->slots->count());
-    }
-
-    protected function setUpCharacter(array $options = []) {
-        $this->user = $this->createUser();
-
-        $gameMap = GameMap::create([
-            'name'    => 'surface',
-            'path'    => 'some/path',
-            'default' => true,
-        ]);
-
-        $this->character = (new CharacterSetup)->setupCharacter($this->user, $options)
-                                               ->getCharacter();
-
-        $this->character->map()->create([
-            'character_id' => $this->character->id,
-            'game_map_id'  => $gameMap->id,
-        ]);
+        $this->assertEquals(1, $this->character->getCharacter()->inventory->slots->count());
     }
 }
