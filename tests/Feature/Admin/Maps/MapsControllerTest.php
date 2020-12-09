@@ -9,7 +9,7 @@ use App\Flare\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class MapsControllerTest extends TestCase
 {
@@ -38,9 +38,7 @@ class MapsControllerTest extends TestCase
     }
 
     public function testNonAdminCannotSeeMapsPage() {
-        $user = $this->createUser();
-
-        (new CharacterSetup)->setupCharacter($user)->getCharacter();
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('maps'))->dontSee('Maps')->see('You don\'t have permission to view that.');
     }
@@ -73,9 +71,7 @@ class MapsControllerTest extends TestCase
     }
 
     public function testNonAdminCannotSeeUploadMapPage() {
-        $user = $this->createUser();
-
-        (new CharacterSetup)->setupCharacter($user)->getCharacter();
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('maps.upload'))->dontSee('Upload Map')->see('You don\'t have permission to view that.');
     }

@@ -3,13 +3,12 @@
 namespace Tests\Feature\Admin\Monsters;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\Monster;
 use Tests\TestCase;
-use App\Flare\Models\Monster as Monster;
-use Database\Seeders\GameSkillsSeeder;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class MonstersControllerTest extends TestCase
 {
@@ -23,8 +22,6 @@ class MonstersControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->seed(GameSkillsSeeder::class);
 
         $role = $this->createAdminRole();
 
@@ -47,9 +44,7 @@ class MonstersControllerTest extends TestCase
 
     public function testNonAdminCannotSeeLocationsPage()
     {
-        $user = $this->createUser();
-
-        (new CharacterSetup)->setupCharacter($user)->getCharacter();
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('monsters.list'))->see('You don\'t have permission to view that.');
     }

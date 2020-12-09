@@ -3,16 +3,14 @@
 namespace Tests\Feature\Admin\Adventures;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\GameMap;
-use Database\Seeders\GameSkillsSeeder;
+use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
-use Tests\Traits\CreateItem;
 use Tests\Setup\CharacterSetup;
 
 class AdventuresControllerTest extends TestCase
@@ -29,8 +27,6 @@ class AdventuresControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->seed(GameSkillsSeeder::class);
 
         $role = $this->createAdminRole();
 

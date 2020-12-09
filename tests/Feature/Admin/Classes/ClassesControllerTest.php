@@ -4,17 +4,9 @@ namespace Tests\Feature\Admin\Classes;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Item;
-use App\Flare\Models\ItemAffix;
-use App\Flare\Models\Location;
-use Event;
-use Queue;
-use Tests\Setup\CharacterSetup;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
-use Tests\Traits\CreateRace;
 
 class ClassesControllerTest extends TestCase
 {

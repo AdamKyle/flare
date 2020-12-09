@@ -127,6 +127,7 @@ class UsersController extends Controller {
     }
 
     public function unBanUser(Request $request, User $user) {
+        
         $user->update([
             'is_banned'      => false,
             'unbanned_at'    => null,

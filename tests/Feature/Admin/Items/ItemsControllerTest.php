@@ -2,15 +2,13 @@
 
 namespace Tests\Feature\Admin\Items;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Item;
-use App\Flare\Models\ItemAffix;
-use App\Flare\Models\Location;
 use Event;
 use Queue;
-use Tests\Setup\CharacterSetup;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateItem;
@@ -81,22 +79,22 @@ class ItemsControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        $character = (new CharacterSetup)->setupCharacter($this->user)
-                                         ->giveItem($this->item)
-                                         ->equipLeftHand()
-                                         ->setSkill('Looting')
-                                         ->setSkill('Dodge')
-                                         ->setSkill('Accuracy')
-                                         ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->inventoryManagement()
+                                           ->giveItem($this->item)
+                                           ->equipLeftHand()
+                                           ->getCharacterFactory();
 
-        $response = $this->actingAs($this->user)->post(route('items.delete', [
+        $this->actingAs($this->user)->post(route('items.delete', [
             'item' => $this->item->id,
         ]))->response;
 
         $this->assertNull(Item::find($this->item->id));
 
+        $character = $character->getCharacter();
+
         $item = $character->inventory->slots->filter(function($slot) {
-            return $slot->item_id = $this->item->id;
+            return $slot->item_id === $this->item->id;
         })->first();
 
         $this->assertNull($item);
