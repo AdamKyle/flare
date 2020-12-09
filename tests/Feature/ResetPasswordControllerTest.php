@@ -4,14 +4,10 @@ namespace Tests\Feature;
 
 use Cache;
 use Hash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mail;
-use Mockery;
 use Str;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\Traits\CreateRace;
-use Tests\Traits\CreateClass;
-use Tests\Traits\CreateCharacter;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 
@@ -19,10 +15,7 @@ class ResetPasswordControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateUser,
-        CreateRole,
-        CreateRace,
-        CreateClass,
-        CreateCharacter;
+        CreateRole;
 
     public function testCanSeeResetPaswordPage() {
         $user = $this->createUser();
@@ -52,7 +45,7 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestions() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -66,7 +59,7 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestionsEmailDoesntMatch() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -80,7 +73,7 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestionsResetAndLogin() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -99,7 +92,7 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestionsCantResetQuestionsAreTheSame() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -118,7 +111,7 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestionsCantResetAnswersAreTheSame() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -137,7 +130,7 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestionsCantResetCacheTimeOut() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -160,38 +153,6 @@ class ResetPasswordControllerTest extends TestCase
     }
 
     protected function createUserWithCharacter() {
-        $user = $this->createUser([
-            'is_banned' => false,
-            'email'  => 'test@test.com',
-        ]);
-
-        $user->securityQuestions()->insert([
-            [
-                'user_id'  => $user->id,
-                'question' => 'test question',
-                'answer' => Hash::make('test'),
-            ],
-            [
-                'user_id' => $user->id,
-                'question' => 'test question 2',
-                'answer' => Hash::make('test2'),
-            ]
-        ]);
-
-        $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $this->createCharacter([
-            'name'    => 'Apples',
-            'user_id' => $user->id,
-        ]);
-
-        return $user;
+        return (new CharacterFactory)->createBaseCharacter();
     }
 }

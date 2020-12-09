@@ -13,6 +13,7 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
+use Tests\Setup\Character\CharacterFactory;
 
 class ForgotPasswordControllerTest extends TestCase
 {
@@ -34,7 +35,7 @@ class ForgotPasswordControllerTest extends TestCase
 
         Mail::fake();
 
-        $user = $this->createUser();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $this->createAdminRole('Admin');
         $user->assignRole('Admin');
@@ -49,7 +50,7 @@ class ForgotPasswordControllerTest extends TestCase
 
     public function testUserGoesThroughSecurityQuestions() {
 
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $this->visit('/login')
              ->click('Forgot Your Password?')
@@ -60,7 +61,7 @@ class ForgotPasswordControllerTest extends TestCase
     }
 
     public function testUserGoesThroughSecurityQuestionsCacheTimeout() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         Mail::fake();
 
@@ -87,7 +88,7 @@ class ForgotPasswordControllerTest extends TestCase
     }
 
     public function testFunctionAnswerSecurityQuestions() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         Mail::fake();
 
@@ -106,7 +107,7 @@ class ForgotPasswordControllerTest extends TestCase
     }
 
     public function testFunctionAnswerSecurityQuestionsAnswersDontMatch() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         Mail::fake();
 
@@ -123,7 +124,7 @@ class ForgotPasswordControllerTest extends TestCase
     }
 
     public function testFunctionAnswerSecurityQuestionsAnswersCacheTimeOut() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         Mail::fake();
 
@@ -148,38 +149,6 @@ class ForgotPasswordControllerTest extends TestCase
     }
 
     protected function createUserWithCharacter() {
-        $user = $this->createUser([
-            'is_banned' => false,
-            'email'  => 'test@test.com',
-        ]);
-
-        $user->securityQuestions()->insert([
-            [
-                'user_id'  => $user->id,
-                'question' => 'test question',
-                'answer' => Hash::make('test'),
-            ],
-            [
-                'user_id' => $user->id,
-                'question' => 'test question 2',
-                'answer' => Hash::make('test2'),
-            ]
-        ]);
-
-        $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $this->createCharacter([
-            'name'    => 'Apples',
-            'user_id' => $user->id,
-        ]);
-
-        return $user;
+        return (new CharacterFactory)->createBaseCharacter();
     }
 }

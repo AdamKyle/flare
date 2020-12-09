@@ -2,20 +2,24 @@
 
 namespace Tests\Feature;
 
+use Storage;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
-use Database\Seeders\CreateClasses;
-use Database\Seeders\CreateRaces;
-use Database\Seeders\GameSkillsSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Storage;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
+use Tests\Traits\CreateRace;
+use Tests\Traits\CreateClass;
+use Tests\Traits\CreateGameSkill;
 
 class InfoPageControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateAdventure;
+    use RefreshDatabase, 
+        CreateAdventure,
+        createClass,
+        createRace,
+        CreateGameSkill;
 
     public function setUp(): void {
         parent::setUp();
@@ -44,8 +48,8 @@ class InfoPageControllerTest extends TestCase
     public function testCanSeePageWithLiveWireTable() {
         $this->artisan('move:files');
 
-        $this->seed(CreateRaces::class);
-        $this->seed(CreateClasses::class);
+        $this->createClass(['name' => 'Fighter']);
+        $this->createRace(['name' => 'Human']);
 
         $this->visitRoute('info.page', [
             'pageName' => 'character-information'
@@ -75,7 +79,7 @@ class InfoPageControllerTest extends TestCase
     public function testViewRace() {
         $this->artisan('move:files');
 
-        $this->seed(CreateRaces::class);
+        $this->createRace(['name' => 'Human']);
 
         $this->visitRoute('info.page.race', [
             'race' => 1,
@@ -85,7 +89,7 @@ class InfoPageControllerTest extends TestCase
     public function testViewClass() {
         $this->artisan('move:files');
 
-        $this->seed(CreateClasses::class);
+        $this->createClass(['name' => 'Fighter']);
 
         $this->visitRoute('info.page.class', [
             'class' => 1,
@@ -95,7 +99,9 @@ class InfoPageControllerTest extends TestCase
     public function testViewSkill() {
         $this->artisan('move:files');
 
-        $this->seed(GameSkillsSeeder::class);
+        $this->createGameSkill([
+            'name' => 'Sample'
+        ]);
 
         $this->visitRoute('info.page.skill', [
             'skill' => 1,

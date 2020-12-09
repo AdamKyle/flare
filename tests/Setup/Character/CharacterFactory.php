@@ -2,12 +2,14 @@
 
 namespace Tests\Setup\Character;
 
+use Str;
+use Hash;
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Game\Core\Services\CharacterService;
-use Str;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameMap;
@@ -17,6 +19,7 @@ use Tests\Traits\CreateMap;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
+use Tests\Traits\CreateSecurityQuestion;
 
 class CharacterFactory {
 
@@ -28,7 +31,8 @@ class CharacterFactory {
         CreateMap,
         CreateGameMap,
         CreateGameSkill,
-        CreateSkill;
+        CreateSkill,
+        CreateSecurityQuestion;
 
     private $character;
 
@@ -61,6 +65,8 @@ class CharacterFactory {
             'game_class_id' => $class->id,
             'game_race_id'  => $race->id,
         ]);
+
+        $this->createSecurityQuestions();
 
         $this->createInventory();
 
@@ -97,6 +103,29 @@ class CharacterFactory {
         $this->character->update($changes);
 
         $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Lets you ban a character
+     * 
+     * If the length is not set, then the ban is for ever.
+     * 
+     * Length should be acarbon date object.
+     * 
+     * @param string $reason | null
+     * @param string $request | null
+     * @param $forLength | null
+     * @return CharacterFactory
+     */
+    public function banCharacter(string $reason = null, string $request = null, $forLength = null): CharacterFactory {
+        $this->character->user->update([
+            'is_banned'      => true,
+            'unbanned_at'    => $forLength,
+            'banned_reason'  => $reason,
+            'un_ban_request' => $request,
+        ]);
 
         return $this;
     }
@@ -279,6 +308,15 @@ class CharacterFactory {
         return $this->character->user;
     }
 
+    /**
+     * Gets the users security Questions
+     * 
+     * @return Collection
+     */
+    public function getSecurityQuestions(): Collection {
+        return $this->getUser()->securityQuestions;
+    }
+
     protected function createInventory() {
         $this->character->inventory()->create([
             'character_id' => $this->character->id,
@@ -303,6 +341,23 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $looting->id,
+        ]);
+    }
+
+    protected function createSecurityQuestions() {
+
+        $user = $this->getUser();
+
+        $this->createSecurityQuestion([
+            'user_id'  => $user->id,
+            'question' => 'test question',
+            'answer'   => Hash::make('test'),
+        ]);
+
+        $this->createSecurityQuestion([
+            'user_id'  => $this->character->user->id,
+            'question' => 'test question 2',
+            'answer'   => Hash::make('test2'),
         ]);
     }
 

@@ -3,17 +3,17 @@
 namespace Tests\Feature;
 
 use Cache;
-use Hash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mail;
 use Str;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Admin\Mail\UnBanRequestMail;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
-use App\Admin\Mail\UnBanRequestMail;
+use Tests\Setup\Character\CharacterFactory;
 
 class UnbanRequestControllerTest extends TestCase
 {
@@ -29,7 +29,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCanSeeSecurityCheck() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -49,7 +49,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCannotSeeSecurityCheckCacheExpired() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         Cache::shouldReceive('put')->andReturn(true);
         Cache::shouldReceive('has')->andReturn(false);
@@ -63,7 +63,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testUserSeesSecurityQuestionsResetAndLogin() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->getUser();
 
         $password = Str::random(25);
 
@@ -82,12 +82,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCanSeeRequestForm() {
-        $user = $this->createUserWithCharacter();
-
-        $user->update([
-            'is_banned' => true,
-            'banned_reason' => 'Sample',
-        ]);
+        $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -104,12 +99,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCannotSeeRequestFormCacheFailed() {
-        $user = $this->createUserWithCharacter();
-
-        $user->update([
-            'is_banned' => true,
-            'banned_reason' => 'Sample',
-        ]);
+        $user = $this->createUserWithCharacter()->banCharacter('sample')->getUser();
 
         Cache::shouldReceive('put')->andReturn(true);
 
@@ -132,12 +122,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCannotSeeRequestFormAnswersDontMatch() {
-        $user = $this->createUserWithCharacter();
-
-        $user->update([
-            'is_banned' => true,
-            'banned_reason' => 'Sample',
-        ]);
+        $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -154,7 +139,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCanSubmitRequest() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
 
         $admin = $this->createUser();
 
@@ -162,11 +147,6 @@ class UnbanRequestControllerTest extends TestCase
         $admin->assignRole('Admin');
 
         Mail::fake();
-
-        $user->update([
-            'is_banned' => true,
-            'banned_reason' => 'Sample',
-        ]);
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -189,7 +169,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCannotSubmitRequestCacheMiss() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
 
         $admin = $this->createUser();
 
@@ -197,11 +177,6 @@ class UnbanRequestControllerTest extends TestCase
         $admin->assignRole('Admin');
 
         Mail::fake();
-
-        $user->update([
-            'is_banned' => true,
-            'banned_reason' => 'Sample',
-        ]);
 
         Cache::shouldReceive('put')->andReturn(true);
         Cache::shouldReceive('delete')->andReturn(true);
@@ -233,7 +208,7 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     public function testCannotSubmitRequest() {
-        $user = $this->createUserWithCharacter();
+        $user = $this->createUserWithCharacter()->banCharacter('Sample', 'reason here.')->getUser();
 
         $admin = $this->createUser();
 
@@ -241,12 +216,6 @@ class UnbanRequestControllerTest extends TestCase
         $admin->assignRole('Admin');
 
         Mail::fake();
-
-        $user->update([
-            'is_banned' => true,
-            'banned_reason' => 'Sample',
-            'un_ban_request' => 'reason here.'
-        ]);
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -269,38 +238,6 @@ class UnbanRequestControllerTest extends TestCase
     }
 
     protected function createUserWithCharacter() {
-        $user = $this->createUser([
-            'is_banned' => false,
-            'email'  => 'test@test.com',
-        ]);
-
-        $user->securityQuestions()->insert([
-            [
-                'user_id'  => $user->id,
-                'question' => 'test question',
-                'answer' => Hash::make('test'),
-            ],
-            [
-                'user_id' => $user->id,
-                'question' => 'test question 2',
-                'answer' => Hash::make('test2'),
-            ]
-        ]);
-
-        $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $this->createCharacter([
-            'name'    => 'Apples',
-            'user_id' => $user->id,
-        ]);
-
-        return $user;
+        return (new CharacterFactory)->createBaseCharacter();
     }
 }

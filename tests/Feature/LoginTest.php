@@ -9,6 +9,7 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
+use Tests\Setup\Character\CharacterFactory;
 
 class LoginTest extends TestCase
 {
@@ -20,7 +21,7 @@ class LoginTest extends TestCase
         CreateCharacter;
 
     public function testAdminIsRedirectedToTheDashboard() {
-        $user = $this->createUser();
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->createAdminRole('Admin');
         $user->assignRole('Admin');
@@ -28,57 +29,27 @@ class LoginTest extends TestCase
         $this->visit('/login')
              ->submitForm('Login', [
                 'email'    => $user->email,
-                'password' => 'password',
+                'password' => 'ReallyLongPassword',
              ])->see('Admin');
     }
 
     public function testPlayerIsRedirectedToTheGame() {
-        $user = $this->createUser();
-
-        $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $character = $this->createCharacter([
-            'name'    => 'Apples',
-            'user_id' => $user->id,
-        ]);
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->visit('/login')
              ->submitForm('Login', [
                 'email'    => $user->email,
-                'password' => 'password',
+                'password' => 'ReallyLongPassword',
              ])->see('Manage Kingdoms');
     }
 
     public function testPlayerIsNotAllowedToLogin() {
-        $user = $this->createUser([
-            'is_banned' => true,
-        ]);
-
-        $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $character = $this->createCharacter([
-            'name'    => 'Apples',
-            'user_id' => $user->id,
-        ]);
+        $user = (new CharacterFactory)->createBaseCharacter()->banCharacter()->getUser();
 
         $this->visit('/login')
              ->submitForm('Login', [
                 'email'    => $user->email,
-                'password' => 'password',
+                'password' => 'ReallyLongPassword',
              ])->see('You have been banned until: For ever.');
     }
 }
