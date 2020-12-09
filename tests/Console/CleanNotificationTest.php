@@ -2,25 +2,20 @@
 
 namespace Tests\Console;
 
-use App\Flare\Models\Notification;
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Setup\CharacterSetup;
+use App\Flare\Models\Notification;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateNotification;
-use Tests\Traits\CreateUser;
 
 class CleanNotificationTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateNotification;
+    use RefreshDatabase, CreateNotification;
 
     public function testCleanNotificationsCommand()
     {
-        $this->seed(GameSkillsSeeder::class);
-        
-        $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter($user)->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         $this->createNotification([
             'character_id' => $character->id,

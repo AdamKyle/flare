@@ -2,20 +2,19 @@
 
 namespace Tests\Console;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\User;
-use Database\Seeders\CreateClasses;
-use Database\Seeders\CreateRaces;
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Storage;
+use App\Flare\Models\Character;
+use App\Flare\Models\User;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateRace;
+use Tests\Traits\CreateClass;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameSkill;
 
 class LevelFakeUsersTest extends TestCase
 {
-    use RefreshDatabase, CreateItem;
+    use RefreshDatabase, CreateItem, CreateRace, CreateClass, CreateGameMap, CreateGameSkill;
 
     public function testLevelFakeUserByTen() {
 
@@ -50,17 +49,10 @@ class LevelFakeUsersTest extends TestCase
     }
 
     protected function setupCharacters() {
-        $this->seed(GameSkillsSeeder::class);
-        $this->seed(CreateClasses::class);
-        $this->seed(CreateRaces::class);
-
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
-
-        GameMap::create([
-            'name'    => 'surface',
-            'path'    => $path,
-            'default' => true,
-        ]);
+        $this->createGameSkill();
+        $this->createGameMap();
+        $this->createRace();
+        $this->createClass();
 
         $this->createItem();
 
@@ -68,7 +60,5 @@ class LevelFakeUsersTest extends TestCase
 
         $this->assertTrue(User::all()->isNotEmpty());
         $this->assertTrue(Character::all()->isNotEmpty());
-
-        Storage::disk('maps')->deleteDirectory('Surface/');
     }
 }

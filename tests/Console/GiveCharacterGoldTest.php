@@ -2,29 +2,17 @@
 
 namespace Tests\Console;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\User;
-use Database\Seeders\CreateClasses;
-use Database\Seeders\CreateRaces;
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Storage;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateUser;
 
 class GiveCharacterGoldTest extends TestCase
 {
-    use RefreshDatabase, CreateUser;
+    use RefreshDatabase;
 
     public function testGiveCharacterGold()
     {
-        $this->seed(GameSkillsSeeder::class);
-        
-        $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user)->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
 
         $this->assertEquals(0, $this->artisan('give:gold', ['characterId' => 1, 'amount' => 100]));
@@ -34,12 +22,7 @@ class GiveCharacterGoldTest extends TestCase
 
     public function testFailToGiveGold()
     {
-        $this->seed(GameSkillsSeeder::class);
-        
-        $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user)->getCharacter();
-
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         $this->assertEquals(0, $this->artisan('give:gold', ['characterId' => 100, 'amount' => 1000]));
 
