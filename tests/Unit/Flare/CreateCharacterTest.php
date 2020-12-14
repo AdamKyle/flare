@@ -9,11 +9,11 @@ use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use App\Flare\Models\GameMap;
+use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGameMap;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
-use Database\Seeders\GameSkillsSeeder;
 
 class CreateCharacterTest extends TestCase
 {
@@ -22,25 +22,31 @@ class CreateCharacterTest extends TestCase
         CreateRace,
         CreateClass,
         CreateItem,
-        CreateUser;
+        CreateUser,
+        CreateGameSkill,
+        CreateGameMap;
 
     private $gameMap;
 
     public function setUp(): void {
         parent::setup();
 
-        $this->seed(GameSkillsSeeder::class);
+        $this->createGameSkill([
+            'name' => 'Accuracy'
+        ]);
+
+        $this->createGameSkill([
+            'name' => 'Dodge'
+        ]);
 
         $this->createItem([
             'name' => 'Rusty Dagger',
             'type' => 'weapon',
         ]);
 
-        $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
-
-        $this->gameMap = GameMap::create([
+        $this->gameMap = $this->createGameMap([
             'name'    => 'surface',
-            'path'    => $path,
+            'path'    => 'some-path',
             'default' => true,
         ]);
     }
@@ -49,8 +55,6 @@ class CreateCharacterTest extends TestCase
         parent::tearDown();
 
         $this->gameMap = null;
-
-        Storage::disk('maps')->deleteDirectory('Surface/');
     }
 
     public function testCreateCharacter()

@@ -8,7 +8,7 @@ use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Jobs\AttackTimeOutJob as JobsAttackTimeOutJob;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class AttackTimeOutJobTest extends TestCase
 {
@@ -23,8 +23,7 @@ class AttackTimeOutJobTest extends TestCase
 
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_attack' => false])
-                                         ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         JobsAttackTimeOutJob::dispatch($character);
 
