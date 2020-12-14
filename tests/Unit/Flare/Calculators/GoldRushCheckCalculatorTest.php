@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Flare\Calculators;
 
-use Database\Seeders\GameSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Tests\TestCase;
@@ -15,8 +14,6 @@ class GoldRushCheckCalculatorTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
-
-        $this->seed(GameSkillsSeeder::class);
     }
 
     public function testGoldDropRushCheck()

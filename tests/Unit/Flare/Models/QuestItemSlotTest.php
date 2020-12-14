@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 
 class QuestItemSlotTest extends TestCase
@@ -15,8 +15,8 @@ class QuestItemSlotTest extends TestCase
 
     public function testGetItemForQuestSlot()
     {
-        $character = (new CharacterSetup)->setUpCharacter($this->createUser())
-                                         ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->getCharacter();
 
         $this->createItem([
             'name' => 'sample',

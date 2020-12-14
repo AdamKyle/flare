@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Admin\Services;
 
+use DB;
+use Mail;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Admin\Mail\GenericMail;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
-use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mail;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 use Tests\TestCase;
 
@@ -44,7 +44,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateRacialStats($oldRace, $race->refresh());
 
-        $this->assertEquals(98, $this->character->refresh()->str);
+        $this->assertEquals(101, $this->character->refresh()->str);
     }
 
     public function testUpdateClassStats() {
@@ -134,9 +134,8 @@ class UpdateCharacterStatsServiceTest extends TestCase
     
 
     protected function baseSetUp() {
-        $user = $this->createUser();
 
-        $this->character = (new CharacterSetup)->setupCharacter($user)
-                                               ->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->getCharacter();
     }
 }

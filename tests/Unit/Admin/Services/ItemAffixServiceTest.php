@@ -3,19 +3,16 @@
 namespace Tests\Unit\Admin\Services;
 
 use App\Admin\Services\ItemAffixService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\ItemAffix;
-use Tests\Setup\CharacterSetup;
-use Tests\Traits\CreateUser;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Setup\Character\CharacterFactory;
 
 class ItemAffixServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateItem, CreateItemAffix;
+    use RefreshDatabase, CreateItem, CreateItemAffix;
 
     private $character;
 
@@ -62,8 +59,6 @@ class ItemAffixServiceTest extends TestCase
     }
 
     protected function baseSetUp() {
-        $user = $this->createUser();
-
         $this->item = $this->createItem();
 
         $this->item->item_suffix_id = $this->createItemAffix()->id;
@@ -74,8 +69,10 @@ class ItemAffixServiceTest extends TestCase
 
         $this->createItem();
 
-        $this->character = (new CharacterSetup)->setupCharacter($user)
-                                               ->giveItem($this->item)
-                                               ->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->inventoryManagement()
+                                                 ->giveItem($this->item)
+                                                 ->getCharacterFactory()
+                                                 ->getCharacter();
     }
 }

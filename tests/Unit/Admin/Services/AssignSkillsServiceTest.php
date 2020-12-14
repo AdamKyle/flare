@@ -2,25 +2,18 @@
 
 namespace Tests\Unit\Admin\Services;
 
-use App\Admin\Services\AssignSkillService;
-use App\Admin\Services\ItemAffixService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\ItemAffix;
 use Exception;
-use Tests\Setup\CharacterSetup;
-use Tests\Traits\CreateUser;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Admin\Services\AssignSkillService;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 
 class AssignSkillsServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateGameSkill;
+    use RefreshDatabase, CreateGameSkill;
 
     private $character;
-
-    private $item;
 
     public function setUp(): void {
         parent::setup();
@@ -55,9 +48,8 @@ class AssignSkillsServiceTest extends TestCase
     }
 
     protected function baseSetUp() {
-        $user = $this->createUser();
 
-        $this->character = (new CharacterSetup)->setupCharacter($user)
-                                               ->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->getCharacter();
     }
 }

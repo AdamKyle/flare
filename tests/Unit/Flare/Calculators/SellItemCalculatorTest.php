@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Flare\Calculators;
 
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

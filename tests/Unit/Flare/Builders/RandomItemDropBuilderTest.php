@@ -6,15 +6,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use Database\Seeders\CreateAffixes;
 use Tests\Traits\CreateItemAffix;
 
-class RandomItemDropBuilderTest extends TestCase
-{
+class RandomItemDropBuilderTest extends TestCase {
 
     use RefreshDatabase,
         CreateItem,
@@ -25,8 +23,6 @@ class RandomItemDropBuilderTest extends TestCase
 
     public function setUp(): void {
         parent::setup();
-
-        $this->seed(CreateAffixes::class);
 
         $this->createItem([
             'name' => 'Rusty Dagger',
@@ -63,11 +59,11 @@ class RandomItemDropBuilderTest extends TestCase
             'skill_training_bonus' => null,
         ]);
 
-        $this->character = (new CharacterSetup)->setupCharacter($this->createUser())
-                                               ->setSkill('Looting', ['skill_bonus_per_level' => 100], [
-                                                   'level'       => 100,
-                                               ])
-                                               ->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->updateSkill('Looting', [
+                                                     'level' => 100,
+                                                 ])
+                                                 ->getCharacter();
     }
 
     public function tearDown(): void {

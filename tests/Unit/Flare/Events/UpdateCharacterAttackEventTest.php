@@ -8,7 +8,7 @@ use App\Flare\Events\UpdateCharacterAttackEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class UpdateCharacterAttackEventTest extends TestCase
 {
@@ -17,17 +17,20 @@ class UpdateCharacterAttackEventTest extends TestCase
 
     public function testUpdateCharacterAttackEvent()
     {
-        $user = $this->createUser();
-
         $item = $this->createItem([
             'name'        => 'Rusty Dagger',
             'type'        => 'weapon',
             'base_damage' => '6'
         ]);
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_attack' => false])
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                         ->updateCharacter([
+                                            'can_attack' => false,
+                                         ])
+                                         ->inventoryManagement()
                                          ->giveItem($item)
                                          ->equipLeftHand()
+                                         ->getCharacterFactory()
                                          ->getCharacter();
 
         event(new UpdateCharacterAttackEvent($character));

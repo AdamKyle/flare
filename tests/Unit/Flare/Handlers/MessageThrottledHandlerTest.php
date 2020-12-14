@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Flare\Handlers;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Handlers\MessageThrottledHandler;
 use Event;
 use Queue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Handlers\MessageThrottledHandler;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
@@ -38,7 +38,6 @@ class MessageThrottledHandlerTest extends TestCase
             'message_throttle_count' => 3
         ]);
         
-
         $handler->forUser($user)->increaseThrottleCount()->silence();
 
         $user = $user->refresh();

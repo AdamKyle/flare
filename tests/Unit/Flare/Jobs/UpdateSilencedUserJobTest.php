@@ -3,7 +3,6 @@
 namespace Tests\Unit\Flare\Jobs;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
