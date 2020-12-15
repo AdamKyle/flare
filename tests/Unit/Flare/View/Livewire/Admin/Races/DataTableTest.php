@@ -4,11 +4,8 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Races;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\GameClass;
 use App\Flare\View\Livewire\Admin\Races\DataTable;
-use Tests\Setup\CharacterSetup;
 use Tests\TestCase;
-use Tests\Traits\CreateClass;
 use Tests\Traits\CreateRace;
 
 class DataTableTest extends TestCase

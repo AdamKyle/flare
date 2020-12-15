@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Locations\Partials;
 
-use App\Flare\Models\Monster;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Locations\Partials\Details;
@@ -10,10 +9,11 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateGameMap;
 
 class DetailsTest extends TestCase
 {
-    use RefreshDatabase, CreateLocation;
+    use RefreshDatabase, CreateLocation, CreateGameMap;
 
     public function testTheComponentLoads() {
         Livewire::test(Details::class)->assertSee('Name')->assertDontSee('Previous');
@@ -26,7 +26,7 @@ class DetailsTest extends TestCase
     }
 
     public function testCreateValidMonster() {
-        GameMap::create([
+        $this->createGameMap([
             'name' => 'Apples',
             'path' => 'test',
             'default' => true
@@ -46,7 +46,7 @@ class DetailsTest extends TestCase
     public function testUpdateMonster() {
         $location = $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -73,7 +73,7 @@ class DetailsTest extends TestCase
     public function testInitialMonsterIsArray() {
         $location = $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true

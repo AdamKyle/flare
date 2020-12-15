@@ -4,9 +4,7 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Classes;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\GameClass;
 use App\Flare\View\Livewire\Admin\Classes\DataTable;
-use Tests\Setup\CharacterSetup;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 

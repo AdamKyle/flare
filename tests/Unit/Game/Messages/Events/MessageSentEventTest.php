@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\MessageSentEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
 
 class MessageSentEventTest extends TestCase
 {
@@ -19,8 +18,6 @@ class MessageSentEventTest extends TestCase
         $user = $this->createUser();
 
         $user->messages()->create(['message' => 'hello']);
-
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new MessageSentEvent($user, $user->messages()->first()));
 

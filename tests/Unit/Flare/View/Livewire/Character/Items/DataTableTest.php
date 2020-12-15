@@ -4,12 +4,11 @@ namespace Tests\Unit\Flare\View\Livewire\Character\Items;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Database\Seeders\GameSkillsSeeder;
 use App\Flare\View\Livewire\Character\Inventory\DataTable;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateItem;
 
 class DataTableTest extends TestCase
@@ -21,10 +20,6 @@ class DataTableTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $item = $this->createItem([
             'name'        => 'Rusty Dagger',
             'type'        => 'weapon',
@@ -33,24 +28,16 @@ class DataTableTest extends TestCase
 
         $adventure = $this->createNewAdventure();
 
-        $this->character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $this->character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
+                                        ->inventoryManagement()
                                         ->giveItem($item)
+                                        ->getCharacterFactory()
                                         ->givePlayerLocation()
                                         ->createAdventureLog($adventure, [
                                             'complete'             => true,
                                             'in_progress'          => false,
                                             'last_completed_level' => 1,
-                                        ])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
                                         ])
                                         ->getCharacter();
     }

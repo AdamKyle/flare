@@ -7,12 +7,11 @@ use Illuminate\Support\Facades\Event;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Jobs\AttackTimeOutJob as JobsAttackTimeOutJob;
 use Tests\TestCase;
-use Tests\Traits\CreateUser;
 use Tests\Setup\Character\CharacterFactory;
 
 class AttackTimeOutJobTest extends TestCase
 {
-    use RefreshDatabase, CreateUser;
+    use RefreshDatabase;
 
 
     public function testAttackTimeOutJob()
@@ -20,8 +19,6 @@ class AttackTimeOutJobTest extends TestCase
         Event::fake([
             ShowTimeOutEvent::class,
         ]);
-
-        $user = $this->createUser();
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 

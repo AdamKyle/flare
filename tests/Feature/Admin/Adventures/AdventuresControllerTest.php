@@ -11,7 +11,7 @@ use Tests\Traits\CreateRole;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class AdventuresControllerTest extends TestCase
 {
@@ -71,9 +71,8 @@ class AdventuresControllerTest extends TestCase
 
     public function testNonAdminCannotSeeAdventuresPage()
     {
-        $user = $this->createUser();
 
-        (new CharacterSetup)->setupCharacter($user)->getCharacter();
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('adventures.list'))->see('You don\'t have permission to view that.');
     }

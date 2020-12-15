@@ -4,19 +4,15 @@ namespace Tests\Unit\Game\Maps\Adventure\Services;
 
 use App\Flare\Models\ItemAffix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Event;
 use App\Game\Maps\Adventure\Services\AdventureFightService;
-use App\Game\Maps\Adventure\Services\AdventureService;
 use Database\Seeders\GameSkillsSeeder;
-use Tests\Setup\AdventureSetup;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateItem;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class AdventureFightServiceTest extends TestCase
 {
@@ -152,23 +148,27 @@ class AdventureFightServiceTest extends TestCase
             'item_suffix_id' => ItemAffix::where('name', 'Dex Boost')->first()->id,
         ]);
 
-        $this->character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                        ->updateCharacter(['can_move' => false])
                                         ->levelCharacterUp(10)
                                         ->createAdventureLog($this->adventure)
+                                        ->inventoryManagement()
                                         ->giveItem($healingSpell)
                                         ->giveItem($damageSpell)
                                         ->giveItem($artifact)
                                         ->equipSpellSlot(1, 'spell-one')
                                         ->equipSpellSlot(2, 'spell-two')
                                         ->equipArtifact(3)
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10,],
-                                        [    
+                                        ->getCharacterFactory()
+                                        ->updateSkill('Accuracy', [
+                                            'skill_bonus_per_level' => 10,
                                             'xp_towards' => 10,
-                                        ], true)
-                                        ->setSkill('Dodge', [
+                                            'currently_training' => true,
+                                        ])
+                                        ->updateSkill('Dodge', [
                                             'skill_bonus_per_level' => 10,
                                         ])
-                                        ->setSkill('Looting', [
+                                        ->updateSkill('Looting', [
                                             'skill_bonus_per_level' => 0,
                                         ])
                                         ->getCharacter();

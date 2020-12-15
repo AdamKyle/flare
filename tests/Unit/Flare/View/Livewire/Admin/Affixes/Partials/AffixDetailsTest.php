@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Affixes\Partials;
 
-use App\Flare\Models\ItemAffix;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\ItemAffix;
 use App\Flare\View\Livewire\Admin\Affixes\Partials\AffixDetails;
 use Tests\TestCase;
 use Tests\Traits\CreateItemAffix;

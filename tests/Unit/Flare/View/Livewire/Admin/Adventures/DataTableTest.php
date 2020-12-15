@@ -5,18 +5,18 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Adventures;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Adventures\DataTable;
-use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
+use Tests\Traits\CreateGameSkill;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase, CreateAdventure;
+    use RefreshDatabase, CreateAdventure, CreateGameSkill;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
+        $this->createGameSkill();
     }
 
     public function testTheComponentLoads()

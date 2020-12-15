@@ -6,22 +6,22 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Maps;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Maps\DataTable;
-use App\Flare\Models\GameMap;
+use Tests\Traits\CreateGameMap;
 use Tests\TestCase;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreateGameMap;
 
     public function testTheComponentLoads()
     {
-        GameMap::create([
+        $this->createGameMap([
             'name' => 'Apples',
             'path' => 'test',
             'default' => true
         ]);
 
-        GameMap::create([
+        $this->createGameMap([
             'name' => 'Bananas',
             'path' => 'test',
             'default' => true

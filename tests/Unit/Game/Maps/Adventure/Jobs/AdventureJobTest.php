@@ -2,45 +2,29 @@
 
 namespace Tests\Unit\Game\Maps\Adventure\Jobs;
 
+use Cache;
+use Str;
 use App\Game\Maps\Adventure\Jobs\AdventureJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Game\Maps\Adventure\Jobs\MoveTimeOutJob;
-use Cache;
-use Database\Seeders\GameSkillsSeeder;
-use Str;
 use Tests\TestCase;
-use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class AdventureJobTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateAdventure;
+    use RefreshDatabase, CreateAdventure;
 
     public function setUp(): void {
         parent::setUp();
-
-        $this->seed(GameSkillsSeeder::class);
     }
 
     public function testAdventureJob()
     {
-        $user = $this->createUser();
-
         $adventure = $this->createNewAdventure();
 
-        $character = (new CharacterSetup)->setupCharacter($user)
+        $character = (new CharacterFactory)->createBaseCharacter()
                                          ->createAdventureLog($adventure)
-                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                                'xp_towards' => 10,
-                                            ], true)
-                                         ->setSkill('Dodge', [
-                                                'skill_bonus_per_level' => 10,
-                                            ])
-                                         ->setSkill('Looting', [
-                                                'skill_bonus_per_level' => 0,
-                                            ])
                                          ->getCharacter();
 
         Event::fake();
@@ -62,21 +46,10 @@ class AdventureJobTest extends TestCase
 
     public function testAdventureJobDoesNotExecuteWhenNameDoesntMatch()
     {
-        $user = $this->createUser();
-
         $adventure = $this->createNewAdventure();
 
-        $character = (new CharacterSetup)->setupCharacter($user)
+        $character = (new CharacterFactory)->createBaseCharacter()
                                          ->createAdventureLog($adventure)
-                                         ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                                'xp_towards' => 10,
-                                            ], true)
-                                         ->setSkill('Dodge', [
-                                                'skill_bonus_per_level' => 10,
-                                            ])
-                                         ->setSkill('Looting', [
-                                                'skill_bonus_per_level' => 0,
-                                            ])
                                          ->getCharacter();
 
         Event::fake();

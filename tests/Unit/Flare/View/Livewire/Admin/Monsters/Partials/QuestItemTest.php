@@ -5,7 +5,6 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Monsters\Partials;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Monsters\Partials\QuestItem;
-use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
@@ -16,12 +15,11 @@ class QuestItemTest extends TestCase
 
     public function setUp(): void {
         parent::setUp();
-
-        $this->seed(GameSkillsSeeder::class);
     }
 
     public function testComponentIsLoaded() {
         $monster = $this->createMonster();
+
         $item    = $this->createItem([
             'name'          => 'Sample',
             'type'          => 'quest',

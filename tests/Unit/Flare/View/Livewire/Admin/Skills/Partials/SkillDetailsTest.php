@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Skills\Partials;
 
-use App\Flare\Models\GameSkill;
 use Livewire;
+use App\Flare\Models\GameSkill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Skills\Partials\SkillDetails;
 use Tests\TestCase;

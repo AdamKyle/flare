@@ -7,7 +7,7 @@ use App\Game\Core\Events\CreateAdventureNotificationEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Database\Seeders\GameSkillsSeeder;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateItem;
@@ -28,8 +28,6 @@ class CreateAdventureNotificationEventTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-
         $this->adventure = $this->createNewAdventure();
 
         $item = $this->createItem([
@@ -39,14 +37,8 @@ class CreateAdventureNotificationEventTest extends TestCase
             'crafting_type' => 'weapon',
         ]);
 
-        $this->character = (new CharacterSetup())
-            ->setupCharacter($this->createUser())
-            ->setSkill('Looting', [], [
-                'level' => 0,
-                'xp_towards' => 0.10,
-                'currently_training' => true,
-            ])
-            ->getCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->getCharacter();
 
 
         $skill = $this->character->skills()->join('game_skills', function($join) {

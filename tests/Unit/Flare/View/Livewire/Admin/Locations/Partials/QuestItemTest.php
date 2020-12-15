@@ -9,15 +9,16 @@ use App\Flare\Models\GameMap;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateGameMap;
 
 class QuestItemTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateLocation;
+    use RefreshDatabase, CreateItem, CreateLocation, CreateGameMap;
 
     public function testLocationQuestItemComponentIsLoaded() {
         $location = $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -41,7 +42,7 @@ class QuestItemTest extends TestCase
     public function testSetQuestItemOnLocation() {
         $location = $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true

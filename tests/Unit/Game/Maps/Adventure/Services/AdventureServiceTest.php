@@ -2,37 +2,38 @@
 
 namespace Tests\Unit\Game\Maps\Adventure\Services;
 
-use App\Flare\Models\Item;
+use DB;
+use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
 use App\Game\Maps\Adventure\Services\AdventureService;
 use App\Game\Maps\Adventure\Builders\RewardBuilder;
 use App\Game\Maps\Adventure\Mail\AdventureCompleted;
-use App\Game\Maps\Adventure\Services\AdventureFightService;
-use Database\Seeders\CreateAffixes;
-use Database\Seeders\GameSkillsSeeder;
-use DB;
-use Mail;
 use Tests\Setup\AdventureSetup;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateMonster;
-use Tests\Setup\CharacterSetup;
+use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
+use Tests\Setup\Character\CharacterFactory;
 
 class AdventureServiceTest extends TestCase
 {
     use RefreshDatabase, 
         CreateUser, 
         CreateAdventure, 
-        CreateMonster;
+        CreateMonster,
+        CreateGameSkill,
+        CreateItemAffix,
+        CreateItem;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
-        $this->seed(CreateAffixes::class);
+        $this->createItemAffix();
 
         Queue::fake();
         Event::fake();
@@ -40,24 +41,27 @@ class AdventureServiceTest extends TestCase
 
     public function testProcessAdventureCharacterLives()
     {
-        $user = $this->createUser();
-
         $adventure = $this->createNewAdventure();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $item = $this->createItem(['name' => 'Item Name']);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                        ->updateCharacter(['can_move' => false])
                                         ->levelCharacterUp(100)
-                                        ->giveItem(Item::where('name', 'Item Name')->first())
+                                        ->inventoryManagement()
+                                        ->giveItem($item)
+                                        ->getCharacterFactory()
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
+                                        ->updateSkill('Accuracy', [
                                             'level' => 10,
-                                        ], [
                                             'xp_towards' => 10,
-                                        ], true)
-                                        ->setSkill('Dodge', [
-                                            'level' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Looting', [
-                                            'level' => 10000,
+                                        ->updateSkill('Dodge', [
+                                            'level' => 10
+                                        ])
+                                        ->updateSkill('Looting', [
+                                            'level' => 10
                                         ])
                                         ->getCharacter();
         
@@ -78,23 +82,22 @@ class AdventureServiceTest extends TestCase
 
     public function testProcessAdventureWithMultipleLevels()
     {
-        $user = $this->createUser();
-
         $adventure = $this->createNewAdventure(null, 5);
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
+                                        ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus_per_level' => 10,
-                                        ], [
+                                        ->updateSkill('Accuracy', [
+                                            'level' => 10,
                                             'xp_towards' => 10,
-                                        ], true)
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Dodge', [
+                                            'level' => 10
+                                        ])
+                                        ->updateSkill('Looting', [
+                                            'level' => 10
                                         ])
                                         ->getCharacter();
 
@@ -115,21 +118,22 @@ class AdventureServiceTest extends TestCase
 
     public function testProcessAdventureWithMultipleLevelsNotTrainingSkills()
     {
-        $user = $this->createUser();
-
         $adventure = $this->createNewAdventure(null, 5);
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
+                                        ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Accuracy', [
+                                            'level' => 10,
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Dodge', [
+                                            'level' => 10
                                         ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Looting', [
+                                            'level' => 10
                                         ])
                                         ->getCharacter();
 
@@ -150,8 +154,6 @@ class AdventureServiceTest extends TestCase
 
     public function testProcessAdventureCharacterDiesLoggedIn()
     {
-        $user = $this->createUser();
-
         $monster = $this->createMonster([
             'name' => 'Monster',
             'damage_stat' => 'str',
@@ -171,16 +173,20 @@ class AdventureServiceTest extends TestCase
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                        ->levelCharacterUp(10)
+                                        ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus_per_level' => 0,
+                                        ->updateSkill('Accuracy', [
+                                            'level' => 0,
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 0,
+                                        ->updateSkill('Dodge', [
+                                            'level' => 0
                                         ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
+                                        ->updateSkill('Looting', [
+                                            'level' => 0
                                         ])
                                         ->getCharacter();
 
@@ -211,8 +217,6 @@ class AdventureServiceTest extends TestCase
 
     public function testProcessAdventureCharacterDiesNotLoggedIn()
     {
-        $user = $this->createUser();
-
         $monster = $this->createMonster([
             'name' => 'Monster',
             'damage_stat' => 'str',
@@ -232,16 +236,20 @@ class AdventureServiceTest extends TestCase
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                        ->levelCharacterUp(10)
+                                        ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus_per_level' => 0,
+                                        ->updateSkill('Accuracy', [
+                                            'level' => 0,
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 0,
+                                        ->updateSkill('Dodge', [
+                                            'level' => 0
                                         ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
+                                        ->updateSkill('Looting', [
+                                            'level' => 0
                                         ])
                                         ->getCharacter();
 
@@ -264,8 +272,6 @@ class AdventureServiceTest extends TestCase
     }
 
     public function testAdventureTookTooLongUserOnline() {
-        $user = $this->createUser();
-
         $monster = $this->createMonster([
             'name' => 'Monster',
             'damage_stat' => 'str',
@@ -286,20 +292,23 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
         
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false, 'dex' => 104])
+        $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
+                                        ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Accuracy', [
+                                            'level' => 100,
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Dodge', [
                                             'level' => 100
                                         ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Looting', [
+                                            'level' => 100
                                         ])
                                         ->getCharacter();
+
         $this->actingAs($character->user);
 
         DB::table('sessions')->insert([[
@@ -323,8 +332,6 @@ class AdventureServiceTest extends TestCase
     }
 
     public function testAdventureTookTooLongUserNotOnline() {
-        $user = $this->createUser();
-
         $monster = $this->createMonster([
             'name' => 'Monster',
             'damage_stat' => 'str',
@@ -345,18 +352,20 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
         
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false, 'dex' => 104])
+        $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
+                                        ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
-                                        ->setSkill('Accuracy', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Accuracy', [
+                                            'level' => 10,
+                                            'xp_towards' => 10,
+                                            'currently_training' => true
                                         ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Dodge', [
                                             'level' => 100
                                         ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 10,
+                                        ->updateSkill('Looting', [
+                                            'level' => 10
                                         ])
                                         ->getCharacter();
         

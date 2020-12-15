@@ -6,18 +6,18 @@ use App\Flare\Models\Monster;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Monsters\Partials\Stats;
-use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateGameSkill;
 
 class StatsTest extends TestCase
 {
-    use RefreshDatabase, CreateMonster;
+    use RefreshDatabase, CreateMonster, CreateGameSkill;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
+        $this->createGameSkill();
     }
 
     public function testTheComponentLoads() {

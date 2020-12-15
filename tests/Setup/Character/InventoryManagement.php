@@ -114,7 +114,7 @@ class InventoryManagement {
 
         $slot->update([
             'equipped' => true,
-            'position' => 'position',
+            'position' => $position,
         ]);
 
         $this->character->refresh();
@@ -136,6 +136,8 @@ class InventoryManagement {
             'item_id'      => $item->id,
         ]);
 
+        $this->character = $this->character->refresh();
+
         return $this;
     }
 
@@ -151,6 +153,8 @@ class InventoryManagement {
                 'equipped' => false,
             ]);
         });
+
+        $this->character = $this->character->refresh();
 
         return $this;
     }

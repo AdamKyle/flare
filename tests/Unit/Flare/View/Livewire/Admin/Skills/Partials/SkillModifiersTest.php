@@ -2,18 +2,12 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Skills\Partials;
 
-use App\Admin\Mail\GenericMail;
+use DB;
+use Mail;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Skills\Partials\SkillModifiers;
-use App\Flare\Models\Item;
-use Auth;
-use Database\Seeders\GameSkillsSeeder;
-use DB;
-use Event;
-use Mail;
-use Queue;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateMonster;
@@ -41,27 +35,10 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testCompnentLoadsWithCharacterContainingSkill() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
 
         $skill = $this->createGameSkill();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->setSkill($skill->name, [
-                                            'skill_bonus_per_level' => 0
-                                        ])
-                                        ->getCharacter();
+        (new CharacterFactory)->createBaseCharacter();
 
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
@@ -69,8 +46,6 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testCompnentLoadsWithMonsterContainingSkill() {
-        $this->seed(GameSkillsSeeder::class);
-
         $monster = $this->createMonster();
 
         $skill = $this->createGameSkill();
@@ -88,10 +63,6 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testCompnentLoadsWithMonsterAndCharacterContainingSkill() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $monster = $this->createMonster();
 
         $skill = $this->createGameSkill();
@@ -103,22 +74,8 @@ class SkillModifiersTest extends TestCase
             'xp_max' => 999,
         ]);
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->setSkill($skill->name, [
-                                            'skill_bonus_per_level' => 0
-                                        ])
-                                        ->getCharacter();
-
+        (new CharacterFactory)->createBaseCharacter();
+                                        
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
         ])->call('update', $skill->id)->assertSee('Base Damage Modifier Per level:');
@@ -137,26 +94,12 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testFailToSaveModifierWhenMofiersAreEmpty() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+                                        
         $skill = $this->createGameSkill([
             'base_damage_mod_bonus_per_level' => null,
             'base_healing_mod_bonus_per_level' => null,
@@ -179,26 +122,12 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testFailToSaveModifierWhenMofiersAreBelowZero() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
         $skill = $this->createGameSkill([
             'base_damage_mod_bonus_per_level' => -1.0,
             'base_healing_mod_bonus_per_level' => -1.0,
@@ -221,26 +150,12 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testFailToSaveModifierWhenNoMonsterSelected() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
         $skill = $this->createGameSkill();
 
         Livewire::test(SkillModifiers::class, [
@@ -257,26 +172,11 @@ class SkillModifiersTest extends TestCase
 
 
     public function testAssignToAll() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
 
         Livewire::test(SkillModifiers::class, [
@@ -291,10 +191,6 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testDontAssignToAllWhenBothHaveTheSkill() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
@@ -308,21 +204,7 @@ class SkillModifiersTest extends TestCase
             'xp_max' => 999,
         ]);
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->setSkill($skill->name, [
-                                            'skill_bonus_per_level' => 0
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         Livewire::test(SkillModifiers::class, [
             'skill' => $skill,
@@ -336,26 +218,10 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testAssignToClasses() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
-        $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
 
         Livewire::test(SkillModifiers::class, [
@@ -368,31 +234,12 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testDontAssignToClassesWhenClassesHaveSkill() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
-        $monster = $this->createMonster();
-
+        
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
         $skill = $this->createGameSkill();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->setSkill($skill->name, [
-                                            'skill_bonus_per_level' => 0
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         
 
         Livewire::test(SkillModifiers::class, [
@@ -405,26 +252,12 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testAssignToAllWhenUserIsLoggedIn() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
+        
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
 
         DB::table('sessions')->insert([[
@@ -448,26 +281,12 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testAssignToMonster() {
-        $this->seed(GameSkillsSeeder::class);
-
-        $user = $this->createUser();
-
+        
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])
-                                        ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->setSkill('Dodge', [
-                                            'skill_bonus_per_level' => 10,
-                                        ])
-                                        ->setSkill('Looting', [
-                                            'skill_bonus_per_level' => 0,
-                                        ])
-                                        ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         $skill = $this->createGameSkill();
 
@@ -484,8 +303,6 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testDontAssignToMonsterWhenMonsterHasSkill() {
-        $this->seed(GameSkillsSeeder::class);
-
         $monster = $this->createMonster();
 
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
@@ -510,8 +327,6 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testFailToAssignToUnknownMonster() {
-        $this->seed(GameSkillsSeeder::class);
-
         $this->actingAs($this->createAdmin([], $this->createAdminRole()));
 
         $skill = $this->createGameSkill();
@@ -523,9 +338,6 @@ class SkillModifiersTest extends TestCase
         ])->set('for', 'select-monsters')
           ->set('selectedMonsters', [9999])
           ->call('validateInput', 'nextStep', 2);
-
-        // No monster exists for this id.
-        // An email should be sent.
     }
 
     public function testInitialSkillIsArray() {

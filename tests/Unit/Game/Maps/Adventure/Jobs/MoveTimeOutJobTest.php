@@ -6,19 +6,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Game\Maps\Adventure\Jobs\MoveTimeOutJob;
 use Tests\TestCase;
-use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class MoveTimeOutJobTest extends TestCase
 {
-    use RefreshDatabase, CreateUser;
+    use RefreshDatabase;
 
 
     public function testMoveTimeOutJob()
     {
-        $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         Event::fake();
 

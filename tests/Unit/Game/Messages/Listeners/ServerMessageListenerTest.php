@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use App\Flare\Events\ServerMessageEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class ServerMessageListenerTest extends TestCase
 {
@@ -16,9 +16,7 @@ class ServerMessageListenerTest extends TestCase
 
     public function testServerMessageEventLevelUp()
     {
-        $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
+        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         event(new ServerMessageEvent($user, 'level_up'));
 
@@ -33,8 +31,6 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
-
         event(new ServerMessageEvent($user, 'gold_rush', '980'));
 
         Event::fake();
@@ -47,8 +43,6 @@ class ServerMessageListenerTest extends TestCase
     public function testServerMessageEventGainedItem()
     {
         $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'gained_item', 'item name'));
 
@@ -63,8 +57,6 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
-
         event(new ServerMessageEvent($user, 'new-damage-stat', 'str'));
 
         Event::fake();
@@ -77,8 +69,6 @@ class ServerMessageListenerTest extends TestCase
     public function testServerMessageEventUnKnownType()
     {
         $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'xxxx', 'item name'));
 
@@ -93,8 +83,6 @@ class ServerMessageListenerTest extends TestCase
     {
         $user = $this->createUser();
 
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
-
         event(new ServerMessageEvent($user, 'adventure', 'message'));
 
         Event::fake();
@@ -107,8 +95,6 @@ class ServerMessageListenerTest extends TestCase
     public function testServerMessageDeletedItem()
     {
         $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
 
         event(new ServerMessageEvent($user, 'deleted_item', 'message'));
 

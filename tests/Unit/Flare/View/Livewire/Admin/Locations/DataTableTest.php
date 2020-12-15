@@ -5,27 +5,27 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Locations;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Locations\DataTable;
-use App\Flare\Models\GameMap;
-use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateGameSkill;
+use Tests\traits\CreateGameMap;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase, CreateLocation, CreateAdventure;
+    use RefreshDatabase, CreateLocation, CreateAdventure, CreateGameSkill, CreateGameMap;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
+        $this->createGameSkill();
     }
 
     public function testTheComponentLoads()
     {
         $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -39,7 +39,7 @@ class DataTableTest extends TestCase
 
         $this->createLocation([
             'name'                 => 'Bananas',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Bananas',
                 'path' => 'test',
                 'default' => true
@@ -65,7 +65,7 @@ class DataTableTest extends TestCase
 
         $locationA = $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -81,7 +81,7 @@ class DataTableTest extends TestCase
 
         $locationB = $this->createLocation([
             'name'                 => 'Bananas',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Bananas',
                 'path' => 'test',
                 'default' => true
@@ -107,7 +107,7 @@ class DataTableTest extends TestCase
     {
         $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -121,7 +121,7 @@ class DataTableTest extends TestCase
 
         $this->createLocation([
             'name'                 => 'Bananas',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Bananas',
                 'path' => 'test',
                 'default' => true
@@ -144,7 +144,7 @@ class DataTableTest extends TestCase
     {
         $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -158,7 +158,7 @@ class DataTableTest extends TestCase
 
         $this->createLocation([
             'name'                 => 'Bananas',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Bananas',
                 'path' => 'test',
                 'default' => true
@@ -185,7 +185,7 @@ class DataTableTest extends TestCase
 
         $locationA = $this->createLocation([
             'name'                 => 'Apples',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
                 'path' => 'test',
                 'default' => true
@@ -201,7 +201,7 @@ class DataTableTest extends TestCase
 
         $locationB = $this->createLocation([
             'name'                 => 'Bananas',
-            'game_map_id'          => GameMap::create([
+            'game_map_id'          => $this->createGameMap([
                 'name' => 'Bananas',
                 'path' => 'test',
                 'default' => true

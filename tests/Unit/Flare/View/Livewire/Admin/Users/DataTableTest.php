@@ -5,10 +5,9 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Users;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Users\DataTable;
-use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class DataTableTest extends TestCase
 {
@@ -17,33 +16,13 @@ class DataTableTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->seed(GameSkillsSeeder::class);
+        (new CharacterFactory)->createBaseCharacter()->updateCharacter([
+            'name' => 'Zex'
+        ])->getCharacter();
 
-        (new CharacterSetup)->setupCharacter($this->createUser(), ['name' => 'trox'])
-            ->levelCharacterUp(10)
-            ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                'xp_towards' => 10,
-            ], true)
-            ->setSkill('Dodge', [
-                'skill_bonus_per_level' => 10,
-            ])
-            ->setSkill('Looting', [
-                'skill_bonus_per_level' => 0,
-            ])
-            ->getCharacter();
-
-        (new CharacterSetup)->setupCharacter($this->createUser(), ['name' => 'Zex'])
-            ->levelCharacterUp(10)
-            ->setSkill('Accuracy', ['skill_bonus_per_level' => 10], [
-                'xp_towards' => 10,
-            ], true)
-            ->setSkill('Dodge', [
-                'skill_bonus_per_level' => 10,
-            ])
-            ->setSkill('Looting', [
-                'skill_bonus_per_level' => 0,
-            ])
-            ->getCharacter();
+        (new CharacterFactory)->createBaseCharacter()->updateCharacter([
+            'name' => 'trox'
+        ])->getCharacter();
     }
 
     public function testTheComponentLoads() {

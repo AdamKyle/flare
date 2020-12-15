@@ -8,7 +8,7 @@ use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Events\ShowTimeOutEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class MoveTimeOutEventTest extends TestCase
 {
@@ -17,9 +17,7 @@ class MoveTimeOutEventTest extends TestCase
 
     public function testShowTimeOutEvent()
     {
-        $user = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($user, ['can_move' => false])->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         Event::fake([ShowTimeOutEvent::class]);
 

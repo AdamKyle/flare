@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Event;
 use App\Game\Messages\Events\PrivateMessageEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
-use Tests\Setup\CharacterSetup;
+use Tests\Setup\Character\CharacterFactory;
 
 class PrivateMessageEventTest extends TestCase
 {
@@ -16,10 +16,8 @@ class PrivateMessageEventTest extends TestCase
 
     public function testPrivateMessageEvent()
     {
-        $user = $this->createUser();
-        $from = $this->createUser();
-
-        $character = (new CharacterSetup)->setupCharacter($from, ['can_move' => false])->getCharacter();
+        $user = $user = (new CharacterFactory)->createBaseCharacter()->getUser();
+        $from = $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         event(new PrivateMessageEvent($from, $user, 'test'));
 

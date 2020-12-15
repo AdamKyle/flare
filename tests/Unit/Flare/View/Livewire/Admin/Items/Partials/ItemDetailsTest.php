@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Items\Partials;
 
-use App\Flare\Models\Item;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\Item;
 use App\Flare\View\Livewire\Admin\Items\Partials\ItemDetails;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
