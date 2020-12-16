@@ -10,7 +10,7 @@ As well as notifications that can be in chat:
 
 Which are called server notifications.
 
-Players can also be emailed if they are not online and have those settings turned on. The only time we will email you is in the following situations where you are not online:
+Players can also be emailed if they are not online and have those settings turned on. The only time we will email you is in the following situations where **you are not online**:
 
 - Adventure you were on completed.
 - Class Damage Stat was changed.
@@ -20,6 +20,8 @@ Players can also be emailed if they are not online and have those settings turne
 - You can speak again.
 - You were unbanned.
 - Your request to be unbanned was ignored.
+
+If you are online, most of the above will display in chat. as you can see in the second image above.
 
 ## Server notifications in chat
 

@@ -8,13 +8,13 @@ The above allows you to see where you are, respserented by the character pin dro
 
 You can drag this map around and as you move to the edges of the map, the map will scroll over or up, or down to show you where you are at all times.
 
-The blue ship icons repersent ports at which your character may set sail from. These are locations are contain the market boards. More on this in the [Markets]() section.
+The blue ship icons repersent ports at which your character may set sail from. These are locations where you can access the market boards. More on this in the [Markets]() section.
 
 Arched lookeing buildings on the map are called locations, these can contain adventures or quest items that drop or both.
 
 The water requires a special item called the Flask of Fresh Air, which is a rare drop off a monster. It has a 1% chance of dropping and allows the character to walk on water.
 
-With  the item, the character cannot traverse any blue sections of the map.
+With the item, the character cannot traverse any blue sections of the map.
 
 ## Movement
 

@@ -27,7 +27,7 @@ The vice versa works when you are the defender.
 
 > ### ATTN!
 >
-> While yes you want to focus on your primary stat, what ever that is for the class you chose, you must also focus on your dexterity as well for be able to dodge the attacks coming in.
+> While yes you want to focus on your primary stat, what ever that is for the class you chose, you must also focus on your dexterity as well for be able to dodge the attacks coming in as well as land attacks.
 
 ### Skill Modifiers
 

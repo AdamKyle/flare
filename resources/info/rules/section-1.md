@@ -34,7 +34,7 @@ Never forget your security questions answers.
 
 ## Character Creation Rules:
 
-Names containing racial slurs or offensive terms will be asked to rename their character (which The Creator will do with the provided name) or will be banned permantly.
+Names containing racial slurs or offensive terms will be forced to change their name. Any attempt to get around this is a bannable offense
 
 - 1. Character names may not have special characters in them.
 - 2. Character names may not have spaces

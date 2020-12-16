@@ -1,6 +1,6 @@
 ## Adventuring in Tlessa
 
-When you are ready to begin your adventure and you on a location, you can click the adventure button below the map. This will popup another window underneat actions that then allows you to select which adventure, as well as see details about that adventure. The same details you saw from clicking on an adventure above, is the same details youll see in game.
+When you are ready to begin your adventure and you on a location, you can click the adventure button below the map. This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. The same details you saw from clicking on an adventure above, is the same details you'll see in game.
 
 ## Informtion about adventures
 
@@ -8,7 +8,7 @@ Lets go over some basics.
 
 - Adventures have a set number of levels, this is then multipled by the time per level to give you the total time.
   - The longer the adventure, the harder the adventure.
-  - The longer the adventure, also means the greator the reward both in XP, skill xp (if you are currently training a skill), as well as loot.
+  - The longer the adventure, also means the greator the reward both in xp, skill xp (if you are currently training a skill), as well as loot.
 - Adventures give bonuses to your chance at a gold rush, finding items and training skills. These are calculated at the end of each successful floor.
 
 Adventures can belong to more the one location, but will always count as the same adventure in your log.
@@ -21,13 +21,13 @@ Some adventures come with rewards. These rewards are rewarded **once** and only 
 
 Now that you have a basics of what adventures offer, how does one go about it? 
 
-Clicking embark will set off the adventure. How ever before that, youll be asked how many levels at a time. If a dungeon has levels divisible by 5, you can do 5 at a time. This will not count as a sucessful completion till you finish the last five, but allows you to do just a few levels at a time. Maybe you have new gear and are not sure if the gear you equipped is right for the adventure.
+Clicking embark will set off the adventure. 
 
 When you embark on the adventue you can't:
 
 - Move
 - Fight
-- Craft
+- Craft/Enchant
 - Buy/sell - from either the shop or market board
 - Train skills
 - Equip items/unequip items
@@ -49,10 +49,12 @@ Clicking on it will allow you to see the rewards for the adventure.
 
 > ### ATTN!!
 >
-> As mentioned before, if you are not logged in, you will recieve an email. You can always turn this off if you are not wanting to rieve emails.
+> As mentioned before, if you are not logged in, you will recieve an email. You can always turn this off if you are not wanting to recieve emails.
 > You will not recieve this email if you are logged in.
 
 When you view your rewards, you will see all the rewards that you have gained. 
+
+This includes, a sum total of XP, gold, skill xp and items as well as the adventures reward.
 
 **You cannot adventure again unless you have collected the rewards fom your previous adventure**.
 
@@ -70,8 +72,12 @@ This can happen in some instances where you and the enemy have bad RNG and you e
 
 ## Repeating Adventures
 
-You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once should the adventure have one.
+You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once.
 
 ## Canceling Adventures
 
 At anytime during the adventuring process you can cancel the adventure. You will not get any rewards. 
+
+## Adventure Took Too Long
+
+In rare cases the adventure might have taken too long. As a result youll get no rewards as the asumption is, one of you ran away and gave up on the adventure, be it you or the enemy.

@@ -1,6 +1,6 @@
 ## Character death
 
-Youre character can die in a few ways. Fighting monsters and dying in an adventure. When you die, you cannot:
+Your character can die in a few ways. Fighting monsters and dying in an adventure. When you die, you cannot:
 
 - Move
 - Attack

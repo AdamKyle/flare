@@ -37,7 +37,7 @@ class InfoPageController extends Controller
                 $view     = null;
                 $livewire = false;
                 $only     = null;
-                $index    = $i === 0 ? 0 : $i - 1; 
+                $index    = $i === 0 ? 0 : $i; 
 
                 if (isset(config('info.' . $pageName)[$index])) {
                     $view     = config('info.' . $pageName)[$index]['view'];
@@ -53,6 +53,8 @@ class InfoPageController extends Controller
                 ];
             }
         }
+
+        //dd($sections);
 
         return view('information.core', [
             'pageTitle' => $pageName,
