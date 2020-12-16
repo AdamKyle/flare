@@ -37,12 +37,14 @@ class InfoPageController extends Controller
                 $view     = null;
                 $livewire = false;
                 $only     = null;
-                $index    = $i === 0 ? 0 : $i; 
+                $index    = $i === 0 ? 0 : $i;
+                $before   = null;
 
                 if (isset(config('info.' . $pageName)[$index])) {
                     $view     = config('info.' . $pageName)[$index]['view'];
                     $livewire = config('info.' . $pageName)[$index]['livewire'];
                     $only     = config('info.' . $pageName)[$index]['only'];
+                    $before   = config('info.' . $pageName)[$index]['insert_before_table'];
                 }
 
                 $sections[] = [
@@ -50,6 +52,7 @@ class InfoPageController extends Controller
                     'view'     => $view,
                     'livewire' => $livewire,
                     'only'     => $only,
+                    'before'   => $before,
                 ];
             }
         }

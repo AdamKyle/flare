@@ -1,15 +1,19 @@
 ## Adventuring in Tlessa
 
-When you are ready to begin your adventure and you on a location, you can click the adventure button below the map. This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. The same details you saw from clicking on an adventure above, is the same details you'll see in game.
+When you are ready to begin your adventure and you on a location, you can click the Adventure button below the map (assuming that location has an advenuture). This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. 
 
-## Informtion about adventures
+![adventuring-image](/storage/info/adventure/images/adventuring-modal.png)
+
+The same details you saw from clicking on an adventure above, is the same details you'll see in game.
+
+## Information about adventures
 
 Lets go over some basics. 
 
 - Adventures have a set number of levels, this is then multipled by the time per level to give you the total time.
-  - The longer the adventure, the harder the adventure.
-  - The longer the adventure, also means the greator the reward both in xp, skill xp (if you are currently training a skill), as well as loot.
-- Adventures give bonuses to your chance at a gold rush, finding items and training skills. These are calculated at the end of each successful floor.
+  - The longer the adventure, the greator the chance for random items, quest items from monsters and gold rushes.
+- Adventures can give bonuses to your chance at a gold rush, finding items and training skills. These are calculated at the end of each successful floor.
+  - You can see this in the adventure details for each eadventure at that specific location.
 
 Adventures can belong to more the one location, but will always count as the same adventure in your log.
 
@@ -19,9 +23,11 @@ Some adventures come with rewards. These rewards are rewarded **once** and only 
 
 ## Embraking on the adventure.
 
+**Note**: In order to embark on an adventure you mst be able to fight and move. You can have a [timer](/information/time-gates) running and embark on adventure for crafting and enchanting how ever.
+
 Now that you have a basics of what adventures offer, how does one go about it? 
 
-Clicking embark will set off the adventure. 
+Clicking embark will set off the adventure. You will only be allowed to go on one adventure at a time. If your adventure completes successfully, you will not be able to embark on another adventure until you have collected your rewards.
 
 When you embark on the adventue you can't:
 
@@ -56,15 +62,9 @@ When you view your rewards, you will see all the rewards that you have gained.
 
 This includes, a sum total of XP, gold, skill xp and items as well as the adventures reward.
 
-**You cannot adventure again unless you have collected the rewards fom your previous adventure**.
-
-Under each adventure details is a detailed log, the same one you see when you fight monsters, for each floor detailing the attacks and blocks and so on.
-
-This helps you, if you fail the adventure, to understand a little more about what might have caused that.
-
 ### Failing the adventure gives you no rewards.
 
-Doesnt matter where you died in the adventure be it level one or level 10. You have died and its assumed you were robbed of all the treasures that you had found. 
+Doesn't matter where you died in the adventure be it level one or level 10. You have died and its assumed you were robbed of all the treasures that you had found. 
 
 ### The adventure took to long.
 
@@ -72,12 +72,8 @@ This can happen in some instances where you and the enemy have bad RNG and you e
 
 ## Repeating Adventures
 
-You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once.
+You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once if that adventure has one.
 
 ## Canceling Adventures
 
 At anytime during the adventuring process you can cancel the adventure. You will not get any rewards. 
-
-## Adventure Took Too Long
-
-In rare cases the adventure might have taken too long. As a result youll get no rewards as the asumption is, one of you ran away and gave up on the adventure, be it you or the enemy.

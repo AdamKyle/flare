@@ -27,5 +27,11 @@ If you are online, most of the above will display in chat. as you can see in the
 
 The chat area is extremly important to pay attention to. Messages about being out of gold for completing things such as enchanting/crafting or being told you have to wait for the appropriate timer to finish - all of these and more can appear in chat.
 
+These server messages are only directed to you, so the rest of chat wont be poluted by eachothers server messages and can just focus on chatting.
+
+## No popups or endless notifications.
+
+We don't do any of that when it comes to notifying you. When you login, you wont have 500 notifications and popups to manage and clear. The only time we will populate your notification center is if you have completed an adventure and are in game.
+
 
 

@@ -2,7 +2,7 @@
 
 Enchanting, like crafting, is also meant to be easy. Although has a slight difference from how crafting works.
 
-Tou enchant an item, you will select the item from your inventory. This will consist of a item that is not a quest and is not equipped.
+To enchant an item, you will select the item from your inventory. This will consist of a item that is not a quest and is not equipped.
 
 This item may have affixes attached.
 
@@ -10,7 +10,9 @@ From here you will select the suffix, prefix or both.
 
 If the item already has an enchantment on it, for each additional enchantment the item has an additional ten seconds will be added to the default ten seconds.
 
-For example, a Rusty Bloody Broken Dagger with no enchantments will result in a ten second time out, with one enchantement the time out is 20 seconds, with two the time out is 30 seconds.
+For exmple if a Rusty Bloddy Broken Dagger has  a suffix on it, and you are attempting to replace the suffix, you will recieve a 20 second time out. How ever if you wanted to add a prefix it would be 10 second timeout.
+
+If, how ever, you are attempting to replace two enchantments on an item, it will be a 30 second timeout.
 
 Each additional 10 seconds is for the disenchanting or removal of previous enchantment which is done automatically for you when you succeed.
 
@@ -20,21 +22,17 @@ If you fail to enchant the item, weather is be with one enchant or two, the item
 
 ## Requirments for enchanting
 
-You need intelligence for this. Your character might want to invest in a fullset of intelligence based gear when enchanting as it gives them more of a bonus. If your enchanting with extremly high intelligence, which is greator then the intelligence needed to apply the enchantment, the check will be halfed because of your intelligence.
-
-Enchanting items that are considered too easy will automatically and always pass. you just wont get the XP.
-
-> ### ATTN!!
->
-> If the player is enchanting an item with two enchantments and one of those items is well below the characters enchanting level, but the other is not, the character will recive xp for the enchantment above or at their level.
+All you need is the gold, the items and the time to level. Enchanting can be an interesting gold sink as more and more enchantments get added to the game. Enchantments are meant to be expensive, as they can add significant advantage in overcoming difficult enemies or adventures.
 
 ## Cost to enchant
 
-The cost of the enchanting is the cost of the enchantment its self plus the cost to remove any previous enchantments + 10% for "materials".
+The cost is the enchantment cost + half the original cost of the already attached enchantment.
 
-Enchanting is not cheap and should be considered like a gold sink. Enchantments can start at as little as 1000 gold and go up to 2 billion, the games maximum gold cap for a character.
+That is, if you have an item with one enchantment and you want to replace it, it will be:
 
-Enchanted items cannot be sold via the shop. They can be destroyed and traded as well as sold on the market board. This provides a great way for the player to make some money.
+The cost of the enchantment you want (ie, 1000) + half the cost of the enchantment to be replaced (ie, 500) for a total of 1500.
+
+Enchanted items cannot be sold via the shop. They can be destroyed and traded as well as sold on the [market]() board. This provides a great way for the player to make some money.
 
 ## Double enchanting with faliure
 

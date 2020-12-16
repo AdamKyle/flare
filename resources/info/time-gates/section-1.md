@@ -8,7 +8,7 @@ All timers will be visible to players. You can close a panel that has a timer an
 
 ## Actions and Timers
 
-Crafting, Attacking, Adventuring, Moving, Setting Sail and Adventuring all currently have timers. Each one veries depending on what it is the timer is for. 
+Crafting, Attacking, Adventuring, Moving, Setting Sail, Enchanting, Fighting and Teleporting all currently have timers. Each one varies depending on what it is the timer is for. 
 
 All of these are seperate. So you can craft, kill a goblin, and move/set sail or start and adventure, for example (in that order - see [Adventure](/information/adventure) section for what happens when you begin an adventure).
 
@@ -22,6 +22,8 @@ Lets go over these:
 - Moving: When a character moves, they will recieve a 10 second time out.
 - Setting Sail: The pannel for setting sail will tell you how long in minutes your time out for movement based actions will be.
 - Adventuring: Depending on levels of adventure the time could vary. Each adventure will tell you how long it will take to completly fufil.
+- Enchanting Can give a 10, 20 or 30 second time out depending on if you are applying one enchant, replacing one enchant or replacing two enchants.
+- Teleporting will gie you a time out equal to the time mentioned in the teleport box when going from one location to another.
 
 > ### ATTN!
 >
@@ -46,5 +48,7 @@ The Creator, can also silence you for 10, 30 or 60 minutes.
 The time until you can talk again will be disaplyed in big bright red letters with your local time (client side) of when you can talk again.
 
 Upon being able to chat you'll see a server message appear telling you can chat again.
+
+If you are not logged in and have the appropriate settings enabled, we will email you when you can talk again.
 
 

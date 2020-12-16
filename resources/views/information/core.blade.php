@@ -13,6 +13,12 @@
 
             @if (!is_null($section['view']))
                 @if ($section['livewire'])
+                    @if ($section['before'])
+                        <div class="mb-2 mt-2">
+                            @include($section['before'])
+                        </div>
+                    @endif
+
                     @livewire($section['view'], [
                         'only' => $section['only']
                     ])
