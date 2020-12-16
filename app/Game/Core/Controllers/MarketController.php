@@ -2,21 +2,24 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Flare\Models\Character;
 use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use App\Http\Controllers\Controller;
+use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
-use App\Http\Controllers\Controller;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use App\Game\Core\Traits\UpdateMarketBoard;
+
 
 class MarketController extends Controller {
 
+    use UpdateMarketBoard;
+
     private $manager;
 
-    private $transfer;
+    private $transformer;
 
     public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
         $this->middleware('auth');
@@ -24,6 +27,8 @@ class MarketController extends Controller {
         $this->middleware('is.character.dead');
         
         $this->middleware('is.character.adventuring');
+
+        $this->middleware('is.character.at.location');
 
         $this->manager     = $manager;
         $this->transformer = $transformer;
@@ -50,11 +55,7 @@ class MarketController extends Controller {
 
         $slot->delete();
         
-        $items = MarketBoard::all();
-        $items = new Collection($items, $this->transformer);
-        $items = $this->manager->createData($items)->toArray();
-
-        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
+        $this->sendUpdate($this->transformer, $this->manager);
         
         return redirect()->to(route('game.market.sell'))->with('success', 'Item listed');
     }
@@ -67,6 +68,19 @@ class MarketController extends Controller {
             ]))->with('error', 'You are not allowed to do that.');
         }
 
+        $locked = MarketBoard::where('character_id', $character->id)->where('is_locked', true)->first();
+        
+        if (!is_null($locked)) {
+            
+            $locked->update([
+                'is_locked' => false,
+            ]);
+
+            $this->sendUpdate($this->transformer, $this->manager);
+        }
+
+        
+
         return view('game.core.market.current-listings', [
             'character' => $character
         ]);
@@ -77,12 +91,21 @@ class MarketController extends Controller {
             return redirect()->back()->with('error', 'You are not allowed to do that.');
         }
 
+        if (!$marketBoard->is_locked) {
+            $marketBoard->update([
+                'is_locked' => true,
+            ]);
+
+            $this->sendUpdate($this->transformer, $this->manager);
+        }
+
         return view('game.core.market.edit-current-listing', [
             'marketBoard' => $marketBoard
         ]);
     }
 
     public function updateCurrentListing(Request $request, MarketBoard $marketBoard) {
+
         $request->validate([
             'listed_price' => 'required|integer'
         ]);
@@ -95,15 +118,15 @@ class MarketController extends Controller {
             return redirect()->back()->with('error', 'Listed price cannot be below or equal to 0.');
         }
 
-        $marketBoard->update($request->all());
+        $marketBoard->update(array_merge($request->all(), [
+            'is_locked' => false,
+        ]));
 
-        $items = MarketBoard::all();
-        $items = new Collection($items, $this->transformer);
-        $items = $this->manager->createData($items)->toArray();
+        $this->sendUpdate($this->transformer, $this->manager);
 
-        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
-
-        return redirect()->back()->with('success', 'Listing for: ' . $marketBoard->item->affix_name . ' updated.');
+        return redirect()->to(route('game.current-listings', [
+            'character' => auth()->user()->character->id
+        ]))->with('success', 'Listing for: ' . $marketBoard->item->affix_name . ' updated.');
     }
 
     public function delist(Request $request, MarketBoard $marketBoard) {
@@ -117,11 +140,7 @@ class MarketController extends Controller {
 
         $marketBoard->delete();
 
-        $items = MarketBoard::all();
-        $items = new Collection($items, $this->transformer);
-        $items = $this->manager->createData($items)->toArray();
-
-        event(new UpdateMarketBoardBroadcastEvent(auth()->user(), $items, auth()->user()->character->gold));
+        $this->sendUpdate($this->transformer, $this->manager);
 
         return redirect()->back()->with('success', 'Delisted: ' . $itemName);
     }

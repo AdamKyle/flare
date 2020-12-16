@@ -29,12 +29,15 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    
     @livewireStyles
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
+    <script src={{asset('js/market-board.js')}} type="text/javascript"></script>
 </head>
 <body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">

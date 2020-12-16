@@ -5,7 +5,7 @@ import CardTemplate from '../game/components/templates/card-template';
 import MarketHistory from './market-history';
 import PurchaseModal from './purchase-modal';
 
-class Board extends Component {
+export default class Board extends Component {
   constructor(props) {
     super(props);
 
@@ -47,13 +47,22 @@ class Board extends Component {
       modalData: {},
       message: null,
       messageType: null,
+      hasItemId: false,
     }
 
     this.update = Echo.join('update-market');
   }
 
   componentDidMount() {
-    axios.get('/api/market-board/items').then((result) => {
+    this.setState({
+      hasItemId: this.props.hasOwnProperty('itemId') && this.props.itemId !== 'undefined'
+    });
+
+    axios.get('/api/market-board/items', {
+      params: {
+        item_id: this.props.itemId,
+      }
+    }).then((result) => {
       this.setState({
         records: result.data.items,
         gold: result.data.gold,
@@ -153,6 +162,7 @@ class Board extends Component {
       <CardTemplate
         OtherCss="p-3"
         cardTitle="Market Board"
+        showButton={!this.state.hasItemId}
         textBesideButton={this.getGoldText()}
         customButtonType="drop-down"
         buttonTitle="Types"
@@ -175,7 +185,7 @@ class Board extends Component {
       >
         { this.state.message !== null ? this.renderMessage() : null }
 
-        <MarketHistory />
+        { !this.state.hasItemId ? <MarketHistory /> : null }
 
         <ReactDatatable
           config={this.config}
@@ -200,11 +210,11 @@ class Board extends Component {
 }
 
 const marketBoard = document.getElementById('market');
-const character = document.head.querySelector('meta[name="character"]');
+const character   = document.head.querySelector('meta[name="character"]');
 
 if (marketBoard !== null) {
   ReactDOM.render(
-    <Board characterId={character.content} />,
+    <Board characterId={character.content}/>,
     marketBoard
   );
 }

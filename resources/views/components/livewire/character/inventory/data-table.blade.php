@@ -92,14 +92,16 @@
                             sort-field="{{$sortField}}"
                             field="items.base_healing"
                         />
-
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('items.cost')" 
-                            header-text="Cost" 
-                            sort-by="{{$sortBy}}"
-                            sort-field="{{$sortField}}"
-                            field="items.cost"
-                        />
+                        
+                        @if (!$marketBoard)
+                            <x-data-tables.header-row 
+                                wire:click.prevent="sortBy('items.cost')" 
+                                header-text="Cost" 
+                                sort-by="{{$sortBy}}"
+                                sort-field="{{$sortField}}"
+                                field="items.cost"
+                            />
+                        @endif
 
                         <x-data-tables.header-row>
                             Actions
@@ -135,7 +137,7 @@
                                 <td>{{is_null($slot->item->base_damage) ? 'N/A' : $slot->item->base_damage}}</td>
                                 <td>{{is_null($slot->item->base_ac) ? 'N/A' : $slot->item->base_ac}}</td>
                                 <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
-                                <td>{{is_null($slot->item->Cost) ? 'N/A' : $slot->item->cost}}</td>
+                                @if (!$marketBoard) <td>{{is_null($slot->item->Cost) ? 'N/A' : $slot->item->cost}}</td> @endif
                                 <td>
                                     @if ($allowInventoryManagement && $slot->item->type !== 'quest')
                                         <div class="dropdown">

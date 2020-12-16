@@ -42,7 +42,7 @@ export default class CardTemplate extends React.Component {
   }
 
   buildCustomButton() {
-    if (this.props.customButtonType === 'drop-down') {
+    if (this.props.customButtonType === 'drop-down' && this.props.showButton) {
       return this.buildDropDown();
     }
   }

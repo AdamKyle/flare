@@ -17,11 +17,21 @@
             ])}}">
                 @csrf
 
+                <div class="alert alert-warning">
+                    <p>While you are editing your items listed price, your item will not appear on the market board. Once you are done, the item will be relisted.</p>
+                </div>
+
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="market-listed-price">Sell For: </label>
                             <input type="number" class="form-control required" id="market-listed-price" name="listed_price" value={{$marketBoard->listed_price}}> 
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check move-down-30">
+                            <input id="stackedCheck1" class="form-check-input" type="checkbox" data-toggle="toggle" name="is_locked" disabled {{$marketBoard->is_locked ? 'checked' : ''}}>
+                            <label for="stackedCheck1" class="form-check-label ml-2">Currently Locked</label>
                         </div>
                     </div>
                 </div>
@@ -33,10 +43,7 @@
                 </div>
             </form>
             <hr />
-            <h4>Market Details</h4>
-            @livewire('market.item-board', [
-                'itemId' => $marketBoard->item->id
-            ])
+            <div id="market-item-board-{{$marketBoard->item->id}}" data-item-id="{{$marketBoard->item->id}}"></div>
             <hr />
             @include('game.items.partials.item', [
                 'item' => $marketBoard->item
@@ -44,3 +51,9 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        renderBoard('market-item-board-{{$marketBoard->item->id}}');
+    </script>
+@endpush

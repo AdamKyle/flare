@@ -39,14 +39,22 @@ class MarketBoardController extends Controller {
     public function index(Request $request) {
         $items = null;
 
-        if ($request->has('type')) {
+        if ($request->has('item_id')) {
+            $items = MarketBoard::join('items', function($join) use($request) {
+                return $join->on('market_board.item_id', '=', 'items.id')
+                            ->where('items.id', $request->item_id);
+            })->where('market_board.is_locked', false)
+              ->select('market_board.*')
+              ->get();  
+        } else if ($request->has('type')) {
             $items = MarketBoard::join('items', function($join) use($request) {
                 return $join->on('market_board.item_id', '=', 'items.id')
                             ->where('items.type', $request->type);
-            })->select('market_board.*')
+            })->where('market_board.is_locked', false)
+              ->select('market_board.*')
               ->get();            
         } else {
-            $items = MarketBoard::all();
+            $items = MarketBoard::where('is_locked', false)->get();
         }
 
         $items = new Collection($items, $this->transformer);

@@ -37,7 +37,6 @@
                                 <td>{{$item->item->type}}</td>
                                 <td>{{$item->listed_price}}</td>
                                 <td>
-                                    @dump($item)
                                     <a href="{{route('game.edit.current-listings', [
                                         'marketBoard' => $item->id
                                     ])}}" class="btn btn-primary">Edit Price</a>

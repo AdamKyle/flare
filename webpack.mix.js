@@ -12,6 +12,7 @@ const mix = require('laravel-mix');
  */
 
 mix.react('resources/js/app.js', 'public/js')
+   .react('resources/js/helpers/market-board.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
    //.extract(['lodash', 'react', 'jquery', 'bootstrap'])
    .version()

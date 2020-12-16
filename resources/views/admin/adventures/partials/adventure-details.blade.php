@@ -39,7 +39,7 @@
             <select class="custom-select form-control" id="adventure-item-reward" name="reward_item_id">
                     <option value="">Please select</option>
                 @foreach($items as $id => $name)
-                    <option {{!is_null($adventure) ? ($adventure->itemReward->id === $id ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
+                    <option {{!is_null($adventure->itemReward) ? ($adventure->itemReward->id === $id ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
                 @endforeach
             </select>
         </div>
