@@ -48,6 +48,7 @@ export default class Board extends Component {
       message: null,
       messageType: null,
       hasItemId: false,
+      type: null,
     }
 
     this.update = Echo.join('update-market');
@@ -124,11 +125,21 @@ export default class Board extends Component {
           type: type
         }
       };
+
+      this.setState({
+        type: type,
+      });
+    } else {
+      this.setState({
+        type: null,
+      });
     }
+    
 
     axios.get('/api/market-board/items', params).then((result) => {
       this.setState({
-        records: result.data,
+        records: result.data.items,
+        gold: result.data.gold,
       });
     }).catch((error) => {
       console.error(error);
@@ -185,7 +196,7 @@ export default class Board extends Component {
       >
         { this.state.message !== null ? this.renderMessage() : null }
 
-        { !this.state.hasItemId ? <MarketHistory /> : null }
+        { !this.state.hasItemId ? <MarketHistory  type={this.state.type} /> : null }
 
         <ReactDatatable
           config={this.config}

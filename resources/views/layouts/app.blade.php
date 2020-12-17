@@ -105,7 +105,7 @@
                     <!-- Bottom points-->
                     <div class="sidebar-footer">
                         <!-- item-->
-                        <a href="" class="link" data-toggle="tooltip" title="Settings"><i class="fas fa-cog"></i></a>
+                        <a href="{{route('user.settings', ['user' => auth()->user()])}}" class="link" data-toggle="tooltip" title="Settings"><i class="fas fa-cog"></i></a>
                         <!-- item-->
                         <a href="" class="link" data-toggle="tooltip" title="Bug Report"><i class="ra ra-beetle"></i></a>
                         <!-- item-->

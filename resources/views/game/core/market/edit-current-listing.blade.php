@@ -30,8 +30,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-check move-down-30">
-                            <input id="stackedCheck1" class="form-check-input" type="checkbox" data-toggle="toggle" name="is_locked" disabled {{$marketBoard->is_locked ? 'checked' : ''}}>
-                            <label for="stackedCheck1" class="form-check-label ml-2">Currently Locked</label>
+                            <input id="isLocked" class="form-check-input" type="checkbox" data-toggle="toggle" name="is_locked" disabled {{$marketBoard->is_locked ? 'checked' : ''}}>
+                            <label for="isLocked" class="form-check-label ml-2">Currently Locked</label>
                         </div>
                     </div>
                 </div>

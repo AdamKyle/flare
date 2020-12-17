@@ -44,4 +44,9 @@ Route::middleware('is.player.banned')->group(function() {
     Route::get('/market/current-listings/edit/{marketBoard}', ['as' => 'game.edit.current-listings', 'uses' => 'MarketController@editCurrentListings']);
     Route::post('/market/current-listing/{marketBoard}/update', ['as' => 'game.update.current-listing', 'uses' => 'MarketController@updateCurrentListing']);
     Route::post('/market/current-listing/{marketBoard}/delist', ['as' => 'game.delist.current-listing', 'uses' => 'MarketController@delist']);
+
+    Route::get('/settings/{user}', ['as' => 'user.settings', 'uses' => 'SettingsController@index']);
+    Route::post('/settings/{user}/email-settings', ['as' => 'user.settings.email', 'uses' => 'SettingsController@emailSettings']);
+    Route::post('/settings/{user}/character-name', ['as' => 'user.settings.character', 'uses' => 'SettingsController@characterSettings']);
+    Route::post('/settings/{user}/security', ['as' => 'user.settings.security', 'uses' => 'SettingsController@securityQuestions']);
 });

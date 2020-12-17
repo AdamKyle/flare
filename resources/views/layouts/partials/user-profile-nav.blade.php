@@ -16,6 +16,12 @@
                         <a href="{{route('info.page', ['pageName' => 'home'])}}">
                             <i class="fas fa-question-circle"></i> Help
                         </a>
+
+                        @if (!auth()->user()->hasRole('Admin'))
+                            <a href="{{route('user.settings', ['user' => auth()->user()->id])}}">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                        @endif
                     @endif
                     
 

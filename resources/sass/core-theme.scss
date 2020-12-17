@@ -5121,6 +5121,8 @@ When click on sidebar toggler and also for tablet
     display: none; }
   .mini-sidebar .left-sidebar {
     width: 60px; }
+  .mini-sidebar-expanded .left-sidebar {
+    width: 60px; }
   .mini-sidebar .user-profile {
     padding-bottom: 30px;
     width: 60px; }
@@ -5158,6 +5160,8 @@ When click on sidebar toggler and also for tablet
     position: fixed; }
   .mini-sidebar .left-sidebar, .mini-sidebar .sidebar-footer {
     left: -240px; }
+  .mini-sidebar-expanded .left-sidebar, .mini-sidebar-expanded .sidebar-footer {
+    left: 0; }
   .mini-sidebar.show-sidebar .left-sidebar, .mini-sidebar.show-sidebar .sidebar-footer {
     left: 0px; } }
 

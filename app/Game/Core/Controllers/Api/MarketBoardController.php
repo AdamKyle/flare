@@ -47,12 +47,11 @@ class MarketBoardController extends Controller {
               ->select('market_board.*')
               ->get();  
         } else if ($request->has('type')) {
-            $items = MarketBoard::join('items', function($join) use($request) {
+            
+            $items = MarketBoard::where('is_locked', false)->join('items', function($join) use($request) {
                 return $join->on('market_board.item_id', '=', 'items.id')
                             ->where('items.type', $request->type);
-            })->where('market_board.is_locked', false)
-              ->select('market_board.*')
-              ->get();            
+            })->select('market_board.*')->get();           
         } else {
             $items = MarketBoard::where('is_locked', false)->get();
         }
@@ -127,7 +126,23 @@ class MarketBoardController extends Controller {
         return response()->json([], 200);
     }
 
-    public function history() {
+    public function history(Request $request) {
+
+        if ($request->has('type')) {
+            return response()->json([
+                'labels' => MarketHistory::where('market_history.created_at', '>=', Carbon::today()->subDays(30))->join('items', function($join) use($request) {
+                    return $join->on('market_history.item_id', '=', 'items.id')
+                                ->where('items.type', $request->type);
+                })->select('market_history.*')->get()->map(function($mh) {
+                    return $mh->created_at->format('y-m-d');
+                }),
+                'data'   => MarketHistory::where('market_history.created_at', '>=', Carbon::today()->subDays(30))->join('items', function($join) use($request) {
+                    return $join->on('market_history.item_id', '=', 'items.id')
+                                ->where('items.type', $request->type);
+                })->select('market_history.*')->get()->pluck('sold_for'),
+            ]);
+        }
+
         return response()->json([
             'labels' => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->map(function($mh) {
                 return $mh->created_at->format('y-m-d');

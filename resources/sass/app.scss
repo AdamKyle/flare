@@ -111,13 +111,6 @@ dd {
   min-height: 100vh
 }
 
-@media (min-width: 576px) {
-  .modal-dialog {
-      max-width: 650px;
-      margin: 1.75rem auto;
-  }
-}
-
 .dropdown-menu {
   box-shadow: 0 4px 20px 0 rgb(255 255 255 / 14%), 0 7px 10px -5px rgb(0 0 0 / 40%);
 }
@@ -128,4 +121,23 @@ dd {
 
 .move-down-30 {
   margin-top: 30px;
+}
+
+@media (min-width: 576px) {
+  .modal-dialog {
+      max-width: 650px;
+      margin: 1.75rem auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .sidebartoggler {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 25px 0;
+  }
 }

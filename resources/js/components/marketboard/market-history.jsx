@@ -47,8 +47,18 @@ export default class MarketHistory extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.type !== prevProps.type) {
+      this.fetchMarketHistory();
+    }
+  }
+
   fetchMarketHistory() {
-    axios.get('/api/market-board/history').then((result) => {
+    axios.get('/api/market-board/history', {
+      params: {
+        type: this.props.type,
+      }
+    }).then((result) => {
       
       let dataset = {...this.state.data};
 

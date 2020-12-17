@@ -74,16 +74,17 @@ class MovementService {
             })->first();
 
             if (is_null($item)) {
-                if (!$character->inventory->slots()->count() < $character->inventory_max) {
+                
+                if (!($character->inventory->slots()->count() < $character->inventory_max)) {
                     event(new ServerMessageEvent($character->user, 'inventory_full'));
+                } else {
+                    $character->inventory->slots()->create([
+                        'inventory_id' => $character->inventory->id,
+                        'item_id'      => $location->questRewardItem->id,
+                    ]);
+
+                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
                 }
-
-                $character->inventory->slots()->create([
-                    'inventory_id' => $character->inventory->id,
-                    'item_id'      => $location->questRewardItem->id,
-                ]);
-
-                event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
             }
         }
     }

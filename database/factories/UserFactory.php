@@ -35,7 +35,9 @@ class UserFactory extends Factory
             'unbanned_at'            => null,
             'ip_address'             => '127.0.0.1',
             'banned_reason'          => null,
-            'un_ban_request'         => null
+            'un_ban_request'         => null,
+            'adventure_email'        => true,
+            'can_speak_again_email'  => true,
         ];
     }
 }
