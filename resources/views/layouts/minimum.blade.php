@@ -30,7 +30,7 @@
 </head>
 <body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">
-        <div class="page-wrapper">
+        <div class="page-wrapper page-wrapper-minimum">
             <div class="container-fluid mb-2">
                 @yield('content')
             </div>

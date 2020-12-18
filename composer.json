@@ -13,6 +13,7 @@
         "bkwld/cloner": "^3.9",
         "christianessl/landmap-generation": "^1.0",
         "fideloper/proxy": "^4.0",
+        "graham-campbell/github": "^9.7",
         "graham-campbell/markdown": "^13.1",
         "laravel/framework": "^8.0",
         "laravel/helpers": "^1.2",
@@ -20,6 +21,7 @@
         "laravel/ui": "^3.0",
         "league/fractal": "^0.18.0",
         "livewire/livewire": "^2.2",
+        "php-http/guzzle6-adapter": "^2.0",
         "pusher/pusher-php-server": "^4.0",
         "spatie/laravel-collection-macros": "^7.0",
         "spatie/laravel-permission": "^3.16"

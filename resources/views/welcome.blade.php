@@ -7,8 +7,9 @@
                 <div class="jumbotron  mt-5">
                     <h1>Planes of Tlessa</h1>
                     <p>A world full of mystery and exploration.</p>
-                    <a class="btn btn-primary btn hero-btn" href="{{route('register')}}" role="button">Join Today!</a>
-                    <a class="btn btn-success btn hero-btn" href="{{route('info.page', ['pageName' => 'home'])}}" role="button">Learn More</a>
+                    <a class="btn btn-primary btn" href="{{route('register')}}" role="button">Join Today!</a>
+                    <a class="btn btn-success btn" href="{{route('info.page', ['pageName' => 'home'])}}" role="button">Learn More</a>
+                    <a class="btn btn-warning btn" href="{{route('releases.list')}}" role="button">Releases</a>
                 </div>
             </div>
         </div>
@@ -86,7 +87,9 @@
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-center snippit-section map-feature-text">
                     <h2>See where you're going!</h2>
                     <p>Adventure on a map by clicking the action buttons. Certian locations will have adventures and some you can set sail from, such as ports!</p>
-                    <a href="#" class="btn btn-primary map-btn">Learn more</a>
+                    <a href="{{route('info.page', [
+                        'pageName' => 'map',
+                    ])}}" class="btn btn-primary map-btn">Learn more</a>
                 </div> 
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <img src="{{asset('promotion/map.png')}}" class="w-100 move-image-down" />
@@ -118,7 +121,9 @@
                             </div>
                             <div class="game-feature">
                                 <h5>
-                                    <a href="#">Crafting is simple</a>
+                                    <a href="{{route('info.page', [
+                                        'pageName' => 'crafting',
+                                    ])}}">Crafting is simple</a>
                                 </h5>
                                 <p>No need to gather. You can just start crafting! Find tomes to get xp bonuses!</p>
                             </div>
@@ -133,7 +138,9 @@
                             </div>
                             <div class="game-feature">
                                 <h5>
-                                    <a href="#">Enchanting is even easier</a>
+                                    <a href="{{route('info.page', [
+                                        'pageName' => 'enchanting',
+                                    ])}}">Enchanting is even easier</a>
                                 </h5>
                                 <p>All you need is to destroy an item with an affix on it for the recipe! How easy is that!</p>
                             </div>
