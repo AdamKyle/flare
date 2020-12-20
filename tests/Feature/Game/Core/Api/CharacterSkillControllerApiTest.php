@@ -64,6 +64,35 @@ class CharacterSkillControllerApiTest extends TestCase {
         $this->assertFalse($currentGold === $this->character->getCharacter()->gold);
     }
 
+    public function testShouldBeAbleToGetAffixesList() {
+        $this->createItemAffix([
+            'int_required' => 1,
+            'skill_level_required' => 0,
+        ]);
+
+        $skill = $this->createGameSkill([
+            'name' => 'Enchanting'
+        ]);
+
+        $character = $this->character->updateCharacter([
+            'gold' => 10000,
+        ])->assignSkill($skill)
+          ->trainSkill($skill->name)
+          ->inventoryManagement()
+          ->giveItem($this->createItem())
+          ->getCharacterFactory()
+          ->getCharacter();
+
+        $response = $this->actingAs($character->user, 'api')->json('GET', '/api/enchanting/' . $character->id)->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertNotEmpty($content);
+        
+    }
+
     public function testCanEnchantItem() {
 
         $this->createItemAffix();

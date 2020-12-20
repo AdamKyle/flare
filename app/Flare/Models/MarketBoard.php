@@ -34,6 +34,7 @@ class MarketBoard extends Model
     protected $casts = [
         'listed_price' => 'integer',
         'is_locked'    => 'boolean',
+        'character_id' => 'integer',
     ];
 
     public function item() {

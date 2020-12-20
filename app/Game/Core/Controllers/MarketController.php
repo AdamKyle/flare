@@ -47,6 +47,10 @@ class MarketController extends Controller {
             return redirect()->to(route('game.market.sell'))->with('error', 'How much are you trying to sell this for? Missing Sell for.');
         }
 
+        if ($request->sell_for <= 0) {
+            return redirect()->back()->with('error', 'The price cannot be below or equal to 0.');
+        }
+
         MarketBoard::create([
             'character_id' => auth()->user()->character->id,
             'item_id'      => $slot->item->id,
@@ -79,8 +83,6 @@ class MarketController extends Controller {
             $this->sendUpdate($this->transformer, $this->manager);
         }
 
-        
-
         return view('game.core.market.current-listings', [
             'character' => $character
         ]);
@@ -105,14 +107,9 @@ class MarketController extends Controller {
     }
 
     public function updateCurrentListing(Request $request, MarketBoard $marketBoard) {
-
         $request->validate([
             'listed_price' => 'required|integer'
         ]);
-
-        if (auth()->user()->character->id !== $marketBoard->character_id) {
-            return redirect()->back()->with('error', 'You are not allowed to do that.');
-        }
 
         if ($request->listed_price <= 0) {
             return redirect()->back()->with('error', 'Listed price cannot be below or equal to 0.');
@@ -135,6 +132,15 @@ class MarketController extends Controller {
         if ($character->id !== $marketBoard->character_id) {
             return redirect()->back()->with('error', 'You are not allowed to do that.');
         }
+
+        if (!($character->inventory_max > $character->inventory->slots->count())) {
+            return redirect()->back()->with('error', 'You don\'t have the inventory space to delist the item.');
+        }
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $marketBoard->item->id,
+        ]);
 
         $itemName = $marketBoard->item->affix_name;
 
