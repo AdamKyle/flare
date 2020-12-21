@@ -31,6 +31,8 @@ class MarketBoardController extends Controller {
         
         $this->middleware('is.character.adventuring');
 
+        $this->middleware('is.character.at.location');
+
         $this->manager    = $manager;
 
         $this->transformer = $transformer;
@@ -84,12 +86,18 @@ class MarketBoardController extends Controller {
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
 
-        if (!($character->inventory->slots()->count() < $character->inventory_max)) {
-            return response()->json(['message' => 'Inventory is full.']);
+        if (!($character->inventory_max > $character->inventory->slots()->count())) {
+            return response()->json(['message' => 'Inventory is full.'], 422);
+        }
+
+        $totalPrice = ($listing->listed_price * 1.05);
+       
+        if (!($character->gold > $totalPrice)) {
+            return response()->json(['message' => 'You don\'t have the gold to puchase this item.'], 422);
         }
 
         $character->update([
-            'gold' => $character->gold - ($listing->listed_price * 1.05),
+            'gold' => $character->gold - $totalPrice,
         ]);
 
         $character->inventory->slots()->create([

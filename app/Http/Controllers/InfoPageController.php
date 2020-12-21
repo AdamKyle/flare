@@ -32,6 +32,8 @@ class InfoPageController extends Controller
 
         $sections = [];
 
+        $files = $this->cleanFiles($files);
+
         for ($i = 0; $i < count($files); $i++) {
             if (explode('.', $files[$i])[1] === 'md') {
                 $view     = null;
@@ -56,8 +58,6 @@ class InfoPageController extends Controller
                 ];
             }
         }
-
-        //dd($sections);
 
         return view('information.core', [
             'pageTitle' => $pageName,
@@ -88,5 +88,19 @@ class InfoPageController extends Controller
         return view('information.adventures.adventure', [
             'adventure' => $adventure,
         ]);
+    }
+
+    protected function cleanFiles(array $files): array {
+        $clean = [];
+
+        foreach ($files as $index => $path) {
+            if (explode('.', $path)[1] === 'DS_Store') {
+                unset($files[$index]);
+            } else {
+                $clean[] = $path;
+            }
+        }
+
+        return $clean;
     }
 }

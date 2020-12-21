@@ -54,6 +54,10 @@
                                             <a href="{{route('skills.skill', [
                                                 'skill' => $gameSkill->id
                                             ])}}">{{$gameSkill->name}}</a>
+                                        @else 
+                                            <a href="{{route('info.page.skill', [
+                                                'skill' => $gameSkill->id
+                                            ])}}">{{$gameSkill->name}}</a>
                                         @endif
                                     @endguest
                                 </td>

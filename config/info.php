@@ -20,6 +20,21 @@ return [
         ]
     ],
 
+    'races-and-classes' => [
+        [
+            'livewire' => true,
+            'view'    => 'admin.races.data-table',
+            'only' => null,
+            'insert_before_table' => null,
+        ], 
+        [
+            'livewire' => true,
+            'view'    => 'admin.classes.data-table',
+            'only' => null,
+            'insert_before_table' => null,
+        ]
+    ],
+
     'skill-information' => [
         [
             'livewire' => true,
@@ -30,6 +45,8 @@ return [
     ],
 
     'home' => [],
+    'character-stats' => [],
+    'movement' => [],
 
     'adventure' => [
         [

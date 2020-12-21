@@ -1,7 +1,7 @@
 @extends('layouts.minimum-with-nav-bar')
 
 @section('content')
-   <div class="container">
+   <div class="container keep-down">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="row page-titles">

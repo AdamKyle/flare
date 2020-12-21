@@ -62,6 +62,12 @@
                                             ])}}">
                                                 {{$race->name}}
                                             </a>
+                                        @else 
+                                            <a href="{{route('info.page.race', [
+                                                'race' => $race
+                                            ])}}">
+                                                {{$race->name}}
+                                            </a> 
                                         @endif
                                     @else
                                         <a href="{{route('info.page.race', [

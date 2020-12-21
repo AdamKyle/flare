@@ -44,9 +44,11 @@
                         </dl>
                         @guest
                         @else
-                            <a href="{{route('skill.edit', [
-                                'skill' => $skill
-                            ])}}" class="btn btn-primary mt-2">Edit</a>
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a href="{{route('skill.edit', [
+                                    'skill' => $skill
+                                ])}}" class="btn btn-primary mt-2">Edit</a>
+                            @endif
                         @endguest
                     </div>
                 </div>

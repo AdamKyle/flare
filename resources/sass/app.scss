@@ -127,6 +127,12 @@ dd {
   margin-top: 30px;
 }
 
+.keep-down {
+  @media (max-width: 768px) {
+    margin-top: 70px;
+  }
+}
+
 @media (min-width: 576px) {
   .modal-dialog {
       max-width: 650px;

@@ -70,6 +70,12 @@
                                             ])}}">
                                                 {{$class->name}}
                                             </a>
+                                        @else
+                                            <a href="{{route('info.page.class', [
+                                                'class' => $class
+                                            ])}}">
+                                                {{$class->name}}
+                                            </a> 
                                         @endif
                                     @else
                                         <a href="{{route('info.page.class', [

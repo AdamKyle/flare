@@ -13,10 +13,25 @@
         ])}}">Core Rules</a>
     </li>
     <li class="nav-devider"></li>
-    <li><a href="{{route('info.page', [
-                'pageName' => 'character-information'
-              ])}}">Character Information</a></li>
+    <li>
+      <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character Information</span></a>
+      <ul aria-expanded="false" class="collapse">
+          <li><a href="{{route('info.page', ['pageName' => 'races-and-classes'])}}">Race and Class</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'skill-information'])}}">Skills</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'character-stats'])}}">Stats</a></li>
+      </ul>
+    </li>
     <li class="nav-devider"></li>
+    <li>
+      <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-scroll-unfurled"></i><span class="hide-menu">Map</span></a>
+      <ul aria-expanded="false" class="collapse">
+          <li><a href="{{route('info.page', ['pageName' => 'movement'])}}">Movement</a></li>
+          <li><a href="form-basic.html">Locations</a></li>
+          <li><a href="form-basic.html">Adventuring</a></li>
+          <li><a href="form-basic.html">Setting Sail</a></li>
+          <li><a href="form-basic.html">Teleporting</a></li>
+      </ul>
+    </li>
     <li><a href="{{route('info.page', [
                 'pageName' => 'map'
               ])}}">Map</a></li>
@@ -29,12 +44,6 @@
       <a href="{{route('info.page', [
           'pageName' => 'notifications'
         ])}}">Notifications</a>
-    </li>
-    <li class="nav-devider"></li>
-    <li>
-        <a href="{{route('info.page', [
-            'pageName' => 'skill-information'
-          ])}}">Skill Information</a>
     </li>
     <li class="nav-devider"></li>
     <li>

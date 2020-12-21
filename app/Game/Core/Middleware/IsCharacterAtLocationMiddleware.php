@@ -22,6 +22,21 @@ class IsCharacterAtLocationMiddleware
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
         
+
+        if ($request->wantsJson()) {
+            if (is_null($location)) {
+                return response()->json([
+                    'error' => 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.',
+                ], 422);
+            }
+
+            if (!$location->is_port) {
+                return response()->json([
+                    'error' => 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.',
+                ], 422);
+            }
+        }
+        
         if (is_null($location)) {
             return redirect()->route('game')->with('error', 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.');
         }

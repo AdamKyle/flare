@@ -65,7 +65,7 @@
                         />
                         @guest
                         @else
-                            @if (auth()->user()->hasRole('admin'))
+                            @if (auth()->user()->hasRole('Admin'))
                                 <x-data-tables.header-row>
                                     Actions
                                 </x-data-tables.header-row>

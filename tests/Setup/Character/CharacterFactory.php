@@ -181,6 +181,26 @@ class CharacterFactory {
     }
 
     /**
+     * Allows one to update a characters location.
+     * 
+     * @param int $x | 16
+     * @param int $y | 16
+     * @return CharacterFactory
+     */
+    public function updateLocation(int $x = 16, int $y = 16): CharacterFactory {
+        $this->character->map()->update([
+            'position_x'           => $x,
+            'position_y'           => $y,
+            'character_position_x' => $x,
+            'character_position_y' => $y,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
      * Level up a character x amount of levels.
      * 
      * Handles leveling the character up.

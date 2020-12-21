@@ -26,7 +26,7 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
-        if (is_null(auth()->user())) {
+        if (is_null(auth()->user()) || !auth()->user()->hasRole('Admin')) {
             
             $item = Item::dataTableSearch($this->search);
       
