@@ -60,20 +60,12 @@ class LevelFakeUsers extends Command
         $bar->start();
 
         for ($i = 1; $i <= (int) $amount; $i++) {
-            $character = Character::find($i);
+            $character        = Character::find($i);
+            $characterService = new CharacterService;
 
             for($j = 1; $j <= $amountOfLevels; $j++) {
-                $character->update([
-                    'xp' => 100
-                ]);
-
-                $character->refresh();
                 
-                $characterService = new CharacterService;
-                
-                if ($character->xp >= $character->xp_next) {
-                    $characterService->levelUpCharacter($character);
-                }
+                $characterService->levelUpCharacter($character);
 
                 $character->refresh();
             }
