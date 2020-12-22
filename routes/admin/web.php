@@ -63,4 +63,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
     
+    Route::get('/admin/character-modeling', ['as' => 'admin.character.modeling', 'uses' => 'CharacterModelingController@index']);
+    Route::post('/admin/character-modeling/generate', ['as' => 'admin.character.modeling.generate', 'uses' => 'CharacterModelingController@generate']);
 });

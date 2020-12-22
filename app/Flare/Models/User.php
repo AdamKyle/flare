@@ -34,6 +34,7 @@ class User extends Authenticatable
         'un_ban_request',
         'adventure_email',
         'can_speak_again_email',
+        'is_test',
     ];
 
     /**
@@ -59,6 +60,7 @@ class User extends Authenticatable
         'unbanned_at'            => 'datetime',
         'adventure_email'        => 'boolean',
         'can_speak_again_email'  => 'boolean',
+        'is_test'                => 'boolean',
     ];
 
     public function character() {

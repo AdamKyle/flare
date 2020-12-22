@@ -6,6 +6,12 @@
         </ul>
     </li>
     <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu"> Modeling</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('admin.character.modeling')}}">Character Modeling</a></li>
+        </ul>
+    </li>
+    <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-quill-ink"></i><span class="hide-menu">Manage Classes/Races</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('races.list')}}">Races</a></li>

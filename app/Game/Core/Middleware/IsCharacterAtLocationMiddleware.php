@@ -17,6 +17,10 @@ class IsCharacterAtLocationMiddleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
+
+        if (auth()->user()->hasRole('Admin')) {
+            return $next($request);
+        }
         
         $character = auth()->user()->character;
 

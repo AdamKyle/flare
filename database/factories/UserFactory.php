@@ -38,6 +38,7 @@ class UserFactory extends Factory
             'un_ban_request'         => null,
             'adventure_email'        => true,
             'can_speak_again_email'  => true,
+            'is_test'                => false,
         ];
     }
 }

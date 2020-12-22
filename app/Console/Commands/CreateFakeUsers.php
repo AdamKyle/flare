@@ -59,7 +59,9 @@ class CreateFakeUsers extends Command
         $bar->start();
 
         for ($i = 1; $i <= (int) $this->argument('amount'); $i++) {
-            $user = User::factory()->create();
+            $user = User::factory()->create([
+                'is_test' => true,
+            ]);
 
             $race  = GameRace::inRandomOrder()->first();
             $class = GameClass::inRandomOrder()->first();

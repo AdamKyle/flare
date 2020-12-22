@@ -112,6 +112,10 @@ class Character extends Model
         return $this->hasMany(Notification::class, 'character_id', 'id');
     }
 
+    public function snapShots() {
+        return $this->hasMany(CharacterSnapShot::class, 'character_id', 'id');
+    }
+
     /**
      * Allows one to get specific information from a character.
      *

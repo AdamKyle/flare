@@ -61,6 +61,11 @@ class LevelFakeUsers extends Command
 
         for ($i = 1; $i <= (int) $amount; $i++) {
             $character        = Character::find($i);
+
+            if (is_null($character)) {
+                throw new \Exception('character with id: ' . $i . ' does not exist.');
+            }
+
             $characterService = new CharacterService;
 
             for($j = 1; $j <= $amountOfLevels; $j++) {
