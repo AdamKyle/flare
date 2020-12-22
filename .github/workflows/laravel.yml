@@ -2,16 +2,13 @@ name: Laravel
 
 on: [push]
 
-
-
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
-    with:
-    - php-version: '7.4'
-    - coverage: none
     steps:
     - uses: actions/checkout@v1
+      with:
+        php-version: '7.4'
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
     - name: Install Dependencies
