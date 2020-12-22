@@ -2,6 +2,10 @@ name: Laravel
 
 on: [push]
 
+with:
+  php-version: '7.4'
+  coverage: none
+
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
