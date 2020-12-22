@@ -2,13 +2,14 @@ name: Laravel
 
 on: [push]
 
-with:
-  php-version: '7.4'
-  coverage: none
+
 
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
+    with:
+    - php-version: '7.4'
+    - coverage: none
     steps:
     - uses: actions/checkout@v1
     - name: Copy .env
