@@ -8,7 +8,7 @@ use App\Flare\Models\Location;
 use Illuminate\Console\Command;
 use Str;
 
-class GenerateLoations extends Command
+class GenerateTestLoations extends Command
 {
     /**
      * The name and signature of the console command.
