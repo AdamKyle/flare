@@ -162,6 +162,9 @@
                                     you changing snap shots when testing. Feel free to change this to your hearts content.</p>
 
                                     <p><strong>Note</strong>: You cannot assign gold, as these characters are for testing monsters and making sure things are balanced.</p>
+                                    @include('admin.character-modeling.partials.inventory-reset-form', [
+                                        'character' => $character
+                                    ])
                                 </div>
                             @endif
                             <dl>

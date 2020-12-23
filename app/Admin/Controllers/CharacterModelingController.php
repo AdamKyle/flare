@@ -10,6 +10,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterSnapShot;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
+use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
@@ -51,15 +52,31 @@ class CharacterModelingController extends Controller {
     }
 
     public function battleResults(CharacterSnapShot $characterSnapShot) {
+        
         return view('admin.character-modeling.battle-results', [
             'battleData'  => $characterSnapShot->battle_simmulation_data,
-            'monsterId'   => Monster::where('name', $characterSnapShot->battle_simmulation_data['monster_name'])->first()->id,
+            'monsterId'   => Monster::find($characterSnapShot->battle_simmulation_data['monster_id'])->id,
             'characterId' => $characterSnapShot->character_id,
         ]);
     }
 
-    public function assignItem(Request $request) {
-        dd($request->all());
+    public function assignItem(Request $request, Character $character) {
+        $request->validate(['item_id' => 'required']);
+
+        $currentInventory = ($character->inventory_max - $character->inventory->slots()->count());
+
+        if (!($currentInventory < $character->inventory_max)) {
+            return redirect()->back()->with('error', "You don't have the inventory space");
+        }
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $request->item_id,
+        ]);
+
+        return redirect()->to(route('admin.character.modeling.sheet', [
+            'character' => $character
+        ]))->with('success', 'Gave item to character.');
     }
 
     public function assignAll(Request $request, Character $character) {
@@ -67,7 +84,7 @@ class CharacterModelingController extends Controller {
 
         $currentInventory = ($character->inventory_max - $character->inventory->slots()->count());
 
-        if (!($currentInventory < count($request->items))) {
+        if (!($currentInventory > count($request->items))) {
             return redirect()->back()->with('error', "You don't have the inventory space");
         }
 
@@ -78,7 +95,28 @@ class CharacterModelingController extends Controller {
             ]);
         }
 
-        return redirect()->back()->with('success', 'Selected item(s) given to character.');
+        return redirect()->to(route('admin.character.modeling.sheet', [
+            'character' => $character
+        ]))->with('success', 'Selected item(s) given to character.');
+    }
+
+    public function resetInventory(Character $character) {
+        $slots = $character->inventory->slots;
+
+        foreach($slots as $slot) {
+            $slot->delete();
+        }
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => Item::first()->id,
+            'equipped'     => true,
+            'position'     => 'left-hand',
+        ]);
+
+        return redirect()->to(route('admin.character.modeling.sheet', [
+            'character' => $character
+        ]))->with('success', 'Character inventory reset back to default.');
     }
 
     public function applySnapShot(Request $request, Character $character) {
@@ -141,9 +179,9 @@ class CharacterModelingController extends Controller {
             $character->update($snapShot->snap_shot);
 
             if ($index === $totalCharacters) {
-                RunTestSimulation::dispatch($character, $request->type, $request->model_id, auth()->user());
+                RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times, auth()->user());
             } else {
-                RunTestSimulation::dispatch($character, $request->type, $request->model_id);
+                RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times);
             }
         }
 

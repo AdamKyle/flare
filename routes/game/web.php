@@ -15,12 +15,12 @@ Route::middleware('is.player.banned')->group(function() {
     
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
     
-    Route::get('/game/character/inventory/compare', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
-    Route::get('/game/character/inventory/compare-items', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
-    Route::post('/game/equip/item', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
-    Route::post('/game/unequip/all', ['as' => 'game.unequip.all', 'uses' => 'CharacterInventoryController@unequipAll']);
-    Route::post('/game/unequip/item', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
-    Route::post('/game/destroy/item', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
+    Route::get('/game/character/inventory/compare/{character}', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
+    Route::get('/game/character/inventory/compare-items/{user}', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
+    Route::post('/game/equip/item/{character}', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
+    Route::post('/game/unequip/all/{character}', ['as' => 'game.unequip.all', 'uses' => 'CharacterInventoryController@unequipAll']);
+    Route::post('/game/unequip/item/{character}', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
+    Route::post('/game/destroy/item/{character}', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
     
     Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
     Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);

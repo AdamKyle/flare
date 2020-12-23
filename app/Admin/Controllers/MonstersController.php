@@ -36,4 +36,10 @@ class MonstersController extends Controller {
             'monster' => $monster,
         ]);
     }
+
+    public function publish(Monster $monster) {
+        $monster->update(['published' => true]);
+
+        return redirect()->to(route('monsters.list'))->with('success', 'Monster was published.');
+    }
 }

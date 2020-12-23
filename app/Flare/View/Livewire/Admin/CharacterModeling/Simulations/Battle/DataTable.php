@@ -10,7 +10,7 @@ class DataTable extends Component
 
     public $monster;
 
-    public $perPage = 100;
+    public $perPage = 10;
 
     public function getDataProperty() {
         return $this->dataQuery->paginate($this->perPage);

@@ -30,16 +30,19 @@ class RunTestSimulation implements ShouldQueue
 
     public $type;
 
+    public $totalTimes;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Character $character, string $type, int $id, User $adminUser = null) {
-        $this->character = $character;
-        $this->adminUser = $adminUser;
-        $this->type      = $type;
-        $this->model     = $this->getModel($type, $id);
+    public function __construct(Character $character, string $type, int $id, int $totalTimes, User $adminUser = null) {
+        $this->character  = $character;
+        $this->adminUser  = $adminUser;
+        $this->type       = $type;
+        $this->model      = $this->getModel($type, $id);
+        $this->totalTimes = $totalTimes;
     }
 
     /**
@@ -60,20 +63,27 @@ class RunTestSimulation implements ShouldQueue
     }
 
     protected function processBattle() {
-        $fightService = resolve(FightService::class, ['character' => $this->character, 'monster'=> $this->model]);
 
-        $fightService->attack($this->character, $this->model);
+        $logData = [];
 
-        $logInfo = $fightService->getLogInformation();
+        for ($i = 1; $i <= $this->totalTimes; $i++) {
+            $fightService = resolve(FightService::class, ['character' => $this->character, 'monster'=> $this->model]);
 
-        $logInfo['character_dead'] = $fightService->isCharacterDead();
-        $logInfo['monster_dead']   = $fightService->isMonsterDead();
-        $logInfo['monster_id']     = $this->model->id;
-        $logInfo['character_name'] = $this->character->name;
-        $logInfo['monster_name']   = $this->model->name;
+            $fightService->attack($this->character, $this->model);
+
+            $logInfo = $fightService->getLogInformation();
+            
+            $logInfo['character_dead'] = $fightService->isCharacterDead();
+            $logInfo['monster_dead']   = $fightService->isMonsterDead();
+            
+            $logData[] = $logInfo;
+        }
+
+        $logData['monster_id']     = $this->model->id;
+        
 
         $this->character->snapShots()->where('snap_shot->level', $this->character->level)->first()->update([
-            'battle_simmulation_data' => $logInfo,
+            'battle_simmulation_data' => $logData,
         ]);
 
         // Finally reset the character back to level 1000.

@@ -34,8 +34,6 @@ class DataTable extends Component
     public $character;
 
     public function getDataQueryProperty() {
-        $character = auth()->user()->character;
-
         if (!is_null($this->character)) {
             $character = $this->character;
         }

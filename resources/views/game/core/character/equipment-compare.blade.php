@@ -40,7 +40,7 @@
                         'details'      => $details,
                     ])
 
-                    <form class="mt-4" action="{{route('game.equip.item')}}" method="POST">
+                    <form class="mt-4" action="{{route('game.equip.item', ['character' => $characterId])}}" method="POST">
                         @csrf
                         @include('game.core.partials.equip.' . $type, [
                             'slotId'      => $slotId,

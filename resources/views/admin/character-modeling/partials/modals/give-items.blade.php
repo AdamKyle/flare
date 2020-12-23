@@ -1,5 +1,5 @@
 <div class="modal fade" id="character-inventory-{{$character->id}}" tabindex="-1" role="dialog" aria-labelledby="character-inventory-label" aria-hidden="true">
-    <div class="modal-dialog character-inventory-modal" role="document">
+    <div class="modal-dialog large-modal" role="document">
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="character-inventory-label">Give Items</h5>

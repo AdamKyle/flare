@@ -5,7 +5,9 @@ namespace App\Game\Core\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\User;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
@@ -36,16 +38,16 @@ class CharacterInventoryController extends Controller {
     public function compare(
         ComparisonValidation $request, 
         ValidEquipPositionsValue $validPositions, 
-        CharacterInventoryService $characterInventoryService
+        CharacterInventoryService $characterInventoryService,
+        Character $character
     ) {
-
         $itemToEquip = InventorySlot::find($request->slot_id);
 
         if (is_null($itemToEquip)) {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
-        $service = $characterInventoryService->setCharacter(auth()->user()->character)
+        $service = $characterInventoryService->setCharacter($character)
                                              ->setInventorySlot($itemToEquip)
                                              ->setPositions($validPositions->getPositions($itemToEquip->item))
                                              ->setInventory($request);
@@ -55,6 +57,7 @@ class CharacterInventoryController extends Controller {
             'itemToEquip' => $itemToEquip->item,
             'type'        => $service->getType($request, $itemToEquip->item),
             'slotId'      => $itemToEquip->id,
+            'characterId' => $character->id,
         ];
 
         if ($service->inventory()->isNotEmpty()) {
@@ -64,28 +67,33 @@ class CharacterInventoryController extends Controller {
                 'type'         => $service->getType($request, $itemToEquip->item),
                 'slotId'       => $itemToEquip->id,
                 'slotPosition' => $itemToEquip->position,
+                'characterId'  => $character->id,
             ];
         }
         
 
-        Cache::put(auth()->user()->id . '-compareItemDetails', $viewData, now()->addMinutes(5));
+        Cache::put($character->user->id . '-compareItemDetails', $viewData, now()->addMinutes(5));
 
-        return redirect()->to(route('game.inventory.compare-items'));
+        return redirect()->to(route('game.inventory.compare-items', ['user' => $character->user]));
     }
 
-    public function compareItem() {
-        if (!Cache::has(auth()->user()->id . '-compareItemDetails')) {
+    public function compareItem(User $user) {
+        if (!Cache::has($user->id . '-compareItemDetails')) {
             redirect()->to('/')->with('error', 'Item comparison expired.');
         }
 
-        return view('game.core.character.equipment-compare', Cache::pull(auth()->user()->id . '-compareItemDetails'));
+        return view('game.core.character.equipment-compare', Cache::pull($user->id . '-compareItemDetails'));
     }
 
-    public function equipItem(EquipItemValidation $request) {
+    public function equipItem(EquipItemValidation $request, Character $character) {
         try {
             $item = $this->equipItemService->setRequest($request)
-                                   ->setCharacter(auth()->user()->character)
-                                   ->equipItem();
+                                           ->setCharacter($character)
+                                           ->equipItem();
+
+            if (auth()->user()->hasRole('Admin')) {
+                return redirect()->to(route('admin.character.modeling.sheet', ['character' => $character]))->with('success', $item->affix_name . ' Equipped.');
+            }
 
             return redirect()->to(route('game.character.sheet'))->with('success', $item->affix_name . ' Equipped.');
 
@@ -94,8 +102,7 @@ class CharacterInventoryController extends Controller {
         }
     }
 
-    public function unequipItem(Request $request) {
-        $character = auth()->user()->character;
+    public function unequipItem(Request $request, Character $character) {
 
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
 
@@ -113,9 +120,7 @@ class CharacterInventoryController extends Controller {
         return redirect()->back()->with('success', 'Unequipped item.');
     }
 
-    public function unequipAll(Request $request) {
-        $character = auth()->user()->character;
-
+    public function unequipAll(Request $request, Character $character) {
         $character->inventory->slots->each(function($slot) {
             $slot->update([
                 'equipped' => false,
@@ -128,8 +133,7 @@ class CharacterInventoryController extends Controller {
         return redirect()->back()->with('success', 'All items have been removed.');
     }
 
-    public function destroy(Request $request) {
-        $character = auth()->user()->character;
+    public function destroy(Request $request, Character $character) {
         
         $slot      = $character->inventory->slots->filter(function($slot) use ($request) {
             return $slot->id === (int) $request->slot_id;

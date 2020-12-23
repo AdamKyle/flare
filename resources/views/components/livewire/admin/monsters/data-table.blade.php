@@ -119,7 +119,13 @@
                                             @endif
                                         @endforeach
                                         @if (!$published)
-                                            <a href="#" class="btn btn-success mt-2">Publish</a>
+                                            <x-forms.button-with-form 
+                                                form-route="{{route('monster.publish', ['monster' => $monster])}}"
+                                                form-id="publish-monster-{{$monster->id}}"
+                                                button-title="Publish Monster"
+                                                form-method="POST"
+                                                class="btn btn-success mt-2"
+                                            />
                                         @endif
                                     @endif
                                 </td>

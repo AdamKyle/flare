@@ -15,7 +15,7 @@
 
                         @if ($allowUnequipAll)
                             <x-forms.button-with-form
-                                form-route="{{ route('game.unequip.all') }}"
+                                form-route="{{ route('game.unequip.all', ['character' => $character]) }}"
                                 form-id='unequip-all'
                                 button-title="Unequip All"
                                 class="btn btn-danger btn-sm ml-2"
@@ -146,7 +146,7 @@
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="actionsButton">
                                             @if (!$slot->equipped)
-                                                <form id="item-comparison-{{$slot->id}}" action="{{route('game.inventory.compare')}}" method="GET" style="display: none">
+                                                <form id="item-comparison-{{$slot->id}}" action="{{route('game.inventory.compare', ['character' => $character])}}" method="GET" style="display: none">
                                                     @csrf
                 
                                                     <input type="hidden" name="slot_id" value={{$slot->id}} />
@@ -156,19 +156,19 @@
                                                     @endif
                                                 </form>
                 
-                                                <a class="dropdown-item" href="{{route('game.inventory.compare')}}"
+                                                <a class="dropdown-item" href="{{route('game.inventory.compare', ['character' => $character])}}"
                                                     onclick="event.preventDefault();
                                                                 document.getElementById('item-comparison-{{$slot->id}}').submit();">
                                                     {{ __('Equip') }}
                 
                                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#slot-{{$slot->id}}">Destroy</a>
                                             @else
-                                                <form id="item-unequip-{{$slot->id}}" action="{{route('game.inventory.unequip')}}" method="POST" style="display: none">
+                                                <form id="item-unequip-{{$slot->id}}" action="{{route('game.inventory.unequip', ['character' => $character])}}" method="POST" style="display: none">
                                                     @csrf
                 
                                                     <input type="hidden" name="item_to_remove" value={{$slot->id}} />
                                                 </form>
-                                                <a class="dropdown-item" href="{{route('game.inventory.unequip')}}"
+                                                <a class="dropdown-item" href="{{route('game.inventory.unequip', ['character' => $character])}}"
                                                     onclick="event.preventDefault();
                                                                 document.getElementById('item-unequip-{{$slot->id}}').submit();">
                                                     {{ __('Unequip') }}</a>
@@ -177,7 +177,7 @@
                                             </div>
                                         </div>
                 
-                                        @include('game.core.partials.destroy-modal', ['slot' => $slot])
+                                        @include('game.core.partials.destroy-modal', ['slot' => $slot, 'character' => $character])
                                     @elseif ($marketBoard)
                                         <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#slot-id-{{$slot->id}}">
                                             Sell On Market

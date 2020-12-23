@@ -11,7 +11,7 @@
                 <p>Are you sure you weant to do this? TRhis action cannot be undone. You will lose the item.</p>
 
 
-                <form id="destroy-item-{{$slot->id}}" action="{{route('game.destroy.item')}}" method="POST">
+                <form id="destroy-item-{{$slot->id}}" action="{{route('game.destroy.item', ['character' => $character])}}" method="POST">
                     @csrf
 
                     <input type="hidden" name="slot_id" value="{{$slot->id}}" />
@@ -19,7 +19,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                <a class="btn btn-danger" href="{{route('game.destroy.item')}}"
+                <a class="btn btn-danger" href="{{route('game.destroy.item', ['character' => $character])}}"
                    onclick="event.preventDefault();
                                  document.getElementById('destroy-item-{{$slot->id}}').submit();">
                     {{ __('Destroy') }}

@@ -24,6 +24,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
     Route::get('/admin/monsters/{monster}', ['as' => 'monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
+    Route::post('/admin/monsters/{monster}/pblish', ['as' => 'monster.publish', 'uses' => 'MonstersController@publish']);
 
     Route::get('/admin/items', ['as' => 'items.list', 'uses' => 'ItemsController@index']);
     Route::get('/admin/items/create', ['as' => 'items.create', 'uses' => 'ItemsController@create']);
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/character-modeling/sheet/{character}', ['as' => 'admin.character.modeling.sheet', 'uses' => 'CharacterModelingController@fetchSheet']);
     Route::get('/admin/character-modeling/{monster}/monster-data', ['as' => 'admin.character.modeling.monster-data', 'uses' => 'CharacterModelingController@monsterData']);
     Route::get('/admin/character-modeling/battle-results/{characterSnapShot}', ['as' => 'admin.character.modeling.battle-simmulation.results', 'uses' => 'CharacterModelingController@battleResults']);
+    Route::post('/admin/character-modeling/reset-inventory/{character}', ['as' => 'admin.character.modeling.reset-inventory', 'uses' => 'CharacterModelingController@resetInventory']);
     Route::post('/admin/character-modeling/assign-item/{character}', ['as' => 'admin.character-modeling.assign-item', 'uses' => 'CharacterModelingController@assignItem']);
     Route::post('/admin/character-modeling/assign-all/{character}', ['as' => 'admin.character-modeling.assign-all', 'uses' => 'CharacterModelingController@assignAll']);
     Route::post('/admin/character-modeling/{character}/apply-snap-shot', ['as' => 'admin.character.modeling.assign-snap-shot', 'uses' => 'CharacterModelingController@applySnapShot']);
