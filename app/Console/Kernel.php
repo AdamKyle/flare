@@ -9,6 +9,7 @@ use App\Console\Commands\CleanNotifications;
 use App\Console\Commands\CreateFakeUsers;
 use App\Console\Commands\GiveCharacterGold;
 use App\Console\Commands\GiveItem;
+use App\Console\Commands\GenerateLoations;
 use App\Console\Commands\LevelFakeUsers;
 use App\Console\Commands\LevelUpSkillsOnFakeUsers;
 use App\Console\Commands\MoveInfoFiles;
@@ -29,6 +30,7 @@ class Kernel extends ConsoleKernel
         LevelUpSkillsOnFakeUsers::class,
         LevelFakeUsers::class,
         CleanMarketHistory::class,
+        GenerateLoations::class,
     ];
 
     /**

@@ -41,7 +41,7 @@ class BattleController extends Controller {
     public function index(Request $request) {
         $character = User::find($request->user_id)->character;
         $character = new Item($character, $this->character);
-        $monsters  = new Collection(Monster::orderBy('max_level', 'asc')->get(), $this->monster);
+        $monsters  = new Collection(Monster::where('published', true)->orderBy('max_level', 'asc')->get(), $this->monster);
 
         return response()->json([
             'monsters'  => $this->manager->createData($monsters)->toArray(),

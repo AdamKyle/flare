@@ -41,6 +41,10 @@ class Stats extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
+        if (is_null($this->monster->published)) {
+            $this->monster->published = false;
+        }
+
         $this->monster->save();
 
         if ($this->monster->skills->isEmpty()) {

@@ -12,5 +12,12 @@
         </div>
     </div>
     @livewire('admin.monsters.data-table')
+
+    <div class="mb-2">
+        <h5>Awaiting approval</h5>
+        @livewire('admin.monsters.data-table', [
+            'published' => false
+        ])
+    </div>
 </div>
 @endsection

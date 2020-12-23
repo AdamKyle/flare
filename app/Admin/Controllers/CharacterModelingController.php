@@ -2,26 +2,78 @@
 
 namespace App\Admin\Controllers;
 
+use Illuminate\Http\Request;
 use App\Admin\Jobs\GenerateTestCharacter;
+use App\Admin\Jobs\RunTestSimulation;
+use App\Admin\Requests\CharacterModelingTestValidation;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterSnapShot;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
+use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
+use DB;
 
 class CharacterModelingController extends Controller {
 
     public function index() {
-        $hasSnapShots = User::where('users.is_test', true)->get()->isNotEmpty();
+        $hasSnapShots = User::where('is_test', true)->get()->isNotEmpty();
 
         return view('admin.character-modeling.index', [
             'hasSnapShots' => $hasSnapShots,
             'cardTitle'    => $hasSnapShots ? 'Modeling' : 'Generate',
+            'snapShots'    => User::where('is_test', true)->paginate(4),
         ]);
     }
 
+    public function fetchSheet(Character $character) {
+        return view ('game.core.character.sheet', [
+            'character' => $character,
+            'characterInfo' => [
+                'maxAttack' => $character->getInformation()->buildAttack(),
+                'maxHealth' => $character->getInformation()->buildHealth(),
+                'maxHeal'   => $character->getInformation()->buildHealFor(),
+                'maxAC'     => $character->getInformation()->buildDefence(),
+                'str'       => $character->getInformation()->statMod('str'),
+                'dur'       => $character->getInformation()->statMod('dur'),
+                'dex'       => $character->getInformation()->statMod('dex'),
+                'chr'       => $character->getInformation()->statMod('chr'),
+                'int'       => $character->getInformation()->statMod('int'),
+            ],
+        ]);
+    }
+
+    public function monsterData(Monster $monster) {
+        return view('admin.character-modeling.monster-data', [
+            'monster' => $monster,
+        ]);
+    }
+
+    public function battleResults(CharacterSnapShot $characterSnapShot) {
+        return view('admin.character-modeling.battle-results', [
+            'battleData'  => $characterSnapShot->battle_simmulation_data,
+            'monsterId'   => Monster::where('name', $characterSnapShot->battle_simmulation_data['monster_name'])->first()->id,
+            'characterId' => $characterSnapShot->character_id,
+        ]);
+    }
+
+    public function applySnapShot(Request $request, Character $character) {
+        $request->validate(['snap_shot' => 'required']);
+
+        $foundSnapShot = CharacterSnapShot::find($request->snap_shot)->snap_shot;
+
+        $character->update($foundSnapShot);
+
+        return redirect()->back()->with('success', 'Applied Level: ' . $foundSnapShot['level'] . ' to character.');
+    }
+
     public function generate() {
+
+        if (User::where('is_test', true)->get()->isNotEmpty()) {
+            return redirect()->back()->with('error', 'You already have test characters for every race and class and combination of.');
+        }
+
         $totalGameRaces   = GameRace::count() - 1;
         $totalGameClasses = GameClass::count() - 1;
 
@@ -36,5 +88,42 @@ class CharacterModelingController extends Controller {
         }
 
         return redirect()->back()->with('success', 'Generation underway. You may leave this page. We will email you when done.');
+    }
+
+    public function test(CharacterModelingTestValidation $request) {
+        $totalCharacters = count($request->characters) - 1;
+
+        switch($request->type) {
+            case 'monster':
+                // truncate all previous battle simulation reports.
+                DB::table('character_snap_shots')->update(['battle_simmulation_data' => null]);
+                break;
+            default:
+                break;
+        }
+
+        foreach ($request->characters as $index => $id) {
+            $character = Character::find($id);
+
+            if (is_null($character)) {
+                return redirect()->back()->with('error', 'Character does not exist for id: ' . $id);
+            }
+
+            $snapShot  = $character->snapShots()->where('snap_shot->level', $request->character_levels)->first();
+            
+            if (is_null($snapShot)) {
+                return redirect()->back()->with('error', 'Level entered does not match any snap shot data for character: ' . $character->id);
+            }
+
+            $character->update($snapShot->snap_shot);
+
+            if ($index === $totalCharacters) {
+                RunTestSimulation::dispatch($character, $request->type, $request->model_id, auth()->user());
+            } else {
+                RunTestSimulation::dispatch($character, $request->type, $request->model_id);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Testing under way. You may log out, we will email you when done.');
     }
 }

@@ -13,6 +13,7 @@ use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Middleware\IsPlayerBannedMiddleware;
 use App\Flare\Services\CharacterRewardService;
+use App\Flare\Services\FightService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\ItemTransfromer;
@@ -87,6 +88,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MessageThrottledHandler::class, function($app) {
             return new MessageThrottledHandler;
+        });
+
+        $this->app->bind(FightService::class, function($app, $paramters) {
+            return new FightService($paramters['character'], $paramters['monster']);
         });
 
         $this->commands([CreateAdminAccount::class]);

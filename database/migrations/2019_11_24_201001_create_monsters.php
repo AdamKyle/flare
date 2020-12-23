@@ -29,6 +29,7 @@ class CreateMonsters extends Migration
             $table->integer('gold')->nullable()->default(10);
             $table->string('health_range');
             $table->string('attack_range');
+            $table->boolean('published')->nullable()->default(true);
             $table->timestamps();
         });
     }

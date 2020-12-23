@@ -36,6 +36,7 @@ class MonsterFactory extends Factory
             'gold'         => 25,
             'drop_check'   => 6,
             'max_level'    => 0,
+            'published'    => true,
         ];
     }
 }

@@ -31,6 +31,7 @@ class CreateMonstersSeeder extends Seeder
                 'attack_range' => '2-8',
                 'gold'         => 25,
                 'drop_check'   => 0.10,
+                'max_level'    => 3,
             ]
         ]);
 

@@ -97,7 +97,7 @@ class GenerateTestCharacter implements ShouldQueue
         }
 
         if (!is_null($this->adminUser)) {
-            Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your character modeling generation is done.', 'Character modeling complete.', true));
+            Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your character modeling generation is done.', 'Character modeling complete.', false));
         }
     }
 }

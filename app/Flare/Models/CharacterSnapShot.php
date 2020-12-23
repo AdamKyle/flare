@@ -4,8 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GameClassFactory;
 use App\Flare\Models\Traits\WithSearch;
+use Database\Factories\CharacterSnapShotFactory;
 
 class CharacterSnapShot extends Model
 {
@@ -20,6 +20,7 @@ class CharacterSnapShot extends Model
     protected $fillable = [
         'character_id',
         'snap_shot',
+        'battle_simmulation_data',
     ];
 
     /**
@@ -28,7 +29,8 @@ class CharacterSnapShot extends Model
      * @var array
      */
     protected $casts = [
-        'snap_shot' => 'array',
+        'snap_shot'               => 'array',
+        'battle_simmulation_data' => 'array',
     ];
 
     public function character() {
@@ -36,6 +38,6 @@ class CharacterSnapShot extends Model
     }
 
     protected static function newFactory() {
-        return GameClassFactory::new();
+        return CharacterSnapShotFactory::new();
     }
 }

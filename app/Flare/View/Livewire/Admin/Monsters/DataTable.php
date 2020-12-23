@@ -2,9 +2,11 @@
 
 namespace App\Flare\View\Livewire\Admin\Monsters;
 
+use App\Flare\Models\CharacterSnapShot;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\Monster;
+use App\Flare\Models\User;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
 class DataTable extends Component
@@ -15,6 +17,9 @@ class DataTable extends Component
     public $search      = '';
     public $sortField   = 'max_level';
     public $perPage     = 10;
+    public $published   = true;
+    public $canTest     = false;
+    public $testCharacters = [];
 
     protected $paginationTheme = 'bootstrap';
 
@@ -28,8 +33,15 @@ class DataTable extends Component
             })->select('monsters.*');
         }
 
-        return $monsters->orderBy($this->sortField, $this->sortBy)
+        return $monsters->where('published', $this->published)
+                        ->orderBy($this->sortField, $this->sortBy)
                         ->paginate($this->perPage);
+    }
+
+    public function mount() {
+        $this->canTest = User::where('is_test', true)->get()->isNotEmpty();
+
+        $this->testCharacters = User::with('character')->where('is_test', true)->get();
     }
     
     public function render()

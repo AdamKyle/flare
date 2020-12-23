@@ -19,6 +19,7 @@ class CreateCharacterSnapShots extends Migration
             $table->foreign('character_id', 'css_cid')
                   ->references('id')->on('characters');
             $table->json('snap_shot');
+            $table->json('battle_simmulation_data')->nullable();
             $table->timestamps();
         });
     }

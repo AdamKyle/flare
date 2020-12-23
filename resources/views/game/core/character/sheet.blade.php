@@ -34,7 +34,7 @@
                                     </dl>
                                 </div>
         
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <dl>
                                         <dt>Max Health:</dt>
                                         <dd>{{$characterInfo['maxHealth']}}</dd>
@@ -47,7 +47,7 @@
                                     </dl>
                                 </div>
         
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <dl>
                                         <dt>Strength:</dt>
                                         <dd>{{$character->str}} (Modded: {{round($characterInfo['str'])}})</dd>
@@ -113,8 +113,16 @@
                                                             @csrf
                                                         </form>
                                                     @endif
+
+                                                    @if (auth()->user()->hasRole('Admin'))
+                                                        <a href="#" class="btn btn-success btn-sm update-skill-btn">change</a>
+                                                    @endif
                                                     @include('game.core.character.partials.skill-train-modal', ['skill' => $skill, 'character' => $character])
                                                 </div>
+                                            @elseif (auth()->user()->hasRole('Admin'))
+                                            <div class="col-md-4">
+                                                <a href="#" class="btn btn-success btn-sm train-skill-btn mb-2">change</a>
+                                            </div>
                                             @endif
                                         </div>
                                     </dd>
@@ -122,6 +130,14 @@
                             @endforeach
                         </div>
                     </div>
+
+                    @if (auth()->user()->hasRole('Admin'))
+                        <div class="mt-3">
+                            <x-cards.card-with-title title="Character management">
+                                @include('admin.character-modeling.partials.character-management')
+                            </x-cards.card-with-title>
+                        </div>
+                    @endif
                 </div>
                 <div class="col-md-6">
                     <h4>Inventory</h4>
@@ -151,12 +167,15 @@
                                 @livewire('character.inventory.data-table', [
                                     'includeQuestItems'        => true,
                                     'allowInventoryManagement' => true,
+                                    'character'                => $character,
                                 ])
                             </div>
                             <div class="tab-pane fade" id="pills-equipped" role="tabpanel" aria-labelledby="pills-equipped-tab">
                                 @livewire('character.inventory.data-table', [
                                     'includeEquipped'   => true,
                                     'allowUnequipAll'   => true,
+                                    'allowInventoryManagement' => true,
+                                    'character'         => $character,
                                 ])
                             </div>
                         </div>

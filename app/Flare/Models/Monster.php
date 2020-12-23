@@ -35,6 +35,7 @@ class Monster extends Model
         'drop_check',
         'quest_item_id',
         'quest_item_drop_chance',
+        'published'
     ];
 
     /**
@@ -54,6 +55,7 @@ class Monster extends Model
         'drop_check'             => 'float',
         'max_level'              => 'integer',
         'quest_item_drop_chance' => 'float',
+        'published'              => 'boolean',
     ];
 
     public function skills() {

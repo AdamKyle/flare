@@ -98,13 +98,31 @@
                                 <td>{{$monster->gold}}</td>
                                 @guest
                                 @else
+                                <td>
                                     @if (auth()->user()->hasRole('Admin'))
-                                        <td>
-                                            <a href="{{route('monster.edit', [
+                                        <a href="{{route('monster.edit', [
                                                 'monster' => $monster->id,
-                                            ])}}" class="btn btn-primary mt-2">Edit</a>
-                                        </td>
+                                        ])}}" class="btn btn-primary mt-2">Edit</a>
+                                        @if ($canTest)
+                                            <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#monster-test-{{$monster->id}}">
+                                                Test
+                                            </button>
+                                        @endif
+                                        @include('admin.character-modeling.partials.modals.monster-test-modal', [
+                                            'monster'    => $monster,
+                                            'users' => $testCharacters,
+                                        ])
+                                        @foreach ($testCharacters as $user)
+                                            @if ($user->character->snapShots()->where('battle_simmulation_data->monster_id', $monster->id)->get()->isNotEmpty())
+                                                <a href="{{route('admin.character.modeling.monster-data', ['monster' => $monster])}}" class="btn btn-success mt-2">View Data</a>
+                                                @break;
+                                            @endif
+                                        @endforeach
+                                        @if (!$published)
+                                            <a href="#" class="btn btn-success mt-2">Publish</a>
+                                        @endif
                                     @endif
+                                </td>
                                 @endguest
                             </tr>
                         @empty

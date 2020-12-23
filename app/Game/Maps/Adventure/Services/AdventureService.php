@@ -108,7 +108,7 @@ class AdventureService {
                              ->where('in_progress', true)
                              ->first();
 
-        $attackService->processBattle();
+        $attackService = $attackService->processBattle();
 
         if ($attackService->isCharacterDead()) {
             $this->characterIsDead($attackService, $adventureLog, $currentLevel);

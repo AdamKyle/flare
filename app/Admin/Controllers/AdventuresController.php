@@ -28,7 +28,7 @@ class AdventuresController extends Controller {
             'adventure' => null,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::all()->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -37,7 +37,7 @@ class AdventuresController extends Controller {
             'adventure' => $adventure,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::all()->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->pluck('name', 'id')->toArray(),
         ]);
     }
 
