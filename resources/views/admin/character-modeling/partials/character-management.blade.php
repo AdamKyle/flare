@@ -1,7 +1,13 @@
 <div class="pl-3">
     <h5>Basic Options</h5>
-    <button class="btn btn-primary mr-2">Give Items</button>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#character-inventory-{{$character->id}}">
+        Give Items
+    </button>
     <button class="btn btn-success mr-2">Create Snapshot</button>
+
+    @include('admin.character-modeling.partials.modals.give-items', [
+        'character' => $character
+    ])
 </div>
 <hr />
 <div class="pl-3 mt-3">

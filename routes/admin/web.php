@@ -67,6 +67,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/character-modeling/sheet/{character}', ['as' => 'admin.character.modeling.sheet', 'uses' => 'CharacterModelingController@fetchSheet']);
     Route::get('/admin/character-modeling/{monster}/monster-data', ['as' => 'admin.character.modeling.monster-data', 'uses' => 'CharacterModelingController@monsterData']);
     Route::get('/admin/character-modeling/battle-results/{characterSnapShot}', ['as' => 'admin.character.modeling.battle-simmulation.results', 'uses' => 'CharacterModelingController@battleResults']);
+    Route::post('/admin/character-modeling/assign-item/{character}', ['as' => 'admin.character-modeling.assign-item', 'uses' => 'CharacterModelingController@assignItem']);
+    Route::post('/admin/character-modeling/assign-all/{character}', ['as' => 'admin.character-modeling.assign-all', 'uses' => 'CharacterModelingController@assignAll']);
     Route::post('/admin/character-modeling/{character}/apply-snap-shot', ['as' => 'admin.character.modeling.assign-snap-shot', 'uses' => 'CharacterModelingController@applySnapShot']);
     Route::post('/admin/character-modeling/generate', ['as' => 'admin.character.modeling.generate', 'uses' => 'CharacterModelingController@generate']);
     Route::post('/admin/character-modeling/test', ['as' => 'admin.character.modeling.test', 'uses' => 'CharacterModelingController@test']);

@@ -58,6 +58,29 @@ class CharacterModelingController extends Controller {
         ]);
     }
 
+    public function assignItem(Request $request) {
+        dd($request->all());
+    }
+
+    public function assignAll(Request $request, Character $character) {
+        $request->validate(['items' => 'required']);
+
+        $currentInventory = ($character->inventory_max - $character->inventory->slots()->count());
+
+        if (!($currentInventory < count($request->items))) {
+            return redirect()->back()->with('error', "You don't have the inventory space");
+        }
+
+        foreach ($request->items as $item) {
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id'      => $item
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Selected item(s) given to character.');
+    }
+
     public function applySnapShot(Request $request, Character $character) {
         $request->validate(['snap_shot' => 'required']);
 
