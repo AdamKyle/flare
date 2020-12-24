@@ -3,7 +3,6 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#character-inventory-{{$character->id}}">
         Give Items
     </button>
-    <button class="btn btn-success mr-2">Create Snapshot</button>
 
     @include('admin.character-modeling.partials.modals.give-items', [
         'character' => $character
@@ -13,8 +12,7 @@
 <div class="pl-3 mt-3">
     <h5>Assign Snap Shot</h5>
     <div class="alert alert-warning">
-        <p>When you test a monster, if you select this character, any applied snap shots will be overwritten.</p>
-        <p>You can also select to use a custom snap shot.</p>
+        <p>When selecting a snap shot to veiw the character in, please note this will be reset when you use this character to test.</p>
     </div>
     <form action="{{route('admin.character.modeling.assign-snap-shot', [
         'character' => $character

@@ -69,7 +69,8 @@ class GenerateTestCharacter implements ShouldQueue
         $map = GameMap::where('default', true)->first(); 
 
         $user = User::factory()->create([
-            'is_test' => true,
+            'is_test'    => true,
+            'ip_address' => null
         ]);
 
         $character = (new CharacterBuilder)->setRace($this->race)
