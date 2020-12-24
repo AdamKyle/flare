@@ -35,11 +35,16 @@ When it comes to training skills there are two ways to train: **Fight** or **Cra
 
 If a skill can be trained, you can head to your character sheet and click train on the desired skill. 
 
-![charactr-sheet](/storage/info/skill-information/images/character-sheet.png)
+<a href="/storage/info/skill-information/images/character-sheet.png" class="glightbox">
+    <img src="/storage/info/skill-information/images/character-sheet.png" class="img-fluid" />
+</a>
 
 From here you can decide how much XP you are willing to sacrafice per fight to train that skill. You sacrafice as little as 10% to a maximum of 100%. All skills are xp based.
 
-![charactr-sheet](/storage/info/skill-information/images/skill-training.png)
+
+<a href="/storage/info/skill-information/images/skill-training.png" class="glightbox">
+    <img src="/storage/info/skill-information/images/skill-training.png" class="img-fluid" />
+</a>
 
 As you fight you will train that skill over time.
 

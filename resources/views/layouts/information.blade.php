@@ -20,9 +20,12 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+
     @livewireStyles
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
 </head>
@@ -111,6 +114,12 @@
             foundSideBar = document.querySelector('#info-left-sidebar');
             foundSideBar.classList.toggle('showSidebar');
         }
+
+        var lightbox = GLightbox();
+        
+        lightbox.on('open', (target) => {
+            console.log("lightbox opened");
+        });
     </script>
 
     @stack('scripts')
