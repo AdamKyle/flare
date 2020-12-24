@@ -31,8 +31,8 @@
     <li>
         <a class="has-arrow " href="#" aria-expanded="false"><i class="ra ra-anvil"></i><span class="hide-menu">Shop</span></a>
         <ul aria-expanded="false" class="collapse">
-            <li><a href={{route('game.shop.buy')}}>Buy</a></li>
-            <li><a href={{route('game.shop.sell')}}>Sell</a></li>
+            <li><a href={{route('game.shop.buy', ['character' => auth()->user()->character->id])}}>Buy</a></li>
+            <li><a href={{route('game.shop.sell', ['character' => auth()->user()->character->id])}}>Sell</a></li>
         </ul>
     </li>
     <li>

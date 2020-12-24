@@ -35,7 +35,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $this->actingAs($user)->post(route('game.inventory.unequip'), [
+        $this->actingAs($user)->post(route('game.inventory.unequip', ['character' => $this->character->getCharacter()->id]), [
             'item_to_remove' => 1
         ]);
 
@@ -49,7 +49,7 @@ class CharacterInventoryControllerTest extends TestCase
     public function testCannotUnEquipItem() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.inventory.unequip'), [
+        $response = $this->actingAs($user)->post(route('game.inventory.unequip', ['character' => $this->character->getCharacter()->id]) , [
             'item_to_remove' => 2
         ])->response;
 
@@ -67,7 +67,7 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->inventoryManagement()->unequipAll()->getCharacterFactory()->getUser();
 
 
-        $this->actingAs($user)->post(route('game.equip.item'), [
+        $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
             'slot_id'    => '1',
             'equip_type' => 'weapon',
@@ -88,7 +88,7 @@ class CharacterInventoryControllerTest extends TestCase
                                 ->getCharacterFactory()
                                 ->getUser();
 
-        $response = $this->actingAs($user)->visitRoute('game')->post(route('game.equip.item'), [
+        $response = $this->actingAs($user)->visitRoute('game')->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
             'slot_id'    => '1',
             'equip_type' => 'weapon',
@@ -100,7 +100,7 @@ class CharacterInventoryControllerTest extends TestCase
     public function testCannotEquipItemYouDontHave() {
         $user = $this->character->inventoryManagement()->unequipAll()->getCharacterFactory()->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.equip.item'), [
+        $response = $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
             'slot_id'    => '7',
             'equip_type' => 'weapon',
@@ -131,7 +131,7 @@ class CharacterInventoryControllerTest extends TestCase
                                 ->getCharacterFactory()
                                 ->getUser();
 
-        $this->actingAs($user)->post(route('game.equip.item'), [
+        $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
             'slot_id'    => '2',
             'equip_type' => 'weapon',
@@ -151,7 +151,7 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->inventoryManagement()->unequipAll()->getCharacterFactory()->getUser();
 
 
-        $response = $this->actingAs($user)->post(route('game.destroy.item'), [
+        $response = $this->actingAs($user)->post(route('game.destroy.item', ['character' => $this->character->getCharacter()->id]), [
             'slot_id' => '1'
         ])->response;
 
@@ -163,7 +163,7 @@ class CharacterInventoryControllerTest extends TestCase
     public function testCannotDestroyItemYouDontHave() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.destroy.item'), [
+        $response = $this->actingAs($user)->post(route('game.destroy.item', ['character' => $this->character->getCharacter()->id]), [
             'slot_id' => '2'
         ])->response;
 
@@ -173,7 +173,7 @@ class CharacterInventoryControllerTest extends TestCase
     public function testCannotDestroyItemYouHaveEquipped() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.destroy.item'), [
+        $response = $this->actingAs($user)->post(route('game.destroy.item', ['character' => $this->character->getCharacter()->id]), [
             'slot_id' => '1'
         ])->response;
 
@@ -195,6 +195,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '2',
+            'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('Equipped:  <span class="normal-item">Rusty Dagger</span> ');
     }
 
@@ -213,6 +214,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'spell',
             'slot_id'            => '2',
+            'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('spell');
     }
 
@@ -230,7 +232,8 @@ class CharacterInventoryControllerTest extends TestCase
                                 ->getUser();
 
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
-            'slot_id'            => '2',
+            'slot_id'   => '2',
+            'character' => $this->character->getCharacter()->id
         ])->see('Equipped')->see('Armour');
     }
 
@@ -263,6 +266,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'gloves',
             'slot_id'            => '2',
+            'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('*Sample* Armour *Sample*');
     }
 
@@ -282,6 +286,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'apple-sauce',
             'slot_id'            => '2',
+            'character'          => $this->character->getCharacter()->id
         ])->see('Error. Invalid Input.');
     }
 
@@ -295,6 +300,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '1',
+            'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('You have nothing equipped for this item type. Anything is better then nothing.');
     }
 
@@ -304,6 +310,7 @@ class CharacterInventoryControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '10',
+            'character'          => $this->character->getCharacter()->id
         ])->see('Item not found in your inventory.');
     }
 
@@ -322,8 +329,9 @@ class CharacterInventoryControllerTest extends TestCase
                                 ->getCharacterFactory()
                                 ->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.unequip.all'))
-                                                           ->response;
+        $response = $this->actingAs($user)->post(route(
+            'game.unequip.all', ['character' => $this->character->getCharacter()->id]
+        ))->response;
 
         $response->assertSessionHas('success', 'All items have been removed.');
 

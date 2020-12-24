@@ -159,13 +159,13 @@ class AdventureServiceTest extends TestCase
             'damage_stat' => 'str',
             'xp' => 10,
             'str' => 500,
-            'dur' => 2,
-            'dex' => 4,
-            'chr' => 1,
-            'int' => 1,
-            'ac' => 100,
+            'dur' => 500,
+            'dex' => 500,
+            'chr' => 500,
+            'int' => 500,
+            'ac' => 500,
             'gold' => 1,
-            'max_level' => 10,
+            'max_level' => 500,
             'health_range' => '999-9999',
             'attack_range' => '99-999',
             'drop_check' => 0.1,
@@ -174,7 +174,6 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
-                                        ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [
@@ -222,11 +221,11 @@ class AdventureServiceTest extends TestCase
             'damage_stat' => 'str',
             'xp' => 10,
             'str' => 500,
-            'dur' => 2,
-            'dex' => 4,
-            'chr' => 1,
-            'int' => 1,
-            'ac' => 100,
+            'dur' => 500,
+            'dex' => 500,
+            'chr' => 500,
+            'int' => 500,
+            'ac' => 500,
             'gold' => 1,
             'max_level' => 10,
             'health_range' => '999-9999',
@@ -237,7 +236,6 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
-                                        ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [

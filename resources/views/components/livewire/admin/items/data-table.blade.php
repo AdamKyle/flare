@@ -10,7 +10,7 @@
                 @else
                     <div class="float-right pb-2">
                         <x-forms.button-with-form
-                            form-route="{{route('game.shop.buy.bulk')}}"
+                            form-route="{{route('game.shop.buy.bulk', ['character' => $character->id])}}"
                             form-id="{{'shop-buy-form-item-in-bulk'}}"
                             button-title="Buy All"
                             class="btn btn-primary btn-sm"
@@ -139,7 +139,7 @@
                                             /> 
                                         @else
                                             <x-forms.button-with-form
-                                                form-route="{{route('game.shop.buy.item')}}"
+                                                form-route="{{route('game.shop.buy.item', ['character' => $character->id])}}"
                                                 form-id="{{'shop-buy-form-item-'.$item->id}}"
                                                 button-title="Buy"
                                                 class="btn btn-primary btn-sm"

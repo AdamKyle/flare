@@ -70,13 +70,13 @@ class ShopControllerTest extends TestCase
     public function testCanSeeShop() {
         $user = $this->character->getUser();
 
-        $this->actingAs($user)->visitRoute('game.shop.buy')->see('Buying');
+        $this->actingAs($user)->visitRoute('game.shop.buy', ['character' => $this->character->getCharacter()->id])->see('Buying');
     }
 
     public function testCanBuyItem() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item', ['character' => $this->character->getCharacter()->id]), [
             'item_id' => $this->item->id,
         ])->response;
 
@@ -86,7 +86,7 @@ class ShopControllerTest extends TestCase
     public function testCannotBuyUnknownItem() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item', ['character' => $this->character->getCharacter()->id]), [
             'item_id' => 6,
         ])->response;
 
@@ -97,7 +97,7 @@ class ShopControllerTest extends TestCase
 
         $user = $this->character->updateCharacter(['gold' => 0])->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item', ['character' => $this->character->getCharacter()->id]), [
             'item_id' => 6,
         ])->response;
 
@@ -113,7 +113,7 @@ class ShopControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.item', ['character' => $this->character->getCharacter()->id]), [
             'item_id' => $this->item->id,
         ])->response;
 
@@ -123,7 +123,7 @@ class ShopControllerTest extends TestCase
     public function testCanSeeSellPage() {
         $user = $this->character->getUser();
 
-        $this->actingAs($user)->visitRoute('game.shop.sell')->see('Inventory');
+        $this->actingAs($user)->visitRoute('game.shop.sell', ['character' => $this->character->getCharacter()->id])->see('Inventory');
     }
 
     public function testCanSellItem() {
@@ -136,7 +136,7 @@ class ShopControllerTest extends TestCase
                                 ])
                                 ->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter()->id]), [
             'slot_id' => 1,
         ])->response;
 
@@ -161,7 +161,7 @@ class ShopControllerTest extends TestCase
             'item_suffix_id' => $this->itemAffix->id,
         ]);
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter()->id]), [
             'slot_id' => 1,
         ])->response;
 
@@ -179,7 +179,7 @@ class ShopControllerTest extends TestCase
                                 ])
                                 ->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.item'), [
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter()->id]), [
             'slot_id' => '10',
         ])->response;
 
@@ -191,7 +191,7 @@ class ShopControllerTest extends TestCase
     public function testCannotSellAllWhenAllEquipped() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.all'))->response;
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter()->id]))->response;
 
         $response->assertSessionHas('error', 'You have nothing that you can sell.');
     }
@@ -202,7 +202,7 @@ class ShopControllerTest extends TestCase
                                 ->getCharacterFactory()
                                 ->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.all'))->response;
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter()->id]))->response;
 
         $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 8 gold.');
     }
@@ -229,7 +229,7 @@ class ShopControllerTest extends TestCase
                                 ->getUser();
 
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.all'))->response;
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter()->id]))->response;
 
         $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 8 gold.');
 
@@ -244,7 +244,7 @@ class ShopControllerTest extends TestCase
 
         $user = $this->character->updateCharacter(['gold' => 0])->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id], [
             'items' => [$this->item->id]
         ]))->response;
 
@@ -254,7 +254,7 @@ class ShopControllerTest extends TestCase
     public function testFailToBulkBuyWhenNoItems() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id], [
             'items' => []
         ]))->response;
 
@@ -271,9 +271,9 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
             'items' => [$this->item->id, $weapon->id]
-        ]))->response;
+        ])->response;
 
         $response->assertSessionHas('error', 'You do not have enough gold to buy: ' . $this->item->name . '. Anything before this item in the list was purchased.');
 
@@ -292,9 +292,9 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
             'items' => [$this->item->id, $weapon->id]
-        ]))->response;
+        ])->response;
 
         $count = $this->character->getCharacter()->inventory->slots->count();
         
@@ -304,9 +304,9 @@ class ShopControllerTest extends TestCase
     public function testFailToSellInBulk() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', ['character' => $this->character->getCharacter()->id]), [
             'slots' => []
-        ]))->response;
+        ])->response;
 
         $response->assertSessionHas('error', 'No items could be found. Did you select any?');
     }
@@ -334,11 +334,11 @@ class ShopControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         
-        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', [
+        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', ['character' => $this->character->getCharacter()->id]), [
             'slots' => $character->inventory->slots->filter(function($slot) {
                 return !$slot->equipped && $slot->item->type !== 'quest';
             })->pluck('id')->toArray(),
-        ]))->response;
+        ])->response;
 
         $response->assertSessionHas('success', 'Sold selected items for: 8 gold.');
     }

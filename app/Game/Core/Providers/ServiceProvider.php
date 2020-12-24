@@ -8,6 +8,7 @@ use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Middleware\IsCharacterAdventuringMiddleware;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
+use App\Game\Core\Middleware\IsCharacterWhoTheySayTheyAre;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\CharacterService;
@@ -69,5 +70,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $router->aliasMiddleware('is.character.adventuring', IsCharacterAdventuringMiddleware::class);
         $router->aliasMiddleware('is.character.at.location', IsCharacterAtLocationMiddleware::class);
+        $router->aliasMiddleware('is.character.who.they.say.they.are', IsCharacterWhoTheySayTheyAre::class);
     }
 }

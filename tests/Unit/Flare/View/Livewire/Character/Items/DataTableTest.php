@@ -54,12 +54,13 @@ class DataTableTest extends TestCase
         
         Livewire::test(DataTable::class, [
             'batchSell' => true,
+            'character' => $this->character,
         ])->set('selected', [1])
           ->call('selectAll')
           ->set('search', 'Rusty Dagger');
     }
 
     public function testSelectAll() {
-        $this->actingAs($this->character->user)->visit(route('game.shop.sell'))->check('select-all');
+        $this->actingAs($this->character->user)->visit(route('game.shop.sell', ['character' => $this->character->id]))->check('select-all');
     }
 }

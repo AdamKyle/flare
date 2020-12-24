@@ -43,7 +43,9 @@
                 </div>
 
                 <h4 class="mb-2">Items</h4>
-                @livewire('admin.items.data-table')
+                @livewire('admin.items.data-table', [
+                    'character' => $character
+                ])
             </div>
         </div>
     </div>

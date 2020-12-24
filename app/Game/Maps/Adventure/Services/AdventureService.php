@@ -8,7 +8,8 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\AdventureLog; 
+use App\Flare\Models\AdventureLog;
+use App\Flare\Services\FightService;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
@@ -139,7 +140,7 @@ class AdventureService {
         return;
     }
 
-    protected function adventureTookToLong(AdventureFightService $attackService, AdventureLog $adventureLog) {
+    protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog) {
         Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
         $this->character->update([
@@ -164,7 +165,7 @@ class AdventureService {
         }
     }
 
-    protected function characterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog, int $level) {
+    protected function characterIsDead(FightService $attackService, AdventureLog $adventureLog, int $level) {
         Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
         $this->character->update([
@@ -198,7 +199,7 @@ class AdventureService {
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
     } 
 
-    protected function monsterIsDead(AdventureFightService $attackService, AdventureLog $adventureLog) {
+    protected function monsterIsDead(FightService $attackService, AdventureLog $adventureLog) {
         $monster     = $attackService->getMonster();
 
         $xpReduction = 0.0;
@@ -230,7 +231,7 @@ class AdventureService {
         $this->setLogs($adventureLog, $attackService);
     }
 
-    protected function setLogs(AdventureLog $adventureLog, AdventureFightService $attackService) {
+    protected function setLogs(AdventureLog $adventureLog, FightService $attackService) {
         $logs = $adventureLog->logs;
 
         if (is_null($logs)) {

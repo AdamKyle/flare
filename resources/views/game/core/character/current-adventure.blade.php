@@ -79,7 +79,7 @@
                     @csrf
                 </form>
 
-                <a class="float-left btn btn-primary mb-2 ml-2" href="{{route('game.inventory.compare')}}"
+                <a class="float-left btn btn-primary mb-2 ml-2" href="#"
                 onclick="event.preventDefault();
                                 document.getElementById('collect-reward').submit();">
                     {{ __('Collect Rewards') }}

@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Models\Character;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
@@ -17,33 +18,32 @@ class ShopController extends Controller {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
         $this->middleware('is.character.adventuring');
+        $this->middleware('is.character.who.they.say.they.are');
     }
 
-    public function shopBuy() {
-
-        $character = auth()->user()->character;
+    public function shopBuy(Character $character) {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
         return view('game.core.shop.buy', [
             'isLocation' => !is_null($location),
-            'gold'       => auth()->user()->character->gold,
+            'gold'       => $character->gold,
+            'character'  => $character,
         ]);
     }
 
-    public function shopSell() {
-        $character = auth()->user()->character;
+    public function shopSell(Character $character) {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
         
         return view('game.core.shop.sell', [
             'isLocation' => !is_null($location),
-            'gold'       => auth()->user()->character->gold,
+            'gold'       => $character->gold,
+            'character'  => $character,
         ]);
     }
 
-    public function shopSellAll(ShopService $service) {
-        $character = auth()->user()->character;
+    public function shopSellAll(Character $character, ShopService $service) {
 
         $totalSoldFor = $service->sellAllItemsInInventory($character);
 
@@ -54,8 +54,7 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
 
-    public function shopBuyBulk(Request $request) {
-        $character = auth()->user()->character;
+    public function shopBuyBulk(Request $request, Character $character) {
 
         if ($character->gold === 0) {
             return redirect()->back()->with('error', 'You do not have enough gold.');
@@ -81,8 +80,7 @@ class ShopController extends Controller {
 
     }
 
-    public function buy(Request $request) {
-        $character = auth()->user()->character;
+    public function buy(Request $request, Character $character) {
 
         if ($character->gold === 0) {
             return redirect()->back()->with('error', 'You do not have enough gold.');
@@ -103,9 +101,7 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Purchased: ' . $item->affix_name . '.');
     }
 
-    public function sell(Request $request) {
-        
-        $character     = auth()->user()->character;
+    public function sell(Request $request, Character $character) {
 
         $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === (int) $request->slot_id && !$slot->equipped;
@@ -124,9 +120,7 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
-    public function shopSellBulk(Request $request, ShopService $service) {
-        $character = auth()->user()->character;
-
+    public function shopSellBulk(Request $request, Character $character, ShopService $service) {
         $inventorySlots = $character->inventory->slots()->findMany($request->slots);
 
         if ($inventorySlots->isEmpty()) {

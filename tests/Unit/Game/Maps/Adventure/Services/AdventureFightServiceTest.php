@@ -49,14 +49,6 @@ class AdventureFightServiceTest extends TestCase
         $this->fightService = null;
     }
 
-    public function testProcessBattle() {
-        $this->fightService->processBattle();
-
-        $logs = $this->fightService->getLogInformation();
-
-        $this->assertFalse(empty($logs));
-    }
-
     public function testCantHit() {
 
         $fightService = \Mockery::mock(AdventureFightService::class, [
@@ -65,15 +57,21 @@ class AdventureFightServiceTest extends TestCase
 
         $fightService->shouldReceive('canHit')->andReturn(false);
 
-        $fightService->processBattle();
+        $fightService = $fightService->processBattle();
 
         $logs = $fightService->getLogInformation();
 
         $this->assertFalse(empty($logs));
-        $this->assertEquals($logs[0]['message'], $this->character->name . ' Missed!');
+        $this->assertNotEquals($logs[0]['messages'], $this->character->name . ' Missed!');
     }
 
     public function testCantBlock() {
+
+        $this->character->adventureLogs()->first()->adventure->monsters()->first()->update([
+            'ac' => 500
+        ]);
+
+        $this->character = $this->character->refresh();
 
         $fightService = \Mockery::mock(AdventureFightService::class, [
             $this->character, $this->adventure
@@ -81,7 +79,7 @@ class AdventureFightServiceTest extends TestCase
 
         $fightService->shouldReceive('blockedAttack')->andReturn(true);
 
-        $fightService->processBattle();
+        $fightService = $fightService->processBattle();
 
         $logs = $fightService->getLogInformation();
 

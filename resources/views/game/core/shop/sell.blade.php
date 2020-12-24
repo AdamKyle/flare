@@ -44,6 +44,7 @@
         Clicking "Sell All" will sell everything listed below. No quest items or currently equipped items will be sold.
     </div>
     @livewire('character.inventory.data-table', [
-        'batchSell' => true 
+        'batchSell' => true,
+        'character' => $character, 
     ])
 @endsection

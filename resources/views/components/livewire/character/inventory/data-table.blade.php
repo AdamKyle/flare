@@ -6,7 +6,7 @@
                     <x-data-tables.per-page wire:model="perPage">
                         @if ($batchSell)
                             <x-forms.button-with-form
-                                form-route="{{route('game.shop.sell.all')}}"
+                                form-route="{{route('game.shop.sell.all', ['character' => $character->id])}}"
                                 form-id='shop-sell-all'
                                 button-title="Sell All"
                                 class="btn btn-primary btn-sm ml-2"
@@ -29,7 +29,7 @@
                     @else
                         <div class="float-right pb-2">
                             <x-forms.button-with-form
-                                form-route="{{route('game.shop.sell.bulk')}}"
+                                form-route="{{route('game.shop.sell.bulk', ['character' => $character->id])}}"
                                 form-id="{{'shop-sell-form-item-in-bulk'}}"
                                 button-title="Sell All Selected"
                                 class="btn btn-primary btn-sm"
@@ -188,13 +188,13 @@
                                         ])
                                     @else
                                         @if ($slot->item->type !== 'quest')
-                                            <a class="btn btn-primary" href="{{route('game.shop.sell.item')}}"
+                                            <a class="btn btn-primary" href="{{route('game.shop.sell.item', ['character' => $character->id])}}"
                                                             onclick="event.preventDefault();
                                                             document.getElementById('shop-sell-form-slot-{{$slot->id}}').submit();">
                                                 {{ __('Sell') }}
                                             </a>
 
-                                            <form id="shop-sell-form-slot-{{$slot->id}}" action="{{route('game.shop.sell.item')}}" method="POST" style="display: none;">
+                                            <form id="shop-sell-form-slot-{{$slot->id}}" action="{{route('game.shop.sell.item', ['character' => $character->id])}}" method="POST" style="display: none;">
                                                 @csrf
 
                                                 <input type="hidden" name="slot_id" value={{$slot->id}} />

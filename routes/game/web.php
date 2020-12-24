@@ -5,13 +5,13 @@ Route::middleware('is.player.banned')->group(function() {
     // Core routes for the game related stuff:
     Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);
 
-    Route::get('/shop/buy', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
-    Route::get('/shop/sell', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
-    Route::post('/shop/sell-all', ['as' => 'game.shop.sell.all', 'uses' => 'ShopController@shopSellAll']);
-    Route::post('/shop/buy-bulk', ['as' => 'game.shop.buy.bulk', 'uses' => 'ShopController@shopBuyBulk']);
-    Route::post('/shop/buy/item', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
-    Route::post('/shop/sell-bulk', ['as' => 'game.shop.sell.bulk', 'uses' => 'ShopController@shopSellBulk']);
-    Route::post('/shop/sell/item', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
+    Route::get('/shop/buy/{character}', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
+    Route::get('/shop/sell/{character}', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
+    Route::post('/shop/sell-all/{character}', ['as' => 'game.shop.sell.all', 'uses' => 'ShopController@shopSellAll']);
+    Route::post('/shop/buy-bulk/{character}', ['as' => 'game.shop.buy.bulk', 'uses' => 'ShopController@shopBuyBulk']);
+    Route::post('/shop/buy/item/{character}', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
+    Route::post('/shop/sell-bulk/{character}', ['as' => 'game.shop.sell.bulk', 'uses' => 'ShopController@shopSellBulk']);
+    Route::post('/shop/sell/item/{character}', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
     
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
     

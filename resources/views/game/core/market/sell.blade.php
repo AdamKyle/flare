@@ -12,6 +12,7 @@
 
             @livewire('character.inventory.data-table', [
                 'marketBoard' => true,
+                'character' => auth()->user()->character
             ])
         </div>
     </div>
