@@ -28,6 +28,7 @@ class CharacterModelingTestValidation extends FormRequest
             'type'             => 'required',
             'characters'       => 'required',
             'character_levels' => 'required',
+            'total_times'      => 'required',
         ];
     }
 
@@ -42,6 +43,7 @@ class CharacterModelingTestValidation extends FormRequest
             'type.required'             => 'Type is required.',
             'characters.required'       => 'You need at least one character to test this.',
             'character_levels.required' => 'Character levels are required.',
+            'total_times.required'      => 'How many times do you want this simmulation to run?',
         ];
     }
 }

@@ -99,7 +99,7 @@
                                 @guest
                                 @else
                                 <td>
-                                    @if (auth()->user()->hasRole('Admin'))
+                                    @if (auth()->user()->hasRole('Admin') && $testCharacters->isNotEmpty())
                                         <a href="{{route('monster.edit', [
                                                 'monster' => $monster->id,
                                         ])}}" class="btn btn-primary mt-2">Edit</a>
@@ -118,6 +118,8 @@
                                                 @break;
                                             @endif
                                         @endforeach
+                                    @endif
+                                    @if(auth()->user()->hasRole('Admin'))
                                         @if (!$published)
                                             <x-forms.button-with-form 
                                                 form-route="{{route('monster.publish', ['monster' => $monster])}}"

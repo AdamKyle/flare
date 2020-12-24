@@ -19,12 +19,12 @@ use DB;
 class CharacterModelingController extends Controller {
 
     public function index() {
-        $hasSnapShots = User::where('is_test', true)->get()->isNotEmpty();
+        $hasSnapShots = CharacterSnapShot::all()->isNotEmpty();
 
         return view('admin.character-modeling.index', [
             'hasSnapShots' => $hasSnapShots,
             'cardTitle'    => $hasSnapShots ? 'Modeling' : 'Generate',
-            'snapShots'    => User::where('is_test', true)->paginate(4),
+            'snapShots'    => CharacterSnapShot::all()->paginate(4),
         ]);
     }
 
@@ -63,9 +63,9 @@ class CharacterModelingController extends Controller {
     public function assignItem(Request $request, Character $character) {
         $request->validate(['item_id' => 'required']);
 
-        $currentInventory = ($character->inventory_max - $character->inventory->slots()->count());
-
-        if (!($currentInventory < $character->inventory_max)) {
+        $freeSlots = ($character->inventory_max - $character->inventory->slots()->count());
+        
+        if ($freeSlots === 0) {
             return redirect()->back()->with('error', "You don't have the inventory space");
         }
 
@@ -82,9 +82,9 @@ class CharacterModelingController extends Controller {
     public function assignAll(Request $request, Character $character) {
         $request->validate(['items' => 'required']);
 
-        $currentInventory = ($character->inventory_max - $character->inventory->slots()->count());
+        $freeSlots = ($character->inventory_max - $character->inventory->slots()->count());
 
-        if (!($currentInventory > count($request->items))) {
+        if ($freeSlots === 0) {
             return redirect()->back()->with('error', "You don't have the inventory space");
         }
 
@@ -167,6 +167,7 @@ class CharacterModelingController extends Controller {
             $character = Character::find($id);
 
             if (is_null($character)) {
+                
                 return redirect()->back()->with('error', 'Character does not exist for id: ' . $id);
             }
 
@@ -184,7 +185,7 @@ class CharacterModelingController extends Controller {
                 RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times);
             }
         }
-
+        
         return redirect()->back()->with('success', 'Testing under way. You may log out, we will email you when done.');
     }
 }

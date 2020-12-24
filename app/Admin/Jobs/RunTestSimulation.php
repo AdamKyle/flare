@@ -18,7 +18,9 @@ class RunTestSimulation implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
+    /**
+     * @var Character $character
+     */
     public $character;
 
     /**
@@ -26,15 +28,29 @@ class RunTestSimulation implements ShouldQueue
      */
     public $adminUser;
 
+    /**
+     * @var mixed Model
+     */
     public $model;
 
+    /**
+     * @var string $type
+     */
     public $type;
 
+    /**
+     * @var int $totalTimes
+     */
     public $totalTimes;
 
     /**
      * Create a new job instance.
      *
+     * @param Character $character
+     * @param string $type
+     * @param int $id
+     * @param int $totalTimes
+     * @param User $adminUser | null
      * @return void
      */
     public function __construct(Character $character, string $type, int $id, int $totalTimes, User $adminUser = null) {
@@ -46,6 +62,7 @@ class RunTestSimulation implements ShouldQueue
     }
 
     /**
+     * Processes the type of simmulation test we want.
      * 
      * @return void
      */
@@ -80,15 +97,14 @@ class RunTestSimulation implements ShouldQueue
         }
 
         $logData['monster_id']     = $this->model->id;
-        
 
-        $this->character->snapShots()->where('snap_shot->level', $this->character->level)->first()->update([
+        $this->character->snapShots()->where('snap_shot->level', strval($this->character->level))->first()->update([
             'battle_simmulation_data' => $logData,
         ]);
 
         // Finally reset the character back to level 1000.
         $this->character->update(
-            $this->character->snapShots()->where('snap_shot->level', 1000)->first()->snap_shot
+            $this->character->snapShots()->where('snap_shot->level', '1000')->first()->snap_shot
         );
     }
 

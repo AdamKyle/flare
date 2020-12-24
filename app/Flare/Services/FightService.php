@@ -7,7 +7,6 @@ use App\Flare\Models\Monster;
 
 class FightService {
 
-
     /**
      * @var Character $character
      */
@@ -52,6 +51,11 @@ class FightService {
      */
     private $tookTooLong = false;
 
+    /**
+     * @param Character $character
+     * @param Monster $monster
+     * @return void
+     */
     public function __construct(Character $character, Monster $monster) {
         $this->character = $character;
         $this->monster   = $monster;

@@ -37,12 +37,12 @@ class MonstersControllerTest extends TestCase
         $this->user = null;
     }
 
-    public function testAdminCanSeeLocationsPage()
+    public function testAdminCanSeeMonstersPage()
     {
         $this->actingAs($this->user)->visit(route('monsters.list'))->see('Monsters');
     }
 
-    public function testNonAdminCannotSeeLocationsPage()
+    public function testNonAdminCannotSeeMonstersPage()
     {
         $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
@@ -67,5 +67,13 @@ class MonstersControllerTest extends TestCase
         $this->actingAs($this->user)->visit(route('monster.edit', [
             'monster' => 1
         ]))->see(Monster::first()->name);
+    }
+
+    public function testPublishMonster() {
+        $monster = $this->createMonster(['published' => false]);
+
+        $this->actingAs($this->user)->post(route('monster.publish', ['monster' => $monster]));
+
+        $this->assertTrue($monster->refresh()->published);
     }
 }
