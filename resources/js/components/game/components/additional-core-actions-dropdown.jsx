@@ -53,7 +53,7 @@ export default class AdditionalCoreActionsDropDown extends React.Component {
       return(
           <Dropdown>
             <Dropdown.Toggle variant="primary" id="dropdown-basic" size="sm" disabled={this.props.isDead || this.props.isAdventuring}>
-              Additional actions
+              Additional Actions
             </Dropdown.Toggle>
 
             <Dropdown.Menu>

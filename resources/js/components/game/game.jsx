@@ -10,6 +10,7 @@ import AdeventureActions   from './components/adventure-actions';
 import AdventureMenu       from './components/menu/adventure-menu';
 import NotificationCenter  from './components/nav-bar/notification-center';
 import RefreshComponent    from './components/refresh-component';
+import Management from './kingdom/management';
 
 class Game extends React.Component {
   constructor(props) {
@@ -32,6 +33,7 @@ class Game extends React.Component {
       openPortDetails: false,
       openAdventureDetails: false,
       openTeleportDetails: false,
+      openKingdomManagement: false,
       characterId: null,
       canAdventureAgainAt: null,
       canAttack: true,
@@ -94,6 +96,10 @@ class Game extends React.Component {
     this.setState({characterId: characterId});
   }
 
+  openKingdomManagement(open) {
+    this.setState({openKingdomManagement: open});
+  }
+
   setCanAttack(bool) {
     this.setState({
       canAttack: bool,
@@ -112,10 +118,11 @@ class Game extends React.Component {
             <div className="row">
               <div className="col-md-9">
                 <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
-                <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} setCharacterId={this.setCharacterId.bind(this)} canAttack={this.setCanAttack.bind(this)} />
+                <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} setCharacterId={this.setCharacterId.bind(this)} canAttack={this.setCanAttack.bind(this)} openKingdomManagement={this.openKingdomManagement.bind(this)}/>
                 {this.state.openPortDetails ? <PortLocationActions updateAdventure={this.updateAdventure.bind(this)} portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
                 {this.state.openAdventureDetails ? <AdeventureActions canAdventure={this.canAdventure.bind(this)} updateAdventure={this.updateAdventure.bind(this)} adventureDetails={this.state.adventureDetails} userId={this.props.userId} characterId={this.state.characterId} openAdventureDetails={this.openAdventureDetails.bind(this)} adventureAgainAt={this.state.canAdventureAgainAt} adventureLogs={this.state.adventureLogs} /> : null}
                 {this.state.openTeleportDetails ? <Teleport teleportLocations={this.state.teleportLocations} openTeleportDetails={this.openTeleportDetails.bind(this)} currentX={this.state.current_x} currentY={this.state.current_y} characterId={this.props.characterId}/> : null}
+                {this.state.openKingdomManagement ? <Management openKingdomManagement={this.openKingdomManagement.bind(this)} /> : null}
               </div>
               <div className="col-md-3">
                 <Map 
