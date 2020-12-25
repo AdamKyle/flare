@@ -15,6 +15,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/adventures', ['as' => 'adventures.list', 'uses' => 'AdventuresController@index']);
     Route::get('/admin/adventures/create', ['as' => 'adventures.create', 'uses' => 'AdventuresController@create']);
+    Route::post('/admin/adventures/{adventure}/published', ['as' => 'adventure.publish', 'uses' => 'AdventureController@publish']);
     Route::get('/admin/adventures/{adventure}', ['as' => 'adventures.adventure', 'uses' => 'AdventuresController@show']);
     Route::get('/admin/adventures/{adventure}/edit', ['as' => 'adventure.edit', 'uses' => 'AdventuresController@edit']);
     Route::post('/admin/adventures/store', ['as' => 'adventures.store', 'uses' => 'AdventuresController@store']);
@@ -67,7 +68,9 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/character-modeling', ['as' => 'admin.character.modeling', 'uses' => 'CharacterModelingController@index']);
     Route::get('/admin/character-modeling/sheet/{character}', ['as' => 'admin.character.modeling.sheet', 'uses' => 'CharacterModelingController@fetchSheet']);
     Route::get('/admin/character-modeling/{monster}/monster-data', ['as' => 'admin.character.modeling.monster-data', 'uses' => 'CharacterModelingController@monsterData']);
+    Route::get('/admin/character-modeling/{adventure}/adventure-data', ['as' => 'admin.character.modeling.adventure-data', 'uses' => 'CharacterModelingController@adventureData']);
     Route::get('/admin/character-modeling/battle-results/{characterSnapShot}', ['as' => 'admin.character.modeling.battle-simmulation.results', 'uses' => 'CharacterModelingController@battleResults']);
+    Route::get('/admin/character-modeling/adventure-results/{characterSnapShot}', ['as' => 'admin.character.modeling.adventure-simmulation.results', 'uses' => 'CharacterModelingController@adventureResults']);
     Route::post('/admin/character-modeling/reset-inventory/{character}', ['as' => 'admin.character.modeling.reset-inventory', 'uses' => 'CharacterModelingController@resetInventory']);
     Route::post('/admin/character-modeling/assign-item/{character}', ['as' => 'admin.character-modeling.assign-item', 'uses' => 'CharacterModelingController@assignItem']);
     Route::post('/admin/character-modeling/assign-all/{character}', ['as' => 'admin.character-modeling.assign-all', 'uses' => 'CharacterModelingController@assignAll']);

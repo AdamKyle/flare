@@ -57,7 +57,7 @@ class AdventuresController extends Controller {
     public function store(AdventureValidation $request) {
         $requestForModel = $request->except(['_token', 'location_ids', 'monster_ids']);
 
-        $adventure = Adventure::create($requestForModel);
+        $adventure = Adventure::create(array_merge($requestForModel, ['published' => false]));
 
         $adventure->locations()->attach($request->location_ids);
 
@@ -66,5 +66,13 @@ class AdventuresController extends Controller {
         return redirect()->route('adventures.adventure', [
             'adventure' => $adventure->id
         ])->with('success', $adventure->name . ' created!');
+    }
+
+    public function publish(Adventure $adventure) {
+        $adventure->update(['published' => true]);
+
+        return redirect()->to(route('adventures.adventure', [
+            'adventure' => $adventure
+        ]))->with('success', 'Adventure published.');
     }
 }

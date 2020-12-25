@@ -11,4 +11,11 @@
         </div>
     </div>
     @livewire('admin.adventures.data-table')
+
+    <div class="mb-2">
+        <h5>Awaiting approval</h5>
+        @livewire('admin.adventures.data-table', [
+            'published' => false
+        ])
+    </div>
 @endsection

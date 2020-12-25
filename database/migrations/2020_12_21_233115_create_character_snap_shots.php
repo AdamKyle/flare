@@ -20,6 +20,7 @@ class CreateCharacterSnapShots extends Migration
                   ->references('id')->on('characters');
             $table->json('snap_shot');
             $table->json('battle_simmulation_data')->nullable();
+            $table->json('adventure_simmulation_data')->nullable();
             $table->timestamps();
         });
     }

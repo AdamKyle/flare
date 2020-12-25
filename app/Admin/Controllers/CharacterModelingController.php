@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Admin\Jobs\GenerateTestCharacter;
 use App\Admin\Jobs\RunTestSimulation;
 use App\Admin\Requests\CharacterModelingTestValidation;
+use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterSnapShot;
 use App\Flare\Models\GameClass;
@@ -51,12 +52,25 @@ class CharacterModelingController extends Controller {
         ]);
     }
 
+    public function adventureData(Adventure $adventure) {
+        return view('admin.character-modeling.adventure-data', [
+            'adventure' => $adventure,
+        ]);
+    }
+
     public function battleResults(CharacterSnapShot $characterSnapShot) {
         
         return view('admin.character-modeling.battle-results', [
             'battleData'  => $characterSnapShot->battle_simmulation_data,
             'monsterId'   => Monster::find($characterSnapShot->battle_simmulation_data['monster_id'])->id,
             'characterId' => $characterSnapShot->character_id,
+        ]);
+    }
+
+    public function adventureResults(CharacterSnapShot $characterSnapShot) {
+        return view('admin.character-modeling.adventure-results', [
+            'adventureData' => $characterSnapShot->adventure_simmulation_data,
+            'characterId'   => $characterSnapShot->character_id,
         ]);
     }
 
@@ -158,6 +172,9 @@ class CharacterModelingController extends Controller {
             case 'monster':
                 // truncate all previous battle simulation reports.
                 DB::table('character_snap_shots')->update(['battle_simmulation_data' => null]);
+                break;
+            case 'adventure':
+                DB::table('character_snap_shots')->update(['adventure_simmulation_data' => null]);
                 break;
             default:
                 break;

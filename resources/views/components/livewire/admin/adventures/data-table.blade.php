@@ -55,6 +55,15 @@
                             sort-field="{{$sortField}}"
                             field="skill_exp_bonus"
                         />
+                        @guest
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))  
+                                <x-data-tables.header-row>
+                                    Actions
+                                </x-data-tables.header-row>
+                            @endif 
+                        @endguest
+                        
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($adventures as $adventure)
@@ -75,9 +84,55 @@
                                 <td>{{$adventure->gold_rush_chance * 100}}%</td>
                                 <td>{{$adventure->item_find_chance * 100}}%</td>
                                 <td>{{$adventure->skill_exp_bonus * 100}}%</td>
+                                @guest
+                                @else
+                                    @if (auth()->user()->hasRole('Admin'))  
+                                        <td>
+                                            <a href="{{route('adventure.edit', [
+                                                'adventure' => $adventure->id,
+                                            ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+
+                                            @if (!$adventure->published)
+                                                <x-forms.button-with-form
+                                                    form-route="{{route('adventure.publish', ['adventure' => $adventure])}}"
+                                                    form-id="publish-adventure-{{$adventure->id}}"
+                                                    button-title="Publish"
+                                                    class="btn btn-success mt-2"
+                                                />
+                                            @endif
+                                            @if ($testCharacters->isNotEmpty())
+                                                @if ($canTest)
+                                                    <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#adventure-test-{{$adventure->id}}">
+                                                        Test
+                                                    </button>
+                                                    @include('admin.character-modeling.partials.modals.adventure-test-modal', [
+                                                        'monster' => $adventure,
+                                                        'users'   => $testCharacters,
+                                                    ])
+                                                @endif
+                                                
+                                                @foreach ($testCharacters as $user)
+                                                    @if ($user->character->snapShots()->where('adventure_simmulation_data->adventure_id', $adventure->id)->get()->isNotEmpty())
+                                                        <a href="{{route('admin.character.modeling.adventure-data', ['adventure' => $adventure])}}" class="btn btn-success mt-2">View Data</a>
+                                                        @break;
+                                                    @endif
+                                                @endforeach
+                                            @endif
+                                        </td>
+                                    @endif 
+                                @endguest
                             </tr>
                         @empty
-                            <x-data-tables.no-results colspan="6" />
+                            @guest
+                                <x-data-tables.no-results colspan="6" />
+                            @else
+                                @if (auth()->user()->hasRole('Admin'))  
+                                    <x-data-tables.no-results colspan="7" />
+                                @else
+                                    <x-data-tables.no-results colspan="6" />
+                                @endif 
+                            @endguest
+                                
                         @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>

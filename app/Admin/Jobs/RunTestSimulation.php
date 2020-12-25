@@ -3,16 +3,20 @@
 namespace App\Admin\Jobs;
 
 use Mail;
+use Str;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Admin\Mail\GenericMail;
+use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Flare\Services\FightService;
+use App\Game\Maps\Adventure\Jobs\AdventureJob;
+use Cache;
 
 class RunTestSimulation implements ShouldQueue
 {
@@ -72,11 +76,28 @@ class RunTestSimulation implements ShouldQueue
                 $this->processBattle();
                 
                 break;
+            case 'adventure':
+                $this->processAdventure();
+
+                break;
             default:
                 return;
         }
+    }
 
-        $this->emailAdmin();
+    protected function processAdventure() {
+        for ($i = 1; $i <= $this->totalTimes; $i++) {
+            $jobName = Str::random(80);
+                
+            Cache::put('character_'.$this->character->id.'_adventure_'.$this->model->id, $jobName, now()->addMinutes(5));
+
+            for ($j = 1; $j <= $this->model->levels; $j++) {
+                $delay            = $j === 1 ? $this->model->time_per_level : $j * $this->model->time_per_level;
+                $timeTillFinished = now()->addMinutes($delay);
+
+                AdventureJob::dispatch($this->character, $this->model, $jobName, $j, true)->delay($timeTillFinished);
+            }
+        }
     }
 
     protected function processBattle() {
@@ -110,7 +131,7 @@ class RunTestSimulation implements ShouldQueue
 
     protected function emailAdmin() {
         if (!is_null($this->adminUser)) {
-            Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your battle simulation has completed.', 'Battle Simmulation Results', false));
+            Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details.', 'Simmulation Results', false));
         }
     }
 
@@ -118,6 +139,8 @@ class RunTestSimulation implements ShouldQueue
         switch($type) {
             case 'monster':
                 return Monster::find($id);
+            case 'adventure':
+                return Adventure::find($id);
             default:
                 return null;
         }

@@ -21,6 +21,7 @@ class CharacterSnapShot extends Model
         'character_id',
         'snap_shot',
         'battle_simmulation_data',
+        'adventure_simmulation_data'
     ];
 
     /**
@@ -29,8 +30,9 @@ class CharacterSnapShot extends Model
      * @var array
      */
     protected $casts = [
-        'snap_shot'               => 'array',
-        'battle_simmulation_data' => 'array',
+        'snap_shot'                  => 'array',
+        'battle_simmulation_data'    => 'array',
+        'adventure_simmulation_data' => 'array',
     ];
 
     public function character() {

@@ -18,8 +18,6 @@
             <div class="alert alert-info pb-2">
                 <p>When the test is complete, You'll receieve an email. You will be able to come back to this page,
                 and see a new button beside the monster called: View Data.<p>
-
-                <p>All data is kept for 24 hours before being wiped.</p>
             </div>
             @include('admin.character-modeling.partials.modals.partials.form', [
                 'route'      => route('admin.character.modeling.test'),

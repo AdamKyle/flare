@@ -22,9 +22,10 @@ class CharacterSnapShotFactory extends Factory
     public function definition()
     {
         return [
-            'character_id'            => 1,
-            'snap_shot'               => [],
-            'battle_simmulation_data' => [],
+            'character_id'               => 1,
+            'snap_shot'                  => [],
+            'battle_simmulation_data'    => [],
+            'adventure_simmulation_data' => [],
         ];
     }
 }
