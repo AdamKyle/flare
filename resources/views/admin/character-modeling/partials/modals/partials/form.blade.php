@@ -19,7 +19,7 @@
         </div>
         <div class="form-group col-md-3">
             <label for="how-many">How many fights?</label>
-            <input type="number" class="form-control" id="how-many" name="total_times" />
+            <input type="number" class="form-control" id="how-many" name="total_times" value="{{$type === 'adventure' ? 1 : ''}}" {{$type === 'adventure' ? 'readonly' : '' }}/>
         </div>
     </div>
 

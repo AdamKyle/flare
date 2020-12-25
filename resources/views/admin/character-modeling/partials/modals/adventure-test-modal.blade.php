@@ -15,11 +15,14 @@
             <h5 class="mb-2 mt-3">Test Adventure</h5>
             <hr />
             <div class="alert alert-info pb-2">
-                <p>When the adventure test is over you will be able to 
-                    come back here and see the results of that adventure.<p>
-                
-                <p>It is advised that you set the time per level to 1 minute if you intend to 
-                    test with a large amount of characters or a large amount of times.
+                <p>
+                    When the adventure test is over you will be able to 
+                    come back here and see the results of that adventure.
+                <p>
+                <p>
+                    Adventures can only be done once. This is because they run at the time per 
+                    level you stated. It is advised for testing that you reduce that time to 
+                    1 minute per level.
                 </p>
             </div>
             @include('admin.character-modeling.partials.modals.partials.form', [

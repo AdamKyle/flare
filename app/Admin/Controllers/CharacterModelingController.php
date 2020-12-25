@@ -166,7 +166,12 @@ class CharacterModelingController extends Controller {
     }
 
     public function test(CharacterModelingTestValidation $request) {
-        $totalCharacters = count($request->characters) - 1;
+        if ($request->total_times > 10) {
+            return redirect()->back()->with('error', 'You may only repeat this test 10 times with any one character.');
+        }
+
+        $count           = count($request->characters);
+        $totalCharacters =  $count === 1 ? 1 : $count - 1;
 
         switch($request->type) {
             case 'monster':
@@ -196,11 +201,7 @@ class CharacterModelingController extends Controller {
 
             $character->update($snapShot->snap_shot);
 
-            if ($index === $totalCharacters) {
-                RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times, auth()->user());
-            } else {
-                RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times);
-            }
+            RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times, auth()->user());
         }
         
         return redirect()->back()->with('success', 'Testing under way. You may log out, we will email you when done.');

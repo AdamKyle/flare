@@ -16,24 +16,30 @@
         <div class="log-text">
             @foreach($adventureData['snap_shot_data'] as $index => $levelData)
                 @foreach($levelData as $levelName => $logData)
-                    @if ($logData['took_to_long'])
-                        <div class="alert alert-error mb-2 mt-2">
-                            This floor took too long.
-                        </div>
-                    @endif
-
-                    @if ($logData['character_dead'])
-                        <div class="alert alert-error mb-2 mt-2">
-                            Character died on this floor.
-                        </div>
-                    @endif
-
                     <x-cards.card-with-title title="Level {{$index + 1}}">
                         <div class="pt-4">
                             @include('admin.character-modeling.partials.battle-data', [
                                 'data' => $logData['logs']
                             ])
                         </div>
+
+                        @if ($logData['took_to_long'])
+                            <div class="alert alert-error mb-2 mt-2">
+                                This floor took too long.
+                            </div>
+                        @endif
+
+                        @if ($logData['character_dead'])
+                            <div class="alert alert-error mb-2 mt-2">
+                                Character died on this floor.
+                            </div>
+                        @endif
+
+                        @if (!$logData['took_to_long'] && !$logData['character_dead'])
+                            <div class="alert alert-success mb-2 mt-2">
+                                Character completed floor.
+                            </div>
+                        @endif
                     </x-cards.card-with-title>
                 @endforeach
             @endforeach

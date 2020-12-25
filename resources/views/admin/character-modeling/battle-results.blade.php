@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+    
     <div class="container">
         <div class="row page-titles">
             <div class="col-md-6 align-self-left">
@@ -14,19 +15,19 @@
         </div>
         <hr />
         <div class="log-text">
-            @foreach($battleData as $key => $data)
-                @if (is_array($data))
+            @foreach($battleData as $value)
+                @if(is_array($value))
                     <x-cards.card-with-title title="Battle Results" class="log-text">
                         <div class="mt-3 mb-3">
                             @include('admin.character-modeling.partials.battle-data', [
-                                'data' => $data
+                                'data' => $value
                             ])
                             <hr />
                             <dl>
                                 <dd>Character Died?</dd>
-                                <dt>{{$data['character_dead'] ? 'Yes' : 'No'}}</dt>
+                                <dt>{{$value['character_dead'] ? 'Yes' : 'No'}}</dt>
                                 <dd>Monster Died?</dd>
-                                <dt>{{$data['monster_dead'] ? 'Yes' : 'No'}}</dt>
+                                <dt>{{$value['monster_dead'] ? 'Yes' : 'No'}}</dt>
                             </dl>
                         </div>
                     </x-cards.card-with-title>

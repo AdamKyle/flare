@@ -57,7 +57,7 @@ class RunTestSimulation implements ShouldQueue
      * @param User $adminUser | null
      * @return void
      */
-    public function __construct(Character $character, string $type, int $id, int $totalTimes, User $adminUser = null) {
+    public function __construct(Character $character, string $type, int $id, int $totalTimes, User $adminUser) {
         $this->character  = $character;
         $this->adminUser  = $adminUser;
         $this->type       = $type;
@@ -95,43 +95,14 @@ class RunTestSimulation implements ShouldQueue
                 $delay            = $j === 1 ? $this->model->time_per_level : $j * $this->model->time_per_level;
                 $timeTillFinished = now()->addMinutes($delay);
 
-                AdventureJob::dispatch($this->character, $this->model, $jobName, $j, true)->delay($timeTillFinished);
+                AdventureJob::dispatch($this->character, $this->model, $jobName, $j, true, $this->adminUser)->delay($timeTillFinished);
             }
         }
     }
 
     protected function processBattle() {
-
-        $logData = [];
-
         for ($i = 1; $i <= $this->totalTimes; $i++) {
-            $fightService = resolve(FightService::class, ['character' => $this->character, 'monster'=> $this->model]);
-
-            $fightService->attack($this->character, $this->model);
-
-            $logInfo = $fightService->getLogInformation();
-            
-            $logInfo['character_dead'] = $fightService->isCharacterDead();
-            $logInfo['monster_dead']   = $fightService->isMonsterDead();
-            
-            $logData[] = $logInfo;
-        }
-
-        $logData['monster_id']     = $this->model->id;
-
-        $this->character->snapShots()->where('snap_shot->level', strval($this->character->level))->first()->update([
-            'battle_simmulation_data' => $logData,
-        ]);
-
-        // Finally reset the character back to level 1000.
-        $this->character->update(
-            $this->character->snapShots()->where('snap_shot->level', '1000')->first()->snap_shot
-        );
-    }
-
-    protected function emailAdmin() {
-        if (!is_null($this->adminUser)) {
-            Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details.', 'Simmulation Results', false));
+            SimulateBattle::dispatch($this->character, $this->model, $i, $this->totalTimes, $this->adminUser)->delay(now()->addMinutes($i));
         }
     }
 

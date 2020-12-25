@@ -15,7 +15,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/adventures', ['as' => 'adventures.list', 'uses' => 'AdventuresController@index']);
     Route::get('/admin/adventures/create', ['as' => 'adventures.create', 'uses' => 'AdventuresController@create']);
-    Route::post('/admin/adventures/{adventure}/published', ['as' => 'adventure.publish', 'uses' => 'AdventureController@publish']);
+    Route::post('/admin/adventures/{adventure}/published', ['as' => 'adventure.publish', 'uses' => 'AdventuresController@publish']);
     Route::get('/admin/adventures/{adventure}', ['as' => 'adventures.adventure', 'uses' => 'AdventuresController@show']);
     Route::get('/admin/adventures/{adventure}/edit', ['as' => 'adventure.edit', 'uses' => 'AdventuresController@edit']);
     Route::post('/admin/adventures/store', ['as' => 'adventures.store', 'uses' => 'AdventuresController@store']);

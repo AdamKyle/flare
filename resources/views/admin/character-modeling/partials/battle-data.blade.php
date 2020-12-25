@@ -1,6 +1,8 @@
 @foreach ($data as $index => $battleData)
-    @if (is_array($battleData))    
-        @php $isMonster = $battleData['is_monster'] @endphp
+    @if (is_array($battleData))
+        @php
+            $isMonster  = $battleData['is_monster'];
+        @endphp
     
         @if (isset($battleData['message']))
             <p class="text-center {{$isMonster ? 'monster-color' : 'character-color'}}">{{$battleData['message']}}</p>
