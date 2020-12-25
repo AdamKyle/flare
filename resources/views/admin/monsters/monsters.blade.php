@@ -11,6 +11,12 @@
             <a href="{{route('monsters.create')}}" class="btn btn-primary float-right ml-2">Create</a>
         </div>
     </div>
+    <hr />
+    @if ($isProcessingBattle)
+        <div class="alert alert-info mb-2 mt-2">
+            You are currently proccesing a battle. You will be emailed when it is done.
+        </div>
+    @endif
     @livewire('admin.monsters.data-table')
 
     <div class="mb-2">

@@ -86,6 +86,8 @@ class RunTestSimulation implements ShouldQueue
     }
 
     protected function processAdventure() {
+        Cache::put('processing-adventure', true);
+
         for ($i = 1; $i <= $this->totalTimes; $i++) {
             $jobName = Str::random(80);
                 
@@ -101,6 +103,8 @@ class RunTestSimulation implements ShouldQueue
     }
 
     protected function processBattle() {
+        Cache::put('processing-battle', true);
+
         for ($i = 1; $i <= $this->totalTimes; $i++) {
             SimulateBattle::dispatch($this->character, $this->model, $i, $this->totalTimes, $this->adminUser)->delay(now()->addMinutes($i));
         }

@@ -120,6 +120,8 @@ class AdventureJob implements ShouldQueue
 
                 Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your adventure simulation has completed. Login and see the details for adventure: ' . $this->adventure->name . '.', 'Adventure Simulation Results', false));
 
+                Cache::delete('processing-adventure');
+
                 // Finally reset the character back to level 1000.
                 $this->character->update(
                     $this->character->snapShots()->where('snap_shot->level', '1000')->first()->snap_shot

@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Flare\Services\FightService;
+use Cache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -84,6 +85,8 @@ class SimulateBattle implements ShouldQueue
             ]);
 
             Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details for the monster: ' . $this->monster->name . '.', 'Battle Simmulation Results', false));
+
+            Cache::delete('processing-battle');
         }
     }
 }

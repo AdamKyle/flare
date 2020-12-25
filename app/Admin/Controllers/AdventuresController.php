@@ -8,12 +8,13 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
+use Cache;
 
 class AdventuresController extends Controller {
 
     public function index() {
         return view('admin.adventures.adventures', [
-            'adventures' => Adventure::all(),
+            'isProcessingAdventure' => Cache::has('processing-adventure'),
         ]);
     }
 

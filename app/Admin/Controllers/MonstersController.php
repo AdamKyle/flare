@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Monster;
+use Cache;
 
 class MonstersController extends Controller {
 
@@ -15,7 +16,7 @@ class MonstersController extends Controller {
 
     public function index() {
         return view('admin.monsters.monsters', [
-            'adventures' => Monster::all(),
+            'isProcessingBattle' => Cache::has('processing-battle'),
         ]);
     }
 

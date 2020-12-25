@@ -8,6 +8,7 @@ use Livewire\WithPagination;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
+use Cache;
 
 class DataTable extends Component
 {
@@ -39,7 +40,7 @@ class DataTable extends Component
     }
 
     public function mount() {
-        $this->canTest = User::where('is_test', true)->get()->isNotEmpty();
+        $this->canTest = User::where('is_test', true)->get()->isNotEmpty() && !Cache::has('processing-battle');
 
         $this->testCharacters = User::with('character')->where('is_test', true)->get();
     }

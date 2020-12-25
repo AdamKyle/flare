@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\User;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
+use Cache;
 
 class DataTable extends Component
 {
@@ -24,7 +25,7 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function mount() {
-        $this->canTest        = User::where('is_test', true)->get()->isNotEmpty();
+        $this->canTest        = User::where('is_test', true)->get()->isNotEmpty() && !Cache::has('processing-adventure');
         $this->testCharacters = User::with('character')->where('is_test', true)->get();
     }
 
