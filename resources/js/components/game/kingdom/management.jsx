@@ -11,6 +11,18 @@ export default class Management extends React.Component {
         this.props.openKingdomManagement(false);
     }
 
+    kingdomDetails() {
+        return (
+            <div className="row justify-content-center">
+                <div className="col-md-12">
+                    
+                    <p>{this.props.isAdventuring !== null ? <em>You are adventuring. You are currently acting as a trusted adviser.</em> : ''}</p>
+                    <p>Test Content</p>
+                </div>
+            </div>
+        );
+    }
+
     render() {
         return (
             <CardTemplate
@@ -18,11 +30,7 @@ export default class Management extends React.Component {
                 cardTitle="Kingdom Management"
                 close={this.closeManagement.bind(this)}
             >
-                <div className="row justify-content-center">
-                    <div className="col-md-12">
-                        Test Content
-                    </div>
-                </div>
+                {this.props.isPort !== null ? <div className="alert alert-danger">You cannot settle here. This is a port city. Move along.</div> : this.kingdomDetails() }
             </CardTemplate>
         );
     }

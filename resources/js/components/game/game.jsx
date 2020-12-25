@@ -122,7 +122,7 @@ class Game extends React.Component {
                 {this.state.openPortDetails ? <PortLocationActions updateAdventure={this.updateAdventure.bind(this)} portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
                 {this.state.openAdventureDetails ? <AdeventureActions canAdventure={this.canAdventure.bind(this)} updateAdventure={this.updateAdventure.bind(this)} adventureDetails={this.state.adventureDetails} userId={this.props.userId} characterId={this.state.characterId} openAdventureDetails={this.openAdventureDetails.bind(this)} adventureAgainAt={this.state.canAdventureAgainAt} adventureLogs={this.state.adventureLogs} /> : null}
                 {this.state.openTeleportDetails ? <Teleport teleportLocations={this.state.teleportLocations} openTeleportDetails={this.openTeleportDetails.bind(this)} currentX={this.state.current_x} currentY={this.state.current_y} characterId={this.props.characterId}/> : null}
-                {this.state.openKingdomManagement ? <Management openKingdomManagement={this.openKingdomManagement.bind(this)} /> : null}
+                {this.state.openKingdomManagement ? <Management openKingdomManagement={this.openKingdomManagement.bind(this)} isAdventuring={this.state.canAdventureAgainAt} isPort={this.state.portDetails.currentPort}/> : null}
               </div>
               <div className="col-md-3">
                 <Map 
