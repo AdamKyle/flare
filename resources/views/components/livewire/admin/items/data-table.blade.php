@@ -8,21 +8,42 @@
                 </div>
                 @empty ($selected)
                 @else
-                    <div class="float-right pb-2">
-                        <x-forms.button-with-form
-                            form-route="{{route('game.shop.buy.bulk', ['character' => $character->id])}}"
-                            form-id="{{'shop-buy-form-item-in-bulk'}}"
-                            button-title="Buy All"
-                            class="btn btn-primary btn-sm"
-                        >
-                            @forelse( $selected as $item)
-                                <input type="hidden" name="items[]" value="{{$item}}" />
-                            @empty
-                                <input type="hidden" name="items[]" value="" />
-                            @endforelse
-                            
-                        </x-forms.button-with-form>
-                    </div>
+                    @guest
+                    @else
+                        @if (auth()->user()->hasRole('Admin'))
+                            <div class="float-right pb-2">
+                                <x-forms.button-with-form
+                                    form-route="{{route('items.delete.all')}}"
+                                    form-id="{{'delete-items-in-bulk'}}"
+                                    button-title="Delete All"
+                                    class="btn btn-danger btn-sm"
+                                >
+                                    @forelse( $selected as $item)
+                                        <input type="hidden" name="items[]" value="{{$item}}" />
+                                    @empty
+                                        <input type="hidden" name="items[]" value="" />
+                                    @endforelse
+                                    
+                                </x-forms.button-with-form>
+                            </div>
+                        @else
+                            <div class="float-right pb-2">
+                                <x-forms.button-with-form
+                                    form-route="{{route('game.shop.buy.bulk', ['character' => $character->id])}}"
+                                    form-id="{{'shop-buy-form-item-in-bulk'}}"
+                                    button-title="Buy All"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    @forelse( $selected as $item)
+                                        <input type="hidden" name="items[]" value="{{$item}}" />
+                                    @empty
+                                        <input type="hidden" name="items[]" value="" />
+                                    @endforelse
+                                    
+                                </x-forms.button-with-form>
+                            </div>
+                        @endif
+                    @endguest
                 @endempty
                 <x-data-tables.table :collection="$items">
                     <x-data-tables.header>

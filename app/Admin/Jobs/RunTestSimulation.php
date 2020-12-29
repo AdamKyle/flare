@@ -47,6 +47,8 @@ class RunTestSimulation implements ShouldQueue
      */
     public $totalTimes;
 
+    public $sendEmail;
+
     /**
      * Create a new job instance.
      *
@@ -57,12 +59,13 @@ class RunTestSimulation implements ShouldQueue
      * @param User $adminUser | null
      * @return void
      */
-    public function __construct(Character $character, string $type, int $id, int $totalTimes, User $adminUser) {
-        $this->character  = $character;
-        $this->adminUser  = $adminUser;
-        $this->type       = $type;
-        $this->model      = $this->getModel($type, $id);
-        $this->totalTimes = $totalTimes;
+    public function __construct(Character $character, string $type, int $id, int $totalTimes, User $adminUser, bool $sendEmail) {
+        $this->character     = $character;
+        $this->adminUser     = $adminUser;
+        $this->type          = $type;
+        $this->model         = $this->getModel($type, $id);
+        $this->totalTimes    = $totalTimes;
+        $this->sendEmail     = $sendEmail;
     }
 
     /**
@@ -88,17 +91,15 @@ class RunTestSimulation implements ShouldQueue
     protected function processAdventure() {
         Cache::put('processing-adventure', true);
 
-        for ($i = 1; $i <= $this->totalTimes; $i++) {
-            $jobName = Str::random(80);
+        $jobName = Str::random(80);
                 
-            Cache::put('character_'.$this->character->id.'_adventure_'.$this->model->id, $jobName, now()->addMinutes(5));
+        Cache::put('character_'.$this->character->id.'_adventure_'.$this->model->id, $jobName, now()->addMinutes(5));
 
-            for ($j = 1; $j <= $this->model->levels; $j++) {
-                $delay            = $j === 1 ? $this->model->time_per_level : $j * $this->model->time_per_level;
-                $timeTillFinished = now()->addMinutes($delay);
+        for ($i = 1; $i <= $this->model->levels; $i++) {
+            $delay            = $i === 1 ? $this->model->time_per_level : $i * $this->model->time_per_level;
+            $timeTillFinished = now()->addMinutes($delay);
 
-                AdventureJob::dispatch($this->character, $this->model, $jobName, $j, true, $this->adminUser)->delay($timeTillFinished);
-            }
+            AdventureJob::dispatch($this->character, $this->model, $jobName, $i, true, $this->adminUser, $this->sendEmail)->delay($timeTillFinished);
         }
     }
 

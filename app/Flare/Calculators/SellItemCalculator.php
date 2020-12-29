@@ -30,7 +30,7 @@ class SellItemCalculator {
         }
 
         if (!is_null($item->itemPrefix)) {
-            $total += $item->itemSuffix->cost;
+            $total += $item->itemPrefix->cost;
         }
 
         return $total;

@@ -32,6 +32,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
     Route::get('/admin/items/{item}/edit', ['as' => 'items.edit', 'uses' => 'ItemsController@edit']);
     Route::post('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);
+    Route::post('/admin/items/delete-all', ['as' => 'items.delete.all', 'uses' => 'ItemsController@deleteAll']);
 
     Route::get('/admin/affixes', ['as' => 'affixes.list', 'uses' => 'AffixesController@index']);
     Route::get('/admin/affixes/create', ['as' => 'affixes.create', 'uses' => 'AffixesController@create']);

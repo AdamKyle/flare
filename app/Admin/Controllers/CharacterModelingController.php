@@ -185,6 +185,8 @@ class CharacterModelingController extends Controller {
                 break;
         }
 
+        $sendEmail = false;
+
         foreach ($request->characters as $index => $id) {
             $character = Character::find($id);
 
@@ -201,7 +203,11 @@ class CharacterModelingController extends Controller {
 
             $character->update($snapShot->snap_shot);
 
-            RunTestSimulation::dispatch($character, $request->type, $request->model_id, $request->total_times, auth()->user());
+            if ($index === $totalCharacters) {
+                $sendEmail = true;
+            }
+            
+            RunTestSimulation::dispatch($character->refresh(), $request->type, $request->model_id, $request->total_times, auth()->user(), $sendEmail, $index);
         }
         
         return redirect()->back()->with('success', 'Testing under way. You may log out, we will email you when done.');

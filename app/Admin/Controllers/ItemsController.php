@@ -8,6 +8,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class ItemsController extends Controller {
 
@@ -58,5 +59,42 @@ class ItemsController extends Controller {
         $item->delete();
 
         return redirect()->back()->with('success', $name . ' was deleted successfully.');
+    }
+
+    public function deleteAll(Request $request) {
+        foreach($request->items as $item) {
+            $item  = Item::find($item);
+
+            if (is_null($item)) {
+                return redirect()->back()->with('error', 'Invalid input.');
+            }
+
+            $slots = InventorySlot::where('item_id', $item->id)->get();
+            $name  = $item->affix_name;
+
+            if ($slots->isEmpty()) {
+                $item->delete();
+            }
+
+            foreach($slots as $slot) {
+                $character = $slot->inventory->character;
+
+                $slot->delete();
+
+                $gold = SellItemCalculator::fetchTotalSalePrice($item);
+
+                $character->gold += $gold;
+                $character->save();
+
+                $character = $character->refresh();
+
+                event(new ServerMessageEvent($character->user, 'deleted_item', $name));
+                event(new UpdateTopBarEvent($character));
+            }
+
+            $item->delete();
+        }
+
+        return redirect()->back()->with('success', 'Deleted all selected items');
     }
 }
