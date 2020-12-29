@@ -39,21 +39,16 @@ class RandomItemDropBuilder {
     public function generateItem(): Item {
         $item          = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])->where('type', '!=', 'artifact')->where('type', '!=', 'quest')->get()->first();
         $duplicateItem = $this->duplicateItem($item);
+        $affix         = $this->fetchRandomItemAffix();
 
-        $affix = $this->fetchRandomItemAffix();
-        
         if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
-            $hasSameAffix = $this->hasSameAffix($duplicateItem, $affix);
-            
-            if ($hasSameAffix) {
-                $duplicateItem->delete();
-
-                return $item;
-            } else {
-                $this->attachAffix($duplicateItem, $affix);
-            }
+            $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         } else {
-            $this->attachAffix($duplicateItem, $affix);
+            $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
+        }
+
+        if (is_null($duplicateItem)) {
+            return $item;
         }
 
         $duplicateItem->update([
@@ -63,6 +58,16 @@ class RandomItemDropBuilder {
         return $duplicateItem->refresh();
     }
 
+    protected function attachAffixOrDelete(Item $duplicateItem, ItemAffix $affix) {
+        if ($this->hasSameAffix($duplicateItem, $affix)) {
+            $duplicateItem->delete();
+        } else {
+            return $this->attachAffix($duplicateItem, $affix);
+        }
+
+        return null;
+    }
+
     protected function duplicateItem(Item $item): Item {
         $duplicateItem = $item->duplicate();
 
@@ -70,13 +75,9 @@ class RandomItemDropBuilder {
     }
 
     protected function hasSameAffix(Item $duplicateItem, ItemAffix $affix): bool {
-        $foundAffix = $duplicateItem->{'item'.ucFirst($affix->type)};
-
-        if (is_null($foundAffix)) {
-            return false;
-        }
-
-        return $foundAffix->name === $affix->name;
+        $item = Item::where('item_' . $affix->type . '_id', $affix->id)->where('name', $duplicateItem->name)->first();
+                    
+        return !is_null($item);
     }
 
     protected function attachAffix(Item $item, ItemAffix $itemAffix): Item {
