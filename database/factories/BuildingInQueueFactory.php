@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\Building;
 
-class BuildingFactory extends Factory
+class BuildingInQueueFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -22,13 +22,11 @@ class BuildingFactory extends Factory
     public function definition()
     {
         return [
-            'game_building_id'  => null,
-            'kingdoms_id'       => null,
-            'level'             => null,
-            'current_defence'   => 0,
-            'curent_durability' => 0,
-            'max_defence'       => 0,
-            'max_durability'    => 0,
+            'character_id' => null,
+            'kingdom_id'   => null,
+            'building_id'  => null,
+            'to_level'     => null,
+            'completed_at' => now(),
         ];
     }
 }

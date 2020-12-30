@@ -22,6 +22,10 @@ class CreateBuildings extends Migration
             $table->foreign('kingdoms_id', 'buildsings_kid')
                 ->references('id')->on('kingdoms');
             $table->integer('level');
+            $table->integer('max_defence');
+            $table->integer('max_durability');
+            $table->integer('current_defence');
+            $table->integer('current_durability');
             $table->timestamps();
         });
     }

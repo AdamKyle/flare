@@ -42,6 +42,12 @@
         </ul>
     </li>
     <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-guarded-tower"></i><span class="hide-menu">Kingdoms</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('buildings.list')}}">Buildings</a></li>
+        </ul>
+    </li>
+    <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-eye-monster"></i><span class="hide-menu">Manage Monsters</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('monsters.list')}}">Monsters</a></li>

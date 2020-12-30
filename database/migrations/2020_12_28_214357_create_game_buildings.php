@@ -16,11 +16,12 @@ class CreateGameBuildings extends Migration
         Schema::create('game_buildings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->string('description');
+            $table->text('description');
             $table->integer('max_level');
             $table->integer('base_durability');
             $table->integer('base_defence');
             $table->integer('required_population');
+            $table->boolean('is_resource_building')->nullable()->default(false);
             $table->boolean('is_walls')->nullable()->default(false);
             $table->boolean('is_church')->nullable()->default(false);
             $table->boolean('is_farm')->nullable()->default(false);
@@ -28,6 +29,9 @@ class CreateGameBuildings extends Migration
             $table->integer('clay_cost')->nullable()->default(0);
             $table->integer('stone_cost')->nullable()->default(0);
             $table->integer('iron_cost')->nullable()->default(0);
+            $table->double('time_to_build')->nullable()->default(1);
+            $table->double('time_increase_amount')->nullable()->default(0);
+            $table->double('decrease_morale_amount')->nullable()->default(0);
             $table->integer('increase_population_amount')->nullable()->default(0);
             $table->double('increase_morale_amount')->nullable()->default(0);
             $table->double('increase_wood_amount')->nullable()->default(0);

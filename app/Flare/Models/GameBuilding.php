@@ -33,6 +33,7 @@ class GameBuilding extends Model
         'iron_cost',
         'increase_population_amount',
         'increase_morale_amount',
+        'decrease_morale_amount',
         'increase_wood_amount',
         'increase_clay_amount',
         'increase_stone_amount',
@@ -59,6 +60,7 @@ class GameBuilding extends Model
         'stone_cost'                  => 'integer',
         'iron_cost'                   => 'integer',
         'increase_population_amount'  => 'integer',
+        'decrease_morale_amount'      => 'float',
         'increase_morale_amount'      => 'float',
         'increase_wood_amount'        => 'float',
         'increase_clay_amount'        => 'float',
@@ -66,6 +68,8 @@ class GameBuilding extends Model
         'increase_iron_amount'        => 'float',
         'increase_durability_amount'  => 'float',
         'increase_defence_amount'     => 'float',
+        'time_to_build'               => 'float',     
+        'time_increase_amount'        => 'float',
     ];
 
     protected static function newFactory() {

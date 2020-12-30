@@ -33,7 +33,7 @@ export default class KingdomModal extends React.Component {
     }
 
     settle() {
-        const kingdomName = this.kingdom_name.trim();
+        const kingdomName = this.state.kingdom_name.trim();
 
         this.setState({
             errorMessage: null
@@ -57,7 +57,7 @@ export default class KingdomModal extends React.Component {
             });
         }
 
-        if (color === null) {
+        if (this.state.color === null) {
             this.setState({
                 errorMessage: 'You need to pick a color.'
             });

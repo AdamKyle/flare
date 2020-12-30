@@ -78,4 +78,9 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/character-modeling/{character}/apply-snap-shot', ['as' => 'admin.character.modeling.assign-snap-shot', 'uses' => 'CharacterModelingController@applySnapShot']);
     Route::post('/admin/character-modeling/generate', ['as' => 'admin.character.modeling.generate', 'uses' => 'CharacterModelingController@generate']);
     Route::post('/admin/character-modeling/test', ['as' => 'admin.character.modeling.test', 'uses' => 'CharacterModelingController@test']);
+
+    Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
+    Route::get('/admin/kingdoms/buildings', ['as' => 'buildings.list', 'uses' => 'BuildingsController@index']);
+    Route::get('/admin/kingdoms/buildings/{building}', ['as' => 'buildings.building', 'uses' => 'BuildingsController@show']);
+    Route::get('/admin/kingdoms/buildings/edit/{building}', ['as' => 'buildings.edit', 'uses' => 'BuildingsController@edit']);
 });

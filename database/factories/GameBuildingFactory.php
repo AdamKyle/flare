@@ -28,6 +28,7 @@ class GameBuildingFactory extends Factory
             'base_durability'             => 100,
             'base_defence'                => 100,
             'required_population'         => 10,
+            'is_resource_building'        => false,
             'is_walls'                    => false,
             'is_church'                   => false,
             'is_farm'                     => false,
@@ -37,12 +38,15 @@ class GameBuildingFactory extends Factory
             'iron_cost'                   => 10,
             'increase_population_amount'  => 5,
             'increase_morale_amount'      => 0.05,
+            'decrease_morale_amount'      => 0.05,
             'increase_wood_amount'        => 0.05,
             'increase_clay_amount'        => 0.05,
             'increase_stone_amount'       => 0.05,
             'increase_iron_amount'        => 0.05,
             'increase_durability_amount'  => 0.10,
             'increase_defence_amount'     => 0.10,
+            'time_to_build'               => 0.01,     
+            'time_increase_amount'        => 0.01,
         ];
     }
 }

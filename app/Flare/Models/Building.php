@@ -3,10 +3,13 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\GameBuildingFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\BuildingFactory;
 
 class Building extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -17,6 +20,10 @@ class Building extends Model
         'game_building_id',
         'kingdoms_id',
         'level',
+        'current_defence',
+        'current_durability',
+        'max_defence',
+        'max_durability',
     ];
 
     /**
@@ -25,7 +32,11 @@ class Building extends Model
      * @var array
      */
     protected $casts = [
-        'level' => 'integer'
+        'level'              => 'integer',
+        'current_defence'    => 'integer',
+        'current_durability' => 'integer',
+        'max_defence'        => 'integer',
+        'max_durability'     => 'integer',
     ];
 
     public function getNameAttribute() {
@@ -92,6 +103,14 @@ class Building extends Model
         return $this->level * $this->gameBuilding->increase_population_amount;
     }
 
+    public function getTimeIncreaseAttribute() {
+        if ($this->level === 1) {
+            return $this->gameBuilding->time_to_build;
+        }
+
+        return ($this->level * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
+    }
+
     public function getMoraleIncreaseAttribute() {
         return ($this->level / 100) + $this->gameBuilding->increase_morale_amount;
     }
@@ -122,5 +141,9 @@ class Building extends Model
 
     public function kingdom() {
         return $this->belongsTo(Kingdom::class);
+    }
+
+    protected static function newFactory() {
+        return BuildingFactory::new();
     }
 }
