@@ -9,8 +9,9 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\Kingdom;
+use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
@@ -18,6 +19,8 @@ use App\Game\Maps\Adventure\Services\MovementService;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\Game\Maps\Adventure\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class MapController extends Controller {
 
@@ -41,7 +44,7 @@ class MapController extends Controller {
         $this->middleware('is.character.dead')->except(['index']);
     }
 
-    public function index(User $user) {
+    public function index(User $user, Manager $manager, KingdomTransformer $kingdom) {
         $location         = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->first();
         $portDetails      = null;
         $adventureDetails = null;
@@ -53,6 +56,9 @@ class MapController extends Controller {
             
             $adventureDetails = $location->adventures;
         }
+
+        $kingdoms = Kingdom::with('buildings', 'buildings.gameBuilding')->where('character_id', $user->character->id)->get();
+        $kingdoms = new Collection($kingdoms, $kingdom);
 
         return response()->json([
             'map_url'                => Storage::disk('maps')->url($user->character->map->gameMap->path),
@@ -68,6 +74,7 @@ class MapController extends Controller {
             'adventure_completed_at' => $user->character->can_adventure_again_at,
             'is_dead'                => $user->character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
+            'my_kingdoms'            => $manager->createData($kingdoms)->toArray(),
         ]);
     }
 

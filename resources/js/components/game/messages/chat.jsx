@@ -35,7 +35,6 @@ export default class Chat extends React.Component {
       result.data.forEach((message) => {
         let newMessage = message;
 
-        newMessage['name'] = null;
         newMessage['from_god'] = this.isGod(message.user);
 
         messages.push(newMessage);
@@ -52,6 +51,8 @@ export default class Chat extends React.Component {
       message['user']     = event.user;
       message['name']     = event.name;
       message['from_god'] = this.isGod(event.user);
+      message['x']        = event.x;
+      message['y']        = event.y;
 
       const messages = cloneDeep(this.state.messages);
 
@@ -143,6 +144,12 @@ export default class Chat extends React.Component {
     });
   }
 
+  fetchLocationInfo(message) {
+    return (
+      <span>[{message.x}/{message.y}]</span>
+    );
+  }
+
   rendermessages() {
     const elements = [];
 
@@ -195,7 +202,7 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id}>
               <div className="message">
-                <strong onClick={this.messageUser.bind(this)} data-name={message.name}>{message.name}</strong>: {message.message}
+                {message.x !== 0 && message.y !== 0 ? this.fetchLocationInfo(message) : null} <strong onClick={this.messageUser.bind(this)} data-name={message.name}>{message.name}</strong>: {message.message}
               </div>
             </li>
           )

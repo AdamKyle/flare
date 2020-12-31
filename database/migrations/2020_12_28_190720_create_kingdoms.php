@@ -35,7 +35,7 @@ class CreateKingdoms extends Migration
             $table->integer('max_population');
             $table->integer('x_position');
             $table->integer('y_position');
-            $table->double('curent_morale');
+            $table->double('current_morale');
             $table->double('max_morale');
             $table->integer('treasury')->nullable()->default(0);
             $table->timestamps();

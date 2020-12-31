@@ -17,6 +17,7 @@ use App\Flare\Services\FightService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\ItemTransfromer;
+use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\BaseSkillValue;
@@ -56,6 +57,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterSheetTransformer::class, function($app){
             return new CharacterSheetTransformer();
+        });
+
+        $this->app->bind(KingdomTransformer::class, function($app){
+            return new KingdomTransformer();
         });
 
         $this->app->bind(MonsterTransfromer::class, function($app){

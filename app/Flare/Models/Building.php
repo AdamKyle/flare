@@ -136,11 +136,11 @@ class Building extends Model
     }
 
     public function gameBuilding() {
-        return $this->belongsTo(GameBuilding::class);
+        return $this->belongsTo(GameBuilding::class, 'game_building_id', 'id');
     }
 
     public function kingdom() {
-        return $this->belongsTo(Kingdom::class);
+        return $this->belongsTo(Kingdom::class, 'kingdoms_id', 'id');
     }
 
     protected static function newFactory() {

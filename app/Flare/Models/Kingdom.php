@@ -63,6 +63,10 @@ class Kingdom extends Model
         'treasury'           => 'integer',
     ];
 
+    public function buildings() {
+        return $this->hasMany(Building::class, 'kingdoms_id', 'id');
+    }
+
     protected static function newFactory() {
         return KingdomFactory::new();
     }

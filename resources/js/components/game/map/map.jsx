@@ -44,6 +44,7 @@ export default class Map extends React.Component {
       timeRemaining: null,
       isDead: false,
       isAdventuring: false,
+      kingdoms: [],
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -77,7 +78,8 @@ export default class Map extends React.Component {
         adventureLogs: result.data.adventure_logs,
         canAdventureAgainAt: result.data.adventure_completed_at,
         isAdventuring: !_.isEmpty(result.data.adventure_logs.filter(al => al.in_progress)),
-        teleportLocations: result.data.teleport
+        teleportLocations: result.data.teleport,
+        kingdoms: result.data.my_kingdoms,
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -123,8 +125,6 @@ export default class Map extends React.Component {
 
     this.updateMap.listen('Game.Maps.Adventure.Events.UpdateMapDetailsBroadcast', (event) => {
       this.updatePlayerPosition(event.map);
-
-      console.log(event);
 
       this.setState({
         currentPort: event.portDetails.current_port,
@@ -355,6 +355,25 @@ export default class Map extends React.Component {
     });
   }
 
+  renderKingdoms() {
+    return this.state.kingdoms.map((kingdom) => {
+      let style = {
+        top: kingdom.y_position, 
+        left: kingdom.x_position,
+        '--kingdom-color': kingdom.color
+      };
+
+      return (
+        <div
+          key={Math.random().toString(36).substring(7) + '-' + kingdom.id}
+          data-kingdom-id={kingdom.id}
+          className="kingdom-x-pin"
+          style={style}>
+        </div>
+      )
+    });
+  }
+
   openPortDetails() {
     this.props.openPortDetails(true);
   }
@@ -400,6 +419,7 @@ export default class Map extends React.Component {
             <div>
               <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
                 {this.renderLocations()}
+                {this.renderKingdoms()}
                 <div className="map-x-pin" style={this.playerIcon()}></div>
               </div>
             </div>

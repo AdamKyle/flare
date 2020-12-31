@@ -13,6 +13,8 @@ class Message extends Model
         'message',
         'from_user',
         'to_user',
+        'x_position',
+        'y_position',
     ];
 
     public function user() {

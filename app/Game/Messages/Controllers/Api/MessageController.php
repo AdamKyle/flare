@@ -33,21 +33,44 @@ class MessageController extends Controller {
     }
 
     public function fetchMessages() {
+        $messages = Message::with(['user', 'user.roles', 'user.character'])
+                            ->where('from_user', null)
+                            ->where('to_user', null)
+                            ->where('created_at', '>=', now()->subHour())
+                            ->orderBy('created_at', 'desc')
+                            ->take(15)
+                            ->get()
+                            ->transform(function($message) {
+                                $message->x    = $message->x_position;
+                                $message->y    = $message->y_position;
+                                $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
+
+                                return $message;
+                            })
+                            ->all();
+
         return response()->json(
-            Message::with(['user', 'user.roles', 'user.character'])
-                ->where('from_user', null)
-                ->where('to_user', null)
-                ->where('created_at', '>=', now()->subHour())
-                ->orderBy('created_at', 'desc')
-                ->take(15)
-                ->get(),
+            $messages,
             200
         );
     }
 
     public function postPublicMessage(Request $request) {
+        $character = null;
+        $x         = 0;
+        $y         = 0;
+
+        if (!auth()->user()->hasRole('Admin')) {
+            $character = auth()->user()->character;
+
+            $x = $character->map->character_position_x;
+            $y = $character->map->character_position_y;
+        }
+
         $message = auth()->user()->messages()->create([
-            'message' => $request->message,
+            'message'    => $request->message,
+            'x_position' => $x,
+            'y_position' => $y,
         ]);
 
         broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();

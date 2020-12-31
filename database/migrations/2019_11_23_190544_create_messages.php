@@ -25,6 +25,8 @@ class CreateMessages extends Migration
             $table->foreign('to_user')
                 ->references('id')->on('users');
             $table->text('message');
+            $table->integer('x_position')->nullable()->default(0);
+            $table->integer('y_position')->nullable()->default(0);
             $table->timestamps();
         });
     }

@@ -24,7 +24,7 @@ class KingdomsSettleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => 'required|min:5|max:15',
+            'name'         => 'required|unique:kingdoms|min:5|max:15',
             'color'        => 'required',
             'x_position'   => 'required',
             'y_position'   => 'required',

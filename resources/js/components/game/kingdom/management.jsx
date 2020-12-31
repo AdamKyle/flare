@@ -1,4 +1,5 @@
 import React from 'react';
+import ContentLoader from 'react-content-loader';
 import CardTemplate from '../components/templates/card-template';
 import KingdomModal from './modal/kingdom-modal';
 
@@ -11,6 +12,9 @@ export default class Management extends React.Component {
             xPosition: props.xPosition,
             yPosition: props.yPosition,
             openSettleModal: false,
+            is_own_kingdom: false,
+            can_settle: true,
+            isLoading: true,
         }
     }
 
@@ -45,10 +49,36 @@ export default class Management extends React.Component {
                 y_position: this.state.yPosition,
             }
         }).then((result) => {
-            console.log(result);
+            const data = result.data;
+
+            this.setState({
+                is_own_kingdom: this.isOwnKingdom(data),
+                can_settle: this.canSettle(data),
+                isLoading: false,
+            })
         }).catch((error) => {
             console.error(error);
         });
+    }
+
+    isOwnKingdom(data) {
+        if (_.isEmpty(data)) {
+            return false;
+        }
+
+        return data.character_id === this.props.characterId;
+    }
+
+    canSettle(data) {
+        if (this.props.is_port) {
+            return false;
+        }
+        
+        if (_.isEmpty(data)) {
+            return true
+        }
+
+        return false;
     }
 
     closeManagement() {
@@ -78,8 +108,13 @@ export default class Management extends React.Component {
                         <div className="col-md-2 mt-2">
                         <strong>Location (X/Y):</strong> {this.state.xPosition} / {this.state.yPosition}
                         </div>
-                        <div className="col-md-10 text-align-left">
+
+                        <div className={this.state.is_own_kingdom ? "col-md-10 text-align-left hide" : "col-md-10 text-align-left"}>
                             <button className="btn btn-primary" onClick={this.openKingdomModal.bind(this)}>Settle Kingdom</button>
+                        </div>
+
+                        <div className={!this.state.is_own_kingdom ? "col-md-10 text-align-left hide" : "col-md-10 text-align-left"}>
+                            <button className="btn btn-primary" onClick={this.openKingdomModal.bind(this)}>Manage Kingdom</button>
                         </div>
                     </div>
                 </div>
@@ -90,13 +125,26 @@ export default class Management extends React.Component {
     }
 
     render() {
+        if (this.state.isLoading) {
+            return (
+                <CardTemplate>
+                    <ContentLoader viewBox="0 0 380 30">
+                        {/* Only SVG shapes */}    
+                        <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
+                        <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
+                        <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
+                    </ContentLoader>
+                </CardTemplate>
+            );
+        }
+
         return (
             <CardTemplate
                 OtherCss="p-3"
                 cardTitle="Kingdom Management"
                 close={this.closeManagement.bind(this)}
             >
-                {this.props.isPort !== null ? <div className="alert alert-danger">You cannot settle here. This is a port city. Move along.</div> : this.kingdomDetails() }
+                {!this.state.can_settle && !this.state.is_own_kingdom ? <div className="alert alert-danger">You cannot settle here. Move along.</div> : this.kingdomDetails() }
             </CardTemplate>
         );
     }

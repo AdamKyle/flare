@@ -197,6 +197,7 @@ return [
       App\Game\Maps\Adventure\Providers\ServiceProvider::class,
       App\Game\Maps\Adventure\Providers\EventsProvider::class,
       App\Game\Maps\Providers\ServiceProvider::class,
+      App\Game\Kingdoms\Providers\ServiceProvider::class,
     ],
 
     /*

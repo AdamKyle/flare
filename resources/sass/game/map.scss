@@ -3,7 +3,7 @@
   max-height: 350px;
 
   .game-map {
-    .map-x-pin, .location-x-pin, .port-x-pin {
+    .map-x-pin, .location-x-pin, .port-x-pin, .kingdom-x-pin {
       background-color: black; /* So we can see where the pixel is */
       height: 1px;
       position: absolute;
@@ -30,6 +30,17 @@
         content: '\f6d9';
         font-size: 16px;
         color: #d9a29e;
+        top: -18px;
+        left: -6px;
+      }
+    }
+
+    .kingdom-x-pin {
+      &:after {
+        font-family: 'RPGAwesome';
+        content: '\e95d';
+        font-size: 16px;
+        color: var(--kingdom-color);
         top: -18px;
         left: -6px;
       }
