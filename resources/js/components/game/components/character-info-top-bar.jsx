@@ -63,62 +63,103 @@ export default class CharacterInfoTopBar extends React.Component {
       <CardTemplate otherClasses="character-top-bar mb-4" loadingStatus={this.state.isLoading}>
         <div className="row">
           <div className="col-md-3">
-            <span className="title">Name:</span> <span className="value">{sheet.name}</span>
+            <dl>
+              <dt><strong>Name</strong>:</dt>
+              <dd>{sheet.name}</dd>
+            </dl>
           </div>
           <div className="col-md-3">
-            <span className="title">Race:</span> <span className="value">{sheet.race}</span>
+            <dl>
+              <dt><strong>Race</strong>:</dt>
+              <dd>{sheet.race}</dd>
+            </dl>
           </div>
           <div className="col-md-3">
-            <span className="title">Class:</span> <span className="value">{sheet.class}</span>
+            <dl>
+              <dt><strong>Class</strong>:</dt>
+              <dd>{sheet.class}</dd>
+            </dl>
           </div>
           <div className="col-md-3">
-            <span className="title">Gold:</span> <span className="value">{sheet.gold}</span>
+            <dl>
+              <dt><strong>Gold</strong>:</dt>
+              <dd>{sheet.gold}</dd>
+            </dl>
           </div>
         </div>
         <hr />
         <div className="row">
           <div className="col-md-2">
-            <span className="title">Level:</span> <span className="value">{sheet.level}</span>
+            <dl>
+              <dt><strong>Level</strong>:</dt>
+              <dd>{sheet.level}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">AC:</span> <span className="value">{sheet.ac}</span>
+            <dl>
+              <dt><strong>AC</strong>:</dt>
+              <dd>{sheet.ac}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">Health:</span> <span className="value">{sheet.health}</span>
+            <dl>
+              <dt><strong>Health</strong>:</dt>
+              <dd>{sheet.health}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">Attack:</span> <span className="value">{sheet.attack}</span>
+            <dl>
+              <dt><strong>Attack</strong>:</dt>
+              <dd>{sheet.attack}</dd>
+            </dl>
           </div>
-          <div className="col-md-4 xp-bar">
-            <span className="title">Xp:</span>
-            <span className="value">
-              <div className="progress level-bar mb-2">
-                <div className="progress-bar skill-bar" role="progressbar"
-                  style={{ width: xpValue + '%' }}
-                  aria-valuenow={sheet.xp} aria-valuemin="0"
-                  aria-valuemax={sheet.xp_next}
-                >
-                  {sheet.xp}
+          <div className="col-md-4">
+            <dl>
+              <dt><strong>XP</strong>:</dt>
+              <dd>
+                <div className="progress level-bar mb-2">
+                  <div className="progress-bar skill-bar" role="progressbar"
+                    style={{ width: xpValue + '%' }}
+                    aria-valuenow={sheet.xp} aria-valuemin="0"
+                    aria-valuemax={sheet.xp_next}
+                  >
+                    {sheet.xp}
+                  </div>
                 </div>
-              </div>
-            </span>
+              </dd>
+            </dl>
           </div>
         </div>
         <div className="row">
           <div className="col-md-2">
-            <span className="title">Strength:</span> <span className="value">{Math.round(sheet.str_modded)}</span>
+            <dl>
+              <dt><strong>Strength</strong>:</dt>
+              <dd>{sheet.str_modded}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">Durability:</span> <span className="value">{Math.round(sheet.dur_modded)}</span>
+            <dl>
+              <dt><strong>Durability</strong>:</dt>
+              <dd>{sheet.dur_modded}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">Dexterity:</span> <span className="value">{Math.round(sheet.dex_modded)}</span>
+            <dl>
+              <dt><strong>Dexterity</strong>:</dt>
+              <dd>{sheet.dex_modded}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">Intelligence:</span> <span className="value">{Math.round(sheet.int_modded)}</span>
+            <dl>
+              <dt><strong>Intelligence</strong>:</dt>
+              <dd>{sheet.int_modded}</dd>
+            </dl>
           </div>
           <div className="col-md-2">
-            <span className="title">Charisma:</span> <span className="value">{Math.round(sheet.chr_modded)}</span>
+            <dl>
+              <dt><strong>Charisma</strong>:</dt>
+              <dd>{sheet.chr_modded}</dd>
+            </dl>
           </div>
         </div>
 

@@ -51,6 +51,7 @@ export default class Map extends React.Component {
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
     this.updateMap = Echo.private('update-map-' + this.props.userId);
+    this.addKingomToMap = Echo.private('add-kingdom-to-map-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -148,6 +149,16 @@ export default class Map extends React.Component {
         if (_.isEmpty(event.adventureDetails)) {
           this.props.openAdventureDetails(false);
         }
+      });
+    });
+    
+    this.addKingomToMap.listen('Game.Kingdoms.Events.AddKingdomToMap', (event) => {
+      const kingdoms = _.cloneDeep(this.state.kingdoms);
+
+      kingdoms.push(event.kingdom);
+
+      this.setState({
+        kingdoms: kingdoms,
       });
     });
   }

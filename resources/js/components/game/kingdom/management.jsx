@@ -1,6 +1,7 @@
 import React from 'react';
 import ContentLoader from 'react-content-loader';
 import CardTemplate from '../components/templates/card-template';
+import KingdomManagementModal from './modal/kingdom-management-modal';
 import KingdomModal from './modal/kingdom-modal';
 
 export default class Management extends React.Component {
@@ -12,9 +13,11 @@ export default class Management extends React.Component {
             xPosition: props.xPosition,
             yPosition: props.yPosition,
             openSettleModal: false,
+            openManagementModal: false,
             is_own_kingdom: false,
             can_settle: true,
             isLoading: true,
+            kingdomData: [],
         }
     }
 
@@ -55,6 +58,7 @@ export default class Management extends React.Component {
                 is_own_kingdom: this.isOwnKingdom(data),
                 can_settle: this.canSettle(data),
                 isLoading: false,
+                kingdomData: result.data,
             })
         }).catch((error) => {
             console.error(error);
@@ -101,6 +105,25 @@ export default class Management extends React.Component {
         });
     }
 
+    closeKingdomManagementModal() {
+        this.setState({
+            openKingdomManagement: false,
+        });
+    }
+
+    openKingdomManagementModal() {
+        this.setState({
+            openKingdomManagement: true,
+        });
+    }
+
+    updateKingdomData(data) {
+        this.setState({
+            kingdomData: data,
+            openKingdomManagement: true,
+        });
+    }
+
     kingdomDetails() {
         return (
             <div className="row justify-content-center">
@@ -118,12 +141,13 @@ export default class Management extends React.Component {
                         </div>
 
                         <div className={!this.state.is_own_kingdom ? "col-md-10 text-align-left hide" : "col-md-10 text-align-left"}>
-                            <button className="btn btn-primary" onClick={this.openKingdomModal.bind(this)}>Manage Kingdom</button>
+                            <button className="btn btn-primary" onClick={this.openKingdomManagementModal.bind(this)}>Manage Kingdom</button>
                         </div>
                     </div>
                 </div>
 
-                {this.state.openSettleModal ? <KingdomModal characterId={this.props.characterId} show={this.state.openSettleModal} x={this.state.xPosition} y={this.state.yPosition} close={this.closeKingdomModal.bind(this)} /> : null}
+                {this.state.openSettleModal ? <KingdomModal characterId={this.props.characterId} show={this.state.openSettleModal} x={this.state.xPosition} y={this.state.yPosition} close={this.closeKingdomModal.bind(this)} updateKingdomData={this.updateKingdomData.bind(this)} /> : null}
+                {this.state.openKingdomManagement ? <KingdomManagementModal show={this.state.openKingdomManagement} close={this.closeKingdomManagementModal.bind(this)} kingdom={this.state.kingdomData} /> : null}
             </div>
         );
     }

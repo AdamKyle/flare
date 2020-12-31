@@ -316,7 +316,7 @@ export default class Chat extends React.Component {
         <div className="card-body">
           <div className="chat">
             <div className="row">
-              <div className="col-11">
+              <div className="col-md-11">
                 <input
                   type="text"
                   className="form-control input-sm"
@@ -327,14 +327,14 @@ export default class Chat extends React.Component {
                 />
               </div>
 
-              <div className="col-1">
+              <div className="col-md-1 message-button">
                 <button className="btn btn-primary" onClick={this.handleOnClick.bind(this)}>Send</button>
               </div>
             </div>
 
             <div className="row">
               <div className="col-md-12">
-                <div className="chat-box mt-3 pt-3 pl-3">
+                <div className="chat-box mt-3">
                   <ul> { this.rendermessages() }</ul>
                 </div>
               </div>

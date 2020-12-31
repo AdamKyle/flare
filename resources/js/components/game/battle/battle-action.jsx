@@ -253,7 +253,7 @@ export default class BattleAction extends React.Component {
         }
         <div className="form-group row">
             <div className="col-md-8">
-                <select className="form-control ml-3" id="monsters" name="monsters"
+                <select className="form-control monster-select" id="monsters" name="monsters"
                   value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
                   onChange={this.updateActions.bind(this)}
                   disabled={this.state.character.is_dead || this.state.isAdventuring}>

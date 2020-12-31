@@ -3,9 +3,11 @@
   color: #fff;
   overflow-y: scroll;
   min-height: 500px;
+  padding-top: 10px;
 
   ul {
     list-style: none;
+    margin-left: -20px;
 
     .private-message {
       color: #b684c0;
@@ -41,5 +43,11 @@
         cursor: pointer;
       }
     }
+  }
+}
+
+.message-button {
+  @media only screen and (max-width: 768px) {
+    margin-top: 10px;
   }
 }

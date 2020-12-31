@@ -15,10 +15,22 @@
   }
 }
 
+.monster-select {
+  @media only screen and (max-width: 768px) {
+    margin-top: 10px;
+    margin-bottom: 10px
+  }
+}
+
 .character-timeout {
   float: left;
   margin-top: -10px;
   margin-left: -40px;
+
+  @media only screen and (max-width: 768px) {
+    margin-top: 10px;
+    margin-left: -40px;
+  }
 
   .timer {
     font-size: 12px;
@@ -32,6 +44,10 @@
 .character-ready {
   position: relative;
   left: -40px;
+
+  @media only screen and (max-width: 768px) {
+    left: -20px;
+  }
 }
 
 .character-map-timeout {

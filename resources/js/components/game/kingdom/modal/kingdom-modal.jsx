@@ -71,7 +71,8 @@ export default class KingdomModal extends React.Component {
         }
 
         axios.post('/api/kingdoms/'+this.props.characterId+'/settle', params).then((result) => {
-            console.log(result);
+            this.props.updateKingdomData(result.data);
+            this.props.close();
         }).catch((error) => {
             console.error(error);
         });

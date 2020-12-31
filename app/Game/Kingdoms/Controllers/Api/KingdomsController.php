@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Requests\KingdomsLocationRequest;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
 use App\Game\Kingdoms\Service\KingdomService;
@@ -56,6 +57,10 @@ class KingdomsController extends Controller {
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 
-        return response()->json($this->manager->createData($kingdom)->toArray(), 200);
+        $kingdom = $this->manager->createData($kingdom)->toArray();
+
+        event(new AddKingdomToMap($character->user, $kingdom));
+
+        return response()->json($kingdom, 200);
     }
 }
