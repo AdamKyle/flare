@@ -62,15 +62,19 @@ export default class Management extends React.Component {
     }
 
     isOwnKingdom(data) {
-        if (_.isEmpty(data)) {
+        if (this.props.isPort !== null) {
             return false;
         }
 
+        if (_.isEmpty(data)) {
+            return false;
+        }
+        
         return data.character_id === this.props.characterId;
     }
 
     canSettle(data) {
-        if (this.props.is_port) {
+        if (this.props.isPort !== null) {
             return false;
         }
         
@@ -78,7 +82,7 @@ export default class Management extends React.Component {
             return true
         }
 
-        return false;
+        return this.isOwnKingdom(data);
     }
 
     closeManagement() {
@@ -125,6 +129,7 @@ export default class Management extends React.Component {
     }
 
     render() {
+        
         if (this.state.isLoading) {
             return (
                 <CardTemplate>
@@ -144,6 +149,7 @@ export default class Management extends React.Component {
                 cardTitle="Kingdom Management"
                 close={this.closeManagement.bind(this)}
             >
+                
                 {!this.state.can_settle && !this.state.is_own_kingdom ? <div className="alert alert-danger">You cannot settle here. Move along.</div> : this.kingdomDetails() }
             </CardTemplate>
         );
