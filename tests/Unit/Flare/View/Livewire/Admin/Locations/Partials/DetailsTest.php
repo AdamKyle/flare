@@ -25,7 +25,7 @@ class DetailsTest extends TestCase
         ]);
     }
 
-    public function testCreateValidMonster() {
+    public function testCreateValidLocation() {
         $this->createGameMap([
             'name' => 'Apples',
             'path' => 'test',

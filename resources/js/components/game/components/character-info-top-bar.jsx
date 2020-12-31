@@ -83,7 +83,7 @@ export default class CharacterInfoTopBar extends React.Component {
           <div className="col-md-3">
             <dl>
               <dt><strong>Gold</strong>:</dt>
-              <dd>{sheet.gold}</dd>
+              <dd>{sheet.gold.toLocaleString('en-US', {maximumFractionDigits:0})}</dd>
             </dl>
           </div>
         </div>

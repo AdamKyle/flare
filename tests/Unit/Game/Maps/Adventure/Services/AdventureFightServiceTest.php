@@ -84,7 +84,7 @@ class AdventureFightServiceTest extends TestCase
         $logs = $fightService->getLogInformation();
 
         $this->assertFalse(empty($logs));
-        $this->assertEquals($logs[0]['message'], 'Monster blocked the attack!');
+        $this->assertEquals($logs[0]['message'], 'Goblin blocked the attack!');
     }
 
     protected function setUpBaseEnviroment() {

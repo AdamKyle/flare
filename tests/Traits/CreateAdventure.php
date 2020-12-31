@@ -14,7 +14,7 @@ use Tests\traits\CreateMonster;
 
 trait CreateAdventure {
 
-    use CreateItem;
+    use CreateItem, CreateMonster;
 
     public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample'): Adventure {
 
@@ -61,35 +61,6 @@ trait CreateAdventure {
     }
 
     protected function createMonsterForAdventure(): Monster {
-        if (GameSkill::all()->isEmpty()) {
-            $this->seed(GameSkillsSeeder::class);
-        }
-
-        $monster = Monster::factory()->create([
-            'name' => 'Monster',
-            'damage_stat' => 'str',
-            'xp' => 10,
-            'str' => 1,
-            'dur' => 2,
-            'dex' => 4,
-            'chr' => 1,
-            'int' => 1,
-            'ac' => 1,
-            'gold' => 1,
-            'max_level' => 10,
-            'health_range' => '1-1',
-            'attack_range' => '1-1',
-            'drop_check' => 0.10,
-        ]);
-
-        foreach(GameSkill::all() as $gameSkill) {
-            if ($gameSkill->can_train) {
-                $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($monster, $gameSkill);
-            }
-        }
-
-        $monster->skills()->insert($skills);
-
-        return $monster->refresh();
+        return $this->createMonster();
     }
 }

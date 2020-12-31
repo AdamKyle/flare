@@ -35,7 +35,8 @@ class Monster extends Model
         'drop_check',
         'quest_item_id',
         'quest_item_drop_chance',
-        'published'
+        'published',
+        'game_map_id',
     ];
 
     /**
@@ -64,6 +65,10 @@ class Monster extends Model
 
     public function questItem() {
         return $this->hasOne(Item::class, 'id', 'quest_item_id');
+    }
+
+    public function gameMap() {
+        return $this->belongsTo(GameMap::class, 'id', 'game_map_id');
     }
 
     protected static function newFactory() {

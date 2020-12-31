@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Monsters\Partials;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
@@ -9,6 +10,9 @@ use Livewire\Component;
 
 class Stats extends Component
 {
+
+    public $gameMaps;
+
     protected $rules = [
         'monster.name'         => 'required',
         'monster.damage_stat'  => 'required',
@@ -24,6 +28,7 @@ class Stats extends Component
         'monster.health_range' => 'required',
         'monster.attack_range' => 'required',
         'monster.drop_check'   => 'required',
+        'monster.game_map_id'  => 'required',
     ];
 
     protected $listeners = ['validateInput'];
@@ -34,6 +39,7 @@ class Stats extends Component
         'monster.attack_range.required' => 'Attack range must be set.',
         'monster.drop_check.required'   => 'Drop Check must be set.',
         'monster.damage_stat.required'  => 'Damage stat is missing',
+        'monster.game_map_id.required'  => 'What map is this monster for?', 
     ];
 
     public $monster;
@@ -71,9 +77,12 @@ class Stats extends Component
         if (is_array($this->monster)) {
             $this->monster = Monster::find($this->monster['id'])->load('skills');
         }
+
+        $this->gameMaps = GameMap::all();
     }
 
     public function render() {
         return view('components.livewire.admin.monsters.partials.stats');
     }
+    
 }

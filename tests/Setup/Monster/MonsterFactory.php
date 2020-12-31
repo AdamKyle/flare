@@ -2,16 +2,19 @@
 
 namespace Tests\Setup\Monster;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateMonster;
 
 class MonsterFactory {
 
-    use CreateMonster;
+    use CreateMonster, CreateGameMap;
 
     private $monster;
 
     public function buildMonster(): MonsterFactory {
+
         $this->monster = $this->createMonster();
 
         return $this;

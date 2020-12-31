@@ -7,12 +7,13 @@ use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Monsters\Partials\Stats;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateGameSkill;
 
 class StatsTest extends TestCase
 {
-    use RefreshDatabase, CreateMonster, CreateGameSkill;
+    use RefreshDatabase, CreateMonster, CreateGameSkill, CreateGameMap;
 
     public function setUp(): void {
         parent::setUp();
@@ -31,6 +32,8 @@ class StatsTest extends TestCase
     }
 
     public function testCreateValidMonster() {
+        $map = $this->createGameMap();
+
         Livewire::test(Stats::class)->set('monster.name', 'Sample')
                                     ->set('monster.str', 10)
                                     ->set('monster.dur', 10)
@@ -45,6 +48,7 @@ class StatsTest extends TestCase
                                     ->set('monster.health_range', '10-20')
                                     ->set('monster.attack_range', '10-20')
                                     ->set('monster.max_level', 10)
+                                    ->set('monster.game_map_id', $map->id)
                                     ->call('validateInput', 'nextStep', 2);
 
         // Assert Monster was created:
@@ -53,6 +57,8 @@ class StatsTest extends TestCase
 
     public function testUpdateMonster() {
         $monster = $this->createMonster();
+
+        $map = $this->createGameMap();
 
         Livewire::test(Stats::class, ['initialMonster' => $monster])
                                     ->set('monster.name', 'Sample')
@@ -69,6 +75,7 @@ class StatsTest extends TestCase
                                     ->set('monster.health_range', $monster->health_range)
                                     ->set('monster.attack_range', $monster->attack_range)
                                     ->set('monster.max_level', $monster->max_level)
+                                    ->set('monster.game_map_id', $map->id)
                                     ->call('validateInput', 'nextStep', 2);
 
         // Assert Monster was updated:

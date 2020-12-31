@@ -118,4 +118,18 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="game_map_id">Game Map: </label>
+                <select wire:model="monster.game_map_id" class="form-control">
+                    <option>Please select</option>
+                    @foreach($gameMaps as $gameMap)
+                        <option value="{{$gameMap->id}}">{{$gameMap->name}}</option>
+                    @endforeach
+                </select>
+                @error('monster.game_map_id') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
 </div>

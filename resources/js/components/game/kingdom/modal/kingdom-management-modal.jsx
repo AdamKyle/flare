@@ -20,7 +20,7 @@ export default class KingdomManagementModal extends React.Component {
             return 0;
         }
 
-        return this.props.kingdom.treasury;
+        return this.props.kingdom.treasury.toLocaleString('en-US', {maximumFractionDigits:0});
     }
 
     render() {
@@ -36,6 +36,7 @@ export default class KingdomManagementModal extends React.Component {
                 onHide={this.props.close}
                 dialogClassName="large-modal"
                 aria-labelledby="kingdom-management-modal"
+                backdrop="static"
             >
                 <Modal.Header closeButton style={{backgroundColor: this.adjust(this.props.kingdom.color, 50)}}>
                     <Modal.Title id="kingdom-management-modal" style={{color: '#fff'}}>

@@ -30,6 +30,9 @@ class CreateMonsters extends Migration
             $table->string('health_range');
             $table->string('attack_range');
             $table->boolean('published')->nullable()->default(true);
+            $table->unsignedBigInteger('game_map_id');
+            $table->foreign('game_map_id')
+                  ->references('id')->on('game_maps');
             $table->timestamps();
         });
     }

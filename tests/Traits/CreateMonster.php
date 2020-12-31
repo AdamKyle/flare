@@ -2,6 +2,7 @@
 
 namespace Tests\Traits;
 
+use App\Flare\Models\GameMap;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
@@ -10,9 +11,22 @@ use Tests\Traits\CreateGameSkill;
 
 trait CreateMonster {
 
-    use CreateGameSkill;
+    use CreateGameSkill, CreateGameMap;
 
     public function createMonster(array $options = []): Monster {
+        if (empty($options) || !isset($options['game_map_id'])) {
+            
+            $maps = GameMap::all();
+
+            if ($maps->isEmpty()) {
+                $map = $this->createGameMap();
+            } else {
+                $map = GameMap::first();
+            }
+
+            $options['game_map_id'] = $map->id;
+        }
+
         $monster     = Monster::factory()->create($options);
         $gameSkills  = $this->fetchSkills();
         $skills      = [];

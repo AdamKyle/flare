@@ -37,6 +37,7 @@ class MonsterFactory extends Factory
             'drop_check'   => 6,
             'max_level'    => 0,
             'published'    => true,
+            'game_map_id'  => null,
         ];
     }
 }
