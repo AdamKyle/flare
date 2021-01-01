@@ -1,16 +1,11 @@
 import React                              from 'react';
 import Draggable                          from 'react-draggable';
-import {
-  OverlayTrigger,
-  Tooltip
-}                                         from 'react-bootstrap';
 import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
 import LocationInfoModal                  from '../components/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
-import SetSail                            from './components/set-sail';
 import CardTemplate                       from '../components/templates/card-template';
-import ContentLoader, { Facebook }        from 'react-content-loader';
+import ContentLoader                      from 'react-content-loader';
 
 export default class Map extends React.Component {
 
