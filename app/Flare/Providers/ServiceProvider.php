@@ -14,6 +14,7 @@ use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Middleware\IsPlayerBannedMiddleware;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\FightService;
+use App\Flare\Transformers\BuildingTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\ItemTransfromer;
@@ -61,6 +62,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(KingdomTransformer::class, function($app){
             return new KingdomTransformer();
+        });
+
+        $this->app->bind(BuildingTransformer::class, function($app) {
+            return new BuildingTransformer();
         });
 
         $this->app->bind(MonsterTransfromer::class, function($app){

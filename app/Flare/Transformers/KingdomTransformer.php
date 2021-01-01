@@ -10,6 +10,10 @@ class KingdomTransformer extends TransformerAbstract {
 
     use BuildingsTransfromerTrait;
 
+    protected $defaultIncludes = [
+        'buildings'
+    ];
+
     /**
      * Gets the response data for the character sheet
      * 
@@ -38,11 +42,14 @@ class KingdomTransformer extends TransformerAbstract {
             'current_morale'     => $kingdom->current_morale,
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasurey,
-            'buildings'          => $kingdom->buildings->load('gameBuilding'),
         ];
     }
 
     protected function getHexColor(array $color) {
         return sprintf("#%02x%02x%02x", $color[0], $color[1], $color[2]);
+    }
+
+    protected function includeBuildings(Kingdom $kingdom) {
+        return $this->collection($kingdom->buildings, resolve(BuildingTransformer::class));
     }
 }

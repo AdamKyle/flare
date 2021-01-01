@@ -49,6 +49,7 @@ class BattleControllerApiTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->equipStartingEquipment();
 
         $this->monster   = (new MonsterFactory)->buildMonster();

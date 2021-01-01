@@ -79,6 +79,10 @@ class Building extends Model
         return $this->gameBuilding->is_chruch;
     }
 
+    public function getGivesResourcesAttribute() {
+        return $this->gameBuilding->is_resource_building;
+    }
+
     public function getWoodCostAttribute() {
         return $this->level * $this->gameBuilding->wood_cost;
     }
@@ -96,42 +100,38 @@ class Building extends Model
     }
 
     public function getPopulationIncreaseAttribute() {
-        if ($this->level === 1) {
-            return 0;
-        }
-
         return $this->level * $this->gameBuilding->increase_population_amount;
     }
 
     public function getTimeIncreaseAttribute() {
-        if ($this->level === 1) {
-            return $this->gameBuilding->time_to_build;
-        }
-
         return ($this->level * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
     }
 
     public function getMoraleIncreaseAttribute() {
-        return ($this->level / 100) + $this->gameBuilding->increase_morale_amount;
+        return $this->gameBuilding->increase_morale_amount;
+    }
+
+    public function getMoraleDecreaseAttribute() {
+        return $this->gameBuilding->decrease_morale_amount;
     }
 
     public function getIncreaseInWoodAttribute() {
-        return ($this->level / 100) + $this->gameBuilding->increase_wood_amount;
+        return $this->level * $this->gameBuilding->increase_wood_amount;
     }
 
     public function getIncreaseInClayAttribute() {
-        return ($this->level / 100) + $this->gameBuilding->increase_clay_amount;
+        return $this->level * $this->gameBuilding->increase_clay_amount;
     }
 
     public function getIncreaseInStoneAttribute() {
-        return ($this->level / 100) + $this->gameBuilding->increase_stone_amount;
+        return $this->level * $this->gameBuilding->increase_stone_amount;
     }
 
     public function getIncreaseInIronAttribute() {
-        return ($this->level / 100) + $this->gameBuilding->increase_iron_amount;
+        return $this->level * $this->gameBuilding->increase_iron_amount;
     }
 
-    public function isAtMaxLevel() {
+    public function getIsAtMaxLevelAttribute() {
         return $this->gameBuilding->max_level === $this->level;
     }
 
