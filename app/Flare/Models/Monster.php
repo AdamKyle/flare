@@ -68,7 +68,7 @@ class Monster extends Model
     }
 
     public function gameMap() {
-        return $this->belongsTo(GameMap::class, 'id', 'game_map_id');
+        return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 
     protected static function newFactory() {

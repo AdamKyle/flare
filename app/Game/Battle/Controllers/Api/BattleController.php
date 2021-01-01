@@ -39,9 +39,9 @@ class BattleController extends Controller {
     }
 
     public function index(Request $request) {
-        $character = User::find($request->user_id)->character;
-        $character = new Item($character, $this->character);
-        $monsters  = new Collection(Monster::where('published', true)->orderBy('max_level', 'asc')->get(), $this->monster);
+        $foundCharacter = User::find($request->user_id)->character;
+        $character = new Item($foundCharacter, $this->character);
+        $monsters  = new Collection(Monster::where('published', true)->where('game_map_id', $foundCharacter->map->game_map_id)->orderBy('max_level', 'asc')->get(), $this->monster);
 
         return response()->json([
             'monsters'  => $this->manager->createData($monsters)->toArray(),

@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             CreateClasses::class,
             CreateItemsSeeder::class,
             GameSkillsSeeder::class,
-            CreateMonstersSeeder::class,
             CreatePortLocationsSeeder::class,
             CreateAffixes::class,
         ]);

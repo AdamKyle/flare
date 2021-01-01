@@ -2,14 +2,10 @@
 
 namespace App\Flare\MapGenerator\Console\Commands;
 
-use Hash;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Str;
 use ChristianEssl\LandmapGeneration\Struct\Color;
 use App\Flare\MapGenerator\Builders\MapBuilder;
-
 
 class CreateMap extends Command
 {
@@ -18,14 +14,14 @@ class CreateMap extends Command
      *
      * @var string
      */
-    protected $signature = 'create:map {width} {height} {randomness}';
+    protected $signature = 'create:map {name} {width} {height} {randomness}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creates the game map';
+    protected $description = 'Creates a game map';
 
     /**
      * Create a new command instance.
@@ -44,6 +40,11 @@ class CreateMap extends Command
      */
     public function handle()
     {
+        // Dungeon:
+        // $water = new Color(43, 94, 161);
+        // $land  = new Color(128, 89, 69);
+
+        // Surface:
         $water = new Color(66, 129, 178);
         $land  = new Color(23, 132, 72);
 
@@ -54,6 +55,6 @@ class CreateMap extends Command
                                   ->setMapHeight($this->argument('height'))
                                   ->setMapWidth($this->argument('width'))
                                   ->setMapSeed(Str::random($this->argument('randomness')))
-                                  ->buildMap('surface');
+                                  ->buildMap($this->argument('name'));
     }
 }
