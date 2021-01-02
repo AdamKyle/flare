@@ -23,11 +23,13 @@ Lets go over these:
 - Setting Sail: The pannel for setting sail will tell you how long in minutes your time out for movement based actions will be.
 - Adventuring: Depending on levels of adventure the time could vary. Each adventure will tell you how long it will take to completly fufil.
 - Enchanting Can give a 10, 20 or 30 second time out depending on if you are applying one enchant, replacing one enchant or replacing two enchants.
-- Teleporting will gie you a time out equal to the time mentioned in the teleport box when going from one location to another.
+- Teleporting will give you a time out equal to the time mentioned in the teleport box when going from one location to another.
 
 > ### ATTN!
 >
 > The Adventuring timer can stop unexpectly if you have died in the middle of an adventure. Each floor is processed per floor timer length. That is if a adventure has 10 floors at 2 minutes each, every two minutes we process a floor, so if you are expecting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died.
+>
+> If hat is the case you will be told. You will also recieve an email, either way (sucess/failure) if you are not signed in and have that email setting enabaled.
 
 ## Timers appear beside the action
 
@@ -45,7 +47,7 @@ You'll first be warned to slow down, then told you cannot speak if you continue 
 
 The Creator, can also silence you for 10, 30 or 60 minutes.
 
-The time until you can talk again will be disaplyed in big bright red letters with your local time (client side) of when you can talk again.
+The time until you can talk again will be disaplayed in big bright red letters with your local time (client side) of when you can talk again.
 
 Upon being able to chat you'll see a server message appear telling you can chat again.
 

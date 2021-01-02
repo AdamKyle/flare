@@ -2,6 +2,8 @@
 
 Enchanting, like crafting, is also meant to be easy. Although has a slight difference from how crafting works.
 
+![enchanting](/storage/info/enchanting/images/enchanting.png)
+
 To enchant an item, you will select the item from your inventory. This will consist of a item that is not a quest and is not equipped.
 
 This item may have affixes attached.
@@ -44,5 +46,7 @@ What this means is:
 
 - The first enchant worked, you were awarded EXP.
 - The second enchant failed, thus you lost the item and the investment and got no EXP for the second enchantment.
+
+**Chat is read: bottom up**
 
 # List Of Enchants

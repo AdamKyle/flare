@@ -31,7 +31,9 @@ These server messages are only directed to you, so the rest of chat wont be polu
 
 ## No popups or endless notifications.
 
-We don't do any of that when it comes to notifying you. When you login, you wont have 500 notifications and popups to manage and clear. The only time we will populate your notification center is if you have completed an adventure and are in game.
+We don't do any of that when it comes to notifying you. When you login, you wont have 500 notifications and popups to manage and clear. The only time we will populate your notification center is if you have completed an adventure.
+
+Since you can only do one adventure at a time, you will not see endless notifications.
 
 
 

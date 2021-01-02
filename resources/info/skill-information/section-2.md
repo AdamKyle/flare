@@ -1,7 +1,7 @@
 > ## ATTN!
 >
 > **can train** refers to if you can train this skill by fighting monsters.
-> if no, then it's a crafting skill that has to be utilized via the [crafting menu](/information/crafting) or [enchanting menu](/information/enchanting).
+> If no, then it's a crafting skill that has to be utilized via the [crafting menu](/information/crafting) or [enchanting menu](/information/enchanting).
 
 
 ## Skill Break Down
@@ -22,7 +22,15 @@ Lets break down whats all in a skill, you can see this information by clicking o
 
 When viewing your character skeet, you will see a list of skills. Each one of those skills can be clicked on to get releavent details about said skill and about where you are in training that skill.
 
-## Training Skills
+## Additional skills can be added
+
+Overtime The Creator can add new skills or modify existing ones. If the skills if modified you will not be notified, these would be balancing changes that The Creator will inform the players of.
+
+How ever if a new skill is created and assigned to all players, then every player will be notified of a new skill. If you are logged in, you'll see it in chat, if not, you'll be emailed.
+
+If additional skills are added, youll be able to see details in game via the character sheet section as well as on this page.
+
+## Training skills
 
 When it comes to training skills there are two ways to train: **Fight** or **Craft**. Thats it.
 
