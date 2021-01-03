@@ -183,7 +183,6 @@ export default class EnchantingAction extends React.Component {
     let cost         = this.state.cost;
 
     if ((value === 0 || value !== 0) && (this.state.prefixId !== 0 && this.state.prefixId !== null) && (this.state.itemToEnchant !== 0 && this.state.itemToEnchant !== null) && typeof oldPrefix !== "undefined") {
-      console.log('I am in here ....');
       foundAffix          = this.state.affixList.filter((a) => a.id === value)[0];
       cost                -= this.getPrefixCost(oldPrefix, this.state.itemToEnchant);
       cost                += this.getPrefixCost(foundAffix, this.state.itemToEnchant);

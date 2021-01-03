@@ -25,7 +25,7 @@ class CreateBuildingsInQueue extends Migration
             $table->foreign('building_id', 'biq_build_id')
                   ->references('id')->on('buildings');
             $table->integer('to_level');
-            $table->date('completed_at');
+            $table->dateTime('completed_at');
             $table->timestamps();
         });
     }

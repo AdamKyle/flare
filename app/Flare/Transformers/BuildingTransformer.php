@@ -47,6 +47,8 @@ class BuildingTransformer extends TransformerAbstract {
             'stone_increase'       => $building->increase_in_stone,
             'iron_increase'        => $building->increase_in_iron,
             'is_maxed'             => $building->is_at_max_level,
+            'defence_increase'     => $building->defence,
+            'durability_increase'  => $building->durability,
         ];
     }
 }

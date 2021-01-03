@@ -19,10 +19,22 @@ export default class Management extends React.Component {
             isLoading: true,
             kingdomData: [],
         }
+
+        this.updateBuildingQueue = Echo.private('building-queue-' + this.props.userId);
     }
 
     componentDidMount() {
         this.fetchKingdomDataAtLocation();
+
+        this.updateBuildingQueue.listen('App.Game.Kingdoms.Events.UpdateBuildingQueue', (event) => {
+            let kingdomData = _.cloneDeep(this.state.kingdomData);
+
+            kingdomData.building_queue = event.queue;
+
+            this.setState({
+                kingdomData: kingdomData,
+            });
+        });
     }
 
     componentDidUpdate() {
@@ -147,7 +159,7 @@ export default class Management extends React.Component {
                 </div>
 
                 {this.state.openSettleModal ? <KingdomModal characterId={this.props.characterId} show={this.state.openSettleModal} x={this.state.xPosition} y={this.state.yPosition} close={this.closeKingdomModal.bind(this)} updateKingdomData={this.updateKingdomData.bind(this)} /> : null}
-                {this.state.openKingdomManagement ? <KingdomManagementModal show={this.state.openKingdomManagement} close={this.closeKingdomManagementModal.bind(this)} kingdom={this.state.kingdomData} /> : null}
+                {this.state.openKingdomManagement ? <KingdomManagementModal show={this.state.openKingdomManagement} close={this.closeKingdomManagementModal.bind(this)} kingdom={this.state.kingdomData} updateKingdomData={this.updateKingdomData.bind(this)} characterId={this.props.characterId} userId={this.props.userId}/> : null}
             </div>
         );
     }

@@ -42,6 +42,7 @@ class KingdomTransformer extends TransformerAbstract {
             'current_morale'     => $kingdom->current_morale,
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasurey,
+            'building_queue'     => $kingdom->buildingsQueue,              
         ];
     }
 

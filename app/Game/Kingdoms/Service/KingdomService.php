@@ -35,10 +35,10 @@ class KingdomService {
                 'game_building_id'    => $building->id,
                 'kingdoms_id'         => $kingdom->id,
                 'level'               => 1,
-                'current_defence'     => $building->defence,
-                'current_durability'  => $building->durability,
-                'max_defence'         => $building->defence,
-                'max_durability'      => $building->durability,
+                'current_defence'     => $building->base_defence,
+                'current_durability'  => $building->base_durability,
+                'max_defence'         => $building->base_defence,
+                'max_durability'      => $building->base_durability,
             ]);
         }
 

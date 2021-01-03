@@ -64,6 +64,8 @@ class ServerMessageListener
                 return broadcast(new ServerMessage($event->user, $message));
             case 'adventure':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'building-upgrade-finished':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'deleted_item':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'deleted_affix':

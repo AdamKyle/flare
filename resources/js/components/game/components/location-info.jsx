@@ -8,7 +8,7 @@ export default class LocationInfo extends React.Component {
 
   adventures() {
     const adventures = [];
-    console.log(this.props.location);
+    
     this.props.location.adventures.forEach((adventure) => {
       adventures.push(
         <li key={adventure.id}>

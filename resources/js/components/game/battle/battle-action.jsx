@@ -98,7 +98,6 @@ export default class BattleAction extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
-      console.log(event);
       this.setState({
         isAdventuring: event.isAdventuring,
       }, () => {

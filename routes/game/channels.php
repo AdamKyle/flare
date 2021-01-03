@@ -29,3 +29,8 @@ Broadcast::channel('update-market', function($user) {
 Broadcast::channel('add-kingdom-to-map-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });
+
+// When the queues update
+Broadcast::channel('building-queue-{userId}', function($user, $userId) {
+	return $user->id === (int) $userId;
+});
