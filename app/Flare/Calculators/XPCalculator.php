@@ -28,7 +28,7 @@ class XPCalculator {
             $xp = ($xpReduction !==  0.0 ? (3.3333 - (3.3333 * $xpReduction)) : 3.3333);
         }
 
-        return round($xp);
+        return $xp;
     }
 
 }

@@ -5,11 +5,8 @@ namespace App\Flare\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Building;
-use App\Flare\Transformers\Traits\BuildingsTransfromerTrait;
 
 class BuildingTransformer extends TransformerAbstract {
-
-    use BuildingsTransfromerTrait;
 
     /**
      * Gets the response data for the character sheet
@@ -34,6 +31,7 @@ class BuildingTransformer extends TransformerAbstract {
             'is_church'            => $building->is_church,
             'is_farm'              => $building->is_farm,
             'is_resource_building' => $building->gives_resources,
+            'trains_units'         => $building->trains_units,
             'wood_cost'            => $building->wood_cost,
             'stone_cost'           => $building->stone_cost,
             'clay_cost'            => $building->clay_cost,

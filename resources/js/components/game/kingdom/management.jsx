@@ -31,6 +31,8 @@ export default class Management extends React.Component {
 
             kingdomData.building_queue = event.queue;
 
+            console.log(event);
+
             this.setState({
                 kingdomData: kingdomData,
             });

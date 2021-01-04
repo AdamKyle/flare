@@ -83,6 +83,10 @@ class Building extends Model
         return $this->gameBuilding->is_resource_building;
     }
 
+    public function getTrainsUnitsAttribute() {
+        return $this->gameBuilding->trains_units;
+    }
+
     public function getWoodCostAttribute() {
         return ($this->level + 1) * $this->gameBuilding->wood_cost;
     }

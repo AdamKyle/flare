@@ -69,7 +69,7 @@ class Character extends Model
         'can_craft_again_at'     => 'datetime',
         'can_adventure_again_at' => 'datetime',
         'level'                  => 'integer',
-        'xp'                     => 'integer',
+        'xp'                     => 'decimal:8,2',
         'xp_next'                => 'integer',
         'str'                    => 'integer',
         'dur'                    => 'integer',

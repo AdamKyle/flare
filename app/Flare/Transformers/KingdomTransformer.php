@@ -4,11 +4,8 @@ namespace App\Flare\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\Traits\BuildingsTransfromerTrait;
 
 class KingdomTransformer extends TransformerAbstract {
-
-    use BuildingsTransfromerTrait;
 
     protected $defaultIncludes = [
         'buildings'

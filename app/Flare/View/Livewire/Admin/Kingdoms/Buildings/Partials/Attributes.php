@@ -14,6 +14,7 @@ class Attributes extends Component
         'gameBuilding.is_church'                  => 'nullable',
         'gameBuilding.is_farm'                    => 'nullable',
         'gameBuilding.is_resource_building'       => 'nullable',
+        'gameBuilding.trains_units'               => 'nullable',
         'gameBuilding.wood_cost'                  => 'nullable',
         'gameBuilding.clay_cost'                  => 'nullable',
         'gameBuilding.stone_cost'                 => 'nullable',

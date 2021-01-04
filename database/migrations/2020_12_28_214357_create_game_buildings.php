@@ -22,6 +22,7 @@ class CreateGameBuildings extends Migration
             $table->integer('base_defence');
             $table->integer('required_population');
             $table->boolean('is_resource_building')->nullable()->default(false);
+            $table->boolean('trains_units')->nullable()->default(false);
             $table->boolean('is_walls')->nullable()->default(false);
             $table->boolean('is_church')->nullable()->default(false);
             $table->boolean('is_farm')->nullable()->default(false);

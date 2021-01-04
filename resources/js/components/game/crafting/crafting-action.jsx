@@ -150,7 +150,7 @@ export default class CraftingAction extends React.Component {
     if (this.state.showCrafting) {
       if (this.state.craftingType === null) {
         return (
-          <select className="form-control ml-3 mt-2" id="crafting-type" name="crafting-type"
+          <select className="form-control mt-2" id="crafting-type" name="crafting-type"
             value={0}
             onChange={this.updateCraftingType.bind(this)}
             disabled={this.state.isDead}>

@@ -83,7 +83,7 @@ export default class KingdomManagementModal extends React.Component {
             },
             {
                 name: "completed-at",
-                text: "Completed At",
+                text: "Completed in",
                 sortable: true,
                 cell: row => <div data-tag="allowRowEvents"><div>{this.fetchTime(row.completed_at)}</div></div>,
 
@@ -110,17 +110,23 @@ export default class KingdomManagementModal extends React.Component {
 
       if (duration > 0) {
         return (
-            <CountdownCircleTimer
-                isPlaying={true}
-                duration={duration}
-                initialRemainingTime={duration}
-                colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
-                size={40}
-                strokeWidth={2}
-                onComplete={() => [false, 0]}
-            >
-                {({ remainingTime }) => (remainingTime / 60).toFixed(0) }
-            </CountdownCircleTimer>
+            <>
+                <div className="float-left">
+                    <CountdownCircleTimer
+                        isPlaying={true}
+                        duration={duration}
+                        initialRemainingTime={duration}
+                        colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+                        size={40}
+                        strokeWidth={2}
+                        onComplete={() => [false, 0]}
+                    >
+                        {({ remainingTime }) => (remainingTime / 60).toFixed(0) }
+                    </CountdownCircleTimer>
+                </div>
+                <div className="float-left mt-2 ml-3">Minutes</div>
+            </>
+            
         );
       } else {
         return null;

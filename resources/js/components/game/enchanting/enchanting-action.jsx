@@ -334,7 +334,7 @@ export default class EnchantingAction extends React.Component {
             ?
             <div className={this.state.affixList.filter((a) => a.type === 'suffix').length === 0 ? "col-md-4" : "col-md-3"}>
               <select 
-                className="form-control ml-3 mt-2" id="crafting" name="crafting"
+                className="form-control mt-2" id="crafting" name="crafting"
                 value={this.state.prefixId !== null ? this.state.prefixId : 0}
                 onChange={this.setPrefixId.bind(this)}
                 disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}

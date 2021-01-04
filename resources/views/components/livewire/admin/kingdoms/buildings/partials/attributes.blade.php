@@ -30,29 +30,35 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameBuilding-is-wall" wire:model="gameBuilding.is_walls">
                 <label class="form-check-label" for="gameBuilding-is-wall">Is this building a wall?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameBuilding-is-farm" wire:model="gameBuilding.is_farm">
                 <label class="form-check-label" for="gameBuilding-is-farm">Is this building a farm?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameBuilding-is-church" wire:model="gameBuilding.is_church">
                 <label class="form-check-label" for="gameBuilding-is-church">Is this building a church?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameBuilding-is-resource-building" wire:model="gameBuilding.is_resource_building">
                 <label class="form-check-label" for="gameBuilding-is-resource-building">Does this building give resources per hour?</label>
             </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="gameBuilding-trains-units" wire:model="gameBuilding.trains_units">
+                <label class="form-check-label" for="gameBuilding-trains-units">Can this building train units?</label>
+            </div>        
         </div>
     </div>
     <div class="row">
