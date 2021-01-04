@@ -162,7 +162,7 @@ class CharacterModelingController extends Controller {
             }
         }
 
-        return redirect()->back()->with('success', 'Generation underway. You may leave this page. We will email you when done.');
+        return redirect()->to(route('admin.character.modeling'))->with('success', 'Generation underway. You may leave this page. We will email you when done.');
     }
 
     public function test(CharacterModelingTestValidation $request) {
@@ -203,7 +203,9 @@ class CharacterModelingController extends Controller {
 
             $character->update($snapShot->snap_shot);
 
-            if ($index === $totalCharacters) {
+            if ($totalCharacters === 1) {
+                $sendEmail = true;
+            } else if ($index === $totalCharacters) {
                 $sendEmail = true;
             }
             

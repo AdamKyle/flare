@@ -107,7 +107,7 @@ class RunTestSimulation implements ShouldQueue
         Cache::put('processing-battle', true);
 
         for ($i = 1; $i <= $this->totalTimes; $i++) {
-            SimulateBattle::dispatch($this->character, $this->model, $i, $this->totalTimes, $this->adminUser)->delay(now()->addMinutes($i));
+            SimulateBattle::dispatch($this->character, $this->model, $i, $this->totalTimes, $this->adminUser, $this->sendEmail)->delay(now()->addMinutes($i));
         }
     }
 

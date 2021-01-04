@@ -65,6 +65,10 @@ class Skill extends Model
         return $this->baseSkill->can_train;
     }
 
+    public function getReducesTimeAttribute() {
+        return !is_null($this->baseSkill->fight_time_out_mod_bonus_per_level);
+    }
+
     public function getBaseDamageModAttribute() {
         return ($this->baseSkill->base_damage_mod_bonus_per_level * $this->level) - $this->baseSkill->base_damage_mod_bonus_per_level;
     }

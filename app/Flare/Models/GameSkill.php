@@ -37,12 +37,12 @@ class GameSkill extends Model
      * @var array
      */
     protected $casts = [
-        'base_damage_mod_bonus_per_level'    => 'float',
-        'base_healing_mod_bonus_per_level'   => 'float',
-        'base_ac_mod_bonus_per_level'        => 'float',
-        'fight_time_out_mod_bonus_per_level' => 'float',
-        'move_time_out_mod_bonus_per_level'  => 'float',
-        'skill_bonus_per_level'              => 'float',
+        'base_damage_mod_bonus_per_level'    => 'decimal:4',
+        'base_healing_mod_bonus_per_level'   => 'decimal:4',
+        'base_ac_mod_bonus_per_level'        => 'decimal:4',
+        'fight_time_out_mod_bonus_per_level' => 'decimal:4',
+        'move_time_out_mod_bonus_per_level'  => 'decimal:4',
+        'skill_bonus_per_level'              => 'decimal:4',
         'specifically_assigned'              => 'boolean',
         'can_train'                          => 'boolean',
     ];

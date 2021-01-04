@@ -39,12 +39,15 @@
                             <dd>{{$skill->fight_time_out_mod_bonus_per_level * 100}}%</dd>
                             <dt>Move Timeout Mod:</dt>
                             <dd>{{$skill->move_time_out_mod_bonus_per_level * 100}}%</dd>
-                            <dt>Skill Bonus</dt>
+                            <dt>Skill Bonus/lv</dt>
+                            <dd>{{$skill->skill_bonus_per_level}}%</dd>
+                            <dt>Final Bonus At Max Level:</dt>
                             <dd>{{$skill->skill_bonus_per_level * 100}}%</dd>
                         </dl>
                         @guest
                         @else
                             @if (auth()->user()->hasRole('Admin'))
+                                <hr />
                                 <a href="{{route('skill.edit', [
                                     'skill' => $skill
                                 ])}}" class="btn btn-primary mt-2">Edit</a>

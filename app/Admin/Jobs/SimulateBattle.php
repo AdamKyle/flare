@@ -29,18 +29,21 @@ class SimulateBattle implements ShouldQueue
 
     public $adminUser;
 
+    public $sendEmail;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Character $character, Monster $monster, $currentFight, $totalFights, User $adminUser)
+    public function __construct(Character $character, Monster $monster, $currentFight, $totalFights, User $adminUser, bool $sendEmail = false)
     {
         $this->character    = $character;
         $this->monster      = $monster; 
         $this->currentFight = $currentFight;
         $this->totalFights  = $totalFights;
         $this->adminUser    = $adminUser;
+        $this->sendEmail    = $sendEmail;
     }
 
     
@@ -84,9 +87,11 @@ class SimulateBattle implements ShouldQueue
                 'battle_simmulation_data' => $snapShotData
             ]);
 
-            Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details for the monster: ' . $this->monster->name . '.', 'Battle Simmulation Results', false));
+            if ($this->sendEmail) {
+                Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details for the monster: ' . $this->monster->name . '.', 'Battle Simmulation Results', false));
 
-            Cache::delete('processing-battle');
+                Cache::delete('processing-battle');
+            }
         }
     }
 }
