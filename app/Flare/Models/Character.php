@@ -69,7 +69,7 @@ class Character extends Model
         'can_craft_again_at'     => 'datetime',
         'can_adventure_again_at' => 'datetime',
         'level'                  => 'integer',
-        'xp'                     => 'decimal:8,2',
+        'xp'                     => 'float',
         'xp_next'                => 'integer',
         'str'                    => 'integer',
         'dur'                    => 'integer',
@@ -114,6 +114,10 @@ class Character extends Model
 
     public function snapShots() {
         return $this->hasMany(CharacterSnapShot::class, 'character_id', 'id');
+    }
+
+    public function getXpAttribute($value) {
+        return number_format($value, 2);
     }
 
     /**
