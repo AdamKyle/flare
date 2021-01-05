@@ -4,7 +4,9 @@ The rules are simple and straight forward. You can either follow them or suffer 
 
 There are two forms of punishment in game. One is being silenced and the other is being banned.
 
-A player can be silenced for 10, 20 or 30 minutes. If the player is not online and they will be emailed that they can speak again.
+A player can be silenced for 10, 20 or 30 minutes. If the player is not online and they will be emailed that they can speak again (assuming they have those settings enabled).
+
+Players can be silenced via **The Creator** or through chat throttling (see below).
 
 A player can be banned for 1 day, 1 week or “For ever”. A banned player may request to be unbanned via the “banned unfairly?” form that can be accessed via the login screen.
 
@@ -20,16 +22,15 @@ Since chat is a part of the game, The Creator, will never moderate chat unless i
 
 Chat messages, including private messages are all logged, unencrypted and can be seen at any time. Should the need arise The Creator can and will step in to deal the appropriate punishment.
 
-Racial slurs, Attacks on other people for any reason including but not limited to: Sexual Identity/Preference, Racial Heritage, Age, Sex, Religious Affiliation or Disability.
+Racial slurs, attacks on other people for any reason including but **not limited to**: Sexual Identity/Preference, Racial Heritage, Age, Sex, Religious Affiliation or Disability.
 
-Do not post your personal information in chat. This includes but not limited to: Email, address, real name, phone number, credit card or any other identifiable information about you.
+**Do not post your personal information in chat**. This includes but **not limited to**: Email, address, real name, phone number, credit card or any other identifiable information about you.
 
-Do not chat from your kingdom. This is not a hard rule, just a bit of advice. The only consequence will be people hunting for kingdoms. The easiest way is to catch a new person chatting in chat from their kingdom.
+Do not chat from your kingdom. This is not a hard rule, just a bit of advice. The only consequence will be people hunting for kingdoms.
 
 With that said your location in game is shown in chat as X,Y coordinates. There is no way to turn this off.
 
 Last but not least, no auction in chat. If you want to sell something go to the [market board]().
-
 
 ## Character Names
 
@@ -38,13 +39,17 @@ Last but not least, no auction in chat. If you want to sell something go to the 
 3. Character names must be between 5 and 15 characters long.
 4. Character names may only container Letters of any case and numbers.
 
-If a character name is deemed to be offensive, that is it contains a racial slur or some other offensive slur, The Creator can and will initiate a forced name change.
+If a character name is deemed to be offensive, that is it contains a racial slur or some other offensive slur, **The Creator** can and will initiate a forced name change.
 
 ![Name Change](/storage/info/rules/images/name-change.png)
 
 Any attempt to circumvent changing your name including scripts, third party tools or hacks will get your account banned for ever.
 
 Once this popup shows up, even if you logout and back in or refresh the page, this popup will stay.
+
+## Chat Throttling
+
+A player may only send 25 messages every 2 minutes. Failure to heed this and the system will auto silence you for 5 minutes. If you are not logged in when you can speak again, and have the email settings enabled, you will be emailed.
 
 ## Core Rules
 
