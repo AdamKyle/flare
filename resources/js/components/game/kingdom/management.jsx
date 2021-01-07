@@ -20,21 +20,16 @@ export default class Management extends React.Component {
             kingdomData: [],
         }
 
-        this.updateBuildingQueue = Echo.private('building-queue-' + this.props.userId);
+        this.updateBuildingQueue = Echo.private('update-kingdom-' + this.props.userId);
     }
 
     componentDidMount() {
         this.fetchKingdomDataAtLocation();
 
-        this.updateBuildingQueue.listen('App.Game.Kingdoms.Events.UpdateBuildingQueue', (event) => {
-            let kingdomData = _.cloneDeep(this.state.kingdomData);
-
-            kingdomData.building_queue = event.queue;
-
+        this.updateBuildingQueue.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {
             console.log(event);
-
             this.setState({
-                kingdomData: kingdomData,
+                kingdomData: event.kingdom,
             });
         });
     }

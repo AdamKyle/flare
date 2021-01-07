@@ -12,8 +12,12 @@ use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
 use App\Flare\Models\Building;
 use App\Flare\Models\BuildingInQueue;
-use App\Game\Kingdoms\Events\UpdateBuildingQueue;
+use App\Flare\Models\Kingdom;
+use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Events\UpdateKingdom;
 use Facades\App\Flare\Values\UserOnlineValue;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use Mail;
 
 class UpgradeBuilding implements ShouldQueue
@@ -51,7 +55,7 @@ class UpgradeBuilding implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
     {
 
         $level = $this->building->level + 1;
@@ -59,29 +63,36 @@ class UpgradeBuilding implements ShouldQueue
         if ($this->building->gives_resources) {
             $type = $this->getResourceType();
 
-            $this->building->kingdom->{'current_' . $type} = 2000 * $level;
-            $this->building->kingdom->{'max_' . $type}     = 2000 * $level;
+            $this->building->kingdom->{'current_' . $type} = $this->building->kingdom->{'max_' . $type} + 1000;
+            $this->building->kingdom->{'max_' . $type}     += 1000;
 
             $this->building->kingdom->save();
         }
 
-        $this->building->Update([
-            'level'              => $level,
-            'current_defence'    => $this->building->durability,
-            'current_durability' => $this->building->defence,
+        $this->building->refresh()->Update([
+            'level' => $level,
+        ]);
+
+        $this->building->refresh()->update([
+            'current_defence'    => $this->building->defence,
+            'current_durability' => $this->building->durability,
             'max_defence'        => $this->building->defence,
             'max_durability'     => $this->building->durability,
         ]);
 
-        BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdom_id)->first()->delete();
+        BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdoms_id)->first()->delete();
         
         if (UserOnlineValue::isOnline($this->user)) {
-            event(new UpdateBuildingQueue($this->user, BuildingInQueue::where('kingdom_id', $this->building->kingdom_id)->get()));
-            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' Finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level));
+            $kingdom = Kingdom::find($this->building->kingdoms_id);
+            $kingdom = new Item($kingdom, $kingdomTransformer);
+            $kingdom = $manager->createData($kingdom)->toArray();
+
+            event(new UpdateKingdom($this->user, $kingdom));
+            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level));
         } else {
             Mail::to($this->user)->send(new GenericMail(
                 $this->user,
-                $this->building->name . ' Finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,
+                $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,
                 'Building Upgrade Finished',
             ));
         }

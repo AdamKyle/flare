@@ -48,19 +48,19 @@ class Building extends Model
     }
 
     public function getDurabilityAttribute() {
-        if ($this->level === 1) {
-            return $this->gameBuilding->base_durability;
-        }
-
-        return $this->gameBuilding->base_durability * (($this->level + 1) + $this->gameBuilding->increase_durability_amount);
+        return $this->gameBuilding->base_durability * (1 + ($this->level * $this->gameBuilding->increase_durability_amount));
     }
 
     public function getDefenceAttribute() {
-        if ($this->level === 1) {
-            return $this->gameBuilding->base_defence;
-        }
+        return $this->gameBuilding->base_defence * (1 + ($this->level * $this->gameBuilding->increase_defence_amount));
+    }
 
-        return $this->gameBuilding->base_defence * (($this->level + 1) + $this->gameBuilding->increase_defence_amount);
+    public function getFutureDurabilityAttribute() {
+        return number_format($this->gameBuilding->base_durability * (1 + (($this->level + 1) * $this->gameBuilding->increase_durability_amount)), 0);
+    }
+
+    public function getFutureDefenceAttribute() {
+        return number_format($this->gameBuilding->base_defence * (1 + (($this->level + 1) * $this->gameBuilding->increase_defence_amount)), 0);
     }
 
     public function getRequiredPopulationAttribute() {
@@ -125,7 +125,11 @@ class Building extends Model
     }
 
     public function getIncreaseInWoodAttribute() {
-        return $this->gameBuilding->increase_wood_amount;
+        return round($this->gameBuilding->increase_wood_amount * (1 + ($this->level / 10)));
+    }
+
+    public function getFutureIncreaseInWoodAttribute() {
+        return round($this->gameBuilding->increase_wood_amount * (1 + (($this->level + 1) / 10)));
     }
 
     public function getIncreaseInClayAttribute() {

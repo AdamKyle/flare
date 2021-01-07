@@ -56,11 +56,15 @@ export default class BuildingManagementModal extends React.Component {
     getIncrease(type) {
         const building = this.props.building;
         
-        if (building.hasOwnProperty(type + '_increase')) {
-            return (building.level + 1) * building[type + '_increase'];
+        if (building.hasOwnProperty('future_' + type + '_increase')) {
+            return building['future_' + type + '_increase'];
         }
 
         return 0;
+    }
+
+    isCurrentlyInQueue() {
+        return _.isEmpty(this.props.queue.filter((q) => q.building_id === this.props.building.id));
     }
 
     upgradeBuilding() {
@@ -153,7 +157,7 @@ export default class BuildingManagementModal extends React.Component {
                         <div className="col-md-6">
                             <dl>
                                 <dt><strong>Can Upgrade</strong>:</dt>
-                                <dd>{this.canUpgrade() ? 'Yes' : 'No'}</dd>
+                                <dd>{this.canUpgrade() && this.isCurrentlyInQueue() ? 'Yes' : 'No'}</dd>
                                 <dt><strong>Needs Repair</strong>:</dt>
                                 <dd>{this.props.building.current_durability === 0 ? 'Yes' : 'No'}</dd>
                                 <dt><strong>Upgrade Time</strong>:</dt>
@@ -164,41 +168,45 @@ export default class BuildingManagementModal extends React.Component {
                     <hr />
                     <h5 className="mt-1">Gain Upon Upgrading</h5>
                     <hr />
-                    <div className="row mt-2">
-                        <div className="col-md-6">
-                            <dl>
-                                <dt><strong>Wood Gain/hr</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('wood')}</dd>
-                                <dt><strong>Clay Gain/hr</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('clay')}</dd>
-                                <dt><strong>Stone Gain/hr</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('stone')}</dd>
-                                <dt><strong>Iron Gain/hr</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('iron')}</dd>
-                                <dt><strong>Population Gain/hr</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('population')}</dd>
-                            </dl>
+                    { !this.isCurrentlyInQueue() ?
+                        <div className="alert alert-warning mb-2 mt-2">
+                            Cannot upgrade building. Currently in queue. Please wait till it's finished.
                         </div>
-                        <div className="col-md-6">
-                            <dl>
-                                <dt><strong>Durability Becomes</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('durability')}</dd>
-                                <dt><strong>Defence Becomes</strong>:</dt>
-                                <dd className="text-success">{this.getIncrease('defence')}</dd>
-                            </dl>
+                    : !this.canUpgrade() ? 
+                        <div className="alert alert-warning mb-2 mt-2">
+                            You don't seem to have the resources to upgrade this building. You can move this modal
+                            by clicking and dragging on the title, to compare the required resources with what you currently have.
                         </div>
-                        <div className="alert alert-info mt-2 mb-2">
-                            <p>
-                                Resource buildings, those that provide raw materials or population double with each level.
-                                For example a farm from level 1-2 will take population to 1000. A wood producing building will increase wood
-                                from 2000 to 4000 (from level 1-2)
-                            </p>
+                    :
+                        <div className="row mt-2">
+                            <div className="col-md-6">
+                                <dl>
+                                    <dt><strong>Wood Gain/hr</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('wood')}</dd>
+                                    <dt><strong>Clay Gain/hr</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('clay')}</dd>
+                                    <dt><strong>Stone Gain/hr</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('stone')}</dd>
+                                    <dt><strong>Iron Gain/hr</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('iron')}</dd>
+                                    <dt><strong>Population Gain/hr</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('population')}</dd>
+                                </dl>
+                            </div>
+                            <div className="col-md-6">
+                                <dl>
+                                    <dt><strong>Durability Becomes</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('durability')}</dd>
+                                    <dt><strong>Defence Becomes</strong>:</dt>
+                                    <dd className="text-success">{this.getIncrease('defence')}</dd>
+                                </dl>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="btn btn-danger" onClick={this.props.close}>Cancel</button>
-                    <button className="btn btn-success" disabled={!this.canUpgrade()} onClick={this.upgradeBuilding.bind(this)}>Upgrade</button>
+                    <button className="btn btn-success" disabled={!this.canUpgrade() || !this.isCurrentlyInQueue()} onClick={this.upgradeBuilding.bind(this)}>Upgrade</button>
                 </Modal.Footer>
             </Modal>
         );

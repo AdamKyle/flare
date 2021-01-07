@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Events;
 
+use App\Flare\Models\Kingdom;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -9,14 +10,13 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 
-class UpdateBuildingQueue implements ShouldBroadcastNow
+class UpdateKingdom implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
  
-    public $queue;
+    public $kingdom;
 
     /**
      * @var User $users
@@ -30,10 +30,10 @@ class UpdateBuildingQueue implements ShouldBroadcastNow
      * @param bool $isDead | false
      * @return void
      */
-    public function __construct(User $user, Collection $queue)
+    public function __construct(User $user, array $kingdom)
     {
-        $this->user    = $user;
-        $this->queue   = $queue;
+        $this->user     = $user;
+        $this->kingdom  = $kingdom;
     }
 
     /**
@@ -43,6 +43,6 @@ class UpdateBuildingQueue implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('building-queue-' . $this->user->id);
+        return new PrivateChannel('update-kingdom-' . $this->user->id);
     }
 }

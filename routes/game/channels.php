@@ -30,7 +30,7 @@ Broadcast::channel('add-kingdom-to-map-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });
 
-// When the queues update
-Broadcast::channel('building-queue-{userId}', function($user, $userId) {
+// When the kingdom updates
+Broadcast::channel('update-kingdom-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });

@@ -106,8 +106,6 @@ export default class KingdomManagementModal extends React.Component {
 
       let duration = moment.duration(then.diff(now)).asSeconds();
 
-      console.log(moment.duration(then.diff(now)).asMinutes())
-
       if (duration > 0) {
         return (
             <>
@@ -211,8 +209,6 @@ export default class KingdomManagementModal extends React.Component {
     }
 
     render() {
-        console.log(this.props.kingdom);
-
         return (
             <Modal
                 show={this.props.show}
@@ -351,6 +347,7 @@ export default class KingdomManagementModal extends React.Component {
                                 kingdom={this.props.kingdom}
                                 characterId={this.props.characterId}
                                 updateKingdomData={this.props.updateKingdomData}
+                                queue={this.props.kingdom.building_queue}
                             /> : null }
                         </Tab>
                         <Tab eventKey="building-queue" title="Building Queue">
