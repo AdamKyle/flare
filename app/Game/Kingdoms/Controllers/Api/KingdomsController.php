@@ -5,14 +5,15 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Building;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\Location;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Requests\KingdomsLocationRequest;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
-use App\Game\Kingdoms\Requests\UpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Http\Controllers\Controller;
+use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -57,6 +58,14 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
+        $location = Location::where('x', $request->x_position)->where('y', $request->y_position)->first();
+        
+        if (!is_null($location)) {
+            return response()->json([
+                'message' => 'Cannot settle here.'
+            ], 422);
+        }
+
         $kingdom = $kingdomService->createKingdom($character);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
@@ -70,6 +79,12 @@ class KingdomsController extends Controller {
 
     public function upgradeBuilding(Request $request, Character $character, Building $building, BuildingService $buildingService) {
         $kingdom = $building->kingdom;
+
+        if (ResourceValidation::shouldRedirect($building, $kingdom)) {
+            return response()->json([
+                'message' => "You don't have the resources."
+            ], 422);
+        }
 
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood - $building->wood_cost,
