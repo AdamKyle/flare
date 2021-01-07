@@ -99,4 +99,51 @@ class ItemsControllerTest extends TestCase
 
         $this->assertNull($item);
     }
+
+    public function testCanDeleteAllItems() {
+        Queue::fake();
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->inventoryManagement()
+                                           ->giveItem($this->item)
+                                           ->equipLeftHand()
+                                           ->getCharacterFactory();
+
+        $this->actingAs($this->user)->post(route('items.delete.all', [
+            'items' => [$this->item->id],
+        ]))->response;
+
+        $this->assertNull(Item::find($this->item->id));
+
+        $character = $character->getCharacter();
+
+        $item = $character->inventory->slots->filter(function($slot) {
+            return $slot->item_id === $this->item->id;
+        })->first();
+
+        $this->assertNull($item);
+    }
+
+    public function testCanDeleteAllItemsNotAssociatedWithCharacters() {
+        Queue::fake();
+        Event::fake();
+
+        $this->actingAs($this->user)->post(route('items.delete.all', [
+            'items' => [$this->item->id],
+        ]))->response;
+
+        $this->assertNull(Item::find($this->item->id));
+    }
+
+    public function testCannotDeleteItemsWhenTheyDontExist() {
+        Queue::fake();
+        Event::fake();
+
+        $response = $this->actingAs($this->user)->post(route('items.delete.all', [
+            'items' => [769],
+        ]))->response;
+
+        $response->assertSessionHas('error', 'Invalid input.');
+    }
 }

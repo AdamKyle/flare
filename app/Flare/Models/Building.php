@@ -136,12 +136,24 @@ class Building extends Model
         return $this->gameBuilding->increase_clay_amount;
     }
 
+    public function getFutureIncreaseInClayAttribute() {
+        return round($this->gameBuilding->increase_clay_amount * (1 + (($this->level + 1) / 10)));
+    }
+
     public function getIncreaseInStoneAttribute() {
         return $this->gameBuilding->increase_stone_amount;
     }
 
+    public function getFutureIncreaseInStoneAttribute() {
+        return round($this->gameBuilding->increase_stone_amount * (1 + (($this->level + 1) / 10)));
+    }
+
     public function getIncreaseInIronAttribute() {
         return $this->gameBuilding->increase_iron_amount;
+    }
+
+    public function getFutureIncreaseInIronAttribute() {
+        return round($this->gameBuilding->increase_iron_amount * (1 + (($this->level + 1) / 10)));
     }
 
     public function getIsAtMaxLevelAttribute() {

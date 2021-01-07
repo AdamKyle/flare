@@ -5,7 +5,7 @@ namespace Tests\Feature\Admin\CharacterModeling;
 use App\Admin\Jobs\RunTestSimulation;
 use App\Admin\Mail\GenericMail;
 use App\Flare\Models\CharacterSnapShot;
-use App\Flare\Models\Item;
+use App\Flare\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mail;
 use Queue;
@@ -19,6 +19,7 @@ use Tests\Traits\CreateGameMap;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateAdventure;
 
 class CharacterModelingControllerTest extends TestCase
 {
@@ -30,7 +31,8 @@ class CharacterModelingControllerTest extends TestCase
         CreateRace,
         CreateGameMap,
         CreateGameSkill,
-        CreateMonster;
+        CreateMonster,
+        CreateAdventure;
 
     private $user;
 
@@ -182,9 +184,7 @@ class CharacterModelingControllerTest extends TestCase
 
         $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
         
-        // Queue::assertPushed(RunTestSimulation::class);
-
-        $this->assertTrue(true);
+        $this->assertEquals(1, User::count());
     }
 
     public function testCannotGenerateCharacters() {
@@ -210,9 +210,9 @@ class CharacterModelingControllerTest extends TestCase
         $this->createGameMap();
         $this->createItem();
 
-        $response = $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
+        $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
 
-        // Mail::assertSent(GenericMail::class);
+        Mail::assertSent(GenericMail::class);
 
         $this->assertTrue(true);
     }
@@ -241,12 +241,106 @@ class CharacterModelingControllerTest extends TestCase
         $response = $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
             'model_id' => $this->createMonster()->id,
             'type' => 'monster',
+            'characters' => [$character->getCharacter()->id],
+            'character_levels' => '1',
+            'total_times' => '1',
+        ])->response;
+
+        $response->assertSessionHas('success', 'Testing under way. You may log out, we will email you when done.');
+    }
+
+    public function testSimmulateMonsterBattleWithMultipleCharacters() {
+        Queue::fake();
+
+        $this->createMonster();
+
+        $character = (new CharacterFactory)->createBaseCharacter();
+
+        CharacterSnapShot::factory()->create([
+            'character_id' => $character->getCharacter()->id,
+            'snap_shot'    => $character->getCharacter()->getAttributes(),
+        ]);
+
+        CharacterSnapShot::factory()->create([
+            'character_id' => $character->getCharacter()->id,
+            'snap_shot'    => $character->levelCharacterUp()->getCharacter()->getAttributes(),
+        ]);
+
+        $this->user->update([
+            'is_test' => false,
+        ]);
+
+        $response = $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
+            'model_id' => $this->createMonster()->id,
+            'type' => 'monster',
+            'characters' => [$character->getCharacter()->id, $character->getCharacter()->id, $character->getCharacter()->id],
+            'character_levels' => '1',
+            'total_times' => '1',
+        ])->response;
+
+        $response->assertSessionHas('success', 'Testing under way. You may log out, we will email you when done.');
+    }
+
+    public function testSimmulateAdventure() {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter();
+
+        CharacterSnapShot::factory()->create([
+            'character_id' => $character->getCharacter()->id,
+            'snap_shot'    => $character->getCharacter()->getAttributes(),
+        ]);
+
+        CharacterSnapShot::factory()->create([
+            'character_id' => $character->getCharacter()->id,
+            'snap_shot'    => $character->levelCharacterUp()->getCharacter()->getAttributes(),
+        ]);
+
+        $this->user->update([
+            'is_test' => false,
+        ]);
+
+        $response = $this->actingAs($this->user)->visit(route('adventures.list'))->post(route('admin.character.modeling.test'), [
+            'model_id' => $this->createNewAdventure()->id,
+            'type' => 'adventure',
             'characters' => [$character->getCharacter()->id, $character->getCharacter()->id],
             'character_levels' => '1',
             'total_times' => '1',
         ])->response;
 
         $response->assertSessionHas('success', 'Testing under way. You may log out, we will email you when done.');
+    }
+
+    public function testFailSimmulateMonsterBattleWithMoreThenTenRounds() {
+        Queue::fake();
+
+        $this->createMonster();
+
+        $character = (new CharacterFactory)->createBaseCharacter();
+
+        CharacterSnapShot::factory()->create([
+            'character_id' => $character->getCharacter()->id,
+            'snap_shot'    => $character->getCharacter()->getAttributes(),
+        ]);
+
+        CharacterSnapShot::factory()->create([
+            'character_id' => $character->getCharacter()->id,
+            'snap_shot'    => $character->levelCharacterUp()->getCharacter()->getAttributes(),
+        ]);
+
+        $this->user->update([
+            'is_test' => false,
+        ]);
+
+        $response = $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
+            'model_id' => $this->createMonster()->id,
+            'type' => 'monster',
+            'characters' => [$character->getCharacter()->id, $character->getCharacter()->id],
+            'character_levels' => '1',
+            'total_times' => '100',
+        ])->response;
+
+        $response->assertSessionHas('error', 'You may only repeat this test 10 times with any one character.');
     }
 
     public function testCannotSimmulateMonsterBattleNonExistantCharacter() {
@@ -329,7 +423,31 @@ class CharacterModelingControllerTest extends TestCase
         ]))->see('Data For Fight');
     }
 
-    protected function createBattleResults() {
+    public function testSeeBattleResultsMultipleTimes() {
+        $this->createBattleResults(3);
+
+        $this->actingAs($this->user)->visit(route('admin.character.modeling.battle-simmulation.results', [
+            'characterSnapShot' => 1
+        ]))->see('Data For Fight');
+    }
+
+    public function testSeeAdventureDetails() {
+        $this->createAdventureResults();
+
+        $this->actingAs($this->user)->visit(route('admin.character.modeling.adventure-data', [
+            'adventure' => 1
+        ]))->see('Adventure Simulation Data For: ');
+    }
+
+    public function testSeeAdventureResults() {
+        $this->createAdventureResults();
+
+        $this->actingAs($this->user)->visit(route('admin.character.modeling.adventure-simmulation.results', [
+            'characterSnapShot' => 1
+        ]))->see('Data For Fight');
+    }
+
+    protected function createBattleResults(int $times = 1) {
         $this->createRace();
         $this->createClass();
         $this->createGameSkill(['name' => 'Accuracy']);
@@ -340,11 +458,29 @@ class CharacterModelingControllerTest extends TestCase
 
         $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
 
-        $this->createMonster();
-
         $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
             'model_id' => $this->createMonster()->id,
             'type' => 'monster',
+            'characters' => [1],
+            'character_levels' => '1',
+            'total_times' => $times,
+        ]);
+    }
+
+    protected function createAdventureResults() {
+        $this->createRace();
+        $this->createClass();
+        $this->createGameSkill(['name' => 'Accuracy']);
+        $this->createGameSkill(['name' => 'Dodge']);
+        $this->createGameSkill(['name' => 'Looting']);
+        $this->createGameMap();
+        $this->createItem();
+
+        $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
+
+        $this->actingAs($this->user)->visit(route('adventures.list'))->post(route('admin.character.modeling.test'), [
+            'model_id' => $this->createNewAdventure()->id,
+            'type' => 'adventure',
             'characters' => [1],
             'character_levels' => '1',
             'total_times' => '1',

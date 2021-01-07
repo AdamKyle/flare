@@ -154,4 +154,14 @@ class AdventuresControllerTest extends TestCase
            ->submitForm('Update Adventure')
            ->see('Adventure needs at least one location.');
     }
+
+    public function testPublishAdventure() {
+        $adventure = $this->createNewAdventure(null, 1, 'Sample', false);
+
+        $response = $this->actingAs($this->user)->call('POST', route('adventure.publish', [
+            'adventure' => $adventure->id
+        ]));
+
+        $this->assertTrue($adventure->refresh()->published);
+    }
 }

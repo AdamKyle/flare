@@ -118,9 +118,9 @@ class UsersController extends Controller {
             'unbanned_at' => $unBanAt,
             'banned_reason' => $request->reason,
         ]);
-
+        
         $this->userService->sendUserMail($user, $unBanAt);
-
+        
         return redirect()->to(route('users.user', [
             'user' => $user->id
         ]))->with('success', 'User has been banned.');

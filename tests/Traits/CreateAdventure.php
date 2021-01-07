@@ -16,7 +16,7 @@ trait CreateAdventure {
 
     use CreateItem, CreateMonster;
 
-    public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample'): Adventure {
+    public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample', bool $published = true): Adventure {
 
         $adventure = Adventure::factory()->create([
             'name'             => $name,
@@ -32,6 +32,7 @@ trait CreateAdventure {
             'gold_rush_chance' => 0.10,
             'item_find_chance' => 0.10,
             'skill_exp_bonus'  => 0.10,
+            'published'        => $published,
         ]);
 
         if (is_null($monster)) {

@@ -156,7 +156,7 @@ class UsersControllerTest extends TestCase
 
         $user = $this->character->getUser();
         
-        $this->actingAs($this->user)->post(route('ban.user.with.reason', [
+        $response = $this->actingAs($this->user)->post(route('ban.user.with.reason', [
             'user' => $this->character->getUser()->id
         ]), [
             'for' => 'perm',

@@ -146,8 +146,6 @@ class UnbanRequestControllerTest extends TestCase
         $this->createAdminRole('Admin');
         $admin->assignRole('Admin');
 
-        Mail::fake();
-
         $this->visit('/login')
              ->click('Banned Unfairly?')
              ->see('Unban Request Process')
@@ -164,8 +162,6 @@ class UnbanRequestControllerTest extends TestCase
              ->submitForm('Submit Request', [
                  'unban_message' => 'Sample'
              ])->see('Request submitted. We will contact you in the next 72 hours.');
-
-        Mail::assertSent(UnBanRequestMail::class);
     }
 
     public function testCannotSubmitRequestCacheMiss() {

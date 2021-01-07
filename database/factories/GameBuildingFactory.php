@@ -32,7 +32,7 @@ class GameBuildingFactory extends Factory
             'is_walls'                    => false,
             'is_church'                   => false,
             'is_farm'                     => false,
-            'trains_unit'                 => false,
+            'trains_units'                => false,
             'wood_cost'                   => 10,
             'clay_cost'                   => 10,
             'stone_cost'                  => 10,
