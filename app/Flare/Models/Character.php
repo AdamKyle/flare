@@ -116,6 +116,10 @@ class Character extends Model
         return $this->hasMany(CharacterSnapShot::class, 'character_id', 'id');
     }
 
+    public function kingdoms() {
+        return $this->hasMany(Kingdom::class, 'character_id', 'id');
+    }
+
     public function getXpAttribute($value) {
         return number_format($value, 2);
     }

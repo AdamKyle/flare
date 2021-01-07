@@ -5,8 +5,6 @@ namespace Tests\Unit\Admin\Jobs;
 use App\Admin\Jobs\UpdateBannedUserJob;
 use App\Admin\Mail\GenericMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Handlers\MessageThrottledHandler;
-use App\Flare\Jobs\UpdateSilencedUserJob;
 use Mail;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;

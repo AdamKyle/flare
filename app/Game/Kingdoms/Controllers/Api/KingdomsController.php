@@ -50,7 +50,7 @@ class KingdomsController extends Controller {
         $kingdomService->setParams($request->all());
 
         $kingdom = Kingdom::where('x_position', $request->x_position)->where('y_position', $request->y_position)->first();
-
+        
         if (!is_null($kingdom)) {
             return response()->json([
                 'message' => 'Cannot settle here.'

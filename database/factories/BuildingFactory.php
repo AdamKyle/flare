@@ -22,13 +22,13 @@ class BuildingFactory extends Factory
     public function definition()
     {
         return [
-            'game_building_id'  => null,
-            'kingdoms_id'       => null,
-            'level'             => null,
-            'current_defence'   => 0,
-            'curent_durability' => 0,
-            'max_defence'       => 0,
-            'max_durability'    => 0,
+            'game_building_id'   => null,
+            'kingdoms_id'        => null,
+            'level'              => 1,
+            'current_defence'    => 300,
+            'current_durability' => 300,
+            'max_defence'        => 300,
+            'max_durability'     => 300,
         ];
     }
 }
