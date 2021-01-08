@@ -3,11 +3,13 @@
 namespace App\Admin\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use ConsoleTVs\Charts\Registrar as Charts;
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
+use App\Charts\BattleSimulationChart;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -40,10 +42,14 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Charts $charts)
     {
 
         $router = $this->app['router'];
+
+        $charts->register([
+            BattleSimulationChart::class,
+        ]);
 
         $router->aliasMiddleware('is.admin', IsAdminMiddleware::class);
     }

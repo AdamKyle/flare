@@ -15,7 +15,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-5 mb-2">
                                     <dl>
                                         <dt>Character Name:</dt>
                                         <dd>{{$character->name}}</dd>
@@ -34,7 +34,7 @@
                                     </dl>
                                 </div>
         
-                                <div class="col-md-3">
+                                <div class="col-md-3 mb-2">
                                     <dl>
                                         <dt>Max Health:</dt>
                                         <dd>{{$characterInfo['maxHealth']}}</dd>
@@ -47,7 +47,7 @@
                                     </dl>
                                 </div>
         
-                                <div class="col-md-5">
+                                <div class="col-md-4 mb-2">
                                     <dl>
                                         <dt>Strength:</dt>
                                         <dd>{{$character->str}} (Modded: {{round($characterInfo['str'])}})</dd>

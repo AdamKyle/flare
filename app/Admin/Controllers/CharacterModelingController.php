@@ -15,17 +15,24 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
+use Cache;
 use DB;
 
 class CharacterModelingController extends Controller {
 
+    public function __construct() {
+        
+    }
+
     public function index() {
-        $hasSnapShots = CharacterSnapShot::all()->isNotEmpty();
+
+        $characters = Character::whereHas('user', function($query) {
+            return $query->where('is_test', true);
+        })->get();
 
         return view('admin.character-modeling.index', [
-            'hasSnapShots' => $hasSnapShots,
-            'cardTitle'    => $hasSnapShots ? 'Modeling' : 'Generate',
-            'snapShots'    => CharacterSnapShot::all()->paginate(4),
+            'cardTitle'    => $characters->isEmpty() ? 'Modeling' : 'Generate',
+            'characters'   => $characters->paginate(4) 
         ]);
     }
 
@@ -152,6 +159,8 @@ class CharacterModelingController extends Controller {
         $totalGameRaces   = GameRace::count() - 1;
         $totalGameClasses = GameClass::count() - 1;
 
+        Cache::put('generating-characters', true);
+
         foreach (GameRace::all() as $raceIndex => $gameRace) {
             foreach (GameClass::all() as $classIndex => $gameClass) {
                 if ($totalGameRaces === $raceIndex && $totalGameClasses === $classIndex) {
@@ -172,17 +181,23 @@ class CharacterModelingController extends Controller {
 
         $count           = count($request->characters);
         $totalCharacters =  $count === 1 ? 1 : $count - 1;
+        $route           = null;
 
         switch($request->type) {
             case 'monster':
                 // truncate all previous battle simulation reports.
                 DB::table('character_snap_shots')->update(['battle_simmulation_data' => null]);
+                Cache::put('processing-battle', true);
+                $route = route('monsters.list');
                 break;
             case 'adventure':
+                // truncate all previous battle simulation reports.
                 DB::table('character_snap_shots')->update(['adventure_simmulation_data' => null]);
+                Cache::put('processing-adventure', true);
+                $route = route('adventures.list');
                 break;
             default:
-                break;
+                return redirect()->back()->with('error', 'Type not determined.');
         }
 
         $sendEmail = false;
@@ -209,9 +224,9 @@ class CharacterModelingController extends Controller {
                 $sendEmail = true;
             }
             
-            RunTestSimulation::dispatch($character->refresh(), $request->type, $request->model_id, $request->total_times, auth()->user(), $sendEmail, $index);
+            RunTestSimulation::dispatchNow($character->refresh(), $request->type, $request->model_id, $request->total_times, auth()->user(), $sendEmail, $index);
         }
         
-        return redirect()->back()->with('success', 'Testing under way. You may log out, we will email you when done.');
+        return redirect()->to($route)->with('success', 'Testing under way. You may log out, we will email you when done.');
     }
 }

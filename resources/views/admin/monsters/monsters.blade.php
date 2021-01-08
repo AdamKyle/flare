@@ -12,7 +12,7 @@
         </div>
     </div>
     <hr />
-    @if ($isProcessingBattle)
+    @if (\Cache::has('processing-battle'))
         <div class="alert alert-info mb-2 mt-2">
             You are currently proccesing a battle. You will be emailed when it is done.
         </div>

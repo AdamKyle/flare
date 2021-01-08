@@ -12,6 +12,7 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Game\Core\Services\CharacterService;
+use Cache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -98,6 +99,8 @@ class GenerateTestCharacter implements ShouldQueue
         }
 
         if (!is_null($this->adminUser)) {
+            Cache::forget('generating-characters');
+            
             Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your character modeling generation is done.', 'Character modeling complete.', false));
         }
     }

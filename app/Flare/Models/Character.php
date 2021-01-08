@@ -9,14 +9,14 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Skill;
 use App\Flare\Models\Inventory;
-use App\Flare\Models\EquippedItem;
+use App\Flare\Models\Traits\WithSearch;
 use App\Flare\Models\User;
 use Database\Factories\CharacterFactory;
 
 class Character extends Model
 {
 
-    use HasFactory;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.

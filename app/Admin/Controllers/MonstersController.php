@@ -15,9 +15,7 @@ class MonstersController extends Controller {
     }
 
     public function index() {
-        return view('admin.monsters.monsters', [
-            'isProcessingBattle' => Cache::has('processing-battle'),
-        ]);
+        return view('admin.monsters.monsters');
     }
 
     public function show(Monster $monster) {

@@ -26,6 +26,7 @@ class UpdateCharacterStatsService {
      * @return void
      */
     public function updateRacialStats(GameRace $oldRace, GameRace $newRace): void {
+        
         Character::where('game_race_id', $newRace->id)->chunkById(1000, function($characters) use($oldRace, $newRace) {
             foreach ($characters as $character) {
                 $character->update([

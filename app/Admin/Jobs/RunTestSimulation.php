@@ -77,11 +77,9 @@ class RunTestSimulation implements ShouldQueue
         switch($this->type) {
             case 'monster':
                 $this->processBattle();
-                
                 break;
             case 'adventure':
                 $this->processAdventure();
-
                 break;
             default:
                 return;
@@ -89,8 +87,6 @@ class RunTestSimulation implements ShouldQueue
     }
 
     protected function processAdventure() {
-        Cache::put('processing-adventure', true);
-
         $jobName = Str::random(80);
                 
         Cache::put('character_'.$this->character->id.'_adventure_'.$this->model->id, $jobName, now()->addMinutes(5));
@@ -104,8 +100,6 @@ class RunTestSimulation implements ShouldQueue
     }
 
     protected function processBattle() {
-        Cache::put('processing-battle', true);
-
         for ($i = 1; $i <= $this->totalTimes; $i++) {
             SimulateBattle::dispatch($this->character, $this->model, $i, $this->totalTimes, $this->adminUser, $this->sendEmail)->delay(now()->addMinutes($i));
         }

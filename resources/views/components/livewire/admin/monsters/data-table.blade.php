@@ -103,7 +103,7 @@
                                         <a href="{{route('monster.edit', [
                                                 'monster' => $monster->id,
                                         ])}}" class="btn btn-primary mt-2">Edit</a>
-                                        @if ($canTest)
+                                        @if (!\Cache::has('processing-battle'))
                                             <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#monster-test-{{$monster->id}}">
                                                 Test
                                             </button>
@@ -121,7 +121,7 @@
                                         @endforeach
                                     @endif
                                     @if(auth()->user()->hasRole('Admin'))
-                                        @if (!$published)
+                                        @if (!$published && !\Cache::has('processing-battle'))
                                             <x-forms.button-with-form 
                                                 form-route="{{route('monster.publish', ['monster' => $monster])}}"
                                                 form-id="publish-monster-{{$monster->id}}"
