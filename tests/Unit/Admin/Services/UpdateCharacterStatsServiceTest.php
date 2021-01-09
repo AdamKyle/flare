@@ -62,6 +62,10 @@ class UpdateCharacterStatsServiceTest extends TestCase
     }
 
     public function testUpdateClassStatsAndCharacterIsAboveLevelOne() {
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->userIsNotTest()
+                                                 ->getCharacter();
+
         $class = GameClass::find($this->character->game_class_id);
 
         $oldClass = $class->replicate();
@@ -82,6 +86,10 @@ class UpdateCharacterStatsServiceTest extends TestCase
     }
 
     public function testUpdateClassStatsChangeDamageStatNotOnline() {
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->userIsNotTest()
+                                                 ->getCharacter();
+
         $class = GameClass::find($this->character->game_class_id);
 
         $oldClass = $class->replicate();
@@ -136,6 +144,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
     protected function baseSetUp() {
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->giveSnapShot()
                                                  ->getCharacter();
     }
 }

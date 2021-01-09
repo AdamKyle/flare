@@ -50,6 +50,14 @@
                             sort-field="{{$sortField}}"
                             field="int_mod"
                         />
+                        @guest
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))
+                                <x-data-tables.header-row>
+                                    Actions
+                                </x-data-tables.header-row>
+                            @endif
+                        @endguest
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($races as $race)
@@ -82,9 +90,27 @@
                                 <td>{{$race->dex_mod}} pts.</td>
                                 <td>{{$race->chr_mod}} pts.</td>
                                 <td>{{$race->int_mod}} pts.</td>
+                                @guest
+                                @else
+                                    @if (auth()->user()->hasRole('Admin'))
+                                        <td>
+                                            <a href="{{route('races.edit', [
+                                                'race' => $race->id,
+                                            ])}}" class="btn btn-primary mt-2 btn-sm">Edit</a>
+                                        </td>
+                                    @endif
+                                @endguest
                             </tr>
                         @empty
-                            <x-data-tables.no-results colspan="6" />
+                            @guest
+                                <x-data-tables.no-results colspan="6" />
+                            @else
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <x-data-tables.no-results colspan="7" />
+                                @else
+                                    <x-data-tables.no-results colspan="6" />
+                                @endif
+                            @endguest
                         @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>

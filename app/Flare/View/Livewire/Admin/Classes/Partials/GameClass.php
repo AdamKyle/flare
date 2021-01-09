@@ -51,7 +51,7 @@ class GameClass extends Component
 
             $message = 'Class: ' . $this->gameClass->name . ' Updated. Applying to all characters who are this class.';
 
-            (new UpdateCharacterStatsService())->updateClassStats($oldClass, $this->gameClass);
+            (new UpdateCharacterStatsService())->updateClassStats($oldClass, $this->gameClass->refresh());
         } else {
             $message = 'Class: ' . $this->gameClass->name . ' Created!';
         }

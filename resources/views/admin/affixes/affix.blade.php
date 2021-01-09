@@ -19,6 +19,8 @@
                     <dl>
                         <dt>Base Damage:</dt>
                         <dd>{{$itemAffix->base_damage_mod * 100}}%</dd>
+                        <dt>Base Defence:</dt>
+                        <dd>{{$itemAffix->base_ac_mod * 100}}%</dd>
                         <dt>Base Healing Mod:</dt>
                         <dd>{{$itemAffix->base_healing_mod * 100}}%</dd>
                         <dt>Str Modifier:</dt>

@@ -85,7 +85,7 @@ class GenerateTestCharacter implements ShouldQueue
             'snap_shot'    => $character->getAttributes(),
         ]);
 
-        for ($i = 1; $i <= $this->levelTo; $i++) {
+        for ($i = 1; $i < $this->levelTo; $i++) {
             $characterService = new CharacterService;
 
             $characterService->levelUpCharacter($character);

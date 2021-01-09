@@ -219,32 +219,26 @@ export default class KingdomManagementModal extends React.Component {
             >
                 <Modal.Header closeButton style={{backgroundColor: this.adjust(this.props.kingdom.color, 50)}}>
                     <Modal.Title id="kingdom-management-modal" style={{color: '#fff'}}>
-                        Manage Your Kingdom
+                        {this.props.kingdom.name}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Tabs defaultActiveKey="manage" id="uncontrolled-tab-example">
                         <Tab eventKey="manage" title="Manage">
                             <div className="row mt-3">
-                                <div className="col-md-2">
-                                    <dl>
-                                        <dt><strong>Name</strong>:</dt>
-                                        <dd>{this.props.kingdom.name}</dd>
-                                    </dl>
-                                </div>
-                                <div className="col-md-2">
+                                <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Population</strong>:</dt>
                                         <dd>{this.props.kingdom.current_population} / {this.props.kingdom.max_population}</dd>
                                     </dl>
                                 </div>
-                                <div className="col-md-2">
+                                <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Morale</strong>:</dt>
                                         <dd>{this.getCurrentMorale()}%</dd>
                                     </dl>
                                 </div>
-                                <div className="col-md-2">
+                                <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Treasury</strong>:</dt>
                                         <dd>{this.getTreasury()}</dd>

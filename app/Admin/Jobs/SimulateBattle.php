@@ -87,6 +87,10 @@ class SimulateBattle implements ShouldQueue
                 'battle_simmulation_data' => $snapShotData
             ]);
 
+            $this->character->update(
+                $this->character->snapShots()->where('snap_shot->level', '1000')->first()->snap_shot
+            );
+
             if ($this->sendEmail) {
                 Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details for the monster: ' . $this->monster->name . '.', 'Battle Simmulation Results', false));
 

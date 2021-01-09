@@ -2,6 +2,7 @@
 
 namespace App\Admin\Services;
 
+use App\Admin\Jobs\LevelTestCharacter;
 use Mail;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Admin\Mail\GenericMail;
@@ -26,19 +27,15 @@ class UpdateCharacterStatsService {
      * @return void
      */
     public function updateRacialStats(GameRace $oldRace, GameRace $newRace): void {
-        
         Character::where('game_race_id', $newRace->id)->chunkById(1000, function($characters) use($oldRace, $newRace) {
             foreach ($characters as $character) {
-                $character->update([
-                    'str'           => ($character->str - $oldRace->str_mod) + $newRace->str_mod,
-                    'dur'           => ($character->dur - $oldRace->dur_mod) + $newRace->dur_mod,
-                    'dex'           => ($character->dex - $oldRace->dex_mod) + $newRace->dex_mod,
-                    'chr'           => ($character->chr - $oldRace->chr_mod) + $newRace->chr_mod,
-                    'int'           => ($character->int - $oldRace->int_mod) + $newRace->int_mod,
-                    'ac'            => ($character->ac - $oldRace->deffense_mod) + $newRace->deffense_mod,
-                ]);
-                
-                event(new UpdateTopBarEvent($character->refresh()));
+                if ($character->user->is_test) {
+                    $this->updateTestCharacterRace($character, $oldRace, $newRace);
+                } else {
+                    $character = $this->updateCharacterStatsForRace($character, $oldRace, $newRace);
+
+                    event(new UpdateTopBarEvent($character));
+                }
             }
         });
     }
@@ -58,36 +55,91 @@ class UpdateCharacterStatsService {
     public function updateClassStats(GameClass $oldClass, GameClass $newClass): void {
         Character::where('game_class_id', $newClass->id)->chunkById(1000, function($characters) use($oldClass, $newClass) {
             foreach ($characters as $character) {
-                $character->update([
-                    'str'           => ($character->str - $oldClass->str_mod) + $newClass->str_mod,
-                    'dur'           => ($character->dur - $oldClass->dur_mod) + $newClass->dur_mod,
-                    'dex'           => ($character->dex - $oldClass->dex_mod) + $newClass->dex_mod,
-                    'chr'           => ($character->chr - $oldClass->chr_mod) + $newClass->chr_mod,
-                    'int'           => ($character->int - $oldClass->int_mod) + $newClass->int_mod,
-                    'ac'            => ($character->ac - $oldClass->deffense_mod) + $newClass->deffense_mod,
-                ]);
-
-                if ($oldClass->damage_stat !== $newClass->damage_stat) {
-                    $totalToAdjust = ($character->level - 1) * 2;
+                if ($character->user->is_test) {
+                    $this->updateTestCharacterClass($character, $oldClass, $newClass);
+                } else {
+                    $character = $this->updateCharacterStatsForClass($character, $oldClass, $newClass);
                     
-                    if ($character->level > 1) {
-                        $character->{$oldClass->damage_stat} -= $totalToAdjust;
-                        $character->{$oldClass->damage_stat} += $character->level - 1;
-
-                        $character->{$newClass->damage_stat} -= $character->level - 1;
-                        $character->{$newClass->damage_stat} += $totalToAdjust;
-                    }
-
-                    if (UserOnlineValue::isOnline($character->user)) {
-                        event(new UpdateTopBarEvent($character->refresh()));
-                        event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));
-                    } else {
-                        $message = 'Your classes damage stat has been changed to: ' . $newClass->damage_stat . '.';
-    
-                        Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'Damage Stat Change'));
-                    }
+                    $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
                 }
             }
         });
+    }
+
+    protected function updateTestCharacterRace(Character $character, GameRace $oldRace, GameRace $newRace) {
+        $character->update(
+            $character->snapShots()->where('snap_shot->level', 1)->first()->snap_shot
+        );
+
+        $character = $this->updateCharacterStatsForRace($character->refresh(), $oldRace, $newRace);
+
+        LevelTestCharacter::dispatch($character)->delay(now()->addMinutes(1));
+    }
+
+    protected function updateCharacterStatsForRace(Character $character, GameRace $oldRace, GameRace $newRace): Character {
+        $character->update([
+            'str'           => ($character->str - $oldRace->str_mod) + $newRace->str_mod,
+            'dur'           => ($character->dur - $oldRace->dur_mod) + $newRace->dur_mod,
+            'dex'           => ($character->dex - $oldRace->dex_mod) + $newRace->dex_mod,
+            'chr'           => ($character->chr - $oldRace->chr_mod) + $newRace->chr_mod,
+            'int'           => ($character->int - $oldRace->int_mod) + $newRace->int_mod,
+            'ac'            => ($character->ac - $oldRace->deffense_mod) + $newRace->deffense_mod,
+        ]);
+
+        return $character->refresh();
+    }
+
+    protected function updateTestCharacterClass(Character $character, GameClass $oldClass, GameClass $newClass) {
+        $character->update(
+            $character->snapShots()->where('snap_shot->level', 1)->first()->snap_shot
+        );
+
+        $character = $this->updateCharacterStatsForClass($character->refresh(), $oldClass, $newClass);
+
+        $character = $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
+
+        LevelTestCharacter::dispatch($character)->delay(now()->addMinutes(1));
+    }
+
+    protected function updateCharacterStatsForClass(Character $character, GameClass $oldClass, GameClass $newClass): Character {
+        $character->update([
+            'str'           => ($character->str - $oldClass->str_mod) + $newClass->str_mod,
+            'dur'           => ($character->dur - $oldClass->dur_mod) + $newClass->dur_mod,
+            'dex'           => ($character->dex - $oldClass->dex_mod) + $newClass->dex_mod,
+            'chr'           => ($character->chr - $oldClass->chr_mod) + $newClass->chr_mod,
+            'int'           => ($character->int - $oldClass->int_mod) + $newClass->int_mod,
+            'ac'            => ($character->ac - $oldClass->deffense_mod) + $newClass->deffense_mod,
+        ]);
+
+        return $character->refresh();
+    }
+
+    protected function adjustCharacterDamageStat(Character $character, GameClass $oldClass, GameClass $newClass) {
+        if ($oldClass->damage_stat !== $newClass->damage_stat) {
+            $totalToAdjust = ($character->level - 1) * 2;
+            
+            if ($character->level > 1) {
+                $character->{$oldClass->damage_stat} -= $totalToAdjust;
+                $character->{$oldClass->damage_stat} += $character->level - 1;
+
+                $character->{$newClass->damage_stat} -= $character->level - 1;
+                $character->{$newClass->damage_stat} += $totalToAdjust;
+            }
+
+            if (!$character->user->is_test) {
+                if (UserOnlineValue::isOnline($character->user)) {
+                    event(new UpdateTopBarEvent($character->refresh()));
+                    event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));
+                } else {
+                    $message = 'Your classes damage stat has been changed to: ' . $newClass->damage_stat . '.';
+
+                    Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'Damage Stat Change'));
+                }
+            } else {
+                return $character;
+            }
+        } else {
+            return $character;
+        }
     }
 }

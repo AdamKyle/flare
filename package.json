@@ -11,10 +11,10 @@
     },
     "devDependencies": {
         "@babel/preset-react": "^7.0.0",
-        "axios": "^0.20",
+        "axios": "^0.21.1",
         "bootstrap": "^4.0.0",
-        "browser-sync": "^2.26.12",
-        "browser-sync-webpack-plugin": "^2.0.1",
+        "browser-sync": "^2.26.13",
+        "browser-sync-webpack-plugin": "^2.3.0",
         "cross-env": "^5.1",
         "jquery": "^3.5",
         "laravel-mix": "^5.0.5",
@@ -22,9 +22,10 @@
         "popper.js": "^1.14.3",
         "react": "^17.0.*",
         "react-dom": "^17.0.*",
-        "resolve-url-loader": "^2.3.1",
+        "resolve-url-loader": "^3.1.2",
         "sass": "^1.26.10",
-        "sass-loader": "7.*"
+        "sass-loader": "7.*",
+        "yarn-audit-fix": "^3.2.13"
     },
     "dependencies": {
         "@ashvin27/react-datatable": "^1.5.3",

@@ -110,6 +110,42 @@ class CharacterFactory {
     }
 
     /**
+     * Give the character a snapshot.
+     * 
+     * Make sure to call this before leveling the chracter up in situations where
+     * you need to test with character snap shots.
+     * 
+     * @return CharacterFactory
+     */
+    public function giveSnapShot(): CharacterFactory {
+        $this->character->snapShots()->create([
+            'character_id' => $this->character->id,
+            'snap_shot'    => $this->character->getAttributes(),
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Marks the user as not a test user.
+     * 
+     * Useful insituations where you do not want a test user, but an "actual" user.
+     * 
+     * @return CharacterFactory
+     */
+    public function userIsNotTest(): CharacterFactory {
+        $this->character->user->update([
+            'is_test' => false
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
      * Lets you ban a character
      * 
      * If the length is not set, then the ban is for ever.

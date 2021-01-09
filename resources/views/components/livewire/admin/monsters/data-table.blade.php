@@ -99,11 +99,11 @@
                                 @guest
                                 @else
                                 <td>
-                                    @if (auth()->user()->hasRole('Admin') && $testCharacters->isNotEmpty())
+                                    @if (auth()->user()->hasRole('Admin'))
                                         <a href="{{route('monster.edit', [
                                                 'monster' => $monster->id,
                                         ])}}" class="btn btn-primary mt-2">Edit</a>
-                                        @if (!\Cache::has('processing-battle'))
+                                        @if (!\Cache::has('processing-battle') && $testCharacters->isNotEmpty())
                                             <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#monster-test-{{$monster->id}}">
                                                 Test
                                             </button>

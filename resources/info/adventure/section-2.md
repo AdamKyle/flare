@@ -1,6 +1,6 @@
 ## Adventuring in Tlessa
 
-When you are ready to begin your adventure and you on a location, you can click the Adventure button below the map (assuming that location has an advenuture). This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. 
+When you are ready to begin your adventure and you on a location, you can click the Adventure button below the map (assuming that location has an adventure). This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. 
 
 ![adventuring-image](/storage/info/adventure/images/adventuring-modal.png)
 
@@ -10,10 +10,10 @@ The same details you saw from clicking on an adventure above, is the same detail
 
 Lets go over some basics. 
 
-- Adventures have a set number of levels, this is then multipled by the time per level to give you the total time.
-  - The longer the adventure, the greator the chance for random items, quest items from monsters and gold rushes.
+- Adventures have a set number of levels, this is then multiplied by the time per level to give you the total time.
+  - The longer the adventure, the greater the chance for random items, quest items from monsters and gold rushes.
 - Adventures can give bonuses to your chance at a gold rush, finding items and training skills. These are calculated at the end of each successful floor.
-  - You can see this in the adventure details for each eadventure at that specific location.
+  - You can see this in the adventure details for each adventure at that specific location.
 
 Adventures can belong to more the one location, but will always count as the same adventure in your log.
 
@@ -21,15 +21,15 @@ Adventures come with a set of monsters, these are picked at random per floor. So
 
 Some adventures come with rewards. These rewards are rewarded **once** and only **once** on a **successful completion** of all levels of the adventure.
 
-## Embraking on the adventure.
+## Embarking on the adventure.
 
-**Note**: In order to embark on an adventure you mst be able to fight and move. You can have a [timer](/information/time-gates) running and embark on adventure for crafting and enchanting how ever.
+**Note**: In order to embark on an adventure you must be able to fight and move. You can have a [timer](/information/time-gates) running and embark on adventure for crafting and enchanting how ever.
 
 Now that you have a basics of what adventures offer, how does one go about it? 
 
 Clicking embark will set off the adventure. You will only be allowed to go on one adventure at a time. If your adventure completes successfully, you will not be able to embark on another adventure until you have collected your rewards.
 
-When you embark on the adventue you can't:
+When you embark on the adventure you can't:
 
 - Move
 - Fight
@@ -39,7 +39,7 @@ When you embark on the adventue you can't:
 - Equip items/unequip items
 - Destroy items.
 
-You can how ever manage your kingdoms and settle new ones as well as participtae in wars and raids.
+You can how ever manage your kingdoms and settle new ones as well as participate in wars and raids.
 
 ### I cannot stay logged in, what if I leave?
 
@@ -55,12 +55,12 @@ Clicking on it will allow you to see the rewards for the adventure.
 
 > ### ATTN!!
 >
-> As mentioned before, if you are not logged in, you will recieve an email. You can always turn this off if you are not wanting to recieve emails.
-> You will not recieve this email if you are logged in.
+> As mentioned before, if you are not logged in, you will receive an email. You can always turn this off if you are not wanting to receive emails.
+> You will not receive this email if you are logged in.
 
 When you view your rewards, you will see all the rewards that you have gained. 
 
-This includes, a sum total of XP, gold, skill xp and items as well as the adventures reward.
+This includes, a sum total of xp, gold, skill xp and items as well as the adventures reward.
 
 ### Failing the adventure gives you no rewards.
 
@@ -72,7 +72,7 @@ This can happen in some instances where you and the enemy have bad RNG and you e
 
 ## Repeating Adventures
 
-You can repeat adventures over and over again as much as you like. You will how ever only recieve the quest reward item once if that adventure has one.
+You can repeat adventures over and over again as much as you like. You will how ever only receive the quest reward item once if that adventure has one.
 
 ## Canceling Adventures
 

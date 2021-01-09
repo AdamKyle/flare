@@ -49,8 +49,8 @@ class Race extends Component
             $oldRace = Cache::pull('race-' . $this->race->id);
 
             $message = 'Race: ' . $this->race->name . ' Updated. Applying to all characters who are this race.';
-
-            (new UpdateCharacterStatsService())->updateRacialStats($oldRace, $this->race);
+            
+            (new UpdateCharacterStatsService())->updateRacialStats($oldRace, $this->race->refresh());
         } else {
             $message = 'Race: ' . $this->race->name . ' Created!';
         }

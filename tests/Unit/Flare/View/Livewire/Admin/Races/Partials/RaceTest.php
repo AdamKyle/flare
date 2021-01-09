@@ -2,10 +2,12 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Races\Partials;
 
+use App\Flare\Models\Character;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\GameRace;
 use App\Flare\View\Livewire\Admin\Races\Partials\Race;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateUser;
@@ -34,6 +36,7 @@ class RaceTest extends TestCase
     }
 
     public function testChangeRaceStats() {
+        
         $gameRace = $this->createRace();
 
         Livewire::test(Race::class, [

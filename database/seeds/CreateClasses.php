@@ -91,7 +91,7 @@ class CreateClasses extends Seeder
                 'accuracy_mod' => 0.05,
                 'dodge_mod'    => 0.05,
                 'deffense_mod' => 0,
-                'looting_mod'  => 0.10,
+                'looting_mod'  => 0.05,
             ],
         ]);
     }

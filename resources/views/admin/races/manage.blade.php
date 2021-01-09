@@ -10,6 +10,11 @@
             <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
         </div>
     </div>
+    @if (!is_null($race)) 
+        <div class="alert alert-warning">
+            Editing this race while you have test characters, will regenerate those characters.
+        </div>
+    @endif
     @livewire('core.form-wizard', [
         'views' => [
             'admin.races.partials.race',

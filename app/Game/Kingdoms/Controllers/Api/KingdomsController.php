@@ -36,8 +36,15 @@ class KingdomsController extends Controller {
         $kingdom = Kingdom::where('x_position', $request->x_position)->where('y_position', $request->y_position)->first();
         
         if (is_null($kingdom)) {
+            $location = Location::where('x', $request->x_position)->where('y', $request->y_position)->first();
+
+            if (!is_null($location)) {
+                return response()->json(['cannot_settle' => true]);
+            }
+            
             return response()->json([], 200);
         }
+        
         
         $kingdom  = new Item($kingdom, $this->kingdom);
 

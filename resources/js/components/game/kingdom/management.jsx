@@ -63,11 +63,17 @@ export default class Management extends React.Component {
         }).then((result) => {
             const data = result.data;
 
+            let kingdom = [];
+
+            if (!result.data.hasOwnProperty('cannot_settle')) {
+                kingdom = result.data;
+            }
+
             this.setState({
                 is_own_kingdom: this.isOwnKingdom(data),
                 can_settle: this.canSettle(data),
                 isLoading: false,
-                kingdomData: result.data,
+                kingdomData: kingdom,
             })
         }).catch((error) => {
             console.error(error);
@@ -93,6 +99,10 @@ export default class Management extends React.Component {
         
         if (_.isEmpty(data)) {
             return true
+        }
+
+        if (data.hasOwnProperty('cannot_settle')) {
+            return false;
         }
 
         return this.isOwnKingdom(data);

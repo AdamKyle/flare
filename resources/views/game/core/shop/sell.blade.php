@@ -41,7 +41,8 @@
 
     <h4>Your Items To Sell</h4>
     <div class="alert alert-warning">
-        Clicking "Sell All" will sell everything listed below. No quest items or currently equipped items will be sold.
+        You can click "Sell all" (beside the page drop down) to auto sell all items or select items you want to sell and click the "Sell all selected" on the table
+        to sell just those specific items.
     </div>
     @livewire('character.inventory.data-table', [
         'batchSell' => true,

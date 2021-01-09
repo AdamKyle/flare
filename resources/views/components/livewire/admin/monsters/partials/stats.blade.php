@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
-                <label for="health_range">Max Health Range: </label>
+                <label for="health_range">Health Range: </label>
                 <input type="text" class="form-control" name="health_range" value="" wire:model="monster.health_range"> 
                 @error('monster.health_range') <span class="text-danger">{{ $message }}</span> @enderror
             </div>

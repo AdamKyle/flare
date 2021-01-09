@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin\CharacterModeling;
 
 use App\Admin\Jobs\RunTestSimulation;
 use App\Admin\Mail\GenericMail;
+use App\Flare\Models\Character;
 use App\Flare\Models\CharacterSnapShot;
 use App\Flare\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -421,6 +422,8 @@ class CharacterModelingControllerTest extends TestCase
         $this->actingAs($this->user)->visit(route('admin.character.modeling.battle-simmulation.results', [
             'characterSnapShot' => 1
         ]))->see('Data For Fight');
+
+        $this->assertEquals(1000, Character::first()->level);
     }
 
     public function testSeeBattleResultsMultipleTimes() {
