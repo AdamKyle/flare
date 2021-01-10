@@ -63,8 +63,14 @@ class UpgradeBuilding implements ShouldQueue
         if ($this->building->gives_resources) {
             $type = $this->getResourceType();
 
-            $this->building->kingdom->{'current_' . $type} = $this->building->kingdom->{'max_' . $type} + 1000;
-            $this->building->kingdom->{'max_' . $type}     += 1000;
+            if ($type === 'population') {
+                $this->building->kingdom->{'current_' . $type} = $this->building->kingdom->{'max_' . $type} * $this->level;
+                $this->building->kingdom->{'max_' . $type}     *= $this->level;
+            } else {
+                dump($type, $this->building->kingdom->{'max_' . $type} + 1000, $this->building->kingdom->{'current_' . $type}, $this->building->kingdom->{'max_' . $type});
+                $this->building->kingdom->{'current_' . $type} = $this->building->kingdom->{'max_' . $type} + 1000;
+                $this->building->kingdom->{'max_' . $type}     += 1000;
+            }
 
             $this->building->kingdom->save();
         }

@@ -104,7 +104,11 @@ class Building extends Model
     }
 
     public function getPopulationIncreaseAttribute() {
-        return $this->gameBuilding->increase_population_amount;
+        return $this->level * $this->gameBuilding->increase_population_amount;
+    }
+
+    public function getFuturePopulationIncreaseAttribute() {
+        return ($this->level + 1) * $this->gameBuilding->increase_population_amount;
     }
 
     public function getTimeIncreaseAttribute() {

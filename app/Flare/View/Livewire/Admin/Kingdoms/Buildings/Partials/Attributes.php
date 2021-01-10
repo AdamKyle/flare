@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials;
 
+use App\Admin\Services\UpdateKingdomsService;
 use App\Flare\Models\GameBuilding;
 use Livewire\Component;
 
@@ -48,6 +49,8 @@ class Attributes extends Component
         $this->validate();
 
         $this->gameBuilding->save();
+
+        (new UpdateKingdomsService)->updateKingdomBuildings($this->gameBuilding->refresh());
 
         $message = 'Created Building: ' . $this->gameBuilding->refresh()->name;
         

@@ -54,7 +54,7 @@ class GenerateTestCharacter implements ShouldQueue
         $this->race = $race;
         $this->class = $class;
         $this->adminUser = $adminUser;
-        $this->levelTo = $levelTo;
+        $this->levelTo = env('APP_ENV') === 'testing' ? 1 : $levelTo;
     }
 
     /**

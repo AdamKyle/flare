@@ -71,6 +71,10 @@ class Kingdom extends Model
         return $this->hasMany(BuildingInQueue::class, 'kingdom_id', 'id');
     }
 
+    public function character() {
+        return $this->belongsTo(Character::class, 'character_id', 'id');
+    }
+
     protected static function newFactory() {
         return KingdomFactory::new();
     }

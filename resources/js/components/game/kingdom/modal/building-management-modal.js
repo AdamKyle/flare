@@ -118,22 +118,16 @@ export default class BuildingManagementModal extends React.Component {
                     </div>
                     <hr />
                     <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-6">
                             <dl>
                                 <dt><strong>Morale Increase/h</strong>:</dt>
                                 <dd>{(this.props.building.morale_increase * 100).toFixed(2)}%</dd>
                             </dl>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-6">
                             <dl>
                                 <dt><strong>Morale Decrease/h</strong><sup>*</sup>:</dt>
                                 <dd>{(this.props.building.morale_decrease * 100).toFixed(2)}%</dd>
-                            </dl>
-                        </div>
-                        <div className="col-md-4">
-                            <dl>
-                                <dt><strong>Population Increase/h</strong>:</dt>
-                                <dd>{this.props.building.population_increase}</dd>
                             </dl>
                         </div>
                         <p className="mt-3 ml-2 text-muted"><small><sup>*</sup> Kingdom morale only decreases if this building's durability is 0.</small></p>

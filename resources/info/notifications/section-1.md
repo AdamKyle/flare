@@ -20,14 +20,19 @@ Players can also be emailed if they are not online and have those settings turne
 - You can speak again.
 - You were unbanned.
 - Your request to be unbanned was ignored.
+- A kingdom is under attack.
 
 If you are online, most of the above will display in chat. as you can see in the second image above.
 
 ## Server notifications in chat
 
-The chat area is extremly important to pay attention to. Messages about being out of gold for completing things such as enchanting/crafting or being told you have to wait for the appropriate timer to finish - all of these and more can appear in chat.
+The chat area is **extremely important** to pay attention to. Messages about being out of gold for completing things such as enchanting/crafting or being told you have to wait for the appropriate timer to finish - all of these and more can appear in chat.
 
-These server messages are only directed to you, so the rest of chat wont be poluted by eachothers server messages and can just focus on chatting.
+Other messages such as gold rushes, being told when you leveled up, skill level up (when fighting) and other game messages will appear here.
+
+These server messages are only directed to you, so the rest of chat wont be polluted by each others server messages and can just focus on chatting.
+
+Information about your [kingdom]() will also appear here as well. Everything from building upgrading to kingdoms coming under attack will appear in chat so long as you are in chat or be emailed to you all at once, once per hour. With the exception of incoming attacks.
 
 ## No popups or endless notifications.
 
