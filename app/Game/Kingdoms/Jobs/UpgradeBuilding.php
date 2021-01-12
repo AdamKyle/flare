@@ -35,7 +35,7 @@ class UpgradeBuilding implements ShouldQueue
     protected $building;
 
     protected $resourceTypes = [
-        'wood', 'clay', 'stone', 'iron', 'population'
+        'wood', 'clay', 'stone', 'iron',
     ];
 
     /**
@@ -63,17 +63,12 @@ class UpgradeBuilding implements ShouldQueue
         if ($this->building->gives_resources) {
             $type = $this->getResourceType();
 
-            if ($type === 'population') {
-                $this->building->kingdom->{'current_' . $type} = $this->building->kingdom->{'max_' . $type} * $this->level;
-                $this->building->kingdom->{'max_' . $type}     *= $this->level;
-            } else {
-                dump($type, $this->building->kingdom->{'max_' . $type} + 1000, $this->building->kingdom->{'current_' . $type}, $this->building->kingdom->{'max_' . $type});
-                $this->building->kingdom->{'current_' . $type} = $this->building->kingdom->{'max_' . $type} + 1000;
-                $this->building->kingdom->{'max_' . $type}     += 1000;
-            }
-
-            $this->building->kingdom->save();
+            $this->building->kingdom->{'max_' . $type} += 1000;
+        } else if ($this->building->is_farm) {
+            $this->building->kingdom->max_population *= $level;
         }
+
+        $this->building->kingdom->save();
 
         $this->building->refresh()->Update([
             'level' => $level,
@@ -106,9 +101,13 @@ class UpgradeBuilding implements ShouldQueue
 
     protected function getResourceType() {
         foreach($this->resourceTypes as $type) {
-            if (!is_null($this->building->{$type . '_increase'})) {
+            dump($this->building->name, $this->building->{'increase_in_' . $type});
+            if ($this->building->{'increase_in_' . $type} !== 0.0) {
+                dump($type);
                 return $type;
             }
         }
+
+        return null;
     }
 }

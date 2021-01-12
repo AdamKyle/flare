@@ -4,6 +4,7 @@ import moment from 'moment';
 import ReactDatatable from '@ashvin27/react-datatable';
 import BuildingManagementModal from './building-management-modal';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
+import QueueModal from './queue-modal';
 
 export default class KingdomManagementModal extends React.Component {
 
@@ -93,6 +94,8 @@ export default class KingdomManagementModal extends React.Component {
         this.state = {
             openBuildingManagement: false,
             buildingToManage: null,
+            openQueueData: false,
+            queue: null,
         }
     }
 
@@ -208,6 +211,20 @@ export default class KingdomManagementModal extends React.Component {
         });
     }
 
+    queueData(event, data, rowIndex) {
+        this.setState({
+            openQueueData: true,
+            queue: data
+        });
+    }
+
+    closeQueueData() {
+        this.setState({
+            openQueueData: false,
+            queue: null,
+        });
+    }
+
     render() {
         return (
             <Modal
@@ -307,17 +324,23 @@ export default class KingdomManagementModal extends React.Component {
                             </div>
                             <hr />
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-4">
                                     <dl>
                                         <dt><strong>Morale Increase/hr</strong>:</dt>
                                         <dd>{this.getTotalMoraleIncreasePerHour()}%</dd>
                                     </dl>
                                 </div>
-                                <div className="col-md-6">
+                                <div className="col-md-4">
                                     <dl>
                                         <dt><strong>Morale Decrease/hr</strong>:</dt>
                                         <dd>{this.getTotalMoraleDecreasePerHour()}%</dd>
                                     </dl>
+                                </div>
+                                <div className="col-md-4">
+                                    <dl>
+                                    <dt><strong>Population Increase/hr</strong>:</dt>
+                                        <dd>{this.getResourceIncrease('population_increase')}</dd>
+                                    </dl> 
                                 </div>
                             </div>
                             <hr />
@@ -343,6 +366,15 @@ export default class KingdomManagementModal extends React.Component {
                                 updateKingdomData={this.props.updateKingdomData}
                                 queue={this.props.kingdom.building_queue}
                             /> : null }
+
+                            { this.state.openQueueData ? 
+                                <QueueModal
+                                    close={this.closeQueueData.bind(this)}
+                                    show={this.state.openQueueData}
+                                    queueData={this.state.queue}
+                                    buildings={this.props.kingdom.buildings}
+                                />: null
+                            }
                         </Tab>
                         <Tab eventKey="building-queue" title="Building Queue">
                             <div className="mt-3">
@@ -350,7 +382,7 @@ export default class KingdomManagementModal extends React.Component {
                                     config={this.building_queue_config}
                                     records={this.props.kingdom.building_queue}
                                     columns={this.building_queue_columns}
-                                    onRowClicked={this.rowClickedHandler.bind(this)}        
+                                    onRowClicked={this.queueData.bind(this)}        
                                 />
                             </div>
                         </Tab>

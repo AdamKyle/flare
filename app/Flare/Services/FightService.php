@@ -134,6 +134,16 @@ class FightService {
      */
     public function attack($attacker, $defender) {
         if ($this->isCharacterDead() || $this->isMonsterDead()) {
+
+            if ($this->isMonsterDead()) {
+                $this->logInformation[] = [
+                    'attacker'   => $defender->name,
+                    'defender'   => $attacker->name,
+                    'message'    => $attacker->name . 'has been defeated!',
+                    'is_monster' => $defender instanceOf Character ? false : true
+                ];
+            }
+
             return;
         }
 

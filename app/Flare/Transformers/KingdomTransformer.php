@@ -20,6 +20,7 @@ class KingdomTransformer extends TransformerAbstract {
     public function transform(Kingdom $kingdom) {
 
         return [
+            'id'                 => $kingdom->id,
             'character_id'       => $kingdom->character_id,
             'game_map_id'        => $kingdom->game_map_id,
             'name'               => $kingdom->name,

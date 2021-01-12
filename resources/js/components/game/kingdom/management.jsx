@@ -27,10 +27,11 @@ export default class Management extends React.Component {
         this.fetchKingdomDataAtLocation();
 
         this.updateBuildingQueue.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {
-            console.log(event);
-            this.setState({
-                kingdomData: event.kingdom,
-            });
+            if (this.state.kingdomData.id === event.kingdom.id) {
+                this.setState({
+                    kingdomData: event.kingdom,
+                });
+            }
         });
     }
 

@@ -423,7 +423,7 @@ class CharacterModelingControllerTest extends TestCase
             'characterSnapShot' => 1
         ]))->see('Data For Fight');
 
-        $this->assertEquals(1000, Character::first()->level);
+        $this->assertEquals(1, Character::first()->level);
     }
 
     public function testSeeBattleResultsMultipleTimes() {
