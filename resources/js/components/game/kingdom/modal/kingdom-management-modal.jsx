@@ -96,11 +96,22 @@ export default class KingdomManagementModal extends React.Component {
             buildingToManage: null,
             openQueueData: false,
             queue: null,
+            kingdom: props.kingdom,
+        }
+    }
+
+    componentDidUpdate() {
+        if (!_.isEqual(this.props.kingdom, this.state.kingdom)) {
+            this.setState({
+                kingdom: this.props.kingdom,
+                openQueueData: false,
+                queue: null,
+            });
         }
     }
 
     fetchBuildingName(buildingId) {
-        return this.props.kingdom.buildings.filter((b) => b.id === buildingId)[0].name
+        return this.state.kingdom.buildings.filter((b) => b.id === buildingId)[0].name
     }
 
     fetchTime(time) {
@@ -140,15 +151,15 @@ export default class KingdomManagementModal extends React.Component {
     }
 
     getTreasury() {
-        if (this.props.kingdom.treasury === null) {
+        if (this.state.kingdom.treasury === null) {
             return 0;
         }
         
-        return this.props.kingdom.treasury.toLocaleString('en-US', {maximumFractionDigits:0});
+        return this.state.kingdom.treasury.toLocaleString('en-US', {maximumFractionDigits:0});
     }
 
     getResourceIncrease(type) {
-        const building = this.props.kingdom.buildings.filter((b) => b[type] !== 0);
+        const building = this.state.kingdom.buildings.filter((b) => b[type] !== 0);
         
         if (_.isEmpty(building)) {
             return 0;
@@ -160,11 +171,11 @@ export default class KingdomManagementModal extends React.Component {
     getTotalMoraleIncreasePerHour() {
         let currentMoraleIncrease = 0;
 
-        if (this.props.kingdom.current_morale >= 1.0) {
+        if (this.state.kingdom.current_morale >= 1.0) {
             return currentMoraleIncrease;
         }
 
-        const buildings = this.props.kingdom.buildings;
+        const buildings = this.state.kingdom.buildings;
 
         buildings.forEach((building) => {
             if (building.current_durability !== 0) {
@@ -178,11 +189,11 @@ export default class KingdomManagementModal extends React.Component {
     getTotalMoraleDecreasePerHour() {
         let currentMoraleDecrease = 0;
 
-        if (this.props.kingdom.current_morale === 0) {
+        if (this.state.kingdom.current_morale === 0) {
             return currentMoraleDecrease;
         }
 
-        const buildings = this.props.kingdom.buildings;
+        const buildings = this.state.kingdom.buildings;
 
         buildings.forEach((building) => {
             if (building.current_durability === 0) {
@@ -194,7 +205,7 @@ export default class KingdomManagementModal extends React.Component {
     }
 
     getCurrentMorale() {
-        return (this.props.kingdom.current_morale * 100).toFixed(2);
+        return (this.state.kingdom.current_morale * 100).toFixed(2);
     }
 
     rowClickedHandler(event, data, rowIndex) {
@@ -234,9 +245,9 @@ export default class KingdomManagementModal extends React.Component {
                 aria-labelledby="kingdom-management-modal"
                 backdrop="static"
             >
-                <Modal.Header closeButton style={{backgroundColor: this.adjust(this.props.kingdom.color, 50)}}>
+                <Modal.Header closeButton style={{backgroundColor: this.adjust(this.state.kingdom.color, 50)}}>
                     <Modal.Title id="kingdom-management-modal" style={{color: '#fff'}}>
-                        {this.props.kingdom.name}
+                        {this.state.kingdom.name}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -246,7 +257,7 @@ export default class KingdomManagementModal extends React.Component {
                                 <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Population</strong>:</dt>
-                                        <dd>{this.props.kingdom.current_population} / {this.props.kingdom.max_population}</dd>
+                                        <dd>{this.state.kingdom.current_population} / {this.state.kingdom.max_population}</dd>
                                     </dl>
                                 </div>
                                 <div className="col-md-3">
@@ -264,7 +275,7 @@ export default class KingdomManagementModal extends React.Component {
                                 <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Location (X/Y)</strong>:</dt>
-                                        <dd>{this.props.kingdom.x_position} / {this.props.kingdom.y_position}</dd>
+                                        <dd>{this.state.kingdom.x_position} / {this.state.kingdom.y_position}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -273,25 +284,25 @@ export default class KingdomManagementModal extends React.Component {
                                 <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Wood</strong>:</dt>
-                                        <dd>{this.props.kingdom.current_wood} / {this.props.kingdom.max_wood}</dd>
+                                        <dd>{this.state.kingdom.current_wood} / {this.state.kingdom.max_wood}</dd>
                                     </dl>
                                 </div>
                                 <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Clay</strong>:</dt>
-                                        <dd>{this.props.kingdom.current_clay} / {this.props.kingdom.max_clay}</dd>
+                                        <dd>{this.state.kingdom.current_clay} / {this.state.kingdom.max_clay}</dd>
                                     </dl>
                                 </div>
                                 <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Stone</strong>:</dt>
-                                        <dd>{this.props.kingdom.current_stone} / {this.props.kingdom.current_stone}</dd>
+                                        <dd>{this.state.kingdom.current_stone} / {this.state.kingdom.current_stone}</dd>
                                     </dl>
                                 </div>
                                 <div className="col-md-3">
                                     <dl>
                                         <dt><strong>Iron</strong>:</dt>
-                                        <dd>{this.props.kingdom.current_iron} / {this.props.kingdom.max_iron}</dd>
+                                        <dd>{this.state.kingdom.current_iron} / {this.state.kingdom.max_iron}</dd>
                                     </dl>
                                 </div>
                             </div>
@@ -348,7 +359,7 @@ export default class KingdomManagementModal extends React.Component {
                                 <div className="col-md-12">
                                     <ReactDatatable
                                         config={this.config}
-                                        records={this.props.kingdom.buildings}
+                                        records={this.state.kingdom.buildings}
                                         columns={this.columns}
                                         onRowClicked={this.rowClickedHandler.bind(this)}        
                                     />
@@ -361,10 +372,10 @@ export default class KingdomManagementModal extends React.Component {
                                 close={this.closeBuildingManagement.bind(this)}
                                 show={this.state.openBuildingManagement}
                                 building={this.state.building}
-                                kingdom={this.props.kingdom}
+                                kingdom={this.state.kingdom}
                                 characterId={this.props.characterId}
                                 updateKingdomData={this.props.updateKingdomData}
-                                queue={this.props.kingdom.building_queue}
+                                queue={this.state.kingdom.building_queue}
                             /> : null }
 
                             { this.state.openQueueData ? 
@@ -372,7 +383,7 @@ export default class KingdomManagementModal extends React.Component {
                                     close={this.closeQueueData.bind(this)}
                                     show={this.state.openQueueData}
                                     queueData={this.state.queue}
-                                    buildings={this.props.kingdom.buildings}
+                                    buildings={this.state.kingdom.buildings}
                                 />: null
                             }
                         </Tab>
@@ -380,7 +391,7 @@ export default class KingdomManagementModal extends React.Component {
                             <div className="mt-3">
                                 <ReactDatatable
                                     config={this.building_queue_config}
-                                    records={this.props.kingdom.building_queue}
+                                    records={this.state.kingdom.building_queue}
                                     columns={this.building_queue_columns}
                                     onRowClicked={this.queueData.bind(this)}        
                                 />

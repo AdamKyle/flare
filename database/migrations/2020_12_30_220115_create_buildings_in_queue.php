@@ -26,6 +26,7 @@ class CreateBuildingsInQueue extends Migration
                   ->references('id')->on('buildings');
             $table->integer('to_level');
             $table->dateTime('completed_at');
+            $table->dateTime('started_at');
             $table->timestamps();
         });
     }

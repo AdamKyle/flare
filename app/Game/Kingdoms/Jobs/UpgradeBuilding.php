@@ -34,6 +34,11 @@ class UpgradeBuilding implements ShouldQueue
      */
     protected $building;
 
+    /**
+     * @var int queueId
+     */
+    protected $queueId;
+
     protected $resourceTypes = [
         'wood', 'clay', 'stone', 'iron',
     ];
@@ -43,11 +48,13 @@ class UpgradeBuilding implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Building $building, User $user)
+    public function __construct(Building $building, User $user, int $queueId)
     {
         $this->user     = $user;
 
         $this->building = $building;
+
+        $this->queueId  = $queueId;
     }
 
     /**
@@ -57,6 +64,12 @@ class UpgradeBuilding implements ShouldQueue
      */
     public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
     {
+
+        $queue = BuildingInQueue::find($this->queueId);
+
+        if (is_null($queue)) {
+            return;
+        }
 
         $level = $this->building->level + 1;
 

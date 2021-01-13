@@ -21,14 +21,15 @@ class BuildingService {
     public function upgradeBuilding(Character $character) {
         $timeToComplete = now()->addMinutes($this->building->time_increase);
         
-        BuildingInQueue::create([
+        $queue = BuildingInQueue::create([
             'character_id' => $character->id,
             'kingdom_id'   => $this->building->kingdom->id,
             'building_id'  => $this->building->id,
             'to_level'     => $this->building->level + 1,
             'completed_at' => $timeToComplete,
+            'started_at'   => now(),
         ]);
 
-        UpgradeBuilding::dispatch($this->building, $character->user)->delay($timeToComplete);
+        UpgradeBuilding::dispatch($this->building, $character->user, $queue->id)->delay($timeToComplete);
     }
 }

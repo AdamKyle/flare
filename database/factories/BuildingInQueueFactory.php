@@ -27,6 +27,7 @@ class BuildingInQueueFactory extends Factory
             'building_id'  => null,
             'to_level'     => null,
             'completed_at' => now(),
+            'started_at'   => now()->subMinutes(10),
         ];
     }
 }

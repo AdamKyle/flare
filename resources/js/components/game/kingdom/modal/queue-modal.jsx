@@ -27,12 +27,13 @@ export default class QueueModal extends React.Component {
     componentDidMount() {
         this.setState({
             building: this.fetchBuilding(),
+            queue: this.props.queueData,
         });
     }
 
     fetchBuilding() {
         const building = this.props.buildings.filter((b) => b.id === this.props.queueData.building_id);
-        console.log(building);
+        
         if (_.isEmpty(building)) {
             return null;
         }
@@ -41,7 +42,13 @@ export default class QueueModal extends React.Component {
     }
 
     cancelUpgrade() {
-
+        axios.post('/api/kingdoms/building-upgrade/cancel', {
+            queue_id: this.props.queueData.id
+        }).then(() => {
+            this.props.close();
+        }).catch((result) => {
+            console.error(result);
+        });
     }
 
     getIncrease(type) {

@@ -24,6 +24,7 @@ class BuildingInQueue extends Model
         'building_id',
         'to_level',
         'completed_at',
+        'started_at',
     ];
 
     /**
@@ -34,14 +35,15 @@ class BuildingInQueue extends Model
     protected $casts = [
         'to_level'     => 'integer',
         'completed_at' => 'datetime',
+        'started_at'   => 'datetime',
     ];
 
     public function getCharacter() {
         return $this->belongsTo(Character::class);
     }
 
-    public function gameBuilding() {
-        return $this->belongsTo(GameBuilding::class);
+    public function building() {
+        return $this->belongsTo(Building::class);
     }
 
     public function kingdom() {
