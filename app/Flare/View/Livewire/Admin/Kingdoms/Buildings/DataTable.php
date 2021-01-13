@@ -17,6 +17,7 @@ class DataTable extends Component
     public $search       = '';
     public $sortField    = 'name';
     public $perPage      = 10;
+    public $editing      = false;
 
     public function fetch() {
         return GameBuilding::dataTableSearch($this->search)->orderBy($this->sortField, $this->sortBy)->paginate($this->perPage);

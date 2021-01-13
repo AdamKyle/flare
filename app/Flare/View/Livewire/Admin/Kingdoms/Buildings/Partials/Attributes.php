@@ -10,6 +10,8 @@ class Attributes extends Component
 {
     public $gameBuilding;
 
+    public $editing;
+
     protected $rules = [
         'gameBuilding.is_walls'                   => 'nullable',
         'gameBuilding.is_church'                  => 'nullable',
@@ -53,6 +55,11 @@ class Attributes extends Component
         (new UpdateKingdomsService)->updateKingdomBuildings($this->gameBuilding->refresh());
 
         $message = 'Created Building: ' . $this->gameBuilding->refresh()->name;
+
+        if ($this->editing) {
+            $message = 'Updated Building: ' . $this->gameBuilding->refresh()->name;
+        }
+        
         
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',

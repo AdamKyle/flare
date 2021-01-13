@@ -26,6 +26,8 @@ class FormWizard extends Component
 
     public $flashMessage    = '';
 
+    public $editing         = false;
+
     protected $listeners    = ['storeModel', 'nextStep', 'finish', 'sessionMessage'];
 
     public function nextStep(int $index, bool $passed = false) {
@@ -75,6 +77,7 @@ class FormWizard extends Component
 
     public function mount() {
         $this->viewData[$this->modelName] = $this->model;
+        $this->viewData['editing']        = $this->editing;
     }
 
     public function render()

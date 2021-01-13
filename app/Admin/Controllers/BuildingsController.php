@@ -13,7 +13,8 @@ class BuildingsController extends Controller {
 
     public function create() {
         return view ('admin.kingdoms.buildings.manage', [
-            'building' => null
+            'building' => null,
+            'editing'  => false,
         ]);
     }
 
@@ -25,7 +26,8 @@ class BuildingsController extends Controller {
 
     public function edit(GameBuilding $building) {
         return view ('admin.kingdoms.buildings.manage', [
-            'building' => $building
+            'building' => $building,
+            'editing'  => true,
         ]);
     }
     

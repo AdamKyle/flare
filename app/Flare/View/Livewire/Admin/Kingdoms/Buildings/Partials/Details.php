@@ -10,6 +10,8 @@ class Details extends Component
 
     public $gameBuilding = null;
 
+    public $editing      = false;
+
     protected $rules = [
         'gameBuilding.name'                 => 'required',
         'gameBuilding.description'          => 'required',
@@ -43,6 +45,8 @@ class Details extends Component
         if (is_null($this->gameBuilding)) {
             $this->gameBuilding = new GameBuilding;
         }
+
+        dump($this->editing);
     }
 
     public function render()

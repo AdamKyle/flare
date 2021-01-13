@@ -22,5 +22,6 @@
             'Building Attributes',
         ],
         'finishRoute' => 'buildings.list',
+        'editing'     => $editing,
     ])
 @endsection
