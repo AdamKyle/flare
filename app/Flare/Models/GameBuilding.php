@@ -76,6 +76,10 @@ class GameBuilding extends Model
         'time_increase_amount'        => 'float',
     ];
 
+    public function units() {
+        return $this->hasMany(GameBuildingUnit::class);
+    }
+
     protected static function newFactory() {
         return GameBuildingFactory::new();
     }

@@ -45,8 +45,6 @@ class Details extends Component
         if (is_null($this->gameBuilding)) {
             $this->gameBuilding = new GameBuilding;
         }
-
-        dump($this->editing);
     }
 
     public function render()
