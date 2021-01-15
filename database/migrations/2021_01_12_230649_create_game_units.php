@@ -17,7 +17,7 @@ class CreateGameUnits extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->text('description');
-            $table->intger('attack');
+            $table->integer('attack');
             $table->integer('deffense');
             $table->boolean('can_heal')->nullable()->default(false);
             $table->integer('unit_can_heal')->nullable();
@@ -28,7 +28,7 @@ class CreateGameUnits extends Migration
             $table->integer('stone_cost');
             $table->integer('iron_cost');
             $table->integer('required_population');
-            $table->intger('time_to_recruit');
+            $table->integer('time_to_recruit');
             $table->timestamps();
         });
     }
