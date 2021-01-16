@@ -45,6 +45,7 @@
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-guarded-tower"></i><span class="hide-menu">Kingdoms</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('buildings.list')}}">Buildings</a></li>
+            <li><a href="{{route('units.list')}}">Units</a></li>
         </ul>
     </li>
     <li>

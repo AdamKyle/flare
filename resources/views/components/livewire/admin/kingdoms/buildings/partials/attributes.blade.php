@@ -1,4 +1,10 @@
 <div>
+    @error('error')
+        <div class="alert alert-danger mb-2">
+            {{ $message }}
+        </div>
+    @enderror
+    
     <div class="row">
         <div class="col-md-3">
             <div class="form-group">
@@ -29,6 +35,13 @@
             </div>
         </div>
     </div>
+    @if (!is_null($gameBuilding))
+        @if ($gameBuilding->trains_units && $gameUnits->isEmpty())
+            <div class="alert alert-warning mb-2 mt-2">
+                You don't have any game units to add to this building.
+            </div>
+        @endif
+    @endif
     <div class="row">
         <div class="col-md-2">
             <div class="form-group form-check-inline">
@@ -59,6 +72,24 @@
                 <input type="checkbox" class="form-check-input" id="gameBuilding-trains-units" wire:model="gameBuilding.trains_units">
                 <label class="form-check-label" for="gameBuilding-trains-units">Can this building train units?</label>
             </div>        
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="skill-for-monster">Units: </label>
+                <select class="form-control" name="units-for-building" wire:model="selectedUnits" {{$this->unit_selection_is_disabled ? 'disabled' : ''}} multiple>
+                    @foreach($gameUnits as $gameUnit)
+                        <option value={{$gameUnit->id}}>{{$gameUnit->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gameBuilding-trains-units">Units per level <a href="#" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-info-circle"></i></a></label>
+                <input type="number" class="form-control" id="gameBuilding-units-per-level" wire:model="everyXLevels" {{$this->unit_selection_is_disabled  ? 'disabled' : ''}}>
+            </div>  
         </div>
     </div>
     <div class="row">
@@ -146,4 +177,32 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Game Units Per Level Help</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Based on the units you selected, we will allow these units to be accessed as specific levels of the building.
+              For example if you selected 5 units and entered 5 for the units per level that would mean, you get a unit
+              at level 1, 6, 11, 16 and 21.</p>
+              <p class="text-danger">Amount of selected units and the units per level can never be greator then the maximum building level.</p>
+              <div class="mt2">
+                  <h5>Formula used</h5>
+                  <p>The following formula is how we determine if what you selected and entered is greator then then building max level</p>
+                  <p>(Total Units selected * units per level) - (Total units selected - 1)</p>
+                  <p>In our example above the answer would be 21. If your building max level is less then 21, you wont be able to create this building.</p>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 </div>

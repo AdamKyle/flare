@@ -2,6 +2,7 @@
 
 namespace App\Admin\Jobs;
 
+use App\Admin\Services\UpdateKingdomsService;
 use App\Flare\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Building;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Service\KingdomService;
 use Facades\App\Flare\Values\UserOnlineValue;
 
 class UpdateBuildings implements ShouldQueue
@@ -19,21 +21,29 @@ class UpdateBuildings implements ShouldQueue
 
     public $gameBuilding;
 
+    public $selectedUnits;
+
+    public $levels;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(GameBuilding $gameBuilding) {
-        $this->gameBuilding = $gameBuilding;
+    public function __construct(GameBuilding $gameBuilding, array $selectedUnits, int $levels) {
+        $this->gameBuilding  = $gameBuilding;
+        $this->selectedUnits = $selectedUnits;
+        $this->levels        = $levels;
     }
 
     /**
      * 
      * @return void
      */
-    public function handle() {
+    public function handle(UpdateKingdomsService $service) {
         $query = Building::where('game_building_id', $this->gameBuilding->id);
+
+        $this->reassignUnits($service);
 
         if ($query->get()->isEmpty()) {
             Kingdom::chunkById(500, function($kingdoms) {
@@ -67,6 +77,19 @@ class UpdateBuildings implements ShouldQueue
                 }
             });
         }
-        
+    }
+
+    public function reassignUnits(UpdateKingdomsService $service) {
+        if (empty($this->selectedUnits)) {
+            return;
+        }
+
+        foreach($this->gameBuilding->units as $unit) {
+            $unit->delete();
+        }
+
+        $service->assignUnits($this->gameBuilding->refresh(), $this->selectedUnits, $this->levels);
+
+        $this->gameBuilding = $this->gameBuilding->refresh();
     }
 }

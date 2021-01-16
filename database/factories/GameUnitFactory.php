@@ -27,7 +27,7 @@ class GameUnitFactory extends Factory
             'attack'                 => 1,
             'deffense'               => 1,
             'can_heal'               => false,
-            'unit_can_heal'          => false,
+            'heal_amount'            => null, 
             'siege_weapon'           => false,
             'travel_time'            => 1,
             'wood_cost'              => 10,

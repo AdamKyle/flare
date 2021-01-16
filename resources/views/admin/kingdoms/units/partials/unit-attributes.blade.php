@@ -1,0 +1,41 @@
+
+<x-cards.card-with-title title="Attributes">
+    <div class="alert alert-info mb-3 mt-2">
+        Please note, these values repersent the recruitment of one unit. These values are then
+        multipled by the amount of units you want to recruit or move (Travel Time)
+    </div>
+    <dl>
+        <dd><strong>Cost in wood</strong>:</dd>
+        <dd>{{$unit->wood_cost}}</dd>
+        <dd><strong>Cost in clay</strong>:</dd>
+        <dd>{{$unit->clay_cost}}</dd>
+        <dd><strong>Cost in stone</strong>:</dd>
+        <dd>{{$unit->stone_cost}}</dd>
+        <dd><strong>Cost in iron</strong>:</dd>
+        <dd>{{$unit->iron_cost}}</dd>
+        <dd><strong>Required population</strong>:</dd>
+        <dd>{{$unit->required_population}}</dd>
+    </dl>
+    <hr />
+    <h5>Unit Stats</h5>
+    <hr />
+    <dl>
+        <dd><strong>Attack</strong>:</dd>
+        <dd>{{$unit->attack}}</dd>
+        <dd><strong>Defence</strong>:</dd>
+        <dd>{{$unit->defence}}</dd>
+        <dd><strong>Is Siege Weapon?</strong>:</dd>
+        <dd>{{$unit->seige_weapon ? 'Yes' : 'No'}}</dd>
+        <dd><strong>Can Heal?</strong>:</dd>
+        <dd>{{$unit->can_heal ? 'Yes' : 'No'}}</dd>
+    </dl>
+    <hr />
+    <h5>Time Information</h5>
+    <hr />
+    <dl>
+        <dd><strong>Travel Time</strong>:</dd>
+        <dd>{{$unit->travel_time}} Minutes</dd>
+        <dd><strong>Time To Recruit</strong>:</dd>
+        <dd>{{$unit->time_to_recruit}} Minutes</dd>
+    </dl>
+</x-cards.card-with-title>

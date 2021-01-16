@@ -18,7 +18,7 @@ class CreateKingdomUnits extends Migration
             $table->bigInteger('kingdom_id')->unsigned();
             $table->foreign('kingdom_id', 'ku_kingdom_id')
                   ->references('id')->on('kingdoms');
-            $table->bigInteger('game_unit_id');
+            $table->bigInteger('game_unit_id')->unsigned();
             $table->foreign('game_unit_id', 'ku_game_unit_id')
                   ->references('id')->on('game_units');
             $table->integer('amount');

@@ -18,9 +18,9 @@ class CreateGameUnits extends Migration
             $table->string('name');
             $table->text('description');
             $table->integer('attack');
-            $table->integer('deffense');
+            $table->integer('defence');
             $table->boolean('can_heal')->nullable()->default(false);
-            $table->integer('unit_can_heal')->nullable();
+            $table->boolean('heal_amount')->nullable()->default(null);
             $table->boolean('siege_weapon')->nullable()->default(false);
             $table->integer('travel_time');
             $table->integer('wood_cost');

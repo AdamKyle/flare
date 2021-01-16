@@ -37,7 +37,7 @@ class GameBuildingUnit extends Model
     }
 
     public function gameUnit() {
-        return $this->hasOne(GameUnit::class);
+        return $this->hasOne(GameUnit::class, 'id', 'game_unit_id');
     }
 
     protected static function newFactory() {

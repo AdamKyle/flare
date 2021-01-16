@@ -83,4 +83,9 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/kingdoms/buildings', ['as' => 'buildings.list', 'uses' => 'BuildingsController@index']);
     Route::get('/admin/kingdoms/buildings/{building}', ['as' => 'buildings.building', 'uses' => 'BuildingsController@show']);
     Route::get('/admin/kingdoms/buildings/edit/{building}', ['as' => 'buildings.edit', 'uses' => 'BuildingsController@edit']);
+
+    Route::get('/admin/kingdoms/units/create', ['as' => 'units.create', 'uses' => 'UnitsController@create']);
+    Route::get('/admin/kingdoms/units', ['as' => 'units.list', 'uses' => 'UnitsController@index']);
+    Route::get('/admin/kingdoms/units/{gameUnit}', ['as' => 'units.unit', 'uses' => 'UnitsController@show']);
+    Route::get('/admin/kingdoms/units/edit/{gameUnit}', ['as' => 'units.edit', 'uses' => 'UnitsController@edit']);
 });

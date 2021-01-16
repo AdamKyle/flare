@@ -87,7 +87,7 @@
                     <label for="skill-for-monster">Monsters: </label>
                     <select class="form-control" name="skill_for_monster" wire:model="selectedMonsters" {{$for !== 'select-monsters' ? 'disabled' : ''}} multiple>
                         @foreach($monsters as $monster)
-                            <option value={{$monster->id}} {{in_array($monster->id, $selectedMonsters) ? 'selected' : ''}}>{{$monster->name}}</option>
+                            <option value={{$monster->id}}>{{$monster->name}}</option>
                         @endforeach
                     </select>
                     @error('monster') <span class="text-danger">{{ $message }}</span> @enderror

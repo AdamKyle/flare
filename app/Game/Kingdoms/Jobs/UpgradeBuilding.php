@@ -114,9 +114,7 @@ class UpgradeBuilding implements ShouldQueue
 
     protected function getResourceType() {
         foreach($this->resourceTypes as $type) {
-            dump($this->building->name, $this->building->{'increase_in_' . $type});
             if ($this->building->{'increase_in_' . $type} !== 0.0) {
-                dump($type);
                 return $type;
             }
         }
