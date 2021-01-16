@@ -89,12 +89,12 @@ class Attributes extends Component
 
         $kingdomService = new UpdateKingdomsService();
 
-        if ($gameBuilding->units->isEmpty()) {
+        if ($gameBuilding->units->isEmpty() && $gameBuilding->trains_unit) {
             $kingdomService->assignUnits($gameBuilding, $this->selectedUnits, $this->everyXLevels);
 
             $this->selectedUnits = [];
         }
-        
+
         $kingdomService->updateKingdomBuildings($this->gameBuilding->refresh(), $this->selectedUnits, $this->everyXLevels);
 
         $message = 'Created Building: ' . $this->gameBuilding->refresh()->name;

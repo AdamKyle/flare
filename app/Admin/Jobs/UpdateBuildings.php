@@ -30,7 +30,7 @@ class UpdateBuildings implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(GameBuilding $gameBuilding, array $selectedUnits, int $levels) {
+    public function __construct(GameBuilding $gameBuilding, array $selectedUnits = [], int $levels = null) {
         $this->gameBuilding  = $gameBuilding;
         $this->selectedUnits = $selectedUnits;
         $this->levels        = $levels;

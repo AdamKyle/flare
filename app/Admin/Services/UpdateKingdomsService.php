@@ -7,7 +7,7 @@ use App\Flare\Models\GameBuilding;
 
 class UpdateKingdomsService {
 
-    public function updateKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits, int $levels) {
+    public function updateKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = null) {
         UpdateBuildings::dispatch($gameBuilding, $selectedUnits, $levels)->delay(now()->addMinutes(1));
     }
 
