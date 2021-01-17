@@ -2,13 +2,17 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameBuildingUnit;
+use App\Flare\Models\GameUnit;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Kingdom;
+use Illuminate\Support\Collection;
 
 class KingdomTransformer extends TransformerAbstract {
 
     protected $defaultIncludes = [
-        'buildings'
+        'buildings', 'recruitable_units'
     ];
 
     /**
@@ -40,7 +44,7 @@ class KingdomTransformer extends TransformerAbstract {
             'current_morale'     => $kingdom->current_morale,
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasurey,
-            'building_queue'     => $kingdom->buildingsQueue,              
+            'building_queue'     => $kingdom->buildingsQueue,         
         ];
     }
 
@@ -50,5 +54,37 @@ class KingdomTransformer extends TransformerAbstract {
 
     protected function includeBuildings(Kingdom $kingdom) {
         return $this->collection($kingdom->buildings, resolve(BuildingTransformer::class));
+    }
+
+    protected function includeRecruitableUnits(Kingdom $kingdom) {
+        $buildings = $kingdom->buildings()->whereHas('gameBuilding', function($query) {
+            return $query->where('trains_units', true);
+        })->get();
+
+        $collection = new Collection;
+
+        foreach($buildings as $building) {
+            $units = GameBuildingUnit::where('game_building_id', $building->gameBuilding->id)
+                                     ->where('required_level', $building->level)
+                                     ->get();
+
+            
+            foreach($units as $unit) {
+                $unit = GameUnit::find($unit->game_unit_id);
+
+                $collection->push($unit);
+            }
+        }
+
+        $collection = $collection->transform(function($unit) use($kingdom) {
+            $kingdomUnitInfo = $kingdom->units()->where('game_unit_id', $unit->id)->first();
+
+            $unit->kingdom_current_amount = !is_null($kingdomUnitInfo) ? $kingdomUnitInfo->amount : 0;
+            $unit->kingdom_max_amount     = $kingdom->max_population;
+
+            return $unit;
+        });
+
+        return $this->collection($collection, resolve(UnitTransformer::class));
     }
 }

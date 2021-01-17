@@ -1,4 +1,10 @@
 <div>
+    @error('error')
+        <div class="alert alert-danger mb-2">
+            {{ $message }}
+        </div>
+    @enderror
+    
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -40,16 +46,28 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-can-heal" wire:model="gameUnit.can_heal">
                 <label class="form-check-label" for="gameUnit-can-heal">Can this unit heal?</label>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-siege-weapon" wire:model="gameUnit.siege_weapon">
                 <label class="form-check-label" for="gameUnit-siege-weapon">Is this a seige weapon?</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="gameUnit-attacker" wire:model="gameUnit.attacker">
+                <label class="form-check-label" for="gameUnit-attacker">Attacker?</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="gameUnit-defender" wire:model="gameUnit.defender">
+                <label class="form-check-label" for="gameUnit-defender">Defender?</label>
             </div>
         </div>
     </div>
@@ -115,4 +133,53 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gameUnit-weak-against-unit-id">Primary Target?: </label>
+                <select class="form-control" wire:model="gameUnit.primary_target">
+                    <option>Please select</option>
+                    <option value="walls">Walls</option>
+                    <option value="buildings">Buildings</option>
+                </select> 
+                @error('gameUnit.primary_target') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gameUnit-weak-against-unit-id">Fallback Target?: </label>
+                <select class="form-control" wire:model="gameUnit.fall_back">
+                    <option>Please select</option>
+                    <option value="walls">Walls</option>
+                    <option value="buildings">Buildings</option>
+                </select> 
+                @error('gameUnit.fall_back') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    @if (!is_null($units))
+        @if ($units->isNotEmpty())
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="gameUnit-weak-against-unit-id">Weak Against?: </label>
+                        <select class="form-control" {{$weakAgainst ? 'disabled' : ''}} wire:model="gameUnit.weak_against_unit_id">
+                            <option>Please select</option>
+                            @foreach($units as $unit)
+                                <option value={{$unit->id}}>{{$unit->name}}</option>
+                            @endforeach
+                        </select> 
+                        @error('gameUnit.weak_against_unit_id') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="gameUnit-weak-against-unit-id" wire:model="weakAgainst" >
+                        <label class="form-check-label" for="gameUnit-is-wall">Weak against it's self?</label>
+                        @error('cant_be_both') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
 </div>

@@ -4,6 +4,10 @@
         Please note, these values repersent the recruitment of one unit. These values are then
         multipled by the amount of units you want to recruit or move (Travel Time)
     </div>
+    <p clas="mb-3 mt-3">{{$unit->description}}</p>
+    <p>Can be recruited from: <a href="{{route('buildings.building', [
+        'building' => $building->id
+    ])}}">{{$building->name}}</a></p>
     <dl>
         <dd><strong>Cost in wood</strong>:</dd>
         <dd>{{$unit->wood_cost}}</dd>
@@ -37,5 +41,20 @@
         <dd>{{$unit->travel_time}} Minutes</dd>
         <dd><strong>Time To Recruit</strong>:</dd>
         <dd>{{$unit->time_to_recruit}} Minutes</dd>
+    </dl>
+    <hr />
+    <h5>Attack Details</h5>
+    <hr />
+    <dl>
+        <dd><strong>Is Atacker?</strong>:</dd>
+        <dd>{{$unit->atacker ? 'Yes' : 'No'}}</dd>
+        <dd><strong>Is Defender?</strong>:</dd>
+        <dd>{{$unit->defender ? 'Yes' : 'No'}}</dd>
+        @if (!is_null($weakAgainst))
+            <dd><strong>Weak Against</strong>:</dd>
+            <dt><a href="{{route('units.unit', [
+                'gameUnit' => $weakAgainst->id
+            ])}}">{{$weakAgainst->name}}</a></dt>
+        @endif
     </dl>
 </x-cards.card-with-title>

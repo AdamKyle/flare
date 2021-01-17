@@ -9,7 +9,7 @@ use App\Flare\Models\GameBuilding;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
 
-class AttributesTest extends TestCase
+class AtrributesTest extends TestCase
 {
     use RefreshDatabase, CreateGameBuilding;
 

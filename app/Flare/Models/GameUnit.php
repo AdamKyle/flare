@@ -30,8 +30,13 @@ class GameUnit extends Model
         'clay_cost',
         'stone_cost',
         'iron_cost',
+        'attacker',
+        'defender',
+        'weak_against_unit_id',
         'required_population',
         'time_to_recruit',
+        'primary_target',
+        'fall_back',
     ];
 
     /**
@@ -40,19 +45,22 @@ class GameUnit extends Model
      * @var array
      */
     protected $casts = [
-        'attack'              => 'integer',
-        'deffense'            => 'integer',
-        'can_heal'            => 'boolean',
-        'heal_amount'         => 'integer',
-        'unit_can_heal'       => 'boolean',
-        'siege_weapon'        => 'boolean',
-        'travel_time'         => 'integer',
-        'wood_cost'           => 'integer',
-        'clay_cost'           => 'integer',
-        'stone_cost'          => 'integer',
-        'iron_cost'           => 'integer',
-        'required_population' => 'integer',
-        'time_to_recruit'     => 'integer',
+        'attack'               => 'integer',
+        'deffense'             => 'integer',
+        'can_heal'             => 'boolean',
+        'heal_amount'          => 'integer',
+        'unit_can_heal'        => 'boolean',
+        'siege_weapon'         => 'boolean',
+        'attacker'             => 'boolean',
+        'defender'             => 'boolean',
+        'weak_against_unit_id' => 'integer',
+        'travel_time'          => 'integer',
+        'wood_cost'            => 'integer',
+        'clay_cost'            => 'integer',
+        'stone_cost'           => 'integer',
+        'iron_cost'            => 'integer',
+        'required_population'  => 'integer',
+        'time_to_recruit'      => 'integer',
     ];
 
     protected static function newFactory() {

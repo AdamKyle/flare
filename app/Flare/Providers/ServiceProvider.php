@@ -21,6 +21,7 @@ use App\Flare\Transformers\ItemTransfromer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
@@ -66,6 +67,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BuildingTransformer::class, function($app) {
             return new BuildingTransformer();
+        });
+
+        $this->app->bind(UnitTransformer::class, function($app) {
+            return new UnitTransformer();
         });
 
         $this->app->bind(MonsterTransfromer::class, function($app){

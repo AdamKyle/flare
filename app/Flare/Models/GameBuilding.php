@@ -42,6 +42,7 @@ class GameBuilding extends Model
         'increase_iron_amount',
         'increase_durability_amount',
         'increase_defence_amount',
+        'units_per_level',
     ];
 
     /**
@@ -74,6 +75,7 @@ class GameBuilding extends Model
         'increase_defence_amount'     => 'float',
         'time_to_build'               => 'float',     
         'time_increase_amount'        => 'float',
+        'units_per_level'             => 'integer',
     ];
 
     public function units() {

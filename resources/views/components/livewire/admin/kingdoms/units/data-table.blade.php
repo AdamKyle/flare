@@ -72,6 +72,18 @@
                             field="required_population"
                         />
 
+                        @if (!$units->isEmpty())
+                            @if(!is_null($units->first()->required_level))
+                                <x-data-tables.header-row 
+                                    wire:click.prevent="sortBy('required_level')" 
+                                    header-text="Required Level" 
+                                    sort-by="{{$sortBy}}"
+                                    sort-field="{{$sortField}}"
+                                    field="required_level"
+                                />
+                            @endif
+                        @endif
+
                         @guest
                         @else
                             @if (auth()->user()->hasRole('Admin'))
@@ -96,6 +108,12 @@
                                 <td>{{$unit->stone_cost}}</td> 
                                 <td>{{$unit->iron_cost}}</td> 
                                 <td>{{$unit->required_population}}</td> 
+
+                                @if (!is_null($unit))
+                                    @if (!is_null($unit->required_level))
+                                        <td>{{$unit->required_level}}</td>
+                                    @endif
+                                @endif
 
                                 @guest
                                 @else

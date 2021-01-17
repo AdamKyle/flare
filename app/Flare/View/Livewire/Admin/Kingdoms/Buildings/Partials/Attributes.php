@@ -17,8 +17,6 @@ class Attributes extends Component
 
     public $selectedUnits = [];
 
-    public $everyXLevels;
-
     protected $rules = [
         'gameBuilding.is_walls'                   => 'nullable',
         'gameBuilding.is_church'                  => 'nullable',
@@ -40,6 +38,7 @@ class Attributes extends Component
         'gameBuilding.increase_defence_amount'    => 'nullable',
         'gameBuilding.time_to_build'              => 'nullable',
         'gameBuilding.time_increase_amount'       => 'nullable',
+        'gameBuilding.units_per_level'            => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];
@@ -79,6 +78,10 @@ class Attributes extends Component
 
         $isValid = $this->validateSelectedUnits();
 
+        if (!empty($this->selectedUnits) && is_null($this->gameBuilding->units_per_level)) {
+            return $this->addError('units_per_level', 'How many levels between units?');
+        }
+
         if (!$isValid) {
             return $this->addError('error', 'Your selected units and units per level are greator then your max level.');
         }
@@ -90,12 +93,12 @@ class Attributes extends Component
         $kingdomService = new UpdateKingdomsService();
 
         if ($gameBuilding->units->isEmpty() && $gameBuilding->trains_unit) {
-            $kingdomService->assignUnits($gameBuilding, $this->selectedUnits, $this->everyXLevels);
+            $kingdomService->assignUnits($gameBuilding, $this->selectedUnits, $gameBuilding->units_per_level);
 
             $this->selectedUnits = [];
         }
 
-        $kingdomService->updateKingdomBuildings($this->gameBuilding->refresh(), $this->selectedUnits, $this->everyXLevels);
+        $kingdomService->updateKingdomBuildings($this->gameBuilding->refresh(), $this->selectedUnits, $gameBuilding->units_per_level);
 
         $message = 'Created Building: ' . $this->gameBuilding->refresh()->name;
 
@@ -115,7 +118,7 @@ class Attributes extends Component
     }
 
     protected function validateSelectedUnits() {
-        $total = (count($this->selectedUnits) * $this->everyXLevels) - (count($this->selectedUnits) - 1);
+        $total = (count($this->selectedUnits) * $this->gameBuilding->units_per_level) - (count($this->selectedUnits) - 1);
 
         if ($total > $this->gameBuilding->max_level) {
             return false;

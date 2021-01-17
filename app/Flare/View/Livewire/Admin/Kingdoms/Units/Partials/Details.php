@@ -7,25 +7,34 @@ use App\Flare\Models\GameUnit;
 
 class Details extends Component
 {
-    public $gameUnit = null;
+    public $gameUnit     = null;
 
-    public $editing  = false;
+    public $editing      = false;
+
+    public $weakAgainst  = false;
+
+    public $units        = null;
 
     protected $rules = [
-        'gameUnit.name'                => 'required',
-        'gameUnit.description'         => 'required',
-        'gameUnit.attack'              => 'required',
-        'gameUnit.defence'             => 'required',
-        'gameUnit.can_heal'            => 'nullable',
-        'gameUnit.heal_amount'         => 'nullable',
-        'gameUnit.siege_weapon'        => 'nullable',
-        'gameUnit.travel_time'         => 'required',
-        'gameUnit.wood_cost'           => 'nullable',
-        'gameUnit.clay_cost'           => 'nullable',
-        'gameUnit.stone_cost'          => 'nullable',
-        'gameUnit.iron_cost'           => 'nullable',
-        'gameUnit.required_population' => 'required',
-        'gameUnit.time_to_recruit'     => 'required',
+        'gameUnit.name'                     => 'required',
+        'gameUnit.description'              => 'required',
+        'gameUnit.attack'                   => 'required',
+        'gameUnit.defence'                  => 'required',
+        'gameUnit.can_heal'                 => 'nullable',
+        'gameUnit.heal_amount'              => 'nullable',
+        'gameUnit.siege_weapon'             => 'nullable',
+        'gameUnit.travel_time'              => 'required',
+        'gameUnit.wood_cost'                => 'nullable',
+        'gameUnit.clay_cost'                => 'nullable',
+        'gameUnit.stone_cost'               => 'nullable',
+        'gameUnit.iron_cost'                => 'nullable',
+        'gameUnit.required_population'      => 'required',
+        'gameUnit.time_to_recruit'          => 'required',
+        'gameUnit.weak_against_unit_id'     => 'nullable',
+        'gameUnit.primary_target'           => 'nullable',
+        'gameUnit.fall_back'                => 'nullable',
+        'gameUnit.attacker'                 => 'nullable',
+        'gameUnit.defender'                 => 'nullable',
     ];
 
     protected $messages = [
@@ -43,12 +52,32 @@ class Details extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
+        if (!is_null($this->gameUnit->weak_against_unit_id) && $this->weakAgainst) {
+            return $this->addError('cant_be_both', 'Your unit cannot be weak against it\'s self and another unit.');
+        }
+
+        if (!is_null($this->gameUnit->primary_target) && !is_null($this->gameUnit->fall_back)) {
+            if ($this->gameUnit->primary_target === $this->gameUnit->fall_back) {
+                return $this->addError('error', 'Cannot have the same fallback target as the primary target.');
+            }
+        }
+
         $this->gameUnit->save();
 
-        $message = 'Created Unit: ' . $this->gameUnit->refresh()->name;
+        $gameUnit = $this->gameUnit->refresh();
+
+        if (is_null($gameUnit->weak_against_unit_id) && !is_null($this->weakAgainst)) {
+            $gameUnit->weak_against_unit_id = $gameUnit->id;
+
+            $gameUnit->save();
+        }
+
+        $gameUnit = $gameUnit->refresh();
+
+        $message = 'Created Unit: ' . $gameUnit->refresh()->name;
 
         if ($this->editing) {
-            $message = 'Updated Unit: ' . $this->gameUnit->refresh()->name;
+            $message = 'Updated Unit: ' . $gameUnit->refresh()->name;
         }
         
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
@@ -64,7 +93,14 @@ class Details extends Component
     public function mount() {
         if (is_null($this->gameUnit)) {
             $this->gameUnit = new GameUnit;
+        } else {
+            dump($this->gameUnit->id);
+            if ($this->gameUnit->weak_against_unit_id === $this->gameUnit->id) {
+                $this->weakAgainst = true;
+            }
         }
+
+        $this->units = GameUnit::all();
     }
 
     public function render()

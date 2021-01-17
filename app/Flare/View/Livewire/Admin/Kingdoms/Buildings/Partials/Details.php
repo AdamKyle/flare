@@ -2,8 +2,9 @@
 
 namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials;
 
-use App\Flare\Models\GameBuilding;
 use Livewire\Component;
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameUnit;
 
 class Details extends Component
 {
@@ -45,6 +46,8 @@ class Details extends Component
         if (is_null($this->gameBuilding)) {
             $this->gameBuilding = new GameBuilding;
         }
+
+        $this->units = GameUnit::all();
     }
 
     public function render()

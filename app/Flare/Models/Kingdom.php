@@ -75,6 +75,10 @@ class Kingdom extends Model
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
+    public function units() {
+        return $this->hasMany(KingdomUnit::class);
+    }
+
     protected static function newFactory() {
         return KingdomFactory::new();
     }

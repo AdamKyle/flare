@@ -33,7 +33,7 @@ class KingdomUnit extends Model
     ];
 
     public function kingdom() {
-        return $this->belongsTo(Kingdom::class);
+        return $this->belongsTo(Kingdom::class, 'id', 'kingdom_id');
     }
 
     public function gameUnit() {

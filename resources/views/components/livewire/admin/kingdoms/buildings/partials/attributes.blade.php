@@ -88,7 +88,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="gameBuilding-trains-units">Units per level <a href="#" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-info-circle"></i></a></label>
-                <input type="number" class="form-control" id="gameBuilding-units-per-level" wire:model="everyXLevels" {{$this->unit_selection_is_disabled  ? 'disabled' : ''}}>
+                <input type="number" class="form-control" id="gameBuilding-units-per-level" wire:model="gameBuilding.units_per_level" {{$this->unit_selection_is_disabled  ? 'disabled' : ''}}>
             </div>  
         </div>
     </div>

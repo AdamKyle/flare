@@ -29,6 +29,11 @@ class GameUnitFactory extends Factory
             'can_heal'               => false,
             'heal_amount'            => null, 
             'siege_weapon'           => false,
+            'attacker'               => true,
+            'defender'               => false,
+            'weak_against_unit_id'   => null,
+            'primary_target'         => null,
+            'fall_back'              => null,
             'travel_time'            => 1,
             'wood_cost'              => 10,
             'clay_cost'              => 10,
@@ -36,6 +41,8 @@ class GameUnitFactory extends Factory
             'iron_cost'              => 10,
             'required_population'    => 1,
             'time_to_recruit'        => 1,
+            'primary_target'         => null,
+            'fall_back'              => null,
         ];
     }
 }
