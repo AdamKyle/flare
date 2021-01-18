@@ -3,17 +3,16 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Flare\Models\Building;
-use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\UnitInQueue;
 
-class BuildingInQueueFactory extends Factory
+class UnitInQueueFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = BuildingInQueue::class;
+    protected $model = UnitInQueue::class;
 
     /**
      * Define the model's default state.
@@ -26,7 +25,7 @@ class BuildingInQueueFactory extends Factory
             'character_id' => null,
             'kingdom_id'   => null,
             'building_id'  => null,
-            'to_level'     => null,
+            'amount'       => null,
             'completed_at' => now(),
             'started_at'   => now()->subMinutes(10),
         ];

@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
+use App\Game\Kingdoms\Service\UnitService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -22,6 +23,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BuildingService::class, function($app) {
             return new BuildingService();
+        });
+
+        $this->app->bind(UnitService::class, function($app) {
+            return new UnitService();
         });
 
         $this->app->bind(KingdomService::class, function($app) {
