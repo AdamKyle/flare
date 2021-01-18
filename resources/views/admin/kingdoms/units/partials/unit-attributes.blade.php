@@ -4,7 +4,7 @@
         Please note, these values repersent the recruitment of one unit. These values are then
         multipled by the amount of units you want to recruit or move (Travel Time)
     </div>
-    <p clas="mb-3 mt-3">{{$unit->description}}</p>
+    <p class="mb-3 mt-3">{{$unit->description}}</p>
     <p>Can be recruited from: <a href="{{route('buildings.building', [
         'building' => $building->id
     ])}}">{{$building->name}}</a></p>

@@ -7422,6 +7422,14 @@ raw-body@^2.3.2:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
+react-bootstrap-range-slider@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-range-slider/-/react-bootstrap-range-slider-2.0.2.tgz#7c02860d8850aaeae0c80baa9fcd7b3749b35cf4"
+  integrity sha512-GptOpQjarlf6H2OfGsAqS1jOFFw8lsfQVLCWD6tgILspr2qZxzoiyUGLPDNfFFLy/ALhzGxlnVUrYjOe34UkhA==
+  dependencies:
+    classnames "^2.2.6"
+    prop-types "^15.7.2"
+
 react-bootstrap-table-next@^3.3.1:
   version "3.3.5"
   resolved "https://registry.yarnpkg.com/react-bootstrap-table-next/-/react-bootstrap-table-next-3.3.5.tgz#fa1d6abe2d4530d59078810c334f40bdacf539c3"
