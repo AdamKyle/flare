@@ -110,7 +110,7 @@ export default class KingdomInfo extends React.Component {
                     <div className="col-md-3">
                         <dl>
                             <dt><strong>Stone</strong>:</dt>
-                            <dd>{this.props.kingdom.current_stone} / {this.props.kingdom.current_stone}</dd>
+                            <dd>{this.props.kingdom.current_stone} / {this.props.kingdom.max_stone}</dd>
                         </dl>
                     </div>
                     <div className="col-md-3">

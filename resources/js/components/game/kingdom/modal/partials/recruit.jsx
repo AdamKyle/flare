@@ -33,6 +33,22 @@ export default class Recruit extends React.Component {
         });
     }
 
+    recruitUnits() {
+        axios.post('/api/kingdoms/'+this.props.kingdom.id+'/recruit-units/' + this.props.unit.id, {
+            amount: this.state.value,
+        }).then((result) => {
+            this.setState({
+                value: 0,
+                canRecruit: false,
+            }, () => {
+                this.props.updateKingdomData(result.data);
+                this.props.close();
+            });
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
     canRecruit(value) {
         
         if (value === 0) {
@@ -100,7 +116,7 @@ export default class Recruit extends React.Component {
                         />
                     </div>
                     <div className="col-md-6">
-                        <button className="btn btn-primary mt-2" disabled={this.state.canRecruit ? false : true}>Recruit Selected Amount</button>
+                        <button className="btn btn-primary mt-2" disabled={this.state.canRecruit ? false : true} onClick={this.recruitUnits.bind(this)}>Recruit Selected Amount</button>
                     </div>
                 </div>
                 <hr />

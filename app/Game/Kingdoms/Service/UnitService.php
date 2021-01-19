@@ -40,6 +40,6 @@ class UnitService {
         ]);
 
 
-        RecruitUnits::dispatch($this->unit, $this->kingdom, $amount, $queue)->delay($timeTillFinished);
+        RecruitUnits::dispatch($this->unit, $this->kingdom, $amount, $queue->id)->delay($timeTillFinished);
     }
 }

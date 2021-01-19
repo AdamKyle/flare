@@ -23,8 +23,9 @@ export default class KingdomBuildings extends React.Component {
                 sortable: true
             },
             {
-                key: "current_amount",
+                key: "current-amount",
                 text: "Current Amount",
+                cell: row => <div data-tag="allowRowEvents"><div key={row.id}>{this.getCurrentUnitAmount(row.id)}</div></div>,
                 sortable: true
             },
             {
@@ -67,6 +68,10 @@ export default class KingdomBuildings extends React.Component {
             show_pagination: true,
             pagination: 'advance',
         }
+    }
+
+    getCurrentUnitAmount(unitId) {
+        return this.props.kingdom.current_units.filter((cu) => cu.game_unit_id === unitId)[0].amount;
     }
 
     render() {

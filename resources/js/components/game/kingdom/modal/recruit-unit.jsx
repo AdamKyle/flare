@@ -36,7 +36,13 @@ export default class RecruitUnit extends React.Component {
                 <Modal.Body>
                     <p className="mb-3 mt-1">{this.props.unit.description}</p>
                     <div className="mb-3">
-                        <Recruit currentPopulation={this.props.kingdom.current_population} unit={this.props.unit} kingdom={this.props.kingdom} updateAmount={this.updateAmount.bind(this)}/>
+                        <Recruit 
+                            currentPopulation={this.props.kingdom.current_population} 
+                            unit={this.props.unit} kingdom={this.props.kingdom} 
+                            updateAmount={this.updateAmount.bind(this)} 
+                            updateKingdomData={this.props.updateKingdomData} 
+                            close={this.props.close}
+                        />
                     </div>
                     <UnitData unit={this.props.unit} amount={this.state.amount} kingdom={this.props.kingdom} />
                 </Modal.Body>

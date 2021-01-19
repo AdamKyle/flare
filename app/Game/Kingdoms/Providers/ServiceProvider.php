@@ -2,11 +2,14 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Flare\Transformers\KingdomTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
+use App\Game\Kingdoms\Service\KingdomResourcesService;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -31,6 +34,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(KingdomService::class, function($app) {
             return new KingdomService($app->make(KingdomBuilder::class));
+        });
+
+        $this->app->bind(KingdomResourcesService::class, function($app) {
+            return new KingdomResourcesService($app->make(Manager::class), $app->make(KingdomTransformer::class));
         });
     }
 

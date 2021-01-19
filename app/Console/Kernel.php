@@ -12,6 +12,7 @@ use App\Console\Commands\GiveItem;
 use App\Console\Commands\LevelFakeUsers;
 use App\Console\Commands\LevelUpSkillsOnFakeUsers;
 use App\Console\Commands\MoveInfoFiles;
+use App\Console\Commands\UpdateKingdom;
 
 class Kernel extends ConsoleKernel
 {
@@ -29,6 +30,7 @@ class Kernel extends ConsoleKernel
         LevelUpSkillsOnFakeUsers::class,
         LevelFakeUsers::class,
         CleanMarketHistory::class,
+        UpdateKingdom::class,
     ];
 
     /**
@@ -41,6 +43,8 @@ class Kernel extends ConsoleKernel
     {
 
         $schedule->command('clean:notifications')->monthly();
+
+        $schedule->command('update:kingdom')->hourly();
         
         $schedule->command('clean:market-history')->cron('0 0 1 */3 *');
     }

@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateKingdom;
@@ -117,7 +118,7 @@ class KingdomsController extends Controller {
         return response()->json($kingdom, 200);
     }
 
-    public function recruitUnits(Request $request, Kingdom $kingdom, GameUnit $unit, UnitService $service) {
+    public function recruitUnits(Request $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service) {
         $request->validate([
             'amount' => 'required|integer',
         ]);
@@ -128,23 +129,23 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        if (ResourceValidation::shouldRedirectUnits($unit, $kingdom, $request->amount)) {
+        if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $request->amount)) {
             return response()->json([
                 'message' => "You don't have the resources."
             ], 422);
         }
 
         $kingdom->update([
-            'current_wood'       => $kingdom->current_wood - ($unit->wood_cost * $request->amount),
-            'current_clay'       => $kingdom->current_clay - ($unit->clay_cost * $request->amount),
-            'current_stone'      => $kingdom->current_stone - ($unit->strone_cost * $request->amount),
-            'current_iron'       => $kingdom->current_iron - ($unit->iron_cost * $request->amount),
-            'current_population' => $kingdom->current_population - ($unit->required_population * $request->amount),
+            'current_wood'       => $kingdom->current_wood - ($gameUnit->wood_cost * $request->amount),
+            'current_clay'       => $kingdom->current_clay - ($gameUnit->clay_cost * $request->amount),
+            'current_stone'      => $kingdom->current_stone - ($gameUnit->strone_cost * $request->amount),
+            'current_iron'       => $kingdom->current_iron - ($gameUnit->iron_cost * $request->amount),
+            'current_population' => $kingdom->current_population - ($gameUnit->required_population * $request->amount),
         ]);
 
         $kingdom = $kingdom->refresh();
 
-        $service->setUnit($unit)->setKingdom($kingdom)->recruitUnits($kingdom->character, $request->amount);
+        $service->setUnit($gameUnit)->setKingdom($kingdom)->recruitUnits($kingdom->character, $request->amount);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 
@@ -158,13 +159,7 @@ class KingdomsController extends Controller {
             'queue_id' => 'required|integer',
         ]);
 
-        if ($request->amount <= 0) {
-            return response()->json([
-                'message' => "Too few units to remove from queue."
-            ], 422);
-        }
-
-        $queue = BuildingInQueue::find($request->queue_id);
+        $queue = UnitInQueue::find($request->queue_id);
 
         if (is_null($queue)) {
             return response()->json(['message' => 'Invalid Input.'], 422);
@@ -180,11 +175,14 @@ class KingdomsController extends Controller {
         if (!($totalResources >= .10)) {
             return response()->json([
                 'message' => 'Your units are almost done. You can\'t cancel this late in the process.'
-            ]);
+            ], 422);
         }
 
         $unit    = $queue->unit;
         $kingdom = $queue->kingdom;
+        $user    = $kingdom->character->user; 
+
+        $queue->delete();
 
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $totalResources),
@@ -198,7 +196,7 @@ class KingdomsController extends Controller {
 
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
-        event(new UpdateKingdom(auth()->user(), $kingdom));
+        event(new UpdateKingdom($user, $kingdom));
 
         return response()->json([], 200);
     }
@@ -226,7 +224,7 @@ class KingdomsController extends Controller {
         if (!($totalResources >= .10)) {
             return response()->json([
                 'message' => 'Your workers are almost done. You can\'t cancel this late in the process.'
-            ]);
+            ], 422);
         }
 
         $building = $queue->building;
@@ -241,14 +239,16 @@ class KingdomsController extends Controller {
             'current_iron'       => $kingdom->current_iron + ($building->iron_cost * $totalResources),
             'current_population' => $kingdom->current_population + ($building->required_population * $totalResources)
         ]);
+        
+        $kingdom = $kingdom->refresh();
+        $user    = $kingdom->character->user;
 
-        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
+        $kingdom  = new Item($kingdom, $this->kingdom);
 
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
-        event(new UpdateKingdom(auth()->user(), $kingdom));
+        event(new UpdateKingdom($user, $kingdom));
 
         return response()->json([], 200);
-
     }
 }

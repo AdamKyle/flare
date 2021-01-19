@@ -43,7 +43,7 @@ class UnitInQueue extends Model
     }
 
     public function unit() {
-        return $this->belongsTo(GameUnit::class);
+        return $this->belongsTo(GameUnit::class, 'game_unit_id', 'id');
     }
 
     public function kingdom() {

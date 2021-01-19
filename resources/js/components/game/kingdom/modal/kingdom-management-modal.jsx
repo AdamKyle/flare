@@ -5,6 +5,7 @@ import QueueModal from './queue-modal';
 import KingdomInfo from './partials/kingdom-info';
 import KingdomBuildings from './partials/kingdom-buildings';
 import KingdomBuildingQueue from './partials/kingdom-building-queue.jsx';
+import UnitBuildingQueue from './partials/unit-recruitment-queue.jsx';
 import KingdomUnits from './partials/kingdom-units';
 import RecruitUnit from './recruit-unit';
 
@@ -21,6 +22,7 @@ export default class KingdomManagementModal extends React.Component {
             unitData: null,
             openUnitModal: false,
             kingdom: props.kingdom,
+            queueType: null,
         }
     }
 
@@ -29,8 +31,8 @@ export default class KingdomManagementModal extends React.Component {
             this.setState({
                 kingdom: this.props.kingdom,
                 openQueueData: false,
-                openUnitModal: false,
                 queue: null,
+                queueType: null,
             });
         }
     }
@@ -41,7 +43,6 @@ export default class KingdomManagementModal extends React.Component {
     }
 
     rowClickedHandler(event, data, rowIndex) {
-        console.log('hello?');
         this.setState({
             openBuildingManagement: true,
             building: data,
@@ -58,8 +59,17 @@ export default class KingdomManagementModal extends React.Component {
     queueData(event, data, rowIndex) {
         this.setState({
             openQueueData: true,
-            queue: data
+            queue: data,
+            queueType: 'building',
         });
+    }
+
+    unitQueueData(event, data, rowIndex) {
+        this.setState({
+            openQueueData: true,
+            queue: data,
+            queueType: 'unit',
+        })
     }
 
     recruitUnit(event, data, rowIndex) {
@@ -80,6 +90,7 @@ export default class KingdomManagementModal extends React.Component {
         this.setState({
             openQueueData: false,
             queue: null,
+            queueType: null,
         });
     }
 
@@ -114,6 +125,9 @@ export default class KingdomManagementModal extends React.Component {
                         <Tab eventKey="building-queue" title="Building Queue">
                             <KingdomBuildingQueue kingdom={this.state.kingdom} queueData={this.queueData.bind(this)} />
                         </Tab>
+                        <Tab eventKey="unit-queue" title="Unit Queue">
+                            <UnitBuildingQueue kingdom={this.state.kingdom} queueData={this.unitQueueData.bind(this)} />
+                        </Tab>
                     </Tabs>
                 </Modal.Body>
 
@@ -134,6 +148,8 @@ export default class KingdomManagementModal extends React.Component {
                         show={this.state.openQueueData}
                         queueData={this.state.queue}
                         buildings={this.state.kingdom.buildings}
+                        queueType={this.state.queueType}
+                        kingdom={this.state.kingdom}
                     />: null
                 }
 

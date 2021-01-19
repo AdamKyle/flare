@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use Facades\App\Flare\Values\UserOnlineValue;
@@ -67,48 +68,54 @@ class RecruitUnits implements ShouldQueue
     public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
     {
 
-        $queue = BuildingInQueue::find($this->queueId);
+        $queue = UnitInQueue::find($this->queueId);
 
         if (is_null($queue)) {
             return;
         }
 
-        if ($this->kingdom->units()->isEmpty()) {
+        $amount = $this->amount;
+
+        if ($this->kingdom->units->isEmpty()) {
             $this->kingdom->units()->create([
                 'kingdom_id'   => $this->kingdom->id,
                 'game_unit_id' => $this->unit->id,
-                'amount'       => $this->amount,
+                'amount'       => $amount,
             ]);
         } else {
-            $found = $this->kingdoms->units()->where('game_unit_id', $this->unit->id)->first();
+            $found = $this->kingdom->units()->where('game_unit_id', $this->unit->id)->first();
 
             if (is_null($found)) {
                 $this->kingdom->units()->create([
                     'kingdom_id'   => $this->kingdom->id,
                     'game_unit_id' => $this->unit->id,
-                    'amount'       => $this->amount,
+                    'amount'       => $amount,
                 ]);
             } else {
+                $amount += $found->amount;
+
                 $found->update([
-                    'amount' => $found->amount + $this->amount,
+                    'amount' => $amount,
                 ]);
             }
         }
 
+        $queue->delete();
+
         $kingdom     = $this->kingdom->refresh();
         $unitDetails = $kingdom->units()->where('game_unit_id', $this->unit->id)->first();
-        $user        = $kingdom->charater->user;
+        $user        = $kingdom->character->user;
         
         if (UserOnlineValue::isOnline($user)) {
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($user, $kingdom));
-            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->building->kingdom->name . ' you now have a total of: ' . $unitDetails->amount));
+            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' you have a total of: ' . $amount));
         } else {
             Mail::to($user)->send(new GenericMail(
                 $user,
-                $this->unit->name . ' finished recruiting for kingdom: ' . $this->building->kingdom->name . ' you now have a total of: ' . $unitDetails->amount,
+                $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' you have a total of: ' . $amount,
                 'Unit Recruitment Finished: ' . $this->unit->name,
             ));
         }

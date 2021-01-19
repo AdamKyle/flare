@@ -45,7 +45,8 @@ class KingdomTransformer extends TransformerAbstract {
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasurey,
             'building_queue'     => $kingdom->buildingsQueue,   
-            'unit_queue'         => $kingdom->unitsQueue,      
+            'unit_queue'         => $kingdom->unitsQueue,  
+            'current_units'      => $kingdom->units,    
         ];
     }
 
@@ -66,7 +67,7 @@ class KingdomTransformer extends TransformerAbstract {
 
         foreach($buildings as $building) {
             $units = GameBuildingUnit::where('game_building_id', $building->gameBuilding->id)
-                                     ->where('required_level', $building->level)
+                                     ->where('required_level', '<=', $building->level)
                                      ->get();
 
             

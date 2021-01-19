@@ -84,6 +84,10 @@ class ServerMessageListener
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'new-building':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'kingdom-resources-update':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
+            case 'unit-recruitment-finished':
+                return broadcast(new ServerMessage($event->user, $event->forMessage));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

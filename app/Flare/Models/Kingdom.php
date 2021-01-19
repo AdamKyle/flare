@@ -80,7 +80,7 @@ class Kingdom extends Model
     }
 
     public function units() {
-        return $this->hasMany(KingdomUnit::class);
+        return $this->hasMany(KingdomUnit::class, 'kingdom_id', 'id');
     }
 
     protected static function newFactory() {
