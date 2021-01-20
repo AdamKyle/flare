@@ -10,6 +10,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
 use App\Flare\Models\Map;
+use App\Game\Maps\Adventure\Services\MovementService;
 
 class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
 {
@@ -31,6 +32,11 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
     public $adventureDetails;
 
     /**
+     * @var array $kingdomDetails
+     */
+    public $kingdomDetails = [];
+
+    /**
      * @var User $user
      */
 
@@ -45,12 +51,13 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      * @param array $adventureDetails
      * @return void
      */
-    public function __construct(Map $map, User $user, array $portDetails, array $adventureDetails)
+    public function __construct(Map $map, User $user, MovementService $service)
     {
         $this->map              = $map;
         $this->user             = $user;
-        $this->portDetails      = $portDetails;
-        $this->adventureDetails = $adventureDetails;
+        $this->portDetails      = $service->portDetails();
+        $this->adventureDetails = $service->adventureDetails();
+        $this->kingdomDetails   = $service->kingdomDetails();
     }
 
     /**

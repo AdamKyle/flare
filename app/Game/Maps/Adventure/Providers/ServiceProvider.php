@@ -51,8 +51,9 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(MapTileValue::class, function($app) {
             return new MapTileValue();
         });
+        
         $this->app->bind(MovementService::class, function($app) {
-            return new MovementService();
+            return new MovementService($app->make(PortService::class));
         });
     }
 

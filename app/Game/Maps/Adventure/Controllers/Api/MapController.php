@@ -44,7 +44,7 @@ class MapController extends Controller {
         $this->middleware('is.character.dead')->except(['index']);
     }
 
-    public function index(User $user, Manager $manager, KingdomTransformer $kingdom) {
+    public function index(User $user, Manager $manager, KingdomTransformer $kingdomTransformer) {
         $location         = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->first();
         $portDetails      = null;
         $adventureDetails = null;
@@ -57,8 +57,24 @@ class MapController extends Controller {
             $adventureDetails = $location->adventures;
         }
 
-        $kingdoms = Kingdom::with('buildings', 'buildings.gameBuilding')->where('character_id', $user->character->id)->get();
-        $kingdoms = new Collection($kingdoms, $kingdom);
+        $kingdom   = Kingdom::where('x_position', $user->character->map->character_position_x)->where('y_position', $user->character->map->character_position_y)->first();
+        $canSettle = false;
+        $canAttack = false;
+        $canManage = false;
+
+        if (!is_null($kingdom)) {
+            if (auth()->user()->id !== $kingdom->character->user->id) {
+                $canAttack = true;
+            } else {
+                $canManage = true;
+            }
+        } else if (is_null($location)) {
+            $canSettle = true;
+        }
+
+        $myKingdoms = Kingdom::where('character_id', $user->character->id)->get();
+        $kingdoms   = new Collection($myKingdoms, $kingdomTransformer);
+        $kingdoms   = $manager->createData($kingdoms)->toArray();  
 
         return response()->json([
             'map_url'                => Storage::disk('maps')->url($user->character->map->gameMap->path),
@@ -74,7 +90,10 @@ class MapController extends Controller {
             'adventure_completed_at' => $user->character->can_adventure_again_at,
             'is_dead'                => $user->character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
-            'my_kingdoms'            => $manager->createData($kingdoms)->toArray(),
+            'can_settle_kingdom'     => $canSettle,
+            'can_attack_kingdom'     => $canAttack,
+            'can_manage_kingdom'     => $canManage,
+            'my_kingdoms'            => $kingdoms,
         ]);
     }
 
@@ -87,9 +106,7 @@ class MapController extends Controller {
             'position_y'           => $request->position_y,
         ]);
 
-        $location = Location::where('x', $request->character_position_x)->where('y', $request->character_position_y)->first();
-        
-        $service->processLocation($location, $character, $this->portService);
+        $service->processArea($request->character_position_x, $request->character_position_y, $character);
         
         $character->update([
             'can_move'          => false,
@@ -101,6 +118,7 @@ class MapController extends Controller {
         return response()->json([
             'port_details'      => $service->portDetails(),
             'adventure_details' => $service->adventureDetails(),
+            'kingdom_details'   => $service->kingdomDetails(),
         ], 200);
     }
 
@@ -174,9 +192,7 @@ class MapController extends Controller {
             ], 422);
         }
 
-        $location = Location::where('x', $request->x)->where('y', $request->y)->first();
-        
-        $service->processLocation($location, $character, $this->portService);
+        $service->processArea($request->x, $request->y, $character);
 
         $character->update([
             'can_move'          => false,
@@ -196,7 +212,7 @@ class MapController extends Controller {
         event(new MoveTimeOutEvent($character, $request->timeout, true));
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdateMapDetailsBroadcast($character->map, $character->user, $service->portDetails(), $service->adventureDetails()));
+        event(new UpdateMapDetailsBroadcast($character->map, $character->user, $service));
 
         return response()->json([], 200);
     }

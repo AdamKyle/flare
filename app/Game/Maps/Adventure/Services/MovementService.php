@@ -4,6 +4,7 @@ namespace App\Game\Maps\Adventure\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 
 class MovementService {
@@ -18,6 +19,51 @@ class MovementService {
      */
     private $adventureDetails = [];
 
+    /**
+     * @var array $kingdomData
+     */
+    private $kingdomData = [];
+
+    /**
+     * @var PortService $portService
+     */
+    private $portService = null;
+
+    public function __construct(PortService $portService) {
+        $this->portService = $portService;
+    }
+
+    public function processArea(int $x, int $y, Character $character) {
+        $location = Location::where('x', $x)->where('y', $y)->first();
+
+        if (!is_null($location)) {
+            $this->processLocation($location, $character);
+        }
+
+        $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->first();
+
+        $canAttack = false;
+        $canSettle = false;
+        $canManage = false;
+
+        if (!is_null($kingdom)) {
+            if ($kingdom->character->user->id !== auth()->user()->id) {
+                $canAttack = true;
+            } else {
+                $canManage = true;
+            }
+        } else if (is_null($location)) {
+            $canSettle = true;
+        }
+
+        $this->kingdomData = [
+            'owner'      => is_null($kingdom) ? 'No one' : $kingdom->character->name,
+            'can_attack' => $canAttack,
+            'can_manage' => $canManage,
+            'can_settle' => $canSettle,
+        ];
+    }
+
 
     /**
      * Process the location for ports and adventures as well as drops.
@@ -27,18 +73,15 @@ class MovementService {
      * @param PortService $portService
      * @return void
      */
-    public function processLocation(Location $location = null, Character $character, PortService $service): void {
+    public function processLocation(Location $location, Character $character): void {
+        if ($location->is_port) {
+            $this->portDetails = $this->portService->getPortDetails($character, $location);
+        }
 
-        if (!is_null($location)) {
-            if ($location->is_port) {
-                $this->portDetails = $service->getPortDetails($character, $location);
-            }
-    
-            $this->giveQuestReward($location, $character);
+        $this->giveQuestReward($location, $character);
 
-            if ($location->adventures->isNotEmpty()) {
-                $this->adventureDetails = $location->adventures->toArray();
-            }
+        if ($location->adventures->isNotEmpty()) {
+            $this->adventureDetails = $location->adventures->toArray();
         }
     }
 
@@ -58,6 +101,15 @@ class MovementService {
      */
     public function adventureDetails(): array {
         return $this->adventureDetails;
+    }
+
+    /**
+     * Get the kingdom data
+     * 
+     * @param array
+     */
+    public function kingdomDetails(): array {
+        return $this->kingdomData;
     }
 
     /**

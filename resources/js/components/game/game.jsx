@@ -10,7 +10,8 @@ import AdeventureActions   from './components/adventure-actions';
 import AdventureMenu       from './components/menu/adventure-menu';
 import NotificationCenter  from './components/nav-bar/notification-center';
 import RefreshComponent    from './components/refresh-component';
-import Management from './kingdom/management';
+import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
+import KingdomModal           from './kingdom/modal/kingdom-modal';
 
 class Game extends React.Component {
   constructor(props) {
@@ -34,11 +35,18 @@ class Game extends React.Component {
       openAdventureDetails: false,
       openTeleportDetails: false,
       openKingdomManagement: false,
+      openKingdomModal: false,
       characterId: null,
       canAdventureAgainAt: null,
       canAttack: true,
       current_x: null,
       current_y: null,
+      kingdomData: {
+        my_kingdoms: [],
+        can_attack: false,
+        can_settle: false,
+      },
+      kingdom: null,
     }
   }
 
@@ -96,14 +104,78 @@ class Game extends React.Component {
     this.setState({characterId: characterId});
   }
 
-  openKingdomManagement(open) {
-    this.setState({openKingdomManagement: open});
+  openKingdomManagement() {
+    const kingdom = this.state.kingdomData.my_kingdoms.filter((mk) => 
+      mk.x_position === this.state.current_x && 
+      mk.y_position === this.state.current_y
+    );
+
+    if (kingdom.length > 0){
+      this.setState({
+        openKingdomManagement: true,
+        kingdom: kingdom[0],
+      });
+    }
+  }
+
+  closeKingdomManagement() {
+    this.setState({
+      openKingdomManagement: false,
+      kingdom: null,
+    })
   }
 
   setCanAttack(bool) {
     this.setState({
       canAttack: bool,
     });
+  }
+
+  updateKingdoms(kingdomData) {
+    this.setState({
+      kingdomData: kingdomData,
+    });
+  }
+
+  openKingdomModal() {
+    this.setState({
+      openKingdomModal: true,
+    });
+  }
+
+  closeKingdomModal() {
+    this.setState({
+      openKingdomModal: false,
+    });
+  }
+
+  updateKingdomData(kingdom) {
+    const index = this.state.kingdomData.my_kingdoms.findIndex((mk) => 
+      mk.x_position === this.state.current_x && 
+      mk.y_position === this.state.current_y
+    );
+    console.log(index);
+    if (index !== -1) {
+      let kingdomData = _.cloneDeep(this.state.kingdomData);
+
+      kingdomData.my_kingdoms[index] = kingdom;
+
+      this.setState({
+        kingdomData: kingdomData,
+        kingdom: kingdom,
+        openKingdomManagement: true,
+      });
+    } else {
+      let kingdomData = _.cloneDeep(this.state.kingdomData);
+
+      kingdomData.my_kingdoms.push(kingdom);
+      console.log('here?');
+      this.setState({
+        kingdomData: kingdomData,
+        kingdom: kingdom,
+        openKingdomManagement: true,
+      });
+    }
   }
 
   canAdventure() {
@@ -117,12 +189,25 @@ class Game extends React.Component {
           <div className="col-md-12">
             <div className="row">
               <div className="col-md-9">
-                <CharacterInfoTopBar apiUrl={this.apiUrl} characterId={this.props.characterId} userId={this.props.userId}/>
-                <CoreActionsSection apiUrl={this.apiUrl} userId={this.props.userId} setCharacterId={this.setCharacterId.bind(this)} canAttack={this.setCanAttack.bind(this)} openKingdomManagement={this.openKingdomManagement.bind(this)}/>
+                <CharacterInfoTopBar 
+                  apiUrl={this.apiUrl} 
+                  characterId={this.props.characterId} 
+                  userId={this.props.userId}
+                />
+                <CoreActionsSection 
+                  apiUrl={this.apiUrl} 
+                  userId={this.props.userId} 
+                  setCharacterId={this.setCharacterId.bind(this)} 
+                  canAttack={this.setCanAttack.bind(this)} 
+                  openKingdomManagement={this.openKingdomManagement.bind(this)}
+                  openKingdomModal={this.openKingdomModal.bind(this)}
+                  kingdomData={this.state.kingdomData}
+                  character_x={this.state.current_x}
+                  character_y={this.state.current_y}
+                />
                 {this.state.openPortDetails ? <PortLocationActions updateAdventure={this.updateAdventure.bind(this)} portDetails={this.state.portDetails} userId={this.props.userId} openPortDetails={this.openPortDetails.bind(this)} updatePlayerPosition={this.updatePlayerPosition.bind(this)}/> : null}
                 {this.state.openAdventureDetails ? <AdeventureActions canAdventure={this.canAdventure.bind(this)} updateAdventure={this.updateAdventure.bind(this)} adventureDetails={this.state.adventureDetails} userId={this.props.userId} characterId={this.state.characterId} openAdventureDetails={this.openAdventureDetails.bind(this)} adventureAgainAt={this.state.canAdventureAgainAt} adventureLogs={this.state.adventureLogs} /> : null}
                 {this.state.openTeleportDetails ? <Teleport teleportLocations={this.state.teleportLocations} openTeleportDetails={this.openTeleportDetails.bind(this)} currentX={this.state.current_x} currentY={this.state.current_y} characterId={this.props.characterId}/> : null}
-                {this.state.openKingdomManagement ? <Management openKingdomManagement={this.openKingdomManagement.bind(this)} isAdventuring={this.state.canAdventureAgainAt} isPort={this.state.portDetails.currentPort} xPosition={this.state.current_x} yPosition={this.state.current_y} characterId={this.state.characterId} userId={this.props.userId}/> : null}
               </div>
               <div className="col-md-3">
                 <Map 
@@ -137,6 +222,7 @@ class Game extends React.Component {
                   updateAdventure={this.updateAdventure.bind(this)}
                   updateTeleportLoations={this.updateTeleportLoations.bind(this)}
                   openTeleportDetails={this.openTeleportDetails.bind(this)}
+                  updateKingdoms={this.updateKingdoms.bind(this)}
                 />
               </div>
             </div>
@@ -147,6 +233,30 @@ class Game extends React.Component {
             <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
           </div>
         </div>
+
+        { this.state.openKingdomManagement ? 
+          <KingdomManagementModal 
+            show={this.state.openKingdomManagement} 
+            close={this.closeKingdomManagement.bind(this)} 
+            kingdom={this.state.kingdom} 
+            updateKingdomData={this.updateKingdomData.bind(this)} 
+            characterId={this.state.characterId} 
+            userId={this.props.userId}/> 
+          : null
+        }
+
+        {
+          this.state.openKingdomModal ? 
+          <KingdomModal 
+            characterId={this.state.characterId} 
+            show={this.state.openKingdomModal} 
+            x={this.state.current_x} 
+            y={this.state.current_y} 
+            close={this.closeKingdomModal.bind(this)} 
+            updateKingdomData={this.updateKingdomData.bind(this)} 
+            /> 
+          : null
+        }
       </>
     )
   }

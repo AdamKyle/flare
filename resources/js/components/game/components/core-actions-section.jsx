@@ -102,7 +102,23 @@ export default class CoreActionsSection extends React.Component {
               updateShowEnchanting={this.updateShowEnchanting.bind(this)}
               canCraft={this.state.canCraft}
             />
-            <button disabled={this.state.isDead || this.state.isAdventuring} className="btn btn-sm btn-primary mt-2" onClick={() => this.props.openKingdomManagement(true)}>Manage Kingdoms</button>
+            {
+              this.props.kingdomData.can_attack ?
+              <button className="btn btn-success btn-sm mt-2">Attack Kingdom</button> 
+              : null
+            }
+
+            {
+              this.props.kingdomData.can_settle ?
+              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal} className="btn btn-success btn-sm mt-2">Settle Kingdom</button> 
+              : null
+            }
+
+            {
+              this.props.kingdomData.is_mine ?
+              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={() => this.props.openKingdomManagement(true)} className="btn btn-success btn-sm mt-2">Manage Kingdom</button> 
+              : null
+            }
           </div>
           <BattleAction
             userId={this.props.userId}

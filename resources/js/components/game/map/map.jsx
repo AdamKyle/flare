@@ -55,7 +55,7 @@ export default class Map extends React.Component {
         mapUrl: result.data.map_url,
         controlledPosition: {
           x: getNewXPosition(result.data.character_map.character_position_x, result.data.character_map.position_x),
-          y:  getNewYPosition(result.data.character_map.character_position_y, result.data.character_map.position_y),
+          y: getNewYPosition(result.data.character_map.character_position_y, result.data.character_map.position_y),
         },
         characterPosition: {
           x: result.data.character_map.character_position_x,
@@ -88,6 +88,13 @@ export default class Map extends React.Component {
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
 
         this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
+
+        this.props.updateKingdoms({
+          my_kingdoms: this.state.kingdoms,
+          can_attack: result.data.can_attack_kingdom,
+          can_settle: result.data.can_settle_kingdom,
+          is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
+        });
       });
     });
 
@@ -137,6 +144,13 @@ export default class Map extends React.Component {
           canMove: this.state.canMove,
         });
 
+        this.props.updateKingdoms({
+          my_kingdoms: this.state.kingdoms,
+          can_attack: event.kingdomDetails.hasOwnProperty('can_attack') ? event.kingdomDetails.can_attack : false,
+          can_settle: event.kingdomDetails.hasOwnProperty('can_settle') ? event.kingdomDetails.can_settle : false,
+          is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
+        });
+
         if (_.isEmpty(event.portDetails)) {
           this.props.openPortDetails(false);
         }
@@ -154,6 +168,13 @@ export default class Map extends React.Component {
 
       this.setState({
         kingdoms: kingdoms,
+      }, () => {
+        this.props.updateKingdoms({
+          my_kingdoms: this.state.kingdoms,
+          can_attack: false,
+          can_settle: false,
+          is_mine: true,
+        });
       });
     });
   }
@@ -168,6 +189,16 @@ export default class Map extends React.Component {
         adventures: this.props.adventures
       });
     }
+  }
+
+  isMyKingdom(kingdoms, characterPosition) {
+    const found = kingdoms.filter((k) => k.x_position === characterPosition.x && k.y_position === characterPosition.y);
+
+    if (found.length > 0) {
+      return true;
+    }
+
+    return false;
   }
 
   handleDrag(e, position) {
@@ -291,6 +322,13 @@ export default class Map extends React.Component {
                 characterId: this.state.characterId,
                 characterIsDead: this.state.isDead,
                 canMove: this.state.canMove,
+              });
+
+              this.props.updateKingdoms({
+                my_kingdoms: this.state.kingdoms,
+                can_attack: result.data.kingdom_details.can_attack,
+                can_settle: result.data.kingdom_details.can_settle,
+                is_mine: result.data.kingdom_details.can_manage,
               });
 
               this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);

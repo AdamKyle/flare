@@ -71,6 +71,10 @@ export default class KingdomBuildings extends React.Component {
     }
 
     getCurrentUnitAmount(unitId) {
+        if (_.isEmpty(this.props.kingdom.current_units)) {
+            return 0;
+        }
+        
         return this.props.kingdom.current_units.filter((cu) => cu.game_unit_id === unitId)[0].amount;
     }
 
