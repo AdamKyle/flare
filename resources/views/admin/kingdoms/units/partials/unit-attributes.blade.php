@@ -5,9 +5,11 @@
         multipled by the amount of units you want to recruit or move (Travel Time)
     </div>
     <p class="mb-3 mt-3">{{$unit->description}}</p>
-    <p>Can be recruited from: <a href="{{route('buildings.building', [
-        'building' => $building->id
-    ])}}">{{$building->name}}</a></p>
+    @if (!is_null($building))
+        <p>Can be recruited from: <a href="{{route('buildings.building', [
+            'building' => $building->id
+        ])}}">{{$building->name}}</a></p>
+    @endif
     <dl>
         <dd><strong>Cost in wood</strong>:</dd>
         <dd>{{$unit->wood_cost}}</dd>

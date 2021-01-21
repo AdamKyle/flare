@@ -54,7 +54,7 @@ class GenerateTestCharacter implements ShouldQueue
         $this->race = $race;
         $this->class = $class;
         $this->adminUser = $adminUser;
-        $this->levelTo = env('APP_ENV') === 'testing' ? 1 : $levelTo;
+        $this->levelTo = env('APP_ENV') === 'testing' ? 2 : $levelTo;
     }
 
     /**
@@ -84,7 +84,7 @@ class GenerateTestCharacter implements ShouldQueue
             'character_id' => $character->id,
             'snap_shot'    => $character->getAttributes(),
         ]);
-
+        
         for ($i = 1; $i < $this->levelTo; $i++) {
             $characterService = new CharacterService;
 

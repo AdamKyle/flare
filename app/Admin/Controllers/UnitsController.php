@@ -20,7 +20,12 @@ class UnitsController extends Controller {
     }
 
     public function show(GameUnit $gameUnit) {
-        $belongsToBuilding = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first()->gameBuilding;
+        $belongsToBuilding = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
+
+        if (!is_null($belongsToBuilding)) {
+            $belongsToBuilding = $belongsToBuilding->gameBuilding;
+        }
+
         $weakAgainst       = GameUnit::find($gameUnit->weak_against_unit_id);
 
         return view('admin.kingdoms.units.unit', [

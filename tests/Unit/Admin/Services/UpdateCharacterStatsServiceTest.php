@@ -44,7 +44,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateRacialStats($oldRace, $race->refresh());
 
-        $this->assertEquals(101, $this->character->refresh()->str);
+        $this->assertEquals(102, $this->character->refresh()->str);
     }
 
     public function testUpdateClassStats() {
@@ -58,7 +58,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateClassStats($oldClass, $class->refresh());
 
-        $this->assertEquals(101, $this->character->refresh()->str);
+        $this->assertEquals(102, $this->character->refresh()->str);
     }
 
     public function testUpdateClassStatsAndCharacterIsAboveLevelOne() {
@@ -134,8 +134,8 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateClassStats($oldClass, $class->refresh());
 
-        $this->assertEquals(101, $this->character->refresh()->str);
-        $this->assertEquals(1, $this->character->refresh()->dex);
+        $this->assertEquals(102, $this->character->refresh()->str);
+        $this->assertEquals(3, $this->character->refresh()->dex);
 
         Mail::assertNotSent(GenericMail::class);
     }

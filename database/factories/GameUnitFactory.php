@@ -25,7 +25,7 @@ class GameUnitFactory extends Factory
             'name'                   => 'Sample Unit',
             'description'            => 'Test unit',
             'attack'                 => 1,
-            'deffense'               => 1,
+            'defence'                => 1,
             'can_heal'               => false,
             'heal_amount'            => null, 
             'siege_weapon'           => false,

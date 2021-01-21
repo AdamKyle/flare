@@ -29,7 +29,7 @@ class LevelTestCharacter implements ShouldQueue
      */
     public function __construct(Character $character, int $levelTo = 1000) {
         $this->character = $character;
-        $this->levelTo = env('APP_ENV') === 'testing' ? 1 : $levelTo;
+        $this->levelTo = env('APP_ENV') === 'testing' ? 2 : $levelTo;
     }
 
     /**
