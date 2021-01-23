@@ -75,6 +75,12 @@ class UpgradeBuilding implements ShouldQueue
 
         if ($this->building->gives_resources) {
             $type = $this->getResourceType();
+            
+            if (is_null($type)) {
+                $queue->delete();
+
+                return;
+            }
 
             $this->building->kingdom->{'max_' . $type} += 1000;
         } else if ($this->building->is_farm) {

@@ -24,10 +24,10 @@ class UnitInQueueFactory extends Factory
         return [
             'character_id' => null,
             'kingdom_id'   => null,
-            'building_id'  => null,
+            'game_unit_id' => null,
             'amount'       => null,
             'completed_at' => now(),
-            'started_at'   => now()->subMinutes(10),
+            'started_at'   => now()->subMinutes(60),
         ];
     }
 }

@@ -219,9 +219,8 @@ class KingdomsController extends Controller {
 
         $completed      = (($current - $start) / ($end - $start));
         $totalResources = 1 - $completed;
-
         
-        if (!($totalResources >= .10)) {
+        if (!($totalResources >= .10) || $completed === 0) {
             return response()->json([
                 'message' => 'Your workers are almost done. You can\'t cancel this late in the process.'
             ], 422);
