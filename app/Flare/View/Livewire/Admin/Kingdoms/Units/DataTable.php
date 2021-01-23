@@ -26,7 +26,7 @@ class DataTable extends Component
         if (!is_null($this->building)) {
             return GameBuildingUnit::where('game_building_id', $this->building->id)->join('game_units', function($join) {
                 $query = $join->on('game_building_units.game_unit_id', '=', 'game_units.id');
-
+                
                 if ($this->search !== '') {
                     $query->where('name', 'like', '%'.$this->search.'%');
                 }

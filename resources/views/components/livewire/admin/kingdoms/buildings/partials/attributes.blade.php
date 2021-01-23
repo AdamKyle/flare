@@ -89,6 +89,7 @@
             <div class="form-group">
                 <label for="gameBuilding-trains-units">Units per level <a href="#" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-info-circle"></i></a></label>
                 <input type="number" class="form-control" id="gameBuilding-units-per-level" wire:model="gameBuilding.units_per_level" {{$this->unit_selection_is_disabled  ? 'disabled' : ''}}>
+                @error('units_per_level') <span class="text-danger">{{ $message }}</span> @enderror
             </div>  
         </div>
     </div>

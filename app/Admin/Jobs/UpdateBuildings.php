@@ -84,10 +84,12 @@ class UpdateBuildings implements ShouldQueue
             return;
         }
 
-        foreach($this->gameBuilding->units as $unit) {
-            $unit->delete();
+        if ($this->gameBuilding->units->isNotEmpty()) {
+            foreach($this->gameBuilding->units as $unit) {
+                $unit->delete();
+            }
         }
-
+        
         $service->assignUnits($this->gameBuilding->refresh(), $this->selectedUnits, $this->levels);
 
         $this->gameBuilding = $this->gameBuilding->refresh();

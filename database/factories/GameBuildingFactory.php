@@ -48,7 +48,7 @@ class GameBuildingFactory extends Factory
             'increase_defence_amount'     => 0.10,
             'time_to_build'               => 0.01,     
             'time_increase_amount'        => 0.01,
-            'units_per_level'             => 0,
+            'units_per_level'             => null,
         ];
     }
 }

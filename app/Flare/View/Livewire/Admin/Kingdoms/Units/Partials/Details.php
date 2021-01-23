@@ -24,10 +24,10 @@ class Details extends Component
         'gameUnit.heal_amount'              => 'nullable',
         'gameUnit.siege_weapon'             => 'nullable',
         'gameUnit.travel_time'              => 'required',
-        'gameUnit.wood_cost'                => 'nullable',
-        'gameUnit.clay_cost'                => 'nullable',
-        'gameUnit.stone_cost'               => 'nullable',
-        'gameUnit.iron_cost'                => 'nullable',
+        'gameUnit.wood_cost'                => 'required',
+        'gameUnit.clay_cost'                => 'required',
+        'gameUnit.stone_cost'               => 'required',
+        'gameUnit.iron_cost'                => 'required',
         'gameUnit.required_population'      => 'required',
         'gameUnit.time_to_recruit'          => 'required',
         'gameUnit.weak_against_unit_id'     => 'nullable',
@@ -94,7 +94,6 @@ class Details extends Component
         if (is_null($this->gameUnit)) {
             $this->gameUnit = new GameUnit;
         } else {
-            dump($this->gameUnit->id);
             if ($this->gameUnit->weak_against_unit_id === $this->gameUnit->id) {
                 $this->weakAgainst = true;
             }
