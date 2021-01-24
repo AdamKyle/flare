@@ -2,8 +2,8 @@
 
 namespace App\Admin\Jobs;
 
-use App\Admin\Services\UpdateKingdomsService;
-use App\Flare\Events\ServerMessageEvent;
+use App\Admin\Mail\GenericMail;
+use Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,8 +11,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Building;
 use App\Flare\Models\GameBuilding;
+use App\Admin\Services\UpdateKingdomsService;
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Service\KingdomService;
 use Facades\App\Flare\Values\UserOnlineValue;
 
 class UpdateBuildings implements ShouldQueue
@@ -46,6 +47,7 @@ class UpdateBuildings implements ShouldQueue
         $this->reassignUnits($service);
 
         if ($query->get()->isEmpty()) {
+            // If no kingdom has this building:
             Kingdom::chunkById(500, function($kingdoms) {
                 foreach($kingdoms as $kingdom) {
                     $kingdom->buildings()->create([
@@ -58,7 +60,8 @@ class UpdateBuildings implements ShouldQueue
                         'max_durability'      => $this->gameBuilding->base_durability,
                     ]);
 
-                    $user = $kingdom->character->user;
+                    $user      = $kingdom->character->user;
+                    $character = $kingdom->character;
 
                     $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
@@ -71,7 +74,8 @@ class UpdateBuildings implements ShouldQueue
                 }
             });
         } else {
-            Building::where('game_building_id', $this->gameBuilding->id)->chunkById(1000, function($buildings) {
+            // If kingdoms do not have this building:
+            $query->chunkById(1000, function($buildings) {
                 foreach($buildings as $building) {
                     UpdateBuilding::dispatch($building)->delay(now()->addMinutes(1));
                 }
@@ -83,7 +87,7 @@ class UpdateBuildings implements ShouldQueue
         if (empty($this->selectedUnits)) {
             return;
         }
-
+        
         if ($this->gameBuilding->units->isNotEmpty()) {
             foreach($this->gameBuilding->units as $unit) {
                 $unit->delete();

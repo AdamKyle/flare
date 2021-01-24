@@ -49,6 +49,10 @@ class KingdomResourcesService {
     protected function updateCurrentPopulation() {
         $building = $this->kingdom->buildings->where('is_farm', true)->first();
 
+        if ($building->current_durability === 0) {
+            return;
+        }
+
         if (!is_null($building)) {
             $newCurrent = $this->kingdom->current_population + $building->population_increase;
 
@@ -69,6 +73,10 @@ class KingdomResourcesService {
 
         foreach($resources as $resource) {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
+
+            if ($building->current_durability === 0) {
+                continue;
+            }
 
             if (!is_null($building)) {
                 $newCurrent = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
@@ -103,7 +111,6 @@ class KingdomResourcesService {
             $totalIncrease -= $totalDecrease;
             $totalDecrease = 0;
 
-            dump($totalIncrease);
             return $this->addMorale($totalIncrease);
         } else if ($totalIncrease < $totalDecrease) {
             $totalDecrease -= $totalIncrease;
@@ -164,15 +171,9 @@ class KingdomResourcesService {
 
         $newTotal = ($current + $toAdd) - $toSub;
 
-        if ($newTotal <= 0.0) {
-            $this->kingdom->update([
-                'current_morale' => 0.0
-            ]);
-        } else {
-            $this->kingdom->update([
-                'current_morale' => $newTotal,
-            ]);
-        }
+        $this->kingdom->update([
+            'current_morale' => $newTotal,
+        ]);
 
         $this->kingdom = $this->kingdom->refresh();
     }
