@@ -196,7 +196,7 @@ class CharacterInventoryControllerTest extends TestCase
             'item_to_equip_type' => 'weapon',
             'slot_id'            => '2',
             'character'          => $this->character->getCharacter()->id
-        ])->see('Equipped')->see('Equipped: <span class="normal-item">Rusty Dagger</span>');
+        ])->see('Equipped')->see('Equipped: Rusty Dagger');
     }
 
     public function testSeeComparePageForSpell() {
