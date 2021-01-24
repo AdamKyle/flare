@@ -20,15 +20,23 @@ class LoginTest extends TestCase
         CreateClass,
         CreateCharacter;
 
-    public function testAdminIsRedirectedToTheDashboard() {
-        $user = (new CharacterFactory)->createBaseCharacter()->getUser();
+    private $user;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->createAdminRole('Admin');
-        $user->assignRole('Admin');
+        $this->user->assignRole('Admin');
 
+        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
+    }
+
+    public function testAdminIsRedirectedToTheDashboard() {
         $this->visit('/login')
              ->submitForm('Login', [
-                'email'    => $user->email,
+                'email'    => $this->user->email,
                 'password' => 'ReallyLongPassword',
              ])->see('Admin');
     }

@@ -2,8 +2,7 @@
 
 namespace Tests\Traits;
 
-use Spatie\Permission\Models\Role;
-use App\Flare\Models\Character;
+use App\Flare\Models\Role;
 
 trait CreateRole {
 
