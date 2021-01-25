@@ -19,6 +19,7 @@
                 <p>When the test is complete, You'll receieve an email. You will be able to come back to this page,
                 and see a new button beside the monster called: View Data.<p>
             </div>
+
             @include('admin.character-modeling.partials.modals.partials.form', [
                 'route'      => route('admin.character.modeling.test'),
                 'users'      => $users,

@@ -63,53 +63,32 @@ class KingdomsController extends Controller {
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {
         $kingdomService->setParams($request->all());
 
-        $kingdom = Kingdom::where('x_position', $request->x_position)->where('y_position', $request->y_position)->first();
-        
-        if (!is_null($kingdom)) {
+        if (!$kingdomService->canSettle($request->x_position, $request->y_position)) {
             return response()->json([
                 'message' => 'Cannot settle here.'
             ], 422);
         }
-
-        $location = Location::where('x', $request->x_position)->where('y', $request->y_position)->first();
         
-        if (!is_null($location)) {
-            return response()->json([
-                'message' => 'Cannot settle here.'
-            ], 422);
-        }
-
         $kingdom = $kingdomService->createKingdom($character);
 
-        $kingdom  = new Item($kingdom, $this->kingdom);
-
-        $kingdom = $this->manager->createData($kingdom)->toArray();
-
-        event(new AddKingdomToMap($character->user, $kingdom));
-
-        return response()->json($kingdom, 200);
+        return response()->json(
+            $kingdomService->addKingdomToMap(
+                $character, $kingdom, $this->kingdom, $this->manager
+            ), 
+        200);
     }
 
     public function upgradeBuilding(Request $request, Character $character, Building $building, BuildingService $buildingService) {
-        $kingdom = $building->kingdom;
 
-        if (ResourceValidation::shouldRedirectBuilding($building, $kingdom)) {
+        if (ResourceValidation::shouldRedirectBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources."
             ], 422);
         }
 
-        $kingdom->update([
-            'current_wood'       => $kingdom->current_wood - $building->wood_cost,
-            'current_clay'       => $kingdom->current_clay - $building->clay_cost,
-            'current_stone'      => $kingdom->current_stone - $building->stone_cost,
-            'current_iron'       => $kingdom->current_iron - $building->iron_cost,
-            'current_population' => $kingdom->current_population - $building->required_population,
-        ]);
+        $kingdom = $buildingService->updateKingdomResourcesForBuildingUpgrade($building);
         
         $buildingService->setBuilding($building)->upgradeBuilding($character);
-
-        $kingdom  = $building->kingdom->refresh();
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 
@@ -135,15 +114,7 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $kingdom->update([
-            'current_wood'       => $kingdom->current_wood - ($gameUnit->wood_cost * $request->amount),
-            'current_clay'       => $kingdom->current_clay - ($gameUnit->clay_cost * $request->amount),
-            'current_stone'      => $kingdom->current_stone - ($gameUnit->strone_cost * $request->amount),
-            'current_iron'       => $kingdom->current_iron - ($gameUnit->iron_cost * $request->amount),
-            'current_population' => $kingdom->current_population - ($gameUnit->required_population * $request->amount),
-        ]);
-
-        $kingdom = $kingdom->refresh();
+        $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
 
         $service->setUnit($gameUnit)->setKingdom($kingdom)->recruitUnits($kingdom->character, $request->amount);
 
@@ -154,7 +125,7 @@ class KingdomsController extends Controller {
         return response()->json($kingdom, 200);
     }
 
-    public function cancelRecruit(Request $request) {
+    public function cancelRecruit(Request $request, UnitService $service) {
         $request->validate([
             'queue_id' => 'required|integer',
         ]);
@@ -165,43 +136,18 @@ class KingdomsController extends Controller {
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
 
-        $start   = Carbon::parse($queue->started_at)->timestamp;
-        $end     = Carbon::parse($queue->completed_at)->timestamp;
-        $current = Carbon::parse(now())->timestamp;
+        $cancelled = $service->cancelRecruit($queue, $this->manager, $this->kingdom);
 
-        $completed      = (($current - $start) / ($end - $start));
-        $totalResources = 1 - $completed;
-        
-        if (!($totalResources >= .10)) {
+        if (!$cancelled) {
             return response()->json([
                 'message' => 'Your units are almost done. You can\'t cancel this late in the process.'
             ], 422);
         }
-
-        $unit    = $queue->unit;
-        $kingdom = $queue->kingdom;
-        $user    = $kingdom->character->user; 
-
-        $queue->delete();
-
-        $kingdom->update([
-            'current_wood'       => $kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $totalResources),
-            'current_clay'       => $kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $totalResources),
-            'current_stone'      => $kingdom->current_stone + (($unit->stone_cost * $queue->amount) * $totalResources),
-            'current_iron'       => $kingdom->current_iron + (($unit->iron_cost * $queue->amount) * $totalResources),
-            'current_population' => $kingdom->current_population + (($unit->required_population * $queue->amount) * $totalResources)
-        ]);
-
-        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
-
-        $kingdom = $this->manager->createData($kingdom)->toArray();
-
-        event(new UpdateKingdom($user, $kingdom));
-
+        
         return response()->json([], 200);
     }
 
-    public function removeBuildingFromQueue(Request $request) {
+    public function removeBuildingFromQueue(Request $request, BuildingService $service) {
 
         $request->validate([
             'queue_id' => 'required|integer',
@@ -213,40 +159,13 @@ class KingdomsController extends Controller {
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
         
-        $start   = Carbon::parse($queue->started_at)->timestamp;
-        $end     = Carbon::parse($queue->completed_at)->timestamp;
-        $current = Carbon::parse(now())->timestamp;
+        $canceled = $service->cancelBuildingUpgrade($queue, $this->manager, $this->kingdom);
 
-        $completed      = (($current - $start) / ($end - $start));
-        $totalResources = 1 - $completed;
-        
-        if (!($totalResources >= .10) || $completed === 0) {
+        if (!$canceled) {
             return response()->json([
                 'message' => 'Your workers are almost done. You can\'t cancel this late in the process.'
             ], 422);
         }
-
-        $building = $queue->building;
-        $kingdom  = $building->kingdom; 
-
-        $queue->delete();
-
-        $kingdom->update([
-            'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $totalResources),
-            'current_clay'       => $kingdom->current_clay + ($building->clay_cost * $totalResources),
-            'current_stone'      => $kingdom->current_stone + ($building->stone_cost * $totalResources),
-            'current_iron'       => $kingdom->current_iron + ($building->iron_cost * $totalResources),
-            'current_population' => $kingdom->current_population + ($building->required_population * $totalResources)
-        ]);
-        
-        $kingdom = $kingdom->refresh();
-        $user    = $kingdom->character->user;
-
-        $kingdom  = new Item($kingdom, $this->kingdom);
-
-        $kingdom = $this->manager->createData($kingdom)->toArray();
-
-        event(new UpdateKingdom($user, $kingdom));
 
         return response()->json([], 200);
     }

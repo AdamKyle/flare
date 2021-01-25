@@ -9,7 +9,9 @@
             <label for="characters">Characters To Test With</label>
             <select id="characters" class="form-control" name="characters[]" multiple>
                 @foreach($users as $user)
-                    <option value="{{$user->character->id}}">{{$user->character->name}} {{$user->character->class->name}} - {{$user->character->race->name}}</option>
+                    @if (!is_null($user->character))
+                        <option value="{{$user->character->id}}">{{$user->character->name}} {{$user->character->class->name}} - {{$user->character->race->name}}</option>
+                    @endif
                 @endforeach
             </select>
         </div>

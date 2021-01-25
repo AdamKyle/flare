@@ -17,9 +17,11 @@ use Illuminate\Support\Collection;
  */
 class BattleSimulationChart extends BaseChart
 {
-    public ?string $name      = 'battle_simmulation_chart';
+    public ?string $name       = 'battle_simmulation_chart';
 
-    public ?string $routeName = 'battle_simmulation_chart';
+    public ?string $routeName  = 'battle_simmulation_chart';
+
+    public ?array $middlewares = ['auth'];
 
     /**
      * Handles the HTTP request for the given chart.
