@@ -15,13 +15,28 @@ use League\Fractal\Resource\Item;
 
 class KingdomService {
 
+    /**
+     * @var KingdomBuilder $builder
+     */
     private $builder;
 
+    /**
+     * constructor
+     * 
+     * @param KingdomBuilder $builder
+     * @return void
+     */
     public function __construct(KingdomBuilder $builder) {
         $this->builder = $builder;
     }
 
-    public function setParams(array $params) {
+    /**
+     * Sets the params for the kingdom.
+     * 
+     * @param array $params
+     * @return void
+     */
+    public function setParams(array $params): void {
         $kingdomParams = $params;
 
         $kingdomParams['color'] = array_values($kingdomParams['color']);
@@ -29,12 +44,28 @@ class KingdomService {
         $this->builder->setRequestAttributes($kingdomParams);
     }
 
+    /**
+     * Creates the kingdom for the character.
+     * 
+     * @param Character $character
+     * @return Kingdom
+     */
     public function createKingdom(Character $character): Kingdom {
         $kingdom = $this->builder->createKingdom($character);
 
         return $this->assignBuildings($kingdom);
     }
 
+    /**
+     * Can the character settle here?
+     * 
+     * No if there is a kingdom there.
+     * No if there is a location there.
+     * 
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
     public function canSettle(int $x, int $y): bool {
         $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->first();
         
@@ -51,6 +82,18 @@ class KingdomService {
         return true;
     }
 
+    /**
+     * Sends off an event to the front end.
+     * 
+     * This will update the current map to add a kingdom at the players location.
+     * 
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param KingdomTransformer $transformer
+     * @param Manager $manager
+     * 
+     * @return array
+     */
     public function addKingdomToMap(Character $character, Kingdom $kingdom, KingdomTransformer $transfromer, Manager $manager): array {
         $kingdom  = new Item($kingdom, $transfromer);
 

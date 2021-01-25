@@ -47,6 +47,10 @@ class RecruitUnits implements ShouldQueue
     /**
      * Create a new job instance.
      *
+     * @param GameUnit $unit
+     * @param Kingdom $kingdom
+     * @param int $amount
+     * @param int $queueId
      * @return void
      */
     public function __construct(GameUnit $unit, Kingdom $kingdom, int $amount, int $queueId)
@@ -63,6 +67,8 @@ class RecruitUnits implements ShouldQueue
     /**
      * Execute the job.
      *
+     * @param Manager $manager
+     * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
     public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)

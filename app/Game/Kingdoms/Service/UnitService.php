@@ -15,43 +15,52 @@ use League\Fractal\Resource\Item;
 
 class UnitService {
 
-    private $unit;
-
-    private $kingdom;
-
+    /**
+     * @var mixed $compled
+     */
     private $completed;
 
+    /**
+     * @var mixed $totalResources
+     */
     private $totalResources;
 
-    public function setUnit(GameUnit $unit): UnitService {
-        $this->unit = $unit;
-
-        return $this;
-    }
-
-    public function setKingdom(Kingdom $kingdom): UnitService {
-        $this->kingdom = $kingdom;
-
-        return $this;
-    }
-
-    public function recruitUnits(Character $character, int $amount) {
-        $timeTillFinished = $this->unit->time_to_recruit * $amount;
+    /**
+     * Recruit a specific unit for a kingdom
+     * 
+     * Will dispatch a job delayed for an amount of time.
+     * 
+     * @param Kingdom $kingdom
+     * @param GameUnit $gameUnit
+     * @param int $amount
+     */
+    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
+        $timeTillFinished = $gameUnit->time_to_recruit * $amount;
         $timeTillFinished = now()->addMinutes($timeTillFinished);
         
         $queue = UnitInQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id'   => $this->kingdom->id,
-            'game_unit_id' => $this->unit->id,
+            'character_id' => $kingdom->character->id,
+            'kingdom_id'   => $kingdom->id,
+            'game_unit_id' => $gameUnit->id,
             'amount'       => $amount,
             'completed_at' => $timeTillFinished,
             'started_at'   => now(),
         ]);
 
 
-        RecruitUnits::dispatch($this->unit, $this->kingdom, $amount, $queue->id)->delay($timeTillFinished);
+        RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
     }
-
+    
+    /**
+     * Update the kingdom resources based on the cost.
+     * 
+     * Subtracts cost from current amount.
+     * 
+     * @param Kingdom $kingdom
+     * @param GameUnit $gameUnit
+     * @param int $amount
+     * @return Kingdom
+     */
     public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood - ($gameUnit->wood_cost * $amount),
@@ -64,6 +73,15 @@ class UnitService {
         return $kingdom->refresh();
     }
 
+    /**
+     * Cancel a recturiment order.
+     * 
+     * Can return false if resources gained back are too little.
+     * 
+     * @param UnitInQueue $queue
+     * @param Manager $manager
+     * @param KingdomTransformer $transfromer
+     */
     public function cancelRecruit(UnitInQueue $queue, Manager $manager, KingdomTransformer $transfromer): bool {
         
         $this->resourceCalculation($queue);

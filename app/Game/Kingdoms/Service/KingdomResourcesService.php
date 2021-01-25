@@ -12,24 +12,55 @@ use App\Game\Kingdoms\Events\UpdateKingdom;
 
 class KingdomResourcesService {
 
+    /**
+     * @var Kingdom $kingdom
+     */
     private $kingdom;
 
+    /**
+     * @var Manager $manager
+     */
     private $manager;
 
+    /**
+     * @var KingdomTransformer $kingdomTransformer
+     */
     private $kingdomTransformer;
 
+    /**
+     * constructor
+     * 
+     * @param Manager $manager
+     * @param KingdomTransformer $kingdomTransformer
+     * @return void
+     */
     public function __construct(Manager $manager, KingdomTransformer $kingdomTransformer) {
         $this->manager            = $manager;
         $this->kingdomTransformer = $kingdomTransformer;
     }
 
+    /**
+     * Set the kingdom to be updated.
+     * 
+     * @param Kingdom $kingdom
+     * @return KingdomResourceService
+     */
     public function setKingdom(Kingdom $kingdom): KingdomResourcesService {
         $this->kingdom = $kingdom;
 
         return $this;
     }
 
-    public function updateKingdom() {
+    /**
+     * Updates the kingdoms resources.
+     * 
+     * Will updates cores resourses, population and morale.
+     * 
+     * This will also alert the player if they are online, via the chat are.
+     * 
+     * @return void
+     */
+    public function updateKingdom(): void {
         $this->updateCurrentPopulation();
         $this->increaseCurrentResource();
         $this->increaseOrDecreaseMorale();

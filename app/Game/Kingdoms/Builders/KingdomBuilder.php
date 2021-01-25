@@ -7,12 +7,27 @@ use App\Flare\Models\Kingdom;
 
 class KingdomBuilder {
 
+    /**
+     * @var array $kingdom
+     */
     private $kingdom;
 
+    /**
+     * Creates the base params for the kingdom based off the request.
+     * 
+     * @param array $params
+     * @return void
+     */
     public function setRequestAttributes(array $params): void {
         $this->kingdom = $params;
     }
 
+    /**
+     * Creates the kingdom
+     * 
+     * @param Character $character
+     * @return Kingdom
+     */
     public function createKingdom(Character $character): Kingdom {
         $kingdom = [
             'character_id'            => $character->id,

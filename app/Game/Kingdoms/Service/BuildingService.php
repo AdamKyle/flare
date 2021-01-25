@@ -15,33 +15,47 @@ use League\Fractal\Resource\Item;
 
 class BuildingService {
 
-    private $building;
-
+    /**
+     * @var mixed $completed
+     */
     private $completed;
 
+    /**
+     * @var mixed $totalResources
+     */
     private $totalResources;
 
-    public function setBuilding(Building $building): BuildingService {
-        $this->building = $building;
-
-        return $this;
-    }
-
-    public function upgradeBuilding(Character $character) {
-        $timeToComplete = now()->addMinutes($this->building->time_increase);
+    /**
+     * Upgrades the building.
+     * 
+     * Create the building queue record and then dispatches based on the buildings time_increase
+     * attribute.
+     * 
+     * @param Building $building
+     * @param Character $character
+     * @return void
+     */
+    public function upgradeBuilding(Building $building, Character $character): void {
+        $timeToComplete = now()->addMinutes($building->time_increase);
         
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
-            'kingdom_id'   => $this->building->kingdom->id,
-            'building_id'  => $this->building->id,
-            'to_level'     => $this->building->level + 1,
+            'kingdom_id'   => $building->kingdom->id,
+            'building_id'  => $building->id,
+            'to_level'     => $building->level + 1,
             'completed_at' => $timeToComplete,
             'started_at'   => now(),
         ]);
 
-        UpgradeBuilding::dispatch($this->building, $character->user, $queue->id)->delay($timeToComplete);
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
     }
 
+    /**
+     * Updates the kingdoms resources based on building cost.
+     * 
+     * @param Building $building
+     * @return Kingdom
+     */
     public function updateKingdomResourcesForBuildingUpgrade(Building $building): Kingdom {
         $building->kingdom->update([
             'current_wood'       => $building->kingdom->current_wood - $building->wood_cost,
@@ -54,6 +68,18 @@ class BuildingService {
         return $building->kingdom->refresh();
     }
 
+    /**
+     * Cancels the building upgrade.
+     * 
+     * Will cancel the resources if the total resources are above 10%.
+     * 
+     * Can return false if there is not enough time left or the too little resources given back.
+     * 
+     * @param BuildingInQueue $queue
+     * @param Manager $manager
+     * @param KingdomTransformer $transformer
+     * @return bool
+     */
     public function cancelBuildingUpgrade(BuildingInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
         $this->resourceCalculation($queue);
         

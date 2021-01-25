@@ -88,7 +88,7 @@ class KingdomsController extends Controller {
 
         $kingdom = $buildingService->updateKingdomResourcesForBuildingUpgrade($building);
         
-        $buildingService->setBuilding($building)->upgradeBuilding($character);
+        $buildingService->upgradeBuilding($building, $character);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 
@@ -116,7 +116,7 @@ class KingdomsController extends Controller {
 
         $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
 
-        $service->setUnit($gameUnit)->setKingdom($kingdom)->recruitUnits($kingdom->character, $request->amount);
+        $service->recruitUnits($kingdom, $gameUnit, $request->amount);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 

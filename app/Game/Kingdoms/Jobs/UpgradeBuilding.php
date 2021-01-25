@@ -39,6 +39,9 @@ class UpgradeBuilding implements ShouldQueue
      */
     protected $queueId;
 
+    /**
+     * @var array $resourceType
+     */
     protected $resourceTypes = [
         'wood', 'clay', 'stone', 'iron',
     ];
@@ -46,6 +49,9 @@ class UpgradeBuilding implements ShouldQueue
     /**
      * Create a new job instance.
      *
+     * @param Building $building
+     * @param User $user
+     * @param int $queueId
      * @return void
      */
     public function __construct(Building $building, User $user, int $queueId)
@@ -60,6 +66,8 @@ class UpgradeBuilding implements ShouldQueue
     /**
      * Execute the job.
      *
+     * @param Manager $manager
+     * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
     public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)

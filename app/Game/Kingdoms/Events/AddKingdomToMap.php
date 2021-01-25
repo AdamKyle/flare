@@ -14,7 +14,9 @@ class AddKingdomToMap implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
- 
+    /**
+     * @var array $kingdom
+     */
     public $kingdom;
 
     /**
@@ -26,7 +28,7 @@ class AddKingdomToMap implements ShouldBroadcastNow
      * Create a new event instance.
      *
      * @param User $user
-     * @param bool $isDead | false
+     * @param array $kingdom
      * @return void
      */
     public function __construct(User $user, array $kingdom)
