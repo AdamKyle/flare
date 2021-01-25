@@ -1,10 +1,7 @@
 <?php
 
-namespace Tests\Fature\Admin\Charts;
+namespace Tests\Feature\Admin\Charts;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterSnapShot;
-use App\Flare\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;

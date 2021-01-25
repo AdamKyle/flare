@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Kingdom\Services;
+namespace Tests\Unit\Game\Kingdoms\Services;
 
 use DB;
 use Tests\TestCase;
