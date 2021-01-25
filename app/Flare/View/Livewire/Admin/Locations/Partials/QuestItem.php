@@ -13,6 +13,8 @@ class QuestItem extends Component
 
     public $items;
 
+    public $editing = false;
+
     protected $rules = [
         'location.quest_reward_item_id' => 'nullable'
     ];
@@ -29,6 +31,10 @@ class QuestItem extends Component
         $this->location->save();
 
         $message = 'Created location: ' . $this->location->refresh()->name;
+
+        if ($this->editing) {
+            $message = 'Updated location: ' . $this->location->refresh()->name;
+        }
 
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',

@@ -38,7 +38,7 @@ class SettingsControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $this->assertTrue($character->user->adventure_email);
-        $this->assertTrue($character->user->can_speak_again_email);
+        $this->assertTrue($character->user->new_building_email);
 
         $this->actingAs($character->user)->post(route('user.settings.email', [
             'user' => $character->user
@@ -47,33 +47,33 @@ class SettingsControllerTest extends TestCase
         $character = $character->refresh();
 
         $this->assertFalse($character->user->adventure_email);
-        $this->assertFalse($character->user->can_speak_again_email);
+        $this->assertFalse($character->user->new_building_email);
     }
 
     public function testCanTurnOnEmailSettings() {
         $character = $this->character->getCharacter();
 
         $character->user()->update([
-            'adventure_email' => false,
-            'can_speak_again_email' => false
+            'adventure_email'    => false,
+            'new_building_email' => false
         ]);
 
         $character = $character->refresh();
 
         $this->assertFalse($character->user->adventure_email);
-        $this->assertFalse($character->user->can_speak_again_email);
+        $this->assertFalse($character->user->new_building_email);
 
         $this->actingAs($character->user)->post(route('user.settings.email', [
             'user' => $character->user
         ]), [
             'adventure_email' => true,
-            'can_speak_again_email' => true,
+            'new_building_email' => true,
         ]);
 
         $character = $character->refresh();
 
         $this->assertTrue($character->user->adventure_email);
-        $this->assertTrue($character->user->can_speak_again_email);
+        $this->assertTrue($character->user->new_building_email);
     }
 
     public function testCanUpdateCharacterName() {

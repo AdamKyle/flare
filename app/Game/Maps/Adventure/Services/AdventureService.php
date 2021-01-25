@@ -333,12 +333,13 @@ class AdventureService {
         }
 
         $character = $this->character->refresh();
+        $user      = $character->user;
 
-        if (UserOnlineValue::isOnline($this->character->user)) {
-            event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
-            event(new ServerMessageEvent($this->character->user, 'adventure', 'Adventure completed! Check your logs for more details.'));
-        } else {
-            Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
+        if (UserOnlineValue::isOnline($user)) {
+            event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $user));
+            event(new ServerMessageEvent($user, 'adventure', 'Adventure completed! Check your logs for more details.'));
+        } else if ($user->adventure_email) {
+            Mail::to($user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
         }
 
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));

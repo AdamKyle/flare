@@ -13,6 +13,8 @@ class QuestItem extends Component
 
     public $questItemList = null;
 
+    public $editing       = false;
+
     protected $rules = [
         'monster.quest_item_id'          => 'nullable',
         'monster.quest_item_drop_chance' => 'nullable',
@@ -36,6 +38,10 @@ class QuestItem extends Component
                 $this->monster->save();
 
                 $message = 'Created monster: ' . $this->monster->refresh()->name;
+
+                if ($this->editing) {
+                    $message = 'Updated monster: ' . $this->monster->refresh()->name;
+                }
 
                 $this->emitTo('core.form-wizard', $functionName, $index, true, [
                     'type'    => 'success',

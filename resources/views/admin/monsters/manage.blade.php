@@ -25,6 +25,7 @@
             'Monster Quest Item Reward'
         ],
         'finishRoute' => 'monsters.list',
+        'editing'     => $editing,
     ])
 </div>
 @endsection

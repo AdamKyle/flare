@@ -14,6 +14,8 @@ class ItemModifiers extends Component
         'walk-on-water',
     ];
 
+    public $editing = false;
+
     protected $rules = [
         'item.base_damage_mod'  => 'nullable',
         'item.base_healing_mod' => 'nullable',
@@ -44,6 +46,10 @@ class ItemModifiers extends Component
         $this->item->save();
 
         $message = 'Created Item: ' . $this->item->refresh()->name;
+
+        if ($this->editing) {
+            $message = 'Updated Item: ' . $this->item->refresh()->name;
+        }
         
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',

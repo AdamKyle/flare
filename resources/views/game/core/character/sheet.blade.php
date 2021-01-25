@@ -75,6 +75,11 @@
                                 </div>
                             @endif
                             <div class="mt-2">
+                                @if (!$character->can_adventure)
+                                    <div class="alert alert-info mt-2 mb-3">
+                                        You are currently adventuring and cannot update your skills.
+                                    </div>
+                                @endif
                                 @foreach($character->skills->sortByDesc('can_train') as $skill)
                                     <dl>
                                         <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>
@@ -94,22 +99,27 @@
                                                 @if ((bool) $skill->can_train)
                                                     <div class="col-md-4">
                                                         @if (!auth()->user()->hasRole('Admin'))
-                                                            <a href="#" class="btn btn-primary btn-sm mb-2 train-skill-btn" data-toggle="modal" data-target="#skill-train-{{$skill->id}}">
+                                                            <button 
+                                                                class="btn btn-primary btn-sm mb-2 train-skill-btn" 
+                                                                data-toggle="modal" 
+                                                                data-target="#skill-train-{{$skill->id}}"
+                                                                {{!$character->can_adventure ? 'disabled' : ''}}
+                                                            >
                                                                 Train
 
                                                                 @if ($skill->currently_training)
                                                                 <i class="ml-2 fas fa-check"></i>
                                                                 @endif
-                                                            </a>
+                                                            </button>
                                                         @endif
 
                                                         @if ($skill->currently_training)
-                                                            <a class="btn btn-danger btn-sm mb-2 train-skill-btn" href="{{ route('logout') }}"
-                                                            onclick="event.preventDefault();
-                                                                        document.getElementById('cancel-skill-train-form').submit();"
+                                                            <button class="btn btn-danger btn-sm mb-2 train-skill-btn" href="{{ route('logout') }}"
+                                                                    onclick="event.preventDefault();
+                                                                    document.getElementById('cancel-skill-train-form').submit();"
                                                             >
                                                                 Cancel
-                                                            </a>
+                                                            </button>
 
                                                             <i class="ml-2 fas fa-info-circle skill-info-icon text-info" 
                                                             data-toggle="tooltip" data-placement="top" 

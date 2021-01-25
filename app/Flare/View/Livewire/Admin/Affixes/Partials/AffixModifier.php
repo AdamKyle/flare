@@ -13,6 +13,8 @@ class AffixModifier extends Component
 
     public $skills;
 
+    public $editing = false;
+
     protected $listeners = ['validateInput' , 'update'];
 
     protected $rules = [
@@ -45,6 +47,10 @@ class AffixModifier extends Component
             $this->itemAffix->save();
 
             $message = 'Created Affix: ' . $this->itemAffix->refresh()->name;
+
+            if ($this->editing) {
+                $message = 'Updated Affix: ' . $this->itemAffix->refresh()->name;
+            }
 
             $this->emitTo('core.form-wizard', $functionName, $index, true, [
                 'type'    => 'success',

@@ -18,6 +18,7 @@ class AffixesController extends Controller {
     public function create() {
         return view('admin.affixes.manage', [
             'itemAffix' => null,
+            'editing'   => false,
         ]);
     }
 
@@ -31,6 +32,7 @@ class AffixesController extends Controller {
     public function edit(ItemAffix $affix) {
         return view('admin.affixes.manage', [
             'itemAffix' => $affix,
+            'editing'   => true,
         ]);
     }
 

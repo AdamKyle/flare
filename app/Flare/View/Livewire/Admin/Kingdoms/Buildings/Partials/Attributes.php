@@ -13,7 +13,7 @@ class Attributes extends Component
 
     public $gameUnits;
 
-    public $editing;
+    public $editing = false;
 
     public $selectedUnits = [];
 

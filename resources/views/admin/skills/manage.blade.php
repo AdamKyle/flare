@@ -22,6 +22,7 @@
             'Skill Modifiers',
         ],
         'finishRoute' => 'skills.list',
+        'editing'     => $editing
     ])
 </div>
 @endsection

@@ -68,7 +68,7 @@ class UpdateBuildings implements ShouldQueue
                     if (UserOnlineValue::isOnline($user)) {
                         
                         event(new ServerMessageEvent($user, 'new-building', $message));
-                    } else {
+                    } else if ($user->new_building_email) {
                         Mail::to($user->email)->send(new GenericMail($character->user, $message, 'New Building!'));
                     }
                 }

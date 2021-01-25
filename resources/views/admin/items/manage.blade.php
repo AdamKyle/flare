@@ -22,5 +22,6 @@
             'Item Modifiers',
         ],
         'finishRoute' => 'items.list',
+        'editing' => $editing,
     ])
 @endsection

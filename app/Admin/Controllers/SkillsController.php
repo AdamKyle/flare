@@ -19,13 +19,15 @@ class SkillsController extends Controller {
 
     public function create() {
         return view('admin.skills.manage', [
-            'skill' => null,
+            'skill'   => null,
+            'editing' => false,
         ]);
     }
 
     public function edit(GameSkill $skill) {
         return view('admin.skills.manage', [
-            'skill' => $skill,
+            'skill'   => $skill,
+            'editing' => true,
         ]);
     }
 }

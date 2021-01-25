@@ -22,12 +22,14 @@ class LocationsController extends Controller {
     public function create() {
         return view('admin.locations.manage', [
             'location'    => null,
+            'editing'     => false,
         ]);
     }
 
     public function edit(Location $location) {
         return view('admin.locations.manage', [
             'location'    => $location,
+            'editing'     => true,
         ]);
     }
 }

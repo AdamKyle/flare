@@ -117,7 +117,7 @@ class UpgradeBuilding implements ShouldQueue
 
             event(new UpdateKingdom($this->user, $kingdom));
             event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level));
-        } else {
+        } else if ($this->user->upgraded_building_email) {
             Mail::to($this->user)->send(new GenericMail(
                 $this->user,
                 $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,

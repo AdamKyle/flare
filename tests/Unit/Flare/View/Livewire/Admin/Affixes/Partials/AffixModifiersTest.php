@@ -22,7 +22,7 @@ class AffixModifiersTest extends TestCase
     public function testTheComponentCallsUpdate() {
         $itemAffix = $this->createItemAffix();
 
-        Livewire::test(AffixModifier::class)->call('update', $itemAffix->id)->assertSet('itemAffix.name', $itemAffix->name);
+        Livewire::test(AffixModifier::class)->set('editing', true)->call('update', $itemAffix->id)->assertSet('itemAffix.name', $itemAffix->name);
     }
 
     public function testValidationFails() {

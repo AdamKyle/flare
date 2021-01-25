@@ -154,7 +154,7 @@ class Game extends React.Component {
       mk.x_position === this.state.current_x && 
       mk.y_position === this.state.current_y
     );
-    console.log(index);
+
     if (index !== -1) {
       let kingdomData = _.cloneDeep(this.state.kingdomData);
 
@@ -169,7 +169,7 @@ class Game extends React.Component {
       let kingdomData = _.cloneDeep(this.state.kingdomData);
 
       kingdomData.my_kingdoms.push(kingdom);
-      console.log('here?');
+      
       this.setState({
         kingdomData: kingdomData,
         kingdom: kingdom,

@@ -21,5 +21,6 @@
             'Affix Modifiers',
         ],
         'finishRoute' => 'affixes.list',
+        'editing'     => $editing,
     ])
 @endsection

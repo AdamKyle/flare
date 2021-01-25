@@ -21,12 +21,14 @@ class ItemsController extends Controller {
     public function create() {
         return view('admin.items.manage', [
             'item' => null,
+            'editing' => false,
         ]);
     }
 
     public function edit(Item $item) {
         return view('admin.items.manage', [
             'item' => $item,
+            'editing' => true,
         ]);
     }
 

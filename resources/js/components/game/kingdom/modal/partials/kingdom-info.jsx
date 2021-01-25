@@ -31,10 +31,6 @@ export default class KingdomInfo extends React.Component {
     getTotalMoraleIncreasePerHour() {
         let currentMoraleIncrease = 0;
 
-        if (this.props.kingdom.current_morale >= 1.0) {
-            return currentMoraleIncrease;
-        }
-
         const buildings = this.props.kingdom.buildings;
 
         buildings.forEach((building) => {
@@ -48,10 +44,6 @@ export default class KingdomInfo extends React.Component {
 
     getTotalMoraleDecreasePerHour() {
         let currentMoraleDecrease = 0;
-
-        if (this.props.kingdom.current_morale === 0) {
-            return currentMoraleDecrease;
-        }
 
         const buildings = this.props.kingdom.buildings;
 

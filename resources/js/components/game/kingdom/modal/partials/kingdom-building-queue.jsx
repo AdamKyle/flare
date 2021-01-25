@@ -48,23 +48,39 @@ export default class KingdomBuildingQueue extends React.Component {
 
       let duration = moment.duration(then.diff(now)).asSeconds();
 
+      const isHours = (duration / 3600) >= 1;
+
       if (duration > 0) {
         return (
             <>
                 <div className="float-left">
-                    <CountdownCircleTimer
-                        isPlaying={true}
-                        duration={duration}
-                        initialRemainingTime={duration}
-                        colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
-                        size={40}
-                        strokeWidth={2}
-                        onComplete={() => [false, 0]}
-                    >
-                        {({ remainingTime }) => (remainingTime / 60).toFixed(0) }
-                    </CountdownCircleTimer>
+                    { isHours ? 
+                        <CountdownCircleTimer
+                            isPlaying={truncate}
+                            duration={duration}
+                            initialRemainingTime={duration}
+                            colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+                            size={40}
+                            strokeWidth={2}
+                            onComplete={() => [false, 0]}
+                            >
+                            {({ remainingTime }) => (remainingTime / 3600).toFixed(0)}
+                        </CountdownCircleTimer> 
+                        : 
+                        <CountdownCircleTimer
+                            isPlaying={true}
+                            duration={duration}
+                            initialRemainingTime={duration}
+                            colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+                            size={40}
+                            strokeWidth={2}
+                            onComplete={() => [false, 0]}
+                        >
+                            {({ remainingTime }) => (remainingTime / 60).toFixed(0) }
+                        </CountdownCircleTimer>
+                    }
                 </div>
-                <div className="float-left mt-2 ml-3">Minutes</div>
+                <div className="float-left mt-2 ml-3">{isHours ? 'Hours' : 'Minutes'}</div>
             </>
             
         );

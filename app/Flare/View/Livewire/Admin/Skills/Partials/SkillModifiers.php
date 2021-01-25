@@ -26,6 +26,8 @@ class SkillModifiers extends Component
 
     public $canNotAssignSkill;
 
+    public $editing = false;
+
     protected $rules = [
         'skill.base_damage_mod_bonus_per_level'    => 'nullable',
         'skill.base_healing_mod_bonus_per_level'   => 'nullable',
@@ -66,6 +68,10 @@ class SkillModifiers extends Component
             }
 
             $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';
+
+            if ($this->editing) {
+                $message = 'Skill: ' . $this->skill->name . ' Updated. Applying to selected entities!';
+            }
 
             $this->emitTo('core.form-wizard', 'finish', $index, true, [
                 'type'    => 'success',

@@ -24,6 +24,18 @@ export default class KingdomManagementModal extends React.Component {
             kingdom: props.kingdom,
             queueType: null,
         }
+
+        this.updateKingdom = Echo.private('update-kingdom-' + this.props.userId);
+    }
+
+    componentDidMount() {
+        this.updateKingdom.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {
+            this.setState({
+                kingdom: event.kingdom
+            }, () => {
+                this.props.updateKingdomData(event.kingdom);
+            });
+        });
     }
 
     componentDidUpdate() {

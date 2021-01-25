@@ -22,7 +22,7 @@ class SettingsController extends Controller {
     public function emailSettings(Request $request, User $user) {
         $user->update([
             'adventure_email'       => $request->has('adventure_email'),
-            'can_speak_again_email' => $request->has('can_speak_again_email'),
+            'new_building_email'    => $request->has('new_building_email'),
         ]);
 
         return redirect()->back()->with('success', 'Updated email prefrences.');

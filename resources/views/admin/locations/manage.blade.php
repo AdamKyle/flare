@@ -23,6 +23,7 @@
             'Location Quest Item',
         ],
         'finishRoute' => 'locations.list',
+        'editing'     => $editing,
     ])
 </div>
 @endsection

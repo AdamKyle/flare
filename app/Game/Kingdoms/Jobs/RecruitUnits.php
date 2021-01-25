@@ -108,14 +108,13 @@ class RecruitUnits implements ShouldQueue
 
         $queue->delete();
 
-        $kingdom     = $this->kingdom->refresh();
-        $unitDetails = $kingdom->units()->where('game_unit_id', $this->unit->id)->first();
-        $user        = $kingdom->character->user;
+        $kingdom = $this->kingdom->refresh();
+        $user    = $kingdom->character->user;
         
         if (UserOnlineValue::isOnline($user)) {
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
-
+            
             event(new UpdateKingdom($user, $kingdom));
             event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' you have a total of: ' . $amount));
         } else {

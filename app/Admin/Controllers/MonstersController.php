@@ -26,13 +26,15 @@ class MonstersController extends Controller {
 
     public function create() {
         return view('admin.monsters.manage', [
-            'monster' => null
+            'monster' => null,
+            'editing' => false,
         ]);
     }
 
     public function edit(Monster $monster) {
         return view('admin.monsters.manage', [
             'monster' => $monster,
+            'editing' => true,
         ]);
     }
 

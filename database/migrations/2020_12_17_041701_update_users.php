@@ -15,7 +15,8 @@ class UpdateUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('adventure_email')->nullable()->default(true);
-            $table->boolean('can_speak_again_email')->nullable()->default(true);
+            $table->boolean('new_building_email')->nullabel()->default(true);
+            $table->boolean('upgraded_building_email')->nullable()->default(true);
         });
     }
 
@@ -28,7 +29,8 @@ class UpdateUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('adventure_email');
-            $table->dropColumn('can_speak_again_email');
+            $table->dropColumn('new_building_email');
+            $table->dropColumn('upgraded_building_email');
         });
     }
 }
