@@ -2,6 +2,8 @@
 
 namespace App\Game\Maps\Adventure\Providers;
 
+use App\Flare\Cache\CoordinatesCache;
+use App\Flare\Transformers\KingdomTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\Game\Maps\Calculations\DistanceCalculation;
@@ -10,9 +12,10 @@ use App\Game\Maps\Adventure\Builders\RewardBuilder;
 use App\Game\Maps\Adventure\Services\AdventureFightService;
 use App\Game\Maps\Adventure\Services\AdventureService;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Maps\Adventure\Services\LocationService;
 use App\Game\Maps\Adventure\Services\MovementService;
 use App\Game\Maps\Adventure\Values\MapTileValue;
-use App\Game\Maps\Adventure\Values\WaterValue;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -53,7 +56,21 @@ class ServiceProvider extends ApplicationServiceProvider
         });
         
         $this->app->bind(MovementService::class, function($app) {
-            return new MovementService($app->make(PortService::class));
+            return new MovementService(
+                $app->make(PortService::class),
+                $app->make(MapTileValue::class),
+                $app->make(CoordinatesCache::class),
+                $app->make(MapPositionValue::class)
+            );
+        });
+
+        $this->app->bind(LocationService::class, function($app) {
+            return new LocationService(
+                $app->make(PortService::class), 
+                $app->make(KingdomTransformer::class), 
+                $app->make(Manager::class),
+                $app->make(CoordinatesCache::class)
+            );
         });
     }
 

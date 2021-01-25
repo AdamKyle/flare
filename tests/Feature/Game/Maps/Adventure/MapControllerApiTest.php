@@ -343,8 +343,10 @@ class MapControllerApiTest extends TestCase
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/map/teleport/' . $character->id, [
-                             'x' => 160,
-                             'y' => 64,
+                             'x'       => 160,
+                             'y'       => 64,
+                             'cost'    => 1,
+                             'timeout' => 1,
                          ])
                          ->response;
 
@@ -371,6 +373,7 @@ class MapControllerApiTest extends TestCase
                              'x' => 160,
                              'y' => 64,
                              'cost' => 10000,
+                             'timeout' => 1,
                          ])
                          ->response;
 
@@ -397,6 +400,7 @@ class MapControllerApiTest extends TestCase
                              'x' => 860,
                              'y' => 864,
                              'cost' => 0,
+                             'timeout' => 1
                          ])
                          ->response;
 

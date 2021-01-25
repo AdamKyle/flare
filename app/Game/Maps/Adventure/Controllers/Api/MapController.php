@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
-use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
@@ -10,91 +9,34 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
-use App\Game\Maps\Adventure\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
+use App\Game\Maps\Adventure\Requests\TeleportValidation;
+use App\Game\Maps\Adventure\Services\LocationService;
 use App\Game\Maps\Adventure\Services\MovementService;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\Game\Maps\Adventure\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 
 class MapController extends Controller {
 
     private $portService;
 
-    private $coordinatesCache;
-
     private $mapTile;
 
-    private $mapPositionValue;
-
-    public function __construct(PortService $portService, MapTileValue $mapTile, CoordinatesCache $coordinatesCache, MapPositionValue $mapPositionValue) {
+    public function __construct(PortService $portService, MapTileValue $mapTile) {
 
         $this->portService      = $portService;
         $this->mapTile          = $mapTile;
-        $this->coordinatesCache = $coordinatesCache;
-        $this->mapPositionValue = $mapPositionValue;
 
         $this->middleware('auth:api');
         $this->middleware('is.character.adventuring')->except(['index']);
         $this->middleware('is.character.dead')->except(['index']);
     }
 
-    public function index(User $user, Manager $manager, KingdomTransformer $kingdomTransformer) {
-        $location         = Location::where('x', $user->character->map->character_position_x)->where('y', $user->character->map->character_position_y)->first();
-        $portDetails      = null;
-        $adventureDetails = null;
-
-        if (!is_null($location)) {
-            if ($location->is_port) {
-                $portDetails      = $this->portService->getPortDetails($user->character, $location);
-            }
-            
-            $adventureDetails = $location->adventures;
-        }
-
-        $kingdom   = Kingdom::where('x_position', $user->character->map->character_position_x)->where('y_position', $user->character->map->character_position_y)->first();
-        $canSettle = false;
-        $canAttack = false;
-        $canManage = false;
-
-        if (!is_null($kingdom)) {
-            if (auth()->user()->id !== $kingdom->character->user->id) {
-                $canAttack = true;
-            } else {
-                $canManage = true;
-            }
-        } else if (is_null($location)) {
-            $canSettle = true;
-        }
-
-        $myKingdoms = Kingdom::where('character_id', $user->character->id)->get();
-        $kingdoms   = new Collection($myKingdoms, $kingdomTransformer);
-        $kingdoms   = $manager->createData($kingdoms)->toArray();  
-
-        return response()->json([
-            'map_url'                => Storage::disk('maps')->url($user->character->map->gameMap->path),
-            'character_map'          => $user->character->map,
-            'character_id'           => $user->character->id,
-            'locations'              => Location::with('adventures', 'questRewardItem')->get(),
-            'can_move'               => $user->character->can_move,
-            'timeout'                => $user->character->can_move_again_at,
-            'show_message'           => $user->character->can_move ? false : true,
-            'port_details'           => $portDetails,
-            'adventure_details'      => $adventureDetails,
-            'adventure_logs'         => $user->character->adventureLogs,
-            'adventure_completed_at' => $user->character->can_adventure_again_at,
-            'is_dead'                => $user->character->is_dead,
-            'teleport'               => $this->coordinatesCache->getFromCache(),
-            'can_settle_kingdom'     => $canSettle,
-            'can_attack_kingdom'     => $canAttack,
-            'can_manage_kingdom'     => $canManage,
-            'my_kingdoms'            => $kingdoms,
-        ]);
+    public function index(User $user, LocationService $locationService) {
+         
+        return response()->json($locationService->getLocationData($user), 200);
     }
 
     public function move(Request $request, Character $character, MovementService $service) {
@@ -163,56 +105,14 @@ class MapController extends Controller {
         ]);
     }
 
-    public function teleport(Request $request, Character $character, MovementService $service) {
-        $color = $this->mapTile->getTileColor($character, $request->x, $request->y);
+    public function teleport(TeleportValidation $request, Character $character, MovementService $service) {
+        $response = $service->teleport($character, $request->x, $request->y, $request->cost, $request->timeout);
 
-        if ($this->mapTile->isWaterTile((int) $color)) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
-                return $slot->item->effect === 'walk-on-water';
-            })->isNotEmpty();
-
-            if (!$hasItem) {
-                return response()->json([
-                    'message' => 'Cannot teleport to water locations without a Flask of Fresh Air.'
-                ], 422);
-            }
-        }
-
-        if ($character->gold < $request->cost) {
+        if ($response['status'] === 422) {
             return response()->json([
-                'message' => 'Not enough gold.'
+                'message' => $response['message']
             ], 422);
         }
-
-        $coordinates = $this->coordinatesCache->getFromCache();
-
-        if (!in_array($request->x, $coordinates['x']) && !in_array($request->x, $coordinates['y'])) {
-            return response()->json([
-                'message' => 'Invalid input.'
-            ], 422);
-        }
-
-        $service->processArea($request->x, $request->y, $character);
-
-        $character->update([
-            'can_move'          => false,
-            'gold'              => $character->gold - $request->cost,
-            'can_move_again_at' => now()->addMinutes($request->time),
-        ]);
-        
-        $character->map()->update([
-            'character_position_x' => $request->x,
-            'character_position_y' => $request->y,
-            'position_x'           => $this->mapPositionValue->fetchXPosition($character->map->character_position_x, $character->map->position_x),
-            'position_y'           => $this->mapPositionValue->fetchYPosition($character->map->character_position_y),
-        ]);
-
-        $character = $character->refresh();
-        
-        event(new MoveTimeOutEvent($character, $request->timeout, true));
-        event(new UpdateTopBarEvent($character));
-
-        event(new UpdateMapDetailsBroadcast($character->map, $character->user, $service));
 
         return response()->json([], 200);
     }
