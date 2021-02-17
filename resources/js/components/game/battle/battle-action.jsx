@@ -1,10 +1,12 @@
 import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 import Monster from './monster/monster';
 import Attack from './attack/attack';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
 import CraftingAction from '../crafting/crafting-action';
 import EnchantingAction from '../enchanting/enchanting-action';
+import moment from 'moment';
 
 export default class BattleAction extends React.Component {
 
@@ -241,7 +243,7 @@ export default class BattleAction extends React.Component {
 
   renderActions() {
     return (
-      <div className="col-md-10">
+      <>
         {this.state.isAdventuring
          ?
          <div className="alert alert-warning" role="alert">
@@ -250,38 +252,39 @@ export default class BattleAction extends React.Component {
          : 
          null
         }
-        <div className="form-group row">
-            <div className="col-md-8">
-                <select className="form-control monster-select" id="monsters" name="monsters"
-                  value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
-                  onChange={this.updateActions.bind(this)}
-                  disabled={this.state.character.is_dead || this.state.isAdventuring}>
-                    <option value="" key="0">Please select a monster</option>
-                    {this.monsterOptions()}
-                </select>
+        <Row>
+          <Col xs={12} sm={12} md={12} lg={6} xl={8}>
+            <select className="form-control monster-select" id="monsters" name="monsters"
+              value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
+              onChange={this.updateActions.bind(this)}
+              disabled={this.state.character.is_dead || this.state.isAdventuring}>
+                <option value="" key="0">Please select a monster</option>
+                {this.monsterOptions()}
+            </select>
+          </Col>
+          <Col xs={3} sm={3} md={3} lg={3} xl={1}>
+            <button className="btn btn-primary"
+              type="button"
+              disabled={this.state.monster !== 0 ? false : true}
+              onClick={this.fightAgain.bind(this)}
+            >
+              Again!
+            </button>
+          </Col>
+          <Col xs={6} sm={6} md={6} lg={3} xl={3}>
+            <div className="ml-4 mt-2">
+              <TimeOutBar
+                cssClass={'character-timeout'}
+                readyCssClass={'character-ready'}
+                forSeconds={this.state.timeRemaining}
+                timeRemaining={this.state.timeRemaining}
+                channel={'show-timeout-bar-' + this.props.userId}
+                eventClass={'Game.Core.Events.ShowTimeOutEvent'}
+              />
             </div>
-
-            <div className="col-md-1">
-              <button className="btn btn-primary"
-                type="button"
-                disabled={this.state.monster !== 0 ? false : true}
-                onClick={this.fightAgain.bind(this)}
-                >Again!</button>
-            </div>
-
-            <div className="col-md-3">
-              <div className="ml-4 mt-2">
-                <TimeOutBar
-                  cssClass={'character-timeout'}
-                  readyCssClass={'character-ready'}
-                  forSeconds={this.state.timeRemaining}
-                  timeRemaining={this.state.timeRemaining}
-                  channel={'show-timeout-bar-' + this.props.userId}
-                  eventClass={'Game.Core.Events.ShowTimeOutEvent'}
-                />
-              </div>
-            </div>
-        </div>
+          </Col>
+        </Row>
+        
         <CraftingAction
           isDead={this.state.character.is_dead}
           characterId={this.state.character.id}
@@ -294,6 +297,7 @@ export default class BattleAction extends React.Component {
           updateCanCraft={this.props.updateCanCraft}
           isAdventuring={this.state.isAdventuring}
         />
+        
         {
           this.props.showEnchanting
           ?
@@ -331,7 +335,7 @@ export default class BattleAction extends React.Component {
           }
           {this.battleMessages()}
         </div>
-      </div>
+      </>
     )
   }
 

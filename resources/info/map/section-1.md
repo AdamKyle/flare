@@ -6,6 +6,12 @@ The game comes with a interactive map.
 
 The above allows you to see where you are, respserented by the character pin drop on the map.
 
+> ### ATTN! 
+>
+> For mobile players you can still interact with the map, you may not be able to "tap" on locations
+> to bring up the modal to see details of that location, but you can always refer to the [locations]()
+> table to see what's at a specific location.
+
 You can drag this map around and as you move to the edges of the map, the map will scroll over or up, or down to show you where you are at all times.
 
 The blue ship icons repersent ports at which your character may set sail from. These are locations where you can access the market boards. More on this in the [Markets]() section.

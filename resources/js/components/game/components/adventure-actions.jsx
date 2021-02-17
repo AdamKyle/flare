@@ -1,4 +1,5 @@
 import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 import AdventureEmbark from './modals/adventure-embark';
 import TimeOutBar from '../timeout/timeout-bar';
 import CardTemplate from './templates/card-template';
@@ -120,7 +121,7 @@ export default class AdeventureActions extends React.Component {
   timeOutBar() {
     return (
       <TimeOutBar
-        cssClass={'float-right adventure-timeout-bar'}
+        cssClass={'float-left adventure-timeout-bar'}
         readyCssClass={'character-ready'}
         forSeconds={this.state.canAdventureAgainAt}
         timeRemaining={this.state.canAdventureAgainAt}
@@ -150,15 +151,35 @@ export default class AdeventureActions extends React.Component {
         }
 
         details.push(
-            <div className="row mb-2" key={adventure.id}>
-                <div className="col-md-2">{adventure.name}</div>
-                <div className="col-md-5">
-                    <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres || hasCollectedRewards || !this.props.canAdventure()} onClick={this.embarkShow.bind(this)}>Embark</button>
-                    <a href={'/adeventures/' + adventure.id} target="_blank" className="mr-2">Details</a>
-                    
-                    { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? <button className="mr-2 btn btn-sm btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel Adventure</button> : null : null }
-                    { foundAdventure !== null ? foundAdventure.adventure_id === adventure.id ? this.timeOutBar() : null : null }
-                </div>
+            <div key={adventure.id} className="mb-2">
+              <Row>
+                <Col xs={3} sm={3} lg={3} xl={1}>
+                  <a href={'/adeventures/' + adventure.id} target="_blank"> {adventure.name} </a>
+                </Col>
+                <Col xs={9} sm={9} lg={9} xl={11}>
+                    <Row>
+                      <Col xs={9} sm={6} lg={8} xl={2}>
+                        <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id} disabled={hasAdventureInProgres || hasCollectedRewards || !this.props.canAdventure()} onClick={this.embarkShow.bind(this)}>Embark</button>
+                        { 
+                          foundAdventure !== null ? 
+                            foundAdventure.adventure_id === adventure.id ? 
+                              <button className="mr-2 btn btn-sm btn-danger" data-adventure-id={adventure.id} onClick={this.cancelAdventure.bind(this)}>Cancel</button> 
+                            : null 
+                          : null 
+                        }
+                      </Col>
+                      <Col xs={3} sm={6} lg={4} xl={10}>
+                      { 
+                        foundAdventure !== null ? 
+                          foundAdventure.adventure_id === adventure.id ? 
+                            this.timeOutBar() 
+                          : null 
+                        : null 
+                      }
+                      </Col>
+                    </Row>
+                </Col>
+              </Row>
             </div>
         );
     });

@@ -51,21 +51,23 @@ export default class AdditionalCoreActionsDropDown extends React.Component {
 
     render() {
       return(
-          <Dropdown>
-            <Dropdown.Toggle variant="primary" id="dropdown-basic" size="sm" disabled={this.props.isDead || this.props.isAdventuring}>
-              Craft/Enchant
-            </Dropdown.Toggle>
+          <div className="mb-2">
+            <Dropdown>
+              <Dropdown.Toggle variant="primary" id="dropdown-basic" size="sm" disabled={this.props.isDead || this.props.isAdventuring}>
+                Craft/Enchant
+              </Dropdown.Toggle>
 
-            <Dropdown.Menu>
-            <Dropdown.Item onClick={this.addCraftingAction.bind(this)}>{this.state.showCrafting ? 'Remove Crafting' : 'Craft'}</Dropdown.Item>
-            <Dropdown.Item onClick={this.addEnchantingAction.bind(this)}>{this.state.showEnchanting ? 'Remove Enchanting' : 'Enchant'}</Dropdown.Item>
-            {this.state.showCrafting
-              ?
-              <Dropdown.Item onClick={this.changeType.bind(this)}>Change Type</Dropdown.Item>
-              : null
-            }
-            </Dropdown.Menu>
-          </Dropdown>
+              <Dropdown.Menu>
+              <Dropdown.Item onClick={this.addCraftingAction.bind(this)}>{this.state.showCrafting ? 'Remove Crafting' : 'Craft'}</Dropdown.Item>
+              <Dropdown.Item onClick={this.addEnchantingAction.bind(this)}>{this.state.showEnchanting ? 'Remove Enchanting' : 'Enchant'}</Dropdown.Item>
+              {this.state.showCrafting
+                ?
+                <Dropdown.Item onClick={this.changeType.bind(this)}>Change Type</Dropdown.Item>
+                : null
+              }
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
       );
     }
 }

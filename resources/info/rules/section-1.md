@@ -28,9 +28,9 @@ Racial slurs, attacks on other people for any reason including but **not limited
 
 Do not chat from your kingdom. This is not a hard rule, just a bit of advice. The only consequence will be people hunting for kingdoms.
 
-With that said your location in game is shown in chat as X,Y coordinates. There is no way to turn this off.
+With that said your location in game is shown in chat as X,Y coordinates. There are quest items that will turn this off, marking it as */*.
 
-Last but not least, no auction in chat. If you want to sell something go to the [market board]().
+Last but not least, no auction in chat. If you want to sell something go to the [market board](). Failure to head this rule can result in being silenced and then, for repeat offenders, banned.
 
 ## Character Names
 
@@ -49,7 +49,7 @@ Once this popup shows up, even if you logout and back in or refresh the page, th
 
 ## Chat Throttling
 
-A player may only send 25 messages every 2 minutes. Failure to heed this and the system will auto silence you for 5 minutes. If you are not logged in when you can speak again, and have the email settings enabled, you will be emailed.
+A player may only send 25 messages every 2 minutes. Failure to heed this and the system will auto silence you for 5 minutes. If you are not logged in when you can speak again, and have the email settings enabled, you will be emailed when you can speak again.
 
 ## Core Rules
 
@@ -63,7 +63,7 @@ A player may only send 25 messages every 2 minutes. Failure to heed this and the
 3. Do not ask for gold in chat, you want it? Earn it. No begging. This will get you silenced, followed by a ban for repeated offences.
 4. Taking advantage of game bugs, including accessing parts of the game you are not allowed to, and failure to report said bugs can and will get you banned.
 5. Hacking, Cheating, Scripting bots to play for you will also get you banned.
-6. Third party tools of any kind, example: IP spoofing to get around being banned will also get you banned (again in the case of the example).
+6. Third party tools of any kind will also get you banned.
 7. Scamming players will get you banned.
 
 

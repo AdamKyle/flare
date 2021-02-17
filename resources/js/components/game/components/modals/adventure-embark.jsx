@@ -65,20 +65,26 @@ export default class AdventureEmbark extends React.Component {
             <Modal.Title>{this.state.adventure.name}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <div className="alert alert-info" role="alert">
-              <h4 className="alert-heading">Before you set off.</h4>
-              <p>
-                Please make sure you have equipped any items you want for this adventure. <br />
-                Once started you cannot equip gear, you cannot craft, attack or move until the adventure is done<sup>*</sup>.
-              </p>
-              <p>
-                You are still able to manage your kingdoms. This will be done through a third party NPC called
-                an advisor.
-              </p>
-              <hr />
-              <p className="mb-0">Should you need additional help, please consider this resource on <a href="/information/adventure" target="_blank">adventureing</a>.</p>
-              <p className="text-muted" style={{fontSize: '12px'}}><sup>*</sup> You are free to logout. Any relevant details will be emailed to you should you have those settings enabled.</p>
-            </div>
+            <h4 className="alert-heading">Before you set off.</h4>
+            <p>
+              Please make sure you have equipped any items you want for this adventure. <br />
+              Once started you cannot do the following:
+            </p>
+            <p>
+              <ul>
+                <li>Craft/Enchant</li>
+                <li>Move/Set Sail or Teleport</li>
+                <li>Manage Equipment (Including equip, unequip or destroy)</li>
+                <li>Fight Monsters</li>
+                <li>Manage/Attack or Settle Kingdoms</li>
+                <li>Train Skills</li>
+                <li>Buy Items (From Shop or Market)</li>
+                <li>List or Sell Items (From Shop or Market)</li>
+              </ul>
+            </p>
+            <hr />
+            <p className="mb-0">Should you need additional help, please consider this resource on <a href="/information/adventure" target="_blank">adventureing</a>.</p>
+            <p className="text-muted" style={{fontSize: '12px'}}> You are free to logout. Any relevant details will be emailed to you should you have those settings enabled.</p>
             <div className="mt-2">
               <span className="text-muted"><strong>Total Levels</strong>: {this.state.adventure.levels}</span>
               <br />
@@ -86,7 +92,7 @@ export default class AdventureEmbark extends React.Component {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="danger" onClick={this.props.embarkClose}>
+            <Button variant="secondary" onClick={this.props.embarkClose}>
               Cancel
             </Button>
             <Button variant="primary" onClick={this.embark.bind(this)}>

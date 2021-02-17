@@ -1,6 +1,8 @@
 import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
 import { getServerMessage } from '../helpers/server_message';
+import moment from 'moment';
 
 export default class CraftingAction extends React.Component {
 
@@ -205,32 +207,33 @@ export default class CraftingAction extends React.Component {
               <div className="alert alert-success">You got new items to craft! Check the list.</div>
             </div>
           </div>
-          
         </div>
         
-        <div className="form-group row">
-          <div className="col-md-8">
+        <Row>
+          <Col xs={12} sm={12} md={8} lg={8} xl={8}>
             {this.renderCraftingDropDowns()}
-            
-          </div>
-          <div className="col-md-1">
-            {this.renderCraftingButton()}
-          </div>
-          <div className="col-md-3">
-            <div className="ml-4 mt-3">
-              {this.state.itemToCraft !== 0 ?
-                <TimeOutBar 
-                  cssClass={'character-timeout'}
-                  readyCssClass={'character-ready'}
-                  timeRemaining={this.state.timeRemaining}
-                  channel={'show-crafting-timeout-bar-' + this.props.userId}
-                  eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
-                />
-                : null
-              }
-            </div>
-          </div>
-        </div>
+          </Col>
+          <Col xs={12} sm={12} md={4} lg={4} xl={4}>
+            <Row>
+              <Col xs={4}>
+                {this.renderCraftingButton()}
+              </Col>
+              <Col xs={8}>
+                {
+                  this.state.itemToCraft !== 0 ?
+                    <TimeOutBar 
+                      cssClass={'crafting-timeout'}
+                      readyCssClass={'crafting-ready'}
+                      timeRemaining={this.state.timeRemaining}
+                      channel={'show-crafting-timeout-bar-' + this.props.userId}
+                      eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
+                    />
+                  : null
+                }
+              </Col>
+            </Row>
+          </Col>
+        </Row>
       </>
     )
   }

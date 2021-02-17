@@ -27,27 +27,41 @@
   margin-top: -10px;
   margin-left: -40px;
 
-  @media only screen and (max-width: 768px) {
-    margin-top: 10px;
-    margin-left: -40px;
+  .timer {
+    font-size: 12px;
   }
+}
+
+.crafting-timeout {
+  position: relative;
+  top: 5px;
+  left: -45px;
 
   .timer {
     font-size: 12px;
   }
 }
 
-.enchanting {
-  left: -20px !important;
+.enchanting-ready {
+  position: relative;
+  left: -20px;
+}
+
+.enchanting-timeout {
+  position: relative;
+  top: -10px;
+  left: -20px;
 }
 
 .character-ready {
   position: relative;
   left: -40px;
+}
 
-  @media only screen and (max-width: 768px) {
-    left: -20px;
-  }
+.crafting-ready {
+  position: relative;
+  top: 15px;
+  left: -45px;
 }
 
 .character-map-timeout {
@@ -61,6 +75,24 @@
 
 .adventure-timeout-bar {
   position: relative;
-  left: -160px;
+  left: -40px;
   top: -8px;
 }
+
+@include media-breakpoint-down(lg) {
+  .crafting-timeout {
+    top: 10px;
+    left: 20px;
+  }
+
+  .crafting-ready {
+    top: 15px;
+    left: 20px;
+  }
+
+  .character-timeout {
+    margin-right: 0px;
+  }
+}
+
+

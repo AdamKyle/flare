@@ -1,4 +1,5 @@
 import React                              from 'react';
+import {Row, Col}                         from 'react-bootstrap';
 import Draggable                          from 'react-draggable';
 import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
@@ -204,20 +205,12 @@ export default class Map extends React.Component {
   handleDrag(e, position) {
     const {x, y}     = position;
     const yBounds    = Math.sign(position.y);
-    const xBounds    = Math.sign(position.x);
     let bottomBounds = this.state.bottomBounds;
-    let rightBounds  = this.state.rightBounds;
 
     if (yBounds === -1) {
       bottomBounds += Math.abs(yBounds);
     } else {
       bottomBounds = 0;
-    }
-
-    if (xBounds === -1) {
-      rightBounds += Math.abs(xBounds);
-    } else {
-      rightBounds = 0;
     }
 
     this.setState({
@@ -446,7 +439,7 @@ export default class Map extends React.Component {
     }
 
     return (
-      <div className="card mb-4">
+      <div className="card mb-4 map-card">
         <div className="card-body">
           <div className="map-body">
             <Draggable
@@ -471,10 +464,18 @@ export default class Map extends React.Component {
          </div>
          <div className="character-position mt-2">
           <div className="mb-2 mt-2 clearfix">
-            <p className="float-left">Character X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
-            <button type="button" className="float-right btn btn-primary btn-sm" data-direction="teleport" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openTeleport.bind(this)}>Teleport</button>
-            { this.state.currentPort !== null ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
-            { !_.isEmpty(this.state.adventures) ? <button type="button" className="float-right btn btn-success mr-2 btn-sm" onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
+            <Row>
+              <Col xs={12} sm={12} md={4} lg={4} xl={4}>
+                <p className="text-left">X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
+              </Col>
+              <Col xs={12} sm={12} md={8} lg={8} xl={8}>
+                <div className="push-right">
+                { !_.isEmpty(this.state.adventures) ? <button type="button" className=" btn btn-success mr-2 btn-sm " onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
+                { this.state.currentPort !== null ? <button type="button" className=" btn btn-success mr-2 btn-sm " disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
+                <button type="button" className="btn btn-primary btn-sm mr-2 " data-direction="teleport" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openTeleport.bind(this)}>Teleport</button>
+                </div>
+              </Col>
+            </Row>
           </div>
          </div>
          <hr />

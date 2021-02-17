@@ -24,11 +24,11 @@ With that said, some players might be put off by the “not everyone is limited�
 
 But that doesn’t mean you are less then. There is no end game. You make of it what you want. If you want to rule the markets, you will craft items, enchant them and sell them.
 
-If you want to rule the land, you’ll settle kingdoms and take your opponents kingdoms. There is faction system here, no clans. It’s every man, woman and child for themselves.
+If you want to rule the land, you’ll settle kingdoms and take your opponents kingdoms. There is no faction system here, no clans. It’s every man, woman and child for themselves. (Read more about [kingdoms]()).
 
 If you want to just find the longest running adventure and run that over and over again for the loot to sell on the market, then go ahead.
 
-There is something for everyone, it just depends on what you want to do? Run the markets? Run the kingdoms? Go on every adventure? You can do it all.
+There is something for everyone, it just depends on what you want to do. Run the markets? Own all the kingdoms? Go on every adventure? You can do it all.
 
 > ### ATTN!
 >
@@ -59,8 +59,14 @@ We will not spam you with email.
 Email is only sent for:
 
 - Bans
-- Adventure (Completion/Failure) Updates (if not signed in when it completes)
-- Being Able To talk Again After Being Silenced (if not signed in when you can talk again)
+- Unban Request responses.
+- Password resets or Security question resets.
+- Adventure (Completion/Failure) Updates.
+- Being Able To talk Again After Being Silenced.
+- Kingdom Management such as building upgrades, unit queues finishing and being attacked.
+- If an item, affix or character class core stat changes.
+
+Emails are only sent if you are not online at the time of any of this happening. Some of these you can turn off in the [settings]() section.
 
 ## FAQ
 
@@ -68,11 +74,20 @@ Email is only sent for:
 
 - **How do you make money, are there adds?**: There are no adds, I make no money off this game what so ever. It is completely open source. In order to pay for server costs, I have a job and a credit card.
 
-- **How do I get rid of [time gates](/information/time-gates)**: You don't. This is how we slow you down a bit and stop you from overwhelming the server. There are some quest items that will reduce the time out by 25%, how ever you'll have to earn those. You cannot buy them.
+- **How do I get rid of [time gates](/information/time-gates)**: You don't. This is how we slow you down a bit and stop you from overwhelming the server. There are some quest items that you can obtain by playing the game that will reduce time gates by a small degree.
 
 - **What Browsers are supported?**: Anything other than any version of Internet Explorer. This game will never support Internet Explorer, but we do support Edge. (Javascript is a must)
 
-- **Mobile looks pretty broken**: My main priority was to make sure the game aspect is functional in mobile. Other pages may be broken. These are being fixed. Information section and the home page as well as releases, login, registration and other non in game forms are all mobile responsive.
+- **Can I play on mobile?**: Of course! How ever note a couple of things:
+  - For iPad Pro users Please play in portrait mode. The map is too squished in landscape mode.
+  - We only support devices listed in Google Chromes Console Option. All iPhones and most android devices
+    are supported.
+  
+  > ### ATNN!
+  >
+  > While the game works on mobile devices, some aspects of the map may not work, such as being able to tap
+  > on the locations to view their details. You can still drag the map around and teleport, move and set
+  > sail. This game is more optimized for desktop but mobile is an option. You will need a decent internet connection.
 
 
 

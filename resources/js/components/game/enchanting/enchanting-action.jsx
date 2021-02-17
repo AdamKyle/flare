@@ -1,6 +1,7 @@
 import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
-import { getServerMessage } from '../helpers/server_message';
+import moment from 'moment';
 
 export default class EnchantingAction extends React.Component {
 
@@ -316,80 +317,72 @@ export default class EnchantingAction extends React.Component {
             </div>
           </div>  
         </div>
-        
-        <div className="form-group row">
-          <div className="col-md-3">
-            <select 
-              className="form-control mt-2" id="crafting" name="crafting"
-              value={this.state.itemToEnchant !== null ? this.state.itemToEnchant : 0}
-              onChange={this.setItemToEnchant.bind(this)}
-              disabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
-            >
-              <option key={'item-0'} value="0">Please Select Item</option>
-              {this.buildInventoryOptions()}
-            </select>
-          </div>
-          { 
-            this.state.affixList.filter((a) => a.type === 'prefix').length > 0
-            ?
-            <div className={this.state.affixList.filter((a) => a.type === 'suffix').length === 0 ? "col-md-4" : "col-md-3"}>
-              <select 
-                className="form-control mt-2" id="crafting" name="crafting"
-                value={this.state.prefixId !== null ? this.state.prefixId : 0}
-                onChange={this.setPrefixId.bind(this)}
-                disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
-              >
-                <option key={'prefix-0'} value="0">Please Select Prefix</option>
-                {this.buildPrefixOptions()}
-              </select>
+
+        <Row>
+          <Col lg={12} xl={8}>
+            <Row>
+              <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                <select 
+                  className="form-control mt-2" id="crafting" name="crafting"
+                  value={this.state.itemToEnchant !== null ? this.state.itemToEnchant : 0}
+                  onChange={this.setItemToEnchant.bind(this)}
+                  disabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
+                >
+                  <option key={'item-0'} value="0">Please Select Item</option>
+                  {this.buildInventoryOptions()}
+                </select>
+              </Col>
+              <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                <select 
+                  className="form-control mt-2" id="crafting" name="crafting"
+                  value={this.state.prefixId !== null ? this.state.prefixId : 0}
+                  onChange={this.setPrefixId.bind(this)}
+                  disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
+                >
+                  <option key={'prefix-0'} value="0">Please Select Prefix</option>
+                  {this.buildPrefixOptions()}
+                </select>
+              </Col>
+              <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                <select 
+                  className="form-control mt-2" id="crafting" name="crafting"
+                  value={this.state.suffixId !== null ? this.state.suffixId : 0}
+                  onChange={this.setSuffixId.bind(this)}
+                  disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
+                >
+                  <option key={'affix-0'} value="0">Please Select Suffix</option>
+                  {this.buildSuffixOptions()}
+                </select>
+              </Col>
+            </Row>
+          </Col>
+          <Col lg={12} xl={4}>
+            <Row>
+              <Col xs={3} sm={3} md={3} lg={3} xl={3}>
+                {this.renderEnchantingButton()}
+              </Col>
+              <Col xs={6} sm={6} md={6} lg={6} xl={6}>
+                <div className="ml-4 mt-3"> 
+                  <TimeOutBar
+                    turnOffFloat={true}
+                    cssClass={'enchanting-timeout'}
+                    readyCssClass={'enchanting-ready'}
+                    timeRemaining={this.state.timeRemaining}
+                    channel={'show-crafting-timeout-bar-' + this.props.userId}
+                    eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
+                  />
+                </div>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12}>
+            <div class="mt-2">
+              <strong>Cost: </strong> {this.state.cost}
             </div>
-            : null
-          }
-          {
-            this.state.affixList.filter((a) => a.type === 'suffix').length > 0
-            ?
-            <div className={this.state.affixList.filter((a) => a.type === 'prefix').length === 0 ? "col-md-4" : "col-md-2"}>
-              <select 
-                className="form-control mt-2" id="crafting" name="crafting"
-                value={this.state.suffixId !== null ? this.state.suffixId : 0}
-                onChange={this.setSuffixId.bind(this)}
-                disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
-              >
-                <option key={'affix-0'} value="0">Please Select Suffix</option>
-                {this.buildSuffixOptions()}
-              </select>
-            </div>
-            : null
-          }
-          <div className="col-md-1">
-            {this.renderEnchantingButton()}
-          </div>
-          <div className="col-md-3">
-            <div className="ml-4 mt-3">
-              {this.state.itemToCraft !== 0 ?
-                <TimeOutBar
-                  turnOffFloat={true}
-                  cssClass={'character-timeout enchanting'}
-                  readyCssClass={'character-ready enchanting'}
-                  timeRemaining={this.state.timeRemaining}
-                  channel={'show-crafting-timeout-bar-' + this.props.userId}
-                  eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
-                />
-                : null
-              }
-            </div>
-          </div>
-        </div>
-        {
-          this.state.cost !== 0
-          ?
-          <div className="form-group row">
-            <div className="col-md-12 ml-3">
-                <strong>Cost: </strong> {this.state.cost}
-            </div>
-          </div>
-          : null
-        }
+          </Col>
+        </Row>
       </>
     )
   }

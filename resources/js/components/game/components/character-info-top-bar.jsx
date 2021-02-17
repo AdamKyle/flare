@@ -1,7 +1,8 @@
 import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 import CardTemplate from './templates/card-template';
 import ForcedNameChange from './modals/forced-name-change';
-import ContentLoader, { Facebook } from 'react-content-loader';
+import ContentLoader from 'react-content-loader';
 
 export default class CharacterInfoTopBar extends React.Component {
 
@@ -61,59 +62,59 @@ export default class CharacterInfoTopBar extends React.Component {
 
     return (
       <CardTemplate otherClasses="character-top-bar mb-4" loadingStatus={this.state.isLoading}>
-        <div className="row">
-          <div className="col-md-3">
+        <Row>
+          <Col md={12} lg={12} xl={3}>
             <dl>
               <dt><strong>Name</strong>:</dt>
               <dd>{sheet.name}</dd>
             </dl>
-          </div>
-          <div className="col-md-3">
+          </Col>
+          <Col md={12} lg={12} xl={3}>
             <dl>
               <dt><strong>Race</strong>:</dt>
               <dd>{sheet.race}</dd>
             </dl>
-          </div>
-          <div className="col-md-3">
+          </Col>
+          <Col md={12} lg={12} xl={3}>
             <dl>
               <dt><strong>Class</strong>:</dt>
               <dd>{sheet.class}</dd>
-            </dl>
-          </div>
-          <div className="col-md-3">
+            </dl>           
+          </Col>
+          <Col md={12} lg={12} xl={3}>
             <dl>
               <dt><strong>Gold</strong>:</dt>
               <dd>{sheet.gold.toLocaleString('en-US', {maximumFractionDigits:0})}</dd>
             </dl>
-          </div>
-        </div>
+          </Col>
+        </Row>
         <hr />
-        <div className="row">
-          <div className="col-md-2">
+        <Row>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Level</strong>:</dt>
               <dd>{sheet.level}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>AC</strong>:</dt>
               <dd>{sheet.ac}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Health</strong>:</dt>
               <dd>{sheet.health}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Attack</strong>:</dt>
               <dd>{sheet.attack}</dd>
             </dl>
-          </div>
-          <div className="col-md-4">
+          </Col>
+          <Col md={12} lg={12} xl={4}>
             <dl>
               <dt><strong>XP</strong>:</dt>
               <dd>
@@ -128,40 +129,40 @@ export default class CharacterInfoTopBar extends React.Component {
                 </div>
               </dd>
             </dl>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-2">
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Strength</strong>:</dt>
               <dd>{sheet.str_modded}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Durability</strong>:</dt>
               <dd>{sheet.dur_modded}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Dexterity</strong>:</dt>
               <dd>{sheet.dex_modded}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Intelligence</strong>:</dt>
               <dd>{sheet.int_modded}</dd>
             </dl>
-          </div>
-          <div className="col-md-2">
+          </Col>
+          <Col md={12} lg={12} xl={4}>
             <dl>
               <dt><strong>Charisma</strong>:</dt>
               <dd>{sheet.chr_modded}</dd>
             </dl>
-          </div>
-        </div>
+          </Col>
+        </Row>
 
         { this.state.forceNameChange
           ? <ForcedNameChange characterId={this.props.characterId}/> : null

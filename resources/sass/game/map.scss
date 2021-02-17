@@ -67,3 +67,17 @@
   top: 5px;
   left: 10px;
 }
+
+@include media-breakpoint-down(md) {
+  .map-card {
+    width: 75%;
+    margin: 0 auto;
+  }
+}
+
+@include media-breakpoint-down(sm) {
+  .map-card {
+    width: 100%;
+    margin: 0;
+  }
+}

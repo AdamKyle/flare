@@ -1,8 +1,9 @@
-import React, { Children, isValidElement, cloneElement } from 'react';
+import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 import BattleAction from '../battle/battle-action';
 import AdditionalCoreActionsDropDown from './additional-core-actions-dropdown';
 import CardTemplate from './templates/card-template';
-import ContentLoader, { Facebook } from 'react-content-loader';
+import ContentLoader from 'react-content-loader';
 
 export default class CoreActionsSection extends React.Component {
 
@@ -92,8 +93,8 @@ export default class CoreActionsSection extends React.Component {
 
     return (
       <CardTemplate>
-        <div className="row justify-content-center">
-          <div className="col-md-2">
+        <Row>
+          <Col xs={12} sm={12} md={12} lg={12} xl={2}>
             <AdditionalCoreActionsDropDown
               isDead={this.state.isDead}
               isAdventuring={this.state.isAdventuring}
@@ -104,37 +105,39 @@ export default class CoreActionsSection extends React.Component {
             />
             {
               this.props.kingdomData.can_attack ?
-              <button className="btn btn-success btn-sm mt-2">Attack Kingdom</button> 
+              <button className="btn btn-success btn-sm mb-2">Attack Kingdom</button> 
               : null
             }
 
             {
               this.props.kingdomData.can_settle ?
-              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal} className="btn btn-success btn-sm mt-2">Settle Kingdom</button> 
+              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal} className="btn btn-success btn-sm mb-2">Settle Kingdom</button> 
               : null
             }
 
             {
               this.props.kingdomData.is_mine ?
-              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={() => this.props.openKingdomManagement(true)} className="btn btn-success btn-sm mt-2">Manage Kingdom</button> 
+              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={() => this.props.openKingdomManagement(true)} className="btn btn-success btn-sm mb-2">Manage Kingdom</button> 
               : null
             }
-          </div>
-          <BattleAction
-            userId={this.props.userId}
-            character={this.state.character}
-            monsters={this.state.monsters}
-            showCrafting={this.state.showCrafting}
-            showEnchanting={this.state.showEnchanting}
-            isDead={this.state.isDead}
-            shouldChangeCraftingType={this.state.changeCraftingType}
-            isCharacterDead={this.characterIsDead.bind(this)}
-            isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
-            changeCraftingType={this.changeCraftingType.bind(this)}
-            updateCanCraft={this.updateCanCraft.bind(this)}
-            canAttack={this.props.canAttack}
-          />
-        </div>
+          </Col>
+          <Col xs={12} sm={12} md={12} lg={12} xl={10}>
+            <BattleAction
+              userId={this.props.userId}
+              character={this.state.character}
+              monsters={this.state.monsters}
+              showCrafting={this.state.showCrafting}
+              showEnchanting={this.state.showEnchanting}
+              isDead={this.state.isDead}
+              shouldChangeCraftingType={this.state.changeCraftingType}
+              isCharacterDead={this.characterIsDead.bind(this)}
+              isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
+              changeCraftingType={this.changeCraftingType.bind(this)}
+              updateCanCraft={this.updateCanCraft.bind(this)}
+              canAttack={this.props.canAttack}
+            />
+          </Col>
+        </Row>
       </CardTemplate>
     );
   }

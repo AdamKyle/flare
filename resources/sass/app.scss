@@ -118,6 +118,24 @@ dd {
   min-height: 100vh
 }
 
+.push-right {
+  float: right;
+  margin-right: -8px;
+}
+
+@include media-breakpoint-down(sm) {
+  .push-right {
+    float: left;
+    margin-right: 0px;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .page-wrapper {
+    padding-top: 0px !important;
+  }
+}
+
 .page-wrapper-minimum {
   margin-left: 0px !important;
 }

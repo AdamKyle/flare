@@ -63,19 +63,17 @@ export default class PortLocationActions extends React.Component {
         cardTitle="Set Sail"
         close={this.hidePort.bind(this)}
       >
-        <div className="row">
-          <SetSail 
-            characterIsDead={this.state.portDetails.characterIsDead}
-            currentPort={this.state.portDetails.currentPort} 
-            portList={this.state.portDetails.portList} 
-            characterId={this.state.portDetails.characterId} 
-            updatePlayerPosition={this.updatePlayerPosition.bind(this)}
-            canMove={this.state.portDetails.canMove}
-            userId={this.props.userId}
-            updatePlayerPosition={this.props.updatePlayerPosition}
-            updateAdventure={this.props.updateAdventure}
-          />
-        </div>
+        <SetSail 
+          characterIsDead={this.state.portDetails.characterIsDead}
+          currentPort={this.state.portDetails.currentPort} 
+          portList={this.state.portDetails.portList} 
+          characterId={this.state.portDetails.characterId} 
+          updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+          canMove={this.state.portDetails.canMove}
+          userId={this.props.userId}
+          updatePlayerPosition={this.props.updatePlayerPosition}
+          updateAdventure={this.props.updateAdventure}
+        />
       </CardTemplate>
     )
   }

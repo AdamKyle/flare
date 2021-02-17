@@ -1,4 +1,5 @@
 import React from 'react';
+import {Row, Col} from 'react-bootstrap';
 
 export default class SetSail extends React.Component {
 
@@ -124,9 +125,9 @@ export default class SetSail extends React.Component {
 
   render() {
     return (
-      <>
-        <div className="col-md-6">
-          <dl>
+      <Row>
+        <Col xs={12} sm={12} md={12} lg={12} xl={6}>
+          <dl className="mb-2">
             <dt>Name:</dt>
             <dd>{this.state.currentPort.name}</dd>
             <dt>X/Y:</dt>
@@ -139,11 +140,11 @@ export default class SetSail extends React.Component {
               </select>
             </dd>
           </dl>
-        </div>
-        <div className="col-md-6">
+        </Col>
+        <Col xs={12} sm={12} md={12} lg={12} xl={6}>
           {this.showPortDetails()}
-        </div>
-      </>
+        </Col>
+      </Row>
     );
   }
 }
