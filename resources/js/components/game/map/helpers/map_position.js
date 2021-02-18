@@ -16,7 +16,7 @@ export const getNewXPosition = (characterX, mapPositionX) => {
   }
 
   if (characterX > 368) {
-    return -25;
+    return -75;
   }
 
   return mapPositionX;
