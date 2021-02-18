@@ -205,7 +205,9 @@ export default class Map extends React.Component {
   handleDrag(e, position) {
     const {x, y}     = position;
     const yBounds    = Math.sign(position.y);
+    const xBounds    = Math.sign(position.x);
     let bottomBounds = this.state.bottomBounds;
+    let rightBounds  = this.state.rightBounds;
 
     if (yBounds === -1) {
       bottomBounds += Math.abs(yBounds);
@@ -213,9 +215,16 @@ export default class Map extends React.Component {
       bottomBounds = 0;
     }
 
+    if (xBounds === -1) {
+      rightBounds += Math.abs(xBounds);
+    } else {
+      rightBounds = 0;
+    }
+
     this.setState({
       controlledPosition: {x, y},
       bottomBounds: bottomBounds,
+      rightBounds: rightBounds,
     });
   }
 
@@ -282,7 +291,7 @@ export default class Map extends React.Component {
       return getServerMessage('cannot_move_down');
     }
 
-    if (x > 386) {
+    if (x > 480) {
       return getServerMessage('cannot_move_right');
     }
 
@@ -444,7 +453,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
                position={this.state.controlledPosition}
-               bounds={{top: -160, left: -75, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+               bounds={{top: -160, left: -100, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
                handle=".handle"
                defaultPosition={{x: 0, y: 0}}
                grid={[16, 16]}

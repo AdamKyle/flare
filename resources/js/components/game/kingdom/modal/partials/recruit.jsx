@@ -7,16 +7,16 @@ export default class Recruit extends React.Component {
         super(props);
 
         this.state = {
-            max: this.props.currentPopulation,
+            max: Math.round(this.props.currentPopulation / this.props.unit.required_population),
             value: 0,
             canRecruit: false,
         }
     }
 
-    componentDidUpdate() {
-        if (this.props.currentPopulation !== this.state.max) {
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.max !== this.state.max) {
             this.setState({
-                max: this.props.currentPopulation,
+                max: Math.round(this.props.currentPopulation / this.props.unit.required_population),
                 value: 0,
             });
         }

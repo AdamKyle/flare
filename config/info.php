@@ -78,6 +78,7 @@ return [
             'insert_before_table' => null,
         ]
     ],
+    'kingdoms' => [],
     'time-gates' => [],
     'rules' => [],
     'monsters' => [

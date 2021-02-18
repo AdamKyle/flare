@@ -13,11 +13,6 @@ export default class KingdomBuildings extends React.Component {
                 sortable: true
             },
             {
-                key: "level",
-                text: "Level",
-                sortable: true
-            },
-            {
                 key: "attack",
                 text: "Attack",
                 sortable: true

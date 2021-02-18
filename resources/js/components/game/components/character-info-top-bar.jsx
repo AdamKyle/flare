@@ -124,7 +124,7 @@ export default class CharacterInfoTopBar extends React.Component {
                     aria-valuenow={sheet.xp} aria-valuemin="0"
                     aria-valuemax={sheet.xp_next}
                   >
-                    {sheet.xp}
+                    {Math.round(sheet.xp)}
                   </div>
                 </div>
               </dd>
