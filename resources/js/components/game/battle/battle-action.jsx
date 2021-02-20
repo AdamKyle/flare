@@ -31,10 +31,10 @@ export default class BattleAction extends React.Component {
       isAdventuring: false,
     }
 
-    this.timeOut         = Echo.private('show-timeout-bar-' + this.props.userId);
+    //this.timeOut         = Echo.private('show-timeout-bar-' + this.props.userId);
     this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
-    this.attackUpdate    = Echo.private('update-character-attack-' + this.props.userId);
-    this.isDead          = Echo.private('character-is-dead-' + this.props.userId);
+    //this.attackUpdate    = Echo.private('update-character-attack-' + this.props.userId);
+    //this.isDead          = Echo.private('character-is-dead-' + this.props.userId);
     this.adventureLogs   = Echo.private('update-adventure-logs-' + this.props.userId);
   }
 
@@ -55,26 +55,6 @@ export default class BattleAction extends React.Component {
       this.props.canAttack(this.state.canAttack);
     });
 
-    this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
-      let character = _.cloneDeep(this.state.character);
-
-      character.is_dead = event.isDead;
-
-      this.props.isCharacterDead(event.isDead);
-
-      this.setState({
-        character: character,
-      });
-    });
-
-    this.timeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
-      this.setState({
-        canAttack:     event.canAttack,
-      }, () => {
-        this.props.canAttack(this.state.canAttack);
-      });
-    });
-
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       const character = this.state.character;
 
@@ -82,21 +62,8 @@ export default class BattleAction extends React.Component {
       character.attack       =  event.characterSheet.attack;
       character.health       =  event.characterSheet.health;
       character.gold         =  event.characterSheet.gold;
-      character.can_attack   =  this.state.character.can_attack;
-      character.id           =  this.state.character.id;
-      character.name         =  this.state.character.name;
-      character.show_message =  this.state.character.show_message;
-      character.skills       =  this.state.character.skills;
 
       this.setState({character: character});
-    });
-
-    this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event) => {
-      this.setState({
-        character: event.attack,
-        characterMaxHealth: event.attack.health,
-        showMessage: false,
-      });
     });
 
     this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
@@ -129,6 +96,8 @@ export default class BattleAction extends React.Component {
       monsterMaxHealth: health,
       monsterCurrentHealth: health,
       battleMessages: [],
+    }, () => {
+      this.props.setMonster(this.state.monster);
     });
   }
 
@@ -138,63 +107,8 @@ export default class BattleAction extends React.Component {
       monsterMaxHealth: this.state.monsterMaxHealth,
       monsterCurrentHealth: this.state.monsterMaxHealth,
       battleMessages: [],
-    });
-  }
-
-  attack() {
-    if (this.state.monster === null) {
-      return getServerMessage('no_monster');
-    }
-
-    if (!this.state.canAttack) {
-      return getServerMessage('cant_attack');
-    }
-
-    const attack = new Attack(
-      this.state.character,
-      this.state.monster,
-      this.state.characterCurrentHealth,
-      this.state.monsterCurrentHealth
-    );
-
-    const state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
-
-    this.setState(state);
-
-    if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
-      axios.post('/api/battle-results/' + this.state.character.id, {
-        is_character_dead: state.characterCurrentHealth <= 0,
-        is_defender_dead: state.monsterCurrentHealth <= 0,
-        defender_type: 'monster',
-        monster_id: this.state.monster.id,
-      }).then((result) => {
-        let health = state.characterCurrentHealth;
-
-        if (health >= 0) {
-          health = this.state.characterMaxHealth;
-        }
-
-        this.setState({
-          characterCurrentHealth: health,
-          canAttack: false,
-        });
-      });
-    }
-  }
-
-  revive() {
-    if (!this.state.canAttack) {
-      return getServerMessage('cant_attack');
-    }
-    
-    axios.post('/api/battle-revive/' + this.state.character.id).then((result) => {
-      this.setState({
-        character: result.data.character,
-        characterMaxHealth: result.data.character.health,
-        characterCurrentHealth: result.data.character.health,
-      }, () => {
-        this.props.isCharacterDead(result.data.character.is_dead);
-      });
+    }, () => {
+      this.props.setMonster(this.state.monster);
     });
   }
 
@@ -204,50 +118,13 @@ export default class BattleAction extends React.Component {
     });
   }
 
-  healthMeters() {
-    if (this.state.monsterCurrentHealth <= 0) {
-      return null;
-    }
-
-    let characterCurrentHealth = 0;
-
-    if (this.state.characterCurrentHealth !== 0 && this.state.characterMaxHealth !== 0) {
-      characterCurrentHealth = (this.state.characterCurrentHealth / this.state.characterMaxHealth) * 100;
-    }
-
-    const monsterCurrentHealth   = (this.state.monsterCurrentHealth / this.state.monsterMaxHealth) * 100;
-
-    return (
-      <div className="health-meters mb-2 mt-2">
-        <div className="progress character mb-2">
-          <div className="progress-bar character-bar" role="progressbar"
-            style={{width: characterCurrentHealth + '%'}}
-            aria-valuenow={this.state.characterCurrentHealth} aria-valuemin="0"
-            aria-valuemax={this.state.characterMaxHealth}>{this.state.character.name}</div>
-        </div>
-        <div className="progress monster mb-2">
-          <div className="progress-bar monster-bar" role="progressbar"
-            style={{width: monsterCurrentHealth + '%'}}
-            aria-valuenow={this.state.monsterCurrentHealth} aria-valuemin="0"
-            aria-valuemax={this.state.monsterMaxHealth}>{this.state.monster.name}</div>
-        </div>
-      </div>
-    );
-  }
-
-  battleMessages() {
-    return this.state.battleMessages.map((message) => {
-      return <div key={message.message}><span className="battle-message">{message.message}</span> <br /></div>
-    });
-  }
-
   renderActions() {
     return (
       <>
         {this.state.isAdventuring
          ?
          <div className="alert alert-warning" role="alert">
-          You are currently adventuring and cannot fight any monsters or craft/enchant.
+          You are currently adventuring and cannot fight any monsters or craft/enchant or manage kingdoms.
         </div>
          : 
          null
@@ -284,64 +161,13 @@ export default class BattleAction extends React.Component {
             </div>
           </Col>
         </Row>
-        
-        <CraftingAction
-          isDead={this.state.character.is_dead}
-          characterId={this.state.character.id}
-          showCrafting={this.props.showCrafting}
-          shouldChangeCraftingType={this.props.shouldChangeCraftingType}
-          changeCraftingType={this.props.changeCraftingType}
-          userId={this.props.userId}
-          characterGold={this.state.character.gold}
-          timeRemaining={this.props.character.can_craft_again_at}
-          updateCanCraft={this.props.updateCanCraft}
-          isAdventuring={this.state.isAdventuring}
-        />
-        
-        {
-          this.props.showEnchanting
-          ?
-          <EnchantingAction
-            isDead={this.state.character.is_dead}
-            characterId={this.state.character.id}
-            showEnchanting={this.props.showEnchanting}
-            shouldChangeCraftingType={this.props.shouldChangeCraftingType}
-            changeCraftingType={this.props.changeCraftingType}
-            userId={this.props.userId}
-            characterGold={this.state.character.gold}
-            timeRemaining={this.props.character.can_craft_again_at}
-            updateCanCraft={this.props.updateCanCraft}
-            isAdventuring={this.state.isAdventuring}
-          />
-          : null
-        }
-        <hr />
-        <div className="battle-section text-center">
-          {this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead
-            ?
-            <>
-              <button className="btn btn-primary" onClick={this.attack.bind(this)} disabled={this.state.isAdventuring}>Attack</button>
-              {this.healthMeters()}
-            </>
-            : null
-          }
-          {this.state.character.is_dead
-            ? 
-            <>
-            <button className="btn btn-primary" onClick={this.revive.bind(this)}>Revive</button>
-            <p className="mt-3">You are dead. Click revive to live again.</p>
-            </>
-            : null
-          }
-          {this.battleMessages()}
-        </div>
       </>
     )
   }
 
   render() {
     return (
-      <>{this.state.isLoading ? 'Loading please wait ..' : this.renderActions() }</>
+      <>{this.state.isLoading ? null : this.renderActions() }</>
     )
   }
 }

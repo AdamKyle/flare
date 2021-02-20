@@ -378,7 +378,7 @@ export default class EnchantingAction extends React.Component {
         </Row>
         <Row>
           <Col xs={12}>
-            <div class="mt-2">
+            <div className="mt-2">
               <strong>Cost: </strong> {this.state.cost}
             </div>
           </Col>

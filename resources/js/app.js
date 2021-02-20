@@ -18,5 +18,9 @@ require('../vendor/monster/theme/js/custom.js');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-require('./components/game/game');
+require('./components/game');
+require('./components/admin-chat');
+require('./components/adventure-menue');
+require('./components/notification-center');
+require('./components/refresh');
 require('./components/marketboard/board');

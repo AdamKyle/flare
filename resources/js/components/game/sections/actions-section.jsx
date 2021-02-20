@@ -1,11 +1,14 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
-import BattleAction from '../battle/battle-action';
-import AdditionalCoreActionsDropDown from './additional-core-actions-dropdown';
-import Card from './templates/card';
 import ContentLoader from 'react-content-loader';
+import BattleAction from '../battle/battle-action';
+import AdditionalCoreActionsDropDown from '../components/additional-core-actions-dropdown';
+import Card from '../components/templates/card';
+import CraftingAction from '../crafting/crafting-action';
+import EnchantingAction from '../enchanting/enchanting-action';
+import FightSection from './fight-section';
 
-export default class CoreActionsSection extends React.Component {
+export default class ActionsSection extends React.Component {
 
   constructor(props) {
     super(props);
@@ -20,6 +23,7 @@ export default class CoreActionsSection extends React.Component {
       character: null,
       monsters: null,
       canCraft: true,
+      monster: null,
     };
   }
 
@@ -76,13 +80,17 @@ export default class CoreActionsSection extends React.Component {
     });
   }
 
-  render() {
+  setMonster(monster) {
+      this.setState({
+          monster: monster
+      });
+  }
 
+  render() {
     if (this.state.isLoading) {
       return (
         <Card>
           <ContentLoader viewBox="0 0 380 30">
-            {/* Only SVG shapes */}
             <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
             <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
             <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
@@ -124,7 +132,7 @@ export default class CoreActionsSection extends React.Component {
           <Col xs={12} sm={12} md={12} lg={12} xl={10}>
             <BattleAction
               userId={this.props.userId}
-              character={this.state.character}
+              character={this.state.character}x
               monsters={this.state.monsters}
               showCrafting={this.state.showCrafting}
               showEnchanting={this.state.showEnchanting}
@@ -134,6 +142,39 @@ export default class CoreActionsSection extends React.Component {
               isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
               changeCraftingType={this.changeCraftingType.bind(this)}
               updateCanCraft={this.updateCanCraft.bind(this)}
+              setMonster={this.setMonster.bind(this)}
+              canAttack={this.props.canAttack}
+            />
+            <CraftingAction
+              isDead={this.state.isDead}
+              characterId={this.state.character.id}
+              showCrafting={this.state.showCrafting}
+              shouldChangeCraftingType={this.state.changeCraftingType}
+              changeCraftingType={this.changeCraftingType.bind(this)}
+              userId={this.props.userId}
+              characterGold={this.state.character.gold}
+              timeRemaining={this.state.character.can_craft_again_at}
+              updateCanCraft={this.updateCanCraft.bind(this)}
+              isAdventuring={this.state.isAdventuring}
+            />
+            <EnchantingAction
+              isDead={this.state.character.is_dead}
+              characterId={this.state.character.id}
+              showEnchanting={this.state.showEnchanting}
+              shouldChangeCraftingType={this.state.changeCraftingType}
+              changeCraftingType={this.changeCraftingType.bind(this)}
+              userId={this.props.userId}
+              characterGold={this.state.character.gold}
+              timeRemaining={this.state.character.can_craft_again_at}
+              updateCanCraft={this.updateCanCraft.bind(this)}
+              isAdventuring={this.state.isAdventuring}
+            />
+            <FightSection
+              character={this.state.character}
+              monster={this.state.monster}
+              userId={this.props.userId}
+              isCharacterDead={this.characterIsDead.bind(this)}
+              setMonster={this.setMonster.bind(this)}
               canAttack={this.props.canAttack}
             />
           </Col>

@@ -1,10 +1,11 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
-import CardTemplate from './templates/card-template';
-import ForcedNameChange from './modals/forced-name-change';
 import ContentLoader from 'react-content-loader';
+import Card from '../components/templates/card';
+import ForcedNameChange from './modals/forced-name-change';
 
-export default class CharacterInfoTopBar extends React.Component {
+
+export default class CharacterInfoTopSection extends React.Component {
 
   constructor(props) {
     super(props);
@@ -45,14 +46,13 @@ export default class CharacterInfoTopBar extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <CardTemplate>
-          <ContentLoader viewBox="0 0 380 30">
-            {/* Only SVG shapes */}    
+        <Card>
+          <ContentLoader viewBox="0 0 380 30">    
             <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
             <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
             <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
           </ContentLoader>
-        </CardTemplate>
+        </Card>
       );
     }
 
@@ -61,7 +61,7 @@ export default class CharacterInfoTopBar extends React.Component {
     const xpValue = sheet.xp / sheet.xp_next * 100;
 
     return (
-      <CardTemplate otherClasses="character-top-bar mb-4" loadingStatus={this.state.isLoading}>
+      <Card otherClasses="character-top-bar mb-4" loadingStatus={this.state.isLoading}>
         <Row>
           <Col md={12} lg={12} xl={3}>
             <dl>
@@ -164,10 +164,12 @@ export default class CharacterInfoTopBar extends React.Component {
           </Col>
         </Row>
 
-        { this.state.forceNameChange
-          ? <ForcedNameChange characterId={this.props.characterId}/> : null
+        { 
+          this.state.forceNameChange ? 
+            <ForcedNameChange characterId={this.props.characterId}/> 
+          : null
         }
-      </CardTemplate>
+      </Card>
     )
   }
 }
