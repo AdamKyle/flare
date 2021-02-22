@@ -1,5 +1,5 @@
 import React from 'react';
-import CardTemplate from '../../components/templates/card-template';
+import Card from '../../components/templates/card';
 
 export default class Teleport extends React.Component {
 
@@ -121,7 +121,7 @@ export default class Teleport extends React.Component {
 
     render() {
         return (
-            <CardTemplate
+            <Card
                 OtherCss="p-3"
                 cardTitle="Teleport"
                 close={this.closeDetails.bind(this)}
@@ -165,8 +165,7 @@ export default class Teleport extends React.Component {
                   </>
                   : null
                 }
-                
-            </CardTemplate>
+            </Card>
         );
     }
 }

@@ -3,9 +3,9 @@ import {Row, Col}                         from 'react-bootstrap';
 import Draggable                          from 'react-draggable';
 import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
-import LocationInfoModal                  from '../components/location-info-modal';
+import LocationInfoModal                  from './components/modals/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
-import CardTemplate                       from '../components/templates/card-template';
+import Card                               from '../components/templates/card';
 import ContentLoader                      from 'react-content-loader';
 
 export default class Map extends React.Component {
@@ -435,7 +435,7 @@ export default class Map extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <CardTemplate>
+        <Card>
           <ContentLoader viewBox="0 0 380 300">
             {/* Only SVG shapes */}    
             <rect x="0" y="0" rx="4" ry="4" width="500" height="230" />
@@ -443,7 +443,7 @@ export default class Map extends React.Component {
             <rect x="0" y="265" rx="3" ry="3" width="250" height="10" />
             <rect x="0" y="285" rx="3" ry="3" width="250" height="10" />
           </ContentLoader>
-        </CardTemplate>
+        </Card>
       );
     }
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { getServerMessage } from '../helpers/server_message';
+import { getServerMessage } from '../../helpers/server_message';
 
-export default class AdditionalCoreActionsDropDown extends React.Component {
+export default class AdditionalActionsDropDown extends React.Component {
 
     constructor(props) {
       super(props)

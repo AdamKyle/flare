@@ -2,7 +2,7 @@ import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import ContentLoader from 'react-content-loader';
 import BattleAction from '../battle/battle-action';
-import AdditionalCoreActionsDropDown from '../components/additional-core-actions-dropdown';
+import AdditionaActionsDropDown from './components/additional-actions-drop-down';
 import Card from '../components/templates/card';
 import CraftingAction from '../crafting/crafting-action';
 import EnchantingAction from '../enchanting/enchanting-action';
@@ -103,7 +103,7 @@ export default class ActionsSection extends React.Component {
       <Card>
         <Row>
           <Col xs={12} sm={12} md={12} lg={12} xl={2}>
-            <AdditionalCoreActionsDropDown
+            <AdditionaActionsDropDown
               isDead={this.state.isDead}
               isAdventuring={this.state.isAdventuring}
               changeCraftingType={this.changeCraftingType.bind(this)}

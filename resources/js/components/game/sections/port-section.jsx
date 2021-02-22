@@ -1,9 +1,10 @@
 import React   from 'react';
+import ContentLoader from 'react-content-loader';
 import SetSail from '../map/components/set-sail';
-import CardTemplate from './templates/card-template';
-import ContentLoader, { Facebook } from 'react-content-loader';
+import Card from '../components/templates/card';
 
-export default class PortLocationActions extends React.Component {
+
+export default class PortSection extends React.Component {
 
   constructor(props) {
     super(props);
@@ -46,19 +47,19 @@ export default class PortLocationActions extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <CardTemplate>
+        <Card>
           <ContentLoader viewBox="0 0 380 30">
             {/* Only SVG shapes */}    
             <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
             <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
             <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
           </ContentLoader>
-        </CardTemplate>
+        </Card>
       );
     }
 
     return (
-      <CardTemplate
+      <Card
         OtherCss="p-3"
         cardTitle="Set Sail"
         close={this.hidePort.bind(this)}
@@ -74,7 +75,7 @@ export default class PortLocationActions extends React.Component {
           updatePlayerPosition={this.props.updatePlayerPosition}
           updateAdventure={this.props.updateAdventure}
         />
-      </CardTemplate>
+      </Card>
     )
   }
 } 

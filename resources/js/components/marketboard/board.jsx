@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import ReactDatatable from '@ashvin27/react-datatable';
-import CardTemplate from '../game/components/templates/card-template';
+import Card from '../game/components/templates/card';
 import MarketHistory from './market-history';
 import PurchaseModal from './purchase-modal';
 
@@ -170,7 +170,7 @@ export default class Board extends Component {
 
   render() {
     return (
-      <CardTemplate
+      <Card
         OtherCss="p-3"
         cardTitle="Market Board"
         showButton={!this.state.hasItemId}
@@ -215,7 +215,7 @@ export default class Board extends Component {
             characterGold={this.state.gold}
           /> : null
         }
-      </CardTemplate>
+      </Card>
     );
   }
 }

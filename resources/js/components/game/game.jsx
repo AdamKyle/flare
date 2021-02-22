@@ -5,8 +5,8 @@ import Map                    from './map/map';
 import Teleport               from './map/components/teleport';
 import CharacterInfoTopSection from './sections/character-info-section';
 import ActionsSection         from './sections/actions-section';
-import PortLocationActions    from './components/port-location-actions';
-import AdeventureActions      from './components/adventure-actions';
+import PortSection            from './sections/port-section';
+import AdeventureActions      from './sections/adventure-section';
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomModal           from './kingdom/modal/kingdom-modal';
 
@@ -198,7 +198,7 @@ export default class Game extends React.Component {
             />
             {
               this.state.openPortDetails ? 
-                <PortLocationActions 
+                <PortSection 
                   updateAdventure={this.updateAdventure.bind(this)} 
                   portDetails={this.state.portDetails} 
                   userId={this.props.userId} 

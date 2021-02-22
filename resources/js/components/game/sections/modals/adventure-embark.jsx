@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import Axios from 'axios';
 
 export default class AdventureEmbark extends React.Component {
 

@@ -2,7 +2,7 @@ import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import AdventureEmbark from './modals/adventure-embark';
 import TimeOutBar from '../timeout/timeout-bar';
-import CardTemplate from './templates/card-template';
+import Card from '../components/templates/card';
 import ContentLoader, { Facebook } from 'react-content-loader';
 
 export default class AdeventureActions extends React.Component {
@@ -196,14 +196,14 @@ export default class AdeventureActions extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <CardTemplate>
+        <Card>
           <ContentLoader viewBox="0 0 380 30">
             {/* Only SVG shapes */}    
             <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
             <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
             <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
           </ContentLoader>
-        </CardTemplate>
+        </Card>
       );
     }
 
@@ -212,7 +212,7 @@ export default class AdeventureActions extends React.Component {
     const hasCollectedRewards = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.rewards !== null));
 
     return (
-      <CardTemplate
+      <Card
         cardTitle="Adventures"
         close={this.hideAdventure.bind(this)}
         otherClasses="p-3"
@@ -233,7 +233,7 @@ export default class AdeventureActions extends React.Component {
           updateMessage={this.updateMessage.bind(this)}
           updateCharacterAdventures={this.updateCharacterAdventures.bind(this)}
         /> : null }
-      </CardTemplate>
+      </Card>
     )
   }
 } 

@@ -1,9 +1,50 @@
 import React from 'react';
+import { Dropdown } from 'react-bootstrap';
 
 export default class Card extends React.Component {
 
   constructor(props) {
     super(props);
+  }
+
+  changeType(event) {
+    this.props.onChange(event.target.dataset.type);
+  }
+
+  buildDropDownOptions() {
+    return this.props.buttons.map((button) => {
+      return <Dropdown.Item onClick={this.changeType.bind(this)} data-type={button.type} key={"button-" + button.type}>{button.name}</Dropdown.Item>
+    })
+  }
+
+  buildDropDown() {
+    return (
+      <>
+      <div className="float-right">
+        <Dropdown size="sm">
+          <Dropdown.Toggle variant="primary" id="dropdown-basic">
+            {this.props.buttonTitle}
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            {this.buildDropDownOptions()}
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+      {
+        this.props.hasOwnProperty('textBesideButton') ?
+        <div className="float-right mr-2 mt-2">
+          <strong>{this.props.textBesideButton}</strong>
+        </div> : null
+      }
+      </>
+    )
+  }
+
+  buildCustomButton() {
+    if (this.props.customButtonType === 'drop-down' && this.props.showButton) {
+      return this.buildDropDown();
+    }
   }
 
   renderTitle() {
@@ -19,6 +60,11 @@ export default class Card extends React.Component {
               >
                 Close
               </button>
+            : null
+          }
+          { 
+            this.props.hasOwnProperty('customButtonType') ? 
+              this.buildCustomButton() 
             : null
           }
         </div>
