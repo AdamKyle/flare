@@ -25,18 +25,6 @@ export default class FightSection extends React.Component {
   }
 
   componentDidMount() {
-
-    // if (this.props.monster !== null) {
-    //   const monsterInfo = new Monster(this.props.monster);
-    //   const health = monsterInfo.health();
-
-    //   this.setState({
-    //     monster: this.props.monster,
-    //     monsterCurrentHealth: health,
-    //     monsterMaxHealth: health,
-    //   });
-    // }
-
     this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event) => {
       this.setState({
         character: event.attack,
@@ -67,20 +55,23 @@ export default class FightSection extends React.Component {
   }
 
   componentDidUpdate() {
-    
-    if (this.state.monster === null && this.props.monster !== null) {
-      const monsterInfo = new Monster(this.props.monster);
-      const health = monsterInfo.health();
-
-      this.setState({
-        battleMessages: [],
-        monster: this.props.monster,
-        monsterCurrentHealth: health,
-        monsterMaxHealth: health,
-      }, () => {
-        this.props.setMonster(null)
-      });
+    if (this.props.monster !== null) {
+      this.setMonsterInfo();
     }
+  }
+
+  setMonsterInfo() {
+    const monsterInfo = new Monster(this.props.monster);
+    const health = monsterInfo.health();
+
+    this.setState({
+      battleMessages: [],
+      monster: this.props.monster,
+      monsterCurrentHealth: health,
+      monsterMaxHealth: health,
+    }, () => {
+      this.props.setMonster(null)
+    });
   }
 
   battleMessages() {

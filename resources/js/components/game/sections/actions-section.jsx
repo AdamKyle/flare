@@ -157,18 +157,21 @@ export default class ActionsSection extends React.Component {
               updateCanCraft={this.updateCanCraft.bind(this)}
               isAdventuring={this.state.isAdventuring}
             />
-            <EnchantingAction
-              isDead={this.state.character.is_dead}
-              characterId={this.state.character.id}
-              showEnchanting={this.state.showEnchanting}
-              shouldChangeCraftingType={this.state.changeCraftingType}
-              changeCraftingType={this.changeCraftingType.bind(this)}
-              userId={this.props.userId}
-              characterGold={this.state.character.gold}
-              timeRemaining={this.state.character.can_craft_again_at}
-              updateCanCraft={this.updateCanCraft.bind(this)}
-              isAdventuring={this.state.isAdventuring}
-            />
+            { this.state.showEnchanting ?
+                <EnchantingAction
+                  isDead={this.state.isDead}
+                  characterId={this.state.character.id}
+                  shouldChangeCraftingType={this.state.changeCraftingType}
+                  changeCraftingType={this.changeCraftingType.bind(this)}
+                  userId={this.props.userId}
+                  characterGold={this.state.character.gold}
+                  timeRemaining={this.state.character.can_craft_again_at}
+                  updateCanCraft={this.updateCanCraft.bind(this)}
+                  isAdventuring={this.state.isAdventuring}
+                />
+              : null
+            }
+            
             <FightSection
               character={this.state.character}
               monster={this.state.monster}

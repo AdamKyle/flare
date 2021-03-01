@@ -2,14 +2,15 @@
 
 namespace App\Game\Core\Controllers\Api;
 
-use App\Flare\Builders\CharacterInformationBuilder;
-use App\Flare\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Events\ServerMessageEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Requests\TrainEnchantingValidation;
 use App\Game\Core\Services\CraftingSkillService;
 use Illuminate\Http\Request;
 
@@ -56,54 +57,81 @@ class CharacterSkillController extends Controller {
         ]);
     }
 
-    public function trainEnchanting(Request $request, Character $character, CharacterInformationBuilder $builder, CraftingSkillService $craftingService) {
-        $request->validate([
-            'slot_id'   => 'required',
-            'affix_ids' => 'required',
-            'cost'      => 'required',
-        ]);
+    public function trainEnchanting(TrainEnchantingValidation $request, Character $character, CharacterInformationBuilder $builder, CraftingSkillService $craftingService) {
+        $builder         = $builder->setCharacter($character);
+        $enchantingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
+        $itemSlot        = $character->inventory->slots->where('id', $request->slot_id)->where('equipped', false)->first();
 
-        $builder        = $builder->setCharacter($character);
-        $enchatingSkill = $character->skills->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
-
-        $affixes  = ItemAffix::findMany($request->affix_ids);
-        $itemSlot = $character->inventory->slots->where('id', $request->slot_id)->where('equipped', false)->first();
-        
-        if ($affixes->isEmpty() || is_null($itemSlot)) {
+        if (is_null($itemSlot)) {
             return response()->json([
                 'message' => 'Invalid input.'
             ], 422);
         }
 
-        $item = $itemSlot->item;
+        $item      = $itemSlot->item;
+        $totalTime = $craftingService->timeForEnchanting($item);
 
-        if ($request->cost > $character->gold) {
-            event(new ServerMessageEvent($character->user, 'not_enough_gold'));
+        foreach($request->affix_ids as $affix) {
+            $affix = ItemAffix::find($affix);
 
-            return response()->json([], 422);
+            if (is_null($affix)) {
+                return response()->json([
+                    'message' => 'Invalid input.'
+                ], 422);
+            }
+
+            if ($enchantingSkill->level < $affix->skill_level_required) {
+                return event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+            }
+
+            if ($enchantingSkill->level > $affix->skill_level_requird) {
+                event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+
+                
+            }
         }
-
-        $totalTime = $craftingService->timeForEnchanting($item, $request->affix_ids[0], count($request->affix_ids));
 
         $craftingService->updateCharacterGoldForEnchanting($character, $request->cost);
 
-        $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $itemSlot, $affixes, $character);
+        // $affixes  = ItemAffix::findMany($request->affix_ids);
+        // dd($affixes);
+        // 
+        
+        // if ($affixes->isEmpty() || is_null($itemSlot)) {
+        //     return response()->json([
+        //         'message' => 'Invalid input.'
+        //     ], 422);
+        // }
 
-        event(new CraftedItemTimeOutEvent($character->refresh(), $totalTime));
+        // $item = $itemSlot->item;
 
-        $inventory      = $character->refresh()->inventory->slots->filter(function($slot) {
-            if ($slot->item->type !== 'quest' && !$slot->equipped) {
-                return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
-            }
+        // if ($request->cost > $character->gold) {
+        //     event(new ServerMessageEvent($character->user, 'not_enough_gold'));
 
-        })->all();
+        //     return response()->json([], 422);
+        // }
 
-        return response()->json([
-            'affixes'             => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
-                                             ->where('skill_level_required', '<=', $enchatingSkill->refresh()->level)
-                                             ->get(),
-            'character_inventory' => array_values($inventory),
-        ]);
+        // $totalTime = $craftingService->timeForEnchanting($item, $request->affix_ids[0], count($request->affix_ids));
+
+        // $craftingService->updateCharacterGoldForEnchanting($character, $request->cost);
+
+        // $craftingService->sendOffEnchantingServerMessage($enchatingSkill, $itemSlot, $affixes, $character);
+
+        // event(new CraftedItemTimeOutEvent($character->refresh(), $totalTime));
+
+        // $inventory      = $character->refresh()->inventory->slots->filter(function($slot) {
+        //     if ($slot->item->type !== 'quest' && !$slot->equipped) {
+        //         return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+        //     }
+
+        // })->all();
+
+        // return response()->json([
+        //     'affixes'             => ItemAffix::where('int_required', '<=', $builder->statMod('int'))
+        //                                      ->where('skill_level_required', '<=', $enchatingSkill->refresh()->level)
+        //                                      ->get(),
+        //     'character_inventory' => array_values($inventory),
+        // ]);
     }
 
     public function trainCrafting(CraftingSkillService $craftingSkill, Request $request, Character $character) {

@@ -110,21 +110,19 @@ class CraftingSkillService {
      * Possible return values:
      * 
      * - Double is 20 seconds instead of ten. Item has at least one prefix or suffix.
-     * - Tripple is 30 seconds instead of ten.
-     * - null - item does not have eiher suffix or prefix. Default to 10 seconds.
+     * - Tripple is 30 seconds instead of ten. Item has both prefix and suffix.
+     * - null. item does not have eiher suffix or prefix. Default to 10 seconds.
      * 
      * @param Item $item
-     * @param int $affixId
      * @return mixed string | null
      */
-    public function timeForEnchanting(Item $item, int $affixId, int $affixLength) {
-        $affix = ItemAffix::find($affixId);
-        
-        if ($affixLength === 2 && !is_null($item->{'item_'.$affix->type.'_id'}) && !is_null($item->{'item_'.$affix->getOppisiteType().'_id'})) {
+    public function timeForEnchanting(Item $item) {
+
+        if (!is_null($item->itemPrefix) && !is_null($item->itemSuffix)) {
             return 'tripple';
         }
-        
-        if (!is_null($item->{'item_'.$affix->type.'_id'})) {
+
+        if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix)) {
             return 'double';
         }
 
@@ -139,84 +137,96 @@ class CraftingSkillService {
      * - Server message for gaining enchanting the item.
      * 
      * @param Skill $currentSkill
-     * @param InventorySlot $slot
+     * @param InventorySlot $item
      * @param ItemAffix $itemAffix
      * @param Character $character
+     * @param Bool $toEasy | false
      * @return void
      */
-    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, InventorySlot $slot, Collection $affixes, Character $character): void {
-        forEach($affixes as $affix) {
-            $item = $slot->refresh()->item;
+    public function sendOffEnchantingServerMessage(Skill $enchantingSkill, InventorySlot $slot, ItemAffix $affix, Character $character, Bool $tooEasy = false): void {
+        
+        if ($tooEasy) {
+            $this->enchantItem($item, $affix);
+    
+            $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
 
-            if ($enchantingSkill->level < $affix->skill_level_required) {
-                event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
-            } else if ($enchantingSkill->level >= $affix->skill_level_trivial) { 
-                event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+            event(new ServerMessageEvent($character->user, 'enchanted', $message));
+        } else {
+            
+        }
+        
+        // forEach($affixes as $affix) {
+        //     $item = $slot->refresh()->item;
+
+        //     if ($enchantingSkill->level < $affix->skill_level_required) {
+        //         event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+        //     } else if ($enchantingSkill->level >= $affix->skill_level_trivial) { 
+        //         event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
                 
                 $this->enchantItem($item, $affix);
     
                 $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->name; 
     
                 event(new ServerMessageEvent($character->user, 'enchanted', $message));
-            } else {
-                $dcCheck       = $this->fetchDCCheck($enchantingSkill);
-                $characterRoll = $this->fetchCharacterRoll($enchantingSkill);
+        //     } else {
+        //         $dcCheck       = $this->fetchDCCheck($enchantingSkill);
+        //         $characterRoll = $this->fetchCharacterRoll($enchantingSkill);
 
-                if (!is_null($item->{'item_' . $affix->type . '_id'})) {
-                    $dcCheck += 10;
-                }
+        //         if (!is_null($item->{'item_' . $affix->type . '_id'})) {
+        //             $dcCheck += 10;
+        //         }
     
-                if ($characterRoll > $dcCheck) {
-                    $this->enchantItem($item, $affix);
+        //         if ($characterRoll > $dcCheck) {
+        //             $this->enchantItem($item, $affix);
     
-                    $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->affix_name; 
+        //             $message = 'Applied enchantment: '.$affix->name.' to: ' . $item->affix_name; 
     
-                    event(new ServerMessageEvent($character->user, 'enchanted', $message));
+        //             event(new ServerMessageEvent($character->user, 'enchanted', $message));
     
-                    event(new UpdateSkillEvent($enchantingSkill));
-                } else {
+        //             event(new UpdateSkillEvent($enchantingSkill));
+        //         } else {
     
-                    $slot->delete();
+        //             $slot->delete();
 
-                    if (!is_null($this->item)) {
-                        $this->item->delete();
+        //             if (!is_null($this->item)) {
+        //                 $this->item->delete();
 
-                        $this->item = null;
-                    }
+        //                 $this->item = null;
+        //             }
                     
-                    $message = 'You failed to apply '.$affix->name.' to: ' . $item->name . '. The item shatters before you. You lost the investment.';
+        //             $message = 'You failed to apply '.$affix->name.' to: ' . $item->name . '. The item shatters before you. You lost the investment.';
     
-                    event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
-                }
-            }
-        }
+        //             event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
+        //         }
+        //     }
+        // }
 
-        if (!is_null($this->item)) {
-            $items = Item::where('name', $this->item->name)
-                        ->where('item_prefix_id', $this->item->item_prefix_id)
-                        ->where('item_suffix_id', $this->item->item_suffix_id);
+        // if (!is_null($this->item)) {
+        //     $items = Item::where('name', $this->item->name)
+        //                 ->where('item_prefix_id', $this->item->item_prefix_id)
+        //                 ->where('item_suffix_id', $this->item->item_suffix_id);
 
                         
-            if ($items->count() > 1) {
-                $item = $this->item;
+        //     if ($items->count() > 1) {
+        //         $item = $this->item;
 
-                $this->item->delete();
-                $this->item = null;
+        //         $this->item->delete();
+        //         $this->item = null;
 
-                $foundItem = Item::where('name', $item->name)
-                                 ->where('item_prefix_id', $item->item_prefix_id)
-                                 ->where('item_suffix_id', $item->item_suffix_id)
-                                 ->first();
+        //         $foundItem = Item::where('name', $item->name)
+        //                          ->where('item_prefix_id', $item->item_prefix_id)
+        //                          ->where('item_suffix_id', $item->item_suffix_id)
+        //                          ->first();
 
-                $slot->update([
-                    'item_id' => $foundItem->id,
-                ]);
-            } else {
-                $slot->update([
-                    'item_id' => $this->item->id,
-                ]);
-            }
-        } 
+        //         $slot->update([
+        //             'item_id' => $foundItem->id,
+        //         ]);
+        //     } else {
+        //         $slot->update([
+        //             'item_id' => $this->item->id,
+        //         ]);
+        //     }
+        // } 
     }
 
     /**

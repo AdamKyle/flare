@@ -48,6 +48,20 @@
                             field="base_healing_mod"
                         />
                         <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('int_required')" 
+                            header-text="Int Required" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="int_required"
+                        />
+                        <x-data-tables.header-row 
+                            wire:click.prevent="sortBy('skill_level_required')" 
+                            header-text="Skill Level Required" 
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="skill_level_required"
+                        />
+                        <x-data-tables.header-row 
                             wire:click.prevent="sortBy('cost')" 
                             header-text="Cost" 
                             sort-by="{{$sortBy}}"
@@ -69,6 +83,8 @@
                                 <td>{{is_null($itemAffix->base_damage) ? 'N/A' : $itemAffix->base_damage}}</td>
                                 <td>{{is_null($itemAffix->base_ac) ? 'N/A' : $itemAffix->base_ac}}</td>
                                 <td>{{is_null($itemAffix->base_healing) ? 'N/A' : $itemAffix->base_healing}}</td>
+                                <td>{{is_null($itemAffix->int_required) ? 'N/A' : $itemAffix->int_required}}</td>
+                                <td>{{is_null($itemAffix->skill_level_required) ? 'N/A' : $itemAffix->skill_level_required}}</td>
                                 <td>{{is_null($itemAffix->cost) ? 'N/A' : $itemAffix->cost}}</td>
                                 <td>
                                     @guest

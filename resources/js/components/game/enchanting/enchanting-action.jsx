@@ -1,7 +1,6 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
-import moment from 'moment';
 
 export default class EnchantingAction extends React.Component {
 
@@ -89,7 +88,7 @@ export default class EnchantingAction extends React.Component {
     const affixesToAttach = [];
     const prefixId        = this.state.prefixId;
     const suffixId        = this.state.suffixId;
-
+    console.log(prefixId, suffixId);
     if ((prefixId !== 0 && prefixId !== null)) {
       affixesToAttach.push(prefixId);
     }
@@ -209,8 +208,8 @@ export default class EnchantingAction extends React.Component {
 
     if ((value === 0 || value !== 0) && (this.state.suffixId !== 0 && this.state.suffixId !== null) && (this.state.itemToEnchant === 0 && this.state.itemToEnchant === null) && typeof oldSuffix !== 'undefined') {
       foundAffix           = this.state.affixList.filter((a) => a.id === value)[0];
-      cost                -= this.getPrefixCost(oldSuffix, this.state.itemToEnchant);
-      cost                += this.getPrefixCost(foundAffix, this.state.itemToEnchant);
+      cost                -= this.getSuffixCost(oldSuffix, this.state.itemToEnchant);
+      cost                += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
     } else if ((this.state.itemToEnchant !== 0 || this.state.itemToEnchant !== null)) {
       foundAffix           = this.state.affixList.filter((a) => a.id === value)[0];
       cost                += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
@@ -280,9 +279,6 @@ export default class EnchantingAction extends React.Component {
   }
 
   render() {
-    if (!this.state.showEnchanting) {
-      return null;
-    }
 
     if (this.state.loading) {
       return (
@@ -298,13 +294,11 @@ export default class EnchantingAction extends React.Component {
 
     if (_.isEmpty(this.state.affixList)) {
       return (
-        <div className={"container justify-content-center"}>
-           <div className="row">
-             <div className="col-md-10">
-               <div className="alert alert-danger">You don't have the required intelligence to enchant.</div>
-             </div>
-           </div>
-         </div>
+        <div className="row mt-2">
+          <div className="col-md-10">
+            <div className="alert alert-danger">You don't have the required intelligence to enchant.</div>
+          </div>
+        </div>
       );
     }
 

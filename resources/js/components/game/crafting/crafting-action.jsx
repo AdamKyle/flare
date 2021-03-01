@@ -157,11 +157,11 @@ export default class CraftingAction extends React.Component {
             onChange={this.updateCraftingType.bind(this)}
             disabled={this.state.isDead}>
             <option value="" key="0">Please select a crafting type</option>
-            <option value="Weapon" key="weapon">Weapon</option>
-            <option value="Armour" key="armour">Armour</option>
-            <option value="Spell" key="spell">Spell</option>
-            <option value="Ring" key="ring">Ring</option>
-            <option value="Artifact" key="artifact">Artifact</option>
+            <option value="weapon" key="weapon">Weapon</option>
+            <option value="armour" key="armour">Armour</option>
+            <option value="spell" key="spell">Spell</option>
+            <option value="ring" key="ring">Ring</option>
+            <option value="artifact" key="artifact">Artifact</option>
           </select>
         );
       }

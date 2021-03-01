@@ -2,11 +2,10 @@
 
 namespace Tests\Feature\Game\Core\Api;
 
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\ItemAffix;
-use App\Game\Core\Services\CraftingSkillService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Game\Skills\Services\CraftingService;
+use App\Game\Skills\Services\EnchantItemService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -103,7 +102,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $character = $this->character->updateCharacter([
             'gold' => 10000,
-        ])->assignSkill($skill)
+        ])->assignSkill($skill, 400)
           ->trainSkill($skill->name)
           ->inventoryManagement()
           ->giveItem($this->createItem([
@@ -121,12 +120,6 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $user        = $this->character->getUser();
         $slot        = $character->inventory->slots->first();
-
-        $craftingSkillService = Mockery::mock(CraftingSkillService::class)->makePartial();
-
-        $this->app->instance(CraftingSkillService::class, $craftingSkillService);
-        
-        $craftingSkillService->shouldReceive('fetchCharacterRoll')->once()->andReturn(10000);
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/enchant/' . $character->id, [
@@ -151,7 +144,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $character = $this->character->updateCharacter([
             'gold' => 10000,
-        ])->assignSkill($skill)
+        ])->assignSkill($skill, 400)
           ->trainSkill($skill->name)
           ->inventoryManagement()
           ->giveItem($this->createItem([
@@ -173,12 +166,6 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $user        = $this->character->getUser();
         $slot        = $character->inventory->slots->first();
-
-        $craftingSkillService = Mockery::mock(CraftingSkillService::class)->makePartial();
-
-        $this->app->instance(CraftingSkillService::class, $craftingSkillService);
-        
-        $craftingSkillService->shouldReceive('fetchCharacterRoll')->once()->andReturn(10000);
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/enchant/' . $character->id, [
@@ -203,7 +190,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $character = $this->character->updateCharacter([
             'gold' => 10000,
-        ])->assignSkill($skill)
+        ])->assignSkill($skill, 400)
           ->inventoryManagement()
           ->giveItem($this->createItem([
             'name' => 'sample 2',
@@ -228,12 +215,6 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $user        = $this->character->getUser();
         $slot        = $character->inventory->slots->first();
-
-        $craftingSkillService = Mockery::mock(CraftingSkillService::class)->makePartial();
-
-        $this->app->instance(CraftingSkillService::class, $craftingSkillService);
-        
-        $craftingSkillService->shouldReceive('fetchCharacterRoll')->andReturn(10000);
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/enchant/' . $character->id, [
@@ -274,11 +255,11 @@ class CharacterSkillControllerApiTest extends TestCase {
         $currentGold = $character->gold;
         $slot        = $character->inventory->slots->first();
 
-        $craftingSkillService = Mockery::mock(CraftingSkillService::class)->makePartial();
+        $craftingSkillService = Mockery::mock(EnchantItemService::class)->makePartial();
 
-        $this->app->instance(CraftingSkillService::class, $craftingSkillService);
+        $this->app->instance(EnchantItemService::class, $craftingSkillService);
         
-        $craftingSkillService->shouldReceive('fetchCharacterRoll')->once()->andReturn(0);
+        $craftingSkillService->shouldReceive('characterRoll')->once()->andReturn(0);
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/enchant/' . $character->id, [
@@ -300,7 +281,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         ]);
         
         $character = $this->character->updateCharacter(['gold' => 10000])
-                                     ->assignSkill($skill)
+                                     ->assignSkill($skill, 400)
                                      ->inventoryManagement()
                                      ->giveItem($this->createItem([
                                         'name' => 'sample 2',
@@ -317,13 +298,6 @@ class CharacterSkillControllerApiTest extends TestCase {
 
 
         $currentGold = $character->gold;
-
-
-        $craftingSkillService = Mockery::mock(CraftingSkillService::class)->makePartial();
-
-        $this->app->instance(CraftingSkillService::class, $craftingSkillService);
-        
-        $craftingSkillService->shouldReceive('fetchCharacterRoll')->once()->andReturn(10000);
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/enchant/' . $character->id, [
@@ -371,7 +345,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                         'affix_ids' => [4],
                         'cost'      => 1000,
                     ])->response;
-
+        
         $this->assertEquals(422, $response->status());
         $this->assertTrue($currentGold === $character->refresh()->gold);
     }
@@ -432,15 +406,15 @@ class CharacterSkillControllerApiTest extends TestCase {
             ->response;
 
         $content = json_decode($response->content());
-
+        
         $this->assertEquals(200, $response->status());
         $this->assertTrue($content->items[0]->name === 'sample 2');
         $this->assertEquals(1, count($content->items));
-        $this->assertFalse($currentGold === $character->refresh()->gold);
+        $this->assertTrue($currentGold === $character->refresh()->gold);
     }
 
     
-    public function testCanEnchantItemTooHard() {
+    public function testCantEnchantItemTooHard() {
         $this->createItemAffix([
             'skill_level_required' => 10
         ]);
@@ -479,7 +453,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $item = $this->character->getCharacter()->inventory->slots->first()->item;
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse($currentGold === $character->refresh()->gold);
+        $this->assertTrue($currentGold === $character->refresh()->gold);
         $this->assertNull($item->item_suffix_id);
     }
 
@@ -511,7 +485,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'crafting_type' => 'weapon',
                     'skill_level_trivial' => 0,
                 ])->id,
-                'type' => 'Weapon',
+                'type' => 'weapon',
             ])
             ->response;
 
@@ -519,6 +493,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $skill = $this->character->getCharacter()->skills->where('name', 'Weapon Crafting')->first();
 
+        // Should still be zero
         $this->assertEquals(0, $skill->xp);
 
         $this->assertEquals(200, $response->status());
@@ -555,7 +530,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $user      = $this->character->getUser();
 
         $currentGold = $character->gold;
-
+        $currentXp   = $character->skills->where('name', 'Enchanting')->first()->xp;
 
         $response = $this->actingAs($user, 'api')
                          ->json('POST', '/api/enchant/' . $character->id, [
@@ -569,6 +544,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $this->assertEquals(200, $response->status());
         $this->assertFalse($currentGold === $character->gold);
+        $this->assertTrue($currentXp === $character->refresh()->skills->where('name', 'Enchanting')->first()->xp);
         $this->assertNotNull($character->inventory->slots->first()->item->item_suffix_id);
     }
 
@@ -593,7 +569,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             ])
             ->response;
 
-        $this->assertEquals(200, $response->status());
+        $this->assertEquals(422, $response->status());
         $this->assertTrue($currentGold === $character->refresh()->gold);
     }
 
@@ -606,7 +582,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'name' => 'Enchanting'
         ]);
 
-        $character = $this->character->updateCharacter(['gold' => 1])
+        $character = $this->character->updateCharacter(['gold' => 0])
                                      ->assignSkill($skill)
                                      ->updateSkill('Enchanting', [
                                          'level' => 1
@@ -635,6 +611,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ])->response;
         
         $character = $this->character->getCharacter();
+        
         $item      = $character->inventory->slots->first()->item;
 
         $this->assertEquals(422, $response->status());
@@ -644,22 +621,10 @@ class CharacterSkillControllerApiTest extends TestCase {
 
     public function testCannotPickUpCraftedItem() {
         $character = $this->character->updateCharacter(['gold' => 1000, 'inventory_max' => 0])
+                                     ->updateSkill('Weapon Crafting', ['level' => 400])
                                      ->getCharacter();
+
         $user      = $this->character->getUser();
-
-        $craftingSkilLService = $this->getMockBuilder(CraftingSkillService::class)
-                                     ->setMethods(array('fetchDCCheck', 'fetchCharacterRoll'))
-                                     ->getMock();
-
-        $this->app->instance(CraftingSkillService::class, $craftingSkilLService);
-
-        $craftingSkilLService->expects($this->any())
-                             ->method('fetchDCCheck')
-                             ->willReturn(0);
-
-        $craftingSkilLService->expects($this->any())
-                             ->method('fetchCharacterRoll')
-                             ->willReturn(100);
 
         $response = $this->actingAs($user, 'api')
             ->json('POST', '/api/craft/' . $character->id, [
@@ -672,7 +637,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                     'crafting_type' => 'weapon',
                     'skill_level_trivial' => 10,
                 ])->id,
-                'type' => 'Weapon',
+                'type' => 'weapon',
             ])
             ->response;
 
@@ -682,6 +647,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
     public function testCanPickUpCraftedItem() {
         $character = $this->character->updateCharacter(['gold' => 1000])
+                                     ->updateSkill('Weapon Crafting', ['level' => 400])
                                      ->inventoryManagement()
                                      ->giveItem($this->createItem([
                                         'name' => 'sample',
@@ -713,20 +679,6 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $user      = $this->character->getUser();
 
-        $craftingSkilLService = $this->getMockBuilder(CraftingSkillService::class)
-                                     ->setMethods(array('fetchDCCheck', 'fetchCharacterRoll'))
-                                     ->getMock();
-
-        $this->app->instance(CraftingSkillService::class, $craftingSkilLService);
-
-        $craftingSkilLService->expects($this->once())
-                             ->method('fetchDCCheck')
-                             ->willReturn(0);
-
-        $craftingSkilLService->expects($this->once())
-                             ->method('fetchCharacterRoll')
-                             ->willReturn(100);
-
         $itemId = $this->createItem([
             'name' => 'sample',
             'type' => 'weapon',
@@ -740,7 +692,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $response = $this->actingAs($user, 'api')
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $itemId,
-                'type' => 'Weapon',
+                'type' => 'weapon',
             ])
             ->response;
 
@@ -754,18 +706,18 @@ class CharacterSkillControllerApiTest extends TestCase {
     }
 
     public function testFailedToCraft() {
-        $craftingSkilLService = $this->getMockBuilder(CraftingSkillService::class)
-                                     ->setMethods(array('fetchDCCheck', 'fetchCharacterRoll'))
+        $craftingSkilLService = $this->getMockBuilder(CraftingService::class)
+                                     ->setMethods(array('getDCCheck', 'characterRoll'))
                                      ->getMock();
 
-        $this->app->instance(CraftingSkillService::class, $craftingSkilLService);
+        $this->app->instance(CraftingService::class, $craftingSkilLService);
 
         $craftingSkilLService->expects($this->once())
-                             ->method('fetchDCCheck')
+                             ->method('getDCCheck')
                              ->willReturn(100);
 
         $craftingSkilLService->expects($this->once())
-                             ->method('fetchCharacterRoll')
+                             ->method('characterRoll')
                              ->willReturn(0);
 
         $itemId = $this->createItem([
@@ -785,7 +737,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $response = $this->actingAs($user, 'api')
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $itemId,
-                'type' => 'Weapon',
+                'type' => 'weapon',
             ])
             ->response;
 

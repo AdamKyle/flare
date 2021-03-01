@@ -264,9 +264,7 @@ class CharacterFactory {
      * @return CharacterFactory
      */
     public function updateSkill(string $name, array $changes = []): CharacterFactory {
-        $skill = $this->character->skills->filter(function($skill) use($name) {
-            return $skill->name === $name;
-        })->first();
+        $skill = $this->character->skills->where('name', $name)->first();
 
         if (is_null($skill)) {
             throw new \Exception($name . ' not found.');
@@ -275,7 +273,7 @@ class CharacterFactory {
         $skill->update($changes);
 
         $this->character = $this->character->refresh();
-
+        
         return $this;
     }
 
@@ -283,13 +281,14 @@ class CharacterFactory {
      * Assign a new skill to a character.
      * 
      * @param GameSkill $skill
+     * @param int $level | 1
      * @return characterFactory
      */
-    public function assignSkill(GameSkill $skill): CharacterFactory {
+    public function assignSkill(GameSkill $skill, int $level = 1): CharacterFactory {
         $this->character->skills()->create([
             'game_skill_id' => $skill->id,
             'character_id'  => $this->character->id,
-            'level'         => 1,
+            'level'         => $level,
             'xp'            => 0,
             'xp_max'        => 100,
         ]);

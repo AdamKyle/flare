@@ -153,7 +153,7 @@ class MarketBoardController extends Controller {
 
         return response()->json([
             'labels' => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->map(function($mh) {
-                return $mh->created_at->format('y-m-d');
+                return $mh->item->affix_name;
             }),
             'data'   => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->pluck('sold_for'),
         ]);

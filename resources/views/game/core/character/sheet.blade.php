@@ -93,7 +93,7 @@
                                                 </div>
                                                 <div class="col-md-2">
                                                     <div class="progress skill-training mb-2 text-center">
-                                                        <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->xp}}" aria-valuemin="0" style="width: {{$skill->xp}}%;"></div>
+                                                        <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->xp}}" aria-valuemin="0" style="width: {{($skill->xp/$skill->xp_max) * 100}}%;"></div>
                                                     </div>
                                                 </div>
                                                 @if ((bool) $skill->can_train)

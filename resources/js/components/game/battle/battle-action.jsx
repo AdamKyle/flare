@@ -31,10 +31,7 @@ export default class BattleAction extends React.Component {
       isAdventuring: false,
     }
 
-    //this.timeOut         = Echo.private('show-timeout-bar-' + this.props.userId);
     this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
-    //this.attackUpdate    = Echo.private('update-character-attack-' + this.props.userId);
-    //this.isDead          = Echo.private('character-is-dead-' + this.props.userId);
     this.adventureLogs   = Echo.private('update-adventure-logs-' + this.props.userId);
   }
 
@@ -153,7 +150,6 @@ export default class BattleAction extends React.Component {
               <TimeOutBar
                 cssClass={'character-timeout'}
                 readyCssClass={'character-ready'}
-                forSeconds={this.state.timeRemaining}
                 timeRemaining={this.state.timeRemaining}
                 channel={'show-timeout-bar-' + this.props.userId}
                 eventClass={'Game.Core.Events.ShowTimeOutEvent'}

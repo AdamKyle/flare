@@ -12,7 +12,7 @@ class DataTable extends Component
     use WithPagination, WithSorting;
 
     public $search      = '';
-    public $sortField   = 'name';
+    public $sortField   = 'skill_level_required';
     public $perPage     = 10;
 
     protected $paginationTheme = 'bootstrap';
