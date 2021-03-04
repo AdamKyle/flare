@@ -169,10 +169,10 @@ class EnchantingService {
                     event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
                     $this->sentToEasyMessage = true;
                 }
-                
-                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost, true)) {
-                    return;
-                }
+
+                $this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost, true);
+
+                return;
             }
 
             if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost)) {

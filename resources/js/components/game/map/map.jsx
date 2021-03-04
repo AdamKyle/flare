@@ -406,7 +406,7 @@ export default class Map extends React.Component {
       let style = {
         top: kingdom.y_position, 
         left: kingdom.x_position,
-        '--kingdom-color': kingdom.color
+        '--kingdom-color': this.convertToHex(kingdom.color)
       };
 
       return (
@@ -418,6 +418,10 @@ export default class Map extends React.Component {
         </div>
       )
     });
+  }
+
+  convertToHex(rgba) {
+    return `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`
   }
 
   openPortDetails() {

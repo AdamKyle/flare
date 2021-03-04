@@ -45,6 +45,10 @@ export default class MarketHistory extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    Echo.leave('update-market');
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.type !== prevProps.type) {
       this.fetchMarketHistory();

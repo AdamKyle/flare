@@ -58,7 +58,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-healing">Base Healing: </label>
-                <input type="number" class="form-control" id="item-base-healing" name="item-base-healing" wire:model="item.base_healing" {{in_array($item->type, $typesForBaseHealing) ? '' : 'disabled'}}> 
+                <input type="number" class="form-control" id="item-base-healing" name="item-base-healing" wire:model="item.base_healing"> 
             </div>
         </div>
     </div>

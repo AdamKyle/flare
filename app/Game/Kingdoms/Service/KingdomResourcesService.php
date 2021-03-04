@@ -61,10 +61,11 @@ class KingdomResourcesService {
      * @return void
      */
     public function updateKingdom(): void {
+        $this->increaseOrDecreaseMorale();
         $this->updateCurrentPopulation();
         $this->increaseCurrentResource();
-        $this->increaseOrDecreaseMorale();
-
+        $this->increaseTreasury();
+        
         $user  = $this->kingdom->character->user;
         $kingdom = $this->kingdom;
 
@@ -73,14 +74,15 @@ class KingdomResourcesService {
             $kingdom = $this->manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($user, $kingdom));
-            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . 'Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
         }
     }
 
     protected function updateCurrentPopulation() {
         $building = $this->kingdom->buildings->where('is_farm', true)->first();
+        $morale   = $this->kingdom->current_morale;
 
-        if ($building->current_durability === 0) {
+        if ($building->current_durability === 0 || $morale === 0) {
             return;
         }
 
@@ -104,8 +106,9 @@ class KingdomResourcesService {
 
         foreach($resources as $resource) {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
+            $morale   = $this->kingdom->morale;
 
-            if ($building->current_durability === 0) {
+            if ($building->current_durability === 0 || $morale === 0) {
                 continue;
             }
 
@@ -125,6 +128,24 @@ class KingdomResourcesService {
         $this->kingdom = $this->kingdom->refresh();
     }
 
+    protected function increaseTreasury() {
+        if ($this->kingdom->current_morale === 0) {
+            return;
+        }
+
+        if ($this->kingdom->current_morale > 0.50) {
+            return $this->updateTreasury(1000);
+        }
+
+        if ($this->kingdom->current_morale < 0.50) {
+            return $this->updateTreasury(500);
+        }
+
+        if ($this->kingdom->current_morale < 0.25) {
+            return $this->updateTreasury(100);
+        }
+    }
+
     protected function increaseOrDecreaseMorale() {
         $totalIncrease = 0;
         $totalDecrease = 0;
@@ -138,14 +159,12 @@ class KingdomResourcesService {
             }
         }
 
-        if ($totalDecrease < $totalIncrease) {
+        if ($totalIncrease > $totalDecrease) {
             $totalIncrease -= $totalDecrease;
-            $totalDecrease = 0;
 
             return $this->addMorale($totalIncrease);
         } else if ($totalIncrease < $totalDecrease) {
             $totalDecrease -= $totalIncrease;
-            $totalIncrease = 0;
 
             return $this->reduceMorale($totalDecrease);
         }
@@ -204,6 +223,14 @@ class KingdomResourcesService {
 
         $this->kingdom->update([
             'current_morale' => $newTotal,
+        ]);
+
+        $this->kingdom = $this->kingdom->refresh();
+    }
+
+    private function updateTreasury(int $increase) {
+        $this->kingdom->update([
+            'treasury' => $this->kingdom->treasury + $increase,
         ]);
 
         $this->kingdom = $this->kingdom->refresh();

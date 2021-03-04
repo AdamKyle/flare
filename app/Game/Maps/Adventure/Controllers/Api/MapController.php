@@ -3,11 +3,10 @@
 namespace App\Game\Maps\Adventure\Controllers\Api;
 
 use Illuminate\Http\Request;
-use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
+use App\Flare\Models\User;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Maps\Adventure\Events\MoveTimeOutEvent;
 use App\Game\Maps\Adventure\Requests\SetSailValidation;
@@ -16,7 +15,6 @@ use App\Game\Maps\Adventure\Services\LocationService;
 use App\Game\Maps\Adventure\Services\MovementService;
 use App\Game\Maps\Adventure\Services\PortService;
 use App\Game\Maps\Adventure\Values\MapTileValue;
-use App\Game\Maps\Values\MapPositionValue;
 
 class MapController extends Controller {
 

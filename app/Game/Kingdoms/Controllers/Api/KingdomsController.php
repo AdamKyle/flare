@@ -2,6 +2,12 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Events\UpdateTopBarEvent;
+use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
+use App\Http\Controllers\Controller;
 use App\Flare\Models\Building;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Character;
@@ -10,19 +16,13 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\AddKingdomToMap;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Requests\KingdomsLocationRequest;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
 use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
-use App\Http\Controllers\Controller;
-use Carbon\Carbon;
-use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
-use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
+use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Requests\KingdomEmbezzelRequest;
 
 class KingdomsController extends Controller {
 
@@ -38,20 +38,7 @@ class KingdomsController extends Controller {
         $this->kingdom = $kingdom;
     }
 
-    public function getLocationData(KingdomsLocationRequest $request) {
-        $kingdom = Kingdom::where('x_position', $request->x_position)->where('y_position', $request->y_position)->first();
-        
-        if (is_null($kingdom)) {
-            $location = Location::where('x', $request->x_position)->where('y', $request->y_position)->first();
-
-            if (!is_null($location)) {
-                return response()->json(['cannot_settle' => true]);
-            }
-            
-            return response()->json([], 200);
-        }
-        
-        
+    public function getLocationData(Kingdom $kingdom) {
         $kingdom  = new Item($kingdom, $this->kingdom);
 
         return response()->json(
@@ -94,6 +81,8 @@ class KingdomsController extends Controller {
 
         $kingdom  = $this->manager->createData($kingdom)->toArray();
 
+        event(new UpdateKingdom($character->user, $kingdom));
+
         return response()->json($kingdom, 200);
     }
 
@@ -118,9 +107,13 @@ class KingdomsController extends Controller {
 
         $service->recruitUnits($kingdom, $gameUnit, $request->amount);
 
+        $character = $kingdom->character;
+
         $kingdom  = new Item($kingdom, $this->kingdom);
 
         $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateKingdom($character->user, $kingdom));
 
         return response()->json($kingdom, 200);
     }
@@ -168,5 +161,39 @@ class KingdomsController extends Controller {
         }
 
         return response()->json([], 200);
+    }
+
+    public function embezzel(KingdomEmbezzelRequest $request, Kingdom $kingdom) {
+        $amountToEmbezzel = $request->embezzel_amount;
+
+        if ($amountToEmbezzel > $kingdom->treasury) {
+            return response()->json([
+                'message' => "You don't have the gold in your treasury."
+            ], 422);
+        }
+
+        if ($kingdom->current_morale <= 0.15) {
+            return response()->json([
+                'message' => "Morale is too low."
+            ], 422);
+        }
+
+        $kingdom->update([
+            'treasury' => $kingdom->treasury - $amountToEmbezzel,
+            'current_morale' => $kingdom->current_morale - 0.15,
+        ]);
+
+        $character = $kingdom->character;
+
+        $character->update([
+            'gold' => $character->gold + $amountToEmbezzel
+        ]);
+
+        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateKingdom($character->user, $kingdom));
     }
 }

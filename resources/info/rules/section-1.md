@@ -32,6 +32,12 @@ With that said your location in game is shown in chat as X,Y coordinates. There 
 
 Last but not least, no auction in chat. If you want to sell something go to the [market board](). Failure to head this rule can result in being silenced and then, for repeat offenders, banned.
 
+## "Free" Speech
+
+Just because chat is self moderated for the most part, does not mean The Creator will allow for hate speech, racism or wild conspiracies or the posting of "fake news." These are bannable offenses and will result in a silence, followed by an appropriate ban for repeatable offences.
+
+The Creator suggests, you leave religion and politics out of the general chat discussion. While we will not go and silence or ban someone for talking about current world events, if things do get out of hand appropriate measures will be taken.
+
 ## Character Names
 
 1. Character names may not have special characters in them.

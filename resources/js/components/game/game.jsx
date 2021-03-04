@@ -261,7 +261,7 @@ export default class Game extends React.Component {
             <KingdomManagementModal 
               show={this.state.openKingdomManagement} 
               close={this.closeKingdomManagement.bind(this)} 
-              kingdom={this.state.kingdom} 
+              kingdomId={this.state.kingdom.id} 
               updateKingdomData={this.updateKingdomData.bind(this)} 
               characterId={this.state.characterId} 
               userId={this.props.userId}

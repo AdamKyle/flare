@@ -1,9 +1,17 @@
 import React from 'react';
+import Embezzel from './Embezzel';
+import {Alert} from 'react-bootstrap';
 
 export default class KingdomInfo extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            showEmbezzel: false,
+            showSuccess: false,
+            successMessage: null,
+        }
     }
 
     getCurrentMorale() {
@@ -56,9 +64,44 @@ export default class KingdomInfo extends React.Component {
         return (currentMoraleDecrease * 100).toFixed(2);
     }
 
+    showEmbezzel() {
+        this.setState({
+            showEmbezzel: true,
+        });
+    }
+
+    closeEmbezzel() {
+        this.setState({
+            showEmbezzel: false,
+        });
+    }
+
+    embezzeledSuccess(amount) {
+        this.setState({
+            showSuccess: true,
+            successMessage: 'Embezzeled ' + amount + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
+        });
+    }
+
+    closeSuccess() {
+        this.setState({
+            showSuccess: false,
+            successMessage: null
+        })
+    }
+
     render() {
         return (
             <>
+                {
+                    this.state.showSuccess ?
+                        <div className="mb-2 mt-2">
+                            <Alert variant="success" onClose={this.closeSuccess.bind(this)} dismissible>
+                                {this.state.successMessage}
+                            </Alert>
+                        </div>
+                    : null
+                }
                 <div className="row mt-3">
                     <div className="col-md-3">
                         <dl>
@@ -74,7 +117,7 @@ export default class KingdomInfo extends React.Component {
                     </div>
                     <div className="col-md-3">
                         <dl>
-                            <dt><strong>Treasury</strong>:</dt>
+                            <dt><strong><button className="btn btn-link treasury-btn" onClick={this.showEmbezzel.bind(this)}>Treasury:</button></strong></dt>
                             <dd>{this.getTreasury()}</dd>
                         </dl>
                     </div>
@@ -160,6 +203,14 @@ export default class KingdomInfo extends React.Component {
                         </dl> 
                     </div>
                 </div>
+                <Embezzel 
+                    show={this.state.showEmbezzel}
+                    close={this.closeEmbezzel.bind(this)}
+                    morale={this.props.kingdom.current_morale}
+                    treasury={this.props.kingdom.treasury}
+                    kingdomId={this.props.kingdom.id}
+                    embezzeledSuccess={this.embezzeledSuccess.bind(this)}
+                />
             </>
         )
     }

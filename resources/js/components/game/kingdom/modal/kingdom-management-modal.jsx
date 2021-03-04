@@ -8,6 +8,7 @@ import KingdomBuildingQueue from './partials/kingdom-building-queue.jsx';
 import UnitBuildingQueue from './partials/unit-recruitment-queue.jsx';
 import KingdomUnits from './partials/kingdom-units';
 import RecruitUnit from './recruit-unit';
+import LoadingModal from './components/LoadingModal';
 
 export default class KingdomManagementModal extends React.Component {
 
@@ -21,34 +22,32 @@ export default class KingdomManagementModal extends React.Component {
             queue: null,
             unitData: null,
             openUnitModal: false,
-            kingdom: props.kingdom,
+            kingdom: null,
             queueType: null,
+            isLoading: true,
         }
 
         this.updateKingdom = Echo.private('update-kingdom-' + this.props.userId);
     }
 
     componentDidMount() {
-        this.updateKingdom.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {
+        axios.get('/api/kingdoms/' + this.props.kingdomId).then((result) => {
             this.setState({
-                kingdom: event.kingdom
-            }, () => {
-                this.props.updateKingdomData(event.kingdom);
-            });
+                kingdom: result.data,
+                isLoading: false,
+            })
+        }).catch((err) => {
+            console.error(err);
+        });
+        
+        this.updateKingdom.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {
+            if (this.state.kingdom.id === event.kingdom.id) {
+                this.setState({
+                    kingdom: event.kingdom
+                });
+            }
         });
     }
-
-    componentDidUpdate() {
-        if (!_.isEqual(this.props.kingdom, this.state.kingdom)) {
-            this.setState({
-                kingdom: this.props.kingdom,
-                openQueueData: false,
-                queue: null,
-                queueType: null,
-            });
-        }
-    }
-
 
     adjust(color, amount) {
         return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
@@ -107,6 +106,16 @@ export default class KingdomManagementModal extends React.Component {
     }
 
     render() {
+        if (this.state.isLoading) {
+            return (
+                <LoadingModal 
+                    loadingText="Fetching Kingdom Data ..."
+                    show={this.props.show}
+                    close={this.props.close}
+                />
+            );
+        }
+        
         return (
             <Modal
                 show={this.props.show}

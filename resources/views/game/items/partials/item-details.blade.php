@@ -3,6 +3,8 @@
     <dd>{{$item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Base AC:</dt>
     <dd>{{$item->getTotalDefence()}} <em>(With all modifiers)</em></dd>
+    <dt>Base Healing:</dt>
+    <dd>{{$item->getTotalHealing()}} <em>(With all modifiers)</em></dd>
     <dt>Type:</dt>
     <dd>{{$item->type}}</dd>
     <dt>Effect:</dt>

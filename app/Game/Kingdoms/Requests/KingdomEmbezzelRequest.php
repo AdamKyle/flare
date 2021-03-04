@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class KingdomsLocationRequest extends FormRequest
+class KingdomEmbezzelRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,15 +24,13 @@ class KingdomsLocationRequest extends FormRequest
     public function rules()
     {
         return [
-            'x_position'   => 'required',
-            'y_position'   => 'required',
+            'embezzel_amount' => 'required|int',
         ];
     }
 
     public function messages() {
         return [
-            'x_position.required'    => 'Missing x position.',
-            'y_position.required'    => 'Missing y position.',
+            'embezzel_amount.required' => 'Amount to embezzel is required.',
         ];
     }
 }

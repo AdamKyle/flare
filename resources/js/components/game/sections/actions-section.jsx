@@ -113,19 +113,19 @@ export default class ActionsSection extends React.Component {
             />
             {
               this.props.kingdomData.can_attack ?
-              <button className="btn btn-success btn-sm mb-2">Attack Kingdom</button> 
+                <button className="btn btn-success btn-sm mb-2">Attack Kingdom</button> 
               : null
             }
 
             {
               this.props.kingdomData.can_settle ?
-              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal} className="btn btn-success btn-sm mb-2">Settle Kingdom</button> 
+                <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal} className="btn btn-success btn-sm mb-2">Settle Kingdom</button> 
               : null
             }
 
             {
               this.props.kingdomData.is_mine ?
-              <button disabled={this.state.isDead || this.state.isAdventuring} onClick={() => this.props.openKingdomManagement(true)} className="btn btn-success btn-sm mb-2">Manage Kingdom</button> 
+                <button disabled={this.state.isDead || this.state.isAdventuring} onClick={() => this.props.openKingdomManagement(true)} className="btn btn-success btn-sm mb-2">Manage Kingdom</button> 
               : null
             }
           </Col>

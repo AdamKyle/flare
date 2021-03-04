@@ -43,7 +43,7 @@ class KingdomTransformer extends TransformerAbstract {
             'y_position'         => $kingdom->y_position,
             'current_morale'     => $kingdom->current_morale,
             'max_morale'         => $kingdom->max_morale,
-            'treasury'           => $kingdom->treasurey,
+            'treasury'           => $kingdom->treasury,
             'building_queue'     => $kingdom->buildingsQueue,   
             'unit_queue'         => $kingdom->unitsQueue,  
             'current_units'      => $kingdom->units,    

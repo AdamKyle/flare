@@ -2,14 +2,16 @@
 
 namespace App\Game\Maps\Adventure\Services;
 
+use Cache;
+use Storage;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use App\Flare\Cache\CoordinatesCache;
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\User;
 use App\Flare\Transformers\KingdomTransformer;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use Storage;
 
 class LocationService {
 
@@ -86,11 +88,7 @@ class LocationService {
     public function getLocationData(User $user): array {
         $this->processLocation($user);
 
-        $this->kingdomManagement($user);
-
-        $myKingdoms = Kingdom::where('character_id', $user->character->id)->get();
-        $kingdoms   = new Collection($myKingdoms, $this->kingdomTransformer);
-        $kingdoms   = $this->manager->createData($kingdoms)->toArray();  
+        $this->kingdomManagement($user);  
 
         return [
             'map_url'                => Storage::disk('maps')->url($user->character->map->gameMap->path),
@@ -109,8 +107,20 @@ class LocationService {
             'can_settle_kingdom'     => $this->canSettle,
             'can_attack_kingdom'     => $this->canAttack,
             'can_manage_kingdom'     => $this->canManage,
-            'my_kingdoms'            => $kingdoms,
+            'my_kingdoms'            => $this->getKingdomsFromCache($user->character),
         ];
+    }
+
+    protected function getKingdomsFromCache(Character $character) {
+        if (Cache::has('character-kingdoms-' . $character->id)) {
+            return Cache::get('character-kingdoms-' . $character->id);
+        }
+
+        $kingdoms = Kingdom::select('id', 'x_position', 'y_position', 'color')->where('character_id', $character->id)->get();
+            
+        Cache::put('character-kingdoms-' . $character->id, $kingdoms);
+
+        return Cache::get('character-kingdoms-' . $character->id);
     }
 
     protected function processLocation(User $user) {

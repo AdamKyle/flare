@@ -24,7 +24,7 @@
           </button>
           <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
 
-          <form id="delist-item-{{$marketBoard->item_id}}" action="{{ route('game.delist.current-listing', [
+          <form id="delist-item-{{$marketBoard->id}}" action="{{ route('game.delist.current-listing', [
             'marketBoard' => $marketBoard->id
           ]) }}" method="POST" style="display: none;">
             @csrf

@@ -57,41 +57,44 @@ export default class Board extends Component {
   componentDidMount() {
     this.setState({
       hasItemId: this.props.hasOwnProperty('itemId') && this.props.itemId !== 'undefined'
-    });
-
-    axios.get('/api/market-board/items', {
-      params: {
-        item_id: this.props.itemId,
-      }
-    }).then((result) => {
-      this.setState({
-        records: result.data.items,
-        gold: result.data.gold,
-      });
-    }).catch((error) => {
-      console.error(error);
-    });
-
-    this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
-      let hasId = false;
-
-      if (!_.isEmpty(this.state.modalData)) {
-        hasId = _.isEmpty(event.marketListings.filter((ml) => ml.id === this.state.modalData.id));
-      }
-
-      if (this.state.showModal && hasId) {
-        this.closeModal();
-
+    }, () => {
+      axios.get('/api/market-board/items', {
+        params: {
+          item_id: this.props.itemId,
+        }
+      }).then((result) => {
         this.setState({
-          message: 'Sorry, that item was sold.',
-          messageType: 'info',
+          records: result.data.items,
+          gold: result.data.gold,
+        });
+      }).catch((error) => {
+        console.error(error);
+      });
+
+      if (!this.state.hasItemId) {
+        console.log('called');
+        this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
+          let hasId = false;
+  
+          if (!_.isEmpty(this.state.modalData)) {
+            hasId = _.isEmpty(event.marketListings.filter((ml) => ml.id === this.state.modalData.id));
+          }
+  
+          if (this.state.showModal && hasId) {
+            this.closeModal();
+  
+            this.setState({
+              message: 'Sorry, that item was sold.',
+              messageType: 'info',
+            });
+          }
+  
+          this.setState({
+            records: event.marketListings,
+            gold: event.characterGold,
+          });
         });
       }
-
-      this.setState({
-        records: event.marketListings,
-        gold: event.characterGold,
-      });
     });
   }
 

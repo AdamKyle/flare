@@ -88,6 +88,8 @@ export default class ItemDetails extends React.Component {
                     <dd>{this.props.item.base_damage} <em>(With all modifiers)</em></dd>
                     <dt>Base AC:</dt>
                     <dd>{this.props.item.base_ac} <em>(With all modifiers)</em></dd>
+                    <dt>Base Healing:</dt>
+                    <dd>{this.props.item.base_healing} <em>(With all modifiers)</em></dd>
                     <dt>Type:</dt>
                     <dd>{this.props.item.type}</dd>
                     <dt>Effect:</dt>

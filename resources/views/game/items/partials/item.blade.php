@@ -18,7 +18,7 @@
         <h4>Base Equip Stats</h4>
         <div class="card">
             <div class="card-body">
-                <p class="text-muted mb-2 mt-2" style="font-size: 12px; font-style: italic;">All values include any attached affixes and any additional modifiers.</p>
+                <p class="text-muted mb-2 mt-2" style="font-size: 12px; font-style: italic;">All values include any attached affixes and any additional modifiers and will be applied upon equiping.</p>
                 @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
             </div>
         </div>

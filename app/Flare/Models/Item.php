@@ -96,6 +96,11 @@ class Item extends Model
         return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
     }
 
+    /**
+     * Gets the affix name attribute.
+     * 
+     * When calling affix_name on the item, it will return the name with all affixes applied.
+     */
     public function getAffixNameAttribute() {
         if (!is_null($this->item_suffix_id) && !is_null($this->item_prefix_id)) {
             return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
@@ -108,51 +113,122 @@ class Item extends Model
         return $this->name;
     }
 
-    public function scopeGetTotalDamage(): float {
+    /**
+     * Gets the total damage value for the item.
+     * 
+     * In some cases an item might not have a base_damage value.
+     * how ever might have either prefix or suffix or both.
+     * 
+     * In this case we will set the damage variable to one.
+     * this will allow the damage modifiers to be applied to the item.
+     * 
+     * Which in turns allows the player to their total damage increased when
+     * attacking.
+     * 
+     * @return int.
+     */
+    public function scopeGetTotalDamage(): int {
         $baseDamage = is_null($this->base_damage) ? 0 : $this->base_damage;
         $damage     = $baseDamage;
 
         if (!is_null($this->itemPrefix)) {
-            $damage += ($baseDamage * (1 + $this->itemPrefix->base_damage_mod));
+            if ($damage === 0 && !is_null($this->itemPrefix->base_damage_mod)) {
+                $damage = 1;
+            }
+
+            $damage = ($damage * (1 + $this->itemPrefix->base_damage_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            $damage += ($baseDamage * (1 + $this->itemSuffix->base_damage_mod));
+            if ($damage === 0 && !is_null($this->itemSuffix->base_damage_mod)) {
+                $damage = 1;
+            }
+
+            $damage = ($damage * (1 + $this->itemSuffix->base_damage_mod));
         }
 
-        return round($damage);
+        return ceil($damage);
     }
 
-    public function scopeGetTotalDefence(): float {
+    /**
+     * Gets the total defence value for the item.
+     * 
+     * In some cases an item might not have a base_ac value.
+     * how ever might have either prefix or suffix or both.
+     * 
+     * In this case we will set the ac variable to one.
+     * this will allow the ac modifiers to be applied to the item.
+     * 
+     * Which in turns allows the player to their total ac increased when
+     * defending from attacks.
+     * 
+     * @return int.
+     */
+    public function scopeGetTotalDefence(): int {
         $baseAc = is_null($this->base_ac) ? 0 : $this->base_ac;
         $ac     = $baseAc;
 
         if (!is_null($this->itemPrefix)) {
-            $ac += ($baseAc * (1 + $this->itemPrefix->base_ac_mod));
+            if ($ac === 0 && !is_null($this->itemPrefix->base_ac_mod)) {
+                $ac = 1;
+            }
+
+            $ac = ($ac * (1 + $this->itemPrefix->base_ac_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            $ac += ($baseAc * (1 + $this->itemSuffix->base_ac_mod));
+            if ($ac === 0 && !is_null($this->itemSuffix->base_ac_mod)) {
+                $ac = 1;
+            }
+
+            $ac = ($ac * (1 + $this->itemSuffix->base_ac_mod));
         }
 
-        return round($ac);
+        return ceil($ac);
     }
 
-    public function scopeGetTotalHealing(): float {
+    /**
+     * Gets the total healing value for the item.
+     * 
+     * In some cases an item might not have a base_healing value.
+     * how ever might have either prefix or suffix or both.
+     * 
+     * In this case we will set the healFor variable to one.
+     * this will allow the healing modifiers to be applied to the item.
+     * 
+     * Which in turns allows the player to their total healing increased when
+     * attacking.
+     * 
+     * @return int.
+     */
+    public function scopeGetTotalHealing(): int {
         $baseHealing = is_null($this->base_healing) ? 0 : $this->base_healing;
         $healFor     = $baseHealing;
 
         if (!is_null($this->itemPrefix)) {
-            $healFor += ($baseHealing * (1 + $this->itemPrefix->base_heal_mod));
+            if ($healFor === 0 && !is_null($this->itemPrefix->base_healing_mod)) {
+                $healFor = 1;
+            }
+
+            $healFor = ($healFor * (1 + $this->itemPrefix->base_healing_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            $healFor += ($baseHealing * (1 + $this->itemSuffix->base_heal_mod));
+            if ($healFor === 0 && !is_null($this->itemSuffix->base_healing_mod)) {
+                $healFor = 1;
+            }
+
+            $healFor = ($healFor * (1 + $this->itemSuffix->base_healing_mod));
         }
 
-        return round($healFor);
+        return ceil($healFor);
     }
 
+    /**
+     * Gets the total percentage increase for a stat.
+     * 
+     * @return float
+     */
     public function scopeGetTotalPercentageForStat($qeury, string $stat): float {
         $baseStat = is_null($this->{$stat . '_mod'}) ? 0.0 : $this->{$stat . '_mod'};
 
@@ -169,6 +245,11 @@ class Item extends Model
         return $baseStat;
     }
 
+    /**
+     * Gets the total skill training bonus
+     * 
+     * @return float
+     */
     public function scopeGetSkillTrainingBonus($query, string $skillName): float {
         $baseSkillTraining = 0.0;
 
