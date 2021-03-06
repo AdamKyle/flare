@@ -99,7 +99,7 @@ export default class Map extends React.Component {
       });
     });
 
-    this.echo.listen('Game.Maps.Adventure.Events.ShowTimeOutEvent', (event) => {
+    this.echo.listen('Game.Maps.Events.ShowTimeOutEvent', (event) => {
       this.setState({
         canMove: event.canMove,
         showMessage: false,
@@ -121,13 +121,13 @@ export default class Map extends React.Component {
       });
     });
 
-    this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+    this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
       this.setState({
         isAdventuring: event.isAdventuring,
       });
     });
 
-    this.updateMap.listen('Game.Maps.Adventure.Events.UpdateMapDetailsBroadcast', (event) => {
+    this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
       this.updatePlayerPosition(event.map);
 
       this.setState({
@@ -509,7 +509,7 @@ export default class Map extends React.Component {
            <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>East</button>
            <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>West</button>
            <TimeOutBar
-              eventClass={'Game.Maps.Adventure.Events.ShowTimeOutEvent'}
+              eventClass={'Game.Maps.Events.ShowTimeOutEvent'}
               channel={'show-timeout-move-' + this.props.userId}
               cssClass={'character-map-timeout'}
               readyCssClass={'character-map-ready float-left'}

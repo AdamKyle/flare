@@ -7,7 +7,7 @@ use App\Flare\Models\AdventureLog;
 use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
-use App\Game\Maps\Adventure\Events\UpdateAdventureLogsBroadcastEvent;
+use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
 
 use function PHPUnit\Framework\isEmpty;
 

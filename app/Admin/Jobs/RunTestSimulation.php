@@ -15,7 +15,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
 use App\Flare\Services\FightService;
-use App\Game\Maps\Adventure\Jobs\AdventureJob;
+use App\Game\Adventures\Jobs\AdventureJob;
 use Cache;
 
 class RunTestSimulation implements ShouldQueue

@@ -104,6 +104,18 @@ class Character extends Model
         return $this->hasOne(Map::class);
     }
 
+    public function getXPositionAttribute() {
+        return $this->map->character_position_x;
+    }
+
+    public function getYPositionAttribute() {
+        return $this->map->character_position_y;
+    }
+
+    public function getMapUrlAttribute() {
+        return $this->map->gameMap->path;
+    }
+
     public function adventureLogs() {
         return $this->hasMany(AdventureLog::class);
     }

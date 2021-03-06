@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\Maps\Adventure\Values;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use App\Game\Maps\Adventure\Values\MapTileValue;
+use App\Game\Maps\Values\MapTileValue;
 use App\Flare\Models\GameMap;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

@@ -33,20 +33,21 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function map()
-    {
-        $this->mapApiRoutes();
+    public function map() {
 
+        // Map Routes:
         $this->mapWebRoutes();
-
         $this->mapAdminRoutes();
-
         $this->adventureRoutes();
-        $this->mapGameRoutes();
+        $this->mapGameCoreRoutes();
+
+        // Api Routes:
+        $this->mapApiRoutes();
         $this->mapGameCoreApiRoutes();
         $this->mapGameMessageApiRoutes();
         $this->mapGameBattleApiRoutes();
-        $this->mapGameAdventureMapApiRoutes();
+        $this->mapGameMapApiRoutes();
+        $this->mapGameAdventuresApiRoutes();
         $this->mapGameSkillsApiRoutes();
         $this->mapGameKingdomApiRoutes();
     }
@@ -99,8 +100,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function adventureRoutes()
     {
         Route::middleware('web')
-             ->namespace('App\Game\Maps\Adventure\Controllers')
-             ->group(base_path('routes/game/maps/adventure/web.php'));
+             ->namespace('App\Game\Adventures\Controllers')
+             ->group(base_path('routes/game/adventures/web.php'));
     }
 
     protected function mapAdminRoutes()
@@ -110,7 +111,7 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/admin/web.php'));
     }
 
-    protected function mapGameRoutes()
+    protected function mapGameCoreRoutes()
     {
         Route::middleware('web')
              ->namespace('App\Game\Core\Controllers')
@@ -141,11 +142,19 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/game/battle/api.php'));
     }
 
-    protected function mapGameAdventureMapApiRoutes()
+    protected function mapGameAdventuresApiRoutes()
     {
         Route::prefix('api')
              ->middleware('api')
-             ->namespace('App\Game\Maps\Adventure\Controllers')
-             ->group(base_path('routes/game/maps/adventure/api.php'));
+             ->namespace('App\Game\Adventures\Controllers')
+             ->group(base_path('routes/game/adventures/api.php'));
+    }
+
+    protected function mapGameMapApiRoutes()
+    {
+        Route::prefix('api')
+             ->middleware('api')
+             ->namespace('App\Game\Maps\Controllers')
+             ->group(base_path('routes/game/maps/api.php'));
     }
 }

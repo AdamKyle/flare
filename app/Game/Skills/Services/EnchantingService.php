@@ -14,8 +14,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\EnchantItemService;
-use App\Game\Skills\Services\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
 
 class EnchantingService {

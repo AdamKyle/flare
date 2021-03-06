@@ -4,7 +4,7 @@ namespace Tests\Unit\Game\Maps\Adventure\Events;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Game\Maps\Adventure\Events\ShowTimeOutEvent;
+use App\Game\Maps\Events\ShowTimeOutEvent;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 

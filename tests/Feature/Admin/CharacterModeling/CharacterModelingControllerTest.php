@@ -308,7 +308,7 @@ class CharacterModelingControllerTest extends TestCase
             'character_levels' => '1',
             'total_times' => '1',
         ])->response;
-
+        
         $response->assertSessionHas('success', 'Testing under way. You may log out, we will email you when done.');
     }
 

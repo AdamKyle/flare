@@ -4,7 +4,7 @@ namespace Tests\Unit\Game\Maps\Adventure\Services;
 
 use App\Flare\Models\ItemAffix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Game\Maps\Adventure\Services\AdventureFightService;
+use App\Game\Adventures\Services\AdventureFightService;
 use Database\Seeders\GameSkillsSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;

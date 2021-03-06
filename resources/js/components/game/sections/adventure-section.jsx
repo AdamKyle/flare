@@ -34,7 +34,7 @@ export default class AdeventureActions extends React.Component {
       isLoading: false,
     });
 
-    this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+    this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
       const lastLog = event.adventureLogs[event.adventureLogs.length - 1];
       let failed    = false;
       let canceled  = false;
@@ -126,7 +126,7 @@ export default class AdeventureActions extends React.Component {
         forSeconds={this.state.canAdventureAgainAt}
         timeRemaining={this.state.canAdventureAgainAt}
         channel={'show-timeout-bar-' + this.props.userId}
-        eventClass={'Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent'}
+        eventClass={'Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent'}
       />
     )
   }

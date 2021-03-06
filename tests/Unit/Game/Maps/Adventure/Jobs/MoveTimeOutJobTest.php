@@ -4,7 +4,7 @@ namespace Tests\Unit\Game\Maps\Adventure\Jobs;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Game\Maps\Adventure\Jobs\MoveTimeOutJob;
+use App\Game\Maps\Jobs\MoveTimeOutJob;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 

@@ -4,7 +4,7 @@ namespace Tests\Unit\Game\Maps\Adventure\Jobs;
 
 use Cache;
 use Str;
-use App\Game\Maps\Adventure\Jobs\AdventureJob;
+use App\Game\Adventures\Jobs\AdventureJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
