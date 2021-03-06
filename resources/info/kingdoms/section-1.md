@@ -168,6 +168,17 @@ To find another person’s kingdom, you must travel around the map. Once you fin
 
 You won’t see their kingdom on the map, but this button indicates you found someone’s kingdom and can attack it. More on that in the [Attacking a kingdom]() section.
 
+## Embezzling 
+
+When it comes to embezzling the gold from your kingdom, you can click the treasury link at the top of the kingdom management window. From here you can embezzle any amount of treasure that you currently have which accumulates per hour.
+
+Every time you embezzle, regardless of how much, your kingdom will loose 15% morale. If your kingdom is at
+or below the 15% morale threshold or has no treasure to embezzle you will not be able to embezzle from your
+kingdom.
+
+If your kingdom is taken, by another player, your treasury will be lost. That does not mean the other player
+will gain that treasure. Instead the treasure is considered lost and will reset to 0.
+
 ## Additional Tips
 
 - Settling one kingdom is free, settling additional kingdoms cost 10,000 gold per kingdom you own. For example, if you have 5 kingdoms, your 6th will cost 50,000 gold. If you don’t have the gold, you can Attack other kingdoms, reduce their morale to 0 and send in a special unit called a “settler” who will settle the kingdom. See [Attacking a kingdom]().

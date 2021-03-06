@@ -38,6 +38,13 @@ class EnchantingService {
     private $sentToEasyMessage = false;
 
     /**
+     * Only set if the affix to be applied was too easy to enchant.
+     * 
+     * @var bool $wasTooEasy
+     */
+    private $wasTooEasy = false;
+
+    /**
      * Constructor
      * 
      * @param CharacterInformationBuilder $characterInformationBuilder
@@ -158,6 +165,9 @@ class EnchantingService {
                 throw new Exception('Affix not found for: ' . $affixId);
             }
 
+            // Reset.
+            $this->wasTooEasy = false;
+
             if ($enchantingSkill->level < $affix->skill_level_required) {
                 event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
 
@@ -172,11 +182,20 @@ class EnchantingService {
 
                 $this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost, true);
 
-                return;
+                $this->wasTooEasy = true;
+
             }
 
-            if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost)) {
-                return;
+            /**
+             * If the affix wasn't too easy to atach, attempt to enchant with the difficulty check 
+             * in place.
+             * 
+             * If we fail to do this then we retrun from the loop.
+             */
+            if (!$this->wasTooEasy) {
+                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost)) {
+                    return;
+                }
             }
         }
     }
