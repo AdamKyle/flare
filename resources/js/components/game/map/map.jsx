@@ -9,6 +9,7 @@ import {
 }                         from './helpers/map_position';
 import CardLoading        from '../components/loading/card-loading';
 import MapMovementActions from './components/map-movement-actions';
+import MapActions         from './components/map-actions';
 import Locations          from './components/locations';
 import KingdomPin         from './components/pins/kingdom-pin';
 
@@ -182,7 +183,7 @@ export default class Map extends React.Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     if (!_.isEmpty(this.props.position)) {
       this.updatePlayerPosition(this.props.position);
     }
@@ -227,6 +228,10 @@ export default class Map extends React.Component {
 
   openTeleport() {
     this.props.openTeleportDetails(true);
+  }
+
+  disableMapButtons() {
+    return this.state.isDead || this.state.isAdventuring || !this.state.canMove;
   }
 
   updatePlayerPosition(position) {
@@ -333,25 +338,22 @@ export default class Map extends React.Component {
          </div>
          <div className="character-position mt-2">
           <div className="mb-2 mt-2 clearfix">
-            <Row>
-              <Col xs={12} sm={12} md={4} lg={4} xl={4}>
-                <p className="text-left">X/Y: {this.state.characterPosition.x}/{this.state.characterPosition.y}</p>
-              </Col>
-              <Col xs={12} sm={12} md={8} lg={8} xl={8}>
-                <div className="push-right">
-                { !_.isEmpty(this.state.adventures) ? <button type="button" className=" btn btn-success mr-2 btn-sm " onClick={this.openAdventureDetails.bind(this)}>Adventure</button> : null}
-                { this.state.currentPort !== null ? <button type="button" className=" btn btn-success mr-2 btn-sm " disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openPortDetails.bind(this)}>Set Sail</button> : null}
-                <button type="button" className="btn btn-primary btn-sm mr-2 " data-direction="teleport" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.openTeleport.bind(this)}>Teleport</button>
-                </div>
-              </Col>
-            </Row>
+            <MapActions 
+              adventures={this.state.adventures}
+              currentPort={this.state.currentPort}
+              characterPosition={this.state.characterPosition}
+              disableMapButtons={this.disableMapButtons.bind(this)}
+              openAdventureDetails={this.openAdventureDetails.bind(this)}
+              openPortDetails={this.openPortDetails.bind(this)}
+              openTeleport={this.openTeleport.bind(this)}
+            />
           </div>
          </div>
          <hr />
          <MapMovementActions 
           isDead={this.state.isDead}
           isAdventuring={this.state.isAdventuring}
-          canMove={this.state.canMove}
+          disableMapButtons={this.disableMapButtons.bind(this)}
           characterPosition={this.state.characterPosition}
           timeRemaining={this.state.timeRemaining}
           move={this.move.bind(this)}

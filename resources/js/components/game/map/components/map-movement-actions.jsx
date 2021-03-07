@@ -8,10 +8,6 @@ export default class MapMovementActions extends React.Component {
     super(props);
   }
 
-  disabled() {
-    return this.props.isDead || this.props.isAdventuring || !this.props.canMove;
-  }
-
   move(e) {
     const coordinates = movePlayer(
       this.props.characterPosition.x,
@@ -41,10 +37,10 @@ export default class MapMovementActions extends React.Component {
               : null
           }
 
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.disabled()} onClick={this.move.bind(this)}>North</button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.disabled()} onClick={this.move.bind(this)}>South</button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.disabled()} onClick={this.move.bind(this)}>East</button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.disabled()} onClick={this.move.bind(this)}>West</button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>North</button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>South</button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>East</button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>West</button>
 
           <TimeOutBar
             eventClass={'Game.Maps.Events.ShowTimeOutEvent'}
