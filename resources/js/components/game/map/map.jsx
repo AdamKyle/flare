@@ -3,10 +3,10 @@ import {Row, Col}                         from 'react-bootstrap';
 import Draggable                          from 'react-draggable';
 import {getServerMessage}                 from '../helpers/server_message';
 import {getNewXPosition, getNewYPosition} from './helpers/map_position';
-import LocationInfoModal                  from './components/modals/location-info-modal';
 import TimeOutBar                         from '../timeout/timeout-bar';
-import Card                               from '../components/templates/card';
-import ContentLoader                      from 'react-content-loader';
+import CardLoading                        from '../components/loading/card-loading';
+import Locations                          from './components/locations';
+import KingdomPin                         from './components/pins/kingdom-pin';
 
 export default class Map extends React.Component {
 
@@ -26,11 +26,9 @@ export default class Map extends React.Component {
       isLoading: true,
       characterId: 0,
       showCharacterInfo: false,
-      showLocationInfo: false,
       canMove: true,
       showMessage: false,
       locations: null,
-      location: null,
       currentPort: null,
       adventures: [],
       portList: [],
@@ -358,71 +356,7 @@ export default class Map extends React.Component {
      });
   }
 
-  openLocationDetails(e) {
-    const location = this.state.locations.filter(l => l.id === parseInt(event.target.getAttribute('data-location-id')))[0];
-
-    this.setState({
-      showLocationInfo: true,
-      location: location,
-    });
-  }
-
-  closeLocationDetails() {
-    this.setState({
-      showLocationInfo: false,
-      location: null,
-    });
-  }
-
-  renderLocations() {
-    return this.state.locations.map((location) => {
-      if (location.is_port) {
-        return (
-          <div
-            key={location.id}
-            data-location-id={location.id}
-            className="port-x-pin"
-            style={{top: location.y, left: location.x}}
-            onClick={this.openLocationDetails.bind(this)}>
-          </div>
-        );
-      } else {
-        return (
-          <div
-            key={location.id}
-            data-location-id={location.id}
-            className="location-x-pin"
-            style={{top: location.y, left: location.x}}
-            onClick={this.openLocationDetails.bind(this)}>
-          </div>
-        );
-      }
-
-    });
-  }
-
-  renderKingdoms() {
-    return this.state.kingdoms.map((kingdom) => {
-      let style = {
-        top: kingdom.y_position, 
-        left: kingdom.x_position,
-        '--kingdom-color': this.convertToHex(kingdom.color)
-      };
-
-      return (
-        <div
-          key={Math.random().toString(36).substring(7) + '-' + kingdom.id}
-          data-kingdom-id={kingdom.id}
-          className="kingdom-x-pin"
-          style={style}>
-        </div>
-      )
-    });
-  }
-
-  convertToHex(rgba) {
-    return `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`
-  }
+  
 
   openPortDetails() {
     this.props.openPortDetails(true);
@@ -438,17 +372,7 @@ export default class Map extends React.Component {
 
   render() {
     if (this.state.isLoading) {
-      return (
-        <Card>
-          <ContentLoader viewBox="0 0 380 300">
-            {/* Only SVG shapes */}    
-            <rect x="0" y="0" rx="4" ry="4" width="500" height="230" />
-            <rect x="0" y="245" rx="3" ry="3" width="250" height="10" />
-            <rect x="0" y="265" rx="3" ry="3" width="250" height="10" />
-            <rect x="0" y="285" rx="3" ry="3" width="250" height="10" />
-          </ContentLoader>
-        </Card>
-      );
+      return <CardLoading />
     }
 
     return (
@@ -468,8 +392,8 @@ export default class Map extends React.Component {
             >
             <div>
               <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
-                {this.renderLocations()}
-                {this.renderKingdoms()}
+                <Locations locations={this.state.locations} />
+                <KingdomPin kingdoms={this.state.kingdoms} />
                 <div className="map-x-pin" style={this.playerIcon()}></div>
               </div>
             </div>
@@ -518,7 +442,7 @@ export default class Map extends React.Component {
          </div>
         </div>
 
-        <LocationInfoModal show={this.state.showLocationInfo} onClose={this.closeLocationDetails.bind(this)} location={this.state.location} />
+        
       </div>
     )
   }

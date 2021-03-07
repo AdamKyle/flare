@@ -42,7 +42,7 @@ export default class LocationInfo extends React.Component {
         <>
           <hr />
           <h5>Quest Reward Items</h5>
-          <div class="alert alert-info">Only handed out once, when you first visit the location.</div>
+          <div className="alert alert-info">Only handed out once, when you first visit the location.</div>
           <ul>
             <li>
               <a href={'/items/' + this.props.location.quest_reward_item.id} target="_blank">{this.props.location.quest_reward_item.name}</a>

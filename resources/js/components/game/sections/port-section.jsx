@@ -1,6 +1,6 @@
 import React   from 'react';
 import ContentLoader from 'react-content-loader';
-import SetSail from '../map/components/set-sail';
+import SetSail from './components/set-sail';
 import Card from '../components/templates/card';
 
 

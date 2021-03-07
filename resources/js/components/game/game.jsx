@@ -2,7 +2,7 @@ import React                  from 'react';
 import {Row, Col}             from 'react-bootstrap';
 import Chat                   from './messages/chat';
 import Map                    from './map/map';
-import Teleport               from './map/components/teleport';
+import Teleport               from './sections/components/teleport';
 import CharacterInfoTopSection from './sections/character-info-section';
 import ActionsSection         from './sections/actions-section';
 import PortSection            from './sections/port-section';
