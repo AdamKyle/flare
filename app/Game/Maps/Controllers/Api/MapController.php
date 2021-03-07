@@ -68,20 +68,4 @@ class MapController extends Controller {
 
         return response()->json($response, $status);
     }
-
-    public function isWater(IsWaterRequest $request, Character $character) {
-        $color = $this->mapTile->getTileColor($character, $request->character_position_x, $request->character_position_y);
-
-        if ($this->mapTile->isWaterTile((int) $color)) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
-                return $slot->item->effect === 'walk-on-water';
-            })->isNotEmpty();
-
-            if (!$hasItem) {
-                return response()->json([], 422);
-            }
-        }
-
-        return response()->json([], 200);
-    }
 }
