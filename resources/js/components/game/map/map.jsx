@@ -1,12 +1,16 @@
-import React                              from 'react';
-import {Row, Col}                         from 'react-bootstrap';
-import Draggable                          from 'react-draggable';
-import {getServerMessage}                 from '../helpers/server_message';
-import {getNewXPosition, getNewYPosition} from './helpers/map_position';
-import TimeOutBar                         from '../timeout/timeout-bar';
-import CardLoading                        from '../components/loading/card-loading';
-import Locations                          from './components/locations';
-import KingdomPin                         from './components/pins/kingdom-pin';
+import React              from 'react';
+import {Row, Col}         from 'react-bootstrap';
+import Draggable          from 'react-draggable';
+import {getServerMessage} from '../helpers/server_message';
+import {
+  getNewXPosition, 
+  getNewYPosition,
+  dragMap
+}                         from './helpers/map_position';
+import CardLoading        from '../components/loading/card-loading';
+import MapMovementActions from './components/map-movement-actions';
+import Locations          from './components/locations';
+import KingdomPin         from './components/pins/kingdom-pin';
 
 export default class Map extends React.Component {
 
@@ -201,29 +205,9 @@ export default class Map extends React.Component {
   }
 
   handleDrag(e, position) {
-    const {x, y}     = position;
-    const yBounds    = Math.sign(position.y);
-    const xBounds    = Math.sign(position.x);
-    let bottomBounds = this.state.bottomBounds;
-    let rightBounds  = this.state.rightBounds;
-
-    if (yBounds === -1) {
-      bottomBounds += Math.abs(yBounds);
-    } else {
-      bottomBounds = 0;
-    }
-
-    if (xBounds === -1) {
-      rightBounds += Math.abs(xBounds);
-    } else {
-      rightBounds = 0;
-    }
-
-    this.setState({
-      controlledPosition: {x, y},
-      bottomBounds: bottomBounds,
-      rightBounds: rightBounds,
-    });
+    this.setState(dragMap(
+      position, this.state.bottomBounds, this.state.rightBounds
+    ));
   }
 
   playerIcon() {
@@ -232,131 +216,6 @@ export default class Map extends React.Component {
       left: this.state.characterPosition.x + 'px',
     }
   }
-
-  updatePlayerPosition(position) {
-    const characterX = position.character_position_x;
-    const characterY = position.character_position_y;
-    const mapX       = position.position_x;
-    const mapY       = position.position_y;
-
-    this.setState({
-      characterPosition: {x: characterX, y: characterY},
-      controlledPosition: {x: getNewXPosition(characterX, mapX), y: getNewYPosition(characterY, mapY)},
-    }, () => {
-      this.props.updatePlayerPosition({});
-    });
-  }
-
-  move(e) {
-    if (!this.state.canMove) {
-      return getServerMessage('cant_move');
-    }
-
-    if (this.state.isDead) {
-      return getServerMessage('dead_character');
-    }
-
-    const movement  = e.target.getAttribute('data-direction');
-    let x           = this.state.characterPosition.x;
-    let y           = this.state.characterPosition.y;
-
-    switch (movement) {
-        case 'north':
-          y = y - 16;
-          break;
-        case 'south':
-          y = y + 16;
-          break;
-        case 'east':
-          x = x + 16;
-          break;
-        case 'west':
-          x = x - 16;
-          break;
-        default:
-          break;
-    }
-
-    if (y < 16) {
-      return getServerMessage('cannot_move_up');
-    }
-
-    if (x < 0) {
-      return getServerMessage('cannot_move_left');
-    }
-
-    if (y > 496) {
-      return getServerMessage('cannot_move_down');
-    }
-
-    if (x > 480) {
-      return getServerMessage('cannot_move_right');
-    }
-
-    axios.get('/api/is-water/' + this.state.characterId, {
-      params: {
-        character_position_x: x,
-        character_position_y: y,
-      }
-    })
-      .then((result) => {
-        // If we're not water:
-        this.setState({
-          characterPosition: {x, y},
-          controlledPosition: {x: getNewXPosition(x, this.state.controlledPosition.x), y: getNewYPosition(y, this.state.controlledPosition.y)},
-        }, () => {
-          axios.post('/api/move/' + this.state.characterId, {
-            position_x: this.state.controlledPosition.x,
-            position_y: this.state.controlledPosition.y,
-            character_position_x: this.state.characterPosition.x,
-            character_position_y: this.state.characterPosition.y,
-          }).then((result) => {
-            this.setState({
-              currentPort: result.data.port_details.hasOwnProperty('current_port') ? result.data.port_details.current_port : null,
-              portList: result.data.port_details.hasOwnProperty('port_list') ? result.data.port_details.port_list : [],
-              adventures: result.data.adventure_details,
-            }, () => {
-              this.props.updatePort({
-                currentPort: this.state.currentPort,
-                portList: this.state.portList,
-                characterId: this.state.characterId,
-                characterIsDead: this.state.isDead,
-                canMove: this.state.canMove,
-              });
-
-              this.props.updateKingdoms({
-                my_kingdoms: this.state.kingdoms,
-                can_attack: result.data.kingdom_details.can_attack,
-                can_settle: result.data.kingdom_details.can_settle,
-                is_mine: result.data.kingdom_details.can_manage,
-              });
-
-              this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
-
-              this.props.updateAdventure(this.state.adventures, [], null);
-
-              if (this.state.currentPort == null) {
-                this.props.openPortDetails(false);
-              }
-
-              if (_.isEmpty(this.state.adventures)) {
-                this.props.openAdventureDetails(false);
-              }
-            });
-          });
-        });
-      })
-     .catch((error) => {
-       this.setState({
-         characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
-       });
-
-       // If we are:
-       return getServerMessage('cannot_walk_on_water');
-     });
-  }
-
-  
 
   openPortDetails() {
     this.props.openPortDetails(true);
@@ -368,6 +227,79 @@ export default class Map extends React.Component {
 
   openTeleport() {
     this.props.openTeleportDetails(true);
+  }
+
+  updatePlayerPosition(position) {
+    const characterX = position.character_position_x;
+    const characterY = position.character_position_y;
+    const mapX       = position.position_x;
+    const mapY       = position.position_y;
+
+    this.setState({
+      characterPosition: {x: characterX, y: characterY},
+      controlledPosition: {x: getNewXPosition(characterX, mapX), y: getNewYPosition(characterY, mapY)},
+    });
+  }
+
+  move(coordinates) {
+    if (!this.state.canMove) {
+      return getServerMessage('cant_move');
+    }
+
+    if (this.state.isDead) {
+      return getServerMessage('dead_character');
+    }
+
+    const x = coordinates.x;
+    const y = coordinates.y;
+
+    axios.post('/api/move/' + this.state.characterId, {
+      position_x: this.state.controlledPosition.x,
+      position_y: this.state.controlledPosition.y,
+      character_position_x: this.state.characterPosition.x,
+      character_position_y: this.state.characterPosition.y,
+    }).then((result) => {
+      this.setState({
+        currentPort: result.data.port_details.hasOwnProperty('current_port') ? result.data.port_details.current_port : null,
+        portList: result.data.port_details.hasOwnProperty('port_list') ? result.data.port_details.port_list : [],
+        adventures: result.data.adventure_details,
+        characterPosition: {x, y},
+        controlledPosition: {x: getNewXPosition(x, this.state.controlledPosition.x), y: getNewYPosition(y, this.state.controlledPosition.y)},
+      }, () => {
+        this.props.updatePort({
+          currentPort: this.state.currentPort,
+          portList: this.state.portList,
+          characterId: this.state.characterId,
+          characterIsDead: this.state.isDead,
+          canMove: this.state.canMove,
+        });
+
+        this.props.updateKingdoms({
+          my_kingdoms: this.state.kingdoms,
+          can_attack: result.data.kingdom_details.can_attack,
+          can_settle: result.data.kingdom_details.can_settle,
+          is_mine: result.data.kingdom_details.can_manage,
+        });
+
+        this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
+
+        this.props.updateAdventure(this.state.adventures, [], null);
+
+        if (this.state.currentPort == null) {
+          this.props.openPortDetails(false);
+        }
+
+        if (_.isEmpty(this.state.adventures)) {
+          this.props.openAdventureDetails(false);
+        }
+      });
+    }).catch((err) => {
+      this.setState({
+        characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
+      });
+
+      return getServerMessage('cannot_walk_on_water');
+    });
   }
 
   render() {
@@ -416,33 +348,16 @@ export default class Map extends React.Component {
           </div>
          </div>
          <hr />
-         <div className="mb-2 mt-2">
-          {this.state.isDead ? <span className="text-danger revive">You must revive.</span> : null}
-         </div>
-         <div className="clearfix">
-          {this.state.isAdventuring
-           ?
-           <div className="alert alert-warning" role="alert">
-             You are currently adventuring and cannot move or set sail.
-           </div>
-           : 
-           null
-           }
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>North</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>South</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>East</button>
-           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.state.isDead || this.state.isAdventuring || !this.state.canMove} onClick={this.move.bind(this)}>West</button>
-           <TimeOutBar
-              eventClass={'Game.Maps.Events.ShowTimeOutEvent'}
-              channel={'show-timeout-move-' + this.props.userId}
-              cssClass={'character-map-timeout'}
-              readyCssClass={'character-map-ready float-left'}
-              timeRemaining={this.state.timeRemaining}
-            />
-         </div>
+         <MapMovementActions 
+          isDead={this.state.isDead}
+          isAdventuring={this.state.isAdventuring}
+          canMove={this.state.canMove}
+          characterPosition={this.state.characterPosition}
+          timeRemaining={this.state.timeRemaining}
+          move={this.move.bind(this)}
+          userId={this.props.userId}
+         />
         </div>
-
-        
       </div>
     )
   }

@@ -40,17 +40,13 @@ class MapController extends Controller {
     }
 
     public function move(MoveRequest $request, Character $character, MovementService $movementSevice) {
-        $character = $movementSevice->updateCharacterPosition($character, $request->all());
+        $response = $movementSevice->updateCharacterPosition($character, $request->all());
 
-        $movementSevice->processArea($character);
+        $status = $response['status'];
 
-        $movementSevice->updateCharacterMovementTimeOut($character);
+        unset($response['status']);
 
-        return response()->json([
-            'port_details'      => $movementSevice->portDetails(),
-            'adventure_details' => $movementSevice->adventureDetails(),
-            'kingdom_details'   => $movementSevice->kingdomDetails(),
-        ], 200);
+        return response()->json($response, $status);
     }
 
     public function teleport(TeleportRequest $request, Character $character, MovementService $movementSevice) {

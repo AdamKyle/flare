@@ -69,14 +69,26 @@ class MovementService {
     /**
      * Update the characters position.
      * 
+     * Only updates the character position if the character can walk on water
+     * 
      * @param Character $character
      * @param array $params
-     * @return Character
+     * @return array
      */
-    public function updateCharacterPosition(Character $character, array $params): Character {
-        $character->map->update($params);
+    public function updateCharacterPosition(Character $character, array $params): array {
+        $xPosition    = $params['character_position_x'];
+        $yPosition    = $params['character_position_y'];
+        $mapTileColor = $this->mapTile->getTileColor($character, $xPosition, $yPosition);
 
-        return $character->refresh();
+        if ($this->mapTile->isWaterTile((int) $mapTileColor)) {
+            if ($this->canWalkOnwater($character, $xPosition, $yPosition)) {
+                return $this->moveCharacter($character, $params);
+            } else {
+                return $this->errorResult('cannot walk on water.');
+            }
+        }
+
+        return $this->moveCharacter($character, $params);
     }
 
     /**
@@ -176,7 +188,7 @@ class MovementService {
      * @return array
      */
     public function teleport(Character $character, int $x, int $y, int $cost, int $timeout): array {
-        $canTeleport = $this->canTeleportToWater($character, $x, $y);
+        $canTeleport = $this->canWalkOnwater($character, $x, $y);
 
         if (!$canTeleport) {
             $item = Item::where('effect', 'walk-on-water')->first();
@@ -274,6 +286,30 @@ class MovementService {
     }
 
     /**
+     * Moves the character to the new location.
+     * 
+     * 
+     * @param Character $character
+     * @param array $params
+     * @return array
+     */
+    protected function moveCharacter(Character $character, array $params): array {
+        $character->map->update($params);
+    
+        $character = $character->refresh();
+
+        $this->processArea($character);
+
+        $this->updateCharacterMovementTimeOut($character);
+
+        return $this->successResult([
+            'port_details'      => $this->portDetails(),
+            'adventure_details' => $this->adventureDetails(),
+            'kingdom_details'   => $this->kingdomDetails(),
+        ]);
+    }
+
+    /**
      * Teleport the character to a new location.
      * 
      * @param Character $character
@@ -350,7 +386,7 @@ class MovementService {
      * @param int $x
      * @param int $y
      */
-    protected function canTeleportToWater(Character $character, int $x, int $y): bool {
+    protected function canWalkOnwater(Character $character, int $x, int $y): bool {
         $color = $this->mapTile->getTileColor($character, $x, $y);
         
         if ($this->mapTile->isWaterTile((int) $color)) {

@@ -21,3 +21,29 @@ export const getNewXPosition = (characterX, mapPositionX) => {
 
   return mapPositionX;
 }
+
+export const dragMap =  (position, bottomBounds, rightBounds) =>  {
+  const {x, y}        = position;
+  const yBounds       = Math.sign(position.y);
+  const xBounds       = Math.sign(position.x);
+  let bottomMapBounds = bottomBounds;
+  let rightMapBounds  = rightBounds;
+
+  if (yBounds === -1) {
+    bottomMapBounds += Math.abs(yBounds);
+  } else {
+    bottomMapBounds = 0;
+  }
+
+  if (xBounds === -1) {
+    rightMapBounds += Math.abs(xBounds);
+  } else {
+    rightMapBounds = 0;
+  }
+
+  return {
+    controlledPosition: {x, y},
+    bottomBounds: bottomBounds,
+    rightBounds: rightBounds,
+  }
+}
