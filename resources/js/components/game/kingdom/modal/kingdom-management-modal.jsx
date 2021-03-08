@@ -8,7 +8,7 @@ import KingdomBuildingQueue from './partials/kingdom-building-queue.jsx';
 import UnitBuildingQueue from './partials/unit-recruitment-queue.jsx';
 import KingdomUnits from './partials/kingdom-units';
 import RecruitUnit from './recruit-unit';
-import LoadingModal from './components/LoadingModal';
+import LoadingModal from '../../components/loading/loading-modal';
 
 export default class KingdomManagementModal extends React.Component {
 

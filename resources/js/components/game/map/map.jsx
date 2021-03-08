@@ -243,6 +243,8 @@ export default class Map extends React.Component {
     this.setState({
       characterPosition: {x: characterX, y: characterY},
       controlledPosition: {x: getNewXPosition(characterX, mapX), y: getNewYPosition(characterY, mapY)},
+    }, () => {
+      this.props.updatePlayerPosition({});
     });
   }
 
@@ -261,8 +263,8 @@ export default class Map extends React.Component {
     axios.post('/api/move/' + this.state.characterId, {
       position_x: this.state.controlledPosition.x,
       position_y: this.state.controlledPosition.y,
-      character_position_x: this.state.characterPosition.x,
-      character_position_y: this.state.characterPosition.y,
+      character_position_x: x,
+      character_position_y: y,
     }).then((result) => {
       this.setState({
         currentPort: result.data.port_details.hasOwnProperty('current_port') ? result.data.port_details.current_port : null,
@@ -330,7 +332,11 @@ export default class Map extends React.Component {
             <div>
               <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
                 <Locations locations={this.state.locations} />
-                <KingdomPin kingdoms={this.state.kingdoms} />
+                <KingdomPin 
+                  kingdoms={this.state.kingdoms} 
+                  characterId={this.state.characterId}
+                  disableMapButtons={this.disableMapButtons.bind(this)}
+                />
                 <div className="map-x-pin" style={this.playerIcon()}></div>
               </div>
             </div>

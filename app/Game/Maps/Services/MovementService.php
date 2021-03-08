@@ -206,12 +206,14 @@ class MovementService {
             return $this->errorResult('Invalid coordinates');
         }
 
-        $character = $this->updateCharacterPosition($character, [
+        $character->map->update([
             'character_position_x' => $x,
             'character_position_y' => $y,
             'position_x'           => $this->mapPositionValue->fetchXPosition($x, $character->map->position_x),
             'position_y'           => $this->mapPositionValue->fetchYPosition($y),
         ]);
+
+        $character = $character->refresh();
 
         $this->processArea($character);
         

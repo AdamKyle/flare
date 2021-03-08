@@ -31,6 +31,14 @@ class CharacterSheetController extends Controller {
         ], 200);
     }
 
+    public function basicLocationInformation(Character $character) {
+        return response()->json([
+            'x_position'    => $character->map->character_position_x,
+            'y_position'    => $character->map->character_position_y,
+            'gold'          => $character->gold,
+        ]);
+    }
+
     public function nameChange(Request $request, Character $character) {
         $request->validate([
             'name' => ['required', 'string', 'min:5', 'max:15', 'unique:characters', 'regex:/^[a-z\d]+$/i', 'unique:characters'],

@@ -3,7 +3,7 @@ import {getServerMessage} from '../../helpers/server_message';
 export const movePlayer = (positionX, positionY, movementDirection) => {
     let x           = positionX;
     let y           = positionY;
-
+    
     switch (movementDirection) {
         case 'north':
           y = y - 16;
