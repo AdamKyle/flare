@@ -9,6 +9,7 @@ import PortSection            from './sections/port-section';
 import AdeventureActions      from './sections/adventure-section';
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomModal           from './kingdom/modal/kingdom-modal';
+import KingdomAttackModal     from './kingdom/modal/kingdom-attack-modal';
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -31,6 +32,7 @@ export default class Game extends React.Component {
       openTeleportDetails: false,
       openKingdomManagement: false,
       openKingdomModal: false,
+      openKingdomAttackModal: false,
       characterId: null,
       canAdventureAgainAt: null,
       canAttack: true,
@@ -144,6 +146,18 @@ export default class Game extends React.Component {
     });
   }
 
+  openKingdomAttackModal() {
+    this.setState({
+      openKingdomAttackModal: true,
+    });
+  }
+
+  closeKingdomAttackModal() {
+    this.setState({
+      openKingdomAttackModal: false,
+    });
+  }
+
   updateKingdomData(kingdom) {
     const index = this.state.kingdomData.my_kingdoms.findIndex((mk) => 
       mk.x_position === this.state.current_x && 
@@ -192,6 +206,7 @@ export default class Game extends React.Component {
               canAttack={this.setCanAttack.bind(this)} 
               openKingdomManagement={this.openKingdomManagement.bind(this)}
               openKingdomModal={this.openKingdomModal.bind(this)}
+              openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}
               character_y={this.state.current_y}
@@ -279,6 +294,16 @@ export default class Game extends React.Component {
               close={this.closeKingdomModal.bind(this)} 
               updateKingdomData={this.updateKingdomData.bind(this)} 
             /> 
+          : null
+        }
+
+        {
+          this.state.openKingdomAttackModal ?
+            <KingdomAttackModal 
+              show={this.state.openKingdomAttackModal}
+              close={this.closeKingdomAttackModal.bind(this)}
+              kingdoms={this.state.kingdomData.my_kingdoms}
+            />
           : null
         }
       </>
