@@ -81,6 +81,13 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
@@ -106,6 +113,13 @@ class MapControllerApiTest extends TestCase
         Event::fake([
             MoveTimeOutEvent::class,
         ]);
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $location = $this->createLocation([
             'name'        => 'Sample',
@@ -143,6 +157,13 @@ class MapControllerApiTest extends TestCase
         Event::fake([
             MoveTimeOutEvent::class,
         ]);
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $location = $this->createLocation([
             'name'        => 'Sample',
@@ -199,6 +220,13 @@ class MapControllerApiTest extends TestCase
         Event::fake([
             MoveTimeOutEvent::class,
         ]);
+
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $location = $this->createLocation([
             'name'        => 'Sample',
@@ -259,6 +287,13 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
+        $water = Mockery::mock(MapTileValue::class);
+
+        $this->app->instance(MapTileValue::class, $water);
+        
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
@@ -294,9 +329,11 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')
-                         ->json('GET', '/api/is-water/' . $character->id, [
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 336,
                              'character_position_y' => 288,
+                             'position_x'           => 0,
+                             'position_y'           => 0,
                          ])
                          ->response;
 
@@ -315,13 +352,15 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
         
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
-        $water->shouldReceive('isWaterTile')->once()->andReturn(true);
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(true);
 
         $response = $this->actingAs($user, 'api')
-                         ->json('GET', '/api/is-water/' . $character->id, [
+                         ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 160,
                              'character_position_y' => 64,
+                             'position_x'           => 0,
+                             'position_y'           => 0,
                          ])
                          ->response;
 
@@ -437,15 +476,17 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
         
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
-        $water->shouldReceive('isWaterTile')->once()->andReturn(true);
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(true);
 
         $response = $this->actingAs($user, 'api')
-                            ->json('GET', '/api/is-water/' . $character->id, [
-                                'character_position_x' => 176,
-                                'character_position_y' => 64,
-                            ])
-                            ->response;
+                         ->json('POST', '/api/move/' . $character->id, [
+                             'character_position_x' => 174,
+                             'character_position_y' => 64,
+                             'position_x'           => 0,
+                             'position_y'           => 0,
+                         ])
+                         ->response;
 
         $this->assertEquals(200, $response->status());
     }
