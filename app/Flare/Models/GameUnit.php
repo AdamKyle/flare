@@ -21,7 +21,7 @@ class GameUnit extends Model
         'name',
         'description',
         'attack',
-        'deffense',
+        'defence',
         'can_heal',
         'heal_amount',
         'siege_weapon',
@@ -46,7 +46,7 @@ class GameUnit extends Model
      */
     protected $casts = [
         'attack'               => 'integer',
-        'deffense'             => 'integer',
+        'defence'              => 'integer',
         'can_heal'             => 'boolean',
         'heal_amount'          => 'integer',
         'unit_can_heal'        => 'boolean',

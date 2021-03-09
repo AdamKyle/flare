@@ -9,6 +9,8 @@ use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Kingdoms\Service\KIngdomsAttackService;
+use App\Game\Kingdoms\Transformers\SelectedKingdom;
 use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -38,6 +40,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(KingdomResourcesService::class, function($app) {
             return new KingdomResourcesService($app->make(Manager::class), $app->make(KingdomTransformer::class));
+        });
+
+        $this->app->bind(SelectedKingdom::class, function() {
+            return new SelectedKingdom();
+        });
+
+        $this->app->bind(KingdomsAttackService::class, function($app) {
+            return new KingdomsAttackService($app->make(SelectedKingdom::class), $app->make(Manager::class));
         });
     }
 

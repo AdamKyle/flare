@@ -14,13 +14,11 @@ export default class KingdomAttackModal extends React.Component {
                 'Select Kingdoms',
                 'Send Units'
             ],
-            kingoms: [],
+            kingdoms: [],
+            selectedKingdomData: [],
             enableNext: false,
+            loading: false,
         }
-    }
-
-    componentDidMount() {
-        console.log(this.props.kingdoms)
     }
 
     renderSteps() {
@@ -54,11 +52,33 @@ export default class KingdomAttackModal extends React.Component {
 
     next() {
         if (this.state.currentStep === 0) {
-            console.log('do api call for kingdoms selected', this.state.kingdoms);
+            this.setState({
+                loading: true,
+            }, () => {
+                this.getKingdomsUnits();
+            });
         }
+    }
 
+    previous() {
         this.setState({
-            currentStep: this.state.currentStep + 1,
+            currentStep: this.state.currentStep - 1,
+        });
+    }
+
+    getKingdomsUnits() {
+        axios.post('/api/kingdoms/'+this.props.characterId+'/attack/selection', {
+            selected_kingdoms: this.state.kingdoms
+        }).then((result) => {
+            this.setState({
+                loading: false,
+                currentStep: this.state.currentStep + 1,
+                selectedKingdomData: result.data,
+            })
+        }).catch((error) => {
+            console.error(error);
+
+            this.props.close();
         });
     }
 
@@ -82,10 +102,14 @@ export default class KingdomAttackModal extends React.Component {
                             </ul>
                         </div>
                     </div>
-                    <div className="progress" style={{position: 'relative'}}>
-                        <div className="progress-bar progress-bar-striped indeterminate">
-                        </div>
-                    </div>
+                    { 
+                        this.state.loading ?
+                            <div className="progress" style={{position: 'relative'}}>
+                                <div className="progress-bar progress-bar-striped indeterminate">
+                                </div>
+                            </div>
+                        : null
+                    }
                     {
                         this.state.currentStep === 0 ?
                             <KingdomSelection 
@@ -97,7 +121,10 @@ export default class KingdomAttackModal extends React.Component {
                     }
                     {
                         this.state.currentStep === 1 ?
-                            <UnitSelection />
+                            <UnitSelection 
+                                selectedKingdomData={this.state.selectedKingdomData}
+                                defendingKingdom={this.props.kingdomToAttack}
+                            />
                         : null
                     }
                 </Modal.Body>
@@ -105,6 +132,13 @@ export default class KingdomAttackModal extends React.Component {
                     <Button variant="secondary" onClick={this.props.close}>
                         Close
                     </Button>
+                    {
+                        this.state.currentStep !== 0 ?
+                            <Button variant="primary" onClick={this.previous.bind(this)}>
+                                Previous
+                            </Button>
+                        : null
+                    }
                     <Button variant="primary" onClick={this.next.bind(this)} disabled={!this.state.enableNext}>
                         Next
                     </Button>

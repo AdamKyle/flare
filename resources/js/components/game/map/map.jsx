@@ -98,6 +98,7 @@ export default class Map extends React.Component {
           can_attack: result.data.can_attack_kingdom,
           can_settle: result.data.can_settle_kingdom,
           is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
+          kingdom_to_attack: result.data.kingdom_to_attack,
         });
       });
     });
@@ -132,7 +133,7 @@ export default class Map extends React.Component {
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
       this.updatePlayerPosition(event.map);
-
+      
       this.setState({
         currentPort: event.portDetails.current_port,
         portList: event.portDetails.port_list,
@@ -153,6 +154,7 @@ export default class Map extends React.Component {
           can_attack: event.kingdomDetails.hasOwnProperty('can_attack') ? event.kingdomDetails.can_attack : false,
           can_settle: event.kingdomDetails.hasOwnProperty('can_settle') ? event.kingdomDetails.can_settle : false,
           is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
+          kingdom_to_attack: event.kingdomDetails.kingdom_to_attack
         });
 
         if (_.isEmpty(event.portDetails)) {
@@ -286,6 +288,7 @@ export default class Map extends React.Component {
           can_attack: result.data.kingdom_details.can_attack,
           can_settle: result.data.kingdom_details.can_settle,
           is_mine: result.data.kingdom_details.can_manage,
+          kingdom_to_attack: result.data.kingdom_details.kingdom_to_attack,
         });
 
         this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);

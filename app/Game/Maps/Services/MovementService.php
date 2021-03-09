@@ -112,13 +112,20 @@ class MovementService {
 
         $kingdom = Kingdom::where('x_position', $character->x_position)->where('y_position', $character->y_position)->first();
 
-        $canAttack = false;
-        $canSettle = false;
-        $canManage = false;
+        $canAttack       = false;
+        $canSettle       = false;
+        $canManage       = false;
+        $kingdomToAttack = [];
 
         if (!is_null($kingdom)) {
             if ($kingdom->character->user->id !== auth()->user()->id) {
                 $canAttack = true;
+
+                $kingdomToAttack = [
+                    'id'         => $kingdom->id,
+                    'x_position' => $kingdom->x_position,
+                    'y_position' => $kingdom->y_position,
+                ];
             } else {
                 $canManage = true;
             }
@@ -127,10 +134,11 @@ class MovementService {
         }
 
         $this->kingdomData = [
-            'owner'      => is_null($kingdom) ? 'No one' : $kingdom->character->name,
-            'can_attack' => $canAttack,
-            'can_manage' => $canManage,
-            'can_settle' => $canSettle,
+            'owner'             => is_null($kingdom) ? 'No one' : $kingdom->character->name,
+            'can_attack'        => $canAttack,
+            'can_manage'        => $canManage,
+            'can_settle'        => $canSettle,
+            'kingdom_to_attack' => $kingdomToAttack,
         ];
     }
 

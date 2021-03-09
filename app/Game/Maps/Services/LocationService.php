@@ -56,6 +56,13 @@ class LocationService {
     private $canManage = false;
 
     /**
+     * Stores the id and the location information
+     * 
+     * @var array $kingdomToAttack
+     */
+    private $kingdomToAttack = [];
+
+    /**
      * Contructor
      * 
      * @param PortService $portService
@@ -94,6 +101,7 @@ class LocationService {
             'can_settle_kingdom'     => $this->canSettle,
             'can_attack_kingdom'     => $this->canAttack,
             'can_manage_kingdom'     => $this->canManage,
+            'kingdom_to_attack'      => $this->kingdomToAttack,
             'my_kingdoms'            => $this->getKingdoms($character),
         ];
     }
@@ -141,6 +149,12 @@ class LocationService {
         if (!is_null($kingdom)) {
             if ($character->id !== $kingdom->character->id) {
                 $this->canAttack = true;
+
+                $this->kingdomToAttack = [
+                    'id' => $kingdom->id,
+                    'x_position' => $kingdom->x_position,
+                    'y_position' => $kingdom->y_position,
+                ];
             } else {
                 $this->canManage = true;
             }

@@ -42,6 +42,7 @@ export default class Game extends React.Component {
         my_kingdoms: [],
         can_attack: false,
         can_settle: false,
+        kingdom_to_attack: [],
       },
       kingdom: null,
     }
@@ -303,6 +304,8 @@ export default class Game extends React.Component {
               show={this.state.openKingdomAttackModal}
               close={this.closeKingdomAttackModal.bind(this)}
               kingdoms={this.state.kingdomData.my_kingdoms}
+              kingdomToAttack={this.state.kingdomData.kingdom_to_attack}
+              characterId={this.state.characterId}
             />
           : null
         }

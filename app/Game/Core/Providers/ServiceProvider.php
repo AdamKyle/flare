@@ -42,10 +42,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ItemComparison();
         });
 
-        $this->app->bind(CraftingSkillService::class, function($app) {
-            return new CraftingSkillService();
-        });
-
         $this->app->bind(AdventureRewardService::class, function($app) {
             return new AdventureRewardService(new CharacterService);
         });
