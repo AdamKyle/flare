@@ -147,7 +147,7 @@ export default class KingdomAttackModal extends React.Component {
                     </div>
                     { 
                         this.state.loading ?
-                            <div className="progress" style={{position: 'relative'}}>
+                            <div className="progress loading-progress" style={{position: 'relative'}}>
                                 <div className="progress-bar progress-bar-striped indeterminate">
                                 </div>
                             </div>
