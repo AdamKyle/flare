@@ -5,6 +5,9 @@ import {
     Card,
     Button
 }              from 'react-bootstrap';
+import {
+    time       
+}              from '../../../../helpers/distance_calculations';
 
 export default class UnitSelection extends React.Component {
 
@@ -14,6 +17,8 @@ export default class UnitSelection extends React.Component {
         this.state = {
             unitsToSend: {},
             loading: true,
+            totalTime: 0,
+            totalAmount: 0,
         }
     }
 
@@ -27,8 +32,8 @@ export default class UnitSelection extends React.Component {
                 kingdom.units.forEach((unit) => {
                     unitsToSend[kingdom.kingdom_name][unit.name] = {
                         amount_to_send: 0,
-                        has_error: false,
                         max_amount: unit.amount,
+                        total_time: 0
                     }
                 });
             }
@@ -45,39 +50,106 @@ export default class UnitSelection extends React.Component {
 
         let kingdomName = event.target.getAttribute('data-kingdom-name');
         let unitName    = event.target.getAttribute('data-unit-name');
-        let amount      = parseInt(event.target.value);
+        let amount      = parseInt(event.target.value) || '';
         let unitsToSend = _.cloneDeep(this.state.unitsToSend);
         let maxAmount   = unitsToSend[kingdomName][unitName]['max_amount'];
 
         unitsToSend[kingdomName][unitName]['amount_to_send'] = amount;
 
         if (amount > maxAmount) {
-            unitsToSend[kingdomName][unitName]['has_error'] = true;
-        } else {
-            unitsToSend[kingdomName][unitName]['has_error'] = false;
+            unitsToSend[kingdomName][unitName]['amount_to_send'] = maxAmount;
+        } else if (amount < 0) {
+            unitsToSend[kingdomName][unitName]['amount_to_send'] = 0;
         }
 
+        if (amount === 0) {
+            unitsToSend[kingdomName][unitName]['total_time'] = 0;           
+        } else {
+            const time = this.getTimeForUnits(kingdomName, unitName, amount);
+
+            unitsToSend[kingdomName][unitName]['total_time'] = time;
+        }
+
+        const totalAmount = this.getTotalAmount(unitsToSend)
+        
         this.setState({
-            unitsToSend: unitsToSend
+            unitsToSend: unitsToSend,
+            totalTime: this.getTotalTime(unitsToSend),
+            totalAmount: totalAmount,
+        }, () => {
+            this.props.enableAttack((totalAmount > 0));
+            this.props.setUnitsToSendValue(unitsToSend);
         });
+    }
+
+    getTimeForUnits(kingdomName, unitName, amount) {
+        if (amount === '') {
+             return 0;
+        }
+
+        let foundKingdom = this.props.selectedKingdomData.filter((k) => k.kingdom_name === kingdomName);
+
+        if (_.isEmpty(foundKingdom)) {
+            return 0;
+        }
+
+        foundKingdom = foundKingdom[0];
+
+        let foundUnit = foundKingdom.units.filter((u) => u.name === unitName);
+
+        if (_.isEmpty(foundUnit)) {
+            return 0;
+        }
+
+        foundUnit = foundUnit[0];
+
+        let additionalTime = Math.ceil((amount / 10));
+
+        if (additionalTime <= 0) {
+            additionalTime = 0;
+        }
+
+        return (time(this.props.defendingKingdom.x_position, this.props.defendingKingdom.y_position, foundKingdom.x_position, foundKingdom.y_position) * foundUnit.travel_time) + additionalTime;
+    }
+
+    getTotalTime(unitsToSend) {
+        let totalTime = 0;
+
+        for (const kingdom in unitsToSend) {
+            for (const unit in unitsToSend[kingdom]) {
+                totalTime += unitsToSend[kingdom][unit].total_time;
+            }
+        }
+
+        return totalTime;
+    }
+
+    getTotalAmount(unitsToSend) {
+        let totalAmount = 0;
+
+        for (const kingdom in unitsToSend) {
+            for (const unit in unitsToSend[kingdom]) {
+                const amount = unitsToSend[kingdom][unit].amount_to_send;
+
+                if (amount !== '') {
+                    totalAmount += amount;
+                }
+            }
+        }
+
+        return totalAmount;
     }
 
     renderUnitSelection(units, kingdomName) {
         return units.map((unit) => {
             return (
                 <div className="form-group mb-2" key={unit.name}>
-                    {
-                        this.state.unitsToSend[kingdomName][unit.name]['has_error'] ?
-                            <div className="alert alert-danger mb-2">
-                                You have entered a value greator then your maximum amount for this unit.
-                                You will not be able to send your units off to battle till you fix this.
-                            </div>
-                        : null
-                    }
                     <label htmlFor={unit.name}>{unit.name} (Max: {unit.amount})</label>
                     <input 
                         type="number"
-                        steps="1" 
+                        steps="1"
+                        min="0"
+                        max={this.state.unitsToSend[kingdomName][unit.name]['max_amount']}
                         className="form-control" 
                         id={unit.name} 
                         data-kingdom-name={kingdomName}
@@ -135,10 +207,10 @@ export default class UnitSelection extends React.Component {
                                 <dl>
                                     <dt><strong>Kingdom To Attack (X/Y)</strong>:</dt>
                                     <dd>{this.props.defendingKingdom.x_position}/{this.props.defendingKingdom.y_position}</dd>
-                                    <dt><strong>Time To Move</strong>:</dt>
-                                    <dd>0</dd>
+                                    <dt><strong>Time Till Desitnation</strong>:</dt>
+                                    <dd>{this.state.totalTime}</dd>
                                     <dt><strong>Total Units To Send</strong>:</dt>
-                                    <dd>0</dd>
+                                    <dd>{this.state.totalAmount}</dd>
                                 </dl>
                             </div>
                         </>

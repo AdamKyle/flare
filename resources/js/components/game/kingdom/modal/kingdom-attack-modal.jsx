@@ -10,13 +10,16 @@ export default class KingdomAttackModal extends React.Component {
 
         this.state = {
             currentStep: 0,
+            finalStep: 1,
             steps: [
                 'Select Kingdoms',
                 'Send Units'
             ],
             kingdoms: [],
             selectedKingdomData: [],
+            unitsToSend: {},
             enableNext: false,
+            enableAttack: false,
             loading: false,
         }
     }
@@ -44,9 +47,21 @@ export default class KingdomAttackModal extends React.Component {
         });
     }
 
+    enableAttack(bool) {
+        this.setState({
+            enableAttack: bool,
+        });
+    }
+
     setKingdoms(value) {
         this.setState({
             kingdoms: value
+        });
+    }
+
+    setUnitsToSendValue(unitsToSend) {
+        this.setState({
+            unitsToSend: unitsToSend,
         });
     }
 
@@ -60,9 +75,33 @@ export default class KingdomAttackModal extends React.Component {
         }
     }
 
+    attack() {
+        const unitsToSend = _.cloneDeep(this.state.unitsToSend);
+        const defenderId  = this.props.kingdomToAttack.id;
+
+        this.setState({
+            loading: true,
+        }, () => {
+            this.attackKingdom(defenderId, unitsToSend);
+        })
+    }
+
     previous() {
         this.setState({
             currentStep: this.state.currentStep - 1,
+        });
+    }
+
+    attackKingdom(defenderId, unitsToSend) {
+        axios.post('/api/kingdoms/'+this.props.characterId+'/attack', {
+            defender_id: defenderId,
+            units_to_send: unitsToSend,
+        }).then((result) => {
+            console.log(result);
+        }).catch((err) => {
+            console.error(err);
+
+            this.props.close();
         });
     }
 
@@ -80,6 +119,10 @@ export default class KingdomAttackModal extends React.Component {
 
             this.props.close();
         });
+    }
+
+    isLastStep() {
+        return this.state.currentStep === this.state.finalStep;
     }
 
     render() {
@@ -124,6 +167,8 @@ export default class KingdomAttackModal extends React.Component {
                             <UnitSelection 
                                 selectedKingdomData={this.state.selectedKingdomData}
                                 defendingKingdom={this.props.kingdomToAttack}
+                                enableAttack={this.enableAttack.bind(this)}
+                                setUnitsToSendValue={this.setUnitsToSendValue.bind(this)}
                             />
                         : null
                     }
@@ -139,9 +184,17 @@ export default class KingdomAttackModal extends React.Component {
                             </Button>
                         : null
                     }
-                    <Button variant="primary" onClick={this.next.bind(this)} disabled={!this.state.enableNext}>
-                        Next
-                    </Button>
+                    {
+                        this.isLastStep() ?
+                            <Button variant="success" onClick={this.attack.bind(this)} disabled={!this.state.enableAttack}>
+                                Attack
+                            </Button>
+                        :
+                            <Button variant="primary" onClick={this.next.bind(this)} disabled={!this.state.enableNext}>
+                                Next
+                            </Button>
+                    }
+                    
                 </Modal.Footer>
             </Modal>
         )
