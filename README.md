@@ -17,31 +17,6 @@ If you have ideas open a ticket with the title: `Idea for Game Name`
 
 This game is heavily under development but some of the features that you will get to experience are:
 
-# Adventure
-
-- Pick a race and a class and begin your adventure!
-- Move around on a 500x500 map that is completely draggable on a 16x16 grid. Explore caves, ancient ruins and more with time based mechanics.
-- Fight monsters, gain loots, gold, experience and levels!
-- Equip your gear and become stronger. Play to your classes strengths and become the strongest character!
-- Chat in real time with other people including private messages.
-- More to come ...
-
-# Kingdoms
-
-> ## ATTN!
->
-> This is a planned feature how ever the game may launch with out it for the initial
-> alpha phase 1.
-
-- Start off with a predefined kingdom on a giant map that can have over 250 thousand kingdoms!
-- Grow your kingdoms, store your gold, rule over other kingdoms in a time based way.
-- Start or Join a clan, conquer the map and farm the plundered villages for scraps of resources.
-- Recruit, build up and gather resources.
-- More the come ...
-
-This game is completely free and any special gear or bonuses that are similar to the two games mentioned above
-can all be gained in game with no need to spend out side money. This point was very important to me.
-
 # Development and Testing
 
 ## Getting started with Development:
@@ -53,7 +28,7 @@ can all be gained in game with no need to spend out side money. This point was v
 - start websockets: `php artisan websocket:serve`
 - listen for queues: `php artisan queue:work --queue=high,default --tries=1`
 - Publish information section: `php artisan move:files` <sup>**</sup>
-- From there you cn register as a new player.
+- From there you can register as a new player.
   - Or since you ran the `create:admn` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
 - Regular players, who sign up, will only see the game section.
 
@@ -95,6 +70,15 @@ PUSHER_APP_CLUSTER=mt1
 
 This game, for the admin section at the time of this writing, requires a way to send out emails. For example you can read [here](https://medium.com/@agavitalis/how-to-send-an-email-in-laravel-using-gmail-smtp-server-53d962f01a0c) about setting up gmail with laravel.
 
+## Telescope for development
+
+We use Laravels Telescope to monitor jobs and queues as well as a few other things when developing to help make sure things are working smoothly.
+
+You can enable this in the env file when you are developing.
+
+If you make changes to a job or event, make sure to restart not just the queue, but the web sockets as well.
+
 ## Testing
 
-- `composer phpunit`
+- `composer phpunit` this will also generate code coverage report.
+- `./vendor/bin/phpunit` this will not generate code coverage but can be used for debugging specific tests via the `--filrer=` option
