@@ -13,9 +13,49 @@ One could argue that making a game is very hard and takes a lot of time and dedi
 
 Those people would be right. I fully intend to finish and launch this yet to be titled game.
 
-If you have ideas open a ticket with the title: `Idea for Game Name`
+If you have ideas open a ticket with the appropriate template.
 
 This game is heavily under development but some of the features that you will get to experience are:
+
+- Fighting Monsters
+- Adventuring
+- Kingdom management
+- Moving around, teleporting and setting sale on an interactive map.
+  - Note for mobile players, the map is not dragable for you, how ever on desktop is.
+  - The map will still function and work on mobile devices and even update its position should you move "off map"
+    or to a position where the map should move automatically.
+- Market board for selling enchanted items.
+- Enchanting/Crafting
+- Skills, including those you can train while fightng and those you can train while doing actions, such as craftin/enchanting.
+- Quest Items and Quest NPC's
+- Travel betwen planes of existance via special quest items.
+- Chat and private message other players.
+
+And many more...
+
+## Common FAQ
+
+- Is this game pay to win? cash shops? Ads?
+
+No, there is no way for you to spend any money in this game. You cannot buy levels, characters, items, nothing. You want it, you earn it.
+
+- How does this game make money if there is no cash shop or ads?
+
+It doesn't. It's a completly free, open source game with no intentions to add any form of monitization, accept maybe a "donate" patreon **far, far** in to the future that would not impact players in any way. That is donating would not get you anything in game.
+
+- Are their clans, guilds or resets for the kingdoms or other aspects of the game?
+
+No. It's every person for them selves. There are also no resets.
+
+- Are there energy systems or ways to slow the player down?
+
+No and yes. There are no energy systems, that is there is no feature in game to prevent you from being as active as you want to be. How ever we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few minutes for an adventure to (at most) a couple hours for upgrading buildings (at higher levels) for your kingdom.
+
+The idea is to keep you enaged and playing.
+
+- I can't play all the time, how do I catch up?
+
+There are many ways you can catch up. You could be the type of player who runs adventures all the time - these are the most idle aspect of the game. Maybe you want to rule all the kingdoms on the map, or craft and enchant all the best items and sell them on the market to make a profit.
 
 # Development and Testing
 
