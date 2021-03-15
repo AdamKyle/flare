@@ -139,8 +139,9 @@
                 <label for="gameUnit-weak-against-unit-id">Primary Target?: </label>
                 <select class="form-control" wire:model="gameUnit.primary_target">
                     <option>Please select</option>
-                    <option value="walls">Walls</option>
-                    <option value="buildings">Buildings</option>
+                    <option value="Walls">Walls</option>
+                    <option value="Farm">Farm</option>
+                    <option value="Buildings">Buildings</option>
                 </select> 
                 @error('gameUnit.primary_target') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
@@ -150,8 +151,9 @@
                 <label for="gameUnit-weak-against-unit-id">Fallback Target?: </label>
                 <select class="form-control" wire:model="gameUnit.fall_back">
                     <option>Please select</option>
-                    <option value="walls">Walls</option>
-                    <option value="buildings">Buildings</option>
+                    <option value="Walls">Walls</option>
+                    <option value="Farm">Farm</option>
+                    <option value="Buildings">Buildings</option>
                 </select> 
                 @error('gameUnit.fall_back') <span class="text-danger">{{ $message }}</span> @enderror
             </div>

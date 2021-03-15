@@ -8,12 +8,15 @@ use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
 class KingdomService {
+
+    use KingdomCache;
 
     /**
      * @var KingdomBuilder $builder
@@ -53,7 +56,11 @@ class KingdomService {
     public function createKingdom(Character $character): Kingdom {
         $kingdom = $this->builder->createKingdom($character);
 
-        return $this->assignBuildings($kingdom);
+        $kingdom = $this->assignBuildings($kingdom);
+
+        $this->addKingdomToCache($character, $kingdom);
+
+        return $kingdom;
     }
 
     /**

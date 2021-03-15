@@ -27,7 +27,7 @@ class BuildingTransformer extends TransformerAbstract {
             'max_defence'                 => $building->max_defence,
             'max_durability'              => $building->max_durability,
             'population_required'         => $building->required_population,
-            'is_wall'                     => $building->is_wall,
+            'is_wall'                     => $building->is_walls,
             'is_church'                   => $building->is_church,
             'is_farm'                     => $building->is_farm,
             'is_resource_building'        => $building->gives_resources,

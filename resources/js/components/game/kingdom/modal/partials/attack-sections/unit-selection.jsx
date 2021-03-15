@@ -140,6 +140,16 @@ export default class UnitSelection extends React.Component {
         return totalAmount;
     }
 
+    getTravelTimeFromKingdom(unitsForKingdom) {
+        let totalTime = 0;
+
+        for (const unit in unitsForKingdom) {
+            totalTime += unitsForKingdom[unit].total_time;
+        }
+
+        return totalTime;
+    }
+
     renderUnitSelection(units, kingdomName) {
         return units.map((unit) => {
             return (
@@ -176,6 +186,15 @@ export default class UnitSelection extends React.Component {
                         <Accordion.Collapse eventKey={kingdom.kingdom_name}>
                             <Card.Body>
                                 {this.renderUnitSelection(kingdom.units, kingdom.kingdom_name)}
+                                <hr />
+                                <dl className="mt-2">
+                                    <dt><strong>Kingdom To Attack (X/Y)</strong>:</dt>
+                                    <dd>{this.props.defendingKingdom.x_position}/{this.props.defendingKingdom.y_position}</dd>
+                                    <dt><strong>Curent Position (X/Y)</strong>:</dt>
+                                    <dd>{kingdom.x_position}/{kingdom.y_position}</dd>
+                                    <dt><strong>Total Travel Time</strong>:</dt>
+                                    <dd>{this.getTravelTimeFromKingdom(this.state.unitsToSend[kingdom.kingdom_name])} Minutes</dd>
+                                </dl>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
@@ -208,7 +227,7 @@ export default class UnitSelection extends React.Component {
                                     <dt><strong>Kingdom To Attack (X/Y)</strong>:</dt>
                                     <dd>{this.props.defendingKingdom.x_position}/{this.props.defendingKingdom.y_position}</dd>
                                     <dt><strong>Time Till Desitnation</strong>:</dt>
-                                    <dd>{this.state.totalTime}</dd>
+                                    <dd>{this.state.totalTime} Minutes (across all kingdoms)</dd>
                                     <dt><strong>Total Units To Send</strong>:</dt>
                                     <dd>{this.state.totalAmount}</dd>
                                 </dl>

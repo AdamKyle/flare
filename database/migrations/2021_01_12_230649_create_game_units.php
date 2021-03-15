@@ -20,7 +20,7 @@ class CreateGameUnits extends Migration
             $table->integer('attack');
             $table->integer('defence');
             $table->boolean('can_heal')->nullable()->default(false);
-            $table->boolean('heal_amount')->nullable()->default(null);
+            $table->boolean('heal_amount')->nullable();
             $table->boolean('siege_weapon')->nullable()->default(false);
             $table->boolean('attacks_walls')->nullable()->default(false);
             $table->boolean('attacks_buildings')->nullable()->default(false);

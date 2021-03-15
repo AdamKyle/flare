@@ -39,6 +39,39 @@ class Building extends Model
         'max_durability'     => 'integer',
     ];
 
+    protected $appends = [
+        'name',
+        'description',
+        'durability',
+        'defence',
+        'future_durability',
+        'future_defence',
+        'required_population',
+        'is_walls',
+        'is_farm',
+        'is_church',
+        'gives_resources',
+        'trains_units',
+        'wood_cost',
+        'clay_cost',
+        'stone_cost',
+        'iron_cost',
+        'population_increase',
+        'future_population_increase',
+        'time_increase',
+        'morale_increase',
+        'morale_decrease',
+        'increase_in_wood',
+        'future_increase_in_wood',
+        'increase_in_clay',
+        'future_increase_in_clay',
+        'increase_in_stone',
+        'future_increase_in_stone',
+        'increase_in_iron',
+        'future_increase_in_iron',
+        'is_at_max_level',
+    ];
+
     public function getNameAttribute() {
         return $this->gameBuilding->name;
     }
@@ -68,7 +101,7 @@ class Building extends Model
     }
 
     public function getIsWallsAttribute() {
-        return $this->gameBuilding->is_wall;
+        return $this->gameBuilding->is_walls;
     }
 
     public function getIsFarmAttribute() {

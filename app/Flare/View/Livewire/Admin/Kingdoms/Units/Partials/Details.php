@@ -62,6 +62,10 @@ class Details extends Component
             }
         }
 
+        if (is_null($this->gameUnit->siege_weapon)) {
+            $this->gameUnit->siege_weapon = false;
+        }
+
         $this->gameUnit->save();
 
         $gameUnit = $this->gameUnit->refresh();

@@ -5,12 +5,16 @@ namespace App\Game\Kingdoms\Providers;
 use App\Flare\Transformers\KingdomTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
+use App\Game\Kingdoms\Handlers\UnitHandler;
+use App\Game\Kingdoms\Handlers\SiegeHandler;
+use App\Game\Kingdoms\Service\AttackService;
 use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Kingdoms\Service\KIngdomsAttackService;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
+
 use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -27,11 +31,11 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(BuildingService::class, function($app) {
-            return new BuildingService();
+            return new BuildingService;
         });
 
         $this->app->bind(UnitService::class, function($app) {
-            return new UnitService();
+            return new UnitService;
         });
 
         $this->app->bind(KingdomService::class, function($app) {
@@ -43,12 +47,36 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(SelectedKingdom::class, function() {
-            return new SelectedKingdom();
+            return new SelectedKingdom;
+        });
+
+        $this->app->bind(KingdomTransformer::class, function() {
+            return new KingdomTransformer;
+        });
+
+        $this->app->bind(SiegeHandler::class, function() {
+            return new SiegeHandler;
+        });
+
+        $this->app->bind(UnitHandler::class, function() {
+            return new UnitHandler;
+        });
+
+        $this->app->bind(AttackService::class, function($app) {
+            return new AttackService(
+                $app->make(SiegeHandler::class),
+                $app->make(UnitHandler::class)
+            );
         });
 
         $this->app->bind(KingdomsAttackService::class, function($app) {
-            return new KingdomsAttackService($app->make(SelectedKingdom::class), $app->make(Manager::class));
+            return new KingdomsAttackService(
+                $app->make(SelectedKingdom::class), 
+                $app->make(Manager::class),
+                $app->make(KingdomTransformer::class),
+            );
         });
+        
     }
 
     /**

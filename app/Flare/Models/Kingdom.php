@@ -75,6 +75,10 @@ class Kingdom extends Model
         return $this->hasMany(UnitInQueue::class, 'kingdom_id', 'id');
     }
 
+    public function unitsMovementQueue() {
+        return $this->hasMany(UnitMovementQueue::class, 'kingdom_id', 'id');
+    }
+
     public function character() {
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }

@@ -46,7 +46,8 @@ class KingdomTransformer extends TransformerAbstract {
             'treasury'           => $kingdom->treasury,
             'building_queue'     => $kingdom->buildingsQueue,   
             'unit_queue'         => $kingdom->unitsQueue,  
-            'current_units'      => $kingdom->units,    
+            'current_units'      => $kingdom->units,  
+            'unit_movement'      => $kingdom->unitsMovementQueue,  
         ];
     }
 
