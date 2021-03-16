@@ -23,6 +23,14 @@ class ResourceValidation {
                ($kingdom->current_population < $building->required_population);
     }
 
+    public function shouldRedirectRebuildBuilding(Building $building, Kingdom $kingdom): bool {
+        return ($kingdom->current_wood < ($building->level * $building->base_wood_cost)) && 
+               ($kingdom->current_clay < ($building->level * $building->base_clay_cost)) &&
+               ($kingdom->current_stone < ($building->level * $building->base_stone_cost)) &&
+               ($kingdom->current_iron < ($building->level * $building->base_iron_cost)) &&
+               ($kingdom->current_population < ($building->level * $building->base_population));
+    }
+
     /**
      * Do we have enough resources to recruit the units?
      * 

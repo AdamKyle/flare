@@ -1,6 +1,8 @@
 import React     from 'react';
 import {Modal, ModalDialog}   from 'react-bootstrap';
 import Draggable from 'react-draggable';
+import UpgradeSection from './partials/building-management/upgrade-section'; 
+import BuildingCostSection from './partials/building-management/building-cost-section';
 
 class DraggableModalDialog extends React.Component {
     render() {
@@ -26,23 +28,19 @@ export default class BuildingManagementModal extends React.Component {
         const kingdom  = this.props.kingdom;
         const building = this.props.building;
 
-        if (building.current_durability === 0) {
-            return false;
-        }
-
         if (building.wood_cost > kingdom.current_wood) {
             return false;
         }
 
-        if (building.clay_cost > kingdom.current_wood) {
+        if (building.clay_cost > kingdom.current_clay) {
             return false;
         }
 
-        if (building.stone_cost > kingdom.current_wood) {
+        if (building.stone_cost > kingdom.current_stone) {
             return false;
         }
 
-        if (building.iron_cost > kingdom.current_wood) {
+        if (building.iron_cost > kingdom.current_iron) {
             return false;
         }
 
@@ -53,14 +51,33 @@ export default class BuildingManagementModal extends React.Component {
         return true;
     }
 
-    getIncrease(type) {
+    canRebuild() {
+        const kingdom  = this.props.kingdom;
         const building = this.props.building;
-        
-        if (building.hasOwnProperty('future_' + type + '_increase')) {
-            return building['future_' + type + '_increase'];
+
+        if ((building.level * building.base_wood_cost) > kingdom.current_wood) {
+            return false;
         }
 
-        return 0;
+        if ((building.level * building.base_clay_cost) > kingdom.current_clay) {
+            return false;
+        }
+
+        if ((building.level * building.base_stone_cost) > kingdom.current_stone) {
+            return false;
+        }
+
+        if ((building.level * building.base_iron_cost)> kingdom.current_iron) {
+            return false;
+        }
+
+        if ((building.level * building.base_population) > kingdom.current_population) {
+            return false;
+        }
+    }
+
+    buildingNeedsToBeRebuilt() {
+       return this.props.building.current_durability === 0;
     }
 
     isCurrentlyInQueue() {
@@ -70,7 +87,16 @@ export default class BuildingManagementModal extends React.Component {
     upgradeBuilding() {
         axios.post('/api/kingdoms/'+this.props.characterId+'/upgrade-building/' + this.props.building.id)
              .then((result) => {
-                this.props.updateKingdomData(result.data);
+                this.props.close();
+             })
+             .catch((error) => {
+                console.error(error);
+             });
+    }
+
+    rebuildBuilding() {
+        axios.post('/api/kingdoms/'+this.props.characterId+'/rebuild-building/' + this.props.building.id)
+             .then((result) => {
                 this.props.close();
              })
              .catch((error) => {
@@ -133,35 +159,11 @@ export default class BuildingManagementModal extends React.Component {
                         <p className="mt-3 ml-2 text-muted"><small><sup>*</sup> Kingdom morale only decreases if this building's durability is 0.</small></p>
                     </div>
                     <hr />
-                    <div className="row">
-                        <div className="col-md-6">
-                            <dl>
-                                <dt><strong>Wood Cost</strong>:</dt>
-                                <dd>{this.props.building.wood_cost}</dd>
-                                <dt><strong>Clay Cost</strong>:</dt>
-                                <dd>{this.props.building.clay_cost}</dd>
-                                <dt><strong>Stone Cost</strong>:</dt>
-                                <dd>{this.props.building.stone_cost}</dd>
-                                <dt><strong>Iron Cost</strong>:</dt>
-                                <dd>{this.props.building.iron_cost}</dd>
-                                <dt><strong>Population Cost</strong>:</dt>
-                                <dd>{this.props.building.population_required}</dd>
-                            </dl>
-                        </div>
-                        <div className="col-md-6">
-                            <dl>
-                                <dt><strong>Can Upgrade</strong>:</dt>
-                                <dd>{this.canUpgrade() && this.isCurrentlyInQueue() ? 'Yes' : 'No'}</dd>
-                                <dt><strong>Needs Repair</strong>:</dt>
-                                <dd>{this.props.building.current_durability === 0 ? 'Yes' : 'No'}</dd>
-                                <dt><strong>Upgrade Time</strong>:</dt>
-                                <dd>{this.props.building.time_increase} Minutes</dd>
-                            </dl>
-                        </div>
-                    </div>
-                    <hr />
-                    <h5 className="mt-1">Gain Upon Upgrading</h5>
-                    <hr />
+                    <BuildingCostSection 
+                        building={this.props.building}
+                        canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
+                    />
+                    
                     { !this.isCurrentlyInQueue() ?
                         <div className="alert alert-warning mb-2 mt-2">
                             Cannot upgrade building. Currently in queue. Please wait till it's finished.
@@ -171,36 +173,36 @@ export default class BuildingManagementModal extends React.Component {
                             You don't seem to have the resources to upgrade this building. You can move this modal
                             by clicking and dragging on the title, to compare the required resources with what you currently have.
                         </div>
+                    : !this.buildingNeedsToBeRebuilt() ?
+                        <>
+                            <hr />
+                            <h5 className="mt-1">Gain Upon Upgrading</h5>
+                            <hr />
+                            <UpgradeSection building={this.props.building} />
+                        </>
                     :
-                        <div className="row mt-2">
-                            <div className="col-md-6">
-                                <dl>
-                                    <dt><strong>Wood Gain/hr</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('wood')}</dd>
-                                    <dt><strong>Clay Gain/hr</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('clay')}</dd>
-                                    <dt><strong>Stone Gain/hr</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('stone')}</dd>
-                                    <dt><strong>Iron Gain/hr</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('iron')}</dd>
-                                    <dt><strong>Population Gain/hr</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('population')}</dd>
-                                </dl>
-                            </div>
-                            <div className="col-md-6">
-                                <dl>
-                                    <dt><strong>Durability Becomes</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('durability')}</dd>
-                                    <dt><strong>Defence Becomes</strong>:</dt>
-                                    <dd className="text-success">{this.getIncrease('defence')}</dd>
-                                </dl>
-                            </div>
-                        </div>
+                      <div className="alert alert-info mt-5">
+                          Rebuilding the building will require the amount of resources to upgrade to the current level.
+                          You can see this in the Cost section above.
+                      </div>   
                     }
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="btn btn-danger" onClick={this.props.close}>Cancel</button>
-                    <button className="btn btn-success" disabled={!this.canUpgrade() || !this.isCurrentlyInQueue()} onClick={this.upgradeBuilding.bind(this)}>Upgrade</button>
+                    {
+                        this.buildingNeedsToBeRebuilt() ?
+                            <button className="btn btn-primary" 
+                                disabled={!this.canRebuild() || !this.isCurrentlyInQueue()}
+                                onClick={this.rebuildBuilding.bind(this)}>Rebuild</button>
+                        :
+                            <button className="btn btn-success" 
+                                disabled={!this.canUpgrade() || !this.isCurrentlyInQueue()} 
+                                onClick={this.upgradeBuilding.bind(this)}
+                            >
+                                Upgrade
+                            </button>
+                    }
+                    
                 </Modal.Footer>
             </Modal>
         );

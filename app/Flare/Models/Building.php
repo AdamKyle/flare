@@ -47,6 +47,7 @@ class Building extends Model
         'future_durability',
         'future_defence',
         'required_population',
+        'base_population',
         'is_walls',
         'is_farm',
         'is_church',
@@ -56,9 +57,14 @@ class Building extends Model
         'clay_cost',
         'stone_cost',
         'iron_cost',
+        'base_wood_cost',
+        'base_clay_cost',
+        'base_stone_cost',
+        'base_iron_cost',
         'population_increase',
         'future_population_increase',
         'time_increase',
+        'rebuild_time',
         'morale_increase',
         'morale_decrease',
         'increase_in_wood',
@@ -100,6 +106,10 @@ class Building extends Model
         return ($this->level + 1) * $this->gameBuilding->required_population;
     }
 
+    public function getBasePopulationAttribute() {
+        return $this->gameBuilding->required_population;
+    }
+
     public function getIsWallsAttribute() {
         return $this->gameBuilding->is_walls;
     }
@@ -136,6 +146,22 @@ class Building extends Model
         return ($this->level + 1) * $this->gameBuilding->iron_cost;
     }
 
+    public function getBaseWoodCostAttribute() {
+        return $this->gameBuilding->wood_cost;;
+    }
+
+    public function getBaseClayCostAttribute() {
+        return $this->gameBuilding->clay_cost;;
+    }
+
+    public function getBaseStoneCostAttribute() {
+        return $this->gameBuilding->stone_cost;;
+    }
+
+    public function getBaseIronCostAttribute() {
+        return $this->gameBuilding->iron_cost;;
+    }
+
     public function getPopulationIncreaseAttribute() {
         return $this->level * $this->gameBuilding->increase_population_amount;
     }
@@ -147,6 +173,19 @@ class Building extends Model
     public function getTimeIncreaseAttribute() {
         $time = (($this->level + 1) * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
 
+        $now  = now();
+        $time = $now->diffInMinutes($now->copy()->addMinutes($time));
+
+        return $time;
+    }
+
+    public function getRebuildTimeAttribute() {
+        $time = ($this->level * $this->gameBuilding->time_to_build);
+
+        if ($this->level > 1) {
+            $time = ($this->level * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
+        }
+        
         $now  = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));
 

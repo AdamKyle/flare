@@ -63,7 +63,7 @@ class SiegeHandler {
     protected function attackBuildings(Kingdom $defender, array $unitInfo): array {
         $buildings = $defender->buildings->where('is_walls', false);
 
-        $unitInfo = $this->attackAllBuildings($defender, $buildings, $unitInfo);
+        return $this->attackAllBuildings($defender, $buildings, $unitInfo);
     }
 
     protected function unitAttack(Kingdom $defender, array $unitInfo) {
@@ -78,6 +78,10 @@ class SiegeHandler {
             $totalDefenderAttack  += $unit->amount * $unit->gameUnit->attack;
             $totalDefenderDefence += $unit->amount * $unit->gameUnit->defence;
             $totalDefenderTypes   += 1;
+        }
+
+        if ($totalDefenderAttack === 0) {
+            return $unitInfo;
         }
 
         if ($totalAttack > $totalDefenderDefence) {
@@ -130,7 +134,7 @@ class SiegeHandler {
         $totalDefence = $unitInfo['total_defence'];
 
         $defenderSiegeUnits        = $this->getDefenderSiegeUnits($defender);
-        $defenderSiegeUnitsAttack  = 0;
+        $defenderSiegeUnitsAttack  = $this->defenderSiegeUnitsAttack($defenderSiegeUnits);
         $defenderBuildingsDefence  = $this->getBuildingsTotalDefence($targets);
 
         if (!$defenderSiegeUnits->isEmpty()) {
@@ -139,7 +143,7 @@ class SiegeHandler {
 
         if ($totalAttack > $defenderBuildingsDefence) {
             $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $defenderBuildingsDefence);
-
+            
             $this->updateAllBuildings($targets, $totalPercentageDurabilityLost);
 
             if ($defenderSiegeUnitsAttack !== 0) {

@@ -8,6 +8,7 @@ use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use Carbon\Carbon;
 use League\Fractal\Manager;
@@ -50,6 +51,21 @@ class BuildingService {
         UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
     }
 
+    public function rebuildBuilding(Building $building, Character $character) {
+        $timeToComplete = now()->addMinutes($building->rebuild_time);
+        
+        $queue = BuildingInQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id'   => $building->kingdom->id,
+            'building_id'  => $building->id,
+            'to_level'     => $building->level,
+            'completed_at' => $timeToComplete,
+            'started_at'   => now(),
+        ]);
+
+        RebuildBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
+    }
+
     /**
      * Updates the kingdoms resources based on building cost.
      * 
@@ -63,6 +79,18 @@ class BuildingService {
             'current_stone'      => $building->kingdom->current_stone - $building->stone_cost,
             'current_iron'       => $building->kingdom->current_iron - $building->iron_cost,
             'current_population' => $building->kingdom->current_population - $building->required_population,
+        ]);
+
+        return $building->kingdom->refresh();
+    }
+
+    public function updateKingdomResourcesForRebuildBuilding(Building $building): Kingdom {
+        $building->kingdom->update([
+            'current_wood'       => $building->kingdom->current_wood - ($building->level * $building->base_wood_cost),
+            'current_clay'       => $building->kingdom->current_clay - ($building->level * $building->base_clay_cost),
+            'current_stone'      => $building->kingdom->current_stone - ($building->level * $building->base_stone_cost),
+            'current_iron'       => $building->kingdom->current_iron - ($building->level * $building->base_iron_cost),
+            'current_population' => $building->kingdom->current_population - ($building->level * $building->base_population),
         ]);
 
         return $building->kingdom->refresh();

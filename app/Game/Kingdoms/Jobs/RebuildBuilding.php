@@ -20,7 +20,7 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Mail;
 
-class UpgradeBuilding implements ShouldQueue
+class RebuildBuilding implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -40,13 +40,6 @@ class UpgradeBuilding implements ShouldQueue
     protected $queueId;
 
     /**
-     * @var array $resourceType
-     */
-    protected $resourceTypes = [
-        'wood', 'clay', 'stone', 'iron',
-    ];
-
-    /**
      * Create a new job instance.
      *
      * @param Building $building
@@ -54,8 +47,7 @@ class UpgradeBuilding implements ShouldQueue
      * @param int $queueId
      * @return void
      */
-    public function __construct(Building $building, User $user, int $queueId)
-    {
+    public function __construct(Building $building, User $user, int $queueId) {
         $this->user     = $user;
 
         $this->building = $building;
@@ -79,42 +71,23 @@ class UpgradeBuilding implements ShouldQueue
             return;
         }
 
-        $level = $this->building->level + 1;
-
-        if ($this->building->gives_resources) {
-            $type = $this->getResourceType();
-            
-            if (is_null($type)) {
-                $queue->delete();
-
-                return;
-            }
-
-            $this->building->kingdom->{'max_' . $type} += 1000;
-        }
-
-        $this->building->kingdom->save();
-
-        $this->building->refresh()->Update([
-            'level' => $level,
+        $this->building->update([
+            'current_durability' => $this->building->max_durability,
         ]);
 
-        $this->building->refresh()->update([
-            'current_defence'    => $this->building->defence,
-            'current_durability' => $this->building->durability,
-            'max_defence'        => $this->building->defence,
-            'max_durability'     => $this->building->durability,
-        ]);
+        if ($this->building->morale_increase > 0) {
+            $kingdom = $this->building->kingdom;
 
-        $building = $this->building->refresh();
-
-        if ($building->is_farm) {
-            $building->kingdom->update([
-                'max_population' => $building->population_increase
+            $kingdom->update([
+                'current_morale' => $kingdom->current_morale + $this->building->morale_increase,
             ]);
         }
 
-        BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdoms_id)->first()->delete();
+        BuildingInQueue::where('to_level', $this->building->level)
+                       ->where('building_id', $this->building->id)
+                       ->where('kingdom_id', $this->building->kingdoms_id)
+                       ->first()
+                       ->delete();
         
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdoms_id);
@@ -122,23 +95,13 @@ class UpgradeBuilding implements ShouldQueue
             $kingdom = $manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($this->user, $kingdom));
-            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level));
+            event(new ServerMessageEvent($this->user, 'building-repair-finished', $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '.'));
         } else if ($this->user->upgraded_building_email) {
             Mail::to($this->user)->send(new GenericMail(
                 $this->user,
-                $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,
-                'Building Upgrade Finished',
+                $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '.',
+                'A Building Was Rebuilt',
             ));
         }
-    }
-
-    protected function getResourceType() {
-        foreach($this->resourceTypes as $type) {
-            if ($this->building->{'increase_in_' . $type} !== 0.0) {
-                return $type;
-            }
-        }
-
-        return null;
     }
 }

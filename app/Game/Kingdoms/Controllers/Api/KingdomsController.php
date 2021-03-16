@@ -13,10 +13,8 @@ use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\Location;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Requests\KingdomsLocationRequest;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
 use App\Game\Kingdoms\Service\BuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
@@ -65,7 +63,7 @@ class KingdomsController extends Controller {
         200);
     }
 
-    public function upgradeBuilding(Request $request, Character $character, Building $building, BuildingService $buildingService) {
+    public function upgradeBuilding(Character $character, Building $building, BuildingService $buildingService) {
 
         if (ResourceValidation::shouldRedirectBuilding($building, $building->kingdom)) {
             return response()->json([
@@ -83,7 +81,27 @@ class KingdomsController extends Controller {
 
         event(new UpdateKingdom($character->user, $kingdom));
 
-        return response()->json($kingdom, 200);
+        return response()->json([], 200);
+    }
+
+    public function rebuildBuilding(Character $character, Building $building, BuildingService $buildingService) {
+        if (ResourceValidation::shouldRedirectRebuildBuilding($building, $building->kingdom)) {
+            return response()->json([
+                'message' => "You don't have the resources."
+            ], 422);
+        }
+
+        $kingdom = $buildingService->updateKingdomResourcesForRebuildBuilding($building, $character);
+
+        $buildingService->rebuildBuilding($building, $character);
+
+        $kingdom  = new Item($kingdom, $this->kingdom);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateKingdom($character->user, $kingdom));
+
+        return response()->json([], 200);
     }
 
     public function recruitUnits(Request $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service) {
