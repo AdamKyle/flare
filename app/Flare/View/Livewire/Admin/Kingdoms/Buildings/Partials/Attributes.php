@@ -3,13 +3,13 @@
 namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials;
 
 use App\Admin\Services\UpdateKingdomsService;
-use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameKingdomBuilding;
 use App\Flare\Models\GameUnit;
 use Livewire\Component;
 
 class Attributes extends Component
 {
-    public $gameBuilding;
+    public $gameKingdomBuilding;
 
     public $gameUnits;
 
@@ -18,37 +18,37 @@ class Attributes extends Component
     public $selectedUnits = [];
 
     protected $rules = [
-        'gameBuilding.is_walls'                   => 'nullable',
-        'gameBuilding.is_church'                  => 'nullable',
-        'gameBuilding.is_farm'                    => 'nullable',
-        'gameBuilding.is_resource_building'       => 'nullable',
-        'gameBuilding.trains_units'               => 'nullable',
-        'gameBuilding.wood_cost'                  => 'nullable',
-        'gameBuilding.clay_cost'                  => 'nullable',
-        'gameBuilding.stone_cost'                 => 'nullable',
-        'gameBuilding.iron_cost'                  => 'nullable',
-        'gameBuilding.increase_population_amount' => 'nullable',
-        'gameBuilding.increase_morale_amount'     => 'nullable',
-        'gameBuilding.decrease_morale_amount'     => 'nullable',
-        'gameBuilding.increase_wood_amount'       => 'nullable',
-        'gameBuilding.increase_clay_amount'       => 'nullable',
-        'gameBuilding.increase_stone_amount'      => 'nullable',
-        'gameBuilding.increase_iron_amount'       => 'nullable',
-        'gameBuilding.increase_durability_amount' => 'nullable',
-        'gameBuilding.increase_defence_amount'    => 'nullable',
-        'gameBuilding.time_to_build'              => 'nullable',
-        'gameBuilding.time_increase_amount'       => 'nullable',
-        'gameBuilding.units_per_level'            => 'nullable',
+        'gameKingdomBuilding.is_walls'                   => 'nullable',
+        'gameKingdomBuilding.is_church'                  => 'nullable',
+        'gameKingdomBuilding.is_farm'                    => 'nullable',
+        'gameKingdomBuilding.is_resource_building'       => 'nullable',
+        'gameKingdomBuilding.trains_units'               => 'nullable',
+        'gameKingdomBuilding.wood_cost'                  => 'nullable',
+        'gameKingdomBuilding.clay_cost'                  => 'nullable',
+        'gameKingdomBuilding.stone_cost'                 => 'nullable',
+        'gameKingdomBuilding.iron_cost'                  => 'nullable',
+        'gameKingdomBuilding.increase_population_amount' => 'nullable',
+        'gameKingdomBuilding.increase_morale_amount'     => 'nullable',
+        'gameKingdomBuilding.decrease_morale_amount'     => 'nullable',
+        'gameKingdomBuilding.increase_wood_amount'       => 'nullable',
+        'gameKingdomBuilding.increase_clay_amount'       => 'nullable',
+        'gameKingdomBuilding.increase_stone_amount'      => 'nullable',
+        'gameKingdomBuilding.increase_iron_amount'       => 'nullable',
+        'gameKingdomBuilding.increase_durability_amount' => 'nullable',
+        'gameKingdomBuilding.increase_defence_amount'    => 'nullable',
+        'gameKingdomBuilding.time_to_build'              => 'nullable',
+        'gameKingdomBuilding.time_increase_amount'       => 'nullable',
+        'gameKingdomBuilding.units_per_level'            => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];
 
     public function getUnitSelectionIsDisabledProperty() {
-        if (is_null($this->gameBuilding)) {
+        if (is_null($this->gameKingdomBuilding)) {
             return true;
         }
 
-        if (!$this->gameBuilding->trains_units) {
+        if (!$this->gameKingdomBuilding->trains_units) {
             return true;
         }
 
@@ -60,17 +60,17 @@ class Attributes extends Component
     }
 
     public function mount() {
-        if (is_array($this->gameBuilding)) {
-            $this->gameBuilding = GameBuilding::find($this->gameBuilding['id']);
+        if (is_array($this->gameKingdomBuilding)) {
+            $this->gameKingdomBuilding = GameKingdomBuilding::find($this->gameKingdomBuilding['id']);
         }
 
         $this->gameUnits = GameUnit::all();
     }
 
     public function update($id) {
-        $this->gameBuilding = GameBuilding::find($id);
+        $this->gameKingdomBuilding = GameKingdomBuilding::find($id);
 
-        $this->selectedUnits = $this->gameBuilding->units()->pluck('game_unit_id')->toArray();
+        $this->selectedUnits = $this->gameKingdomBuilding->units()->pluck('game_unit_id')->toArray();
     }
 
     public function validateInput(string $functionName, int $index) {
@@ -78,7 +78,7 @@ class Attributes extends Component
 
         $isValid = $this->validateSelectedUnits();
 
-        if (!empty($this->selectedUnits) && is_null($this->gameBuilding->units_per_level)) {
+        if (!empty($this->selectedUnits) && is_null($this->gameKingdomBuilding->units_per_level)) {
             return $this->addError('units_per_level', 'How many levels between units?');
         }
 
@@ -86,18 +86,18 @@ class Attributes extends Component
             return $this->addError('error', 'Your selected units and units per level are greator then your max level.');
         }
 
-        $this->gameBuilding->save();
+        $this->gameKingdomBuilding->save();
 
-        $gameBuilding = $this->gameBuilding->refresh();
+        $gameKingdomBuilding = $this->gameKingdomBuilding->refresh();
 
         $kingdomService = new UpdateKingdomsService();
 
-        $kingdomService->updateKingdomBuildings($this->gameBuilding->refresh(), $this->selectedUnits, $gameBuilding->units_per_level);
+        $kingdomService->updateKingdomKingdomBuildings($this->gameKingdomBuilding->refresh(), $this->selectedUnits, $gameKingdomBuilding->units_per_level);
 
-        $message = 'Created Building: ' . $this->gameBuilding->refresh()->name;
+        $message = 'Created KingdomBuilding: ' . $this->gameKingdomBuilding->refresh()->name;
 
         if ($this->editing) {
-            $message = 'Updated Building: ' . $this->gameBuilding->refresh()->name;
+            $message = 'Updated KingdomBuilding: ' . $this->gameKingdomBuilding->refresh()->name;
         }
         
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
@@ -112,9 +112,9 @@ class Attributes extends Component
     }
 
     protected function validateSelectedUnits() {
-        $total = (count($this->selectedUnits) * $this->gameBuilding->units_per_level) - (count($this->selectedUnits) - 1);
+        $total = (count($this->selectedUnits) * $this->gameKingdomBuilding->units_per_level) - (count($this->selectedUnits) - 1);
 
-        if ($total > $this->gameBuilding->max_level) {
+        if ($total > $this->gameKingdomBuilding->max_level) {
             return false;
         }
 

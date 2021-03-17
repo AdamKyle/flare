@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameKingdomBuilding;
 use App\Http\Controllers\Controller;
 
 class BuildingsController extends Controller {
@@ -18,13 +18,13 @@ class BuildingsController extends Controller {
         ]);
     }
 
-    public function show(GameBuilding $building) {
+    public function show(GameKingdomBuilding $building) {
         return view('admin.kingdoms.buildings.building', [
             'building' => $building
         ]);
     }
 
-    public function edit(GameBuilding $building) {
+    public function edit(GameKingdomBuilding $building) {
         return view ('admin.kingdoms.buildings.manage', [
             'building' => $building,
             'editing'  => true,

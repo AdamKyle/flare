@@ -3,8 +3,9 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Console\Commands\UpdateKingdom;
-use App\Flare\Models\Building;
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
@@ -14,7 +15,7 @@ use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
-class BuildingService {
+class KingdomBuildingService {
 
     /**
      * @var mixed $completed
@@ -32,11 +33,11 @@ class BuildingService {
      * Create the building queue record and then dispatches based on the buildings time_increase
      * attribute.
      * 
-     * @param Building $building
+     * @param KingdomBuilding $building
      * @param Character $character
      * @return void
      */
-    public function upgradeBuilding(Building $building, Character $character): void {
+    public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character): void {
         $timeToComplete = now()->addMinutes($building->time_increase);
         
         $queue = BuildingInQueue::create([
@@ -51,7 +52,7 @@ class BuildingService {
         UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
     }
 
-    public function rebuildBuilding(Building $building, Character $character) {
+    public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
         $timeToComplete = now()->addMinutes($building->rebuild_time);
         
         $queue = BuildingInQueue::create([
@@ -69,10 +70,10 @@ class BuildingService {
     /**
      * Updates the kingdoms resources based on building cost.
      * 
-     * @param Building $building
+     * @param KingdomBuilding $building
      * @return Kingdom
      */
-    public function updateKingdomResourcesForBuildingUpgrade(Building $building): Kingdom {
+    public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building): Kingdom {
         $building->kingdom->update([
             'current_wood'       => $building->kingdom->current_wood - $building->wood_cost,
             'current_clay'       => $building->kingdom->current_clay - $building->clay_cost,
@@ -84,7 +85,7 @@ class BuildingService {
         return $building->kingdom->refresh();
     }
 
-    public function updateKingdomResourcesForRebuildBuilding(Building $building): Kingdom {
+    public function updateKingdomResourcesForRebuildKingdomBuilding(KingdomBuilding $building): Kingdom {
         $building->kingdom->update([
             'current_wood'       => $building->kingdom->current_wood - ($building->level * $building->base_wood_cost),
             'current_clay'       => $building->kingdom->current_clay - ($building->level * $building->base_clay_cost),
@@ -103,12 +104,12 @@ class BuildingService {
      * 
      * Can return false if there is not enough time left or the too little resources given back.
      * 
-     * @param BuildingInQueue $queue
+     * @param KingdomBuildingInQueue $queue
      * @param Manager $manager
      * @param KingdomTransformer $transformer
      * @return bool
      */
-    public function cancelBuildingUpgrade(BuildingInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
+    public function cancelKingdomBuildingUpgrade(BuildingInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
         $this->resourceCalculation($queue);
         
         if (!($this->totalResources >= .10) || $this->completed === 0) {
@@ -142,7 +143,7 @@ class BuildingService {
         $this->totalResources = 1 - $this->completed;
     }
 
-    protected function updateKingdomAfterCancelation(Kingdom $kingdom, Building $building) {
+    protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building) {
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $this->totalResources),
             'current_clay'       => $kingdom->current_clay + ($building->clay_cost * $this->totalResources),

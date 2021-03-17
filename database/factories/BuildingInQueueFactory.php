@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Flare\Models\Building;
 use App\Flare\Models\BuildingInQueue;
 
 class BuildingInQueueFactory extends Factory

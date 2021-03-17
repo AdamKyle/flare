@@ -9,11 +9,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Building;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 
-class UpdateBuilding implements ShouldQueue
+class UpdateKingdomBuilding implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -24,7 +24,7 @@ class UpdateBuilding implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Building $building) {
+    public function __construct(KingdomBuilding $building) {
         $this->building     = $building;
     }
 

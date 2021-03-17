@@ -2,9 +2,9 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\Building;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameKingdomBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Transformers\KingdomTransformer;
@@ -56,7 +56,7 @@ class KingdomService {
     public function createKingdom(Character $character): Kingdom {
         $kingdom = $this->builder->createKingdom($character);
 
-        $kingdom = $this->assignBuildings($kingdom);
+        $kingdom = $this->assignKingdomBuildings($kingdom);
 
         $this->addKingdomToCache($character, $kingdom);
 
@@ -111,11 +111,11 @@ class KingdomService {
         return $kingdom;
     }
 
-    protected function assignBuildings(Kingdom $kingdom): Kingdom {
-        foreach(GameBuilding::all() as $building) {
+    protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {
+        foreach(GameKingdomBuilding::all() as $building) {
             $kingdom->buildings()->create([
                 'game_building_id'    => $building->id,
-                'kingdoms_id'         => $kingdom->id,
+                'kingdom_id'         => $kingdom->id,
                 'level'               => 1,
                 'current_defence'     => $building->base_defence,
                 'current_durability'  => $building->base_durability,

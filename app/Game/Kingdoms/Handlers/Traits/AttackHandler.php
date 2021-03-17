@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Handlers\Traits;
 
-use App\Flare\Models\Building;
+use App\Flare\Models\KingdomBuilding;
 
 trait AttackHandler {
 
@@ -14,7 +14,7 @@ trait AttackHandler {
         return  ($totalDefence / $totalAttack);
     }
 
-    public function updateBuilding(Building $building, float $durabilityPercentageLost) {
+    public function updateKingdomBuilding(KingdomBuilding $building, float $durabilityPercentageLost) {
         $durability = ceil($building->current_durability - ($building->current_durability * $durabilityPercentageLost));
 
         $building->update([

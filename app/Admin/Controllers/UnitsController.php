@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\GameBuildingUnit;
+use App\Flare\Models\GameKingdomBuildingUnit;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameUnit;
 
@@ -20,17 +20,17 @@ class UnitsController extends Controller {
     }
 
     public function show(GameUnit $gameUnit) {
-        $belongsToBuilding = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
+        $belongsToKingdomBuilding = GameKingdomBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
 
-        if (!is_null($belongsToBuilding)) {
-            $belongsToBuilding = $belongsToBuilding->gameBuilding;
+        if (!is_null($belongsToKingdomBuilding)) {
+            $belongsToKingdomBuilding = $belongsToKingdomBuilding->gameKingdomBuilding;
         }
 
         $weakAgainst       = GameUnit::find($gameUnit->weak_against_unit_id);
 
         return view('admin.kingdoms.units.unit', [
             'unit'        => $gameUnit,
-            'building'    => $belongsToBuilding,
+            'building'    => $belongsToKingdomBuilding,
             'weakAgainst' => $weakAgainst,
         ]);
     }

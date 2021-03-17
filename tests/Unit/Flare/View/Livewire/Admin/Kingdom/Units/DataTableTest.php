@@ -6,12 +6,12 @@ use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Kingdoms\Units\DataTable;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateGameUnit;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase, CreateGameUnit, CreateGameBuilding;
+    use RefreshDatabase, CreateGameUnit, CreateGameKingdomBuilding;
 
     public function setUp(): void {
         parent::setUp();
@@ -29,17 +29,17 @@ class DataTableTest extends TestCase
             ->assertDontSee('Sample Unit');
     }
 
-    public function testTheComponentLoadsWithBuilding() {
-        $gameBuilding = $this->createGameBuilding();
+    public function testTheComponentLoadsWithKingdomBuilding() {
+        $gameKingdomBuilding = $this->createGameKingdomBuilding();
 
-        $gameBuilding->units()->create([
-            'game_building_id' => $gameBuilding->id,
+        $gameKingdomBuilding->units()->create([
+            'game_building_id' => $gameKingdomBuilding->id,
             'game_unit_id'     => $this->createGameUnit()->id,
             'required_level'   => 1,
         ]);
 
         Livewire::test(DataTable::class, [
-            'building' => $gameBuilding->refresh(),
+            'building' => $gameKingdomBuilding->refresh(),
         ])
         ->assertSee('Sample Unit')
         ->set('search', 'Sample Unit')

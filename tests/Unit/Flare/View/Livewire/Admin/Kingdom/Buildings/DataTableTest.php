@@ -4,28 +4,28 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Kingdom\Buildings;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\View\Livewire\Admin\Kingdoms\Buildings\DataTable;
+use App\Flare\View\Livewire\Admin\Kingdoms\KingdomBuildings\DataTable;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 
 class DataTableTest extends TestCase
 {
-    use RefreshDatabase, CreateGameBuilding;
+    use RefreshDatabase, CreateGameKingdomBuilding;
 
     public function setUp(): void {
         parent::setUp();
 
-        $this->createGameBuilding();
+        $this->createGameKingdomBuilding();
     }
 
     public function testTheComponentLoads()
     {
         
         Livewire::test(DataTable::class)
-            ->assertSee('Test Building')
-            ->set('search', 'Test Building')
-            ->assertSee('Test Building')
+            ->assertSee('Test KingdomBuilding')
+            ->set('search', 'Test KingdomBuilding')
+            ->assertSee('Test KingdomBuilding')
             ->set('search', 'Test cuilding')
-            ->assertDontSee('Test Building');
+            ->assertDontSee('Test KingdomBuilding');
     }
 }

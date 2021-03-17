@@ -43,7 +43,7 @@ class BuildingInQueue extends Model
     }
 
     public function building() {
-        return $this->belongsTo(Building::class);
+        return $this->belongsTo(KingdomBuilding::class);
     }
 
     public function kingdom() {

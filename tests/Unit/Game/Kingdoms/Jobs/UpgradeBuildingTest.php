@@ -3,17 +3,17 @@
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Building;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
-use App\Game\Kingdoms\Jobs\UpgradeBuilding;
+use App\Game\Kingdoms\Jobs\UpgradeKingdomBuilding;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateKingdom;
 
 class UpgradeBuildingTest extends TestCase
 {
-    use RefreshDatabase, CreateKingdom, CreateGameBuilding;
+    use RefreshDatabase, CreateKingdom, CreateGameKingdomBuilding;
 
     public function testJobReturnsEarlyWithNoQueue()
     {
@@ -23,8 +23,8 @@ class UpgradeBuildingTest extends TestCase
         ]);
 
         $kingdom->buildings()->create([
-            'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdoms_id'        => $kingdom->id,
+            'game_building_id'   => $this->createGameKingdomBuilding()->id,
+            'kingdom_id'        => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 300,
@@ -32,7 +32,7 @@ class UpgradeBuildingTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        UpgradeBuilding::dispatch(Building::first(), User::first(), 1);
+        UpgradeKingdomBuilding::dispatch(KingdomBuilding::first(), User::first(), 1);
 
         $this->assertTrue($kingdom->refresh()->buildings->first()->level === 1);
     }
@@ -45,8 +45,8 @@ class UpgradeBuildingTest extends TestCase
         ]);
 
         $kingdom->buildings()->create([
-            'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-            'kingdoms_id'        => $kingdom->id,
+            'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+            'kingdom_id'        => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 300,
@@ -54,14 +54,14 @@ class UpgradeBuildingTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        $this->createBuildingQueue([
+        $this->createKingdomBuildingQueue([
             'character_id' => 1,
             'kingdom_id'   => 1,
             'building_id'  => 1,
             'to_level'     => 2,
         ]);
 
-        UpgradeBuilding::dispatch(Building::first(), User::first(), 1);
+        UpgradeKingdomBuilding::dispatch(KingdomBuilding::first(), User::first(), 1);
         
         $kingdom = $kingdom->refresh();
 
@@ -69,7 +69,7 @@ class UpgradeBuildingTest extends TestCase
         $this->assertTrue($kingdom->max_population > 0);
     }
 
-    public function testUpgradeBuildingWithInvalidResourceType()
+    public function testUpgradeKingdomBuildingWithInvalidResourceType()
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
@@ -77,14 +77,14 @@ class UpgradeBuildingTest extends TestCase
         ]);
 
         $kingdom->buildings()->create([
-            'game_building_id'   => $this->createGameBuilding([
+            'game_building_id'   => $this->createGameKingdomBuilding([
                 'increase_wood_amount'  => 0,
                 'increase_clay_amount'  => 0,
                 'increase_stone_amount' => 0,
                 'increase_iron_amount'  => 0,
                 'is_resource_building'  => true,
             ])->id,
-            'kingdoms_id'        => $kingdom->id,
+            'kingdom_id'        => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 300,
@@ -92,14 +92,14 @@ class UpgradeBuildingTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        $this->createBuildingQueue([
+        $this->createKingdomBuildingQueue([
             'character_id' => 1,
             'kingdom_id'   => 1,
             'building_id'  => 1,
             'to_level'     => 2,
         ]);
 
-        UpgradeBuilding::dispatch(Building::first(), User::first(), 1);
+        UpgradeKingdomBuilding::dispatch(KingdomBuilding::first(), User::first(), 1);
         
         $kingdom = $kingdom->refresh();
 

@@ -8,15 +8,15 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\Building;
-use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
-use App\Game\Kingdoms\Service\BuildingService;
+use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Events\UpdateKingdom;
@@ -63,17 +63,17 @@ class KingdomsController extends Controller {
         200);
     }
 
-    public function upgradeBuilding(Character $character, Building $building, BuildingService $buildingService) {
+    public function upgradeKingdomBuilding(Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
 
-        if (ResourceValidation::shouldRedirectBuilding($building, $building->kingdom)) {
+        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources."
             ], 422);
         }
 
-        $kingdom = $buildingService->updateKingdomResourcesForBuildingUpgrade($building);
+        $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
         
-        $buildingService->upgradeBuilding($building, $character);
+        $buildingService->upgradeKingdomBuilding($building, $character);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 
@@ -84,16 +84,16 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function rebuildBuilding(Character $character, Building $building, BuildingService $buildingService) {
-        if (ResourceValidation::shouldRedirectRebuildBuilding($building, $building->kingdom)) {
+    public function rebuildKingdomBuilding(Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
+        if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources."
             ], 422);
         }
 
-        $kingdom = $buildingService->updateKingdomResourcesForRebuildBuilding($building, $character);
+        $kingdom = $buildingService->updateKingdomResourcesForRebuildKingdomBuilding($building, $character);
 
-        $buildingService->rebuildBuilding($building, $character);
+        $buildingService->rebuildKingdomBuilding($building, $character);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 
@@ -158,19 +158,19 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function removeBuildingFromQueue(Request $request, BuildingService $service) {
+    public function removeKingdomBuildingFromQueue(Request $request, KingdomBuildingService $service) {
 
         $request->validate([
             'queue_id' => 'required|integer',
         ]);
 
-        $queue = BuildingInQueue::find($request->queue_id);
+        $queue = KingdomBuildingInQueue::find($request->queue_id);
 
         if (is_null($queue)) {
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
         
-        $canceled = $service->cancelBuildingUpgrade($queue, $this->manager, $this->kingdom);
+        $canceled = $service->cancelKingdomBuildingUpgrade($queue, $this->manager, $this->kingdom);
 
         if (!$canceled) {
             return response()->json([

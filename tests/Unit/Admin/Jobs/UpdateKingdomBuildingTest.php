@@ -2,18 +2,18 @@
 
 namespace Tests\Unit\Admin\Jobs;
 
-use App\Admin\Jobs\UpdateBuilding;
+use App\Admin\Jobs\UpdateKingdomBuilding;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateKingdom;
 
-class UpdateBuildingTest extends TestCase
+class UpdateKingdomBuildingTest extends TestCase
 {
-    use RefreshDatabase, CreateKingdom, CreateGameBuilding;
+    use RefreshDatabase, CreateKingdom, CreateGameKingdomBuilding;
 
-    public function testBuildingGetsUpdated()
+    public function testKingdomBuildingGetsUpdated()
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
@@ -23,8 +23,8 @@ class UpdateBuildingTest extends TestCase
         ]);
 
         $kingdom->buildings()->create([
-            'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdoms_id'        => $kingdom->id,
+            'game_building_id'   => $this->createGameKingdomBuilding()->id,
+            'kingdom_id'        => $kingdom->id,
             'level'              => 2,
             'max_defence'        => 100,
             'max_durability'     => 100,
@@ -35,7 +35,7 @@ class UpdateBuildingTest extends TestCase
         $kingdom  = $kingdom->refresh();
         $building = $kingdom->buildings->first();
 
-        UpdateBuilding::dispatch($building);
+        UpdateKingdomBuilding::dispatch($building);
 
         $building = $kingdom->buildings->first()->refresh();
 

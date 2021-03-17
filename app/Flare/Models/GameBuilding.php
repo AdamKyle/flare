@@ -79,10 +79,10 @@ class GameBuilding extends Model
     ];
 
     public function units() {
-        return $this->hasMany(GameBuildingUnit::class);
+        return $this->hasMany(GameKingdomBuildingUnit::class);
     }
 
     protected static function newFactory() {
-        return GameBuildingFactory::new();
+        return GameBuilding::new();
     }
 }

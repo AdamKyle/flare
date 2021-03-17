@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Validation;
 
-use App\Flare\Models\Building;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 
@@ -11,11 +11,11 @@ class ResourceValidation {
     /**
      * Do we have enough resources for the building?
      * 
-     * @param Building $building
+     * @param KingdomBuilding $building
      * @param Kingdom $kingdom
      * @return bool
      */
-    public function shouldRedirectBuilding(Building $building, Kingdom $kingdom): bool {
+    public function shouldRedirectKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool {
         return ($kingdom->current_wood < $building->wood_cost) && 
                ($kingdom->current_clay < $building->clay_cost) &&
                ($kingdom->current_stone < $building->stone_cost) &&
@@ -23,7 +23,7 @@ class ResourceValidation {
                ($kingdom->current_population < $building->required_population);
     }
 
-    public function shouldRedirectRebuildBuilding(Building $building, Kingdom $kingdom): bool {
+    public function shouldRedirectRebuildKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool {
         return ($kingdom->current_wood < ($building->level * $building->base_wood_cost)) && 
                ($kingdom->current_clay < ($building->level * $building->base_clay_cost)) &&
                ($kingdom->current_stone < ($building->level * $building->base_stone_cost)) &&

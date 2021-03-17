@@ -2,18 +2,18 @@
 
 namespace App\Admin\Services;
 
-use App\Admin\Jobs\UpdateBuildings;
-use App\Flare\Models\GameBuilding;
+use App\Admin\Jobs\UpdateKingdomBuildings;
+use App\Flare\Models\GameKingdomBuilding;
 
 class UpdateKingdomsService {
 
-    public function updateKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = null) {
-        UpdateBuildings::dispatch($gameBuilding, $selectedUnits, $levels)->delay(now()->addMinutes(1));
+    public function updateKingdomKingdomBuildings(GameKingdomBuilding $gameKingdomBuilding, $selectedUnits = [], int $levels = null) {
+        UpdateKingdomBuildings::dispatch($gameKingdomBuilding, $selectedUnits, $levels)->delay(now()->addMinutes(1));
     }
 
-    public function assignUnits(GameBuilding $gameBuilding, array $selectedUnits, int $levels) {
-        $gameBuilding->units()->create([
-            'game_building_id' => $gameBuilding->id,
+    public function assignUnits(GameKingdomBuilding $gameKingdomBuilding, array $selectedUnits, int $levels) {
+        $gameKingdomBuilding->units()->create([
+            'game_building_id' => $gameKingdomBuilding->id,
             'game_unit_id'     => $selectedUnits[0],
             'required_level'   => 1,
         ]);
@@ -29,8 +29,8 @@ class UpdateKingdomsService {
         foreach($selectedUnits as $unitId) {
             $initialLevel += $levels;
 
-            $gameBuilding->units()->create([
-                'game_building_id' => $gameBuilding->id,
+            $gameKingdomBuilding->units()->create([
+                'game_building_id' => $gameKingdomBuilding->id,
                 'game_unit_id'     => $unitId,
                 'required_level'   => $initialLevel,
             ]);

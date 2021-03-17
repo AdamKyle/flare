@@ -7,12 +7,12 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Tests\Setup\Character\CharacterFactory;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateKingdom;
 
 class KingdomResourcesServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateKingdom, CreateGameBuilding;
+    use RefreshDatabase, CreateKingdom, CreateGameKingdomBuilding;
 
     public function testkingdomGetsUpdated() {
         $kingdom = $this->createKingdom([
@@ -24,8 +24,8 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -34,11 +34,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building' => true, 
                     'increase_wood_amount' => 100
                 ])->id,
-                'kingdoms_id'          => $kingdom->id,
+                'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -80,8 +80,8 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -90,11 +90,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building' => true, 
                     'increase_wood_amount' => 100
                 ])->id,
-                'kingdoms_id'          => $kingdom->id,
+                'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -126,8 +126,8 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -136,11 +136,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building' => true, 
                     'increase_wood_amount' => 100
                 ])->id,
-                'kingdoms_id'          => $kingdom->id,
+                'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -172,11 +172,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'   => $this->createGameBuilding([
+                'game_building_id'   => $this->createGameKingdomBuilding([
                     'is_resource_building' => true, 
                     'increase_wood_amount' => 100
                 ])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -185,8 +185,8 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -217,8 +217,8 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -227,11 +227,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building' => true, 
                     'increase_wood_amount' => 100,
                 ])->id,
-                'kingdoms_id'          => $kingdom->id,
+                'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -263,8 +263,8 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-                'kingdoms_id'        => $kingdom->id,
+                'game_building_id'   => $this->createGameKingdomBuilding(['is_farm' => true])->id,
+                'kingdom_id'        => $kingdom->id,
                 'level'              => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -273,11 +273,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building' => true, 
                     'increase_wood_amount' => 100,
                 ])->id,
-                'kingdoms_id'          => $kingdom->id,
+                'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
@@ -311,11 +311,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'       => $this->createGameBuilding([
+                'game_building_id'       => $this->createGameKingdomBuilding([
                     'is_farm'                => true,
                     'increase_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -324,12 +324,12 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building'   => true, 
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -362,11 +362,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'       => $this->createGameBuilding([
+                'game_building_id'       => $this->createGameKingdomBuilding([
                     'is_farm'                => true,
                     'increase_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -375,12 +375,12 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building'   => true, 
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -413,11 +413,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'       => $this->createGameBuilding([
+                'game_building_id'       => $this->createGameKingdomBuilding([
                     'is_farm'                => true,
                     'decrease_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -426,12 +426,12 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building'   => true, 
                     'increase_wood_amount'   => 100,
                     'decrease_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -463,11 +463,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'       => $this->createGameBuilding([
+                'game_building_id'       => $this->createGameKingdomBuilding([
                     'is_farm'                => true,
                     'decrease_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -476,12 +476,12 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building'   => true, 
                     'increase_wood_amount'   => 100,
                     'decrease_morale_amount' => 2.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -513,11 +513,11 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom->buildings()->insert([
             [
-                'game_building_id'       => $this->createGameBuilding([
+                'game_building_id'       => $this->createGameKingdomBuilding([
                     'is_farm'                => true,
                     'decrease_morale_amount' => 6.0,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,
@@ -526,12 +526,12 @@ class KingdomResourcesServiceTest extends TestCase {
 
             ],
             [
-                'game_building_id'     => $this->createGameBuilding([
+                'game_building_id'     => $this->createGameKingdomBuilding([
                     'is_resource_building'   => true, 
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => .05,
                 ])->id,
-                'kingdoms_id'            => $kingdom->id,
+                'kingdom_id'            => $kingdom->id,
                 'level'                  => 1,
                 'max_defence'            => 100,
                 'max_durability'         => 100,

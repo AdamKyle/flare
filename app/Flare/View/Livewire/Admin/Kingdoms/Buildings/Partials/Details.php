@@ -3,32 +3,32 @@
 namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials;
 
 use Livewire\Component;
-use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameKingdomBuilding;
 use App\Flare\Models\GameUnit;
 
 class Details extends Component
 {
 
-    public $gameBuilding = null;
+    public $gameKingdomBuilding = null;
 
     public $editing      = false;
 
     protected $rules = [
-        'gameBuilding.name'                 => 'required',
-        'gameBuilding.description'          => 'required',
-        'gameBuilding.max_level'            => 'required',
-        'gameBuilding.base_durability'      => 'required',
-        'gameBuilding.base_defence'         => 'required',
-        'gameBuilding.required_population'  => 'required',
+        'gameKingdomBuilding.name'                 => 'required',
+        'gameKingdomBuilding.description'          => 'required',
+        'gameKingdomBuilding.max_level'            => 'required',
+        'gameKingdomBuilding.base_durability'      => 'required',
+        'gameKingdomBuilding.base_defence'         => 'required',
+        'gameKingdomBuilding.required_population'  => 'required',
     ];
 
     protected $messages = [
-        'gameBuilding.name'                 => 'Name is required.',
-        'gameBuilding.description'          => 'Description is required.',
-        'gameBuilding.max_level'            => 'Max Level is required.',
-        'gameBuilding.base_durability'      => 'Base Durability is required.',
-        'gameBuilding.base_defence'         => 'Base Defence is required.',
-        'gameBuilding.required_population'  => 'Required Population is required.',
+        'gameKingdomBuilding.name'                 => 'Name is required.',
+        'gameKingdomBuilding.description'          => 'Description is required.',
+        'gameKingdomBuilding.max_level'            => 'Max Level is required.',
+        'gameKingdomBuilding.base_durability'      => 'Base Durability is required.',
+        'gameKingdomBuilding.base_defence'         => 'Base Defence is required.',
+        'gameKingdomBuilding.required_population'  => 'Required Population is required.',
     ];
 
     protected $listeners = ['validateInput'];
@@ -36,15 +36,15 @@ class Details extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
-        $this->gameBuilding->save();
+        $this->gameKingdomBuilding->save();
 
-        $this->emitTo('core.form-wizard', 'storeModel', $this->gameBuilding->refresh());
+        $this->emitTo('core.form-wizard', 'storeModel', $this->gameKingdomBuilding->refresh());
         $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 
     public function mount() {
-        if (is_null($this->gameBuilding)) {
-            $this->gameBuilding = new GameBuilding;
+        if (is_null($this->gameKingdomBuilding)) {
+            $this->gameKingdomBuilding = new GameKingdomBuilding;
         }
 
         $this->units = GameUnit::all();

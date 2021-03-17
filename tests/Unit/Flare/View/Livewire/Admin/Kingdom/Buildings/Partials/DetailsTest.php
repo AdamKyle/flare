@@ -4,14 +4,14 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Kingdom\Buildings\Partials;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials\Details;
-use App\Flare\Models\GameBuilding;
+use App\Flare\View\Livewire\Admin\Kingdoms\KingdomBuildings\Partials\Details;
+use App\Flare\Models\GameKingdomBuilding;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 
 class DetailsTest extends TestCase
 {
-    use RefreshDatabase, CreateGameBuilding;
+    use RefreshDatabase, CreateGameKingdomBuilding;
 
     public function testTheComponentLoads() {
         Livewire::test(Details::class)->assertSee('Name')->assertDontSee('Previous');
@@ -19,32 +19,32 @@ class DetailsTest extends TestCase
 
     public function testValidationFails() {
         Livewire::test(Details::class)->call('validateInput', 'nextStep', 2)->assertHasErrors([
-            'gameBuilding.name' => 'required'
+            'gameKingdomBuilding.name' => 'required'
         ]);
     }
 
-    public function testCreateValidBuilding() {
+    public function testCreateValidKingdomBuilding() {
         Livewire::test(Details::class)
-                                    ->set('gameBuilding.name', 'Sample')
-                                    ->set('gameBuilding.description', 'something')
-                                    ->set('gameBuilding.max_level', 10)
-                                    ->set('gameBuilding.base_durability', 10)
-                                    ->set('gameBuilding.base_defence', 10)
-                                    ->set('gameBuilding.required_population', 10)
+                                    ->set('gameKingdomBuilding.name', 'Sample')
+                                    ->set('gameKingdomBuilding.description', 'something')
+                                    ->set('gameKingdomBuilding.max_level', 10)
+                                    ->set('gameKingdomBuilding.base_durability', 10)
+                                    ->set('gameKingdomBuilding.base_defence', 10)
+                                    ->set('gameKingdomBuilding.required_population', 10)
                                     ->call('validateInput', 'nextStep', 2);
 
         // Assert building was created:
-        $this->assertNotNull(GameBuilding::where('name', 'Sample')->first());
+        $this->assertNotNull(GameKingdomBuilding::where('name', 'Sample')->first());
     }
 
-    public function testUpdateBuilding() {
-        $building = $this->createGameBuilding();
+    public function testUpdateKingdomBuilding() {
+        $building = $this->createGameKingdomBuilding();
 
-        Livewire::test(Details::class, ['gameBuilding' => $building])
-                                        ->set('gameBuilding.name', 'Keep')
+        Livewire::test(Details::class, ['gameKingdomBuilding' => $building])
+                                        ->set('gameKingdomBuilding.name', 'Keep')
                                         ->call('validateInput', 'nextStep', 2);
 
         // Assert building was updated:
-        $this->assertNotNull(GameBuilding::where('name', 'Keep')->first());
+        $this->assertNotNull(GameKingdomBuilding::where('name', 'Keep')->first());
     }
 }

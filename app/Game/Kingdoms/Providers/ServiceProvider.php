@@ -8,7 +8,7 @@ use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Handlers\UnitHandler;
 use App\Game\Kingdoms\Handlers\SiegeHandler;
 use App\Game\Kingdoms\Service\AttackService;
-use App\Game\Kingdoms\Service\BuildingService;
+use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
@@ -30,8 +30,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomBuilder();
         });
 
-        $this->app->bind(BuildingService::class, function($app) {
-            return new BuildingService;
+        $this->app->bind(KingdomBuildingService::class, function($app) {
+            return new KingdomBuildingService;
         });
 
         $this->app->bind(UnitService::class, function($app) {

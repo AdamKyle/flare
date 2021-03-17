@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBuildings extends Migration
+class CreateKingdomKingdomBuildings extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateBuildings extends Migration
      */
     public function up()
     {
-        Schema::create('buildings', function (Blueprint $table) {
+        Schema::create('kingdom_buildings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('game_building_id');
             $table->foreign('game_building_id', 'builds_gbid')
                   ->references('id')->on('game_buildings');
-            $table->unsignedBigInteger('kingdoms_id');
-            $table->foreign('kingdoms_id', 'buildsings_kid')
+            $table->unsignedBigInteger('kingdom_id');
+            $table->foreign('kingdom_id', 'buildings_kid')
                 ->references('id')->on('kingdoms');
             $table->integer('level');
             $table->integer('max_defence');
@@ -37,6 +37,6 @@ class CreateBuildings extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('buildings');
+        Schema::dropIfExists('kingdom_buildings');
     }
 }

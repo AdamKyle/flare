@@ -4,14 +4,15 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Admin\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\BuildingInQueue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
-use App\Flare\Models\Building;
-use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
@@ -30,7 +31,7 @@ class RebuildBuilding implements ShouldQueue
     protected $user;
 
     /**
-     * @var Building $building
+     * @var KingdomBuilding $building
      */
     protected $building;
 
@@ -42,12 +43,12 @@ class RebuildBuilding implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param Building $building
+     * @param KingdomBuilding $building
      * @param User $user
      * @param int $queueId
      * @return void
      */
-    public function __construct(Building $building, User $user, int $queueId) {
+    public function __construct(KingdomBuilding $building, User $user, int $queueId) {
         $this->user     = $user;
 
         $this->building = $building;
@@ -85,12 +86,12 @@ class RebuildBuilding implements ShouldQueue
 
         BuildingInQueue::where('to_level', $this->building->level)
                        ->where('building_id', $this->building->id)
-                       ->where('kingdom_id', $this->building->kingdoms_id)
+                       ->where('kingdom_id', $this->building->kingdom_id)
                        ->first()
                        ->delete();
         
         if (UserOnlineValue::isOnline($this->user)) {
-            $kingdom = Kingdom::find($this->building->kingdoms_id);
+            $kingdom = Kingdom::find($this->building->kingdom_id);
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
@@ -100,7 +101,7 @@ class RebuildBuilding implements ShouldQueue
             Mail::to($this->user)->send(new GenericMail(
                 $this->user,
                 $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '.',
-                'A Building Was Rebuilt',
+                'A KingdomBuilding Was Rebuilt',
             ));
         }
     }

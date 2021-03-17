@@ -5,13 +5,13 @@ namespace Tests\Feature\Game\Kingdom\Api;
 use DB;
 use Mail;
 use App\Admin\Mail\GenericMail;
-use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\UnitInQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
-use Tests\Traits\CreateBuilding;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateKingdomBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateGameUnit;
 use Tests\Traits\CreateKingdom;
 use Tests\Traits\CreateLocation;
@@ -20,8 +20,8 @@ class KingdomsControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateKingdom,
-        CreateGameBuilding,
-        CreateBuilding,
+        CreateGameKingdomBuilding,
+        CreateKingdomBuilding,
         CreateLocation,
         CreateGameUnit;
 
@@ -40,7 +40,7 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testSettleKingdom() {
-        $this->createGameBuilding();
+        $this->createGameKingdomBuilding();
 
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
             'character' => 1
@@ -124,13 +124,13 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals('Cannot settle here.', $content->message);
     }
 
-    public function testUpgradeBuildingWhileOnline() {
+    public function testUpgradeKingdomBuildingWhileOnline() {
         $this->createKingdom([
             'character_id' => 1,
             'game_map_id'  => 1,
         ]);
 
-        $gameBuilding = $this->createGameBuilding();
+        $gameKingdomBuilding = $this->createGameKingdomBuilding();
 
         DB::table('sessions')->insert([[
             'id'           => '1',
@@ -141,14 +141,14 @@ class KingdomsControllerTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        $this->createBuilding([
-            'game_building_id'   => $gameBuilding->id,
-            'kingdoms_id'        => 1,
+        $this->createKingdomBuilding([
+            'game_building_id'   => $gameKingdomBuilding->id,
+            'kingdom_id'        => 1,
             'level'              => 1,
-            'current_defence'    => $gameBuilding->base_defence,
-            'current_durability' => $gameBuilding->base_durability,
-            'max_defence'        => $gameBuilding->base_defence,
-            'max_durability'     => $gameBuilding->base_durability,
+            'current_defence'    => $gameKingdomBuilding->base_defence,
+            'current_durability' => $gameKingdomBuilding->base_durability,
+            'max_defence'        => $gameKingdomBuilding->base_defence,
+            'max_durability'     => $gameKingdomBuilding->base_durability,
         ]);
 
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
@@ -162,22 +162,22 @@ class KingdomsControllerTest extends TestCase
         $this->assertTrue(!empty($content));
     }
 
-    public function testUpgradeBuildingWithEmail() {
+    public function testUpgradeKingdomBuildingWithEmail() {
         $this->createKingdom([
             'character_id' => 1,
             'game_map_id'  => 1,
         ]);
 
-        $gameBuilding = $this->createGameBuilding();
+        $gameKingdomBuilding = $this->createGameKingdomBuilding();
 
-        $this->createBuilding([
-            'game_building_id'   => $gameBuilding->id,
-            'kingdoms_id'        => 1,
+        $this->createKingdomBuilding([
+            'game_building_id'   => $gameKingdomBuilding->id,
+            'kingdom_id'        => 1,
             'level'              => 1,
-            'current_defence'    => $gameBuilding->base_defence,
-            'current_durability' => $gameBuilding->base_durability,
-            'max_defence'        => $gameBuilding->base_defence,
-            'max_durability'     => $gameBuilding->base_durability,
+            'current_defence'    => $gameKingdomBuilding->base_defence,
+            'current_durability' => $gameKingdomBuilding->base_durability,
+            'max_defence'        => $gameKingdomBuilding->base_defence,
+            'max_durability'     => $gameKingdomBuilding->base_durability,
         ]);
 
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
@@ -191,24 +191,24 @@ class KingdomsControllerTest extends TestCase
         $this->assertTrue(!empty($content));
     }
 
-    public function testUpgradeBuildingThatIsResource() {
+    public function testUpgradeKingdomBuildingThatIsResource() {
         $this->createKingdom([
             'character_id' => 1,
             'game_map_id'  => 1,
         ]);
 
-        $gameBuilding = $this->createGameBuilding([
+        $gameKingdomBuilding = $this->createGameKingdomBuilding([
             'is_resource_building' => true,
         ]);
 
-        $this->createBuilding([
-            'game_building_id'   => $gameBuilding->id,
-            'kingdoms_id'        => 1,
+        $this->createKingdomBuilding([
+            'game_building_id'   => $gameKingdomBuilding->id,
+            'kingdom_id'        => 1,
             'level'              => 1,
-            'current_defence'    => $gameBuilding->base_defence,
-            'current_durability' => $gameBuilding->base_durability,
-            'max_defence'        => $gameBuilding->base_defence,
-            'max_durability'     => $gameBuilding->base_durability,
+            'current_defence'    => $gameKingdomBuilding->base_defence,
+            'current_durability' => $gameKingdomBuilding->base_durability,
+            'max_defence'        => $gameKingdomBuilding->base_defence,
+            'max_durability'     => $gameKingdomBuilding->base_durability,
         ]);
 
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
@@ -233,18 +233,18 @@ class KingdomsControllerTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $gameBuilding = $this->createGameBuilding([
+        $gameKingdomBuilding = $this->createGameKingdomBuilding([
             'is_resource_building' => true,
         ]);
 
-        $this->createBuilding([
-            'game_building_id'   => $gameBuilding->id,
-            'kingdoms_id'        => 1,
+        $this->createKingdomBuilding([
+            'game_building_id'   => $gameKingdomBuilding->id,
+            'kingdom_id'        => 1,
             'level'              => 1,
-            'current_defence'    => $gameBuilding->base_defence,
-            'current_durability' => $gameBuilding->base_durability,
-            'max_defence'        => $gameBuilding->base_defence,
-            'max_durability'     => $gameBuilding->base_durability,
+            'current_defence'    => $gameKingdomBuilding->base_defence,
+            'current_durability' => $gameKingdomBuilding->base_durability,
+            'max_defence'        => $gameKingdomBuilding->base_defence,
+            'max_durability'     => $gameKingdomBuilding->base_durability,
         ]);
 
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
@@ -580,7 +580,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals('Your units are almost done. You can\'t cancel this late in the process.', $content->message);
     }
 
-    public function testCanCancelBuildingOrder() {
+    public function testCanCancelKingdomBuildingOrder() {
         $kingdom = $this->createKingdom([
             'character_id'       => 1,
             'game_map_id'        => 1,
@@ -591,9 +591,9 @@ class KingdomsControllerTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $this->createBuilding([
-            'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdoms_id'        => 1,
+        $this->createKingdomBuilding([
+            'game_building_id'   => $this->createGameKingdomBuilding()->id,
+            'kingdom_id'        => 1,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -601,7 +601,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => 100,
         ]);
 
-        $this->createBuildingQueue([
+        $this->createKingdomBuildingQueue([
             'character_id' => 1,
             'kingdom_id'   => $kingdom->id,
             'building_id'  => 1,
@@ -616,7 +616,7 @@ class KingdomsControllerTest extends TestCase
         ])->response;
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue(BuildingInQueue::all()->isEmpty());
+        $this->assertTrue(KingdomBuildingInQueue::all()->isEmpty());
 
         $kingdom = $kingdom->refresh();
 
@@ -626,7 +626,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertTrue($kingdom->current_iron > 0);
     }
 
-    public function testCannotCancelBuildingOrderForNonExistantQueue() {
+    public function testCannotCancelKingdomBuildingOrderForNonExistantQueue() {
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.building.queue.delete'), [
@@ -640,7 +640,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals('Invalid Input.', $content->message);
     }
 
-    public function testCannotCancelBuildingOrderToLittleTimeLeft() {
+    public function testCannotCancelKingdomBuildingOrderToLittleTimeLeft() {
         $kingdom = $this->createKingdom([
             'character_id'       => 1,
             'game_map_id'        => 1,
@@ -651,9 +651,9 @@ class KingdomsControllerTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $this->createBuilding([
-            'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdoms_id'        => 1,
+        $this->createKingdomBuilding([
+            'game_building_id'   => $this->createGameKingdomBuilding()->id,
+            'kingdom_id'        => 1,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -661,7 +661,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => 100,
         ]);
 
-        $this->createBuildingQueue([
+        $this->createKingdomBuildingQueue([
             'character_id' => 1,
             'kingdom_id'   => $kingdom->id,
             'building_id'  => 1,

@@ -5,19 +5,20 @@ namespace Tests\Unit\Admin\Jobs;
 use Mail;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Admin\Jobs\UpdateBuildings;
+use App\Admin\Jobs\UpdateKingdomBuildings;
 use App\Admin\Mail\GenericMail;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateGameUnit;
 use Tests\Traits\CreateKingdom;
 
-class UpdateBuildingsTest extends TestCase
+class UpdateKingdomBuildingsTest extends TestCase
 {
-    use RefreshDatabase, CreateKingdom, CreateGameBuilding, CreateGameUnit;
+    use RefreshDatabase, CreateKingdom, CreateGameKingdomBuilding, CreateGameUnit;
+    
 
-    public function testAddBuildingToKingdom()
+    public function testAddKingdomBuildingToKingdom()
     {
         Mail::fake();
 
@@ -28,9 +29,9 @@ class UpdateBuildingsTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $building = $this->createGameBuilding();
+        $building = $this->createGameKingdomBuilding();
 
-        UpdateBuildings::dispatch($building);
+        UpdateKingdomBuildings::dispatch($building);
 
         $kingdom = $kingdom->refresh();
 
@@ -39,7 +40,7 @@ class UpdateBuildingsTest extends TestCase
         Mail::assertSent(GenericMail::class, 1);
     }
 
-    public function testAddBuildingToKingdomWhenUserOnline()
+    public function testAddKingdomBuildingToKingdomWhenUserOnline()
     {
         Mail::fake();
 
@@ -61,9 +62,9 @@ class UpdateBuildingsTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $building = $this->createGameBuilding();
+        $building = $this->createGameKingdomBuilding();
 
-        UpdateBuildings::dispatch($building);
+        UpdateKingdomBuildings::dispatch($building);
 
         $kingdom = $kingdom->refresh();
 
@@ -72,7 +73,7 @@ class UpdateBuildingsTest extends TestCase
         Mail::assertNotSent(GenericMail::class);
     }
 
-    public function testUpdateBuildingWhenKingdomHasBuildingWithUnits()
+    public function testUpdateKingdomBuildingWhenKingdomHasKingdomBuildingWithUnits()
     {
         Mail::fake();
 
@@ -94,7 +95,7 @@ class UpdateBuildingsTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $building = $this->createGameBuilding([
+        $building = $this->createGameKingdomBuilding([
             'max_level' => 30
         ]);
         
@@ -107,7 +108,7 @@ class UpdateBuildingsTest extends TestCase
         ]);
 
         $kingdom->buildings()->create([
-            'kingdoms_id' => $kingdom->id,
+            'kingdom_id' => $kingdom->id,
             'game_building_id' => $building->id,
             'level' => 2,
             'current_defence' => 100,
@@ -116,7 +117,7 @@ class UpdateBuildingsTest extends TestCase
             'max_durability' => 100,
         ]);
 
-        UpdateBuildings::dispatch($building->refresh(), [1], 5);
+        UpdateKingdomBuildings::dispatch($building->refresh(), [1], 5);
 
         $kingdom  = $kingdom->refresh();
         $building = $kingdom->buildings->first();

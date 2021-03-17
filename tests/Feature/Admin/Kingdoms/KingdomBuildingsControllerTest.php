@@ -4,16 +4,16 @@ namespace Tests\Feature\Admin\Kingdoms;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameKingdomBuilding;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
-class BuildingsControllerTest extends TestCase
+class KingdomBuildingsControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateUser,
         CreateRole,
-        CreateGameBuilding;
+        CreateGameKingdomBuilding;
 
     private $user;
 
@@ -25,7 +25,7 @@ class BuildingsControllerTest extends TestCase
 
         $this->user = $this->createAdmin([], $role);
 
-        $this->createGameBuilding();
+        $this->createGameKingdomBuilding();
     }
 
     public function tearDown(): void
@@ -36,22 +36,22 @@ class BuildingsControllerTest extends TestCase
     }
 
     public function testCanSeeIndex() {
-        $this->actingAs($this->user)->visitRoute('buildings.list')->see('Buildings')->see('Test Building');
+        $this->actingAs($this->user)->visitRoute('buildings.list')->see('KingdomBuildings')->see('Test KingdomBuilding');
     }
 
     public function testCanSeeCreate() {
-        $this->actingAs($this->user)->visitRoute('buildings.create')->see('Create building')->see('Building Details');
+        $this->actingAs($this->user)->visitRoute('buildings.create')->see('Create building')->see('KingdomBuilding Details');
     }
 
     public function testCanSeeEdit() {
         $this->actingAs($this->user)->visitRoute('buildings.edit', [
             'building' => 1
-        ])->see('Edit Building: Test Building')->see('Building Details');
+        ])->see('Edit KingdomBuilding: Test KingdomBuilding')->see('KingdomBuilding Details');
     } 
 
     public function testCanSeeShow() {
         $this->actingAs($this->user)->visitRoute('buildings.building', [
             'building' => 1
-        ])->see('Test Building')->see('Base Details');
+        ])->see('Test KingdomBuilding')->see('Base Details');
     }
 }

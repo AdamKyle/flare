@@ -4,14 +4,14 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Admin\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\BuildingInQueue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
-use App\Flare\Models\Building;
-use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
@@ -30,7 +30,7 @@ class UpgradeBuilding implements ShouldQueue
     protected $user;
 
     /**
-     * @var Building $building
+     * @var KingdomBuilding $building
      */
     protected $building;
 
@@ -49,12 +49,12 @@ class UpgradeBuilding implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param Building $building
+     * @param KingdomBuilding $building
      * @param User $user
      * @param int $queueId
      * @return void
      */
-    public function __construct(Building $building, User $user, int $queueId)
+    public function __construct(KingdomBuilding $building, User $user, int $queueId)
     {
         $this->user     = $user;
 
@@ -114,10 +114,10 @@ class UpgradeBuilding implements ShouldQueue
             ]);
         }
 
-        BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdoms_id)->first()->delete();
+        BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdom_id)->first()->delete();
         
         if (UserOnlineValue::isOnline($this->user)) {
-            $kingdom = Kingdom::find($this->building->kingdoms_id);
+            $kingdom = Kingdom::find($this->building->kingdom_id);
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
@@ -127,7 +127,7 @@ class UpgradeBuilding implements ShouldQueue
             Mail::to($this->user)->send(new GenericMail(
                 $this->user,
                 $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,
-                'Building Upgrade Finished',
+                'KingdomBuilding Upgrade Finished',
             ));
         }
     }

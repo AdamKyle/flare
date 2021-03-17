@@ -32,8 +32,8 @@ class GameBuildingUnit extends Model
         'required_level' => 'integer',
     ];
 
-    public function gameBuilding() {
-        return $this->belongsTo(GameBuilding::class);
+    public function gameKingdomBuilding() {
+        return $this->belongsTo(GameKingdomBuilding::class);
     }
 
     public function gameUnit() {

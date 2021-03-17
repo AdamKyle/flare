@@ -36,12 +36,12 @@ class UnitHandler {
             $totalAttackersLost      = $this->calculatePerentageLost($totalAttack, $totalWallDefence, true);
             $totalWallDurabilityLost = $this->calculatePerentageLost($totalAttack, $totalWallDefence);
 
-            $this->updateBuilding($walls, $totalWallDurabilityLost);
+            $this->updateKingdomBuilding($walls, $totalWallDurabilityLost);
             $attackingUnits = $this->updateUnits($attackingUnits, $totalAttackersLost);
         } else {
             $totalAttackersLost      = $this->calculatePerentageLost($totalAttack, $totalWallDefence, true);
 
-            $this->updateBuilding($walls, 0.01);
+            $this->updateKingdomBuilding($walls, 0.01);
 
             $attackingUnits = $this->updateUnits($attackingUnits, $totalAttackersLost);
         }

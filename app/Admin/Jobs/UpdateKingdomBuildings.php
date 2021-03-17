@@ -9,18 +9,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\Building;
-use App\Flare\Models\GameBuilding;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\GameKingdomBuilding;
 use App\Admin\Services\UpdateKingdomsService;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Kingdom;
 use Facades\App\Flare\Values\UserOnlineValue;
 
-class UpdateBuildings implements ShouldQueue
+class UpdateKingdomBuildings implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $gameBuilding;
+    public $gameKingdomBuilding;
 
     public $selectedUnits;
 
@@ -31,8 +31,8 @@ class UpdateBuildings implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(GameBuilding $gameBuilding, array $selectedUnits = [], int $levels = null) {
-        $this->gameBuilding  = $gameBuilding;
+    public function __construct(GameKingdomBuilding $gameKingdomBuilding, array $selectedUnits = [], int $levels = null) {
+        $this->gameKingdomBuilding  = $gameKingdomBuilding;
         $this->selectedUnits = $selectedUnits;
         $this->levels        = $levels;
     }
@@ -42,7 +42,7 @@ class UpdateBuildings implements ShouldQueue
      * @return void
      */
     public function handle(UpdateKingdomsService $service) {
-        $query = Building::where('game_building_id', $this->gameBuilding->id);
+        $query = KingdomBuilding::where('game_building_id', $this->gameKingdomBuilding->id);
 
         $this->reassignUnits($service);
 
@@ -51,25 +51,25 @@ class UpdateBuildings implements ShouldQueue
             Kingdom::chunkById(500, function($kingdoms) {
                 foreach($kingdoms as $kingdom) {
                     $kingdom->buildings()->create([
-                        'game_building_id'    => $this->gameBuilding->id,
-                        'kingdoms_id'         => $kingdom->id,
+                        'game_building_id'    => $this->gameKingdomBuilding->id,
+                        'kingdom_id'         => $kingdom->id,
                         'level'               => 1,
-                        'current_defence'     => $this->gameBuilding->base_defence,
-                        'current_durability'  => $this->gameBuilding->base_durability,
-                        'max_defence'         => $this->gameBuilding->base_defence,
-                        'max_durability'      => $this->gameBuilding->base_durability,
+                        'current_defence'     => $this->gameKingdomBuilding->base_defence,
+                        'current_durability'  => $this->gameKingdomBuilding->base_durability,
+                        'max_defence'         => $this->gameKingdomBuilding->base_defence,
+                        'max_durability'      => $this->gameKingdomBuilding->base_durability,
                     ]);
 
                     $user      = $kingdom->character->user;
                     $character = $kingdom->character;
 
-                    $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
+                    $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameKingdomBuilding->name;
 
                     if (UserOnlineValue::isOnline($user)) {
                         
                         event(new ServerMessageEvent($user, 'new-building', $message));
                     } else if ($user->new_building_email) {
-                        Mail::to($user->email)->send(new GenericMail($character->user, $message, 'New Building!'));
+                        Mail::to($user->email)->send(new GenericMail($character->user, $message, 'New KingdomBuilding!'));
                     }
                 }
             });
@@ -77,7 +77,7 @@ class UpdateBuildings implements ShouldQueue
             // If kingdoms do not have this building:
             $query->chunkById(1000, function($buildings) {
                 foreach($buildings as $building) {
-                    UpdateBuilding::dispatch($building)->delay(now()->addMinutes(1));
+                    UpdateKingdomBuilding::dispatch($building)->delay(now()->addMinutes(1));
                 }
             });
         }
@@ -88,14 +88,14 @@ class UpdateBuildings implements ShouldQueue
             return;
         }
         
-        if ($this->gameBuilding->units->isNotEmpty()) {
-            foreach($this->gameBuilding->units as $unit) {
+        if ($this->gameKingdomBuilding->units->isNotEmpty()) {
+            foreach($this->gameKingdomBuilding->units as $unit) {
                 $unit->delete();
             }
         }
         
-        $service->assignUnits($this->gameBuilding->refresh(), $this->selectedUnits, $this->levels);
+        $service->assignUnits($this->gameKingdomBuilding->refresh(), $this->selectedUnits, $this->levels);
 
-        $this->gameBuilding = $this->gameBuilding->refresh();
+        $this->gameKingdomBuilding = $this->gameKingdomBuilding->refresh();
     }
 }

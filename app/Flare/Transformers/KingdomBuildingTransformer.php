@@ -4,9 +4,9 @@ namespace App\Flare\Transformers;
 
 
 use League\Fractal\TransformerAbstract;
-use App\Flare\Models\Building;
+use App\Flare\Models\KingdomBuilding;
 
-class BuildingTransformer extends TransformerAbstract {
+class KingdomBuildingTransformer extends TransformerAbstract {
 
     /**
      * Gets the response data for the character sheet
@@ -14,11 +14,11 @@ class BuildingTransformer extends TransformerAbstract {
      * @param Character $character
      * @return mixed
      */
-    public function transform(Building $building) {
+    public function transform(KingdomBuilding $building) {
 
         return [
             'id'                          => $building->id,
-            'kingdoms_id'                 => $building->kingdom_id,
+            'kingdom_id'                 => $building->kingdom_id,
             'name'                        => $building->name,
             'description'                 => $building->description,
             'level'                       => $building->level,
