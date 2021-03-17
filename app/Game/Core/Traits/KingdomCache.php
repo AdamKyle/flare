@@ -48,7 +48,7 @@ trait KingdomCache {
             Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom, $cache));
         }
 
-        Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom, $cache));
+        Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom));
 
         return Cache::get('character-kingdoms-' . $character->id);
     }

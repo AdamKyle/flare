@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\BuildingInQueue;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -164,7 +165,7 @@ class KingdomsController extends Controller {
             'queue_id' => 'required|integer',
         ]);
 
-        $queue = KingdomBuildingInQueue::find($request->queue_id);
+        $queue = BuildingInQueue::find($request->queue_id);
 
         if (is_null($queue)) {
             return response()->json(['message' => 'Invalid Input.'], 422);

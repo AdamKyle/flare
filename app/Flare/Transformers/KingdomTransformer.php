@@ -2,8 +2,8 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Models\GameKingdomBuilding;
-use App\Flare\Models\GameKingdomBuildingUnit;
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Kingdom;
@@ -55,19 +55,19 @@ class KingdomTransformer extends TransformerAbstract {
         return sprintf("#%02x%02x%02x", $color[0], $color[1], $color[2]);
     }
 
-    protected function includeKingdomBuildings(Kingdom $kingdom) {
+    protected function includeBuildings(Kingdom $kingdom) {
         return $this->collection($kingdom->buildings, resolve(KingdomBuildingTransformer::class));
     }
 
     protected function includeRecruitableUnits(Kingdom $kingdom) {
-        $buildings = $kingdom->buildings()->whereHas('gameKingdomBuilding', function($query) {
+        $buildings = $kingdom->buildings()->whereHas('gameBuilding', function($query) {
             return $query->where('trains_units', true);
         })->get();
 
         $collection = new Collection;
 
         foreach($buildings as $building) {
-            $units = GameKingdomBuildingUnit::where('game_building_id', $building->gameKingdomBuilding->id)
+            $units = GameBuildingUnit::where('game_building_id', $building->gameBuilding->id)
                                      ->where('required_level', '<=', $building->level)
                                      ->get();
 

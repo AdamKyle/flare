@@ -24,7 +24,7 @@ class KingdomsSettleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => 'required|unique:kingdoms|min:5|max:15',
+            'name'         => 'required|unique:kingdoms|min:5|max:30',
             'color'        => 'required',
             'x_position'   => 'required',
             'y_position'   => 'required',
@@ -34,8 +34,8 @@ class KingdomsSettleRequest extends FormRequest
     public function messages() {
         return [
             'name.required'          => 'Name is required.',
-            'name.max'               => 'Name can only be 15 characters long.',
-            'name.min'               => 'Name must be 4 characters long at least.',
+            'name.max'               => 'Name can only be 30 characters long.',
+            'name.min'               => 'Name must be 5 characters long at least.',
             'x_position.required'    => 'Missing x position.',
             'y_position.required'    => 'Missing y position.',
         ];

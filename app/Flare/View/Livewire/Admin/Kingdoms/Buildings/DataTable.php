@@ -2,7 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings;
 
-use App\Flare\Models\GameKingdomBuilding;
+use App\Flare\Models\GameBuilding;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
@@ -20,7 +20,7 @@ class DataTable extends Component
     public $editing      = false;
 
     public function fetch() {
-        return GameKingdomBuilding::dataTableSearch($this->search)->orderBy($this->sortField, $this->sortBy)->paginate($this->perPage);
+        return GameBuilding::dataTableSearch($this->search)->orderBy($this->sortField, $this->sortBy)->paginate($this->perPage);
     }
 
     public function render() {

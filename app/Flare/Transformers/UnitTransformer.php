@@ -2,7 +2,7 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Models\GameKingdomBuildingUnit;
+use App\Flare\Models\GameBuildingUnit;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\GameUnit;
 
@@ -37,7 +37,7 @@ class UnitTransformer extends TransformerAbstract {
             'time_to_recruit'      => $unit->time_to_recruit,
             'current_amount'       => $unit->kingdom_current_amount,
             'max_amount'           => $unit->kingdom_max_amount,
-            'recruited_from'       => GameKingdomBuildingUnit::where('game_unit_id', $unit->id)->first()->gameKingdomBuilding,
+            'recruited_from'       => GameBuildingUnit::where('game_unit_id', $unit->id)->first()->gameBuilding,
         ];
     }
 }

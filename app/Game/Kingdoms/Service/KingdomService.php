@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameKingdomBuilding;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Transformers\KingdomTransformer;
@@ -112,7 +112,7 @@ class KingdomService {
     }
 
     protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {
-        foreach(GameKingdomBuilding::all() as $building) {
+        foreach(GameBuilding::all() as $building) {
             $kingdom->buildings()->create([
                 'game_building_id'    => $building->id,
                 'kingdom_id'         => $kingdom->id,

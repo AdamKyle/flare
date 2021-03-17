@@ -6,12 +6,12 @@ use App\Admin\Jobs\UpdateKingdomBuilding;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGameKingdomBuilding;
+use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateKingdom;
 
 class UpdateKingdomBuildingTest extends TestCase
 {
-    use RefreshDatabase, CreateKingdom, CreateGameKingdomBuilding;
+    use RefreshDatabase, CreateKingdom, CreateGameBuilding;
 
     public function testKingdomBuildingGetsUpdated()
     {
@@ -23,7 +23,7 @@ class UpdateKingdomBuildingTest extends TestCase
         ]);
 
         $kingdom->buildings()->create([
-            'game_building_id'   => $this->createGameKingdomBuilding()->id,
+            'game_building_id'   => $this->createGameBuilding()->id,
             'kingdom_id'        => $kingdom->id,
             'level'              => 2,
             'max_defence'        => 100,

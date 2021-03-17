@@ -68,7 +68,7 @@ class Kingdom extends Model
     }
 
     public function buildingsQueue() {
-        return $this->hasMany(KingdomBuildingInQueue::class, 'kingdom_id', 'id');
+        return $this->hasMany(BuildingInQueue::class, 'kingdom_id', 'id');
     }
 
     public function unitsQueue() {

@@ -4,71 +4,71 @@ namespace Tests\Unit\Flare\View\Livewire\Admin\Kingdom\Buildings\Partials;
 
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\View\Livewire\Admin\Kingdoms\KingdomBuildings\Partials\Attributes;
-use App\Flare\Models\GameKingdomBuilding;
+use App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials\Attributes;
+use App\Flare\Models\GameBuilding;
 use Tests\TestCase;
-use Tests\Traits\CreateGameKingdomBuilding;
+use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
 
 class AtrributesTest extends TestCase
 {
-    use RefreshDatabase, CreateGameKingdomBuilding, CreateGameUnit;
+    use RefreshDatabase, CreateGameBuilding, CreateGameUnit;
 
     public function testTheComponentLoads() {
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $this->createGameKingdomBuilding()->toArray(),
+            'gameBuilding' => $this->createGameBuilding()->toArray(),
         ])->assertSee('Cost in Wood:');
     }
 
     public function testTheComponentLoadsWithUnitSelectionDisabled() {
-        $gameKingdomBuilding = $this->createGameKingdomBuilding();
+        $gameBuilding = $this->createGameBuilding();
 
-        $gameKingdomBuilding->update([
+        $gameBuilding->update([
             'trains_units' => true,
         ]);
 
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $gameKingdomBuilding->refresh()
+            'gameBuilding' => $gameBuilding->refresh()
         ])->assertSee('Cost in Wood:');
     }
 
     public function testTheComponentLoadsWithUnitSelectionNotDisabled() {
-        $gameKingdomBuilding = $this->createGameKingdomBuilding();
+        $gameBuilding = $this->createGameBuilding();
 
-        $gameKingdomBuilding->update([
+        $gameBuilding->update([
             'trains_units' => true,
         ]);
 
-        $gameKingdomBuilding->units()->create([
-            'game_building_id' => $gameKingdomBuilding->id,
+        $gameBuilding->units()->create([
+            'game_building_id' => $gameBuilding->id,
             'game_unit_id'     => $this->createGameUnit()->id,
             'required_level'   => 1,
         ]);
 
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $gameKingdomBuilding->refresh()
+            'gameBuilding' => $gameBuilding->refresh()
         ])->assertSee('Cost in Wood:');
     }
 
     public function testTheComponentCallsUpdate() {
-        $gameKingdomBuilding = $this->createGameKingdomBuilding();
+        $gameBuilding = $this->createGameBuilding();
 
-        Livewire::test(Attributes::class)->call('update', $gameKingdomBuilding->id)->assertSet('gameKingdomBuilding.name', $gameKingdomBuilding->name);
+        Livewire::test(Attributes::class)->call('update', $gameBuilding->id)->assertSet('gameBuilding.name', $gameBuilding->name);
     }
 
     public function testNoValidation() {
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $this->createGameKingdomBuilding(),
-        ])->set('gameKingdomBuilding.is_walls', true)->call('validateInput', 'nextStep', 2);
+            'gameBuilding' => $this->createGameBuilding(),
+        ])->set('gameBuilding.is_walls', true)->call('validateInput', 'nextStep', 2);
         
-        $this->assertNotNull(GameKingdomBuilding::where('is_walls', true)->first());
+        $this->assertNotNull(GameBuilding::where('is_walls', true)->first());
     }
 
     public function testSelectedUnitsWithNoPerLevelValidationError() {
         $unit = $this->createGameUnit();
 
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $this->createGameKingdomBuilding(),
+            'gameBuilding' => $this->createGameBuilding(),
         ])->set('selectedUnits', [$unit->id])->call('validateInput', 'nextStep', 2)->assertSee('How many levels between units?');
     }
 
@@ -76,36 +76,36 @@ class AtrributesTest extends TestCase
         $unit = $this->createGameUnit();
 
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $this->createGameKingdomBuilding(),
+            'gameBuilding' => $this->createGameBuilding(),
         ])->set('selectedUnits', [$unit->id])
-          ->set('gameKingdomBuilding.units_per_level', 30)
+          ->set('gameBuilding.units_per_level', 30)
           ->call('validateInput', 'nextStep', 2)
           ->assertSee('Your selected units and units per level are greator then your max level.');
     }
 
     public function testIsEditing() {
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $this->createGameKingdomBuilding(),
+            'gameBuilding' => $this->createGameBuilding(),
             'editing'      => true,
         ])->call('validateInput', 'nextStep', 2)
           ->assertSet('editing', true);
     }
 
     public function testAssignUnitsToKingdomBuilding() {
-        $gameKingdomBuilding = $this->createGameKingdomBuilding();
+        $gameBuilding = $this->createGameBuilding();
 
-        $gameKingdomBuilding->update([
+        $gameBuilding->update([
             'max_level' => 30
         ]);
 
         $unit = $this->createGameUnit();
 
         Livewire::test(Attributes::class, [
-            'gameKingdomBuilding' => $gameKingdomBuilding->refresh(),
+            'gameBuilding' => $gameBuilding->refresh(),
         ])->set('selectedUnits', [$unit->id])
-          ->set('gameKingdomBuilding.units_per_level', 5)
+          ->set('gameBuilding.units_per_level', 5)
           ->call('validateInput', 'nextStep', 2);
 
-        $this->assertTrue($gameKingdomBuilding->refresh()->units->isNotEmpty());
+        $this->assertTrue($gameBuilding->refresh()->units->isNotEmpty());
     }
 }

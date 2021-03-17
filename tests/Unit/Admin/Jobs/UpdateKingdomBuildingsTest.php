@@ -9,13 +9,13 @@ use App\Admin\Jobs\UpdateKingdomBuildings;
 use App\Admin\Mail\GenericMail;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
-use Tests\Traits\CreateGameKingdomBuilding;
+use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
 use Tests\Traits\CreateKingdom;
 
 class UpdateKingdomBuildingsTest extends TestCase
 {
-    use RefreshDatabase, CreateKingdom, CreateGameKingdomBuilding, CreateGameUnit;
+    use RefreshDatabase, CreateKingdom, CreateGameBuilding, CreateGameUnit;
     
 
     public function testAddKingdomBuildingToKingdom()
@@ -29,7 +29,7 @@ class UpdateKingdomBuildingsTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $building = $this->createGameKingdomBuilding();
+        $building = $this->createGameBuilding();
 
         UpdateKingdomBuildings::dispatch($building);
 
@@ -62,7 +62,7 @@ class UpdateKingdomBuildingsTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $building = $this->createGameKingdomBuilding();
+        $building = $this->createGameBuilding();
 
         UpdateKingdomBuildings::dispatch($building);
 
@@ -95,7 +95,7 @@ class UpdateKingdomBuildingsTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $building = $this->createGameKingdomBuilding([
+        $building = $this->createGameBuilding([
             'max_level' => 30
         ]);
         

@@ -5,7 +5,7 @@ namespace Tests\Feature\Admin\Kingdoms;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameUnit;
-use Tests\Traits\CreateGameKingdomBuilding;
+use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
@@ -15,7 +15,7 @@ class UnitsControllerTest extends TestCase
         CreateUser,
         CreateRole,
         CreateGameUnit,
-        CreateGameKingdomBuilding;
+        CreateGameBuilding;
 
     private $user;
 
@@ -58,7 +58,7 @@ class UnitsControllerTest extends TestCase
     }
 
     public function testCanSeeShowWithKingdomBuildingAssociation() {
-        $building = $this->createGameKingdomBuilding();
+        $building = $this->createGameBuilding();
 
         $building->units()->create([
             'game_building_id' => $building->id,

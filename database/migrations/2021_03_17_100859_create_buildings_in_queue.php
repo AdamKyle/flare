@@ -23,7 +23,7 @@ class CreateBuildingsInQueue extends Migration
                   ->references('id')->on('kingdoms');
             $table->unsignedBigInteger('building_id');
             $table->foreign('building_id', 'biq_build_id')
-                  ->references('id')->on('buildings');
+                  ->references('id')->on('kingdom_buildings');
             $table->integer('to_level');
             $table->dateTime('completed_at');
             $table->dateTime('started_at');

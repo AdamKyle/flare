@@ -22,7 +22,7 @@ class GameBuildingFactory extends Factory
     public function definition()
     {
         return [
-            'name'                        => 'Test KingdomBuilding',
+            'name'                        => 'Test Building',
             'description'                 => 'Sample description',
             'max_level'                   => 1,
             'base_durability'             => 100,
