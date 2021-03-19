@@ -118,6 +118,8 @@ class UsersController extends Controller {
             'unbanned_at' => $unBanAt,
             'banned_reason' => $request->reason,
         ]);
+
+        $user = $user->refresh();
         
         $this->userService->sendUserMail($user, $unBanAt);
         

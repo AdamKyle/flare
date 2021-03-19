@@ -98,11 +98,11 @@ class AtrributesTest extends TestCase
             'max_level' => 30
         ]);
 
-        $unit = $this->createGameUnit();
+        $unitIds = $this->createGameUnits([], 3)->pluck('id')->toArray();
 
         Livewire::test(Attributes::class, [
             'gameBuilding' => $gameBuilding->refresh(),
-        ])->set('selectedUnits', [$unit->id])
+        ])->set('selectedUnits', $unitIds)
           ->set('gameBuilding.units_per_level', 5)
           ->call('validateInput', 'nextStep', 2);
 

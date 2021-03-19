@@ -69,8 +69,8 @@ class UserService {
         event(new BannedUserEvent($user));
 
         $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'For ever.';
-        $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $request->reason;
-
+        $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $user->banned_reason;
+        
         Mail::to($user->email)->send(new GenericMail($user, $message, 'You have been banned!', true));
     }
 }

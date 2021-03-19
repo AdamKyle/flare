@@ -2,6 +2,7 @@
 
 namespace Tests\Console;
 
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Character;
 use App\Flare\Models\User;
@@ -23,6 +24,12 @@ class LevelFakeUsersTest extends TestCase
         $this->assertEquals(0, $this->artisan('level-up:fake-users', ['amount' => 1, 'amountOfLevels' => 10]));
 
         $this->assertEquals(11, Character::first()->level);
+    }
+
+    public function testFailToLevelFakeUserByTen() {
+        $this->expectException(Exception::class);
+
+        $this->assertEquals(0, $this->artisan('level-up:fake-users', ['amount' => 1, 'amountOfLevels' => 10]));
     }
 
     public function testFailOnAmount() {

@@ -8,7 +8,6 @@ use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\UpdateCharacterStatsService;
-use App\Admin\Services\UpdateKingdomService;
 use App\Admin\Services\UserService;
 use App\Charts\BattleSimulationChart;
 
@@ -31,10 +30,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(UpdateCharacterStatsService::class, function ($app) {
             return new UpdateCharacterStatsService();
-        });
-
-        $this->app->bind(UpdateKingdomService::class, function($app) {
-            return new UpdateKingdomService();
         });
 
         $this->app->bind(UserService::class, function($app) {

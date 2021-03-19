@@ -39,7 +39,7 @@ class KingdomFactory extends Factory
             'x_position'         => 16,
             'y_position'         => 16,
             'current_morale'     => .50,
-            'max_morale'         => .50,
+            'max_morale'         => 1.0,
             'treasury'           => null,
         ];
     }

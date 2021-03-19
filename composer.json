@@ -36,6 +36,7 @@
         "laravel/telescope": "^4.0",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
+        "php-vcr/php-vcr": "^1.5",
         "phpunit/phpunit": "^9.0",
         "sempro/phpunit-pretty-print": "^1.3"
     },

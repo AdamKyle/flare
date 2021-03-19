@@ -81,8 +81,6 @@ class RunTestSimulation implements ShouldQueue
             case 'adventure':
                 $this->processAdventure();
                 break;
-            default:
-                return;
         }
     }
 
@@ -106,13 +104,16 @@ class RunTestSimulation implements ShouldQueue
     }
 
     protected function getModel(string $type, int $id) {
+        $model = null;
+
         switch($type) {
             case 'monster':
-                return Monster::find($id);
+                $model = Monster::find($id);
+                break;
             case 'adventure':
-                return Adventure::find($id);
-            default:
-                return null;
+                $model = Adventure::find($id);
         }
+
+        return $model;
     }
 }

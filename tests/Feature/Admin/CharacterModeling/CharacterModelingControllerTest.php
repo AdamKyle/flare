@@ -174,7 +174,18 @@ class CharacterModelingControllerTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEquals($character->getAttributes(), $snapShotOne->snap_shot);
+        $attributes = $character->getAttributes();
+        $snapShot   = $snapShotOne->snap_shot;
+
+        // These tend to be off by a bit.
+        // So we remove them.
+        unset($attributes['created_at']);
+        unset($attributes['updated_at']);
+
+        unset($snapShot['created_at']);
+        unset($snapShot['updated_at']);
+
+        $this->assertEquals($attributes, $snapShot);
     }
 
     public function testGenerateCharacters() {
@@ -423,7 +434,7 @@ class CharacterModelingControllerTest extends TestCase
             'characterSnapShot' => 1
         ]))->see('Data For Fight');
 
-        $this->assertEquals(1, Character::first()->level);
+        $this->assertEquals(2, Character::first()->level);
     }
 
     public function testSeeBattleResultsMultipleTimes() {

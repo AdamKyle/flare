@@ -23,7 +23,7 @@ class KingdomBuildingFactory extends Factory
     {
         return [
             'game_building_id'   => null,
-            'kingdom_id'        => null,
+            'kingdom_id'         => null,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 300,

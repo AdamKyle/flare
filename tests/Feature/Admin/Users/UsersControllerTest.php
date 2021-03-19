@@ -154,6 +154,8 @@ class UsersControllerTest extends TestCase
 
     public function testCanBanUserPerm() {
 
+        Mail::fake();
+
         $user = $this->character->getUser();
         
         $response = $this->actingAs($this->user)->post(route('ban.user.with.reason', [
@@ -167,6 +169,8 @@ class UsersControllerTest extends TestCase
 
         $this->assertTrue($user->is_banned);
         $this->assertNull($user->unbanned_at);
+
+        Mail::assertSent(GenericMail::class);
     }
 
     public function testCannotBanUserUnknownLength() {

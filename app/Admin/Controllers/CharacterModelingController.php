@@ -196,8 +196,6 @@ class CharacterModelingController extends Controller {
                 Cache::put('processing-adventure', true);
                 $route = route('adventures.list');
                 break;
-            default:
-                return redirect()->back()->with('error', 'Type not determined.');
         }
 
         $sendEmail = false;

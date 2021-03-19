@@ -56,12 +56,6 @@ class AssignSkillService {
         Character::where('game_class_id', $classId)->chunkById(1000, function($characters) use($skill) {
             foreach ($characters as $character) {
 
-                $foundSkill = $character->skills->where('game_skill_id', $skill->id)->first();
-
-                if (!is_null($foundSkill)) {
-                    continue;
-                }
-
                 $character->skills()->create([
                     'character_id' => $character->id,
                     'game_skill_id' => $skill->id,
@@ -78,12 +72,6 @@ class AssignSkillService {
     protected function assignSkillToCharacters(GameSkill $skill) {
         Character::chunkById(1000, function($characters) use ($skill) {
             foreach ($characters as $character) {
-
-                $foundSkill = $character->skills->where('game_skill_id', $skill->id)->first();
-
-                if (!is_null($foundSkill)) {
-                    continue;
-                }
 
                 $character->skills()->create([
                     'character_id' => $character->id,

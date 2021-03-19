@@ -77,7 +77,7 @@ class SimulateBattle implements ShouldQueue
                 'battle_simmulation_data' => $snapShotData,
             ]);
         }
-
+        
         if ($this->currentFight === $this->totalFights) {
             $snapShot                   = $this->character->snapShots()->where('snap_shot->level', strval($this->character->level))->first();
             $snapShotData               = $snapShot->battle_simmulation_data;
@@ -86,14 +86,14 @@ class SimulateBattle implements ShouldQueue
             $snapShot->update([
                 'battle_simmulation_data' => $snapShotData
             ]);
-
+            
             $this->character->update(
-                $this->character->snapShots()->where('snap_shot->level', '1000')->first()->snap_shot
+                $this->character->snapShots()->orderBy('snap_shot->level', 'desc')->first()->snap_shot
             );
-
+            
             if ($this->sendEmail) {
                 Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details for the monster: ' . $this->monster->name . '.', 'Battle Simmulation Results', false));
-
+                
                 Cache::delete('processing-battle');
             }
         }

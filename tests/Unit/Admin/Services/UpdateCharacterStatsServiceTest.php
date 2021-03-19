@@ -9,6 +9,7 @@ use App\Admin\Mail\GenericMail;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
+use Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 use Tests\TestCase;
@@ -44,7 +45,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateRacialStats($oldRace, $race->refresh());
 
-        $this->assertEquals(102, $this->character->refresh()->str);
+        $this->assertEquals(101, $this->character->refresh()->str);
     }
 
     public function testUpdateClassStats() {
@@ -58,7 +59,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateClassStats($oldClass, $class->refresh());
 
-        $this->assertEquals(102, $this->character->refresh()->str);
+        $this->assertEquals(101, $this->character->refresh()->str);
     }
 
     public function testUpdateClassStatsAndCharacterIsAboveLevelOne() {
@@ -134,17 +135,64 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
         resolve(UpdateCharacterStatsService::class)->updateClassStats($oldClass, $class->refresh());
 
-        $this->assertEquals(102, $this->character->refresh()->str);
-        $this->assertEquals(3, $this->character->refresh()->dex);
+        $this->assertEquals(101, $this->character->refresh()->str);
+        $this->assertEquals(1, $this->character->refresh()->dex);
 
         Mail::assertNotSent(GenericMail::class);
+    }
+
+    public function testUpdateTestCharacterRacialStats() {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->giveSnapShot()
+                                           ->getCharacter();
+
+        $race = GameRace::find($character->race->id);
+
+        $oldRace = $race->replicate();
+
+        $race->update([
+            'str_mod' => 100,
+        ]);
+
+        resolve(UpdateCharacterStatsService::class)->updateRacialStats($oldRace, $race->refresh());
+        
+        $character = $character->refresh();
+
+        $this->assertEquals(100, $character->race->str_mod);
+    }
+
+    public function testUpdateTestCharacterClassStats() {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->giveSnapShot()
+                                           ->getCharacter();
+
+        $class = GameClass::find($character->class->id);
+        
+        $oldClass = $class->replicate();
+
+        $class->update([
+            'str_mod' => 100,
+            'damage_stat' => 'int'
+        ]);
+
+
+        resolve(UpdateCharacterStatsService::class)->updateClassStats($oldClass, $class->refresh());
+        
+        $character = $character->refresh();
+
+        $this->assertEquals(100, $character->class->str_mod);
+        $this->assertEquals('int', $character->class->damage_stat);
     }
     
 
     protected function baseSetUp() {
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
-                                                 ->giveSnapShot()
+                                                 ->userIsNotTest()
                                                  ->getCharacter();
     }
 }

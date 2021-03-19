@@ -126,7 +126,7 @@ class UpdateCharacterStatsService {
                 $character->{$newClass->damage_stat} += $totalToAdjust;
             }
 
-            if (!$character->user->is_test) {
+            if (!$character->user->is_test) {                
                 if (UserOnlineValue::isOnline($character->user)) {
                     event(new UpdateTopBarEvent($character->refresh()));
                     event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));

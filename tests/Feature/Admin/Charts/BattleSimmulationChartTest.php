@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Admin\Charts;
 
+use App\Admin\Mail\GenericMail;
+use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -94,6 +96,8 @@ class BattleSimmulationChartTest extends TestCase {
     }
 
     protected function createBattleResults(int $times = 1, array $monsterOptions = []) {
+        Mail::fake();
+
         $this->createRace();
         $this->createClass();
         $this->createGameSkill(['name' => 'Accuracy']);
@@ -102,14 +106,16 @@ class BattleSimmulationChartTest extends TestCase {
         $this->createGameMap();
         $this->createItem();
 
-        $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
-
-        $response = $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
+        $this->actingAs($this->user)->post(route('admin.character.modeling.generate'));
+        
+        $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
             'model_id' => $this->createMonster($monsterOptions)->id,
             'type' => 'monster',
             'characters' => [1],
             'character_levels' => '1',
             'total_times' => $times,
-        ])->response;
+        ]);
+
+        Mail::assertSent(GenericMail::class);
     }
 }

@@ -1,0 +1,159 @@
+
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+        headers:
+            Host: api.github.com
+            Accept-Encoding: ''
+            User-Agent: 'php-github-api (http://github.com/KnpLabs/php-github-api)'
+            Accept: application/vnd.github.v3+json
+            Authorization: ''
+    response:
+        status:
+            http_version: '1.1'
+            code: '200'
+            message: OK
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 19 Mar 2021 03:30:29 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '1667'
+            Cache-Control: 'private, max-age=60, s-maxage=60'
+            Vary: ['Accept, Authorization, Cookie, X-GitHub-OTP', 'Accept-Encoding, Accept, X-Requested-With']
+            ETag: '"f116a5efbab5d158f995a6b834d962a34a77ad1f85eb1212ae78ff2bd3b2de4a"'
+            Last-Modified: 'Fri, 19 Mar 2021 03:23:41 GMT'
+            X-OAuth-Scopes: 'public_repo, repo:status, repo_deployment'
+            X-Accepted-OAuth-Scopes: repo
+            X-GitHub-Media-Type: 'github.v3; format=json'
+            X-RateLimit-Limit: '5000'
+            X-RateLimit-Remaining: '4999'
+            X-RateLimit-Reset: '1616128229'
+            X-RateLimit-Used: '1'
+            Access-Control-Expose-Headers: 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset'
+            Access-Control-Allow-Origin: '*'
+            Strict-Transport-Security: 'max-age=31536000; includeSubdomains; preload'
+            X-Frame-Options: deny
+            X-Content-Type-Options: nosniff
+            X-XSS-Protection: '0'
+            Referrer-Policy: 'origin-when-cross-origin, strict-origin-when-cross-origin'
+            Content-Security-Policy: 'default-src ''none'''
+            X-GitHub-Request-Id: 'E554:755E:332AED:121C1AC:60541AD5'
+        body: '{"url":"https://api.github.com/repos/AdamKyle/flare/releases/40042165","assets_url":"https://api.github.com/repos/AdamKyle/flare/releases/40042165/assets","upload_url":"https://uploads.github.com/repos/AdamKyle/flare/releases/40042165/assets{?name,label}","html_url":"https://github.com/AdamKyle/flare/releases/tag/0.01","id":40042165,"author":{"login":"AdamKyle","id":188563,"node_id":"MDQ6VXNlcjE4ODU2Mw==","avatar_url":"https://avatars.githubusercontent.com/u/188563?v=4","gravatar_id":"","url":"https://api.github.com/users/AdamKyle","html_url":"https://github.com/AdamKyle","followers_url":"https://api.github.com/users/AdamKyle/followers","following_url":"https://api.github.com/users/AdamKyle/following{/other_user}","gists_url":"https://api.github.com/users/AdamKyle/gists{/gist_id}","starred_url":"https://api.github.com/users/AdamKyle/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/AdamKyle/subscriptions","organizations_url":"https://api.github.com/users/AdamKyle/orgs","repos_url":"https://api.github.com/users/AdamKyle/repos","events_url":"https://api.github.com/users/AdamKyle/events{/privacy}","received_events_url":"https://api.github.com/users/AdamKyle/received_events","type":"User","site_admin":false},"node_id":"MDc6UmVsZWFzZTQwMDQyMTY1","tag_name":"0.01","target_commitish":"master","name":"Test Release - Delete This","draft":false,"prerelease":false,"created_at":"2021-03-10T05:31:17Z","published_at":"2021-03-19T03:23:41Z","assets":[],"tarball_url":"https://api.github.com/repos/AdamKyle/flare/tarball/0.01","zipball_url":"https://api.github.com/repos/AdamKyle/flare/zipball/0.01","body":"Test Release For testing."}'
+        curl_info:
+            url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+            content_type: 'application/json; charset=utf-8'
+            http_code: 200
+            header_size: 1273
+            request_size: 250
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.502218
+            namelookup_time: 0.077038
+            connect_time: 0.178453
+            pretransfer_time: 0.323781
+            size_upload: !!float 0
+            size_download: !!float 1667
+            speed_download: !!float 3320
+            speed_upload: !!float 0
+            download_content_length: !!float 1667
+            upload_content_length: !!float -1
+            starttransfer_time: 0.501923
+            redirect_time: !!float 0
+            redirect_url: ''
+            primary_ip: 140.82.113.5
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 192.168.0.14
+            local_port: 58708
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: HTTPS
+            appconnect_time_us: 323712
+            connect_time_us: 178453
+            namelookup_time_us: 77038
+            pretransfer_time_us: 323781
+            redirect_time_us: 0
+            starttransfer_time_us: 501923
+            total_time_us: 502218
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+        headers:
+            Host: api.github.com
+            Accept-Encoding: ''
+            User-Agent: 'php-github-api (http://github.com/KnpLabs/php-github-api)'
+            Accept: application/vnd.github.v3+json
+            Authorization: 'token 99a894c179304121c30ef0e37c5b232bdd100025'
+    response:
+        status:
+            http_version: '1.1'
+            code: '200'
+            message: OK
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 19 Mar 2021 03:30:51 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '1667'
+            Cache-Control: 'private, max-age=60, s-maxage=60'
+            Vary: ['Accept, Authorization, Cookie, X-GitHub-OTP', 'Accept-Encoding, Accept, X-Requested-With']
+            ETag: '"f116a5efbab5d158f995a6b834d962a34a77ad1f85eb1212ae78ff2bd3b2de4a"'
+            Last-Modified: 'Fri, 19 Mar 2021 03:23:41 GMT'
+            X-OAuth-Scopes: 'public_repo, repo:status, repo_deployment'
+            X-Accepted-OAuth-Scopes: repo
+            X-GitHub-Media-Type: 'github.v3; format=json'
+            X-RateLimit-Limit: '5000'
+            X-RateLimit-Remaining: '4998'
+            X-RateLimit-Reset: '1616128229'
+            X-RateLimit-Used: '2'
+            Access-Control-Expose-Headers: 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset'
+            Access-Control-Allow-Origin: '*'
+            Strict-Transport-Security: 'max-age=31536000; includeSubdomains; preload'
+            X-Frame-Options: deny
+            X-Content-Type-Options: nosniff
+            X-XSS-Protection: '0'
+            Referrer-Policy: 'origin-when-cross-origin, strict-origin-when-cross-origin'
+            Content-Security-Policy: 'default-src ''none'''
+            X-GitHub-Request-Id: 'E55A:355D:15B45E5:2283483:60541AEB'
+        body: '{"url":"https://api.github.com/repos/AdamKyle/flare/releases/40042165","assets_url":"https://api.github.com/repos/AdamKyle/flare/releases/40042165/assets","upload_url":"https://uploads.github.com/repos/AdamKyle/flare/releases/40042165/assets{?name,label}","html_url":"https://github.com/AdamKyle/flare/releases/tag/0.01","id":40042165,"author":{"login":"AdamKyle","id":188563,"node_id":"MDQ6VXNlcjE4ODU2Mw==","avatar_url":"https://avatars.githubusercontent.com/u/188563?v=4","gravatar_id":"","url":"https://api.github.com/users/AdamKyle","html_url":"https://github.com/AdamKyle","followers_url":"https://api.github.com/users/AdamKyle/followers","following_url":"https://api.github.com/users/AdamKyle/following{/other_user}","gists_url":"https://api.github.com/users/AdamKyle/gists{/gist_id}","starred_url":"https://api.github.com/users/AdamKyle/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/AdamKyle/subscriptions","organizations_url":"https://api.github.com/users/AdamKyle/orgs","repos_url":"https://api.github.com/users/AdamKyle/repos","events_url":"https://api.github.com/users/AdamKyle/events{/privacy}","received_events_url":"https://api.github.com/users/AdamKyle/received_events","type":"User","site_admin":false},"node_id":"MDc6UmVsZWFzZTQwMDQyMTY1","tag_name":"0.01","target_commitish":"master","name":"Test Release - Delete This","draft":false,"prerelease":false,"created_at":"2021-03-10T05:31:17Z","published_at":"2021-03-19T03:23:41Z","assets":[],"tarball_url":"https://api.github.com/repos/AdamKyle/flare/tarball/0.01","zipball_url":"https://api.github.com/repos/AdamKyle/flare/zipball/0.01","body":"Test Release For testing."}'
+        curl_info:
+            url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+            content_type: 'application/json; charset=utf-8'
+            http_code: 200
+            header_size: 1274
+            request_size: 250
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.45057
+            namelookup_time: 0.066021
+            connect_time: 0.188922
+            pretransfer_time: 0.308704
+            size_upload: !!float 0
+            size_download: !!float 1667
+            speed_download: !!float 3704
+            speed_upload: !!float 0
+            download_content_length: !!float 1667
+            upload_content_length: !!float -1
+            starttransfer_time: 0.448137
+            redirect_time: !!float 0
+            redirect_url: ''
+            primary_ip: 140.82.114.5
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 192.168.0.14
+            local_port: 58714
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: HTTPS
+            appconnect_time_us: 308629
+            connect_time_us: 188922
+            namelookup_time_us: 66021
+            pretransfer_time_us: 308704
+            redirect_time_us: 0
+            starttransfer_time_us: 448137
+            total_time_us: 450570
