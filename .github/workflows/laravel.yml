@@ -13,8 +13,6 @@ jobs:
         php-version: 7.4
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHIUB_ACCESS_TOKEN}}
     - name: Install Dependencies
       run: |
         rm -rf vendor
@@ -31,4 +29,5 @@ jobs:
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
+        GITHUB_TOKEN: ${{secrets.GITHIUB_ACCESS_TOKEN}}
       run: vendor/bin/phpunit --stop-on-failure
