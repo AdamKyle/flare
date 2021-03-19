@@ -157,3 +157,151 @@
             redirect_time_us: 0
             starttransfer_time_us: 448137
             total_time_us: 450570
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+        headers:
+            Host: api.github.com
+            Accept-Encoding: ''
+            User-Agent: 'php-github-api (http://github.com/KnpLabs/php-github-api)'
+            Accept: application/vnd.github.v3+json
+            Authorization: token
+    response:
+        status:
+            http_version: '1.1'
+            code: '401'
+            message: Unauthorized
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 19 Mar 2021 04:29:16 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '80'
+            X-GitHub-Media-Type: 'github.v3; format=json'
+            X-RateLimit-Limit: '60'
+            X-RateLimit-Remaining: '59'
+            X-RateLimit-Reset: '1616131756'
+            X-RateLimit-Used: '1'
+            Access-Control-Expose-Headers: 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset'
+            Access-Control-Allow-Origin: '*'
+            Strict-Transport-Security: 'max-age=31536000; includeSubdomains; preload'
+            X-Frame-Options: deny
+            X-Content-Type-Options: nosniff
+            X-XSS-Protection: '0'
+            Referrer-Policy: 'origin-when-cross-origin, strict-origin-when-cross-origin'
+            Content-Security-Policy: 'default-src ''none'''
+            Vary: 'Accept-Encoding, Accept, X-Requested-With'
+            X-GitHub-Request-Id: 'E880:4079:16139E1:23CC0CE:6054289C'
+        body: '{"message":"Bad credentials","documentation_url":"https://docs.github.com/rest"}'
+        curl_info:
+            url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+            content_type: 'application/json; charset=utf-8'
+            http_code: 401
+            header_size: 968
+            request_size: 209
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.454587
+            namelookup_time: 0.050732
+            connect_time: 0.14653
+            pretransfer_time: 0.327288
+            size_upload: !!float 0
+            size_download: !!float 80
+            speed_download: !!float 176
+            speed_upload: !!float 0
+            download_content_length: !!float 80
+            upload_content_length: !!float -1
+            starttransfer_time: 0.454457
+            redirect_time: !!float 0
+            redirect_url: ''
+            primary_ip: 140.82.114.5
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 192.168.0.14
+            local_port: 59520
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: HTTPS
+            appconnect_time_us: 327211
+            connect_time_us: 146530
+            namelookup_time_us: 50732
+            pretransfer_time_us: 327288
+            redirect_time_us: 0
+            starttransfer_time_us: 454457
+            total_time_us: 454587
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+        headers:
+            Host: api.github.com
+            Accept-Encoding: ''
+            User-Agent: 'php-github-api (http://github.com/KnpLabs/php-github-api)'
+            Accept: application/vnd.github.v3+json
+            Authorization: 'token 111111'
+    response:
+        status:
+            http_version: '1.1'
+            code: '401'
+            message: Unauthorized
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 19 Mar 2021 04:29:32 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '80'
+            X-GitHub-Media-Type: 'github.v3; format=json'
+            X-RateLimit-Limit: '60'
+            X-RateLimit-Remaining: '58'
+            X-RateLimit-Reset: '1616131756'
+            X-RateLimit-Used: '2'
+            Access-Control-Expose-Headers: 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset'
+            Access-Control-Allow-Origin: '*'
+            Strict-Transport-Security: 'max-age=31536000; includeSubdomains; preload'
+            X-Frame-Options: deny
+            X-Content-Type-Options: nosniff
+            X-XSS-Protection: '0'
+            Referrer-Policy: 'origin-when-cross-origin, strict-origin-when-cross-origin'
+            Content-Security-Policy: 'default-src ''none'''
+            Vary: 'Accept-Encoding, Accept, X-Requested-With'
+            X-GitHub-Request-Id: 'E881:592D:154F80A:2260D8E:605428AC'
+        body: '{"message":"Bad credentials","documentation_url":"https://docs.github.com/rest"}'
+        curl_info:
+            url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+            content_type: 'application/json; charset=utf-8'
+            http_code: 401
+            header_size: 968
+            request_size: 216
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.416416
+            namelookup_time: 0.046943
+            connect_time: 0.152835
+            pretransfer_time: 0.280361
+            size_upload: !!float 0
+            size_download: !!float 80
+            speed_download: !!float 192
+            speed_upload: !!float 0
+            download_content_length: !!float 80
+            upload_content_length: !!float -1
+            starttransfer_time: 0.416293
+            redirect_time: !!float 0
+            redirect_url: ''
+            primary_ip: 140.82.114.5
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 192.168.0.14
+            local_port: 59521
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: HTTPS
+            appconnect_time_us: 280277
+            connect_time_us: 152835
+            namelookup_time_us: 46943
+            pretransfer_time_us: 280361
+            redirect_time_us: 0
+            starttransfer_time_us: 416293
+            total_time_us: 416416

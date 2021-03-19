@@ -13,6 +13,8 @@ jobs:
         php-version: 7.4
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      env:
+        GITHUB_TOKEN: ${{secret.GITHIUB_ACCESS_TOKEN}}
     - name: Install Dependencies
       run: |
         rm -rf vendor
