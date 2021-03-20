@@ -22,9 +22,9 @@ class GameBuildingUnitFactory extends Factory
     public function definition()
     {
         return [
-            'game_building_id',
-            'game_unit_id',
-            'required_level',
+            'game_building_id' => 0,
+            'game_unit_id'     => 0,
+            'required_level'   => 0,
         ];
     }
 }

@@ -22,8 +22,10 @@ class ReleaseNoteFactory extends Factory
     public function definition()
     {
         return [
-            'inventory_id' => null,
-            'item_id'      => null,
+            'name'         => null,
+            'url'          => null,
+            'release_date' => null,
+            'body'         => null,
         ];
     }
 }

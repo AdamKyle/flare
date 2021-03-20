@@ -24,6 +24,7 @@ class ItemAffixFactory extends Factory
         return [
             'name'                 => 'Sample',
             'base_damage_mod'      => 0.1,
+            'base_ac_mod'          => 0,
             'type'                 => 'suffix',
             'description'          => 'Test',
             'base_healing_mod'     => 0.1,

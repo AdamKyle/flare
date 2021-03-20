@@ -22,10 +22,6 @@ class ReleaseNote extends Model {
         'body',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
-    }
-
     protected static function newFactory() {
         return ReleaseNoteFactory::new();
     }

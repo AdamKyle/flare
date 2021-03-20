@@ -38,7 +38,7 @@ class BuildingInQueue extends Model
         'started_at'   => 'datetime',
     ];
 
-    public function getCharacter() {
+    public function character() {
         return $this->belongsTo(Character::class);
     }
 

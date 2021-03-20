@@ -252,7 +252,7 @@ class Item extends Model
      */
     public function scopeGetSkillTrainingBonus($query, string $skillName): float {
         $baseSkillTraining = 0.0;
-
+        
         if (!is_null($this->itemPrefix)) {
             if ($this->itemPrefix->skill_name === $skillName) {
                 $stat               = $this->itemPrefix->skill_training_bonus;
