@@ -15,11 +15,7 @@ class IsCharacterDeadMiddleware
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)
-    {
-        if (auth()->user()->hasRole('Admin')) {
-            return $next($request);
-        }
-        
+    {   
         if ($request->wantsJson()) {
             if (auth()->user()->character->is_dead) {
                 return response()->json([
