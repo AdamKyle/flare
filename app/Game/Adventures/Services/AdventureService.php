@@ -130,7 +130,7 @@ class AdventureService {
 
             return;
         }
-
+        
         if ($attackService->isMonsterDead()) {
             $this->monsterIsDead($attackService, $adventureLog, $characterModeling);
 
@@ -276,11 +276,7 @@ class AdventureService {
         }
     }
 
-    protected function setLogs(FightService $attackService, AdventureLog $adventureLog = null) {
-
-        if (is_null($adventureLog)) {
-            return;
-        }
+    protected function setLogs(FightService $attackService, AdventureLog $adventureLog) {
 
         $logs = $adventureLog->logs;
 

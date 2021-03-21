@@ -107,15 +107,11 @@ class AdventureJob implements ShouldQueue
             $data = [];
             $data[$this->currentLevel] = $adevntureService->getLogInformation();
 
-            $snapShot = CharacterSnapShot::where('snap_shot->level', strval($this->character->level))->where('character_id', $this->character->id)->first();
-
-            if (is_null($snapShot->adventure_simmulation_data)) {
-                $snapShot->update(['adventure_simmulation_data' => $data]);
-            } else {
-                $snapShotData = $snapShot->adventure_simmulation_data;
-                
-                $snapShot->update(['adventure_simmulation_data' => array_merge($snapShotData, $data)]);
-            }
+            $snapShot = CharacterSnapShot::where('snap_shot->level', strval($this->character->level))
+                                         ->where('character_id', $this->character->id)
+                                         ->first();
+            
+            $snapShot->update(['adventure_simmulation_data' => $data]);
 
             if ($this->currentLevel === $this->adventure->levels) {
                 $data         = [];
@@ -132,9 +128,9 @@ class AdventureJob implements ShouldQueue
 
                 // Finally reset the character back to level 1000.
                 $this->character->update(
-                    $this->character->snapShots()->where('snap_shot->level', '1000')->where('character_id', $this->character->id)->first()->snap_shot
+                    $this->character->snapShots()->orderBy('snap_shot->level', 'desc')->first()->snap_shot
                 );
-
+                
                 if ($this->sendEmail) {
                     Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your adventure simulation has completed. Login and see the details for adventure: ' . $this->adventure->name . '.', 'Adventure Simulation Results', false));
 

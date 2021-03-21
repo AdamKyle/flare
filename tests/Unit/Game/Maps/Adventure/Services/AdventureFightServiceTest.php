@@ -85,6 +85,7 @@ class AdventureFightServiceTest extends TestCase
 
         $this->assertFalse(empty($logs));
         $this->assertEquals($logs[0]['message'], 'Goblin blocked the attack!');
+        $this->assertTrue($fightService->tooLong());
     }
 
     protected function setUpBaseEnviroment() {

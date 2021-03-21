@@ -446,7 +446,7 @@ class CharacterModelingControllerTest extends TestCase
     }
 
     public function testSeeAdventureDetails() {
-        $this->createAdventureResults();
+        $this->createAdventureResults(2);
 
         $this->actingAs($this->user)->visit(route('admin.character.modeling.adventure-data', [
             'adventure' => 1
@@ -481,7 +481,9 @@ class CharacterModelingControllerTest extends TestCase
         ]);
     }
 
-    protected function createAdventureResults() {
+    protected function createAdventureResults($timesToRun = 1) {
+        Mail::fake();
+
         $this->createRace();
         $this->createClass();
         $this->createGameSkill(['name' => 'Accuracy']);
@@ -492,12 +494,16 @@ class CharacterModelingControllerTest extends TestCase
 
         $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
 
-        $this->actingAs($this->user)->visit(route('adventures.list'))->post(route('admin.character.modeling.test'), [
-            'model_id' => $this->createNewAdventure()->id,
-            'type' => 'adventure',
-            'characters' => [1],
-            'character_levels' => '1',
-            'total_times' => '1',
-        ]);
+        for ($i = 1; $i <= $timesToRun; $i++) {
+            $this->actingAs($this->user)->visit(route('adventures.list'))->post(route('admin.character.modeling.test'), [
+                'model_id' => $this->createNewAdventure()->id,
+                'type' => 'adventure',
+                'characters' => [1],
+                'character_levels' => '1',
+                'total_times' => '1',
+            ]);
+        }
+
+        Mail::assertSent(GenericMail::class);
     }
 }
