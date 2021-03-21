@@ -8718,16 +8718,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.10.0",
+            "version": "2.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "6ecda5217bf048088b891f7403b262906be5a957"
+                "reference": "f6e14679f948d8a5cfb866fa7065a30c66bd64d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/6ecda5217bf048088b891f7403b262906be5a957",
-                "reference": "6ecda5217bf048088b891f7403b262906be5a957",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/f6e14679f948d8a5cfb866fa7065a30c66bd64d3",
+                "reference": "f6e14679f948d8a5cfb866fa7065a30c66bd64d3",
                 "shasum": ""
             },
             "require": {
@@ -8781,7 +8781,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-16T12:00:00+00:00"
+            "time": "2021-03-19T12:00:00+00:00"
         },
         {
             "name": "fzaninotto/faker",
@@ -9380,16 +9380,16 @@
         },
         {
             "name": "php-vcr/php-vcr",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-vcr/php-vcr.git",
-                "reference": "c482b6e7da4135a04329ffe1e0528ccc3c082bc6"
+                "reference": "989fdcad482d830890757b8165127ed0183de41b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-vcr/php-vcr/zipball/c482b6e7da4135a04329ffe1e0528ccc3c082bc6",
-                "reference": "c482b6e7da4135a04329ffe1e0528ccc3c082bc6",
+                "url": "https://api.github.com/repos/php-vcr/php-vcr/zipball/989fdcad482d830890757b8165127ed0183de41b",
+                "reference": "989fdcad482d830890757b8165127ed0183de41b",
                 "shasum": ""
             },
             "require": {
@@ -9404,7 +9404,7 @@
                 "mikey179/vfsstream": "^1.6",
                 "phpstan/phpstan": "^0.12",
                 "phpstan/phpstan-beberlei-assert": "^0.12.0",
-                "phpunit/phpunit": "^7.4.3",
+                "phpunit/phpunit": "^8.4.0",
                 "sebastian/version": "^1.0.3|^2.0",
                 "thecodingmachine/phpstan-strict-rules": "^0.12"
             },
@@ -9425,7 +9425,7 @@
                 }
             ],
             "description": "Record your test suite's HTTP interactions and replay them during future test runs for fast, deterministic, accurate tests.",
-            "time": "2020-11-22T13:11:57+00:00"
+            "time": "2021-03-20T10:01:20+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
