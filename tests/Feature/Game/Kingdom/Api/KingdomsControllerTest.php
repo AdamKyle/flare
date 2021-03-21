@@ -4,12 +4,12 @@ namespace Tests\Feature\Game\Kingdom\Api;
 
 use DB;
 use Mail;
-use App\Admin\Mail\GenericMail;
-use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\KingdomBuildingInQueue;
-use App\Flare\Models\UnitInQueue;
 use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Admin\Mail\GenericMail;
+use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\Kingdom;
+use App\Flare\Models\UnitInQueue;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateKingdomBuilding;
@@ -39,6 +39,23 @@ class KingdomsControllerTest extends TestCase
         parent::tearDown();
 
         $this->character = null;
+    }
+
+    public function testGetKingdomData() {
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('GET', route('kingdoms.location', [
+            'kingdom' => 1
+        ]))->response;
+
+        $content = json_decode($response->content());
+        
+        $this->assertEquals(200, $response->status());     
+        
+        $this->assertEquals('Sample', $content->name);
     }
 
     public function testSettleKingdom() {
@@ -125,6 +142,153 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(422, $response->status());
         $this->assertEquals('Cannot settle here.', $content->message);
+    }
+
+    public function testRebuildKingdomBuilding() {
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+        ]);
+
+        $this->createGameBuilding();
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => 1,
+            'kingdom_id'         => 1,
+            'level'              => 1,
+            'current_defence'    => 300,
+            'current_durability' => 0,
+            'max_defence'        => 300,
+            'max_durability'     => 300,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.rebuild', [
+            'character'  => 1,
+            'building'   => 1,
+        ]))->response;
+        
+        $this->assertEquals(200, $response->status());
+
+        $building = Kingdom::first()->buildings->first();
+        
+        $this->assertNotEquals(0, $building->current_durability);
+        $this->assertEquals(300, $building->current_durability);
+    } 
+
+    public function testCannotRebuildKingdomBuildingNotEnoughResources() {
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+            'current_stone'      => 1,
+            'current_wood'       => 1,
+            'current_clay'       => 1,
+            'current_iron'       => 1,
+            'current_population' => 1,
+        ]);
+
+        $this->createGameBuilding();
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => 1,
+            'kingdom_id'         => 1,
+            'level'              => 1,
+            'current_defence'    => 300,
+            'current_durability' => 0,
+            'max_defence'        => 300,
+            'max_durability'     => 300,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.rebuild', [
+            'character'  => 1,
+            'building'   => 1,
+        ]))->response;
+        
+        $this->assertEquals(422, $response->status());
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('You don\'t have the resources.', $content->message);
+
+        $building = Kingdom::first()->buildings->first();
+        
+        $this->assertEquals(0, $building->current_durability);
+    }
+
+    public function testCanEmbezzel() {
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+            'treasury'     => 2000,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+            'kingdom' => 1
+        ]), [
+            'embezzel_amount' => 2000
+        ])->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertEquals(0, Kingdom::first()->treasury);
+    }
+    
+    public function testCannotEmbezzelMissingParam() {
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+            'treasury'     => 2000,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+            'kingdom' => 1
+        ]))->response;
+
+        $this->assertEquals(422, $response->status());
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('Amount to embezzel is required.', $content->errors->embezzel_amount[0]);
+    }
+
+    public function testCannotEmbezzelHaveNoTreasury() {
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+            'treasury'     => 0,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+            'kingdom' => 1
+        ]), [
+            'embezzel_amount' => 2000
+        ])->response;
+
+        $this->assertEquals(422, $response->status());
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('You don\'t have the gold in your treasury.', $content->message);
+    }
+
+    public function testCannotEmbezzelMoraleTooLow() {
+        $this->createKingdom([
+            'character_id'   => 1,
+            'game_map_id'    => 1,
+            'current_morale' => 0.07,
+            'treasury'       => 2000,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+            'kingdom' => 1
+        ]), [
+            'embezzel_amount' => 2000
+        ])->response;
+
+        $this->assertEquals(422, $response->status());
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('Morale is too low.', $content->message);
     }
 
     public function testUpgradeKingdomBuildingWhileOnline() {

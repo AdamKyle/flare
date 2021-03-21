@@ -10,7 +10,6 @@ use League\Fractal\Resource\Item;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
