@@ -42,7 +42,6 @@ class SelectedKingdom extends TransformerAbstract {
                 'heal_amount'          => $unit->gameUnit->heal_amount,
                 'siege_weapon'         => $unit->gameUnit->seige_weapon,
                 'travel_time'          => $unit->gameUnit->travel_time,
-                'weak_against_unit_id' => GameUnit::find($unit->gameUnit->weak_against_unit_id)->name,
                 'primary_attack'       => $unit->gameUnit->primary_attack,
                 'fall_back'            => $unit->gameUnit->fall_back,
             ];

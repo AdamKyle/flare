@@ -96,6 +96,15 @@ class CharacterFactory {
     }
 
     /**
+     * Fetch the kingdom management class.
+     * 
+     * @return KingdomManagement.
+     */
+    public function kingdomManagement(): KingdomManagement {
+        return new KingdomManagement($this->character, $this);
+    }
+
+    /**
      * Lets you update the character
      * 
      * @param array $changes | []

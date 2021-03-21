@@ -34,7 +34,7 @@ class KingdomsAttackService {
         
         foreach ($kingdoms as $kingdomId) {
             $kingdom = Kingdom::where('character_id', $character->id)->where('id', $kingdomId)->first();
-
+            
             if (is_null($kingdom)) {
                 return $this->errorResult('You do not own this kingdom.');
             }

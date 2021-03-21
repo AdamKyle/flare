@@ -25,16 +25,15 @@ class AttackRequest extends FormRequest
     {
         return [
             'defender_id'         => 'required|integer',
-            'units_to_send.*'     => 'required|array',
+            'units_to_send'       => 'required|array',
         ];
     }
 
     public function messages() {
         return [
-            'defender_id.required'         => 'Defender id is required',
-            'defender_id.integer'          => 'Defender id must be an integer.',
-            'units_to_send.*.required'     => 'Units is required.',
-            'units_to_send.*.array'        => 'Units to send must be an array.',
+            'defender_id.required' => 'Defender id is required',
+            'defender_id.integer'  => 'Defender id must be an integer.',
+            'units_to_send'        => 'Units to send must be an array.' 
         ];
     }
 }
