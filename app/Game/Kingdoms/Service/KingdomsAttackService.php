@@ -119,7 +119,7 @@ class KingdomsAttackService {
                     $kingdomUnitInformation->amount . 
                     ' and are trying to send: ' . 
                     $unitInformation['amount_to_send'] . 
-                    'for: ' . $kingdom->name
+                    ' for: ' . $kingdom->name
                 );
             }
 

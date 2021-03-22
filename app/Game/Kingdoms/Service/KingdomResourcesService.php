@@ -129,21 +129,15 @@ class KingdomResourcesService {
     }
 
     protected function increaseTreasury() {
-        if ($this->kingdom->current_morale === 0) {
+        if ($this->kingdom->current_morale === 0.0) {
             return;
         }
 
         if ($this->kingdom->current_morale > 0.50) {
-            return $this->updateTreasury(1000);
-        }
-
-        if ($this->kingdom->current_morale < 0.50) {
-            return $this->updateTreasury(500);
-        }
-
-        if ($this->kingdom->current_morale < 0.25) {
             return $this->updateTreasury(100);
         }
+
+        return $this->updateTreasury(50);
     }
 
     protected function increaseOrDecreaseMorale() {
