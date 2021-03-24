@@ -9,12 +9,11 @@ use Illuminate\Database\Eloquent\Collection;
 class SiegeHandler {
 
     public function attack(Kingdom $defender, array $siegeUnits) {
-
         foreach ($siegeUnits as $index => $unitInfo) {
             $unitInfo = $this->primaryAttack($defender, $unitInfo);
             
             if ($unitInfo['amount'] > 0) {
-                if ($unitInfo['fall_back'] === 'KingdomBuildings') {
+                if ($unitInfo['fall_back'] === 'Buildings') {
                     $unitInfo = $this->attackKingdomBuildings($defender, $unitInfo);
                 } else {
                     $unitInfo = $this->fallBackAttack($defender, $unitInfo);
@@ -38,7 +37,7 @@ class SiegeHandler {
         if (is_null($primaryTarget)) {
             return $unitInfo;
         }
-        
+
         if ($this->hasKingdomBuildingFallen($primaryTarget)) {
             return $unitInfo;
         }
@@ -83,7 +82,7 @@ class SiegeHandler {
         if ($totalDefenderAttack === 0) {
             return $unitInfo;
         }
-
+        
         if ($totalAttack > $totalDefenderDefence) {
             $totalDefenderPercentageLost = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence);
             $totalAttackersLost          = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence, true);
@@ -107,7 +106,7 @@ class SiegeHandler {
 
     private function attackTarget(KingdomBuilding $target, array $unitInfo): array {
         $totalAttack = $unitInfo['total_attack'];
-
+        
         if ($totalAttack > $target->current_defence) {
             $totalPercentageUnitsLost      = $this->calculatePerentageLost($totalAttack, $target->current_defence, true);
             $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $target->current_defence);
@@ -133,19 +132,19 @@ class SiegeHandler {
         $totalAttack  = $unitInfo['total_attack'];
         $totalDefence = $unitInfo['total_defence'];
 
-        $defenderSiegeUnits        = $this->getDefenderSiegeUnits($defender);
-        $defenderSiegeUnitsAttack  = $this->defenderSiegeUnitsAttack($defenderSiegeUnits);
+        $defenderSiegeUnits               = $this->getDefenderSiegeUnits($defender);
+        $defenderSiegeUnitsAttack         = $this->defenderSiegeUnitsAttack($defenderSiegeUnits);
         $defenderKingdomBuildingsDefence  = $this->getKingdomBuildingsTotalDefence($targets);
 
         if (!$defenderSiegeUnits->isEmpty()) {
             $defenderSiegeUnitsAttack = $this->defenderSiegeUnitsAttack($defenderSiegeUnits);
         }
-
+        
         if ($totalAttack > $defenderKingdomBuildingsDefence) {
             $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $defenderKingdomBuildingsDefence);
             
             $this->updateAllKingdomBuildings($targets, $totalPercentageDurabilityLost);
-
+            
             if ($defenderSiegeUnitsAttack !== 0) {
                 $totalPercentageOfAttackersLost = $this->calculatePerentageLost($defenderSiegeUnitsAttack, $totalDefence);
 
@@ -209,7 +208,7 @@ class SiegeHandler {
     }
 
     private function hasKingdomBuildingFallen(KingdomBuilding $building): bool {
-        return $building->durabilityPercentageLost > 0;
+        return $building->current_durability === 0;
     }
 
     private function getDefenderSiegeUnits(Kingdom $defender) {
