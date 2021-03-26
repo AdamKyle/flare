@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Kingdoms\Handlers;
+namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\UnitMovementQueue;

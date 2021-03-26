@@ -9,7 +9,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class Itemtest extends TestCase
+class ItemTest extends TestCase
 {
     use RefreshDatabase,
         CreateItem,

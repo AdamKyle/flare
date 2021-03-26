@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Kingdoms\Handlers;
+namespace Tests\Unit\Game\Maps\Services;
 
 use Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;

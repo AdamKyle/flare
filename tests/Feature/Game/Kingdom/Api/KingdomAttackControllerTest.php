@@ -7,7 +7,7 @@ use App\Flare\Models\Kingdom;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
-class KingdomsAttackControllerTest extends TestCase
+class KingdomAttackControllerTest extends TestCase
 {
     use RefreshDatabase;
 

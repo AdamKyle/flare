@@ -6,7 +6,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
-use App\Game\Kingdoms\Jobs\UpgradeKingdomBuilding;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
