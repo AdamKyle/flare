@@ -21,10 +21,6 @@ class UnitHandler {
     public function handleWalls(Kingdom $defender, array $attackingUnits): array {
         $walls = $defender->buildings->where('is_walls', true)->first();
 
-        if (is_null($walls)) {
-            return $attackingUnits;
-        }
-
         $totalAttack      = $this->getTotalAttack($attackingUnits);
         $totalWallDefence = $walls->current_defence;
 
@@ -52,7 +48,7 @@ class UnitHandler {
     protected function handleUnits(Kingdom $defender, array $attackingUnits) {
         $defendingUnits = $defender->units;
 
-        if (!isEmpty($defendingUnits)) {
+        if ($defendingUnits->isEmpty()) {
             return $attackingUnits;
         }
 

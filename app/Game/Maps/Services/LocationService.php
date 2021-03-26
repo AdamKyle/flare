@@ -145,7 +145,6 @@ class LocationService {
                             ->where('y_position', $character->y_position)
                             ->first();
         
-
         if (!is_null($kingdom)) {
             if ($character->id !== $kingdom->character->id) {
                 $this->canAttack = true;

@@ -118,7 +118,7 @@ class MovementService {
         $kingdomToAttack = [];
 
         if (!is_null($kingdom)) {
-            if ($kingdom->character->user->id !== auth()->user()->id) {
+            if ($kingdom->character->id !== $character->id) {
                 $canAttack = true;
 
                 $kingdomToAttack = [
@@ -355,7 +355,6 @@ class MovementService {
             })->first();
 
             if (is_null($item)) {
-                
                 if (!($character->inventory->slots()->count() < $character->inventory_max)) {
                     event(new ServerMessageEvent($character->user, 'inventory_full'));
                 } else {

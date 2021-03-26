@@ -18,7 +18,6 @@ class ShopController extends Controller {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
         $this->middleware('is.character.adventuring');
-        $this->middleware('is.character.who.they.say.they.are');
     }
 
     public function shopBuy(Character $character) {

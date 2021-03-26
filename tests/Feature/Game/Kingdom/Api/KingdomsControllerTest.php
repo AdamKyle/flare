@@ -144,7 +144,17 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals('Cannot settle here.', $content->message);
     }
 
-    public function testRebuildKingdomBuilding() {
+    public function testRebuildKingdomBuildingOnline() {
+
+        DB::table('sessions')->insert([[
+            'id'           => '1',
+            'user_id'      => $this->character->getUser()->id,
+            'ip_address'   => '1',
+            'user_agent'   => '1',
+            'payload'      => '1',
+            'last_activity'=> 1602801731,
+        ]]);
+        
         $this->createKingdom([
             'character_id' => 1,
             'game_map_id'  => 1,
@@ -173,6 +183,41 @@ class KingdomsControllerTest extends TestCase
         
         $this->assertNotEquals(0, $building->current_durability);
         $this->assertEquals(300, $building->current_durability);
+    }
+
+    public function testRebuildKingdomBuildingOffLine() {
+        Mail::fake();
+
+        $this->createKingdom([
+            'character_id' => 1,
+            'game_map_id'  => 1,
+        ]);
+
+        $this->createGameBuilding();
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => 1,
+            'kingdom_id'         => 1,
+            'level'              => 1,
+            'current_defence'    => 300,
+            'current_durability' => 0,
+            'max_defence'        => 300,
+            'max_durability'     => 300,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.rebuild', [
+            'character'  => 1,
+            'building'   => 1,
+        ]))->response;
+        
+        $this->assertEquals(200, $response->status());
+
+        $building = Kingdom::first()->buildings->first();
+        
+        $this->assertNotEquals(0, $building->current_durability);
+        $this->assertEquals(300, $building->current_durability);
+
+        Mail::assertSent(GenericMail::class);
     } 
 
     public function testCannotRebuildKingdomBuildingNotEnoughResources() {

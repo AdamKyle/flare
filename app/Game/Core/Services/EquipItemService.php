@@ -65,13 +65,6 @@ class EquipItemService {
             return $slot->position === $this->request->position; 
         })->first();
 
-        if (!is_null($itemForPosition)) {
-            $itemForPosition->update([
-                'equipped' => false,
-                'position' => null,
-            ]);
-        }
-
         $characterSlot->update([
             'equipped' => true,
             'position' => $this->request->position,
