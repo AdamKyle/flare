@@ -81,6 +81,31 @@ class KingdomsControllerTest extends TestCase
         );
     }
 
+    public function testSettleKingdomWithCache() {
+        Cache::put('character-kingdoms-' . $this->character->getCharacter()->id, [['sample data']]);
+
+        $this->createGameBuilding();
+
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
+            'character' => 1
+        ]), [
+            'x_position' => 16,
+            'y_position' => 16,
+            'name'       => 'Apple Sauce',
+            'color'      => [193, 66, 66, 1],
+        ])->response;
+
+        $content = json_decode($response->content());
+        
+        $this->assertEquals(200, $response->status());
+        $this->assertTrue(!empty($content));
+        $this->assertEquals(2, count(Cache::get('character-kingdoms-' . $this->character->getCharacter()->id)));
+        
+        $this->assertTrue(
+            $this->character->getCharacter()->kingdoms->first()->buildings->isNotEmpty()
+        );
+    }
+
     public function testFailToSettleKingdomMissingData() {
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
             'character' => 1

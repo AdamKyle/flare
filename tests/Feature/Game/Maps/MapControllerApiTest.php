@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
+use Cache;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateAdventure;
@@ -50,6 +51,24 @@ class MapControllerApiTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
+        $this->assertEquals(16, $content->character_map->position_x);
+        $this->assertEquals(16, $content->character_map->character_position_x);
+    }
+
+    public function testGetMapWithKingdomCache() {
+
+        Cache::put('character-kingdoms-' . $this->character->getCharacter()->id, [['sample']]);
+
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('GET', '/api/map/' . $user->id)
+                         ->response;
+
+        $content = json_decode($response->content());
+        
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals(1, count($content->my_kingdoms));
         $this->assertEquals(16, $content->character_map->position_x);
         $this->assertEquals(16, $content->character_map->character_position_x);
     }

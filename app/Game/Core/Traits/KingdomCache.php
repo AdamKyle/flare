@@ -44,8 +44,10 @@ trait KingdomCache {
     public function addKingdomToCache(Character $character, Kingdom $kingdom): array {
         if (Cache::has('character-kingdoms-' . $character->id)) {
             $cache = Cache::get('character-kingdoms-' . $character->id);
-
+            
             Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom, $cache));
+
+            return Cache::get('character-kingdoms-' . $character->id);
         }
 
         Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom));
