@@ -15,7 +15,7 @@ class UpdateKingdomsService {
         $gameBuilding->units()->create([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id'     => $selectedUnits[0],
-            'required_level'   => 1,
+            'required_level'   => !is_null($gameBuilding->only_at_level) ? $gameBuilding->only_at_level : 1,
         ]);
 
         unset($selectedUnits[0]);

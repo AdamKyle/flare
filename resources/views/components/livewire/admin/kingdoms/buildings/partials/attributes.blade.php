@@ -85,11 +85,18 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gameBuilding-trains-units">Units per level <a href="#" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-info-circle"></i></a></label>
                 <input type="number" class="form-control" id="gameBuilding-units-per-level" wire:model="gameBuilding.units_per_level" {{$this->unit_selection_is_disabled  ? 'disabled' : ''}}>
                 @error('units_per_level') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>  
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="gameBuilding-only_at_level">Only at level</label>
+                <input type="number" class="form-control" id="gameBuilding-only_at_level" wire:model="gameBuilding.only_at_level" {{($this->unit_selection_is_disabled && $this->only_at_level_is_disabled)  ? 'disabled' : ''}}>
+                @error('only_at_level') <span class="text-danger">{{ $message }}</span> @enderror
             </div>  
         </div>
     </div>

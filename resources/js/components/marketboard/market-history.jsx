@@ -38,6 +38,7 @@ export default class MarketHistory extends React.Component {
   }
 
   componentDidMount() {
+    
     this.fetchMarketHistory();
 
     this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {

@@ -19,14 +19,16 @@ class CreateGameUnits extends Migration
             $table->text('description');
             $table->integer('attack');
             $table->integer('defence');
+            $table->boolean('can_not_be_healed')->nullable()->default(false);
+            $table->boolean('is_settler')->nullable()->default(false);
+            $table->double('reduces_morale_by')->nullable()->default(0);
             $table->boolean('can_heal')->nullable()->default(false);
-            $table->boolean('heal_amount')->nullable();
+            $table->double('heal_percentage')->nullable()->default(0);
             $table->boolean('siege_weapon')->nullable()->default(false);
             $table->boolean('attacks_walls')->nullable()->default(false);
             $table->boolean('attacks_buildings')->nullable()->default(false);
             $table->boolean('defender')->nullable()->default(false);
             $table->boolean('attacker')->nullable()->default(false);
-            $table->bigInteger('weak_against_unit_id')->unsigned()->nullable();
             $table->string('primary_target')->nullable();
             $table->string('fall_back')->nullable();
             $table->integer('travel_time');

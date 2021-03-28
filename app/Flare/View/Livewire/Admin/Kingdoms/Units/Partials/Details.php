@@ -21,7 +21,7 @@ class Details extends Component
         'gameUnit.attack'                   => 'required',
         'gameUnit.defence'                  => 'required',
         'gameUnit.can_heal'                 => 'nullable',
-        'gameUnit.heal_amount'              => 'nullable',
+        'gameUnit.heal_percentage'          => 'nullable',
         'gameUnit.siege_weapon'             => 'nullable',
         'gameUnit.travel_time'              => 'required',
         'gameUnit.wood_cost'                => 'required',
@@ -30,11 +30,13 @@ class Details extends Component
         'gameUnit.iron_cost'                => 'required',
         'gameUnit.required_population'      => 'required',
         'gameUnit.time_to_recruit'          => 'required',
-        'gameUnit.weak_against_unit_id'     => 'nullable',
         'gameUnit.primary_target'           => 'nullable',
         'gameUnit.fall_back'                => 'nullable',
         'gameUnit.attacker'                 => 'nullable',
         'gameUnit.defender'                 => 'nullable',
+        'gameUnit.can_not_be_healed'        => 'nullable',
+        'gameUnit.is_settler'               => 'nullable',
+        'gameUnit.reduces_morale_by'        => 'nullable',
     ];
 
     protected $messages = [
@@ -52,10 +54,6 @@ class Details extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
-        if (!is_null($this->gameUnit->weak_against_unit_id) && $this->weakAgainst) {
-            return $this->addError('cant_be_both', 'Your unit cannot be weak against it\'s self and another unit.');
-        }
-
         if (!is_null($this->gameUnit->primary_target) && !is_null($this->gameUnit->fall_back)) {
             if ($this->gameUnit->primary_target === $this->gameUnit->fall_back) {
                 return $this->addError('error', 'Cannot have the same fallback target as the primary target.');
@@ -69,14 +67,6 @@ class Details extends Component
         $this->gameUnit->save();
 
         $gameUnit = $this->gameUnit->refresh();
-
-        if (is_null($gameUnit->weak_against_unit_id) && !is_null($this->weakAgainst)) {
-            $gameUnit->weak_against_unit_id = $gameUnit->id;
-
-            $gameUnit->save();
-        }
-
-        $gameUnit = $gameUnit->refresh();
 
         $message = 'Created Unit: ' . $gameUnit->refresh()->name;
 
@@ -92,6 +82,10 @@ class Details extends Component
 
     public function getIsHealForDisabledProperty() {
         return !$this->gameUnit->can_heal;
+    }
+
+    public function getIsReducesMoraleByDisabledProperty() {
+        return !$this->gameUnit->is_settler;
     }
 
     public function mount() {

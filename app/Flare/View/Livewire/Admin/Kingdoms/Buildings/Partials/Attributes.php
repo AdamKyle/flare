@@ -15,6 +15,8 @@ class Attributes extends Component
 
     public $editing = false;
 
+    public $unitsPerLevelDisabled = false;
+
     public $selectedUnits = [];
 
     protected $rules = [
@@ -39,6 +41,7 @@ class Attributes extends Component
         'gameBuilding.time_to_build'              => 'nullable',
         'gameBuilding.time_increase_amount'       => 'nullable',
         'gameBuilding.units_per_level'            => 'nullable',
+        'gameBuilding.only_at_level'              => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];
@@ -53,6 +56,22 @@ class Attributes extends Component
         }
 
         if ($this->gameUnits->isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getOnlyAtLevelIsDisabledProperty() {
+        if (is_null($this->gameBuilding)) {
+            return true;
+        }
+
+        if (empty($this->selectedUnits)) {
+            return true;
+        }
+
+        if ($this->gameUnits->isEmpty() || count($this->selectedUnits) > 1) {
             return true;
         }
 
@@ -82,6 +101,10 @@ class Attributes extends Component
             return $this->addError('units_per_level', 'How many levels between units?');
         }
 
+        if (count($this->selectedUnits) > 1 && !is_null($this->gameBuilding->only_at_level)) {
+            return $this->addError('only_at_level', 'You can only select one unit for this field.');
+        }
+
         if (!$isValid) {
             return $this->addError('error', 'Your selected units and units per level are greator then your max level.');
         }
@@ -94,10 +117,10 @@ class Attributes extends Component
 
         $kingdomService->updateKingdomKingdomBuildings($this->gameBuilding->refresh(), $this->selectedUnits, $gameBuilding->units_per_level);
 
-        $message = 'Created KingdomBuilding: ' . $this->gameBuilding->refresh()->name;
+        $message = 'Created Building: ' . $this->gameBuilding->refresh()->name;
 
         if ($this->editing) {
-            $message = 'Updated KingdomBuilding: ' . $this->gameBuilding->refresh()->name;
+            $message = 'Updated Building: ' . $this->gameBuilding->refresh()->name;
         }
         
         $this->emitTo('core.form-wizard', $functionName, $index, true, [

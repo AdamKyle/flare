@@ -112,7 +112,7 @@ export default class ActionsSection extends React.Component {
               canCraft={this.state.canCraft}
             />
             {
-              this.props.kingdomData.can_attack ?
+              this.props.kingdomData.can_attack && !_.isEmpty(this.props.kingdomData.my_kingdoms) ?
                 <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomAttackModal}>Attack Kingdom</button> 
               : null
             }

@@ -14,7 +14,7 @@ function renderBoard(id) {
     
 
     render(
-        <Board characterId={character.content} itemId={parseInt(itemId)} />,
+        <Board characterId={character.content} itemId={parseInt(itemId)} allowBuying={false} />,
         marketBoard
     );
 }

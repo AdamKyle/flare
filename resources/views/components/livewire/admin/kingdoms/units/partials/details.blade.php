@@ -46,37 +46,56 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-can-heal" wire:model="gameUnit.can_heal">
                 <label class="form-check-label" for="gameUnit-can-heal">Can this unit heal?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-siege-weapon" wire:model="gameUnit.siege_weapon">
                 <label class="form-check-label" for="gameUnit-siege-weapon">Is this a seige weapon?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-attacker" wire:model="gameUnit.attacker">
                 <label class="form-check-label" for="gameUnit-attacker">Attacker?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-defender" wire:model="gameUnit.defender">
                 <label class="form-check-label" for="gameUnit-defender">Defender?</label>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="gameUnit-can-not-be-healed" wire:model="gameUnit.can_not_be_healed">
+                <label class="form-check-label" for="gameUnit-can-not-be-healed">Can Not Be healed?</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="gameUnit-is-settler" wire:model="gameUnit.is_settler">
+                <label class="form-check-label" for="gameUnit-is-settler">Is Settler?</label>
+            </div>
+        </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <div class="form-group">
-                <label for="gameUnit-heal-for">Heals other units for?: </label>
-                <input type="number" class="form-control required" id="gameUnit-heal-for" name="gameUnit-heal-for" wire:model="gameUnit.heal_for" {{$this->is_heal_for_disabled ? 'disabled' : ''}}> 
-                @error('gameUnit.heal_for') <span class="text-danger">{{ $message }}</span> @enderror
+                <label for="gameUnit-heal-for">Heals other units for (percentage)?: </label>
+                <input type="number" steps="0.01" min="0.0" max="1.0" class="form-control required" id="gameUnit-heal-for" name="gameUnit-heal-for" wire:model="gameUnit.heal_percentage" {{$this->is_heal_for_disabled ? 'disabled' : ''}}> 
+                @error('gameUnit.heal_percentage') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gameUnit-reduces-morale-by">Reduces Morale By (percentage)?: </label>
+                <input type="number" steps="0.01" min="0.0" max="1.0" class="form-control required" id="gameUnit-reduces-morale-by" name="gameUnit-reduces-morale-by" wire:model="gameUnit.reduces_morale_by" {{$this->is_reduces_morale_by_disabled ? 'disabled' : ''}}> 
+                @error('gameUnit.reduces_morale_by') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>
@@ -159,29 +178,4 @@
             </div>
         </div>
     </div>
-    @if (!is_null($units))
-        @if ($units->isNotEmpty())
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="gameUnit-weak-against-unit-id">Weak Against?: </label>
-                        <select class="form-control" {{$weakAgainst ? 'disabled' : ''}} wire:model="gameUnit.weak_against_unit_id">
-                            <option>Please select</option>
-                            @foreach($units as $unit)
-                                <option value={{$unit->id}}>{{$unit->name}}</option>
-                            @endforeach
-                        </select> 
-                        @error('gameUnit.weak_against_unit_id') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="gameUnit-weak-against-unit-id" wire:model="weakAgainst" >
-                        <label class="form-check-label" for="gameUnit-is-wall">Weak against it's self?</label>
-                        @error('cant_be_both') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-            </div>
-        @endif
-    @endif
 </div>

@@ -74,7 +74,13 @@ export default class KingdomModal extends React.Component {
             this.props.updateKingdomData(result.data);
             this.props.close();
         }).catch((error) => {
-            console.error(error);
+            if (error.hasOwnProperty('response')) {
+                this.setState({
+                    errorMessage: error.response.data.errors.name[0],
+                });
+            } else {
+                console.error(error);
+            }
         });
     }
 

@@ -48,6 +48,7 @@ export default class Board extends Component {
       message: null,
       messageType: null,
       hasItemId: false,
+      allowBuying: true,
       type: null,
     }
 
@@ -56,6 +57,7 @@ export default class Board extends Component {
 
   componentDidMount() {
     this.setState({
+      allowBuying: this.props.hasOwnProperty('allowBuying') ? this.props.allowBuying : true,
       hasItemId: this.props.hasOwnProperty('itemId') && this.props.itemId !== 'undefined'
     }, () => {
       axios.get('/api/market-board/items', {
@@ -72,7 +74,6 @@ export default class Board extends Component {
       });
 
       if (!this.state.hasItemId) {
-        console.log('called');
         this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
           let hasId = false;
   
@@ -99,6 +100,10 @@ export default class Board extends Component {
   }
 
   rowClickedHandler(event, data, rowIndex) {
+    if (!this.state.allowBuying) {
+      return;
+    }
+
     this.setState({
       modalData: data,
       showModal: true,
@@ -198,8 +203,8 @@ export default class Board extends Component {
         onChange={this.typeChange.bind(this)}
       >
         { this.state.message !== null ? this.renderMessage() : null }
-
-        { !this.state.hasItemId ? <MarketHistory  type={this.state.type} /> : null }
+        
+        { !this.state.hasItemId && this.state.allowBuying ? <MarketHistory  type={this.state.type} /> : null }
 
         <ReactDatatable
           config={this.config}

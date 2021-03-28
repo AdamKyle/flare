@@ -27,6 +27,8 @@ class KingdomResourcesService {
      */
     private $kingdomTransformer;
 
+    private $kingdomsUpdated = [];
+
     /**
      * constructor
      * 
@@ -75,7 +77,16 @@ class KingdomResourcesService {
 
             event(new UpdateKingdom($user, $kingdom));
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+        } else {
+            $this->kingdomsUpdated[$kingdom->name] = $kingdom->refresh->audits()->latest()->first();
         }
+    }
+
+    /**
+     * Gets the details pertaining to the kingdoms that were updated.
+     */
+    public function getKingdomsUpdated(): array {
+        return $this->kingdomsUpdated;
     }
 
     protected function updateCurrentPopulation() {

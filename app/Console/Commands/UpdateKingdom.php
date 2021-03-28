@@ -44,5 +44,7 @@ class UpdateKingdom extends Command
                 $service->setKingdom($kingdom)->updateKingdom();
             }
         });
+
+        dd($service->getKingdomsUpdated());
     }
 }

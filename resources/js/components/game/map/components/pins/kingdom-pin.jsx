@@ -51,7 +51,11 @@ export default class KingdomPin extends React.Component {
   }
 
   convertToHex(rgba) {
-    return `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`
+    if (Array.isArray(rgba)) {
+      return `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`
+    } else {
+      return rgba; // already a hex ...
+    }
   }
 
   render() {
