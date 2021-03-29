@@ -27,7 +27,6 @@ class UnitTransformer extends TransformerAbstract {
             'siege_weapon'         => $unit->siege_weapon,
             'attacker'             => $unit->attacker,
             'defender'             => $unit->defender,
-            'weak_against_unit'    => GameUnit::find($unit->weak_against_unit_id),
             'travel_time'          => $unit->travel_time,
             'wood_cost'            => $unit->wood_cost,
             'clay_cost'            => $unit->clay_cost,

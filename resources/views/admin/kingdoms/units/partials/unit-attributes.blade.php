@@ -52,11 +52,5 @@
         <dd>{{$unit->atacker ? 'Yes' : 'No'}}</dd>
         <dd><strong>Is Defender?</strong>:</dd>
         <dd>{{$unit->defender ? 'Yes' : 'No'}}</dd>
-        @if (!is_null($weakAgainst))
-            <dd><strong>Weak Against</strong>:</dd>
-            <dt><a href="{{route('units.unit', [
-                'gameUnit' => $weakAgainst->id
-            ])}}">{{$weakAgainst->name}}</a></dt>
-        @endif
     </dl>
 </x-cards.card-with-title>

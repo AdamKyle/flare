@@ -26,12 +26,9 @@ class UnitsController extends Controller {
             $belongsToKingdomBuilding = $belongsToKingdomBuilding->gameBuilding;
         }
 
-        $weakAgainst       = GameUnit::find($gameUnit->weak_against_unit_id);
-
         return view('admin.kingdoms.units.unit', [
             'unit'        => $gameUnit,
-            'building'    => $belongsToKingdomBuilding,
-            'weakAgainst' => $weakAgainst,
+            'building'    => $belongsToKingdomBuilding
         ]);
     }
 

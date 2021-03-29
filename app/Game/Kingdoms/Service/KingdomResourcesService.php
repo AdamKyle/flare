@@ -78,7 +78,7 @@ class KingdomResourcesService {
             event(new UpdateKingdom($user, $kingdom));
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
         } else {
-            $this->kingdomsUpdated[$kingdom->name] = $kingdom->refresh->audits()->latest()->first();
+            $this->kingdomsUpdated[$kingdom->name] = $kingdom->refresh()->audits()->latest()->first();
         }
     }
 

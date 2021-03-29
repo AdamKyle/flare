@@ -17,18 +17,6 @@ class DetailsTest extends TestCase
         Livewire::test(Details::class)->assertSee('Name')->assertDontSee('Previous');
     }
 
-    public function testTheComponentLoadsWithUnitWeakAgainstItsSelf() {
-        $gameUnit = $this->createGameUnit();
-
-        $gameUnit->update([
-            'weak_against_unit_id' => $gameUnit->id
-        ]);
-
-        Livewire::test(Details::class, [
-            'gameUnit' => $gameUnit->refresh(),
-        ])->assertSee('Name')->assertDontSee('Previous')->assertSet('weakAgainst', true);
-    }
-
     public function testCreateBasicUnit() {
         Livewire::test(Details::class)->set('gameUnit.name', 'Sample Name')
                                       ->set('gameUnit.description', 'Test Description')
@@ -69,26 +57,6 @@ class DetailsTest extends TestCase
         $gameUnit = GameUnit::first();
 
         $this->assertTrue($gameUnit->name === 'Sample Name');
-    }
-
-    public function testValidationUnitWeakAgainstFails() {
-        $unit = $this->createGameUnit();
-
-        Livewire::test(Details::class)->set('gameUnit.name', 'Sample Unit Name')
-                                      ->set('gameUnit.description', 'Test Description')
-                                      ->set('gameUnit.attack', 2)
-                                      ->set('gameUnit.defence', 3)
-                                      ->set('gameUnit.travel_time', 1)
-                                      ->set('gameUnit.required_population', 10)
-                                      ->set('gameUnit.time_to_recruit', 2)
-                                      ->set('gameUnit.wood_cost', 1)
-                                      ->set('gameUnit.clay_cost', 1)
-                                      ->set('gameUnit.stone_cost', 1)
-                                      ->set('gameUnit.iron_cost', 1)
-                                      ->set('gameUnit.weak_against_unit_id', $unit->id)
-                                      ->set('weakAgainst', true)
-                                      ->call('validateInput', 'nextStep', 2)
-                                      ->assertSee('Your unit cannot be weak against it\'s self and another unit.');
     }
 
     public function testValidationOfPrimaryAndFallBackTargetFails() {

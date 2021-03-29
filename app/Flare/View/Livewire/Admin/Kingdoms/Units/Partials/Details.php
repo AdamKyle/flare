@@ -91,10 +91,6 @@ class Details extends Component
     public function mount() {
         if (is_null($this->gameUnit)) {
             $this->gameUnit = new GameUnit;
-        } else {
-            if ($this->gameUnit->weak_against_unit_id === $this->gameUnit->id) {
-                $this->weakAgainst = true;
-            }
         }
 
         $this->units = GameUnit::all();

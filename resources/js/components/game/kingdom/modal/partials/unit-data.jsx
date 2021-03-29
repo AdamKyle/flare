@@ -118,8 +118,6 @@ export default class UnitData extends React.Component {
                             <dd>{this.props.unit.atacker ? 'Yes' : 'No'}</dd>
                             <dd><strong>Is Defender?</strong>:</dd>
                             <dd>{this.props.unit.defender ? 'Yes' : 'No'}</dd>
-                            <dd><strong>Weak Against</strong>:</dd>
-                            <dt>{this.props.unit.weak_against_unit.name}</dt>
                         </dl>
                     </div>
                 </div>
