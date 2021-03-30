@@ -9,6 +9,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use Cache;
 
 class KingdomResourcesService {
 
@@ -78,7 +79,17 @@ class KingdomResourcesService {
             event(new UpdateKingdom($user, $kingdom));
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
         } else {
-            $this->kingdomsUpdated[$kingdom->name] = $kingdom->refresh()->audits()->latest()->first();
+            if (Cache::has('kingdoms-updated-' . $user->id)) {
+                $cache = Cache::get('kingdoms-updated-' . $user->id);
+
+                $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
+                
+                Cache::put('kingdoms-updated-' . $user->id, $cache);
+            } else {
+                $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
+
+                Cache::put('kingdoms-updated-' . $user->id, $cache);
+            }
         }
     }
 
@@ -87,6 +98,12 @@ class KingdomResourcesService {
      */
     public function getKingdomsUpdated(): array {
         return $this->kingdomsUpdated;
+    }
+
+    protected function putUpdatedKingdomIntoCache(int $kingdomId, array $cache = []): array {
+        $cache[] = $kingdomId;
+
+        return $cache;
     }
 
     protected function updateCurrentPopulation() {

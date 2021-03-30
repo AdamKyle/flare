@@ -100,10 +100,13 @@
                                 @else
                                 <td>
                                     @if (auth()->user()->hasRole('Admin'))
-                                        <a href="{{route('monster.edit', [
-                                                'monster' => $monster->id,
-                                        ])}}" class="btn btn-primary mt-2">Edit</a>
-                                        @if (!\Cache::has('processing-battle') && $testCharacters->isNotEmpty())
+                                        @if (!\Cache::has('processing-battle-' . $monster->id))
+                                            <a href="{{route('monster.edit', [
+                                                    'monster' => $monster->id,
+                                            ])}}" class="btn btn-primary mt-2">Edit</a>
+                                        @endif
+                                        
+                                        @if (!\Cache::has('processing-battle-' . $monster->id) && $testCharacters->isNotEmpty())
                                             <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#monster-test-{{$monster->id}}">
                                                 Test
                                             </button>
@@ -121,7 +124,7 @@
                                         @endforeach
                                     @endif
                                     @if(auth()->user()->hasRole('Admin'))
-                                        @if (!$published && !\Cache::has('processing-battle'))
+                                        @if (!$published && !\Cache::has('processing-battle-' . $monster->id))
                                             <x-forms.button-with-form 
                                                 form-route="{{route('monster.publish', ['monster' => $monster])}}"
                                                 form-id="publish-monster-{{$monster->id}}"
@@ -130,6 +133,10 @@
                                                 class="btn btn-success mt-2"
                                             />
                                         @endif
+                                    @endif
+
+                                    @if (\Cache::has('processing-battle-' . $monster->id))
+                                      Testing underway. We will email you when done.
                                     @endif
                                 </td>
                                 @endguest

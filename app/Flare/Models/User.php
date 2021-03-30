@@ -35,6 +35,7 @@ class User extends Authenticatable
         'adventure_email',
         'new_building_email',
         'upgraded_building_email',
+        'kingdoms_update_email',
         'is_test',
     ];
 
@@ -53,16 +54,17 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at'      => 'datetime',
-        'can_speak_again_at'     => 'datetime',
-        'is_silenced'            => 'boolean',
-        'message_throttle_count' => 'integer',
-        'is_banned'              => 'boolean',
-        'unbanned_at'            => 'datetime',
-        'adventure_email'        => 'boolean',
-        'new_building_email'     => 'boolean',
-        'is_test'                => 'boolean',
+        'email_verified_at'       => 'datetime',
+        'can_speak_again_at'      => 'datetime',
+        'is_silenced'             => 'boolean',
+        'message_throttle_count'  => 'integer',
+        'is_banned'               => 'boolean',
+        'unbanned_at'             => 'datetime',
+        'adventure_email'         => 'boolean',
+        'new_building_email'      => 'boolean',
+        'is_test'                 => 'boolean',
         'upgraded_building_email' => 'boolean',
+        'kingdoms_update_email'   => 'boolean',
     ];
 
     public function character() {

@@ -21,8 +21,11 @@ class SettingsController extends Controller {
 
     public function emailSettings(Request $request, User $user) {
         $user->update([
-            'adventure_email'       => $request->has('adventure_email'),
-            'new_building_email'    => $request->has('new_building_email'),
+            'adventure_email'         => $request->has('adventure_email'),
+            'new_building_email'      => $request->has('new_building_email'),
+            'kingdoms_update_email'   => $request->has('kingdoms_update_email'),
+            'new_building_email'      => $request->has('new_building_email'),
+            'upgraded_building_email' => $request->has('upgraded_building_email'),
         ]);
 
         return redirect()->back()->with('success', 'Updated email prefrences.');

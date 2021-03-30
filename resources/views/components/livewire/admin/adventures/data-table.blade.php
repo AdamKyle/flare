@@ -88,11 +88,13 @@
                                 @else
                                     @if (auth()->user()->hasRole('Admin'))  
                                         <td>
-                                            <a href="{{route('adventure.edit', [
-                                                'adventure' => $adventure->id,
-                                            ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+                                            @if (!\Cache::has('processing-adventure-' . $adventure->id))
+                                                <a href="{{route('adventure.edit', [
+                                                    'adventure' => $adventure->id,
+                                                ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+                                            @endif
 
-                                            @if (!$adventure->published)
+                                            @if (!$adventure->published && !\Cache::has('processing-adventure-' . $adventure->id))
                                                 <x-forms.button-with-form
                                                     form-route="{{route('adventure.publish', ['adventure' => $adventure])}}"
                                                     form-id="publish-adventure-{{$adventure->id}}"
@@ -100,7 +102,7 @@
                                                     class="btn btn-success mt-2"
                                                 />
                                             @endif
-                                            @if ($testCharacters->isNotEmpty())
+                                            @if ($testCharacters->isNotEmpty() && !\Cache::has('processing-adventure-' . $adventure->id))
                                                 @if ($canTest)
                                                     <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#adventure-test-{{$adventure->id}}">
                                                         Test
@@ -117,6 +119,10 @@
                                                         @break;
                                                     @endif
                                                 @endforeach
+                                            @endif
+
+                                            @if (\Cache::has('processing-adventure-' . $adventure->id))
+                                                Testing underway. We will email you when done.
                                             @endif
                                         </td>
                                     @endif 

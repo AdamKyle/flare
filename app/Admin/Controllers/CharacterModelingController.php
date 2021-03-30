@@ -187,13 +187,13 @@ class CharacterModelingController extends Controller {
             case 'monster':
                 // truncate all previous battle simulation reports.
                 DB::table('character_snap_shots')->update(['battle_simmulation_data' => null]);
-                Cache::put('processing-battle', true);
+                Cache::put('processing-battle-' . $request->model_id, true);
                 $route = route('monsters.list');
                 break;
             case 'adventure':
                 // truncate all previous battle simulation reports.
                 DB::table('character_snap_shots')->update(['adventure_simmulation_data' => null]);
-                Cache::put('processing-adventure', true);
+                Cache::put('processing-adventure-' . $request->model_id, true);
                 $route = route('adventures.list');
                 break;
         }

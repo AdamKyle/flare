@@ -11,11 +11,6 @@
         </div>
     </div>
     <hr />
-    @if ($isProcessingAdventure)
-        <div class="alert alert-info mb-2 mt-2">
-            You are currently proccesing an adventure. You will be emailed when it is done.
-        </div>
-    @endif
 
     @livewire('admin.adventures.data-table')
 

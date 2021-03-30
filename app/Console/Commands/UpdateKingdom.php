@@ -2,9 +2,14 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
+use Cache;
+use Mail;
 use Illuminate\Console\Command;
+use App\Flare\Models\Kingdom;
+use App\Flare\Models\User;
+use App\Game\Kingdoms\Mail\KingdomsUpdated;
+use App\Game\Kingdoms\Service\KingdomResourcesService;
+use Facades\App\Flare\Values\UserOnlineValue;
 
 class UpdateKingdom extends Command
 {
@@ -44,5 +49,35 @@ class UpdateKingdom extends Command
                 $service->setKingdom($kingdom)->updateKingdom();
             }
         });
+
+        User::chunkById(100, function($users) {
+            foreach ($users as $user) {
+                if (Cache::has('kingdoms-updated-' . $user->id)) {
+                    if ($user->kingdoms_update_email && !UserOnlineValue::isOnline($user)) {
+                        $kingdoms = $this->getKingdomEmailData(Cache::pull('kingdoms-updated-' . $user->id));
+
+                        Mail::to($user->email)->send(new KingdomsUpdated($user, $kingdoms));
+                    } else {
+                        Cache::delete('kingdoms-updated-' . $user->id);
+                    }
+                }
+            }
+        });
+    }
+
+    protected function getKingdomEmailData(array $kingdoms) {
+        $kingdomData = [];
+
+        foreach ($kingdoms as $kingdomId) {
+            $kingdom = Kingdom::find($kingdomId);
+
+            $kingdomData[] = [
+                'name'       => $kingdom->name,
+                'x_position' => $kingdom->x_position,
+                'y_position' => $kingdom->y_position,
+            ];
+        }
+
+        return $kingdomData;
     }
 }

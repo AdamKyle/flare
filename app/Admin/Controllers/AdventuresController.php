@@ -13,9 +13,7 @@ use Cache;
 class AdventuresController extends Controller {
 
     public function index() {
-        return view('admin.adventures.adventures', [
-            'isProcessingAdventure' => Cache::has('processing-adventure'),
-        ]);
+        return view('admin.adventures.adventures');
     }
 
     public function show(Adventure $adventure) {

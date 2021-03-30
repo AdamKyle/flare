@@ -134,7 +134,7 @@ class AdventureJob implements ShouldQueue
                 if ($this->sendEmail) {
                     Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your adventure simulation has completed. Login and see the details for adventure: ' . $this->adventure->name . '.', 'Adventure Simulation Results', false));
 
-                    Cache::delete('processing-adventure');
+                    Cache::delete('processing-adventure-' . $this->adventure->id);
                 }
             }
         }

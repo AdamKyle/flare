@@ -28,6 +28,18 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
+                            <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="kingdoms_update_email" value="1" {{$user->kingdoms_update_email ? 'checked' : ''}}>
+                            <label for="canSpeakAgain" class="form-check-label ml-2">Kingdoms Upgraded Email</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8 move-down-30 alert alert-info">
+                        By selecting this, you are saying you want to recieve an email about kingdoms that were updated.
+                        <p class="mt-2"><strong>Note:</strong>: Kingdoms are updated every hour with new resources, morale adjustments and population increases. You will only recieve one email.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check move-down-30">
                             <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="new_building_email" value="1" {{$user->new_building_email ? 'checked' : ''}}>
                             <label for="canSpeakAgain" class="form-check-label ml-2">New Building Email</label>
                         </div>

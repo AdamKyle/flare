@@ -14,7 +14,7 @@ Completed: {{$adventureLog->complete ? 'Yes' : 'No'}}
 Last level completed: {{$adventureLog->last_completed_level}}
 Total adventure levels: {{$adventureLog->adventure->levels}}
 
-Do not reply to this email. This was an automated message. If you want to stop recieveing these you can visit your settings page: and make the appropriate adjustments!</p>
+Do not reply to this email. This was an automated message. If you want to stop recieveing these you can visit your settings page: and make the appropriate adjustments!
 Your email is safe with us, we never use it for anything other then game related information.
 
 

@@ -57,7 +57,14 @@
                             sort-field="{{$sortField}}"
                             field="int_mod"
                         />
-                        
+                        @guest
+                        @else
+                            @if (auth()->user()->hasRole('Admin'))
+                                <x-data-tables.header-row>
+                                    Actions
+                                </x-data-tables.header-row>
+                            @endif
+                        @endguest
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($gameClasses as $class)
@@ -91,6 +98,16 @@
                                 <td>{{$class->dex_mod}} pts. </td>
                                 <td>{{$class->chr_mod}} pts. </td>
                                 <td>{{$class->int_mod}} pts. </td>
+                                @guest
+                                @else
+                                    @if (auth()->user()->hasRole('Admin'))
+                                        <td>
+                                            <a href="{{route('classes.edit', [
+                                                'class' => $class->id,
+                                            ])}}" class="btn btn-primary mt-2 btn-sm">Edit</a>
+                                        </td>
+                                    @endif
+                                @endguest
                             </tr>
                         @empty
                             <x-data-tables.no-results colspan="6" />

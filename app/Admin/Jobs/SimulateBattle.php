@@ -94,7 +94,7 @@ class SimulateBattle implements ShouldQueue
             if ($this->sendEmail) {
                 Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your simulation has completed. Login and see the details for the monster: ' . $this->monster->name . '.', 'Battle Simmulation Results', false));
                 
-                Cache::delete('processing-battle');
+                Cache::delete('processing-battle-' . $this->monster->id);
             }
         }
     }

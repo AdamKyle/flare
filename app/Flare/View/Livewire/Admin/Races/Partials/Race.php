@@ -2,11 +2,10 @@
 
 namespace App\Flare\View\Livewire\Admin\Races\Partials;
 
-use App\Admin\Jobs\UpdateCharacterStatsJob;
-use App\Admin\Services\UpdateCharacterStatsService;
-use App\Flare\Models\GameRace;
 use Cache;
 use Livewire\Component;
+use App\Admin\Services\UpdateCharacterStatsService;
+use App\Flare\Models\GameRace;
 
 class Race extends Component
 {
