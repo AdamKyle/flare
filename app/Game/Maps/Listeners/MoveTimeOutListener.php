@@ -17,7 +17,7 @@ class MoveTimeOutListener
     public function handle(MoveTimeOutEvent $event)
     {
         $character = $event->character;
-
+        
         if ($event->timeOut !== 0) {
             $timeOut = now()->addMinutes($event->timeOut);
 
@@ -39,7 +39,7 @@ class MoveTimeOutListener
             ]);
 
             $character = $character->refresh();
-
+            
             MoveTimeOutJob::dispatch($character)->delay($timeOut);
         }
         

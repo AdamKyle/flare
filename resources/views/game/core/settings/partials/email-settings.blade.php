@@ -29,7 +29,7 @@
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
                             <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="kingdoms_update_email" value="1" {{$user->kingdoms_update_email ? 'checked' : ''}}>
-                            <label for="canSpeakAgain" class="form-check-label ml-2">Kingdoms Upgraded Email</label>
+                            <label for="canSpeakAgain" class="form-check-label ml-2">Kingdoms Updated Email</label>
                         </div>
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
@@ -52,7 +52,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
-                            <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="upgraded_building_email" value="1" {{$user->new_building_email ? 'checked' : ''}}>
+                            <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="upgraded_building_email" value="1" {{$user->upgraded_building_email ? 'checked' : ''}}>
                             <label for="canSpeakAgain" class="form-check-label ml-2">Building Upgrade Email</label>
                         </div>
                     </div>

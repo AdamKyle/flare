@@ -183,7 +183,7 @@ class AdventureService {
         if (UserOnlineValue::isOnline($character->user)) {
             event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
             event(new ServerMessageEvent($character->user, 'adventure', 'The adventure took too long per floor. Check the logs for more info.'));
-        } else {
+        } else if ($character->user->adventure_email) {
             Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
         }
     }

@@ -48,6 +48,8 @@ class Race extends Component
             $oldRace = Cache::pull('race-' . $this->race->id);
 
             $message = 'Race: ' . $this->race->name . ' Updated. Applying to all characters who are this race.';
+
+            Cache::put('updating-characters', true);
             
             (new UpdateCharacterStatsService())->updateRacialStats($oldRace, $this->race->refresh());
         } else {

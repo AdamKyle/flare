@@ -42,7 +42,6 @@ class KingdomsUpdated extends Mailable
     public function build()
     {
         return $this->subject('Your kingdoms were updated!')
-                    ->view('game.core.kingdoms.mail.updated')
-                    ->text('game.core.kingdoms.mail.updated_text');
+                    ->view('game.core.kingdoms.mail.updated');
     }
 }

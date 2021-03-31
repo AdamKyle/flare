@@ -13,7 +13,7 @@
             'user' => $user,
         ])
         @include('game.core.settings.partials.email-settings', [
-            'user'        => $user,
+            'user' => $user,
         ])
         @include('game.core.settings.partials.security-questions', [
             'user' => $user,

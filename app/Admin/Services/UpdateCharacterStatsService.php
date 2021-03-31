@@ -2,8 +2,9 @@
 
 namespace App\Admin\Services;
 
-use App\Admin\Jobs\LevelTestCharacter;
 use Mail;
+use Cache;
+use App\Admin\Jobs\LevelTestCharacter;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Admin\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
@@ -11,6 +12,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
+
 
 class UpdateCharacterStatsService {
 
@@ -30,11 +32,21 @@ class UpdateCharacterStatsService {
         Character::where('game_race_id', $newRace->id)->chunkById(1000, function($characters) use($oldRace, $newRace) {
             foreach ($characters as $character) {
                 if ($character->user->is_test) {
+                    if (!Cache::has('updating-test-characters')) {
+                        Cache::put('updating-test-characters', true);
+                    }
+
                     $this->updateTestCharacterRace($character, $oldRace, $newRace);
                 } else {
                     $character = $this->updateCharacterStatsForRace($character, $oldRace, $newRace);
 
                     event(new UpdateTopBarEvent($character));
+                }
+                
+                $lastCharacter = Character::where('game_race_id', $newRace->id)->orderBy('id', 'desc')->first();
+
+                if ($character->id === $lastCharacter->id) {
+                    Cache::delete('updating-characters');
                 }
             }
         });
@@ -56,11 +68,21 @@ class UpdateCharacterStatsService {
         Character::where('game_class_id', $newClass->id)->chunkById(1000, function($characters) use($oldClass, $newClass) {
             foreach ($characters as $character) {
                 if ($character->user->is_test) {
+                    if (!Cache::has('updating-test-characters')) {
+                        Cache::put('updating-test-characters', true);
+                    }
+
                     $this->updateTestCharacterClass($character, $oldClass, $newClass);
                 } else {
                     $character = $this->updateCharacterStatsForClass($character, $oldClass, $newClass);
                     
                     $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
+                }
+
+                $lastCharacter = Character::where('game_class_id', $newClass->id)->orderBy('id', 'desc')->first();
+
+                if ($character->id === $lastCharacter->id) {
+                    Cache::delete('updating-characters');
                 }
             }
         });
@@ -73,7 +95,7 @@ class UpdateCharacterStatsService {
 
         $character = $this->updateCharacterStatsForRace($character->refresh(), $oldRace, $newRace);
 
-        LevelTestCharacter::dispatch($character)->delay(now()->addMinutes(1));
+        LevelTestCharacter::dispatch($character, 1000, auth()->user(), true)->delay(now()->addMinutes(1));
     }
 
     protected function updateCharacterStatsForRace(Character $character, GameRace $oldRace, GameRace $newRace): Character {
@@ -97,8 +119,8 @@ class UpdateCharacterStatsService {
         $character = $this->updateCharacterStatsForClass($character->refresh(), $oldClass, $newClass);
 
         $character = $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
-
-        LevelTestCharacter::dispatch($character)->delay(now()->addMinutes(1));
+        
+        LevelTestCharacter::dispatch($character, 1000, auth()->user())->delay(now()->addMinutes(1));
     }
 
     protected function updateCharacterStatsForClass(Character $character, GameClass $oldClass, GameClass $newClass): Character {

@@ -2,13 +2,11 @@
 
 namespace App\Game\Adventures\Listeners;
 
-use App\Flare\Events\ServerMessageEvent;
 use Cache;
 use Illuminate\Support\Str;
 use App\Game\Adventures\Jobs\AdventureJob;
 use App\Game\Adventures\Events\EmbarkOnAdventureEvent;
 use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
-use Illuminate\Support\Facades\Bus;
 
 class EmbarkOnAdventureListener
 {

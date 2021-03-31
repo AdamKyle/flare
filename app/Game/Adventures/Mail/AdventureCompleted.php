@@ -43,7 +43,6 @@ class AdventureCompleted extends Mailable
     public function build()
     {
         return $this->subject('An adventure has been completed!')
-                    ->view('game.core.adventures.mail.completed')
-                    ->text('game.core.adventures.mail.completed_text');
+                    ->view('game.core.adventures.mail.completed');
     }
 }

@@ -56,7 +56,6 @@ class GenericMail extends Mailable
     public function build()
     {
         return $this->subject($this->genericSubject)
-                    ->view('admin.email.generic_mail')
-                    ->text('admin.email.generic_mail_text');
+                    ->view('admin.email.generic_mail');
     }
 }

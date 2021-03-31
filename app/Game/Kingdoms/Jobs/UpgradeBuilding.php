@@ -127,7 +127,7 @@ class UpgradeBuilding implements ShouldQueue
             Mail::to($this->user)->send(new GenericMail(
                 $this->user,
                 $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,
-                'KingdomBuilding Upgrade Finished',
+                'Building Upgrade Finished',
             ));
         }
     }

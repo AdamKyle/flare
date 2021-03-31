@@ -46,7 +46,7 @@ class AdventureJob implements ShouldQueue
      */
     protected $characterModeling;
 
-    protected $adminUser;
+    protected $user;
 
     protected $sendEmail;
 
@@ -65,7 +65,7 @@ class AdventureJob implements ShouldQueue
         string $name, 
         int $currentLevel, 
         bool $characterModeling = false, 
-        User $adminUser = null, 
+        User $user = null, 
         bool $sendEmail = false
     ) {
         $this->character          = $character;
@@ -73,7 +73,7 @@ class AdventureJob implements ShouldQueue
         $this->name               = $name;
         $this->currentLevel       = $currentLevel;
         $this->characterModeling  = $characterModeling;
-        $this->adminUser          = $adminUser;
+        $this->user               = $user;
         $this->sendEmail          = $sendEmail;
     }
 
@@ -132,7 +132,7 @@ class AdventureJob implements ShouldQueue
                 );
                 
                 if ($this->sendEmail) {
-                    Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your adventure simulation has completed. Login and see the details for adventure: ' . $this->adventure->name . '.', 'Adventure Simulation Results', false));
+                    Mail::to($this->user->email)->send(new GenericMail($this->user, 'Your adventure simulation has completed. Login and see the details for adventure: ' . $this->adventure->name . '.', 'Adventure Simulation Results', false));
 
                     Cache::delete('processing-adventure-' . $this->adventure->id);
                 }

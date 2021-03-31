@@ -28,10 +28,12 @@ export default class Embezzel extends React.Component {
             axios.post('/api/kingdoms/embezel/' + this.props.kingdomId, {
                 embezzel_amount: this.state.totalToEmbezzel
             }).then((result) => {
+                const amountEmbzzeled = this.state.totalToEmbezzel;
+
                 this.setState({
                     totalToEmbezzel: 0,
                 }, () => {
-                    this.props.embezzeledSuccess();
+                    this.props.embezzeledSuccess(amountEmbzzeled);
                     this.props.close();
                 });
             }).catch((error) => {
@@ -95,7 +97,7 @@ export default class Embezzel extends React.Component {
                         <div className="form-group">
                             <label htmlFor="embezzel-amount">Embezzel Amount</label>
                             <input 
-                                type="amount" 
+                                type="number" 
                                 className="form-control" 
                                 id="embezzel-amount" 
                                 value={this.state.totalToEmbezzel} 

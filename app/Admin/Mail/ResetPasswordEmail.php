@@ -40,7 +40,6 @@ class ResetPasswordEmail extends Mailable
     public function build()
     {
         return $this->subject('Password Reset Requested')
-                    ->view('admin.email.password_reset')
-                    ->text('admin.email.password_reset_text');
+                    ->view('admin.email.password_reset');
     }
 }

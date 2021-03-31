@@ -178,7 +178,7 @@ class MovementService {
             'can_move'          => false,
             'can_move_again_at' => now()->addSeconds(10),
         ]);
-
+        
         event(new MoveTimeOutEvent($character));
     }
 

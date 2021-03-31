@@ -94,9 +94,13 @@
                                 @else
                                     @if (auth()->user()->hasRole('Admin'))
                                         <td>
-                                            <a href="{{route('races.edit', [
-                                                'race' => $race->id,
-                                            ])}}" class="btn btn-primary mt-2 btn-sm">Edit</a>
+                                            @if (!\Cache::has('updating-characters') && !\Cache::has('updating-test-characters')) 
+                                                <a href="{{route('races.edit', [
+                                                    'race' => $race->id,
+                                                ])}}" class="btn btn-primary mt-2 btn-sm">Edit</a>
+                                            @else
+                                                Currently updating all characters. You will be emailed when this is finished.
+                                            @endif
                                         </td>
                                     @endif
                                 @endguest
