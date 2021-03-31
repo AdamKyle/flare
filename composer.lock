@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dde01988572596d50b721dbfcde3cef5",
+    "content-hash": "1ab14ad33b1da59e16d0e39523cdd4e8",
     "packages": [
+        {
+            "name": "asahasrabuddhe/laravel-mjml",
+            "version": "0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/asahasrabuddhe/laravel-mjml.git",
+                "reference": "01e9620e96c01770b5f8a549ab6fd626e2d3fd8e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/asahasrabuddhe/laravel-mjml/zipball/01e9620e96c01770b5f8a549ab6fd626e2d3fd8e",
+                "reference": "01e9620e96c01770b5f8a549ab6fd626e2d3fd8e",
+                "shasum": ""
+            },
+            "require": {
+                "soundasleep/html2text": "~0.5",
+                "symfony/process": "^4.0|^5.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~3.6",
+                "php-coveralls/php-coveralls": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Asahasrabuddhe\\LaravelMJML\\Providers\\MJMLServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Asahasrabuddhe\\LaravelMJML\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Ajitem Sahasrabuddhe",
+                    "email": "ajitem.s@outlook.com"
+                }
+            ],
+            "description": "A package that enables using MJML with Laravel Mailables.",
+            "time": "2020-10-01T14:45:31+00:00"
+        },
         {
             "name": "beyondcode/laravel-websockets",
             "version": "1.11.1",
@@ -4662,6 +4707,56 @@
                 "uri"
             ],
             "time": "2018-05-29T20:21:04+00:00"
+        },
+        {
+            "name": "soundasleep/html2text",
+            "version": "0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/soundasleep/html2text.git",
+                "reference": "cdb89f6ffa2c4cc78f8ed9ea6ee0594a9133ccad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/soundasleep/html2text/zipball/cdb89f6ffa2c4cc78f8ed9ea6ee0594a9133ccad",
+                "reference": "cdb89f6ffa2c4cc78f8ed9ea6ee0594a9133ccad",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=4.0",
+                "soundasleep/component-tests": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Html2Text\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "EPL-1.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jevon Wright",
+                    "homepage": "https://jevon.org",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP script to convert HTML into a plain text format",
+            "homepage": "https://github.com/soundasleep/html2text",
+            "keywords": [
+                "email",
+                "html",
+                "php",
+                "text"
+            ],
+            "time": "2017-04-19T22:01:50+00:00"
         },
         {
             "name": "spatie/laravel-collection-macros",
