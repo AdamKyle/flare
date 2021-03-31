@@ -3,7 +3,7 @@
 namespace App\Game\Adventures\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Character;
@@ -43,6 +43,9 @@ class AdventureCompleted extends Mailable
     public function build()
     {
         return $this->subject('An adventure has been completed!')
-                    ->view('game.core.adventures.mail.completed');
+                    ->mjml('game.core.adventures.mail.completed', [
+                        'adventureLog' => $this->adventureLog,
+                        'character'    => $this->character,
+                    ]);
     }
 }

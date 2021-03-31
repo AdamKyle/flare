@@ -1,11 +1,11 @@
 <mjml>
     <mj-body>
 
-        <!-- Company Header -->
-        <mj-section background-color="#f0f0f0">
+        <!-- Header -->
+        <mj-section background-color="#8db9e0">
         <mj-column>
             <mj-text  font-style="bold"
-                        font-size="20px"
+                        font-size="24px"
                         color="#626262"
                         align="center">
                 {{$title}}
@@ -14,19 +14,23 @@
         </mj-section>
 
 
-        <!-- Introduction Text -->
-        <mj-section background-color="#fafafa">
+        <!-- Core Text -->
+        <mj-section background-color="#1a62a1">
             @yield('content')
             
         </mj-section>
 
-        <!-- Social icons -->
+        <!-- Footer Text -->
         @if (!is_null($showBottomText))
             @if ($showBottomText)
-                <mj-section background-color="#f0f0f0">
-                    <mj-text color="#525252" padding="10px 5px 5px 10px">
+                <mj-section background-color="#8db9e0">
+                    <mj-text color="#626262" padding="10px 5px 5px 10px">
                         Do not respond to this email. This was an automated message. If you would like to not recieve this email in the future. Please <a href="{{route('login')}}">login</a> and 
                         head to your settings section. From there you can disable specific types of emails.
+                    </mj-text>
+
+                    <mj-text color="#626262" padding="10px 5px 5px 10px" font-style="italic">
+                        Your email is safe with us. We will never use it for anything other then game related information.
                     </mj-text>
                 </mj-section>
             @endif

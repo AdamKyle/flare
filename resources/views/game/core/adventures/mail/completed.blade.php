@@ -1,35 +1,50 @@
-@extends('layouts.minimum')
+@extends('flare.email.core_email', [
+    'title'          => $adventureLog->adventure->name,
+    'showBottomText' => true,
+])
 
 @section('content')
-<div class="container justify-content-center">
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">{{$adventureLog->adventure->name}}</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('game.current.adventure')}}" class="btn btn-primary float-right ml-2">View Log</a>
-        </div>
-    </div>
-    
-    <div class="card" style="padding: 5px">
-        <p>Hello {{$character->name}}, some basic adventure information is listed below based on your latest adventure log.</p>
-        <p>You wen't logged in so we thought we would send you this email with the details below:</p>
-        <dl>
-            <dt>Completed:</dt>
-            <dd>{{$adventureLog->complete ? 'Yes' : 'No'}}</dd>
-            @if (!$adventureLog->complete)
-                <dt>Reason:</dt>
-                <dd>You died.</dd>
-            @endif
-            <dt>Last level completed:</dt>
-            <dd>{{$adventureLog->last_completed_level}}</dd>
-            <dt>Total adventure levels:</dt>
-            <dd>{{$adventureLog->adventure->levels}}</dd>
-        </dl>
-    </div>
-    <div class="bt-3">
-        <p class="text-muted">Do not reply to this email. This was an automated message. If you want to stop recieveing these you can visit your <a href="#">settings page</a> and make the appropriate adjustments!</p>
-        <p class="text-muted">Your email is safe with us, we never use it for anything other then game related information.</p>
-    </div>
-</div>
+    <mj-column width="400px">
+
+        <mj-text font-style="bold"
+                font-size="16px"
+                font-family="Helvetica Neue"
+                color="#ffffff"
+                align="center">
+            {{$adventureLog->adventure->name}} Has been {{$adventureLog->complete ? 'completed.' : 'lost.'}}
+        </mj-text>
+
+        <mj-text color="#dedede">
+            Hello {{$character->name}}, some basic adventure information is listed below based on your latest adventure log.
+        </mj-text>
+
+        <mj-text color="#dedede">
+            You weren't logged in so we thought we would send you this email with the details below:
+        </mj-text>
+
+        @if (!$adventureLog->complete)
+            <mj-text color="#dedede">
+                Reason for failing: You died. You will have to revive in order to emabrk on the adventure again.
+            </mj-text>
+        @endif
+
+        <mj-table>
+            <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+              <th style="padding: 0 15px 0 0;">Completed</th>
+              <th style="padding: 0 0 0 15px;">Last level Completed</th>
+              <th style="padding: 0 0 0 15px;">Total Levels</th>
+            </tr>
+            <tr>
+              <td style="padding: 0 15px 0 0;">{{$adventureLog->complete ? 'Yes' : 'No'}}</td>
+              <td style="padding: 0 0 0 15px;">{{$adventureLog->last_completed_level}}</td>
+              <td style="padding: 0 0 0 15px;">{{$adventureLog->adventure->levels}}</td>
+            </tr>
+          </mj-table>
+
+        <mj-button background-color="#1a3e66"
+                href="{{route('login')}}">
+            Login!
+        </mj-button>
+
+    </mj-column>
 @endsection
