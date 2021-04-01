@@ -18,6 +18,14 @@
             {{$user->banned_reason}}
         </mj-text>
 
+        <mj-text color="#dedede">
+            Request:
+        </mj-text>
+
+        <mj-text color="#dedede">
+            {{$user->un_ban_request}}
+        </mj-text>
+
         <mj-button background-color="#388a2d"
                    href="{{route('login')}}">
             Login

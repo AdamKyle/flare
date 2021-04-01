@@ -45,7 +45,7 @@ class UpgradedBuilding extends Mailable
         return $this->subject('Upgraded Building')
                     ->mjml('game.core.kingdoms.mail.upgraded', [
                         'user'        => $this->user,
-                        'kingdomData' => $this->building,
+                        'building'    => $this->building,
                     ]);
     }
 }

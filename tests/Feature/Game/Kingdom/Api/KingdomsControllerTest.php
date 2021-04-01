@@ -6,10 +6,11 @@ use DB;
 use Mail;
 use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Mail\GenericMail;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
+use App\Game\Kingdoms\Mail\RebuiltBuilding;
+use App\Game\Kingdoms\Mail\RecruitedUnits;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateKingdomBuilding;
@@ -242,7 +243,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertNotEquals(0, $building->current_durability);
         $this->assertEquals(300, $building->current_durability);
 
-        Mail::assertSent(GenericMail::class);
+        Mail::assertSent(RebuiltBuilding::class);
     } 
 
     public function testCannotRebuildKingdomBuildingNotEnoughResources() {
@@ -422,7 +423,7 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-
+        
         $this->assertEquals(200, $response->status());
     }
 
@@ -592,7 +593,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertTrue($kingdom->units->isNotEmpty());
         $this->assertEquals(5, $kingdom->units->first()->amount);
 
-        Mail::assertSent(GenericMail::class, 1);
+        Mail::assertSent(RecruitedUnits::class, 1);
     }
     public function testRecruitAdditionalUnits() {
         $kingdom = $this->createKingdom([

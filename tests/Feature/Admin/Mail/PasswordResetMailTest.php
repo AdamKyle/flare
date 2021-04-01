@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Admin\Mail;
 
-use App\Admin\Mail\ResetPasswordEmail;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mail;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Admin\Mail\ResetPasswordEmail;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
@@ -42,8 +42,6 @@ class PasswordResetMailTest extends TestCase
             'user' => $this->user->id
         ]));
 
-        Mail::assertSent(function (ResetPasswordEmail $mail) {
-            return $mail->user->id === $this->user->id && $mail->hasTo($this->user->email);
-        });
+        Mail::assertSent(ResetPasswordEmail::class);
     } 
 }

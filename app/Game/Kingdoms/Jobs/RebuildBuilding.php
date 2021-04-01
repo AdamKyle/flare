@@ -12,7 +12,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
