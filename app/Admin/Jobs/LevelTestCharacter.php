@@ -2,7 +2,7 @@
 
 namespace App\Admin\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

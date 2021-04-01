@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 
 
 class UpdateBannedUserJob implements ShouldQueue

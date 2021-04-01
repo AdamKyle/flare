@@ -2,19 +2,19 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Mail\RecruitedUnits;
 use Facades\App\Flare\Values\UserOnlineValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -118,10 +118,11 @@ class RecruitUnits implements ShouldQueue
             event(new UpdateKingdom($user, $kingdom));
             event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' you have a total of: ' . $amount));
         } else {
-            Mail::to($user)->send(new GenericMail(
+            Mail::to($user)->send(new RecruitedUnits(
                 $user,
-                $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' you have a total of: ' . $amount,
-                'Unit Recruitment Finished: ' . $this->unit->name,
+                $this->unit,
+                $this->kingdom,
+                $amount,
             ));
         }
     }

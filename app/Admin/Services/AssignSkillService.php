@@ -2,7 +2,7 @@
 
 namespace App\Admin\Services;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;

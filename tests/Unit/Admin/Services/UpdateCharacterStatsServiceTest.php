@@ -5,7 +5,7 @@ namespace Tests\Unit\Admin\Services;
 use DB;
 use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;

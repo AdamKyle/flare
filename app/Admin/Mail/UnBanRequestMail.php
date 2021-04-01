@@ -3,9 +3,8 @@
 namespace App\Admin\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Flare\Models\User;
 
 class UnBanRequestMail extends Mailable
@@ -36,7 +35,6 @@ class UnBanRequestMail extends Mailable
     public function build()
     {
         return $this->subject('UnBan Request from: ' . $this->user->character->name)
-                    ->view('flare.email.unban_request')
-                    ->text('flare.email.unban_request_text');
+                    ->mjml('flare.email.unban_request');
     }
 }

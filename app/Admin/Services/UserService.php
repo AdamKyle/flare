@@ -6,7 +6,7 @@ use Mail;
 use App\Flare\Models\User;
 use App\Admin\Events\BannedUserEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Game\Messages\Events\MessageSentEvent;
 
 

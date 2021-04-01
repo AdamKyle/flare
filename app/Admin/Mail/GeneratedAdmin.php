@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Flare\Mail;
+namespace App\Admin\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\User;
 
@@ -42,7 +42,9 @@ class GeneratedAdmin extends Mailable
     public function build()
     {
         return $this->subject('Game Administrator Account Created')
-                    ->view('flare.email.admin_generated')
-                    ->text('flare.email.admin_generated_text');
+                    ->mjml('admin.mail.admin_generated', [
+                        'user'  => $this->user,
+                        'token' => $this->token,
+                    ]);
     }
 }

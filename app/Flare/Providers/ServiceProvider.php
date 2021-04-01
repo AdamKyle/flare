@@ -2,13 +2,13 @@
 
 namespace App\Flare\Providers;
 
+
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Console\Commands\CreateAdminAccount;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Middleware\IsPlayerBannedMiddleware;
@@ -108,8 +108,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(FightService::class, function($app, $paramters) {
             return new FightService($paramters['character'], $paramters['monster']);
         });
-
-        $this->commands([CreateAdminAccount::class]);
     }
 
     /**

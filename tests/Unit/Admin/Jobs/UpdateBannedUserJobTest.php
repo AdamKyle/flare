@@ -3,7 +3,7 @@
 namespace Tests\Unit\Admin\Jobs;
 
 use App\Admin\Jobs\UpdateBannedUserJob;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mail;
 use Tests\TestCase;

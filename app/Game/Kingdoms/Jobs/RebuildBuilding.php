@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
 use Illuminate\Bus\Queueable;
@@ -16,6 +16,7 @@ use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Mail\RebuiltBuilding;
 use Facades\App\Flare\Values\UserOnlineValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -98,10 +99,9 @@ class RebuildBuilding implements ShouldQueue
             event(new UpdateKingdom($this->user, $kingdom));
             event(new ServerMessageEvent($this->user, 'building-repair-finished', $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '.'));
         } else if ($this->user->upgraded_building_email) {
-            Mail::to($this->user)->send(new GenericMail(
+            Mail::to($this->user)->send(new RebuiltBuilding(
                 $this->user,
-                $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '.',
-                'A KingdomBuilding Was Rebuilt',
+                $this->building
             ));
         }
     }

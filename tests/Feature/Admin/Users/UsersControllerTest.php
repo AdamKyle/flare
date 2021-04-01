@@ -6,7 +6,7 @@ use Event;
 use Mail;
 use Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;

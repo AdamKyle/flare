@@ -1,4 +1,5 @@
 import React from 'react';
+import {OverlayTrigger, Popover} from 'react-bootstrap';
 
 export default class UnitData extends React.Component {
 
@@ -75,6 +76,25 @@ export default class UnitData extends React.Component {
                             <dd className={this.getClass('attack', this.props.amount)}>{this.calculateAmount('attack', this.props.amount)}</dd>
                             <dd><strong>Defence</strong>:</dd>
                             <dd className={this.getClass('defence', this.props.amount)}>{this.calculateAmount('defence', this.props.amount)}</dd>
+                            <dd><strong>Healing Percentage</strong>:</dd>
+                            <dd>{this.props.unit.heal_percentage * 100}% 
+                                <OverlayTrigger
+                                    trigger="click"
+                                    key='right'
+                                    placement='right'
+                                    overlay={
+                                        <Popover id={`popover-positioned-right`}>
+                                            <Popover.Title as="h3">Healing Percentage</Popover.Title>
+                                            <Popover.Content>
+                                                <p>The percentage shown is for one unit. One unit will heal the total percentage of all units.</p>
+                                                <p>Stacking (sending multiple) will increase healing amount.</p>
+                                            </Popover.Content>
+                                        </Popover>
+                                    }
+                                >
+                                    <i className="fas fa-question-circle ml-2"></i>
+                                </OverlayTrigger>
+                            </dd>
                             <dd><strong>Is Siege Weapon?</strong>:</dd>
                             <dd>{this.props.unit.seige_weapon ? 'Yes' : 'No'}</dd>
                             <dd><strong>Can Heal?</strong>:</dd>

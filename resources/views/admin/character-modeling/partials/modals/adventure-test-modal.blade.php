@@ -20,9 +20,8 @@
                     come back here and see the results of that adventure.
                 <p>
                 <p>
-                    Adventures can only be done once. This is because they run at the time per 
-                    level you stated. It is advised for testing that you reduce that time to 
-                    1 minute per level.
+                    Adventures can only be done once. This is because adventures may have multiple levels
+                    and take a long time to run.
                 </p>
             </div>
             @include('admin.character-modeling.partials.modals.partials.form', [

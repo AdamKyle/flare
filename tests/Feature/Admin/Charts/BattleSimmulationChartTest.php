@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Charts;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

@@ -4,6 +4,7 @@ namespace App\Admin\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use ConsoleTVs\Charts\Registrar as Charts;
+use App\Admin\Console\Commands\CreateAdminAccount;
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
@@ -35,6 +36,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UserService::class, function($app) {
             return new UserService();
         });
+
+        $this->commands([CreateAdminAccount::class]);
     }
 
     /**

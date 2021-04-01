@@ -11,7 +11,7 @@ use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Flare\Events\ServerMessageEvent;
 use App\Admin\Events\ForceNameChangeEvent;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Admin\Mail\ResetPasswordEmail;
 use App\Admin\Services\UserService;
 

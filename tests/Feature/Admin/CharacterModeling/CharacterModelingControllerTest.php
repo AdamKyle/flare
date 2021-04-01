@@ -3,7 +3,7 @@
 namespace Tests\Feature\Admin\CharacterModeling;
 
 use App\Admin\Jobs\RunTestSimulation;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterSnapShot;
 use App\Flare\Models\User;

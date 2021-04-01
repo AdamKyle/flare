@@ -2,7 +2,7 @@
 
 namespace App\Game\Adventures\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Adventure;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

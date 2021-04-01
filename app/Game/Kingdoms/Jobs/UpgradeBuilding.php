@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
 use Illuminate\Bus\Queueable;
@@ -15,6 +15,7 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Mail\UpgradedBuilding;
 use Facades\App\Flare\Values\UserOnlineValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -124,10 +125,9 @@ class UpgradeBuilding implements ShouldQueue
             event(new UpdateKingdom($this->user, $kingdom));
             event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level));
         } else if ($this->user->upgraded_building_email) {
-            Mail::to($this->user)->send(new GenericMail(
+            Mail::to($this->user)->send(new UpgradedBuilding(
                 $this->user,
-                $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level,
-                'Building Upgrade Finished',
+                $this->building
             ));
         }
     }

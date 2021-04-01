@@ -30,18 +30,18 @@
 
         <mj-table>
             <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
-              <th style="padding: 0 15px 0 0;">Completed</th>
-              <th style="padding: 0 0 0 15px;">Last level Completed</th>
-              <th style="padding: 0 0 0 15px;">Total Levels</th>
+              <th style="padding: 0 15px 0 0;color:#ffffff;">Completed</th>
+              <th style="padding: 0 0 0 15px;color:#ffffff;">Last level Completed</th>
+              <th style="padding: 0 0 0 15px;color:#ffffff;">Total Levels</th>
             </tr>
             <tr>
-              <td style="padding: 0 15px 0 0;">{{$adventureLog->complete ? 'Yes' : 'No'}}</td>
-              <td style="padding: 0 0 0 15px;">{{$adventureLog->last_completed_level}}</td>
-              <td style="padding: 0 0 0 15px;">{{$adventureLog->adventure->levels}}</td>
+              <td style="padding: 0 15px 0 0;color:#ffffff;">{{$adventureLog->complete ? 'Yes' : 'No'}}</td>
+              <td style="padding: 0 0 0 15px;color:#ffffff;">{{$adventureLog->last_completed_level}}</td>
+              <td style="padding: 0 0 0 15px;color:#ffffff;">{{$adventureLog->adventure->levels}}</td>
             </tr>
           </mj-table>
 
-        <mj-button background-color="#1a3e66"
+        <mj-button background-color="#388a2d"
                 href="{{route('login')}}">
             Login!
         </mj-button>

@@ -6,7 +6,7 @@ use Mail;
 use Cache;
 use App\Admin\Jobs\LevelTestCharacter;
 use Facades\App\Flare\Values\UserOnlineValue;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;

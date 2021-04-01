@@ -1,31 +1,34 @@
-@extends('layouts.minimum')
+@extends('flare.email.core_email', [
+    'title'          => 'Kingdoms Have Been Updated',
+    'showBottomText' => true,
+])
 
 @section('content')
-<div class="container justify-content-center">
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">Kingdoms</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('login')}}" class="btn btn-primary float-right ml-2">Login!</a>
-        </div>
-    </div>
-    
-    <div class="card" style="padding: 5px">
-        <p>Hello {{$user->character->name}}, the following are a list of kingdoms that have been updated.</p>
-        <dl>
-            @foreach ($kingdomData as $kingdoms)
-                <dt><strong>Name</strong>:</dt>
-                <dd>{{$kingdoms['name']}}</dd>
+    <mj-column width="400px">
 
-                <dt><strong>X/Y</strong>:</dt>
-                <dd>{{$kingdoms['x_position']}}/{{$kingdoms['y_position']}}</dd>
+        <mj-text color="#dedede">
+            Hello {{$user->character->name}}, the following are a list of kingdoms that have been updated.
+        </mj-text>
+
+        <mj-table>
+            <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+              <th style="padding: 0 15px 0 0;color:#ffffff;">Kingdom Name</th>
+              <th style="padding: 0 0 0 15px;color:#ffffff;">X Position</th>
+              <th style="padding: 0 0 0 15px;color:#ffffff;">Y Position</th>
+            </tr>
+            @foreach ($kingdomData as $kingdom)
+                <tr>
+                    <td style="padding: 0 15px 0 0;color:#ffffff;">{{$kingdom['name']}}</td>
+                    <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom['x_position']}}</td>
+                    <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom['y_position']}}</td>
+                </tr>
             @endforeach
-        </dl>
-    </div>
-    <div class="bt-3">
-        <p class="text-muted">Do not reply to this email. This was an automated message. If you want to stop recieveing these you can visit your <a href="#">settings page</a> and make the appropriate adjustments!</p>
-        <p class="text-muted">Your email is safe with us, we never use it for anything other then game related information.</p>
-    </div>
-</div>
+        </mj-table>
+
+        <mj-button background-color="#388a2d"
+                href="{{route('login')}}">
+            Login!
+        </mj-button>
+
+    </mj-column>
 @endsection

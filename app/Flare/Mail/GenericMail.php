@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Admin\Mail;
+namespace App\Flare\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\User;
 
@@ -56,6 +56,11 @@ class GenericMail extends Mailable
     public function build()
     {
         return $this->subject($this->genericSubject)
-                    ->view('admin.email.generic_mail');
+                    ->mjml('flare.email.generic_mail', [
+                        'user'           => $this->user,
+                        'genericMessage' => $this->genericMessage,
+                        'genericSubject' => $this->genericSubject,
+                        'dontShowLogin'  => $this->dontShowLogin
+                    ]);
     }
 }

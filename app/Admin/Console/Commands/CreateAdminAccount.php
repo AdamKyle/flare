@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Console\Commands;
+namespace App\Admin\Console\Commands;
 
 use Hash;
 use Illuminate\Console\Command;

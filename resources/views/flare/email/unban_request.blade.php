@@ -1,20 +1,27 @@
-@extends('layouts.minimum')
+@extends('flare.email.core_email', [
+    'title'          => 'Request to be unbanned.'
+    'showBottomText' => false,
+])
 
 @section('content')
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">{{$user->character->name}} Requesting to be unbanned</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('login')}}" class="btn btn-primary float-right ml-2">Login</a>
-        </div>
-    </div>
+    <mj-column width="400px">
 
-    <div class="card" style="padding: 5px">
-        <p><strong>Original Reason:</strong> {{$user->banned_reason}}</p>
+        <mj-text color="#dedede">
+            Hello Administrator, {{$user->character->name}} is requesting to be unbanned.
+        </mj-text>
 
-        <p clas="mt-2"><strong>Request</strong></p>
-        <hr />
-        <p>{{$user->un_ban_request}}</p>
-    </div>
+        <mj-text color="#dedede">
+            Original Reason:
+        </mj-text>
+
+        <mj-text color="#dedede">
+            {{$user->banned_reason}}
+        </mj-text>
+
+        <mj-button background-color="#388a2d"
+                   href="{{route('login')}}">
+            Login
+        </mj-button>
+
+    </mj-column>
 @endsection

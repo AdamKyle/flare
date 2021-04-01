@@ -183,24 +183,26 @@ export default class KingdomInfo extends React.Component {
                     </div>
                 </div>
                 <hr />
-                <div className="row">
-                    <div className="col-md-4">
-                        <dl>
-                            <dt><strong>Morale Increase/hr</strong>:</dt>
-                            <dd>{this.getTotalMoraleIncreasePerHour()}%</dd>
-                        </dl>
-                    </div>
-                    <div className="col-md-4">
-                        <dl>
-                            <dt><strong>Morale Decrease/hr</strong>:</dt>
-                            <dd>{this.getTotalMoraleDecreasePerHour()}%</dd>
-                        </dl>
-                    </div>
-                    <div className="col-md-4">
-                        <dl>
-                        <dt><strong>Population Increase/hr</strong>:</dt>
-                            <dd>{this.getResourceIncrease('population_increase')}</dd>
-                        </dl> 
+                <div style={{backgroundColor: 'rgb(174 212 234)', padding: '20px'}}>
+                    <div className="row">
+                        <div className="col-md-4">
+                            <dl>
+                                <dt><strong>Morale Increase/hr</strong>:</dt>
+                                <dd>{this.getTotalMoraleIncreasePerHour()}%</dd>
+                            </dl>
+                        </div>
+                        <div className="col-md-4">
+                            <dl>
+                                <dt><strong>Morale Decrease/hr</strong>:</dt>
+                                <dd>{this.getTotalMoraleDecreasePerHour()}%</dd>
+                            </dl>
+                        </div>
+                        <div className="col-md-4">
+                            <dl>
+                            <dt><strong>Population Increase/hr</strong>:</dt>
+                                <dd>{this.getResourceIncrease('population_increase')}</dd>
+                            </dl> 
+                        </div>
                     </div>
                 </div>
                 <Embezzel 

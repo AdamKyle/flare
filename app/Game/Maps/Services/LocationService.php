@@ -126,7 +126,7 @@ class LocationService {
                 $this->portDetails = $this->portService->getPortDetails($character, $this->location);
             }
             
-            $this->adventureDetails = $this->location->adventures;
+            $this->adventureDetails = $this->location->adventures()->where('published', true)->get();
         }
     }
 

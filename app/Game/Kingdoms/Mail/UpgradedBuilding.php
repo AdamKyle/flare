@@ -2,12 +2,13 @@
 
 namespace App\Game\Kingdoms\Mail;
 
+use App\Flare\Models\KingdomBuilding;
 use Illuminate\Bus\Queueable;
 use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\User;
 
-class KingdomsUpdated extends Mailable
+class UpgradedBuilding extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -17,9 +18,9 @@ class KingdomsUpdated extends Mailable
     public $user;
 
     /**
-     * @var array $kingdomData
+     * @var KingdomBuilding $building
      */
-    public $kingdomData;
+    public $building;
 
     /**
      * Create a new message instance.
@@ -28,10 +29,10 @@ class KingdomsUpdated extends Mailable
      * @param array $kingdomData
      * @return void
      */
-    public function __construct(User $user, array $kingdomData)
+    public function __construct(User $user, KingdomBuilding $building)
     {
-        $this->user        = $user;
-        $this->kingdomData = $kingdomData;
+        $this->user     = $user;
+        $this->building = $building;
     }
 
     /**
@@ -41,10 +42,10 @@ class KingdomsUpdated extends Mailable
      */
     public function build()
     {
-        return $this->subject('Your kingdoms were updated!')
-                    ->mjml('game.core.kingdoms.mail.updated', [
+        return $this->subject('Upgraded Building')
+                    ->mjml('game.core.kingdoms.mail.upgraded', [
                         'user'        => $this->user,
-                        'kingdomData' => $this->kingdomData,
+                        'kingdomData' => $this->building,
                     ]);
     }
 }

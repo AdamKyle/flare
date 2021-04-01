@@ -6,7 +6,7 @@ use Mail;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Admin\Jobs\UpdateKingdomBuildings;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateGameBuilding;

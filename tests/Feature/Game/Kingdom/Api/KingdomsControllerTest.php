@@ -6,7 +6,7 @@ use DB;
 use Mail;
 use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;

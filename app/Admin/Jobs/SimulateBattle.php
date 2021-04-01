@@ -2,7 +2,7 @@
 
 namespace App\Admin\Jobs;
 
-use App\Admin\Mail\GenericMail;
+use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;

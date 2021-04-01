@@ -23,7 +23,7 @@ class UnitTransformer extends TransformerAbstract {
             'attack'               => $unit->attack,
             'defence'              => $unit->defence,
             'can_heal'             => $unit->can_heal,
-            'heal_amount'          => $unit->heal_amount,
+            'heal_percentage'      => $unit->heal_percentage,
             'siege_weapon'         => $unit->siege_weapon,
             'attacker'             => $unit->attacker,
             'defender'             => $unit->defender,
