@@ -17,8 +17,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
-                            <input id="adventure" class="form-check-input" type="checkbox" data-toggle="toggle" name="adventure_email" value="1" {{$user->adventure_email ? 'checked' : ''}}>
-                            <label for="adventure" class="form-check-label ml-2">Adventure Emails</label>
+                            <input id="adventureEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="adventure_email" value="1" {{$user->adventure_email ? 'checked' : ''}}>
+                            <label for="adventureEmail" class="form-check-label ml-2">Adventure Emails</label>
                         </div>
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
@@ -28,8 +28,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
-                            <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="kingdoms_update_email" value="1" {{$user->kingdoms_update_email ? 'checked' : ''}}>
-                            <label for="canSpeakAgain" class="form-check-label ml-2">Kingdoms Updated Email</label>
+                            <input id="kingdomsUpdatedEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="kingdoms_update_email" value="1" {{$user->kingdoms_update_email ? 'checked' : ''}}>
+                            <label for="kingdomsUpdatedEmail" class="form-check-label ml-2">Kingdoms Updated Email</label>
                         </div>
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
@@ -40,8 +40,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
-                            <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="new_building_email" value="1" {{$user->new_building_email ? 'checked' : ''}}>
-                            <label for="canSpeakAgain" class="form-check-label ml-2">New Building Email</label>
+                            <input id="newBuildingEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="new_building_email" value="1" {{$user->new_building_email ? 'checked' : ''}}>
+                            <label for="newBuildingEmail" class="form-check-label ml-2">New Building Email</label>
                         </div>
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
@@ -52,8 +52,8 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
-                            <input id="canSpeakAgain" class="form-check-input" type="checkbox" data-toggle="toggle" name="upgraded_building_email" value="1" {{$user->upgraded_building_email ? 'checked' : ''}}>
-                            <label for="canSpeakAgain" class="form-check-label ml-2">Building Upgrade Email</label>
+                            <input id="upgradedBuildingEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="upgraded_building_email" value="1" {{$user->upgraded_building_email ? 'checked' : ''}}>
+                            <label for="upgradedBuildingEmail" class="form-check-label ml-2">Building Upgrade Email</label>
                         </div>
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
@@ -61,7 +61,18 @@
                         <p class="mt-2"><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each.</p>
                     </div>
                 </div>
-
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check move-down-30">
+                            <input id="rebuiltBuildingEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="rebuilt_building_email" value="1" {{$user->rebuilt_building_email ? 'checked' : ''}}>
+                            <label for="rebuiltBuildingEmail" class="form-check-label ml-2">Building Rebuilt Email</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8 move-down-30 alert alert-info">
+                        By Selecting this, you are saying that, when a building is rebuilt you would like to recieve an email.
+                        <p class="mt-2"><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each.</p>
+                    </div>
+                </div>
                 <div class="row mb-0">
                     <div class="col-md-6 ml-3">
                         <button type="submit" class="btn btn-primary">

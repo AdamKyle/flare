@@ -40,6 +40,7 @@ class UserFactory extends Factory
             'is_test'                 => true,
             'new_building_email'      => true,
             'upgraded_building_email' => true,
+            'rebuilt_building_email'  => true,
         ];
     }
 }
