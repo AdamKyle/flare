@@ -15,10 +15,10 @@ class CreateGameMaps extends Migration
     {
         Schema::create('game_maps', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
             $table->string('name');
             $table->string('path');
             $table->boolean('default')->nullable()->default(false);
+            $table->timestamps();
         });
     }
 

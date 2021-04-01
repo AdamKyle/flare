@@ -22,6 +22,7 @@ class CreateMarketBoard extends Migration
             $table->foreign('item_id')
                   ->references('id')->on('items');
             $table->integer('listed_price');
+            $table->boolean('is_locked')->nullable()->default(false);
             $table->timestamps();
         });
     }

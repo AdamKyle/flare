@@ -28,6 +28,12 @@ class CreateUsersTable extends Migration
             $table->dateTime('unbanned_at')->nullable();
             $table->string('banned_reason')->nullable();
             $table->string('un_ban_request')->nullable();
+            $table->boolean('adventure_email')->nullable()->default(true);
+            $table->boolean('new_building_email')->nullabel()->default(true);
+            $table->boolean('upgraded_building_email')->nullable()->default(true);
+            $table->boolean('kingdoms_update_email')->nullable()->default(true);
+            $table->boolean('rebuilt_building_email')->nullable()->default(true);
+            $table->boolean('is_test')->nullable()->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
