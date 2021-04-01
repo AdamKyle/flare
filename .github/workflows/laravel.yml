@@ -17,6 +17,7 @@ jobs:
       run: |
         rm -rf vendor
         composer install
+        yarn install
     - name: Generate key
       run: php artisan key:generate
     - name: Link Storage
