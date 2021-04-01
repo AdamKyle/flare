@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Str;
-use App\Flare\Mail\GeneratedAdmin;
+use App\Admin\Mail\GeneratedAdmin;
 use App\Flare\Models\User;
 
 class CreateAdminAccount extends Command

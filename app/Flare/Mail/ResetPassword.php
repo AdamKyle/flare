@@ -1,27 +1,37 @@
 <?php
 
-namespace App\Admin\Mail;
+namespace App\Flare\Mail;
 
 use Illuminate\Bus\Queueable;
-use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use App\Flare\Models\User;
 
-class ResetPasswordEmail extends Mailable
+class ResetPassword extends Mailable
 {
     use Queueable, SerializesModels;
+
+    /**
+     * @var User $user
+     */
+    public $user;
 
     /**
      * @var string $token
      */
     public $token;
 
+
     /**
      * Create a new message instance.
      *
+     * @param User $user
+     * @param string $token
      * @return void
      */
-    public function __construct(string $token)
+    public function __construct(User $user, string $token)
     {
+        $this->user  = $user;
         $this->token = $token;
     }
 
@@ -32,8 +42,8 @@ class ResetPasswordEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Password Reset Requested')
-                    ->mjml('admin.email.password_reset', [
+        return $this->subject('Password reset')
+                    ->view('flare.email.password_reset', [
                         'token' => $this->token,
                     ]);
     }

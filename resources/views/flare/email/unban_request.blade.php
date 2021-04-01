@@ -1,5 +1,5 @@
 @extends('flare.email.core_email', [
-    'title'          => 'Request to be unbanned.'
+    'title'          => 'Request to be unbanned',
     'showBottomText' => false,
 ])
 

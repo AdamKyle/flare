@@ -2,18 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use Mail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
+use App\Admin\Events\ForceNameChangeEvent;
+use App\Admin\Mail\ResetPasswordEmail;
+use App\Admin\Services\UserService;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Flare\Events\ServerMessageEvent;
-use App\Admin\Events\ForceNameChangeEvent;
 use App\Flare\Mail\GenericMail;
-use App\Admin\Mail\ResetPasswordEmail;
-use App\Admin\Services\UserService;
+use App\Flare\Jobs\SendOffEmail;
 
 class UsersController extends Controller {
 
@@ -29,15 +27,11 @@ class UsersController extends Controller {
 
     public function resetPassword(User $user) {
 
-        $password = Str::random(80);
-
-        $user->update([
-            'password' => Hash::make($password)
-        ]);
-
         $token = app('Password')::getRepository()->create($user);
 
-        Mail::to($user->email)->send(new ResetPasswordEmail($user, $token));
+        $mailable = new ResetPasswordEmail($token);
+
+        SendOffEmail::dispatch($user, $mailable)->delay(now()->addMinutes(1));
 
         return redirect()->back()->with('success', $user->character->name . ' password reset email sent.');
     }
@@ -137,13 +131,18 @@ class UsersController extends Controller {
             'ban_reason'     => null,
         ]);
 
-        Mail::to($user->email)->send(new GenericMail($user, 'You are now unbanned and may log in again.', 'You have been unbanned'));
+        $mailable = new GenericMail($user, 'You are now unbanned and may log in again.', 'You have been unbanned');
+
+        SendOffEmail::dispatch($user, $mailable)->delay(now()->addMinutes(1));
 
         return redirect()->back()->with('success', 'User has been unbanned.');
     }
 
     public function ignoreUnBanRequest(Request $request, User $user) {
-        Mail::to($user->email)->send(new GenericMail($user, 'This is to inform you that your request to be unbanned has been denied. All decisions are final. Future requests will be ignored.', 'Your request has been denied', true));
+
+        $mailable = new GenericMail($user, 'This is to inform you that your request to be unbanned has been denied. All decisions are final. Future requests will be ignored.', 'Your request has been denied', true);
+
+        SendOffEmail::dispatch($user, $mailable)->delay(now()->addMinutes(1));
 
         return redirect()->back()->with('success', 'User request to be unbanned was ignored. Email has been sent.');
     }

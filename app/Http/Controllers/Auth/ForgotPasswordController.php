@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Flare\Models\User;
-use App\Http\Controllers\Controller;
 use Cache;
 use Hash;
+use Mail;
+use Password;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
-use Password;
+use App\Flare\Mail\ResetPassword;
+use App\Flare\Models\User;
+use App\Http\Controllers\Controller;
 
 class ForgotPasswordController extends Controller
 {
@@ -74,17 +76,12 @@ class ForgotPasswordController extends Controller
             return redirect()->back()->with('error', 'The answer to one or more security questions does not match our records.');
         }
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $response = $this->broker()->sendResetLink(
-            $this->credentials($request)
-        );
+        $token = app('Password')::getRepository()->create($user);
+
+        Mail::to($user->email)->send(new ResetPassword($user, $token));
 
         Cache::delete($user->id . '-email');
 
-        return $response == Password::RESET_LINK_SENT
-                    ? redirect()->to('/')->with('success', 'Sent you an email to begin the reset process.')
-                    : redirect()->to('/')->with('error', 'Failed to send link.');
+        return redirect()->to('/')->with('success', 'Sent you an email to begin the reset process.');
     }
 }
