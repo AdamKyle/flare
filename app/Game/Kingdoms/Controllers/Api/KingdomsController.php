@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\BuildingInQueue;
+use App\Game\Kingdoms\Requests\KingdomRenameRequest;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -46,21 +47,33 @@ class KingdomsController extends Controller {
     }
 
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {
-        $kingdomService->setParams($request->all());
+        $kingdomService->setParams($request->all(), $character);
 
         if (!$kingdomService->canSettle($request->x_position, $request->y_position)) {
             return response()->json([
                 'message' => 'Cannot settle here.'
             ], 422);
         }
-        
+
         $kingdom = $kingdomService->createKingdom($character);
 
         return response()->json(
             $kingdomService->addKingdomToMap(
                 $character, $kingdom, $this->kingdom, $this->manager
-            ), 
+            ),
         200);
+    }
+
+    public function rename(KingdomRenameRequest $request, Kingdom $kingdom, KingdomService $kingdomService) {
+        $kingdom->update($request->all());
+
+        $kingdomData  = new Item($kingdom->refresh(), $this->kingdom);
+
+        $kingdomData  = $this->manager->createData($kingdomData)->toArray();
+
+        event(new UpdateKingdom($kingdom->character->user, $kingdomData));
+
+        return response()->json([], 200);
     }
 
     public function upgradeKingdomBuilding(Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
@@ -72,7 +85,7 @@ class KingdomsController extends Controller {
         }
 
         $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
-        
+
         $buildingService->upgradeKingdomBuilding($building, $character);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
@@ -154,7 +167,7 @@ class KingdomsController extends Controller {
                 'message' => 'Your units are almost done. You can\'t cancel this late in the process.'
             ], 422);
         }
-        
+
         return response()->json([], 200);
     }
 
@@ -169,7 +182,7 @@ class KingdomsController extends Controller {
         if (is_null($queue)) {
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
-        
+
         $canceled = $service->cancelKingdomBuildingUpgrade($queue, $this->manager, $this->kingdom);
 
         if (!$canceled) {

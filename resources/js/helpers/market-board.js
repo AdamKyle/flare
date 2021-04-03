@@ -4,19 +4,19 @@ import Board from '../components/marketboard/board';
 
 /**
  * Helper to render the market board.
- * 
- * @param {Number} id 
+ *
+ * @param {Number} id
  */
 function renderBoard(id) {
-    const marketBoard = document.getElementById(id);
-    const character   = document.head.querySelector('meta[name="character"]');
-    const itemId      = document.querySelector('#'+id).dataset.itemId;
-    
+  const marketBoard = document.getElementById(id);
+  const character = document.head.querySelector('meta[name="character"]');
+  const itemId = document.querySelector('#' + id).dataset.itemId;
 
-    render(
-        <Board characterId={character.content} itemId={parseInt(itemId)} allowBuying={false} />,
-        marketBoard
-    );
+
+  render(
+    <Board characterId={character.content} itemId={parseInt(itemId)} allowBuying={false}/>,
+    marketBoard
+  );
 }
 
 window.renderBoard = renderBoard;

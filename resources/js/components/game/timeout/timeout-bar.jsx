@@ -1,6 +1,6 @@
 import React from 'react';
-import moment, { max } from 'moment';
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import moment, {max} from 'moment';
+import {CountdownCircleTimer} from "react-countdown-circle-timer";
 
 const renderTime = value => {
   if (value === 0) {
@@ -31,8 +31,8 @@ export default class TimeOutBar extends React.Component {
     let maxTimeOut = 0;
 
     if (this.props.timeRemaining !== null) {
-      let now    = moment();
-      let then   = moment(this.props.timeRemaining);
+      let now = moment();
+      let then = moment(this.props.timeRemaining);
 
       let duration = moment.duration(then.diff(now));
 
@@ -46,7 +46,7 @@ export default class TimeOutBar extends React.Component {
 
     this.echo.listen(this.props.eventClass, (event) => {
       let forLength = event.hasOwnProperty('timeout') ? event.timeout : 10;
-      
+
       if (event.hasOwnProperty('forLength')) {
         if (event.forLength !== 0) {
 
@@ -63,7 +63,7 @@ export default class TimeOutBar extends React.Component {
           }
         }
       }
-      
+
       this.setState({
         maxTimeOut: event.activatebar ? forLength : 0,
         active: event.activatebar,
@@ -77,8 +77,8 @@ export default class TimeOutBar extends React.Component {
 
   fetchTimer() {
     const maxTimeOut = this.state.maxTimeOut;
-    const isHours    = (maxTimeOut / 3600) > 1;
-    const isMinutes  = (maxTimeOut / 60) > 1;
+    const isHours = (maxTimeOut / 3600) > 1;
+    const isMinutes = (maxTimeOut / 60) > 1;
 
     if (isHours) {
       return (
@@ -92,7 +92,7 @@ export default class TimeOutBar extends React.Component {
             strokeWidth={2}
             onComplete={() => [false, 0]}
           >
-            {({ remainingTime }) => (remainingTime / 3600).toFixed(0)}
+            {({remainingTime}) => (remainingTime / 3600).toFixed(0)}
           </CountdownCircleTimer>
           <div>Hours</div>
         </div>
@@ -109,7 +109,7 @@ export default class TimeOutBar extends React.Component {
             strokeWidth={2}
             onComplete={() => [false, 0]}
           >
-            {({ remainingTime }) => (remainingTime / 60).toFixed(0)}
+            {({remainingTime}) => (remainingTime / 60).toFixed(0)}
           </CountdownCircleTimer>
           <div>Minutes</div>
         </div>
@@ -126,7 +126,7 @@ export default class TimeOutBar extends React.Component {
             strokeWidth={2}
             onComplete={() => [false, 0]}
           >
-            {({ remainingTime }) => remainingTime}
+            {({remainingTime}) => remainingTime}
           </CountdownCircleTimer>
           <div>Seconds</div>
         </div>
@@ -143,7 +143,7 @@ export default class TimeOutBar extends React.Component {
       )
     }
 
-    return(
+    return (
       <>{this.fetchTimer()}</>
     );
   }

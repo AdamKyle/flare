@@ -17,7 +17,7 @@ class KingdomTransformer extends TransformerAbstract {
 
     /**
      * Gets the response data for the character sheet
-     * 
+     *
      * @param Character $character
      * @return mixed
      */
@@ -28,7 +28,7 @@ class KingdomTransformer extends TransformerAbstract {
             'character_id'       => $kingdom->character_id,
             'game_map_id'        => $kingdom->game_map_id,
             'name'               => $kingdom->name,
-            'color'              => $this->getHexColor($kingdom->color),
+            'color'              => $kingdom->color,
             'max_stone'          => $kingdom->max_stone,
             'max_wood'           => $kingdom->max_wood,
             'max_clay'           => $kingdom->max_clay,
@@ -44,15 +44,11 @@ class KingdomTransformer extends TransformerAbstract {
             'current_morale'     => $kingdom->current_morale,
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasury,
-            'building_queue'     => $kingdom->buildingsQueue,   
-            'unit_queue'         => $kingdom->unitsQueue,  
-            'current_units'      => $kingdom->units,  
-            'unit_movement'      => $kingdom->unitsMovementQueue,  
+            'building_queue'     => $kingdom->buildingsQueue,
+            'unit_queue'         => $kingdom->unitsQueue,
+            'current_units'      => $kingdom->units,
+            'unit_movement'      => $kingdom->unitsMovementQueue,
         ];
-    }
-
-    protected function getHexColor(array $color) {
-        return sprintf("#%02x%02x%02x", $color[0], $color[1], $color[2]);
     }
 
     protected function includeBuildings(Kingdom $kingdom) {
@@ -71,7 +67,7 @@ class KingdomTransformer extends TransformerAbstract {
                                      ->where('required_level', '<=', $building->level)
                                      ->get();
 
-            
+
             foreach($units as $unit) {
                 $unit = GameUnit::find($unit->game_unit_id);
 

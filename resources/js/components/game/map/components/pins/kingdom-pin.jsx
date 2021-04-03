@@ -1,4 +1,4 @@
-import React        from 'react';
+import React from 'react';
 import KingdomModal from '../modals/kingdom-modal';
 
 export default class KingdomPin extends React.Component {
@@ -34,7 +34,7 @@ export default class KingdomPin extends React.Component {
       let style = {
         top: kingdom.y_position,
         left: kingdom.x_position,
-        '--kingdom-color': this.convertToHex(kingdom.color)
+        '--kingdom-color': kingdom.color
       };
 
       return (
@@ -50,29 +50,21 @@ export default class KingdomPin extends React.Component {
     });
   }
 
-  convertToHex(rgba) {
-    if (Array.isArray(rgba)) {
-      return `#${((1 << 24) + (parseInt(rgba[0]) << 16) + (parseInt(rgba[1]) << 8) + parseInt(rgba[2])).toString(16).slice(1)}`
-    } else {
-      return rgba; // already a hex ...
-    }
-  }
-
   render() {
     return (
       <>
         {this.renderKingdoms()}
 
-        { 
+        {
           this.state.openKingdomModal ?
-            <KingdomModal 
-              kingdom={this.state.kingdom} 
-              show={this.state.openKingdomModal} 
-              close={this.closeKingdomModal.bind(this)} 
-              characterId={this.props.characterId} 
+            <KingdomModal
+              kingdom={this.state.kingdom}
+              show={this.state.openKingdomModal}
+              close={this.closeKingdomModal.bind(this)}
+              characterId={this.props.characterId}
               disableMapButtons={this.props.disableMapButtons}
             />
-          : null
+            : null
         }
       </>
     )

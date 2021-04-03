@@ -25,7 +25,7 @@ class KingdomService {
 
     /**
      * constructor
-     * 
+     *
      * @param KingdomBuilder $builder
      * @return void
      */
@@ -35,21 +35,24 @@ class KingdomService {
 
     /**
      * Sets the params for the kingdom.
-     * 
+     *
      * @param array $params
+     * @param Character $character
      * @return void
      */
-    public function setParams(array $params): void {
-        $kingdomParams = $params;
+    public function setParams(array $params, Character $character): void {
+        $params['color'] = $character->map->gameMap->kingdom_color;
 
-        $kingdomParams['color'] = array_values($kingdomParams['color']);
+        $this->builder->setRequestAttributes($params);
+    }
 
-        $this->builder->setRequestAttributes($kingdomParams);
+    public function renameKingdom(Kingdom $kingdom, Character $character, array $params) {
+
     }
 
     /**
      * Creates the kingdom for the character.
-     * 
+     *
      * @param Character $character
      * @return Kingdom
      */
@@ -65,23 +68,23 @@ class KingdomService {
 
     /**
      * Can the character settle here?
-     * 
+     *
      * No if there is a kingdom there.
      * No if there is a location there.
-     * 
+     *
      * @param int $x
      * @param int $y
      * @return bool
      */
     public function canSettle(int $x, int $y): bool {
         $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->first();
-        
+
         if (!is_null($kingdom)) {
             return false;
         }
 
         $location = Location::where('x', $x)->where('y', $y)->first();
-        
+
         if (!is_null($location)) {
             return false;
         }
@@ -91,14 +94,14 @@ class KingdomService {
 
     /**
      * Sends off an event to the front end.
-     * 
+     *
      * This will update the current map to add a kingdom at the players location.
-     * 
+     *
      * @param Character $character
      * @param Kingdom $kingdom
      * @param KingdomTransformer $transformer
      * @param Manager $manager
-     * 
+     *
      * @return array
      */
     public function addKingdomToMap(Character $character, Kingdom $kingdom, KingdomTransformer $transfromer, Manager $manager): array {

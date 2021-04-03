@@ -6,7 +6,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Traits\HasRoles;
-use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
 use Database\Factories\UserFactory;
 
@@ -20,9 +19,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 
+        'email',
         'password',
-        'game_key', 
+        'game_key',
         'private_game_key',
         'message_throttle_count',
         'can_speak_again_at',

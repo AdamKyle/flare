@@ -20,10 +20,19 @@ class UpdateKingdomBuildings implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var GameBuilding $gameBuilding
+     */
     public $gameBuilding;
 
+    /**
+     * @var array $selectedUnits
+     */
     public $selectedUnits;
 
+    /**
+     * @var int|null $levels
+     */
     public $levels;
 
     /**
@@ -38,13 +47,14 @@ class UpdateKingdomBuildings implements ShouldQueue
     }
 
     /**
-     * 
+     * Job handler.
+     *
      * @return void
      */
-    public function handle(UpdateKingdomsService $service) {
+    public function handle() {
         $query = KingdomBuilding::where('game_building_id', $this->gameBuilding->id);
 
-        $this->reassignUnits($service);
+        $this->reassignUnits();
 
         if ($query->get()->isEmpty()) {
             // If no kingdom has this building:
@@ -52,7 +62,7 @@ class UpdateKingdomBuildings implements ShouldQueue
                 foreach($kingdoms as $kingdom) {
                     $kingdom->buildings()->create([
                         'game_building_id'    => $this->gameBuilding->id,
-                        'kingdom_id'         => $kingdom->id,
+                        'kingdom_id'          => $kingdom->id,
                         'level'               => 1,
                         'current_defence'     => $this->gameBuilding->base_defence,
                         'current_durability'  => $this->gameBuilding->base_durability,
@@ -66,7 +76,7 @@ class UpdateKingdomBuildings implements ShouldQueue
                     $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
                     if (UserOnlineValue::isOnline($user)) {
-                        
+
                         event(new ServerMessageEvent($user, 'new-building', $message));
                     } else if ($user->new_building_email) {
                         Mail::to($user->email)->send(new GenericMail($character->user, $message, 'New KingdomBuilding!'));
@@ -74,28 +84,66 @@ class UpdateKingdomBuildings implements ShouldQueue
                 }
             });
         } else {
-            // If kingdoms do not have this building:
             $query->chunkById(1000, function($buildings) {
                 foreach($buildings as $building) {
-                    UpdateKingdomBuilding::dispatch($building)->delay(now()->addMinutes(1));
+                    UpdateKingdomBuilding::dispatch($building, $this->gameBuilding)->delay(now()->addMinutes(1));
                 }
             });
         }
     }
 
-    public function reassignUnits(UpdateKingdomsService $service) {
+    /**
+     * Reassigns the units to a building.
+     *
+     * @return void
+     */
+    protected function reassignUnits(): void {
         if (empty($this->selectedUnits)) {
             return;
         }
-        
+
         if ($this->gameBuilding->units->isNotEmpty()) {
             foreach($this->gameBuilding->units as $unit) {
                 $unit->delete();
             }
         }
-        
-        $service->assignUnits($this->gameBuilding->refresh(), $this->selectedUnits, $this->levels);
+
+        $this->assignUnits($this->gameBuilding->refresh(), $this->selectedUnits, $this->levels);
 
         $this->gameBuilding = $this->gameBuilding->refresh();
+    }
+
+    /**
+     * Assigns the units to the building.
+     *
+     * @param GameBuilding $gameBuilding
+     * @param array $selectedUnits
+     * @param int $levels
+     * @return void
+     */
+    private function assignUnits(GameBuilding $gameBuilding, array $selectedUnits, int $levels): void {
+        $gameBuilding->units()->create([
+            'game_building_id' => $gameBuilding->id,
+            'game_unit_id'     => $selectedUnits[0],
+            'required_level'   => !is_null($gameBuilding->only_at_level) ? $gameBuilding->only_at_level : 1,
+        ]);
+
+        unset($selectedUnits[0]);
+
+        $initialLevel = 1;
+
+        if (empty($selectedUnits)) {
+            return;
+        }
+
+        foreach($selectedUnits as $unitId) {
+            $initialLevel += $levels;
+
+            $gameBuilding->units()->create([
+                'game_building_id' => $gameBuilding->id,
+                'game_unit_id'     => $unitId,
+                'required_level'   => $initialLevel,
+            ]);
+        }
     }
 }

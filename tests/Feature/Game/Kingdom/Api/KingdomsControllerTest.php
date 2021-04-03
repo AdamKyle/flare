@@ -29,7 +29,7 @@ class KingdomsControllerTest extends TestCase
         CreateGameUnit;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
@@ -53,9 +53,9 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-       
-        $this->assertEquals(200, $response->status());     
-        
+
+        $this->assertEquals(200, $response->status());
+
         $this->assertEquals('Sample', $content->name);
     }
 
@@ -72,11 +72,11 @@ class KingdomsControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
         $this->assertTrue(!empty($content));
         $this->assertTrue(Cache::has('character-kingdoms-' . $this->character->getCharacter()->id));
-        
+
         $this->assertTrue(
             $this->character->getCharacter()->kingdoms->first()->buildings->isNotEmpty()
         );
@@ -97,11 +97,11 @@ class KingdomsControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
         $this->assertTrue(!empty($content));
         $this->assertEquals(2, count(Cache::get('character-kingdoms-' . $this->character->getCharacter()->id)));
-        
+
         $this->assertTrue(
             $this->character->getCharacter()->kingdoms->first()->buildings->isNotEmpty()
         );
@@ -117,7 +117,6 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
         $this->assertEquals('The given data was invalid.', $content->message);
         $this->assertTrue(!empty($content->errors->name));
-        $this->assertTrue(!empty($content->errors->color));
         $this->assertTrue(!empty($content->errors->x_position));
         $this->assertTrue(!empty($content->errors->y_position));
     }
@@ -180,7 +179,7 @@ class KingdomsControllerTest extends TestCase
             'payload'      => '1',
             'last_activity'=> 1602801731,
         ]]);
-        
+
         $this->createKingdom([
             'character_id' => 1,
             'game_map_id'  => 1,
@@ -202,11 +201,11 @@ class KingdomsControllerTest extends TestCase
             'character'  => 1,
             'building'   => 1,
         ]))->response;
-        
+
         $this->assertEquals(200, $response->status());
 
         $building = Kingdom::first()->buildings->first();
-        
+
         $this->assertNotEquals(0, $building->current_durability);
         $this->assertEquals(300, $building->current_durability);
     }
@@ -235,16 +234,16 @@ class KingdomsControllerTest extends TestCase
             'character'  => 1,
             'building'   => 1,
         ]))->response;
-        
+
         $this->assertEquals(200, $response->status());
 
         $building = Kingdom::first()->buildings->first();
-        
+
         $this->assertNotEquals(0, $building->current_durability);
         $this->assertEquals(300, $building->current_durability);
 
         Mail::assertSent(RebuiltBuilding::class);
-    } 
+    }
 
     public function testCannotRebuildKingdomBuildingNotEnoughResources() {
         $this->createKingdom([
@@ -273,7 +272,7 @@ class KingdomsControllerTest extends TestCase
             'character'  => 1,
             'building'   => 1,
         ]))->response;
-        
+
         $this->assertEquals(422, $response->status());
 
         $content = json_decode($response->content());
@@ -281,7 +280,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals('You don\'t have the resources.', $content->message);
 
         $building = Kingdom::first()->buildings->first();
-        
+
         $this->assertEquals(0, $building->current_durability);
     }
 
@@ -302,7 +301,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(0, Kingdom::first()->treasury);
     }
-    
+
     public function testCannotEmbezzelMissingParam() {
         $this->createKingdom([
             'character_id' => 1,
@@ -395,7 +394,7 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
     }
 
@@ -423,7 +422,7 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
     }
 

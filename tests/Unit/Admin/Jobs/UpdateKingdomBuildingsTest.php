@@ -16,7 +16,7 @@ use Tests\Traits\CreateKingdom;
 class UpdateKingdomBuildingsTest extends TestCase
 {
     use RefreshDatabase, CreateKingdom, CreateGameBuilding, CreateGameUnit;
-    
+
 
     public function testAddKingdomBuildingToKingdom()
     {
@@ -98,7 +98,7 @@ class UpdateKingdomBuildingsTest extends TestCase
         $building = $this->createGameBuilding([
             'max_level' => 30
         ]);
-        
+
         $unit = $this->createGameUnit();
 
         $building->units()->create([
@@ -122,10 +122,10 @@ class UpdateKingdomBuildingsTest extends TestCase
         $kingdom  = $kingdom->refresh();
         $building = $kingdom->buildings->first();
 
-        $this->assertTrue($building->current_defence > 100);
-        $this->assertTrue($building->current_durability > 100);
-        $this->assertTrue($building->max_defence > 100);
-        $this->assertTrue($building->max_durability > 100);
+        $this->assertEquals($building->current_defence, 200);
+        $this->assertEquals($building->current_durability, 100);
+        $this->assertEquals($building->max_defence, 200);
+        $this->assertEquals($building->max_durability, 200);
 
         Mail::assertNotSent(GenericMail::class);
     }

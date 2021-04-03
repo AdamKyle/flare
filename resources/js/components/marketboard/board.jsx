@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import ReactDatatable from '@ashvin27/react-datatable';
 import Card from '../game/components/templates/card';
@@ -76,20 +76,20 @@ export default class Board extends Component {
       if (!this.state.hasItemId) {
         this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
           let hasId = false;
-  
+
           if (!_.isEmpty(this.state.modalData)) {
             hasId = _.isEmpty(event.marketListings.filter((ml) => ml.id === this.state.modalData.id));
           }
-  
+
           if (this.state.showModal && hasId) {
             this.closeModal();
-  
+
             this.setState({
               message: 'Sorry, that item was sold.',
               messageType: 'info',
             });
           }
-  
+
           this.setState({
             records: event.marketListings,
             gold: event.characterGold,
@@ -142,7 +142,7 @@ export default class Board extends Component {
         type: null,
       });
     }
-    
+
 
     axios.get('/api/market-board/items', params).then((result) => {
       this.setState({
@@ -186,25 +186,25 @@ export default class Board extends Component {
         customButtonType="drop-down"
         buttonTitle="Types"
         buttons={[
-          { type:'reset', name: 'Reset Filter'},
-          { type:'weapon', name: 'Weapon'},
-          { type:'body', name: 'Body'},
-          { type:'shield', name: 'Shield'},
-          { type:'feet', name: 'Feet'},
-          { type:'leggings', name: 'Leggings'},
-          { type:'sleeves', name: 'Sleeves'},
-          { type:'helmet', name: 'Helmet'},
-          { type:'gloves', name: 'Gloves'},
-          { type:'spell-damage', name: 'Spell Damage'},
-          { type:'spell-healing', name: 'Spell Healing'},
-          { type:'ring', name: 'Ring'},
-          { type:'artifact', name: 'Artifact'},
+          {type: 'reset', name: 'Reset Filter'},
+          {type: 'weapon', name: 'Weapon'},
+          {type: 'body', name: 'Body'},
+          {type: 'shield', name: 'Shield'},
+          {type: 'feet', name: 'Feet'},
+          {type: 'leggings', name: 'Leggings'},
+          {type: 'sleeves', name: 'Sleeves'},
+          {type: 'helmet', name: 'Helmet'},
+          {type: 'gloves', name: 'Gloves'},
+          {type: 'spell-damage', name: 'Spell Damage'},
+          {type: 'spell-healing', name: 'Spell Healing'},
+          {type: 'ring', name: 'Ring'},
+          {type: 'artifact', name: 'Artifact'},
         ]}
         onChange={this.typeChange.bind(this)}
       >
-        { this.state.message !== null ? this.renderMessage() : null }
-        
-        { !this.state.hasItemId && this.state.allowBuying ? <MarketHistory  type={this.state.type} /> : null }
+        {this.state.message !== null ? this.renderMessage() : null}
+
+        {!this.state.hasItemId && this.state.allowBuying ? <MarketHistory type={this.state.type}/> : null}
 
         <ReactDatatable
           config={this.config}
@@ -213,8 +213,8 @@ export default class Board extends Component {
           onRowClicked={this.rowClickedHandler.bind(this)}
         />
 
-        {this.state.showModal ? 
-          <PurchaseModal 
+        {this.state.showModal ?
+          <PurchaseModal
             closeModal={this.closeModal.bind(this)}
             showModal={this.state.showModal}
             modalData={this.state.modalData}
@@ -229,7 +229,7 @@ export default class Board extends Component {
 }
 
 const marketBoard = document.getElementById('market');
-const character   = document.head.querySelector('meta[name="character"]');
+const character = document.head.querySelector('meta[name="character"]');
 
 if (marketBoard !== null) {
   ReactDOM.render(

@@ -22,9 +22,10 @@ class GameMapFactory extends Factory
     public function definition()
     {
         return [
-            'name'    => 'Sample',
-            'path'    => 'path',
-            'default' => true,
+            'name'          => 'Sample',
+            'path'          => 'path',
+            'default'       => true,
+            'kingdom_color' => '#ffffff',
         ];
     }
 }

@@ -85,7 +85,7 @@ class ResetPasswordControllerTest extends TestCase
                 'password_confirmation' => $password
              ])->submitForm('Reset and Login', [
                 'question_one'          => 'Whats your favourite movie?',
-                'question_two'          => 'Whats the name of the town you grew up in?', 
+                'question_two'          => 'Whats the name of the town you grew up in?',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])->see('Manage Kingdoms');
@@ -104,7 +104,7 @@ class ResetPasswordControllerTest extends TestCase
                 'password_confirmation' => $password
              ])->submitForm('Reset and Login', [
                 'question_one'          => 'Whats your favourite movie?',
-                'question_two'          => 'Whats your favourite movie?', 
+                'question_two'          => 'Whats your favourite movie?',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])->see('Security questions need to be unique.');
@@ -123,7 +123,7 @@ class ResetPasswordControllerTest extends TestCase
                 'password_confirmation' => $password
              ])->submitForm('Reset and Login', [
                 'question_one'          => 'Whats the name of the town you grew up in?',
-                'question_two'          => 'Whats your favourite movie?', 
+                'question_two'          => 'Whats your favourite movie?',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test',
              ])->see('Security questions answers need to be unique.');
@@ -146,7 +146,7 @@ class ResetPasswordControllerTest extends TestCase
                 'password_confirmation' => $password
              ])->submitForm('Reset and Login', [
                 'question_one'          => 'Whats the name of the town you grew up in?',
-                'question_two'          => 'Whats your favourite movie?', 
+                'question_two'          => 'Whats your favourite movie?',
                 'answer_one'            => 'test3',
                 'answer_two'            => 'test',
              ])->see('Unable to process password reset. Please start again by following the forgot password link on the login page.');

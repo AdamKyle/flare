@@ -1,17 +1,17 @@
-import React              from 'react';
-import {Row, Col}         from 'react-bootstrap';
-import Draggable          from 'react-draggable';
+import React from 'react';
+import {Row, Col} from 'react-bootstrap';
+import Draggable from 'react-draggable';
 import {getServerMessage} from '../helpers/server_message';
 import {
-  getNewXPosition, 
+  getNewXPosition,
   getNewYPosition,
   dragMap
-}                         from './helpers/map_position';
-import CardLoading        from '../components/loading/card-loading';
+} from './helpers/map_position';
+import CardLoading from '../components/loading/card-loading';
 import MapMovementActions from './components/map-movement-actions';
-import MapActions         from './components/map-actions';
-import Locations          from './components/locations';
-import KingdomPin         from './components/pins/kingdom-pin';
+import MapActions from './components/map-actions';
+import Locations from './components/locations';
+import KingdomPin from './components/pins/kingdom-pin';
 
 export default class Map extends React.Component {
 
@@ -133,7 +133,7 @@ export default class Map extends React.Component {
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
       this.updatePlayerPosition(event.map);
-      
+
       this.setState({
         currentPort: event.portDetails.current_port,
         portList: event.portDetails.port_list,
@@ -166,7 +166,7 @@ export default class Map extends React.Component {
         }
       });
     });
-    
+
     this.addKingomToMap.listen('Game.Kingdoms.Events.AddKingdomToMap', (event) => {
       const kingdoms = _.cloneDeep(this.state.kingdoms);
 
@@ -239,8 +239,8 @@ export default class Map extends React.Component {
   updatePlayerPosition(position) {
     const characterX = position.character_position_x;
     const characterY = position.character_position_y;
-    const mapX       = position.position_x;
-    const mapY       = position.position_y;
+    const mapX = position.position_x;
+    const mapY = position.position_y;
 
     this.setState({
       characterPosition: {x: characterX, y: characterY},
@@ -273,7 +273,10 @@ export default class Map extends React.Component {
         portList: result.data.port_details.hasOwnProperty('port_list') ? result.data.port_details.port_list : [],
         adventures: result.data.adventure_details,
         characterPosition: {x, y},
-        controlledPosition: {x: getNewXPosition(x, this.state.controlledPosition.x), y: getNewYPosition(y, this.state.controlledPosition.y)},
+        controlledPosition: {
+          x: getNewXPosition(x, this.state.controlledPosition.x),
+          y: getNewYPosition(y, this.state.controlledPosition.y)
+        },
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -314,7 +317,7 @@ export default class Map extends React.Component {
 
   render() {
     if (this.state.isLoading) {
-      return <CardLoading />
+      return <CardLoading/>
     }
 
     return (
@@ -322,52 +325,53 @@ export default class Map extends React.Component {
         <div className="card-body">
           <div className="map-body">
             <Draggable
-               position={this.state.controlledPosition}
-               bounds={{top: -160, left: -100, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
-               handle=".handle"
-               defaultPosition={{x: 0, y: 0}}
-               grid={[16, 16]}
-               scale={1}
-               onStart={this.handleStart}
-               onDrag={this.handleDrag.bind(this)}
-               onStop={this.handleStop}
+              position={this.state.controlledPosition}
+              bounds={{top: -160, left: -100, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+              handle=".handle"
+              defaultPosition={{x: 0, y: 0}}
+              grid={[16, 16]}
+              scale={1}
+              onStart={this.handleStart}
+              onDrag={this.handleDrag.bind(this)}
+              onStop={this.handleStop}
             >
-            <div>
-              <div className="handle game-map" style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
-                <Locations locations={this.state.locations} />
-                <KingdomPin 
-                  kingdoms={this.state.kingdoms} 
-                  characterId={this.state.characterId}
-                  disableMapButtons={this.disableMapButtons.bind(this)}
-                />
-                <div className="map-x-pin" style={this.playerIcon()}></div>
+              <div>
+                <div className="handle game-map"
+                     style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
+                  <Locations locations={this.state.locations}/>
+                  <KingdomPin
+                    kingdoms={this.state.kingdoms}
+                    characterId={this.state.characterId}
+                    disableMapButtons={this.disableMapButtons.bind(this)}
+                  />
+                  <div className="map-x-pin" style={this.playerIcon()}></div>
+                </div>
               </div>
-            </div>
-           </Draggable>
-         </div>
-         <div className="character-position mt-2">
-          <div className="mb-2 mt-2 clearfix">
-            <MapActions 
-              adventures={this.state.adventures}
-              currentPort={this.state.currentPort}
-              characterPosition={this.state.characterPosition}
-              disableMapButtons={this.disableMapButtons.bind(this)}
-              openAdventureDetails={this.openAdventureDetails.bind(this)}
-              openPortDetails={this.openPortDetails.bind(this)}
-              openTeleport={this.openTeleport.bind(this)}
-            />
+            </Draggable>
           </div>
-         </div>
-         <hr />
-         <MapMovementActions 
-          isDead={this.state.isDead}
-          isAdventuring={this.state.isAdventuring}
-          disableMapButtons={this.disableMapButtons.bind(this)}
-          characterPosition={this.state.characterPosition}
-          timeRemaining={this.state.timeRemaining}
-          move={this.move.bind(this)}
-          userId={this.props.userId}
-         />
+          <div className="character-position mt-2">
+            <div className="mb-2 mt-2 clearfix">
+              <MapActions
+                adventures={this.state.adventures}
+                currentPort={this.state.currentPort}
+                characterPosition={this.state.characterPosition}
+                disableMapButtons={this.disableMapButtons.bind(this)}
+                openAdventureDetails={this.openAdventureDetails.bind(this)}
+                openPortDetails={this.openPortDetails.bind(this)}
+                openTeleport={this.openTeleport.bind(this)}
+              />
+            </div>
+          </div>
+          <hr/>
+          <MapMovementActions
+            isDead={this.state.isDead}
+            isAdventuring={this.state.isAdventuring}
+            disableMapButtons={this.disableMapButtons.bind(this)}
+            characterPosition={this.state.characterPosition}
+            timeRemaining={this.state.timeRemaining}
+            move={this.move.bind(this)}
+            userId={this.props.userId}
+          />
         </div>
       </div>
     )

@@ -16,7 +16,7 @@ export default class CharacterInfoTopSection extends React.Component {
       forceNameChange: false,
     }
 
-    this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
+    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
     this.forceNameChange = Echo.private('force-name-change-' + this.props.userId);
   }
 
@@ -47,10 +47,10 @@ export default class CharacterInfoTopSection extends React.Component {
     if (this.state.isLoading) {
       return (
         <Card>
-          <ContentLoader viewBox="0 0 380 30">    
-            <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
-            <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
-            <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
+          <ContentLoader viewBox="0 0 380 30">
+            <rect x="0" y="0" rx="4" ry="4" width="250" height="5"/>
+            <rect x="0" y="8" rx="3" ry="3" width="250" height="5"/>
+            <rect x="0" y="16" rx="4" ry="4" width="250" height="5"/>
           </ContentLoader>
         </Card>
       );
@@ -79,16 +79,16 @@ export default class CharacterInfoTopSection extends React.Component {
             <dl>
               <dt><strong>Class</strong>:</dt>
               <dd>{sheet.class}</dd>
-            </dl>           
+            </dl>
           </Col>
           <Col md={12} lg={12} xl={3}>
             <dl>
               <dt><strong>Gold</strong>:</dt>
-              <dd>{sheet.gold.toLocaleString('en-US', {maximumFractionDigits:0})}</dd>
+              <dd>{sheet.gold.toLocaleString('en-US', {maximumFractionDigits: 0})}</dd>
             </dl>
           </Col>
         </Row>
-        <hr />
+        <hr/>
         <Row>
           <Col md={12} lg={12} xl={2}>
             <dl>
@@ -120,9 +120,9 @@ export default class CharacterInfoTopSection extends React.Component {
               <dd>
                 <div className="progress level-bar mb-2">
                   <div className="progress-bar skill-bar" role="progressbar"
-                    style={{ width: xpValue + '%' }}
-                    aria-valuenow={sheet.xp} aria-valuemin="0"
-                    aria-valuemax={sheet.xp_next}
+                       style={{width: xpValue + '%'}}
+                       aria-valuenow={sheet.xp} aria-valuemin="0"
+                       aria-valuemax={sheet.xp_next}
                   >
                     {Math.round(sheet.xp)}
                   </div>
@@ -164,10 +164,10 @@ export default class CharacterInfoTopSection extends React.Component {
           </Col>
         </Row>
 
-        { 
-          this.state.forceNameChange ? 
-            <ForcedNameChange characterId={this.props.characterId}/> 
-          : null
+        {
+          this.state.forceNameChange ?
+            <ForcedNameChange characterId={this.props.characterId}/>
+            : null
         }
       </Card>
     )

@@ -1,5 +1,5 @@
 import React from 'react';
-import { movePlayer } from '../helpers/movement';
+import {movePlayer} from '../helpers/movement';
 import TimeOutBar from '../../timeout/timeout-bar';
 
 export default class MapMovementActions extends React.Component {
@@ -33,14 +33,22 @@ export default class MapMovementActions extends React.Component {
             this.props.isAdventuring ?
               <div className="alert alert-warning" role="alert">
                 You are currently adventuring and cannot move or set sail.
-                            </div>
+              </div>
               : null
           }
 
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>North</button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>South</button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>East</button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west" disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>West</button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="north"
+                  disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>North
+          </button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south"
+                  disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>South
+          </button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east"
+                  disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>East
+          </button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west"
+                  disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>West
+          </button>
 
           <TimeOutBar
             eventClass={'Game.Maps.Events.ShowTimeOutEvent'}

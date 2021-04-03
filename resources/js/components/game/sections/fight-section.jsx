@@ -19,9 +19,9 @@ export default class FightSection extends React.Component {
       battleMessages: [],
     }
 
-    this.timeOut         = Echo.private('show-timeout-bar-' + this.props.userId);
-    this.attackUpdate    = Echo.private('update-character-attack-' + this.props.userId);
-    this.isDead          = Echo.private('character-is-dead-' + this.props.userId);
+    this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
+    this.isDead = Echo.private('character-is-dead-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -34,7 +34,7 @@ export default class FightSection extends React.Component {
     });
 
     this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
-      let character     = _.cloneDeep(this.state.character);
+      let character = _.cloneDeep(this.state.character);
 
       character.is_dead = event.isDead;
 
@@ -76,7 +76,7 @@ export default class FightSection extends React.Component {
 
   battleMessages() {
     return this.state.battleMessages.map((message) => {
-      return <div key={message.message}><span className="battle-message">{message.message}</span> <br /></div>
+      return <div key={message.message}><span className="battle-message">{message.message}</span> <br/></div>
     });
   }
 
@@ -157,15 +157,15 @@ export default class FightSection extends React.Component {
       <div className="health-meters mb-2 mt-2">
         <div className="progress character mb-2">
           <div className="progress-bar character-bar" role="progressbar"
-            style={{ width: characterCurrentHealth + '%' }}
-            aria-valuenow={this.state.characterCurrentHealth} aria-valuemin="0"
-            aria-valuemax={this.state.characterMaxHealth}>{this.state.character.name}</div>
+               style={{width: characterCurrentHealth + '%'}}
+               aria-valuenow={this.state.characterCurrentHealth} aria-valuemin="0"
+               aria-valuemax={this.state.characterMaxHealth}>{this.state.character.name}</div>
         </div>
         <div className="progress monster mb-2">
           <div className="progress-bar monster-bar" role="progressbar"
-            style={{ width: monsterCurrentHealth + '%' }}
-            aria-valuenow={this.state.monsterCurrentHealth} aria-valuemin="0"
-            aria-valuemax={this.state.monsterMaxHealth}>{this.state.monster.name}</div>
+               style={{width: monsterCurrentHealth + '%'}}
+               aria-valuenow={this.state.monsterCurrentHealth} aria-valuemin="0"
+               aria-valuemax={this.state.monsterMaxHealth}>{this.state.monster.name}</div>
         </div>
       </div>
     );
@@ -174,12 +174,14 @@ export default class FightSection extends React.Component {
   render() {
     return (
       <>
-        <hr />
+        <hr/>
         <div className="battle-section text-center">
           {
             this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead && this.state.monster !== null ?
               <>
-                <button className="btn btn-primary" onClick={this.attack.bind(this)} disabled={this.state.isAdventuring}>Attack</button>
+                <button className="btn btn-primary" onClick={this.attack.bind(this)}
+                        disabled={this.state.isAdventuring}>Attack
+                </button>
                 {this.healthMeters()}
               </>
               : null

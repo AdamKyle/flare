@@ -22,7 +22,7 @@ class CreateKingdoms extends Migration
             $table->foreign('game_map_id', 'king_gmid')
                 ->references('id')->on('game_maps');
             $table->string('name');
-            $table->json('color');
+            $table->string('color');
             $table->bigInteger('max_stone');
             $table->bigInteger('max_wood');
             $table->bigInteger('max_clay');

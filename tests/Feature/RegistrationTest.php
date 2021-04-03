@@ -34,9 +34,10 @@ class RegistrationTest extends TestCase
         ]);
 
         $gameMap = GameMap::create([
-            'name'    => 'surface',
-            'path'    => 'test path',
-            'default' => true,
+            'name'          => 'surface',
+            'path'          => 'test path',
+            'default'       => true,
+            'kingdom_color' => '#ffffff',
         ]);
     }
 
@@ -78,7 +79,7 @@ class RegistrationTest extends TestCase
                  'race'                  => $race->id,
                  'class'                 => $class->id,
                  'question_one'          => 'Whats your favourite movie?',
-                 'question_two'          => 'Whats the name of the town you grew up in?', 
+                 'question_two'          => 'Whats the name of the town you grew up in?',
                  'answer_one'            => 'test',
                  'answer_two'            => 'test2',
              ])->dontSee('The name has already been taken.');
@@ -110,7 +111,7 @@ class RegistrationTest extends TestCase
                  'race'                  => $race->id,
                  'class'                 => $class->id,
                  'question_one'          => 'Whats your favourite movie?',
-                 'question_two'          => 'Whats your favourite movie?', 
+                 'question_two'          => 'Whats your favourite movie?',
                  'answer_one'            => 'test',
                  'answer_two'            => 'test2',
              ])->see('Security questions need to be unique.');
@@ -136,7 +137,7 @@ class RegistrationTest extends TestCase
                  'race'                  => $race->id,
                  'class'                 => $class->id,
                  'question_one'          => 'Whats your favourite movie?',
-                 'question_two'          => 'Whats the name of the town you grew up in?', 
+                 'question_two'          => 'Whats the name of the town you grew up in?',
                  'answer_one'            => 'test',
                  'answer_two'            => 'test',
              ])->see('Security questions answers need to be unique.');
@@ -204,7 +205,7 @@ class RegistrationTest extends TestCase
                 'race'                  => GameRace::first()->id,
                 'class'                 => GameClass::first()->id,
                 'question_one'          => 'Whats your favourite movie?',
-                'question_two'          => 'Whats the name of the town you grew up in?', 
+                'question_two'          => 'Whats the name of the town you grew up in?',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
             ])->see('You cannot register anymore characters.');

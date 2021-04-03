@@ -1,6 +1,6 @@
 import React from 'react';
-import { Dropdown } from 'react-bootstrap';
-import { getServerMessage } from '../../helpers/server_message';
+import {Dropdown} from 'react-bootstrap';
+import {getServerMessage} from '../../helpers/server_message';
 
 export default class NotificationCenter extends React.Component {
 
@@ -54,7 +54,7 @@ export default class NotificationCenter extends React.Component {
   }
 
   customDropDown() {
-    return React.forwardRef(({ children, onClick }, ref) => (
+    return React.forwardRef(({children, onClick}, ref) => (
       <a
         href=""
         ref={ref}
@@ -64,13 +64,14 @@ export default class NotificationCenter extends React.Component {
         }}
       >
         <i className="far fa-comment-alt"></i>
-        { this.state.notificationCount !== 0 ? <span className="badge badge-success">{this.state.notificationCount}</span> : null}
+        {this.state.notificationCount !== 0 ?
+          <span className="badge badge-success">{this.state.notificationCount}</span> : null}
       </a>
     ));
   }
 
   customMenu() {
-    return React.forwardRef( ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+    return React.forwardRef(({children, style, className, 'aria-labelledby': labeledBy}, ref) => {
       return (
         <div
           ref={ref}
@@ -90,7 +91,7 @@ export default class NotificationCenter extends React.Component {
   }
 
   fetchIcon(type) {
-    switch(type) {
+    switch (type) {
       case 'adventure':
         return 'ra ra-trail'
       default:
@@ -107,10 +108,14 @@ export default class NotificationCenter extends React.Component {
 
     this.state.notifications.forEach((notification) => {
       notifications.push(
-        <Dropdown.Item eventKey={notification.id} key={notification.id} data-notification-id={notification.id} onClick={() => {this.clearNotification(notification)}}>
+        <Dropdown.Item eventKey={notification.id} key={notification.id} data-notification-id={notification.id}
+                       onClick={() => {
+                         this.clearNotification(notification)
+                       }}>
           <div className="notification">
-            <div className={notification.status === 'success' ? 'success-bar pl-3 clearfix' : 'danger-bar pl-3 clearfix'}>
-              <i className={this.fetchIcon(notification.type) + ' float-left mt-2 pr-2'} />
+            <div
+              className={notification.status === 'success' ? 'success-bar pl-3 clearfix' : 'danger-bar pl-3 clearfix'}>
+              <i className={this.fetchIcon(notification.type) + ' float-left mt-2 pr-2'}/>
               <p className="float-right">{notification.message}</p>
             </div>
           </div>

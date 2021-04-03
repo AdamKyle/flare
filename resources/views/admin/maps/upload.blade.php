@@ -13,6 +13,10 @@
                             <label for="name">Map Name</label>
                             <input type="text" class="form-control" id="name" aria-describedby="name" name="name">
                         </div>
+                        <div class="form-group">
+                            <label for="kingdomColor">Kingdom Color</label>
+                            <input type="text" class="form-control" id="kingdomColor" aria-describedby="kingdom_name" name="kingdom_color">
+                        </div>
                         <fieldset class="form-group row">
                           <legend class="col-sm-2">Default Map?</legend>
                           <div class="col-sm-10">

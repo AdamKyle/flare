@@ -1,8 +1,8 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import {getServerMessage} from '../helpers/server_message'
-import { isEmpty } from 'lodash';
-import { DateTime } from "luxon";
+import {isEmpty} from 'lodash';
+import {DateTime} from "luxon";
 
 export default class Chat extends React.Component {
 
@@ -16,8 +16,8 @@ export default class Chat extends React.Component {
       user: {},
     }
 
-    this.echo            = Echo.join('chat');
-    this.serverMessages  = Echo.private('server-message-' + this.props.userId);
+    this.echo = Echo.join('chat');
+    this.serverMessages = Echo.private('server-message-' + this.props.userId);
     this.privateMessages = Echo.private('private-message-' + this.props.userId);
   }
 
@@ -47,12 +47,12 @@ export default class Chat extends React.Component {
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
-      const message       = event.message;
-      message['user']     = event.user;
-      message['name']     = event.name;
+      const message = event.message;
+      message['user'] = event.user;
+      message['name'] = event.name;
       message['from_god'] = this.isGod(event.user);
-      message['x']        = event.x;
-      message['y']        = event.y;
+      message['x'] = event.x;
+      message['y'] = event.y;
 
       const messages = cloneDeep(this.state.messages);
 
@@ -65,19 +65,19 @@ export default class Chat extends React.Component {
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
       const messages = cloneDeep(this.state.messages);
-      const message  = {
-        message:  event.message,
-        type:     'server-message',
-        user:     event.user,
-        user_id:  event.user.id,
-        id:       Math.random().toString(36).substring(7),
+      const message = {
+        message: event.message,
+        type: 'server-message',
+        user: event.user,
+        user_id: event.user.id,
+        id: Math.random().toString(36).substring(7),
       };
 
       messages.unshift(message);
 
       const user = cloneDeep(this.state.user);
 
-      user.is_silenced       = event.user.is_silenced;
+      user.is_silenced = event.user.is_silenced;
       user.can_talk_again_at = event.user.can_speak_again_at;
 
       this.setState({
@@ -88,13 +88,13 @@ export default class Chat extends React.Component {
 
     this.privateMessages.listen('Game.Messages.Events.PrivateMessageEvent', (event) => {
       const messages = cloneDeep(this.state.messages);
-      const message  = {
+      const message = {
         message: event.message,
-        type:    'private-message',
-        user:    event.user,
+        type: 'private-message',
+        user: event.user,
         user_id: event.user.id,
-        from:    event.from,
-        id:      Math.random().toString(36).substring(7),
+        from: event.from,
+        id: Math.random().toString(36).substring(7),
       };
 
       messages.unshift(message);
@@ -107,27 +107,27 @@ export default class Chat extends React.Component {
 
   isGod(user) {
     if (isEmpty(user.roles)) {
-       return false;
+      return false;
     }
 
     return user.roles.filter(r => r.name === 'Admin').length > 0
-  } 
+  }
 
   buildErrorMessage(customMessage) {
-      const messages = cloneDeep(this.state.messages);
-      
-      const message  = {
-        message:  customMessage,
-        type:     'error-message',
-        user_id:  this.props.userId,
-        id:       Math.random().toString(36).substring(7),
-      };
+    const messages = cloneDeep(this.state.messages);
 
-      messages.unshift(message);
+    const message = {
+      message: customMessage,
+      type: 'error-message',
+      user_id: this.props.userId,
+      id: Math.random().toString(36).substring(7),
+    };
 
-      this.setState({
-        messages: messages,
-      });
+    messages.unshift(message);
+
+    this.setState({
+      messages: messages,
+    });
   }
 
   componentWillUnMount() {
@@ -166,7 +166,8 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id + '_private-message'}>
               <div className="private-message">
-                <strong onClick={this.messageUser.bind(this)} data-name={message.from}>{message.from}</strong>: {message.message}
+                <strong onClick={this.messageUser.bind(this)}
+                        data-name={message.from}>{message.from}</strong>: {message.message}
               </div>
             </li>
           )
@@ -186,7 +187,7 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id + '_god-message'}>
               <div className="god-message">
-                <div className="god-message"><strong>The Creator</strong>: {message.message}</div> 
+                <div className="god-message"><strong>The Creator</strong>: {message.message}</div>
               </div>
             </li>
           )
@@ -194,7 +195,7 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id + '_private-message-sent'}>
               <div className="private-message-sent">
-                <div className="private-message-sent">{message.message}</div> 
+                <div className="private-message-sent">{message.message}</div>
               </div>
             </li>
           )
@@ -202,7 +203,9 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id}>
               <div className="message">
-                {message.x !== 0 && message.y !== 0 ? this.fetchLocationInfo(message) : null} <strong onClick={this.messageUser.bind(this)} data-name={message.name}>{message.name}</strong>: {message.message}
+                {message.x !== 0 && message.y !== 0 ? this.fetchLocationInfo(message) : null} <strong
+                onClick={this.messageUser.bind(this)}
+                data-name={message.name}>{message.name}</strong>: {message.message}
               </div>
             </li>
           )
@@ -224,7 +227,7 @@ export default class Chat extends React.Component {
       return this.buildErrorMessage('You cannot talk again until: ' + dt);
     }
 
-    const message = this.state.message.replace(/(<([^>]+)>)/ig,"");
+    const message = this.state.message.replace(/(<([^>]+)>)/ig, "");
 
     this.setState({
       message: ''
@@ -261,8 +264,8 @@ export default class Chat extends React.Component {
 
     const message = {
       message: 'Sent to ' + messageData[1] + ': ' + messageData[2],
-      type:    'private-message-sent',
-      id:      Math.random().toString(36).substring(7),
+      type: 'private-message-sent',
+      id: Math.random().toString(36).substring(7),
     }
 
     const messages = cloneDeep(this.state.messages);
@@ -273,7 +276,7 @@ export default class Chat extends React.Component {
       messages: messages,
       message: '',
     });
-    
+
     axios.post('/api/private-message', {
       user_name: messageData[1],
       message: messageData[2],
@@ -323,7 +326,9 @@ export default class Chat extends React.Component {
                   value={this.state.message}
                   onChange={this.handleOnChange.bind(this)}
                   onKeyPress={this.handleKeyPress.bind(this)}
-                  ref={(input) => { this.chatInput = input; }} 
+                  ref={(input) => {
+                    this.chatInput = input;
+                  }}
                 />
               </div>
 
@@ -335,7 +340,7 @@ export default class Chat extends React.Component {
             <div className="row">
               <div className="col-md-12">
                 <div className="chat-box mt-3">
-                  <ul> { this.rendermessages() }</ul>
+                  <ul> {this.rendermessages()}</ul>
                 </div>
               </div>
             </div>

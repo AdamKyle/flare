@@ -81,9 +81,9 @@ export default class ActionsSection extends React.Component {
   }
 
   setMonster(monster) {
-      this.setState({
-          monster: monster
-      });
+    this.setState({
+      monster: monster
+    });
   }
 
   render() {
@@ -91,9 +91,9 @@ export default class ActionsSection extends React.Component {
       return (
         <Card>
           <ContentLoader viewBox="0 0 380 30">
-            <rect x="0" y="0" rx="4" ry="4" width="250" height="5" />
-            <rect x="0" y="8" rx="3" ry="3" width="250" height="5" />
-            <rect x="0" y="16" rx="4" ry="4" width="250" height="5" />
+            <rect x="0" y="0" rx="4" ry="4" width="250" height="5"/>
+            <rect x="0" y="8" rx="3" ry="3" width="250" height="5"/>
+            <rect x="0" y="16" rx="4" ry="4" width="250" height="5"/>
           </ContentLoader>
         </Card>
       );
@@ -113,26 +113,30 @@ export default class ActionsSection extends React.Component {
             />
             {
               this.props.kingdomData.can_attack && !_.isEmpty(this.props.kingdomData.my_kingdoms) ?
-                <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomAttackModal}>Attack Kingdom</button> 
-              : null
+                <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring}
+                        onClick={this.props.openKingdomAttackModal}>Attack Kingdom</button>
+                : null
             }
 
             {
               this.props.kingdomData.can_settle ?
-                <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal} className="btn btn-success btn-sm mb-2">Settle Kingdom</button> 
-              : null
+                <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal}
+                        className="btn btn-success btn-sm mb-2">Settle Kingdom</button>
+                : null
             }
 
             {
               this.props.kingdomData.is_mine ?
-                <button disabled={this.state.isDead || this.state.isAdventuring} onClick={() => this.props.openKingdomManagement(true)} className="btn btn-success btn-sm mb-2">Manage Kingdom</button> 
-              : null
+                <button disabled={this.state.isDead || this.state.isAdventuring}
+                        onClick={() => this.props.openKingdomManagement(true)}
+                        className="btn btn-success btn-sm mb-2">Manage Kingdom</button>
+                : null
             }
           </Col>
           <Col xs={12} sm={12} md={12} lg={12} xl={10}>
             <BattleAction
               userId={this.props.userId}
-              character={this.state.character}x
+              character={this.state.character} x
               monsters={this.state.monsters}
               showCrafting={this.state.showCrafting}
               showEnchanting={this.state.showEnchanting}
@@ -157,21 +161,21 @@ export default class ActionsSection extends React.Component {
               updateCanCraft={this.updateCanCraft.bind(this)}
               isAdventuring={this.state.isAdventuring}
             />
-            { this.state.showEnchanting ?
-                <EnchantingAction
-                  isDead={this.state.isDead}
-                  characterId={this.state.character.id}
-                  shouldChangeCraftingType={this.state.changeCraftingType}
-                  changeCraftingType={this.changeCraftingType.bind(this)}
-                  userId={this.props.userId}
-                  characterGold={this.state.character.gold}
-                  timeRemaining={this.state.character.can_craft_again_at}
-                  updateCanCraft={this.updateCanCraft.bind(this)}
-                  isAdventuring={this.state.isAdventuring}
-                />
+            {this.state.showEnchanting ?
+              <EnchantingAction
+                isDead={this.state.isDead}
+                characterId={this.state.character.id}
+                shouldChangeCraftingType={this.state.changeCraftingType}
+                changeCraftingType={this.changeCraftingType.bind(this)}
+                userId={this.props.userId}
+                characterGold={this.state.character.gold}
+                timeRemaining={this.state.character.can_craft_again_at}
+                updateCanCraft={this.updateCanCraft.bind(this)}
+                isAdventuring={this.state.isAdventuring}
+              />
               : null
             }
-            
+
             <FightSection
               character={this.state.character}
               monster={this.state.monster}

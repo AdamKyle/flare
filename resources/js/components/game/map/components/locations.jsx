@@ -1,6 +1,6 @@
-import React             from 'react';
-import PortPin           from './pins/port-pin';
-import LocationPin       from './pins/location-pin';
+import React from 'react';
+import PortPin from './pins/port-pin';
+import LocationPin from './pins/location-pin';
 import LocationInfoModal from './modals/location-info-modal';
 
 export default class Location extends React.Component {
@@ -54,12 +54,12 @@ export default class Location extends React.Component {
     return (
       <>
         {this.renderLocations()}
-        <LocationInfoModal 
-          show={this.state.showLocationInfo} 
-          onClose={this.closeLocationDetails.bind(this)} 
-          location={this.state.location} 
+        <LocationInfoModal
+          show={this.state.showLocationInfo}
+          onClose={this.closeLocationDetails.bind(this)}
+          location={this.state.location}
         />
       </>
     )
-  } 
+  }
 }

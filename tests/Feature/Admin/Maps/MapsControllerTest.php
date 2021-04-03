@@ -53,6 +53,7 @@ class MapsControllerTest extends TestCase
              ->type('Surface', 'name')
              ->select('yes', 'default')
              ->attach(UploadedFile::fake()->image('avatar.jpeg'), 'map')
+             ->type('#ffffff', 'kingdom_color')
              ->press('Submit')
              ->see('Surface');
 
@@ -67,7 +68,8 @@ class MapsControllerTest extends TestCase
              ->visit(route('maps.upload'))
              ->press('Submit')
              ->see('Map name is required.')
-             ->see('Map upload is required.');
+             ->see('Map upload is required.')
+             ->see('Kingdom color is required.');
     }
 
     public function testNonAdminCannotSeeUploadMapPage() {

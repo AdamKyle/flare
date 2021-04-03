@@ -23,7 +23,7 @@ export default class CharacterInfoModal extends React.Component {
       return null;
     }
 
-    return(
+    return (
       <Modal
         backdrop={'static'}
         dialogAs={DraggableModalDialog}
@@ -38,7 +38,7 @@ export default class CharacterInfoModal extends React.Component {
           <Modal.Title><span className="location-info">{location.name}</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <LocationInfo location={location} />
+          <LocationInfo location={location}/>
         </Modal.Body>
         <Modal.Footer>
           <div className="float-left">{'Coordinates: ' + location.x + '/' + location.y}</div>

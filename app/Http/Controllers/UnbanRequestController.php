@@ -24,7 +24,16 @@ class UnbanRequestController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (is_null($user)) {
+            // dd('here');
             return redirect()->back()->with('error', 'This email does not match our records.');
+        }
+
+        if (!$user->is_banned) {
+            return redirect()->back()->with('error', 'You are not banned.');
+        }
+
+        if (!is_null($user->unbanned_at)) {
+            return redirect()->back()->with('error', 'You are not banned forever.');
         }
 
         Cache::put('user-temp-' . $user->id, 'temp', now()->addMinutes(60));
@@ -78,7 +87,7 @@ class UnbanRequestController extends Controller
         if (!Cache::has('user-temp-' . $user->id)) {
             return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
         }
-        
+
         $request->validate([
             'unban_message' => 'required'
         ]);
@@ -87,7 +96,7 @@ class UnbanRequestController extends Controller
             $user->update([
                 'un_ban_request' => $request->unban_message
             ]);
-            
+
             foreach (User::role('Admin')->get() as $adminUser) {
                 Mail::to($adminUser->email)->send(new UnBanRequestMail($user));
             }

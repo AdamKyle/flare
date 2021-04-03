@@ -23,9 +23,10 @@ class MapsController extends Controller {
         $path = Storage::disk('maps')->putFile($request->name, $request->map);
 
         GameMap::create([
-            'name'    => $request->name,
-            'path'    => $path,
-            'default' => $request->default === 'yes' ? true : false
+            'name'          => $request->name,
+            'path'          => $path,
+            'default'       => $request->default === 'yes' ? true : false,
+            'kingdom_color' => $request->kingdom_color,
         ]);
 
         return redirect()->route('maps')->with('success', $request->name . ' uploaded successsfully.');

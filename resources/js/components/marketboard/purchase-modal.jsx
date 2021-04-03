@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import {Modal, Button} from 'react-bootstrap';
 import ItemDetails from './item-details';
 
 export default class PurchaseModal extends React.Component {
@@ -14,15 +14,15 @@ export default class PurchaseModal extends React.Component {
   }
 
   componentDidMount() {
-    axios.get('/api/market-board/'+this.props.modalData.item_id+'/listing-details')
-         .then((result) => {
-           this.setState({
-             item: result.data,
-             loading: false,
-           })
-         }).catch((error) => {
-           console.error(error);
-         });
+    axios.get('/api/market-board/' + this.props.modalData.item_id + '/listing-details')
+      .then((result) => {
+        this.setState({
+          item: result.data,
+          loading: false,
+        })
+      }).catch((error) => {
+      console.error(error);
+    });
   }
 
   hasEnoughGold() {
@@ -46,9 +46,9 @@ export default class PurchaseModal extends React.Component {
 
   render() {
     return (
-      <Modal 
-        show={this.props.showModal} 
-        onHide={this.props.closeModal} 
+      <Modal
+        show={this.props.showModal}
+        onHide={this.props.closeModal}
         backdrop="static"
         keyboard={false}
         size="lg"
@@ -58,21 +58,24 @@ export default class PurchaseModal extends React.Component {
         </Modal.Header>
         <Modal.Body>
           {
-            !this.hasEnoughGold() && !this.belongsToCharacter() ? <div className="alert alert-danger mb-2 mt-2">You do not have enough gold to buy this.</div> : null
+            !this.hasEnoughGold() && !this.belongsToCharacter() ?
+              <div className="alert alert-danger mb-2 mt-2">You do not have enough gold to buy this.</div> : null
           }
 
           {
-            this.belongsToCharacter() ? <div className="alert alert-danger mb-2 mt-2">You cannot purchase your own item.</div> : null
+            this.belongsToCharacter() ?
+              <div className="alert alert-danger mb-2 mt-2">You cannot purchase your own item.</div> : null
           }
-          <p>Is this the item you would like to purchase? It will <strong>cost</strong>: {this.props.modalData.listed_price * 1.05} Gold (incl. 5% tax)</p>
-          { this.state.loading ? 'Loading please wait ...' : <ItemDetails item={this.state.item} /> }
+          <p>Is this the item you would like to purchase? It
+            will <strong>cost</strong>: {this.props.modalData.listed_price * 1.05} Gold (incl. 5% tax)</p>
+          {this.state.loading ? 'Loading please wait ...' : <ItemDetails item={this.state.item}/>}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={this.props.closeModal}>
             Close
           </Button>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={this.purchase.bind(this)}
             disabled={!this.hasEnoughGold() || this.belongsToCharacter()}
           >

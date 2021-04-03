@@ -2,19 +2,19 @@ import React from 'react';
 
 export default class RefreshComponent extends React.Component {
 
-    constructor(props) {
-        super(props);
-        
-        this.refreshListener  = Echo.private('refresh-listener-' + this.props.userId);
-    }
+  constructor(props) {
+    super(props);
 
-    componentDidMount() {
-        this.refreshListener.listen('Admin.Events.BannedUserEvent', (event) => {
-            location.reload();
-        });
-    }
+    this.refreshListener = Echo.private('refresh-listener-' + this.props.userId);
+  }
 
-    render() {
-        return null;
-    }
-} 
+  componentDidMount() {
+    this.refreshListener.listen('Admin.Events.BannedUserEvent', (event) => {
+      location.reload();
+    });
+  }
+
+  render() {
+    return null;
+  }
+}

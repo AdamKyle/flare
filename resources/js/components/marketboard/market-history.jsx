@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Line } from 'react-chartjs-2';
+import {Line} from 'react-chartjs-2';
 
 export default class MarketHistory extends React.Component {
   constructor(props) {
@@ -38,7 +38,7 @@ export default class MarketHistory extends React.Component {
   }
 
   componentDidMount() {
-    
+
     this.fetchMarketHistory();
 
     this.update.listen('Game.Core.Events.UpdateMarketBoardBroadcastEvent', (event) => {
@@ -62,10 +62,10 @@ export default class MarketHistory extends React.Component {
         type: this.props.type,
       }
     }).then((result) => {
-      
+
       let dataset = {...this.state.data};
 
-      dataset.labels           = result.data.labels;
+      dataset.labels = result.data.labels;
       dataset.datasets[0].data = result.data.data;
 
       this.setState({
@@ -87,11 +87,11 @@ export default class MarketHistory extends React.Component {
     return (
       <div className="mb-4">
         <h6>Market History</h6>
-        <Line 
-          data={this.state.data} 
-          width={300} 
-          height={50} 
-          options={{ maintainAspectRatio: true, scales: {xAxes: [{ticks: {display: false}}]} }} 
+        <Line
+          data={this.state.data}
+          width={300}
+          height={50}
+          options={{maintainAspectRatio: true, scales: {xAxes: [{ticks: {display: false}}]}}}
         />
       </div>
     );
@@ -102,7 +102,7 @@ const marketHistory = document.getElementById('admin-market-history');
 
 if (marketHistory !== null) {
   ReactDOM.render(
-    <MarketHistory />,
+    <MarketHistory/>,
     marketHistory
   );
 }

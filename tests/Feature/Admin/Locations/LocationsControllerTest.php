@@ -35,7 +35,8 @@ class LocationsControllerTest extends TestCase
             'game_map_id'          => GameMap::create([
                 'name' => 'Apples',
                 'path' => 'test',
-                'default' => true
+                'default' => true,
+                'kingdom_color' => '#ffffff',
             ])->id,
             'quest_reward_item_id' => null,
             'description'          => 'test',

@@ -24,22 +24,25 @@ class MapUploadValidation extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'map'  => 'required|image|max:2000'
+            'name'          => 'required',
+            'map'           => 'required|image|max:2000',
+            'kingdom_color' => 'required|min:7',
         ];
     }
 
     /**
      * Messages for the validation.
-     * 
+     *
      * @return array
      */
     public function messages() {
         return [
-            'name.required'  => 'Map name is required.',
-            'map.required'   => 'Map upload is required.',
-            'map.image'      => 'Map must be an image.',
-            'map.max:2000'   => 'Map must be be smaller. Max upload is 2 Mbs.'
+            'name.required'          => 'Map name is required.',
+            'map.required'           => 'Map upload is required.',
+            'map.image'              => 'Map must be an image.',
+            'map.max:2000'           => 'Map must be be smaller. Max upload is 2 Mbs.',
+            'kingdom_color.required' => 'Kingdom color is required.',
+            'kingdom_color.min'      => 'Kingdom color must be a min of 7 characters.',
         ];
     }
 }

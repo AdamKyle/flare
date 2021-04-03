@@ -12,7 +12,7 @@ class GameMap extends Model
 {
 
     use WithSearch, HasFactory;
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +22,7 @@ class GameMap extends Model
         'name',
         'path',
         'default',
+        'kingdom_color',
     ];
 
     protected $casts = [

@@ -21,7 +21,7 @@ export default class ItemDetails extends React.Component {
       <>
         <h5 className="mb-2">{type.charAt(0).toUpperCase() + type.slice(1)}</h5>
         <p>{this.props.item['item_' + type].description}</p>
-        <hr />
+        <hr/>
         <dl>
           <dt>Name:</dt>
           <dd>{this.props.item['item_' + type].name}</dd>
@@ -46,7 +46,7 @@ export default class ItemDetails extends React.Component {
           <dt>Skill Bonus:</dt>
           <dd>{this.props.item['item_' + type].skill_name === null ? 0 : this.props.item['item_' + type].skill_bonus * 100}%</dd>
         </dl>
-        <hr />
+        <hr/>
       </>
     );
   }
@@ -109,11 +109,12 @@ export default class ItemDetails extends React.Component {
                   </dl>
                 </div>
               </div>
-              <hr />
+              <hr/>
               <div className="row mb-3">
                 <div className="col-md-12">
                   <h3 className="mb-2">Base Equip Stats</h3>
-                  <p className="text-muted mb-2 mt-2" style={{fontSize: '12px', fontStyle: 'italic'}}>All values include any attached affixes and any additional modifiers.</p>
+                  <p className="text-muted mb-2 mt-2" style={{fontSize: '12px', fontStyle: 'italic'}}>All values include
+                    any attached affixes and any additional modifiers.</p>
                   <dl className="mt-2">
                     <dt>Attack:</dt>
                     <dd><span className='text-success'>{this.props.item.base_damage} </span></dd>
@@ -138,7 +139,7 @@ export default class ItemDetails extends React.Component {
                   </dl>
                 </div>
               </div>
-              <hr />
+              <hr/>
               <div className="row mb-3">
                 <div className="col-md-12">
                   {this.renderAffixes()}

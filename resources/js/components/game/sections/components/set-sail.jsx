@@ -65,7 +65,7 @@ export default class SetSail extends React.Component {
     this.setState({
       portId: ""
     });
-    
+
     axios.post('/api/map/set-sail/' + portId + '/' + this.props.characterId, {
       current_port_id: this.state.currentPort.id,
       cost: foundPort.cost,

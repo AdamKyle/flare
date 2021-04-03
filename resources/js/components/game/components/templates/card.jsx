@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown } from 'react-bootstrap';
+import {Dropdown} from 'react-bootstrap';
 
 export default class Card extends React.Component {
 
@@ -13,30 +13,31 @@ export default class Card extends React.Component {
 
   buildDropDownOptions() {
     return this.props.buttons.map((button) => {
-      return <Dropdown.Item onClick={this.changeType.bind(this)} data-type={button.type} key={"button-" + button.type}>{button.name}</Dropdown.Item>
+      return <Dropdown.Item onClick={this.changeType.bind(this)} data-type={button.type}
+                            key={"button-" + button.type}>{button.name}</Dropdown.Item>
     })
   }
 
   buildDropDown() {
     return (
       <>
-      <div className="float-right">
-        <Dropdown size="sm">
-          <Dropdown.Toggle variant="primary" id="dropdown-basic">
-            {this.props.buttonTitle}
-          </Dropdown.Toggle>
+        <div className="float-right">
+          <Dropdown size="sm">
+            <Dropdown.Toggle variant="primary" id="dropdown-basic">
+              {this.props.buttonTitle}
+            </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            {this.buildDropDownOptions()}
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
-      {
-        this.props.hasOwnProperty('textBesideButton') ?
-        <div className="float-right mr-2 mt-2">
-          <strong>{this.props.textBesideButton}</strong>
-        </div> : null
-      }
+            <Dropdown.Menu>
+              {this.buildDropDownOptions()}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+        {
+          this.props.hasOwnProperty('textBesideButton') ?
+            <div className="float-right mr-2 mt-2">
+              <strong>{this.props.textBesideButton}</strong>
+            </div> : null
+        }
       </>
     )
   }
@@ -60,15 +61,15 @@ export default class Card extends React.Component {
               >
                 Close
               </button>
-            : null
+              : null
           }
-          { 
-            this.props.hasOwnProperty('customButtonType') ? 
-              this.buildCustomButton() 
-            : null
+          {
+            this.props.hasOwnProperty('customButtonType') ?
+              this.buildCustomButton()
+              : null
           }
         </div>
-        <hr />
+        <hr/>
       </>
     );
   }
@@ -80,7 +81,7 @@ export default class Card extends React.Component {
           {
             this.props.cardTitle ?
               this.renderTitle()
-            : null
+              : null
           }
           <div className="mb-2">
             {this.props.children}

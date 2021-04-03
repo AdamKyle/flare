@@ -22,7 +22,7 @@ export default class PortPin extends React.Component {
         key={this.props.location.id}
         data-location-id={this.props.location.id}
         className="port-x-pin"
-        style={{ top: this.props.location.y, left: this.props.location.x }}
+        style={{top: this.props.location.y, left: this.props.location.x}}
         onClick={this.openLocationInformation.bind(this)}>
       </div>
     )

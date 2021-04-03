@@ -17,6 +17,7 @@ class CreateGameMaps extends Migration
             $table->id();
             $table->string('name');
             $table->string('path');
+            $table->string('kingdom_color');
             $table->boolean('default')->nullable()->default(false);
             $table->timestamps();
         });

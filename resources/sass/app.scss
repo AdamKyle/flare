@@ -153,6 +153,10 @@ dd {
   margin-top: 30px;
 }
 
+.cursor {
+    cursor: pointer;
+}
+
 .keep-down {
   @media (max-width: 768px) {
     margin-top: 70px;

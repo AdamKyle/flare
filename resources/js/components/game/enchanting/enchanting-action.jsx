@@ -39,7 +39,7 @@ export default class EnchantingAction extends React.Component {
 
     this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
       this.setState({
-        canCraft:      event.canCraft,
+        canCraft: event.canCraft,
         timeRemaining: event.canCraft ? 0 : event.timeout,
       }, () => {
         this.props.updateCanCraft(event.canCraft);
@@ -53,7 +53,7 @@ export default class EnchantingAction extends React.Component {
         loading: false,
       });
     }).catch((error) => {
-        console.error(error);
+      console.error(error);
     });
   }
 
@@ -77,7 +77,7 @@ export default class EnchantingAction extends React.Component {
     }
 
     if (this.state.isAdventuring !== this.props.isAdventuring) {
-      
+
       this.setState({
         isAdventuring: this.props.isAdventuring,
       });
@@ -86,8 +86,8 @@ export default class EnchantingAction extends React.Component {
 
   enchant() {
     const affixesToAttach = [];
-    const prefixId        = this.state.prefixId;
-    const suffixId        = this.state.suffixId;
+    const prefixId = this.state.prefixId;
+    const suffixId = this.state.suffixId;
     console.log(prefixId, suffixId);
     if ((prefixId !== 0 && prefixId !== null)) {
       affixesToAttach.push(prefixId);
@@ -115,12 +115,12 @@ export default class EnchantingAction extends React.Component {
     }).catch((error) => {
       console.error(error.response);
     });
-    
+
   }
 
   setItemToEnchant(event) {
-    let cost       = 0;
-    const value    = parseInt(event.target.value);
+    let cost = 0;
+    const value = parseInt(event.target.value);
     let foundAffix = null;
 
     if (this.state.suffixId !== null && this.state.suffixId !== 0) {
@@ -129,12 +129,12 @@ export default class EnchantingAction extends React.Component {
       if (typeof foundAffix !== 'undefined') {
         cost += this.getSuffixCost(foundAffix, value);
       }
-      
+
     }
 
     if (this.state.prefixId !== null && this.state.prefixId !== 0) {
       foundAffix = this.state.affixList.filter((a) => a.id === this.state.prefixId)[0];
-      
+
       if (typeof foundAffix !== 'undefined') {
         cost += this.getPrefixCost(foundAffix, value);
       }
@@ -168,7 +168,7 @@ export default class EnchantingAction extends React.Component {
       const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant)[0];
 
       if (foundSlot.item.item_suffix !== null) {
-        
+
         cost += (foundSlot.item.item_suffix.cost / 2)
       }
     }
@@ -177,15 +177,15 @@ export default class EnchantingAction extends React.Component {
   }
 
   setPrefixId(event) {
-    const value      = parseInt(event.target.value);
-    const oldPrefix  = this.state.affixList.filter((a) => a.id === this.state.prefixId)[0];
-    let foundAffix   = null;
-    let cost         = this.state.cost;
+    const value = parseInt(event.target.value);
+    const oldPrefix = this.state.affixList.filter((a) => a.id === this.state.prefixId)[0];
+    let foundAffix = null;
+    let cost = this.state.cost;
 
     if ((value === 0 || value !== 0) && (this.state.prefixId !== 0 && this.state.prefixId !== null) && (this.state.itemToEnchant !== 0 && this.state.itemToEnchant !== null) && typeof oldPrefix !== "undefined") {
-      foundAffix          = this.state.affixList.filter((a) => a.id === value)[0];
-      cost                -= this.getPrefixCost(oldPrefix, this.state.itemToEnchant);
-      cost                += this.getPrefixCost(foundAffix, this.state.itemToEnchant);
+      foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
+      cost -= this.getPrefixCost(oldPrefix, this.state.itemToEnchant);
+      cost += this.getPrefixCost(foundAffix, this.state.itemToEnchant);
     } else if ((this.state.itemToEnchant !== 0 || this.state.itemToEnchant !== null)) {
       foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
 
@@ -201,18 +201,18 @@ export default class EnchantingAction extends React.Component {
   }
 
   setSuffixId(event) {
-    const value      = parseInt(event.target.value);
-    const oldSuffix  = this.state.affixList.filter((a) => a.id === this.state.suffixId)[0];
-    let foundAffix   = null;
-    let cost         = this.state.cost;
+    const value = parseInt(event.target.value);
+    const oldSuffix = this.state.affixList.filter((a) => a.id === this.state.suffixId)[0];
+    let foundAffix = null;
+    let cost = this.state.cost;
 
     if ((value === 0 || value !== 0) && (this.state.suffixId !== 0 && this.state.suffixId !== null) && (this.state.itemToEnchant === 0 && this.state.itemToEnchant === null) && typeof oldSuffix !== 'undefined') {
-      foundAffix           = this.state.affixList.filter((a) => a.id === value)[0];
-      cost                -= this.getSuffixCost(oldSuffix, this.state.itemToEnchant);
-      cost                += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
+      foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
+      cost -= this.getSuffixCost(oldSuffix, this.state.itemToEnchant);
+      cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
     } else if ((this.state.itemToEnchant !== 0 || this.state.itemToEnchant !== null)) {
-      foundAffix           = this.state.affixList.filter((a) => a.id === value)[0];
-      cost                += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
+      foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
+      cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
     } else if ((this.state.itemToEnchant === 0 || this.state.itemToEnchant === null)) {
       cost = 0;
     }
@@ -225,14 +225,15 @@ export default class EnchantingAction extends React.Component {
 
   buildInventoryOptions() {
     return this.state.inventoryList.map((slot) => {
-        return (<option key={'item-' + slot.id} value={slot.item.id}>{slot.item.affix_name}</option>);
+      return (<option key={'item-' + slot.id} value={slot.item.id}>{slot.item.affix_name}</option>);
     });
   }
 
   buildSuffixOptions() {
     return this.state.affixList.map((affix) => {
       if (affix.type === 'suffix') {
-      return (<option key={'suffix-'+affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost}</option>);
+        return (
+          <option key={'suffix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost}</option>);
       }
     });
   }
@@ -240,7 +241,8 @@ export default class EnchantingAction extends React.Component {
   buildPrefixOptions() {
     return this.state.affixList.map((affix) => {
       if (affix.type === 'prefix') {
-      return (<option key={'prefix-'+affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost}</option>);
+        return (
+          <option key={'prefix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost}</option>);
       }
     });
   }
@@ -264,14 +266,14 @@ export default class EnchantingAction extends React.Component {
 
     return this.state.isAdventuring;
   }
-  
+
 
   renderEnchantingButton() {
     return (
       <button className="btn btn-primary mt-2"
-        type="button"
-        disabled={this.isButtonDisabled()}
-        onClick={this.enchant.bind(this)}
+              type="button"
+              disabled={this.isButtonDisabled()}
+              onClick={this.enchant.bind(this)}
       >
         Enchant!
       </button>
@@ -285,7 +287,7 @@ export default class EnchantingAction extends React.Component {
         <div className={"container justify-content-center " + (!this.state.loading ? 'hide' : '')}>
           <div className="row">
             <div className="col-md-10 text-align-center text-info">
-               Loading please wait ...
+              Loading please wait ...
             </div>
           </div>
         </div>
@@ -304,19 +306,20 @@ export default class EnchantingAction extends React.Component {
 
     return (
       <>
-        <div className={"container justify-content-center " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>
+        <div
+          className={"container justify-content-center " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>
           <div className="row">
             <div className="col-md-10">
               <div className="alert alert-danger">You have no items to enchant.</div>
             </div>
-          </div>  
+          </div>
         </div>
 
         <Row>
           <Col lg={12} xl={8}>
             <Row>
               <Col xs={12} sm={12} md={12} lg={12} xl={4}>
-                <select 
+                <select
                   className="form-control mt-2" id="crafting" name="crafting"
                   value={this.state.itemToEnchant !== null ? this.state.itemToEnchant : 0}
                   onChange={this.setItemToEnchant.bind(this)}
@@ -327,7 +330,7 @@ export default class EnchantingAction extends React.Component {
                 </select>
               </Col>
               <Col xs={12} sm={12} md={12} lg={12} xl={4}>
-                <select 
+                <select
                   className="form-control mt-2" id="crafting" name="crafting"
                   value={this.state.prefixId !== null ? this.state.prefixId : 0}
                   onChange={this.setPrefixId.bind(this)}
@@ -338,7 +341,7 @@ export default class EnchantingAction extends React.Component {
                 </select>
               </Col>
               <Col xs={12} sm={12} md={12} lg={12} xl={4}>
-                <select 
+                <select
                   className="form-control mt-2" id="crafting" name="crafting"
                   value={this.state.suffixId !== null ? this.state.suffixId : 0}
                   onChange={this.setSuffixId.bind(this)}
@@ -356,7 +359,7 @@ export default class EnchantingAction extends React.Component {
                 {this.renderEnchantingButton()}
               </Col>
               <Col xs={6} sm={6} md={6} lg={6} xl={6}>
-                <div className="ml-4 mt-3"> 
+                <div className="ml-4 mt-3">
                   <TimeOutBar
                     turnOffFloat={true}
                     cssClass={'enchanting-timeout'}
@@ -380,4 +383,4 @@ export default class EnchantingAction extends React.Component {
       </>
     )
   }
-} 
+}

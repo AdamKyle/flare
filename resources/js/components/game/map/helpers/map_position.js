@@ -22,12 +22,12 @@ export const getNewXPosition = (characterX, mapPositionX) => {
   return mapPositionX;
 }
 
-export const dragMap =  (position, bottomBounds, rightBounds) =>  {
-  const {x, y}        = position;
-  const yBounds       = Math.sign(position.y);
-  const xBounds       = Math.sign(position.x);
+export const dragMap = (position, bottomBounds, rightBounds) => {
+  const {x, y} = position;
+  const yBounds = Math.sign(position.y);
+  const xBounds = Math.sign(position.x);
   let bottomMapBounds = bottomBounds;
-  let rightMapBounds  = rightBounds;
+  let rightMapBounds = rightBounds;
 
   if (yBounds === -1) {
     bottomMapBounds += Math.abs(yBounds);

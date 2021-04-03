@@ -35,13 +35,13 @@ class UpdateKingdomBuildingTest extends TestCase
         $kingdom  = $kingdom->refresh();
         $building = $kingdom->buildings->first();
 
-        UpdateKingdomBuilding::dispatch($building);
+        UpdateKingdomBuilding::dispatch($building, $building->gameBuilding);
 
         $building = $kingdom->buildings->first()->refresh();
 
-        $this->assertTrue($building->current_defence > 100);
-        $this->assertTrue($building->current_durability > 100);
-        $this->assertTrue($building->max_defence > 100);
-        $this->assertTrue($building->max_durability > 100);
+        $this->assertEquals($building->current_defence,  200);
+        $this->assertEquals($building->current_durability, 100);
+        $this->assertEquals($building->max_defence, 200);
+        $this->assertEquals($building->max_durability, 200);
     }
 }

@@ -25,7 +25,6 @@ class KingdomsSettleRequest extends FormRequest
     {
         return [
             'name'         => 'required|unique:kingdoms|min:5|max:30',
-            'color'        => 'required',
             'x_position'   => 'required',
             'y_position'   => 'required',
         ];

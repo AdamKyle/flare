@@ -20,9 +20,10 @@ class CreatePortLocationsSeeder extends Seeder
         $path = Storage::disk('maps')->putFile('Surface', resource_path('maps/surface.jpg'));
 
         $gameMap = GameMap::create([
-            'name'    => 'surface',
-            'path'    => $path,
-            'default' => true,
+            'name'          => 'surface',
+            'path'          => $path,
+            'default'       => true,
+            'kingdom_color' => '#879bc2',
         ]);
 
         // Ports:

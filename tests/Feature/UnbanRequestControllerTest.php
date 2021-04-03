@@ -31,6 +31,11 @@ class UnbanRequestControllerTest extends TestCase
     public function testCanSeeSecurityCheck() {
         $user = $this->createUserWithCharacter()->getUser();
 
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
+
         $this->visit('/login')
              ->click('Banned Unfairly?')
              ->see('Unban Request Process')
@@ -39,7 +44,35 @@ class UnbanRequestControllerTest extends TestCase
              ])->see('Security Check');
     }
 
-    public function testCannotSeeSecurityCheck() {
+    public function testCannotAccessUnBannedRequestBecauseNotBanned() {
+        $user = $this->createUserWithCharacter()->getUser();
+
+        $this->visit('/login')
+            ->click('Banned Unfairly?')
+            ->see('Unban Request Process')
+            ->submitForm('Next Step', [
+                'email' => $user->email
+            ])->see('You are not banned.');
+    }
+
+    public function testCannotAccessUnBannedRequestBecauseNotBannedForEver() {
+        $user = $this->createUserWithCharacter()->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => now()->addDays(1),
+        ]);
+
+        $this->visit('/login')
+            ->click('Banned Unfairly?')
+            ->see('Unban Request Process')
+            ->submitForm('Next Step', [
+                'email' => $user->email
+            ])
+            ->see('You are not banned forever.');
+    }
+
+    public function testCannotSeeSecurityCheckEmailDoesNotExist() {
         $this->visit('/login')
              ->click('Banned Unfairly?')
              ->see('Unban Request Process')
@@ -50,6 +83,11 @@ class UnbanRequestControllerTest extends TestCase
 
     public function testCannotSeeSecurityCheckCacheExpired() {
         $user = $this->createUserWithCharacter()->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         Cache::shouldReceive('put')->andReturn(true);
         Cache::shouldReceive('has')->andReturn(false);
@@ -62,27 +100,13 @@ class UnbanRequestControllerTest extends TestCase
              ])->see('Invalid input. Please start the unban request process again.');
     }
 
-    public function testUserSeesSecurityQuestionsResetAndLogin() {
-        $user = $this->createUserWithCharacter()->getUser();
-
-        $password = Str::random(25);
-
-        $this->visit(route('password.reset', app('Password')::getRepository()->create($user)))
-             ->see('Reset Password')
-             ->submitForm('Next Step', [
-                'email' => $user->email,
-                'password' => $password,
-                'password_confirmation' => $password
-             ])->submitForm('Reset and Login', [
-                'question_one'          => 'Whats your favourite movie?',
-                'question_two'          => 'Whats the name of the town you grew up in?', 
-                'answer_one'            => 'test',
-                'answer_two'            => 'test2',
-             ])->see('Manage Kingdoms');
-    }
-
     public function testCanSeeRequestForm() {
         $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -92,7 +116,7 @@ class UnbanRequestControllerTest extends TestCase
              ])
              ->submitForm('Next Step', [
                 'question_one'          => 'test question',
-                'question_two'          => 'test question 2', 
+                'question_two'          => 'test question 2',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])->see('Unban Request');
@@ -100,6 +124,11 @@ class UnbanRequestControllerTest extends TestCase
 
     public function testCannotSeeRequestFormCacheFailed() {
         $user = $this->createUserWithCharacter()->banCharacter('sample')->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         Cache::shouldReceive('put')->andReturn(true);
 
@@ -115,7 +144,7 @@ class UnbanRequestControllerTest extends TestCase
              ])
              ->submitForm('Next Step', [
                 'question_one'          => 'test question',
-                'question_two'          => 'test question 2', 
+                'question_two'          => 'test question 2',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])->see('Invalid input. Please start the unban request process again.');
@@ -123,6 +152,11 @@ class UnbanRequestControllerTest extends TestCase
 
     public function testCannotSeeRequestFormAnswersDontMatch() {
         $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         $this->visit('/login')
              ->click('Banned Unfairly?')
@@ -132,7 +166,7 @@ class UnbanRequestControllerTest extends TestCase
              ])
              ->submitForm('Next Step', [
                 'question_one'          => 'test question',
-                'question_two'          => 'test question 2', 
+                'question_two'          => 'test question 2',
                 'answer_one'            => 'apples',
                 'answer_two'            => 'bananas',
              ])->see('The answer to one or more security questions does not match our records.');
@@ -140,6 +174,11 @@ class UnbanRequestControllerTest extends TestCase
 
     public function testCanSubmitRequest() {
         $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         $admin = $this->createUser();
 
@@ -154,7 +193,7 @@ class UnbanRequestControllerTest extends TestCase
              ])
              ->submitForm('Next Step', [
                 'question_one'          => 'test question',
-                'question_two'          => 'test question 2', 
+                'question_two'          => 'test question 2',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])
@@ -166,6 +205,11 @@ class UnbanRequestControllerTest extends TestCase
 
     public function testCannotSubmitRequestCacheMiss() {
         $user = $this->createUserWithCharacter()->banCharacter('Sample')->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         $admin = $this->createUser();
 
@@ -191,7 +235,7 @@ class UnbanRequestControllerTest extends TestCase
              ])
              ->submitForm('Next Step', [
                 'question_one'          => 'test question',
-                'question_two'          => 'test question 2', 
+                'question_two'          => 'test question 2',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])
@@ -203,8 +247,13 @@ class UnbanRequestControllerTest extends TestCase
         Mail::assertNotSent(UnBanRequestMail::class);
     }
 
-    public function testCannotSubmitRequest() {
+    public function testCannotSubmitRequestBecauseRequestWasAlreadySubmitted() {
         $user = $this->createUserWithCharacter()->banCharacter('Sample', 'reason here.')->getUser();
+
+        $user->update([
+            'is_banned' => true,
+            'unbanned_at' => null,
+        ]);
 
         $admin = $this->createUser();
 
@@ -221,7 +270,7 @@ class UnbanRequestControllerTest extends TestCase
              ])
              ->submitForm('Next Step', [
                 'question_one'          => 'test question',
-                'question_two'          => 'test question 2', 
+                'question_two'          => 'test question 2',
                 'answer_one'            => 'test',
                 'answer_two'            => 'test2',
              ])

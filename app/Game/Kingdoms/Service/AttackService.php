@@ -10,15 +10,40 @@ use App\Game\Kingdoms\Handlers\SiegeHandler;
 
 class AttackService {
 
+    /**
+     * @var SiegeHandler $seigeHandler
+     */
     private $siegeHandler;
 
+    /**
+     * @var UnitHandler $unitHandler
+     */
     private $unitHandler;
 
-    public function __construct(SiegeHandler $siegeHandler, UnitHandler $unitHandler) {
-        $this->siegeHandler = $siegeHandler;
-        $this->unitHandler  = $unitHandler;
+    /**
+     * @var KingdomResourcesService $kingdomResourcesService
+     */
+    private $kingdomResourcesService;
+
+    /**
+     * AttackService constructor.
+     *
+     * @param SiegeHandler $siegeHandler
+     * @param UnitHandler $unitHandler
+     * @param KingdomResourcesService $kingdomResourcesService
+     */
+    public function __construct(SiegeHandler $siegeHandler, UnitHandler $unitHandler, KingdomResourcesService  $kingdomResourcesService) {
+        $this->siegeHandler            = $siegeHandler;
+        $this->unitHandler             = $unitHandler;
+        $this->kingdomResourcesService = $kingdomResourcesService;
     }
 
+    /**
+     * Handles the actual attack.
+     *
+     * @param UnitMovementQueue $unitMovement
+     * @param int $defenderId
+     */
     public function attack(UnitMovementQueue $unitMovement, int $defenderId) {
         $attackingUnits = $unitMovement->units_moving;
         $defender       = Kingdom::where('id', $defenderId)
@@ -28,7 +53,7 @@ class AttackService {
 
         $siegeUnits   = $this->fetchSiegeUnits($attackingUnits);
         $regularUnits = $this->getRegularUnits($attackingUnits);
-        
+
         if (!empty($siegeUnits)) {
             $newSiegeUnits   = $this->siegeHandler->attack($defender, $siegeUnits);
         }
@@ -36,8 +61,18 @@ class AttackService {
         if (!empty($regularUnits)) {
             $newRegularUnits = $this->unitHandler->attack($defender, $regularUnits);
         }
+
+        $defender = $defender->refresh();
+
+        $this->kingdomResourcesService->setKingdom($defender)->increaseOrDecreaseMorale();
     }
 
+    /**
+     * Fetches the siege units.
+     *
+     * @param array $attackingUnits
+     * @return array
+     */
     public function fetchSiegeUnits(array $attackingUnits): array {
         $siegeUnits = [];
 
@@ -59,6 +94,12 @@ class AttackService {
         return $siegeUnits;
     }
 
+    /**
+     * Gets the regular non siege units.
+     *
+     * @param array $attackingUnits
+     * @return array
+     */
     public function getRegularUnits(array $attackingUnits): array {
         $regularUnits = [];
 

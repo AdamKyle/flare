@@ -1,7 +1,7 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
-import { getServerMessage } from '../helpers/server_message';
+import {getServerMessage} from '../helpers/server_message';
 import moment from 'moment';
 
 export default class CraftingAction extends React.Component {
@@ -35,7 +35,7 @@ export default class CraftingAction extends React.Component {
 
     this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
       this.setState({
-        canCraft:      event.canCraft,
+        canCraft: event.canCraft,
         timeRemaining: event.canCraft ? 0 : 10,
       }, () => {
         this.props.updateCanCraft(event.canCraft);
@@ -76,7 +76,7 @@ export default class CraftingAction extends React.Component {
       this.setState({
         showSuccess: true
       }, () => {
-        setTimeout( () => {
+        setTimeout(() => {
           this.setState({
             showSuccess: false
           });
@@ -134,7 +134,7 @@ export default class CraftingAction extends React.Component {
       showSuccess: false,
     }, () => {
       this.props.updateCanCraft(event.canCraft);
-      
+
       axios.post('/api/craft/' + this.state.characterId, {
         item_to_craft: this.state.itemToCraft,
         type: this.state.craftingType,
@@ -153,9 +153,9 @@ export default class CraftingAction extends React.Component {
       if (this.state.craftingType === null) {
         return (
           <select className="form-control mt-2" id="crafting-type" name="crafting-type"
-            value={0}
-            onChange={this.updateCraftingType.bind(this)}
-            disabled={this.state.isDead}>
+                  value={0}
+                  onChange={this.updateCraftingType.bind(this)}
+                  disabled={this.state.isDead}>
             <option value="" key="0">Please select a crafting type</option>
             <option value="weapon" key="weapon">Weapon</option>
             <option value="armour" key="armour">Armour</option>
@@ -168,9 +168,9 @@ export default class CraftingAction extends React.Component {
 
       return (
         <select className="form-control mt-2" id="crafting" name="crafting"
-          value={this.state.itemToCraft !== null ? this.state.itemToCraft : 1}
-          onChange={this.setItemToCraft.bind(this)}
-          disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
+                value={this.state.itemToCraft !== null ? this.state.itemToCraft : 1}
+                onChange={this.setItemToCraft.bind(this)}
+                disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
           {this.buildCraftableItemsOptions()}
         </select>
       );
@@ -181,9 +181,9 @@ export default class CraftingAction extends React.Component {
     if (this.state.itemToCraft !== 0 && this.state.showCrafting) {
       return (
         <button className="btn btn-primary mt-2"
-          type="button"
-          disabled={this.state.isDead || !this.state.canCraft}
-          onClick={this.craft.bind(this)}
+                type="button"
+                disabled={this.state.isDead || !this.state.canCraft}
+                onClick={this.craft.bind(this)}
         >
           Craft!
         </button>
@@ -208,7 +208,7 @@ export default class CraftingAction extends React.Component {
             </div>
           </div>
         </div>
-        
+
         <Row>
           <Col xs={12} sm={12} md={8} lg={8} xl={8}>
             {this.renderCraftingDropDowns()}
@@ -221,14 +221,14 @@ export default class CraftingAction extends React.Component {
               <Col xs={8}>
                 {
                   this.state.itemToCraft !== 0 ?
-                    <TimeOutBar 
+                    <TimeOutBar
                       cssClass={'crafting-timeout'}
                       readyCssClass={'crafting-ready'}
                       timeRemaining={this.state.timeRemaining}
                       channel={'show-crafting-timeout-bar-' + this.props.userId}
                       eventClass={'Game.Core.Events.ShowCraftingTimeOutEvent'}
                     />
-                  : null
+                    : null
                 }
               </Col>
             </Row>
@@ -237,4 +237,4 @@ export default class CraftingAction extends React.Component {
       </>
     )
   }
-} 
+}

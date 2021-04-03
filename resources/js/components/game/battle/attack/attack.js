@@ -4,12 +4,12 @@ import {randomNumber} from '../../helpers/random_number';
 export default class Attack {
 
   constructor(attacker, defender, characterCurrenthealth, monsterCurrenthealth) {
-    this.attacker               = attacker;
-    this.defender               = defender;
+    this.attacker = attacker;
+    this.defender = defender;
     this.characterCurrentHealth = characterCurrenthealth;
-    this.monsterCurrentHealth   = monsterCurrenthealth;
-    this.battleMessages         = [];
-    this.attackerName           = '';
+    this.monsterCurrentHealth = monsterCurrenthealth;
+    this.battleMessages = [];
+    this.attackerName = '';
   }
 
   attack(attacker, defender, attackAgain, type) {
@@ -67,14 +67,14 @@ export default class Attack {
   getState() {
     return {
       characterCurrentHealth: this.characterCurrentHealth,
-      monsterCurrentHealth:   this.monsterCurrentHealth,
-      battleMessages:         this.battleMessages,
+      monsterCurrentHealth: this.monsterCurrentHealth,
+      battleMessages: this.battleMessages,
     }
   }
 
   canHit(attacker, defender) {
     const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
-    const defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+    const defenderDodge = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
 
     return (attacker.dex * (1 + attackerAccuracy)) > (defender.dex * (1 + defenderDodge));
   }
@@ -122,7 +122,7 @@ export default class Attack {
           this.characterCurrentHealth += healFor;
 
           this.battleMessages.push({
-            message: 'Light floods your eyes as your wounds heal over.' 
+            message: 'Light floods your eyes as your wounds heal over.'
           });
         }
       }
@@ -134,7 +134,7 @@ export default class Attack {
 
     if (type === 'monster') {
       const monster = new Monster(attacker);
-      const attack  = monster.attack();
+      const attack = monster.attack();
 
       this.characterCurrentHealth = this.characterCurrentHealth - attack;
 

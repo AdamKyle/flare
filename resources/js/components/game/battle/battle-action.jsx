@@ -31,8 +31,8 @@ export default class BattleAction extends React.Component {
       isAdventuring: false,
     }
 
-    this.topBar          = Echo.private('update-top-bar-' + this.props.userId);
-    this.adventureLogs   = Echo.private('update-adventure-logs-' + this.props.userId);
+    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -55,10 +55,10 @@ export default class BattleAction extends React.Component {
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       const character = this.state.character;
 
-      character.ac           =  event.characterSheet.ac;
-      character.attack       =  event.characterSheet.attack;
-      character.health       =  event.characterSheet.health;
-      character.gold         =  event.characterSheet.gold;
+      character.ac = event.characterSheet.ac;
+      character.attack = event.characterSheet.attack;
+      character.health = event.characterSheet.health;
+      character.gold = event.characterSheet.gold;
 
       this.setState({character: character});
     });
@@ -84,9 +84,9 @@ export default class BattleAction extends React.Component {
   }
 
   updateActions(event) {
-    const monster     = this.state.monsters.filter(monster => monster.id === parseInt(event.target.value))[0];
+    const monster = this.state.monsters.filter(monster => monster.id === parseInt(event.target.value))[0];
     const monsterInfo = new Monster(monster);
-    const health      = monsterInfo.health();
+    const health = monsterInfo.health();
 
     this.setState({
       monster: monster,
@@ -119,28 +119,28 @@ export default class BattleAction extends React.Component {
     return (
       <>
         {this.state.isAdventuring
-         ?
-         <div className="alert alert-warning" role="alert">
-          You are currently adventuring and cannot fight any monsters or craft/enchant or manage kingdoms.
-        </div>
-         : 
-         null
+          ?
+          <div className="alert alert-warning" role="alert">
+            You are currently adventuring and cannot fight any monsters or craft/enchant or manage kingdoms.
+          </div>
+          :
+          null
         }
         <Row>
           <Col xs={12} sm={12} md={12} lg={6} xl={8}>
             <select className="form-control monster-select" id="monsters" name="monsters"
-              value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
-              onChange={this.updateActions.bind(this)}
-              disabled={this.state.character.is_dead || this.state.isAdventuring}>
-                <option value="" key="0">Please select a monster</option>
-                {this.monsterOptions()}
+                    value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
+                    onChange={this.updateActions.bind(this)}
+                    disabled={this.state.character.is_dead || this.state.isAdventuring}>
+              <option value="" key="0">Please select a monster</option>
+              {this.monsterOptions()}
             </select>
           </Col>
           <Col xs={3} sm={3} md={3} lg={3} xl={1}>
             <button className="btn btn-primary"
-              type="button"
-              disabled={this.state.monster !== 0 ? false : true}
-              onClick={this.fightAgain.bind(this)}
+                    type="button"
+                    disabled={this.state.monster !== 0 ? false : true}
+                    onClick={this.fightAgain.bind(this)}
             >
               Again!
             </button>
@@ -163,7 +163,7 @@ export default class BattleAction extends React.Component {
 
   render() {
     return (
-      <>{this.state.isLoading ? null : this.renderActions() }</>
+      <>{this.state.isLoading ? null : this.renderActions()}</>
     )
   }
 }

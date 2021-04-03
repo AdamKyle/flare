@@ -65,18 +65,19 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(AttackService::class, function($app) {
             return new AttackService(
                 $app->make(SiegeHandler::class),
-                $app->make(UnitHandler::class)
+                $app->make(UnitHandler::class),
+                $app->make(KingdomResourcesService::class),
             );
         });
 
         $this->app->bind(KingdomsAttackService::class, function($app) {
             return new KingdomsAttackService(
-                $app->make(SelectedKingdom::class), 
+                $app->make(SelectedKingdom::class),
                 $app->make(Manager::class),
                 $app->make(KingdomTransformer::class),
             );
         });
-        
+
     }
 
     /**

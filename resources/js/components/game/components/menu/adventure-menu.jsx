@@ -1,5 +1,5 @@
 import React from 'react';
-import { getServerMessage } from '../../helpers/server_message';
+import {getServerMessage} from '../../helpers/server_message';
 import Collapse from 'react-bootstrap/Collapse'
 
 export default class AdventureMenu extends React.Component {
@@ -54,7 +54,7 @@ export default class AdventureMenu extends React.Component {
           return;
         }
       });
-      
+
       return hasUnCollectedReward;
     }
 
@@ -63,24 +63,25 @@ export default class AdventureMenu extends React.Component {
 
   renderCurrentAdventureLink() {
     if (this.hasRewardsToCollect()) {
-        return <><a href="/current-adventure/" className="text-success">Rewards <i className="ml-3 text-success fas fa-check-double fa-bounce"></i></a></>
+      return <><a href="/current-adventure/" className="text-success">Rewards <i
+        className="ml-3 text-success fas fa-check-double fa-bounce"></i></a></>
     }
 
     return null;
   }
 
   render() {
-    
+
     return (
       <>
-        <a className="has-arrow" 
-          href="#" onClick={this.open.bind(this)} 
-          aria-expanded={open} aria-controls="adventure-links">
-            <i className={'ra ra-trail ' + (this.hasRewardsToCollect() ? 'text-success fa-bounce' : null)}></i>
-            <span className="hide-menu">
+        <a className="has-arrow"
+           href="#" onClick={this.open.bind(this)}
+           aria-expanded={open} aria-controls="adventure-links">
+          <i className={'ra ra-trail ' + (this.hasRewardsToCollect() ? 'text-success fa-bounce' : null)}></i>
+          <span className="hide-menu">
               Adventure Logs
             </span>
-          </a>
+        </a>
         <Collapse in={this.state.open}>
           <ul id="adventure-links">
             <li>{this.renderCurrentAdventureLink()}</li>

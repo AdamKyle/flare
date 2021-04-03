@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import {Row, Col} from 'react-bootstrap';
 
 export default class MapActions extends React.Component {
 
@@ -27,21 +27,24 @@ export default class MapActions extends React.Component {
               <div className="push-right">
                 {
                   !_.isEmpty(this.props.adventures) ?
-                    <button type="button" className=" btn btn-success mr-2 btn-sm " disabled={this.props.disableMapButtons()} onClick={this.props.openAdventureDetails}>
+                    <button type="button" className=" btn btn-success mr-2 btn-sm "
+                            disabled={this.props.disableMapButtons()} onClick={this.props.openAdventureDetails}>
                       Adventure
                     </button>
-                  : null
+                    : null
                 }
 
                 {
                   this.props.currentPort !== null ?
-                    <button type="button" className=" btn btn-success mr-2 btn-sm " disabled={this.props.disableMapButtons()} onClick={this.props.openPortDetails}>
+                    <button type="button" className=" btn btn-success mr-2 btn-sm "
+                            disabled={this.props.disableMapButtons()} onClick={this.props.openPortDetails}>
                       Set Sail
                     </button>
-                  : null
+                    : null
                 }
 
-                <button type="button" className="btn btn-primary btn-sm mr-2 " data-direction="teleport" disabled={this.props.disableMapButtons()} onClick={this.props.openTeleport}>
+                <button type="button" className="btn btn-primary btn-sm mr-2 " data-direction="teleport"
+                        disabled={this.props.disableMapButtons()} onClick={this.props.openTeleport}>
                   Teleport
                 </button>
               </div>

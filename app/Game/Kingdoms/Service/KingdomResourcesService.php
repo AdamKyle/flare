@@ -32,7 +32,7 @@ class KingdomResourcesService {
 
     /**
      * constructor
-     * 
+     *
      * @param Manager $manager
      * @param KingdomTransformer $kingdomTransformer
      * @return void
@@ -44,7 +44,7 @@ class KingdomResourcesService {
 
     /**
      * Set the kingdom to be updated.
-     * 
+     *
      * @param Kingdom $kingdom
      * @return KingdomResourceService
      */
@@ -56,11 +56,11 @@ class KingdomResourcesService {
 
     /**
      * Updates the kingdoms resources.
-     * 
+     *
      * Will updates cores resourses, population and morale.
-     * 
+     *
      * This will also alert the player if they are online, via the chat are.
-     * 
+     *
      * @return void
      */
     public function updateKingdom(): void {
@@ -68,7 +68,7 @@ class KingdomResourcesService {
         $this->updateCurrentPopulation();
         $this->increaseCurrentResource();
         $this->increaseTreasury();
-        
+
         $user  = $this->kingdom->character->user;
         $kingdom = $this->kingdom;
 
@@ -83,7 +83,7 @@ class KingdomResourcesService {
                 $cache = Cache::get('kingdoms-updated-' . $user->id);
 
                 $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
-                
+
                 Cache::put('kingdoms-updated-' . $user->id, $cache);
             } else {
                 $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
@@ -98,6 +98,41 @@ class KingdomResourcesService {
      */
     public function getKingdomsUpdated(): array {
         return $this->kingdomsUpdated;
+    }
+
+    /**
+     * Increase or decrease the morale.
+     *
+     * This is based on building durability.
+     */
+    public function increaseOrDecreaseMorale(): void {
+        $totalIncrease = 0;
+        $totalDecrease = 0;
+        $buildings     = $this->kingdom->buildings;
+
+        foreach ($buildings as $building) {
+            if ($building->current_durability > 0) {
+                $totalIncrease += $building->morale_increase;
+            } else {
+                $totalDecrease += $building->morale_decrease;
+            }
+        }
+
+        if ($totalIncrease > $totalDecrease) {
+            $totalIncrease -= $totalDecrease;
+
+            $this->addMorale($totalIncrease);
+
+            return;
+        } else if ($totalIncrease < $totalDecrease) {
+            $totalDecrease -= $totalIncrease;
+
+            $this->reduceMorale($totalDecrease);
+
+            return;
+        }
+
+        $this->adjustMorale($totalIncrease, $totalDecrease);
     }
 
     protected function putUpdatedKingdomIntoCache(int $kingdomId, array $cache = []): array {
@@ -168,33 +203,8 @@ class KingdomResourcesService {
         return $this->updateTreasury(50);
     }
 
-    protected function increaseOrDecreaseMorale() {
-        $totalIncrease = 0;
-        $totalDecrease = 0;
-        $buildings     = $this->kingdom->buildings;
 
-        foreach ($buildings as $building) {
-            if ($building->current_durability > 0) {
-                $totalIncrease += $building->morale_increase;
-            } else {
-                $totalDecrease += $building->morale_decrease;
-            }
-        }
-
-        if ($totalIncrease > $totalDecrease) {
-            $totalIncrease -= $totalDecrease;
-
-            return $this->addMorale($totalIncrease);
-        } else if ($totalIncrease < $totalDecrease) {
-            $totalDecrease -= $totalIncrease;
-
-            return $this->reduceMorale($totalDecrease);
-        }
-        
-        return $this->adjustMorale($totalIncrease, $totalDecrease);
-    }
-
-    private function addMorale(float $toAdd) {
+    protected function addMorale(float $toAdd): void {
         $current = $this->kingdom->current_morale;
 
         if ($current === 1.0) {
@@ -216,7 +226,7 @@ class KingdomResourcesService {
         $this->kingdom = $this->kingdom->refresh();
     }
 
-    private function reduceMorale(float $toSub) {
+    protected function reduceMorale(float $toSub): void {
         $current = $this->kingdom->current_morale;
 
         if ($current === 0.0) {
@@ -238,7 +248,7 @@ class KingdomResourcesService {
         $this->kingdom = $this->kingdom->refresh();
     }
 
-    private function adjustMorale(float $toAdd, float $toSub) {
+    protected function adjustMorale(float $toAdd, float $toSub): void {
         $current = $this->kingdom->current_morale;
 
         $newTotal = ($current + $toAdd) - $toSub;
