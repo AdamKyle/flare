@@ -190,7 +190,7 @@ class KingdomResourcesService {
 
         $this->kingdom = $this->kingdom->refresh();
     }
-    
+
     protected function increaseResource(string $resource, KingdomBuilding  $building) {
         $newCurrent = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
 
