@@ -65,7 +65,7 @@ export default class UnitSelection extends React.Component {
     if (amount === 0) {
       unitsToSend[kingdomName][unitName]['total_time'] = 0;
     } else {
-      const time = this.getTimeForUnits(kingdomName, unitName, amount);
+      const time = this.getTimeForUnits(kingdomName, unitName);
 
       unitsToSend[kingdomName][unitName]['total_time'] = time;
     }
@@ -82,10 +82,7 @@ export default class UnitSelection extends React.Component {
     });
   }
 
-  getTimeForUnits(kingdomName, unitName, amount) {
-    if (amount === '') {
-      return 0;
-    }
+  getTimeForUnits(kingdomName, unitName) {
 
     let foundKingdom = this.props.selectedKingdomData.filter((k) => k.kingdom_name === kingdomName);
 
@@ -103,13 +100,7 @@ export default class UnitSelection extends React.Component {
 
     foundUnit = foundUnit[0];
 
-    let additionalTime = Math.ceil((amount / 10));
-
-    if (additionalTime <= 0) {
-      additionalTime = 0;
-    }
-
-    return (time(this.props.defendingKingdom.x_position, this.props.defendingKingdom.y_position, foundKingdom.x_position, foundKingdom.y_position) * foundUnit.travel_time) + additionalTime;
+    return (time(this.props.defendingKingdom.x_position, this.props.defendingKingdom.y_position, foundKingdom.x_position, foundKingdom.y_position) * foundUnit.travel_time);
   }
 
   getTotalTime(unitsToSend) {

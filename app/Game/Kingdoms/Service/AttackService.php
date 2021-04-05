@@ -55,7 +55,8 @@ class AttackService {
         $regularUnits = $this->getRegularUnits($attackingUnits);
 
         if (!empty($siegeUnits)) {
-            $newSiegeUnits   = $this->siegeHandler->attack($defender, $siegeUnits);
+            $healers         = $this->fetchHealers($attackingUnits);
+            $newSiegeUnits   = $this->siegeHandler->attack($defender, $siegeUnits, $healers);
         }
 
         if (!empty($regularUnits)) {
@@ -114,10 +115,32 @@ class AttackService {
                     'primary_target' => $gameUnit->primary_target,
                     'fall_back'      => $gameUnit->fall_back,
                     'unit_id'        => $gameUnit->id,
+                    'healer'         => $gameUnit->can_heal,
+                    'heal_for'       => !is_null($gameUnit->heal_percentage) ? $gameUnit->heal_percentage * $unitInfo['amount'] : 0,
                 ];
             }
         }
 
         return $regularUnits;
+    }
+
+    public function fetchHealers(array $attackingUnits): array {
+        $healerUnits = [];
+
+        foreach ($attackingUnits as $unitInfo) {
+            $gameUnit = GameUnit::where('id', $unitInfo['unit_id'])->where('can_heal', true)->first();
+
+            if (is_null($gameUnit)) {
+                continue;
+            }
+
+            $healerUnits[] = [
+                'amount'   => $unitInfo['amount'],
+                'heal_for' => $gameUnit->heal_percentage * $unitInfo['amount'],
+                'unit_id'  => $gameUnit->id,
+            ];
+        }
+
+        return $healerUnits;
     }
 }

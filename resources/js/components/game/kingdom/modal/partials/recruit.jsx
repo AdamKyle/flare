@@ -37,12 +37,14 @@ export default class Recruit extends React.Component {
     axios.post('/api/kingdoms/' + this.props.kingdom.id + '/recruit-units/' + this.props.unit.id, {
       amount: this.state.value,
     }).then((result) => {
+      const amount = this.state.value;
+
       this.setState({
         value: 0,
         canRecruit: false,
       }, () => {
         this.props.updateKingdomData(result.data);
-        this.props.showUnitRecruitmentSuccess('Recruiting ' + this.state.value + ' ' + this.props.unit.name + '. You can see this in the Unit Queue tab.')
+        this.props.showUnitRecruitmentSuccess('Recruiting ' + amount + ' ' + this.props.unit.name + '. You can see this in the Unit Queue tab.')
         this.props.close();
       });
     }).catch((err) => {

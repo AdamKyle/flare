@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Flare\Handlers\MessageThrottledHandler;
+use Illuminate\Session\TokenMismatchException;
 use Throwable;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
@@ -48,6 +49,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+
+        if ($exception instanceof TokenMismatchException) {
+            return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');
+        }
+
         if ($exception instanceof ThrottleRequestsException) {
             $handler = resolve(MessageThrottledHandler::class);
 

@@ -64,6 +64,22 @@ class Details extends Component
             $this->gameUnit->siege_weapon = false;
         }
 
+        if (is_null($this->gameUnit->can_heal)) {
+            $this->gameUnit->can_heal = false;
+        }
+
+        if (is_null($this->gameUnit->can_not_be_healed)) {
+            $this->gameUnit->can_not_be_healed = false;
+        }
+
+        if (is_null($this->gameUnit->defender)) {
+            $this->gameUnit->defender = false;
+        }
+
+        if (is_null($this->gameUnit->attacker)) {
+            $this->gameUnit->atacker = false;
+        }
+
         $this->gameUnit->save();
 
         $gameUnit = $this->gameUnit->refresh();
@@ -73,7 +89,7 @@ class Details extends Component
         if ($this->editing) {
             $message = 'Updated Unit: ' . $gameUnit->refresh()->name;
         }
-        
+
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',
             'message' => $message,

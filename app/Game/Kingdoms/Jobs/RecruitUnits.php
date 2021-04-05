@@ -61,7 +61,7 @@ class RecruitUnits implements ShouldQueue
 
         $this->queueId  = $queueId;
 
-        $this->amount   = $amount; 
+        $this->amount   = $amount;
     }
 
     /**
@@ -109,14 +109,17 @@ class RecruitUnits implements ShouldQueue
         $queue->delete();
 
         $kingdom = $this->kingdom->refresh();
+        $x       = $kingdom->x_position;
+        $y       = $kingdom->y_position;
         $user    = $kingdom->character->user;
-        
+
         if (UserOnlineValue::isOnline($user)) {
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
-            
+
             event(new UpdateKingdom($user, $kingdom));
-            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' you have a total of: ' . $amount));
+
+            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' (X/Y: '.$x.'/'.$y.') you have a total of: ' . $amount));
         } else {
             Mail::to($user)->send(new RecruitedUnits(
                 $user,

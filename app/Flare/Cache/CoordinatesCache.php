@@ -8,7 +8,7 @@ class CoordinatesCache {
 
     /**
      * Fetches the coordinates from cache or builds them into cache.
-     * 
+     *
      * @return array
      */
     public function getFromCache(): array {
@@ -28,13 +28,13 @@ class CoordinatesCache {
 
     /**
      * Builds the x coordinates
-     * 
+     *
      * @return array
      */
     public function buildXCoordinates(): array {
-        
+
         $start = 0;
-        $max   = 466;
+        $max   = 496;
         $coordinates = [$start];
 
         $current = $start;
@@ -50,11 +50,11 @@ class CoordinatesCache {
 
     /**
      * Builds the y coordinates
-     * 
+     *
      * @return array
      */
     public function buildYCoordinates(): array {
-        
+
         $start = 16;
         $max   = 496;
         $coordinates = [$start];

@@ -20,6 +20,9 @@ export default class KingdomBuildings extends React.Component {
       {
         key: "current_durability",
         text: "Current Durability",
+        cell: row => <div data-tag="allowRowEvents">
+          <div key={row.id}>{row.current_durability}</div>
+        </div>,
         sortable: true
       },
       {

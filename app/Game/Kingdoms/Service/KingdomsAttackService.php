@@ -31,17 +31,17 @@ class KingdomsAttackService {
 
     public function fetchSelectedKingdomData(Character $character, array $kingdoms): array {
         $kingdomData = [];
-        
+
         foreach ($kingdoms as $kingdomId) {
             $kingdom = Kingdom::where('character_id', $character->id)->where('id', $kingdomId)->first();
-            
+
             if (is_null($kingdom)) {
                 return $this->errorResult('You do not own this kingdom.');
             }
 
             $kingdom = new Item($kingdom, $this->selectedKingdom);
             $kingdom = $this->manager->createData($kingdom)->toArray();
-            
+
             $kingdomData[] = $kingdom;
         }
 
@@ -54,7 +54,7 @@ class KingdomsAttackService {
         if (is_null($defender)) {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
         }
-        
+
         foreach ($params as $kingdomName => $units) {
             $kingdom = Kingdom::where('character_id', $character->id)
                               ->where('name', $kingdomName)
@@ -71,7 +71,7 @@ class KingdomsAttackService {
             } catch (\Exception $e) {
                 return $this->errorResult($e->getMessage());
             }
-            
+
             $totalTime = $this->fetchTotalTime($units);
 
             $timeTillFinished = now()->addMinutes($totalTime);
@@ -87,7 +87,7 @@ class KingdomsAttackService {
                 'from_y'       => $kingdom->y_position,
             ]);
 
-            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack')->delay($timeTillFinished);
+            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack')->delay(now()->addMinutes($timeTillFinished);
 
             $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransfromer);
 
@@ -115,10 +115,10 @@ class KingdomsAttackService {
 
             if ($newAmountInKingdom < 0) {
                 throw new \Exception(
-                    'You don\'t have enough units. You have: ' . 
-                    $kingdomUnitInformation->amount . 
-                    ' and are trying to send: ' . 
-                    $unitInformation['amount_to_send'] . 
+                    'You don\'t have enough units. You have: ' .
+                    $kingdomUnitInformation->amount .
+                    ' and are trying to send: ' .
+                    $unitInformation['amount_to_send'] .
                     ' for: ' . $kingdom->name
                 );
             }
@@ -134,7 +134,7 @@ class KingdomsAttackService {
                 ]);
             }
         }
-        
+
         return $unitsToSend;
     }
 

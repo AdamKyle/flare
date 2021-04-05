@@ -84,7 +84,7 @@ class UpgradeBuilding implements ShouldQueue
 
         if ($this->building->gives_resources) {
             $type = $this->getResourceType();
-            
+
             if (is_null($type)) {
                 $queue->delete();
 
@@ -116,14 +116,18 @@ class UpgradeBuilding implements ShouldQueue
         }
 
         BuildingInQueue::where('to_level', $level)->where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdom_id)->first()->delete();
-        
+
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($this->user, $kingdom));
-            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' and is now level: ' . $level));
+
+            $x = $this->building->kingdom->x_position;
+            $y = $this->building->kingdom->y_position;
+
+            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' (X/Y: '.$x.'/'.$y.') and is now level: ' . $level));
         } else if ($this->user->upgraded_building_email) {
             Mail::to($this->user)->send(new UpgradedBuilding(
                 $this->user,

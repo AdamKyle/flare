@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Models\KingdomBuilding;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
@@ -28,6 +29,9 @@ class KingdomResourcesService {
      */
     private $kingdomTransformer;
 
+    /**
+     * @var array $kingdomsUpdated
+     */
     private $kingdomsUpdated = [];
 
     /**
@@ -171,24 +175,32 @@ class KingdomResourcesService {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
             $morale   = $this->kingdom->morale;
 
-            if ($building->current_durability === 0 || $morale === 0) {
-                continue;
+            if ($building->current_durability === 0) {
+                if ($morale === 0) {
+                    continue;
+                } else {
+                    $this->increaseResource($resource, $building);
+                }
             }
 
             if (!is_null($building)) {
-                $newCurrent = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
-
-                if ($newCurrent > $this->kingdom->{'max_' . $resource}) {
-                    $newCurrent = $this->kingdom->{'max_' . $resource};
-                }
-
-                $this->kingdom->{'current_' . $resource} = $newCurrent;
-
-                $this->kingdom->save();
+                $this->increaseResource($resource, $building);
             }
         }
 
         $this->kingdom = $this->kingdom->refresh();
+    }
+    
+    protected function increaseResource(string $resource, KingdomBuilding  $building) {
+        $newCurrent = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
+
+        if ($newCurrent > $this->kingdom->{'max_' . $resource}) {
+            $newCurrent = $this->kingdom->{'max_' . $resource};
+        }
+
+        $this->kingdom->{'current_' . $resource} = $newCurrent;
+
+        $this->kingdom->save();
     }
 
     protected function increaseTreasury() {

@@ -74,6 +74,8 @@ export default class BuildingManagementModal extends React.Component {
     if ((building.level * building.base_population) > kingdom.current_population) {
       return false;
     }
+
+    return true;
   }
 
   buildingNeedsToBeRebuilt() {
@@ -87,7 +89,7 @@ export default class BuildingManagementModal extends React.Component {
   upgradeBuilding() {
     axios.post('/api/kingdoms/' + this.props.characterId + '/upgrade-building/' + this.props.building.id)
       .then((result) => {
-        this.props.showBuildingSuccess(this.props.building.name + ' is in queue. You can see this in the Building Queue tab.');
+        this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being upgraded). You can see this in the Building Queue tab.');
         this.props.close();
       })
       .catch((error) => {
@@ -98,6 +100,7 @@ export default class BuildingManagementModal extends React.Component {
   rebuildBuilding() {
     axios.post('/api/kingdoms/' + this.props.characterId + '/rebuild-building/' + this.props.building.id)
       .then((result) => {
+        this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being rebuilt). You can see this in the Building Queue tab.');
         this.props.close();
       })
       .catch((error) => {
@@ -106,6 +109,7 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   render() {
+    console.log(!this.canRebuild(), !this.isCurrentlyInQueue())
     return (
       <Modal
         dialogAs={DraggableModalDialog}

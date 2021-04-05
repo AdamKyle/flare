@@ -89,14 +89,18 @@ class RebuildBuilding implements ShouldQueue
                        ->where('kingdom_id', $this->building->kingdom_id)
                        ->first()
                        ->delete();
-        
+
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($this->user, $kingdom));
-            event(new ServerMessageEvent($this->user, 'building-repair-finished', $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '.'));
+
+            $x = $kingdom->x_position;
+            $y = $kingdom->y_position;
+
+            event(new ServerMessageEvent($this->user, 'building-repair-finished', $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '  (X/Y: '.$x.'/'.$y.').'));
         } else if ($this->user->rebuilt_building_email) {
             Mail::to($this->user)->send(new RebuiltBuilding(
                 $this->user,
