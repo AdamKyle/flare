@@ -11,8 +11,6 @@ class Details extends Component
 
     public $editing      = false;
 
-    public $weakAgainst  = false;
-
     public $units        = null;
 
     protected $rules = [
@@ -60,29 +58,13 @@ class Details extends Component
             }
         }
 
-        if (is_null($this->gameUnit->siege_weapon)) {
-            $this->gameUnit->siege_weapon = false;
+        if ($this->editing) {
+            $this->gameUnit->update($this->gameUnit->getAttributes());
+
+            $gameUnit = $this->gameUnit->refresh();
+        } else {
+            $gameUnit = GameUnit::create($this->gameUnit->getAttributes());
         }
-
-        if (is_null($this->gameUnit->can_heal)) {
-            $this->gameUnit->can_heal = false;
-        }
-
-        if (is_null($this->gameUnit->can_not_be_healed)) {
-            $this->gameUnit->can_not_be_healed = false;
-        }
-
-        if (is_null($this->gameUnit->defender)) {
-            $this->gameUnit->defender = false;
-        }
-
-        if (is_null($this->gameUnit->attacker)) {
-            $this->gameUnit->atacker = false;
-        }
-
-        $this->gameUnit->save();
-
-        $gameUnit = $this->gameUnit->refresh();
 
         $message = 'Created Unit: ' . $gameUnit->refresh()->name;
 

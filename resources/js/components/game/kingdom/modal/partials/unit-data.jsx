@@ -145,8 +145,8 @@ export default class UnitData extends React.Component {
             <h5>Misc. Details</h5>
             <hr/>
             <dl>
-              <dd><strong>Is Atacker?</strong>:</dd>
-              <dd>{this.props.unit.atacker ? 'Yes' : 'No'}</dd>
+              <dd><strong>Is Attacker?</strong>:</dd>
+              <dd>{this.props.unit.attacker ? 'Yes' : 'No'}</dd>
               <dd><strong>Is Defender?</strong>:</dd>
               <dd>{this.props.unit.defender ? 'Yes' : 'No'}</dd>
             </dl>

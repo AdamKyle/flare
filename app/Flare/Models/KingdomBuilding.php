@@ -87,19 +87,19 @@ class KingdomBuilding extends Model
     }
 
     public function getDurabilityAttribute() {
-        return $this->gameBuilding->base_durability * (1 + ($this->level * $this->gameBuilding->increase_durability_amount));
+        return $this->level * $this->gameBuilding->increase_durability_amount;
     }
 
     public function getDefenceAttribute() {
-        return $this->gameBuilding->base_defence * (1 + ($this->level * $this->gameBuilding->increase_defence_amount));
+        return $this->level * $this->gameBuilding->increase_defence_amount;
     }
 
     public function getFutureDurabilityAttribute() {
-        return number_format($this->gameBuilding->base_durability * (1 + (($this->level + 1) * $this->gameBuilding->increase_durability_amount)), 0);
+        return ($this->level + 1) * $this->gameBuilding->increase_defence_amount;
     }
 
     public function getFutureDefenceAttribute() {
-        return number_format($this->gameBuilding->base_defence * (1 + (($this->level + 1) * $this->gameBuilding->increase_defence_amount)), 0);
+        return ($this->level + 1) * $this->gameBuilding->increase_defence_amount;
     }
 
     public function getRequiredPopulationAttribute() {
@@ -185,7 +185,7 @@ class KingdomBuilding extends Model
         if ($this->level > 1) {
             $time = ($this->level * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
         }
-        
+
         $now  = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));
 
@@ -201,11 +201,11 @@ class KingdomBuilding extends Model
     }
 
     public function getIncreaseInWoodAttribute() {
-        return round($this->gameBuilding->increase_wood_amount * (1 + ($this->level / 10)));
+        return $this->level * $this->gameBuilding->increase_wood_amount;
     }
 
     public function getFutureIncreaseInWoodAttribute() {
-        return round($this->gameBuilding->increase_wood_amount * (1 + (($this->level + 1) / 10)));
+        return ($this->level + 1) * $this->gameBuilding->increase_wood_amount;
     }
 
     public function getIncreaseInClayAttribute() {
@@ -213,7 +213,7 @@ class KingdomBuilding extends Model
     }
 
     public function getFutureIncreaseInClayAttribute() {
-        return round($this->gameBuilding->increase_clay_amount * (1 + (($this->level + 1) / 10)));
+        return ($this->level + 1) * $this->gameBuilding->increase_clay_amount;
     }
 
     public function getIncreaseInStoneAttribute() {
@@ -221,7 +221,7 @@ class KingdomBuilding extends Model
     }
 
     public function getFutureIncreaseInStoneAttribute() {
-        return round($this->gameBuilding->increase_stone_amount * (1 + (($this->level + 1) / 10)));
+        return ($this->level + 1) * $this->gameBuilding->increase_stone_amount;
     }
 
     public function getIncreaseInIronAttribute() {
@@ -229,7 +229,7 @@ class KingdomBuilding extends Model
     }
 
     public function getFutureIncreaseInIronAttribute() {
-        return round($this->gameBuilding->increase_iron_amount * (1 + (($this->level + 1) / 10)));
+        return ($this->level + 1) * $this->gameBuilding->increase_iron_amount;
     }
 
     public function getIsAtMaxLevelAttribute() {

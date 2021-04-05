@@ -87,7 +87,7 @@ class KingdomsAttackService {
                 'from_y'       => $kingdom->y_position,
             ]);
 
-            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack')->delay(now()->addMinutes($timeTillFinished);
+            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack')->delay($timeTillFinished);
 
             $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransfromer);
 
@@ -125,8 +125,9 @@ class KingdomsAttackService {
 
             if ($unitInformation['amount_to_send'] > 0) {
                 $unitsToSend[] = [
-                    'unit_id' => $unit->id,
-                    'amount'  => $unitInformation['amount_to_send']
+                    'unit_id'        => $unit->id,
+                    'amount'         => $unitInformation['amount_to_send'],
+                    'time_to_return' => $unitInformation['total_time'],
                 ];
 
                 $kingdomUnitInformation->update([

@@ -39,6 +39,10 @@ class UnitHandler {
             $totalDefenderDefence += ($unit->amount) * $unit->gameUnit->defence;
         }
 
+        if ($totalDefenderAttack === 0) {
+            return $attackingUnits;
+        }
+
         $defenceBonus = $this->getTotalDefenceBonus($defender);
 
         $totalDefenderDefence = $totalDefenderDefence * ($defenceBonus > 0 ? $defenceBonus : 1 + $defenceBonus);
@@ -107,9 +111,11 @@ class UnitHandler {
         $percentageLost = ($percentageLost / count($attackingUnits));
 
         foreach ($attackingUnits as $index => $unitInfo) {
-            $amountLost = ceil($unitInfo['amount'] - ($unitInfo['amount'] * $percentageLost));
+            if (!$unitInfo['settler']) {
+                $amountLost = ceil($unitInfo['amount'] - ($unitInfo['amount'] * $percentageLost));
 
-            $attackingUnits[$index]['amount'] = $amountLost > 0 ? $amountLost : 0;
+                $attackingUnits[$index]['amount'] = $amountLost > 0 ? $amountLost : 0;
+            }
         }
 
         return $this->healAttackingUnits($attackingUnits, $this->getHealingAmountForAttacking($attackingUnits));
@@ -119,9 +125,11 @@ class UnitHandler {
         $healingAmount = ($healingAmount / count($attackingUnits));
 
         foreach ($attackingUnits as $index => $unitInfo) {
-            $amountHealed = ceil($unitInfo['amount'] * ($healingAmount > 1 ? $healingAmount : (1 + $healingAmount)));
+            if (!$unitInfo['settler']) {
+                $amountHealed = ceil($unitInfo['amount'] * ($healingAmount > 1 ? $healingAmount : (1 + $healingAmount)));
 
-            $attackingUnits[$index]['amount'] = $amountHealed;
+                $attackingUnits[$index]['amount'] = $amountHealed;
+            }
         }
 
         return $attackingUnits;

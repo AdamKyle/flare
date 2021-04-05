@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Service\UnitReturnService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Handlers\UnitHandler;
@@ -68,6 +69,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UnitHandler::class),
                 $app->make(KingdomResourcesService::class),
             );
+        });
+
+        $this->app->bind(UnitReturnService::class, function($app) {
+           return new UnitReturnService();
         });
 
         $this->app->bind(KingdomsAttackService::class, function($app) {

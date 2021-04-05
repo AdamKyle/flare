@@ -101,10 +101,10 @@ class UpgradeBuilding implements ShouldQueue
         ]);
 
         $this->building->refresh()->update([
-            'current_defence'    => ($this->building->level * $this->building->gameBuilding->base_defence),
-            'current_durability' => ($this->building->level * $this->building->gameBuilding->base_durability),
-            'max_defence'        => ($this->building->level * $this->building->gameBuilding->base_defence),
-            'max_durability'     => ($this->building->level * $this->building->gameBuilding->base_durability),
+            'current_defence'    => $this->building->defence,
+            'current_durability' => $this->building->durability,
+            'max_defence'        => $this->building->defence,
+            'max_durability'     => $this->building->durability,
         ]);
 
         $building = $this->building->refresh();

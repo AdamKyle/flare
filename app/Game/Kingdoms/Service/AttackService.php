@@ -7,6 +7,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Handlers\UnitHandler;
 use App\Game\Kingdoms\Handlers\SiegeHandler;
+use App\Game\Kingdoms\Jobs\MoveUnits;
 
 class AttackService {
 
@@ -32,7 +33,7 @@ class AttackService {
      * @param UnitHandler $unitHandler
      * @param KingdomResourcesService $kingdomResourcesService
      */
-    public function __construct(SiegeHandler $siegeHandler, UnitHandler $unitHandler, KingdomResourcesService  $kingdomResourcesService) {
+    public function __construct(SiegeHandler $siegeHandler, UnitHandler $unitHandler, KingdomResourcesService $kingdomResourcesService) {
         $this->siegeHandler            = $siegeHandler;
         $this->unitHandler             = $unitHandler;
         $this->kingdomResourcesService = $kingdomResourcesService;
@@ -54,6 +55,9 @@ class AttackService {
         $siegeUnits   = $this->fetchSiegeUnits($attackingUnits);
         $regularUnits = $this->getRegularUnits($attackingUnits);
 
+        $newSiegeUnits   = [];
+        $newRegularUnits = [];
+
         if (!empty($siegeUnits)) {
             $healers         = $this->fetchHealers($attackingUnits);
             $newSiegeUnits   = $this->siegeHandler->attack($defender, $siegeUnits, $healers);
@@ -66,6 +70,31 @@ class AttackService {
         $defender = $defender->refresh();
 
         $this->kingdomResourcesService->setKingdom($defender)->increaseOrDecreaseMorale();
+
+        $timeToReturn = $this->getTotalReturnTime($newSiegeUnits, $newRegularUnits);
+
+        if ($timeToReturn > 0) {
+            $timeToReturn = now()->addMinutes($timeToReturn);
+
+            $unitMovement->update([
+                'units_moving' => [
+                    'new_units' => array_merge($newSiegeUnits, $newRegularUnits),
+                    'old_units' => array_merge($siegeUnits, $regularUnits)
+                ],
+                'completed_at' => $timeToReturn,
+                'started_at'   => now(),
+                'moving_to_x'  => $unitMovement->from_x,
+                'moving_to_y'  => $unitMovement->from_y,
+                'from_x'       => $unitMovement->moving_to_x,
+                'from_y'       => $unitMovement->moving_to_y,
+            ]);
+
+            $unitMovement = $unitMovement->refresh();
+
+            MoveUnits::dispatch($unitMovement->id, $defenderId, 'return')->delay($timeToReturn);
+        } else {
+            dump('All units lost ...');
+        }
     }
 
     /**
@@ -88,6 +117,7 @@ class AttackService {
                     'primary_target' => $gameUnit->primary_target,
                     'fall_back'      => $gameUnit->fall_back,
                     'unit_id'        => $gameUnit->id,
+                    'time_to_return' => $unitInfo['time_to_return'],
                 ];
             }
         }
@@ -117,6 +147,9 @@ class AttackService {
                     'unit_id'        => $gameUnit->id,
                     'healer'         => $gameUnit->can_heal,
                     'heal_for'       => !is_null($gameUnit->heal_percentage) ? $gameUnit->heal_percentage * $unitInfo['amount'] : 0,
+                    'can_be_healed'  => !$gameUnit->can_not_be_healed,
+                    'settler'        => $gameUnit->is_settler,
+                    'time_to_return' => $unitInfo['time_to_return'],
                 ];
             }
         }
@@ -142,5 +175,31 @@ class AttackService {
         }
 
         return $healerUnits;
+    }
+
+    protected function getTotalReturnTime(array $regularUnits, array $siegeUnits) {
+        $time = 0;
+
+        if (!empty($regularUnits)) {
+            $time += $this->getTime($regularUnits);
+        }
+
+        if (!empty($siegeUnits)) {
+            $time += $this->getTime($siegeUnits);
+        }
+
+        return $time;
+    }
+
+    private function getTime(array $units) {
+        $time = 0;
+
+        foreach ($units as $unitInfo) {
+            if ($unitInfo['amount'] > 0) {
+                $time += $unitInfo['time_to_return'];
+            }
+        }
+
+        return $time;
     }
 }

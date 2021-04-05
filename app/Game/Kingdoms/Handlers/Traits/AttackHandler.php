@@ -28,11 +28,13 @@ trait AttackHandler {
         $totalHealed    = ($amount / $totalUnitTypes);
 
         foreach ($defender->units as $unit) {
-            $newAmount = $unit->amount * ($totalHealed > 1 ? $totalHealed : (1 + $totalHealed));
+            if (!$unit->gameUnit->can_not_be_healed) {
+                $newAmount = $unit->amount * ($totalHealed > 1 ? $totalHealed : (1 + $totalHealed));
 
-            $unit->update([
-                'amount' => $newAmount
-            ]);
+                $unit->update([
+                    'amount' => $newAmount
+                ]);
+            }
         }
     }
 

@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Service\AttackService;
+use App\Game\Kingdoms\Service\UnitReturnService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,7 +28,7 @@ class MoveUnits implements ShouldQueue
         $this->defenderId = $defenderId;
     }
 
-    public function handle(AttackService $attackService) {
+    public function handle(AttackService $attackService, UnitReturnService $unitReturnService) {
         $unitMovement = UnitMovementQueue::find($this->movementId);
 
         if (is_null($unitMovement)) {
@@ -37,6 +38,8 @@ class MoveUnits implements ShouldQueue
         switch ($this->type) {
             case 'attack':
                 return $attackService->attack($unitMovement, $this->defenderId);
+            case 'return':
+                return $unitReturnService->returnUnits($unitMovement);
             default:
                 return;
         }
