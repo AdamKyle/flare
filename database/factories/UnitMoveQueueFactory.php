@@ -22,16 +22,17 @@ class UnitMoveQueueFactory extends Factory
     public function definition()
     {
         return [
-            'kingdom_id'     => 1,
-            'units_moving'   => [],
-            'completed_at'   => now()->addMinutes(45),
-            'started_at'     => now(),
-            'moving_to_x'    => 16,
-            'moving_to_y'    => 16,
-            'from_x'         => 0,
-            'from_y'         => 0,
-            'is_recalled'    => false,
-            'is_returning'   => false,
+            'from_kingdom_id' => 1,
+            'to_kingdom_id'   => 1,
+            'units_moving'    => [],
+            'completed_at'    => now()->addMinutes(45),
+            'started_at'      => now(),
+            'moving_to_x'     => 16,
+            'moving_to_y'     => 16,
+            'from_x'          => 0,
+            'from_y'          => 0,
+            'is_recalled'     => false,
+            'is_returning'    => false,
         ];
     }
 }

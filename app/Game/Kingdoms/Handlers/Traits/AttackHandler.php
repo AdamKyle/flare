@@ -23,13 +23,19 @@ trait AttackHandler {
         ]);
     }
 
-    public function healDefendingUnits(Kingdom $defender, $amount) {
+    public function healDefendingUnits(Kingdom $defender, array $oldAmounts, $amount) {
         $totalUnitTypes = $defender->units->count();
         $totalHealed    = ($amount / $totalUnitTypes);
 
         foreach ($defender->units as $unit) {
             if (!$unit->gameUnit->can_not_be_healed) {
                 $newAmount = $unit->amount * ($totalHealed > 1 ? $totalHealed : (1 + $totalHealed));
+
+                $oldAmount = $oldAmounts[$unit->id];
+
+                if ($newAmount > $oldAmount) {
+                    $newAmount = $oldAmount;
+                }
 
                 $unit->update([
                     'amount' => $newAmount

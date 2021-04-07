@@ -24,7 +24,7 @@ class UpdateKingdomBuildingTest extends TestCase
 
         $kingdom->buildings()->create([
             'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdom_id'        => $kingdom->id,
+            'kingdom_id'         => $kingdom->id,
             'level'              => 2,
             'max_defence'        => 100,
             'max_durability'     => 100,

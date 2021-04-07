@@ -108,7 +108,8 @@ class UnitHandler {
     }
 
     private function updateUnits(array $attackingUnits, float $percentageLost): array {
-        $percentageLost = ($percentageLost / count($attackingUnits));
+        $percentageLost    = ($percentageLost / count($attackingUnits));
+        $oldAttackingUnits = $attackingUnits;
 
         foreach ($attackingUnits as $index => $unitInfo) {
             if (!$unitInfo['settler']) {
@@ -118,17 +119,25 @@ class UnitHandler {
             }
         }
 
-        return $this->healAttackingUnits($attackingUnits, $this->getHealingAmountForAttacking($attackingUnits));
+        return $this->healAttackingUnits($attackingUnits, $oldAttackingUnits, $this->getHealingAmountForAttacking($attackingUnits));
     }
 
-    private function healAttackingUnits(array $attackingUnits, float $healingAmount): array {
+    private function healAttackingUnits(array $attackingUnits, array $oldAttackingUnits, float $healingAmount): array {
         $healingAmount = ($healingAmount / count($attackingUnits));
 
         foreach ($attackingUnits as $index => $unitInfo) {
             if (!$unitInfo['settler']) {
                 $amountHealed = ceil($unitInfo['amount'] * ($healingAmount > 1 ? $healingAmount : (1 + $healingAmount)));
 
+                $oldAmount = $oldAttackingUnits[$index]['amount'];
+
                 $attackingUnits[$index]['amount'] = $amountHealed;
+
+                $newAmount = $attackingUnits[$index]['amount'];
+
+                if ($newAmount > $oldAmount) {
+                    $attackingUnits[$index]['amount'] = $oldAttackingUnits;
+                }
             }
         }
 
@@ -150,8 +159,10 @@ class UnitHandler {
     private function updateDefenderUnitsLeft(Kingdom $defender, float $percentageLost) {
         $totalUnitTypes = $defender->units->count();
         $percentageLost = ($percentageLost / $totalUnitTypes);
+        $oldAmounts     = [];
 
         foreach ($defender->units as $unit) {
+            $oldAmounts[$unit->id] = $unit->amount;
             $newAmount = $unit->amount - ($unit->amount * $percentageLost);
 
             $unit->update([
@@ -163,6 +174,6 @@ class UnitHandler {
 
         $defender = $defender->refresh();
 
-        $this->healDefendingUnits($defender, $this->getHealingAmountForDefender($defender));
+        $this->healDefendingUnits($defender, $oldAmounts, $this->getHealingAmountForDefender($defender));
     }
 }

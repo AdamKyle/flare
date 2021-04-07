@@ -92,13 +92,13 @@ class RebuildBuilding implements ShouldQueue
 
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
+            $x       = $kingdom->x_position;
+            $y       = $kingdom->y_position;
+
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($this->user, $kingdom));
-
-            $x = $kingdom->x_position;
-            $y = $kingdom->y_position;
 
             event(new ServerMessageEvent($this->user, 'building-repair-finished', $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '  (X/Y: '.$x.'/'.$y.').'));
         } else if ($this->user->rebuilt_building_email) {

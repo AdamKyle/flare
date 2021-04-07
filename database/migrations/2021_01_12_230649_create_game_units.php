@@ -21,9 +21,9 @@ class CreateGameUnits extends Migration
             $table->integer('defence');
             $table->boolean('can_not_be_healed')->default(false);
             $table->boolean('is_settler')->default(false);
-            $table->double('reduces_morale_by')->default(false);
+            $table->double('reduces_morale_by')->nullable();
             $table->boolean('can_heal')->default(false);
-            $table->double('heal_percentage')->default(false);
+            $table->double('heal_percentage')->nullable();
             $table->boolean('siege_weapon')->default(false);
             $table->boolean('attacks_walls')->default(false);
             $table->boolean('attacks_buildings')->default(false);

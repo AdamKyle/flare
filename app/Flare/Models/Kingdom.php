@@ -80,7 +80,7 @@ class Kingdom extends Model implements Auditable
     }
 
     public function unitsMovementQueue() {
-        return $this->hasMany(UnitMovementQueue::class, 'kingdom_id', 'id');
+        return $this->hasMany(UnitMovementQueue::class, 'from_kingdom_id', 'id');
     }
 
     public function character() {

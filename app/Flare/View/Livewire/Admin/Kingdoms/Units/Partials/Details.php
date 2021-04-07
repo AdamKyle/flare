@@ -59,10 +59,14 @@ class Details extends Component
         }
 
         if ($this->editing) {
+            $this->updateBooleanAttributes();
+
             $this->gameUnit->update($this->gameUnit->getAttributes());
 
             $gameUnit = $this->gameUnit->refresh();
         } else {
+            $this->updateBooleanAttributes();
+
             $gameUnit = GameUnit::create($this->gameUnit->getAttributes());
         }
 
@@ -94,8 +98,33 @@ class Details extends Component
         $this->units = GameUnit::all();
     }
 
-    public function render()
-    {
+    public function render() {
         return view('components.livewire.admin.kingdoms.units.partials.details');
+    }
+
+    protected function updateBooleanAttributes() {
+        if (is_null($this->gameUnit->can_not_be_healed)) {
+            $this->gameUnit->can_not_be_healed = false;
+        }
+
+        if (is_null($this->gameUnit->is_settler)) {
+            $this->gameUnit->is_settler = false;
+        }
+
+        if (is_null($this->gameUnit->can_heal)) {
+            $this->gameUnit->can_heal = false;
+        }
+
+        if (is_null($this->gameUnit->siege_weapon)) {
+            $this->gameUnit->siege_weapon = false;
+        }
+
+        if (is_null($this->gameUnit->defender)) {
+            $this->gameUnit->defender = false;
+        }
+
+        if (is_null($this->gameUnit->attacker)) {
+            $this->gameUnit->attacker = false;
+        }
     }
 }

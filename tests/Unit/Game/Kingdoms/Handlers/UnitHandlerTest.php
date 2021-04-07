@@ -13,7 +13,7 @@ class UnitHandlerTest extends TestCase {
     use RefreshDatabase;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
@@ -45,60 +45,15 @@ class UnitHandlerTest extends TestCase {
         $this->character = null;
     }
 
-    public function testUnitsFailToDoMoreDamageThenWallsDefence() {
-        $unitsToAttack = $this->createAtackingUnits(1, 1);
-        $defender      = $this->createEnemyKingdom()->getKingdom();
-        
-        $unitAttackHandler = new UnitHandler();
-
-        $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
-
-        $this->assertEquals(0, $unitsLeft[0]['amount']);
-    }
-
-    public function testUnitsDoesMoreDamageThenWalls() {
-        $unitsToAttack = $this->createAtackingUnits(1000, 1000);
-        $defender      = $this->createEnemyKingdom()->getKingdom();
-        
-        $unitAttackHandler = new UnitHandler();
-
-        $unitAttackHandler->attack($defender, $unitsToAttack);
-        
-        $walls = $defender->refresh()->buildings->where('name', 'Walls')->first();
-
-        $this->assertEquals(0, $walls->current_durability);
-    }
-
     public function testUnitsDoNotAttackWhenTotalAttackIsZero() {
         $unitsToAttack = $this->createAtackingUnits(0, 0);
         $defender      = $this->createEnemyKingdom()->getKingdom();
-        
+
         $unitAttackHandler = new UnitHandler();
 
         $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
-        
+
         $this->assertEquals(10, $unitsLeft[0]['amount']);
-    }
-
-    public function testUnitsDoNotAttackAfterWallsWhenThereAreNoDefendingUnits() {
-        $unitsToAttack = $this->createAtackingUnits(1000, 1000);
-        $defender      = $this->createEnemyKingdom()->getKingdom();
-
-        foreach ($defender->units as $unit) {
-            $unit->delete();
-        }
-
-        $defender = $defender->refresh();
-        
-        $unitAttackHandler = new UnitHandler();
-
-        $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
-
-        $walls = $defender->refresh()->buildings->where('name', 'Walls')->first();
-
-        $this->assertEquals(0, $walls->current_durability);
-        
-        $this->assertTrue($unitsLeft[0]['amount'] > 0);
     }
 
     protected function createAtackingUnits(int $totalAttack = 100, int $totalDefence = 100): array {
@@ -118,7 +73,7 @@ class UnitHandlerTest extends TestCase {
                                      ->kingdomManagement()
                                      ->assignKingdom()
                                      ->assignBuilding([
-                                        'name'     => 'Walls', 
+                                        'name'     => 'Walls',
                                         'is_walls' => true
                                     ])
                                     ->assignBuilding([

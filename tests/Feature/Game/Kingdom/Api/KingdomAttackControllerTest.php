@@ -12,7 +12,7 @@ class KingdomAttackControllerTest extends TestCase
     use RefreshDatabase;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
 
         $this->assertNotEmpty($content);
@@ -73,9 +73,9 @@ class KingdomAttackControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
-        
+
         $this->assertEquals('Selected kingdoms is required.', $content->errors->selected_kingdoms[0]);
     }
 
@@ -89,9 +89,9 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
-        
+
         $this->assertEquals('Selected kingdoms must be an array.', $content->errors->selected_kingdoms[0]);
     }
 
@@ -114,7 +114,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
 
         $this->assertEmpty($content);
@@ -144,7 +144,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
 
         $this->assertEmpty($content);
@@ -169,7 +169,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
 
         $this->assertEquals('Defender kingdom does not exist for: 27', $content->message);
@@ -194,7 +194,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
 
         $this->assertEquals('No such kingdom for name: bananas', $content->message);
@@ -219,7 +219,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
 
         $this->assertEquals('No unit exists for name: Sample Jazz on this kingdom: Sample', $content->message);
@@ -244,7 +244,7 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
 
         $this->assertEquals('You don\'t have enough units. You have: 500 and are trying to send: 1500 for: Sample', $content->message);
@@ -258,7 +258,7 @@ class KingdomAttackControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
 
         $this->assertEquals('Defender id is required', $content->errors->defender_id[0]);
@@ -274,9 +274,9 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
-        
+
         $this->assertEquals('The units to send field is required.', $content->errors->units_to_send[0]);
     }
 
@@ -291,9 +291,9 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(422, $response->status());
-        
+
         $this->assertEquals('The units to send must be an array.', $content->errors->units_to_send[0]);
     }
 

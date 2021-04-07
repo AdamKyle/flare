@@ -22,7 +22,6 @@ class KingdomTransformer extends TransformerAbstract {
      * @return mixed
      */
     public function transform(Kingdom $kingdom) {
-
         return [
             'id'                 => $kingdom->id,
             'character_id'       => $kingdom->character_id,

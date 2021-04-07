@@ -35,7 +35,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building' => true, 
+                    'is_resource_building' => true,
                     'increase_wood_amount' => 100
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
@@ -91,7 +91,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building' => true, 
+                    'is_resource_building' => true,
                     'increase_wood_amount' => 100
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
@@ -137,7 +137,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building' => true, 
+                    'is_resource_building' => true,
                     'increase_wood_amount' => 100
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
@@ -173,7 +173,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $kingdom->buildings()->insert([
             [
                 'game_building_id'   => $this->createGameBuilding([
-                    'is_resource_building' => true, 
+                    'is_resource_building' => true,
                     'increase_wood_amount' => 100
                 ])->id,
                 'kingdom_id'        => $kingdom->id,
@@ -228,7 +228,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building' => true, 
+                    'is_resource_building' => true,
                     'increase_wood_amount' => 100,
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
@@ -249,7 +249,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->current_morale < .50);
-        $this->assertFalse($kingdom->current_wood > 500);
+        $this->assertFalse($kingdom->current_wood < 500);
         $this->assertFalse($kingdom->current_population > 0);
     }
 
@@ -274,7 +274,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building' => true, 
+                    'is_resource_building' => true,
                     'increase_wood_amount' => 100,
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
@@ -295,7 +295,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $kingdom = $kingdom->refresh();
 
         $this->assertEquals($kingdom->current_morale, .50);
-        $this->assertEquals($kingdom->current_wood, 500);
+        $this->assertEquals($kingdom->current_wood, 700);
         $this->assertTrue($kingdom->current_population > 0);
     }
 
@@ -325,7 +325,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building'   => true, 
+                    'is_resource_building'   => true,
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => 2.0,
                 ])->id,
@@ -376,7 +376,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building'   => true, 
+                    'is_resource_building'   => true,
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => 2.0,
                 ])->id,
@@ -427,7 +427,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building'   => true, 
+                    'is_resource_building'   => true,
                     'increase_wood_amount'   => 100,
                     'decrease_morale_amount' => 2.0,
                 ])->id,
@@ -477,7 +477,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building'   => true, 
+                    'is_resource_building'   => true,
                     'increase_wood_amount'   => 100,
                     'decrease_morale_amount' => 2.0,
                 ])->id,
@@ -527,7 +527,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building'   => true, 
+                    'is_resource_building'   => true,
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => .05,
                 ])->id,
@@ -587,7 +587,7 @@ class KingdomResourcesServiceTest extends TestCase {
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([
-                    'is_resource_building'   => true, 
+                    'is_resource_building'   => true,
                     'increase_wood_amount'   => 100,
                     'increase_morale_amount' => .05,
                 ])->id,

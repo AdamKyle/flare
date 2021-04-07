@@ -4,9 +4,12 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Handlers\Traits\AttackHandler;
 use Illuminate\Database\Eloquent\Collection;
 
 class SiegeHandler {
+
+    use AttackHandler;
 
     public function attack(Kingdom $defender, array $siegeUnits, array $healers) {
 
@@ -166,6 +169,10 @@ class SiegeHandler {
     }
 
     private function calculatePerentageLost(int $totalAttack, int $totalDefence, bool $flipped = false): float {
+        if ($totalDefence === 0) {
+            return 0;
+        }
+
         if (!$flipped) {
             return ($totalAttack / $totalDefence);
         }
@@ -183,8 +190,12 @@ class SiegeHandler {
 
     private function updateAllKingdomBuildings(Collection $buildings, float $percentageOfDurabilityLost) {
         $buildingsStillStanding = $buildings->where('current_durability', '!=', 0)->all();
-        $totalKingdomBuildings         = count($buildingsStillStanding);
-        $percentageLost         = ($percentageOfDurabilityLost / $totalKingdomBuildings);
+
+        if (empty($buildingsStillStanding)) {
+            return;
+        }
+
+        $percentageLost = ($percentageOfDurabilityLost / count($buildingsStillStanding));
 
         foreach ($buildingsStillStanding as $building) {
             $newDurability = $building->current_durability - ($building->current_durability * $percentageLost);
@@ -196,7 +207,11 @@ class SiegeHandler {
     }
 
     private function updateDefenderUnits(Kingdom $defender, float $percentageOfUnitsLost) {
+      $oldAmount = [];
+
       foreach ($defender->units as $unit) {
+          $oldAmount[$unit->id] = $unit->amount;
+
           $newAmount = $this->getNewUnitTotal($unit->amount, $percentageOfUnitsLost);
 
           $unit->update([
@@ -206,7 +221,7 @@ class SiegeHandler {
 
       $defender = $defender->refresh();
 
-      $this->healDefendingUnits($defender, $this->getHealingAmountForDefender($defender));
+      $this->healDefendingUnits($defender, $oldAmount, $this->getHealingAmountForDefender($defender));
     }
 
     private function getNewUnitTotal(int $totalUnits, float $percentageOfUnitsLost) {

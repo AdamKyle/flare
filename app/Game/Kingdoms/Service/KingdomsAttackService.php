@@ -77,17 +77,18 @@ class KingdomsAttackService {
             $timeTillFinished = now()->addMinutes($totalTime);
 
             $unitMovement = UnitMovementQueue::create([
-                'kingdom_id'   => $kingdom->id,
-                'units_moving' => $unitsToSend,
-                'completed_at' => $timeTillFinished,
-                'started_at'   => now(),
-                'moving_to_x'  => $defender->x_position,
-                'moving_to_y'  => $defender->y_position,
-                'from_x'       => $kingdom->x_position,
-                'from_y'       => $kingdom->y_position,
+                'from_kingdom_id'   => $kingdom->id,
+                'to_kingdom_id'     => $defender->id,
+                'units_moving'      => $unitsToSend,
+                'completed_at'      => $timeTillFinished,
+                'started_at'        => now(),
+                'moving_to_x'       => $defender->x_position,
+                'moving_to_y'       => $defender->y_position,
+                'from_x'            => $kingdom->x_position,
+                'from_y'            => $kingdom->y_position,
             ]);
 
-            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack')->delay($timeTillFinished);
+            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes(2)/*$timeTillFinished*/);
 
             $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransfromer);
 

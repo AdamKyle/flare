@@ -14,7 +14,7 @@ class SiegeHandlerTest extends TestCase {
     use RefreshDatabase;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
@@ -52,8 +52,8 @@ class SiegeHandlerTest extends TestCase {
 
         $siegeHandler  = new SiegeHandler();
 
-        $siegeUnits = $siegeHandler->attack($defender, $unitsToAttack);
-        
+        $siegeUnits = $siegeHandler->attack($defender, $unitsToAttack, []);
+
         $defender  = $defender->refresh();
         $buildings = $defender->buildings;
         $units     = $defender->units;
@@ -65,7 +65,7 @@ class SiegeHandlerTest extends TestCase {
         foreach($units as $unit) {
             $this->assertEquals(0, $unit->amount);
         }
-        
+
         // We lost at least one.
         $this->assertEquals(9.0, $siegeUnits[0]['amount']);
     }
@@ -73,7 +73,7 @@ class SiegeHandlerTest extends TestCase {
     public function testAttackKingdomCantGetPastTheWalls() {
         $unitsToAttack = $this->createAtackingUnits();
         $defender      = $this->createEnemyKingdom()->getKingdom();
-        
+
 
         foreach ($unitsToAttack as $index => $unitInfo) {
             $unitsToAttack[$index]['amount']        = 1;
@@ -83,8 +83,8 @@ class SiegeHandlerTest extends TestCase {
 
         $siegeHandler  = new SiegeHandler();
 
-        $siegeUnits = $siegeHandler->attack($defender, $unitsToAttack);
-        
+        $siegeUnits = $siegeHandler->attack($defender, $unitsToAttack, []);
+
         // We lost all units
         foreach($siegeUnits as $index => $unitInfo) {
             $this->assertEquals(0, $siegeUnits[$index]['amount']);
@@ -102,8 +102,8 @@ class SiegeHandlerTest extends TestCase {
 
         $siegeHandler  = new SiegeHandler();
 
-        $siegeHandler->attack($defender, $unitsToAttack);
-        
+        $siegeHandler->attack($defender, $unitsToAttack, []);
+
         $defender  = $defender->refresh();
         $buildings = $defender->buildings;
 
@@ -127,11 +127,11 @@ class SiegeHandlerTest extends TestCase {
             'current_durability' => 20000,
             'current_defence'    => 20000
         ]);
-        
+
         $defender = $defender->refresh();
 
-        $siegeHandler->attack($defender, $unitsToAttack);
-        
+        $siegeHandler->attack($defender, $unitsToAttack, []);
+
         $defender  = $defender->refresh();
         $farm      = $defender->buildings->where('is_farm', true)->first();
         $walls     = $defender->buildings->where('is_walls', true)->first();
@@ -179,7 +179,7 @@ class SiegeHandlerTest extends TestCase {
                                      ->kingdomManagement()
                                      ->assignKingdom()
                                      ->assignBuilding([
-                                        'name'     => 'Walls', 
+                                        'name'     => 'Walls',
                                         'is_walls' => true
                                     ])
                                     ->assignBuilding([
@@ -187,6 +187,6 @@ class SiegeHandlerTest extends TestCase {
                                         'is_farm' => true
                                     ])
                                     ->assignBuilding()
-                                     ->assignUnits();
+                                    ->assignUnits();
     }
 }

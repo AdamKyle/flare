@@ -21,7 +21,8 @@ class UnitMovementQueueTest extends TestCase
 
         $this->createUnitMovementQueue();
 
-        $this->assertNotNull(UnitMovementQueue::first()->kingdom);
+        $this->assertNotNull(UnitMovementQueue::first()->from_kingdom);
+        $this->assertNotNull(UnitMovementQueue::first()->to_kingdom);
     }
 
     public function testSetUnitsInMovement() {
