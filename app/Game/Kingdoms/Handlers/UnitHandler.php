@@ -3,13 +3,14 @@
 namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Handlers\Traits\AttackHandler;
+use App\Game\Kingdoms\Handlers\Traits\AttackHandlerCalculations;
 
+use App\Game\Kingdoms\Handlers\Traits\DefenderHandler;
 use function PHPUnit\Framework\isEmpty;
 
 class UnitHandler {
 
-    use AttackHandler;
+    use AttackHandlerCalculations, DefenderHandler;
 
     public function attack(Kingdom $defender, array $attackingUnits): array {
         $attackingUnits = $this->handleUnits($defender, $attackingUnits);

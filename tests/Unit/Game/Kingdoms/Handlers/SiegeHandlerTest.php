@@ -37,7 +37,11 @@ class SiegeHandlerTest extends TestCase {
                                                     'primary_target' => 'Walls',
                                                     'fall_back'      => 'Buildings',
                                                     'siege_weapon'   => true,
-                                                 ], 1000);
+                                                 ], 1000)
+                                                ->assignUnits([
+                                                    'can_heal'        => true,
+                                                    'heal_percentage' => 0.01
+                                                ], 1000);;
     }
 
     public function tearDown(): void {
@@ -50,7 +54,7 @@ class SiegeHandlerTest extends TestCase {
         $unitsToAttack = $this->createAtackingUnits();
         $defender      = $this->createEnemyKingdom()->getKingdom();
 
-        $siegeHandler  = new SiegeHandler();
+        $siegeHandler  = resolve(SiegeHandler::class);
 
         $siegeUnits = $siegeHandler->attack($defender, $unitsToAttack, []);
 
@@ -81,7 +85,7 @@ class SiegeHandlerTest extends TestCase {
             $unitsToAttack[$index]['total_defence'] = 1;
         }
 
-        $siegeHandler  = new SiegeHandler();
+        $siegeHandler  = resolve(SiegeHandler::class);
 
         $siegeUnits = $siegeHandler->attack($defender, $unitsToAttack, []);
 
@@ -100,7 +104,7 @@ class SiegeHandlerTest extends TestCase {
             'defender'     => true,
         ], 2000)->getKingdom();
 
-        $siegeHandler  = new SiegeHandler();
+        $siegeHandler  = resolve(SiegeHandler::class);
 
         $siegeHandler->attack($defender, $unitsToAttack, []);
 
@@ -121,7 +125,7 @@ class SiegeHandlerTest extends TestCase {
             'defender'     => true,
         ], 2000)->getKingdom();
 
-        $siegeHandler  = new SiegeHandler();
+        $siegeHandler  = resolve(SiegeHandler::class);
 
         $defender->buildings->find(4)->update([
             'current_durability' => 20000,
@@ -142,6 +146,64 @@ class SiegeHandlerTest extends TestCase {
         $buildingThatHasntFallen = $defender->buildings->find(4);
 
         $this->assertNotEquals(0, $buildingThatHasntFallen->current_durability);
+    }
+
+    public function testAttackKingdomsWithNoDefence() {
+        $unitsToAttack = $this->createAtackingUnits();
+        $defender      = $this->createEnemyKingdom()->getKingdom();
+
+        foreach ($defender->buildings as $building) {
+            $building->update([
+                'current_durability' => 0,
+            ]);
+        }
+
+        foreach ($defender->units as $unit) {
+            $unit->delete();
+        }
+
+        $defender = $defender->refresh();
+
+        $siegeHandler  = resolve(SiegeHandler::class);
+
+        $unitsToAttack = $siegeHandler->attack($defender, $unitsToAttack, []);
+
+        foreach ($unitsToAttack as $unitsInfo) {
+            $this->assertEquals(10, $unitsInfo['amount']);
+        }
+    }
+
+    public function testHealSiegeUnits() {
+        $unitsToAttack = $this->createAtackingUnits();
+        $defender      = $this->createEnemyKingdom()->getKingdom();
+
+        $siegeHandler  = resolve(SiegeHandler::class);
+
+        $unitsToAttack = $siegeHandler->attack($defender, $unitsToAttack, $this->createHealingUnits());
+
+        foreach ($unitsToAttack as $unitsInfo) {
+            $this->assertTrue($unitsInfo['amount'] > 9.0);
+        }
+    }
+
+    public function testDefenderUnitsGetHealed() {
+        $unitsToAttack = $this->createAtackingUnits();
+        $defender      = $this->createEnemyKingdom()->assignUnits([
+            'can_heal' => true,
+            'heal_percentage' => 0.01
+        ], 50000)->getKingdom();
+
+        $siegeHandler  = resolve(SiegeHandler::class);
+
+        $siegeHandler->attack($defender, $unitsToAttack, []);
+
+        $defender = $defender->refresh();
+
+        $attackingUnit = $defender->units->first();
+        $healingUnit   = $defender->units()->orderBy('id', 'desc')->first();
+
+        $this->assertEquals(500, $attackingUnit->amount);
+        $this->assertEquals(50000, $healingUnit->amount);
     }
 
     protected function createAtackingUnits(): array {
@@ -170,6 +232,17 @@ class SiegeHandlerTest extends TestCase {
                 "fall_back"      => 'Buildings',
                 "unit_id"        => 3,
             ],
+        ];
+    }
+
+    public function createHealingUnits(): array {
+
+        return [
+            [
+                'amount'   => 20,
+                'heal_for' => 0.10,
+                'unit_id'  => 4,
+            ]
         ];
     }
 

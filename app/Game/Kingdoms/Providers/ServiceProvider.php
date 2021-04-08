@@ -2,9 +2,10 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Service\UnitReturnService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+
+use App\Game\Kingdoms\Handlers\AttackHandler;
+use App\Game\Kingdoms\Service\UnitReturnService;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Handlers\UnitHandler;
 use App\Game\Kingdoms\Handlers\SiegeHandler;
@@ -15,6 +16,7 @@ use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Kingdoms\Service\KIngdomsAttackService;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
+use App\Flare\Transformers\KingdomTransformer;
 
 use League\Fractal\Manager;
 
@@ -55,8 +57,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomTransformer;
         });
 
-        $this->app->bind(SiegeHandler::class, function() {
-            return new SiegeHandler;
+        $this->app->bind(AttackHandler::class, function() {
+            return new AttackHandler;
+        });
+
+        $this->app->bind(SiegeHandler::class, function($app) {
+            return new SiegeHandler($app->make(AttackHandler::class));
         });
 
         $this->app->bind(UnitHandler::class, function() {
