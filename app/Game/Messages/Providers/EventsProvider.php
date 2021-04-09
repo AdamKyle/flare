@@ -1,7 +1,8 @@
 <?php
 namespace App\Game\Messages\Providers;
 
-use Illuminate\Support\Facades\Event;
+use App\Flare\Events\KingdomServerMessageEvent;
+use App\Game\Messages\Listeners\KingdomServerMessageListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
@@ -12,7 +13,7 @@ class EventsProvider extends ServiceProvider {
 
     protected $listen = [
 
-        // When a user registers for the first tme:
+        // When a server message should be sent to the player.
         ServerMessageEvent::class => [
             ServerMessageListener::class,
         ],
@@ -20,6 +21,11 @@ class EventsProvider extends ServiceProvider {
         // When a skill levels up.
         SkillLeveledUpServerMessageEvent::class => [
             SkillLeveledUpServerMessageListener::class,
+        ],
+
+        // When a kingdom should send a server message to the player.
+        KingdomServerMessageEvent::class => [
+            KingdomServerMessageListener::class,
         ],
     ];
 

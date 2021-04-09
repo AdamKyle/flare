@@ -45,24 +45,114 @@ class UnitHandlerTest extends TestCase {
         $this->character = null;
     }
 
-    public function testUnitsDoNotAttackWhenTotalAttackIsZero() {
-        $unitsToAttack = $this->createAtackingUnits(0, 0);
+    public function testThereAreNoDefendingUnitsToAttack() {
+        $unitsToAttack = $this->createAttackingUnits(0, 0);
         $defender      = $this->createEnemyKingdom()->getKingdom();
 
         $unitAttackHandler = new UnitHandler();
+
+        foreach ($defender->units as $unit) {
+            $unit->delete();
+        }
+
+        $defender = $defender->refresh();
 
         $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
 
         $this->assertEquals(10, $unitsLeft[0]['amount']);
     }
 
-    protected function createAtackingUnits(int $totalAttack = 100, int $totalDefence = 100): array {
+    public function testAttackingUnitsHaveNoAttack() {
+        $unitsToAttack = $this->createAttackingUnits(0, 0);
+        $defender      = $this->createEnemyKingdom()->getKingdom();
+
+        $unitsToAttack[0]['total_attack'] = 0;
+
+        $unitAttackHandler = new UnitHandler();
+
+        $defender = $defender->refresh();
+
+        $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
+
+        $this->assertEquals(10, $unitsLeft[0]['amount']);
+    }
+
+    public function testDefendingUnitsHaveNoAttack() {
+        $unitsToAttack = $this->createAttackingUnits();
+        $defender      = $this->createEnemyKingdom()->getKingdom();
+
+        $unitAttackHandler = new UnitHandler();
+
+        foreach ($defender->units as $unit) {
+            $unit->gameUnit()->update([
+                'attack' => 0
+            ]);
+        }
+
+        $defender = $defender->refresh();
+
+        $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
+
+        $this->assertEquals(10, $unitsLeft[0]['amount']);
+    }
+
+    public function testAttackIsGreaterThenDefence() {
+        $unitsToAttack = $this->createAttackingUnits(1000, 1000);
+        $defender      = $this->createEnemyKingdom()->getKingdom();
+
+        $unitAttackHandler = new UnitHandler();
+
+        $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
+
+        $this->assertTrue($unitsLeft[0]['amount'] > 0);
+    }
+
+    public function testAttackIsLessThenDefence() {
+        $unitsToAttack = $this->createAttackingUnits(1, 1);
+        $defender      = $this->createEnemyKingdom()->getKingdom();
+
+        $unitsLeft[0]['amount'] = 1;
+
+        $unitAttackHandler = new UnitHandler();
+
+        $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);
+
+        $this->assertEquals(0, $unitsLeft[0]['amount']);
+    }
+
+    public function testHealAttackingUnits() {
+        $unitsToAttack = $this->createAttackingUnits();
+        $defender      = $this->createEnemyKingdom()->assignUnits()->getKingdom();
+
+        $unitsToAttack[] = [
+            'amount'         => 1000,
+            'total_attack'   => 0,
+            'total_defence'  => 0,
+            'unit_id'        => 1,
+            'settler'        => false,
+            'healer'         => true,
+            'heal_for'       => 0.01,
+        ];
+
+        $unitAttackHandler = new UnitHandler();
+
+        $unitsToAttack = $unitAttackHandler->attack($defender, $unitsToAttack);
+
+        foreach ($unitsToAttack as $unitInfo) {
+            $this->assertTrue($unitInfo['amount'] > 0);
+        }
+    }
+
+    protected function createAttackingUnits(int $totalAttack = 100, int $totalDefence = 100): array {
         return [
             [
-                "amount"         => 10,
-                "total_attack"   => $totalAttack,
-                "total_defence"  => $totalDefence,
-                "unit_id"        => 1,
+                'amount'         => 10,
+                'total_attack'   => $totalAttack,
+                'total_defence'  => $totalDefence,
+                'unit_id'        => 1,
+                'settler'        => false,
+                'healer'         => false,
+                'heal_for'       => 0.00,
             ],
         ];
     }

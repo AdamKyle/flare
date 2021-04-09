@@ -2,10 +2,13 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
 use App\Flare\Models\UnitMovementQueue;
+use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Handlers\UnitHandler;
 use App\Game\Kingdoms\Handlers\SiegeHandler;
 use App\Game\Kingdoms\Jobs\MoveUnits;
@@ -78,8 +81,24 @@ class AttackService {
             $settlerUnit = GameUnit::find($settlerUnit['unit_id']);
 
             if (!is_null($settlerUnit)) {
-                if (count($regularUnits) === 1) {
-                    $regularUnits = [];
+                if ($this->isSettlerTheOnlyUnitLeft($newRegularUnits)) {
+                    $newRegularUnits = [];
+
+                    KingdomLog::create([
+                        'from_kingdom_id'   => $defenderId,
+                        'to_kingdom_id'     => $unitMovement->to_kingdom->id,
+                        'status'            => KingdomLogStatusValue::LOST,
+                        'units_sent'        => $regularUnits,
+                        'units_survived'    => $newRegularUnits
+                    ]);
+
+                    $message = 'You lost all your units when attacking kingdom at: (X/Y) ' .
+                        $defender->x_position . '/' . $defender->y_position .
+                        ' Check the kingdom attack logs for more info.';
+
+                    event(new KingdomServerMessageEvent($character->user, 'all-units-lost', $message));
+
+                    // Show all units was lost
                 } else {
                     if ($defender->current_morale > 0) {
                         $currentMorale = $defender->current_morale - $settlerUnit->reduces_morale_by;
@@ -166,7 +185,18 @@ class AttackService {
 
             MoveUnits::dispatch($unitMovement->id, $defenderId, 'return')->delay(now()->addMinutes(2)/*$timeToReturn*/);
         } else {
-            dump('All units lost ...');
+            KingdomLog::create([
+                'from_kingdom_id'   => $defenderId,
+                'to_kingdom_id'     => $unitMovement->to_kingdom->id,
+                'status'            => KingdomLogStatusValue::LOST,
+                'units_sent'        => $regularUnits,
+                'units_survived'    => $newRegularUnits
+            ]);
+
+            $message = 'You lost all your units when attacking kingdom at: (X/Y) ' .
+                $defender->x_position . '/' . $defender->y_position . ' Check the kingdom attack logs for more info.';
+
+            event(new KingdomServerMessageEvent($character->user, 'all-units-lost', $message));
         }
     }
 
@@ -250,6 +280,22 @@ class AttackService {
         return $healerUnits;
     }
 
+    protected function isSettlerTheOnlyUnitLeft(array $attackingUnits): bool {
+        $allDead = false;
+
+        foreach ($attackingUnits as $unitInfo) {
+            if (!$unitInfo['settler']) {
+                if ($unitInfo['amount'] === 0.0 || $unitInfo['amount'] === 0) {
+                    $allDead = true;
+                } else {
+                    $allDead = false;
+                }
+            }
+        }
+
+        return $allDead;
+    }
+
     protected function getTotalReturnTime(array $regularUnits, array $siegeUnits) {
         $time = 0;
 
@@ -273,15 +319,13 @@ class AttackService {
         // Then it dies.
         if (count($regularUnits) === 1) {
             return null;
-        } else {
-            foreach ($regularUnits as $unitInfo) {
-                if ($unitInfo['settler']) {
-                    return $unitInfo;
-                }
-            }
         }
 
-        return null;
+        foreach ($regularUnits as $unitInfo) {
+            if ($unitInfo['settler']) {
+                return $unitInfo;
+            }
+        }
     }
 
     private function getTime(array $units) {

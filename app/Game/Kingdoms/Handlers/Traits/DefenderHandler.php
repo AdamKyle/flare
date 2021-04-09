@@ -124,6 +124,34 @@ trait DefenderHandler {
     }
 
     /**
+     * Get the total defence including any bonuses.
+     *
+     * There is a bonus for the amount of defender units you have as opposed to regular units that can
+     * or cannot attack.
+     *
+     * There is also a bonus if you have walls that haven't lost their durability.
+     *
+     * @param Kingdom $defender
+     * @return float|int
+     */
+    public function getTotalDefenceBonus(Kingdom $defender) {
+        $totalUnitTypes = $defender->units()->count();
+        $totalDefenders = $defender->units()->join('game_units', function($join) {
+            $join->on('kingdom_units.game_unit_id', 'game_units.id')->where('game_units.defender', true)->where('kingdom_units.amount', '>', 0);
+        })->count();
+
+        $walls          = $defender->buildings->where('is_walls', true)->where('current_durability', '>', 0)->first();
+        $wallsBonus     = 0;
+
+        if ($walls->current_durability > 0) {
+            $wallsBonus = ($walls->level / 100);
+        }
+
+        return ($totalDefenders / $totalUnitTypes) + $wallsBonus;
+
+    }
+
+    /**
      * Get the total attack of defenders siege units.
      *
      * @param Collection $siegeUnits

@@ -112,4 +112,36 @@ trait AttackHandlerCalculations {
 
         return $healingAmount;
     }
+
+    /**
+     * Get the total attack for attacking units.
+     *
+     * @param array $attackingUnits
+     * @return int
+     */
+    public function getTotalAttack(array $attackingUnits): int {
+        $totalAttack = 0;
+
+        foreach ($attackingUnits as $unitInfo) {
+            $totalAttack += $unitInfo['total_attack'];
+        }
+
+        return $totalAttack;
+    }
+
+    /**
+     * Get the total defence for attacking units.
+     *
+     * @param array $attackingUnits
+     * @return int
+     */
+    public function getTotalDefence(array $attackingUnits): int {
+        $totalDefence = 0;
+
+        foreach ($attackingUnits as $unitInfo) {
+            $totalDefence += $unitInfo['total_defence'];
+        }
+
+        return $totalDefence;
+    }
 }
