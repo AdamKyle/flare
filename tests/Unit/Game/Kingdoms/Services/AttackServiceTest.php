@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
@@ -57,6 +58,130 @@ class AttackServiceTest extends TestCase {
         $attackService->attack($unitMovementQueue, $character, $defender->id);
 
         $this->assertTrue(KingdomLog::all()->isNotEmpty());
+    }
+
+    public function testSettlerReducesMorale() {
+        $defender = $this->createKingdom()->getKingdom();
+        $attacker = $this->createKingdom()->assignUnits([
+            'attack'  => 5000,
+            'defence' => 5000,
+            'siege_weapon' => true,
+        ], 500)->assignUnits([
+            'is_settler'        => true,
+            'reduces_morale_by' => 0.10
+        ]);
+
+        $character = $attacker->getCharacter();
+
+        $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
+
+        $attackService = resolve(AttackService::class);
+
+        $attackService->attack($unitMovementQueue, $character, $defender->id);
+
+        $this->assertTrue(KingdomLog::all()->isNotEmpty());
+
+        $defender = $defender->refresh();
+
+        $this->assertTrue($defender->current_morale < 1);
+    }
+
+    public function testSettleKingdomAfterAttack() {
+        $defender = $this->createKingdom()->getKingdom();
+        $attacker = $this->createKingdom()->assignUnits([
+            'attack'  => 5000,
+            'defence' => 5000,
+            'siege_weapon' => true,
+            'is_settler' => false,
+        ])->assignUnits([
+            'is_settler'        => true,
+            'reduces_morale_by' => 0.10
+        ]);
+
+        $defender->update([
+            'current_morale' => 0.10
+        ]);
+
+        foreach ($attacker->getKingdom()->units as $unit) {
+            $defender->units()->create([
+                'kingdom_id'   => $defender->id,
+                'game_unit_id' => $unit->game_unit_id,
+                'amount'       => 0,
+            ]);
+        }
+
+        $defender          = $defender->refresh();
+
+        $character         = $attacker->getCharacter();
+
+        $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
+
+        $attackService = resolve(AttackService::class);
+
+        $attackService->attack($unitMovementQueue, $character, $defender->id);
+
+        $this->assertTrue(KingdomLog::all()->isEmpty());
+
+        $character = $character->refresh();
+
+        $this->assertEquals(2, $character->kingdoms->count());
+    }
+
+    public function testTakeKingdomWhenMoraleIsAlreadyAtZero() {
+        $defender = $this->createKingdom()->getKingdom();
+        $attacker = $this->createKingdom()->assignUnits([
+            'attack'  => 5000,
+            'defence' => 5000,
+            'siege_weapon' => true,
+        ], 500)->assignUnits([
+            'is_settler'        => true,
+            'reduces_morale_by' => 0.10
+        ]);
+
+        $defender->update([
+            'current_morale' => 0
+        ]);
+
+        foreach ($attacker->getKingdom()->units as $unit) {
+            $defender->units()->create([
+                'kingdom_id'   => $defender->id,
+                'game_unit_id' => $unit->game_unit_id,
+                'amount'       => 0,
+            ]);
+        }
+
+        $defender          = $defender->refresh();
+
+        $character         = $attacker->getCharacter();
+
+        $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
+
+        $attackService = resolve(AttackService::class);
+
+        $attackService->attack($unitMovementQueue, $character, $defender->id);
+
+        $this->assertTrue(KingdomLog::all()->isEmpty());
+
+        $character = $character->refresh();
+
+        $this->assertEquals(2, $character->kingdoms->count());
+    }
+
+    public function testFetchHealers() {
+        $attacker = $this->createKingdom()->assignUnits([
+            'attack'  => 0,
+            'defence' => 0,
+            'can_heal' => true,
+            'heal_percentage' => 0.01,
+        ]);
+
+        $unitsInMovement = $this->getUnitsInMovement($attacker->getKingdom());
+
+        $attackService = resolve(AttackService::class);
+
+        $healers = $attackService->fetchHealers($unitsInMovement);
+
+        $this->assertTrue(!empty($healers));
     }
 
     protected function createUnitMovement(Kingdom $defenderKingdom, Kingdom $attackingKingdom): UnitMovementQueue {

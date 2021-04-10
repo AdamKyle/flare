@@ -10,11 +10,7 @@ class UnitReturnService {
     public function returnUnits(UnitMovementQueue $unitMovement) {
         $unitsReturning = $unitMovement->units_moving['new_units'];
 
-        $kingdom = Kingdom::find($unitMovement->kingdom_id);
-
-        if (is_null($kingdom)) {
-            return;
-        }
+        $kingdom = Kingdom::find($unitMovement->from_kingdom_id);
 
         foreach ($unitsReturning as $unitInfo) {
             $foundUnits = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();

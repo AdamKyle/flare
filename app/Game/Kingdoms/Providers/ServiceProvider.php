@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Game\Kingdoms\Handlers\KingdomHandler;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 use App\Game\Kingdoms\Handlers\AttackHandler;
@@ -69,11 +70,15 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UnitHandler;
         });
 
+        $this->app->bind(KingdomHandler::class, function() {
+           return new KingdomHandler;
+        });
+
         $this->app->bind(AttackService::class, function($app) {
             return new AttackService(
                 $app->make(SiegeHandler::class),
                 $app->make(UnitHandler::class),
-                $app->make(KingdomResourcesService::class),
+                $app->make(KingdomHandler::class)
             );
         });
 

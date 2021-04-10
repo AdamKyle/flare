@@ -29,17 +29,17 @@ class KingdomBuildingService {
 
     /**
      * Upgrades the building.
-     * 
+     *
      * Create the building queue record and then dispatches based on the buildings time_increase
      * attribute.
-     * 
+     *
      * @param KingdomBuilding $building
      * @param Character $character
      * @return void
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character): void {
         $timeToComplete = now()->addMinutes($building->time_increase);
-        
+
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
             'kingdom_id'   => $building->kingdom->id,
@@ -54,7 +54,7 @@ class KingdomBuildingService {
 
     public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
         $timeToComplete = now()->addMinutes($building->rebuild_time);
-        
+
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
             'kingdom_id'   => $building->kingdom->id,
@@ -69,7 +69,7 @@ class KingdomBuildingService {
 
     /**
      * Updates the kingdoms resources based on building cost.
-     * 
+     *
      * @param KingdomBuilding $building
      * @return Kingdom
      */
@@ -99,30 +99,31 @@ class KingdomBuildingService {
 
     /**
      * Cancels the building upgrade.
-     * 
+     *
      * Will cancel the resources if the total resources are above 10%.
-     * 
+     *
      * Can return false if there is not enough time left or the too little resources given back.
-     * 
+     *
      * @param KingdomBuildingInQueue $queue
      * @param Manager $manager
      * @param KingdomTransformer $transformer
      * @return bool
      */
     public function cancelKingdomBuildingUpgrade(BuildingInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
+
         $this->resourceCalculation($queue);
-        
-        if (!($this->totalResources >= .10) || $this->completed === 0) {
+
+        if ($this->completed === 0 || !$this->totalResources >= .10) {
            return false;
         }
 
         $building = $queue->building;
-        $kingdom  = $building->kingdom; 
+        $kingdom  = $building->kingdom;
 
         $queue->delete();
 
         $kingdom = $this->updateKingdomAfterCancelation($kingdom, $building);
-        
+
         $user    = $kingdom->character->user;
 
         $kingdom = new Item($kingdom, $transformer);
@@ -140,6 +141,7 @@ class KingdomBuildingService {
         $current = Carbon::parse(now())->timestamp;
 
         $this->completed      = (($current - $start) / ($end - $start));
+
         $this->totalResources = 1 - $this->completed;
     }
 
@@ -151,7 +153,7 @@ class KingdomBuildingService {
             'current_iron'       => $kingdom->current_iron + ($building->iron_cost * $this->totalResources),
             'current_population' => $kingdom->current_population + ($building->required_population * $this->totalResources)
         ]);
-        
+
         return $kingdom->refresh();
     }
 }

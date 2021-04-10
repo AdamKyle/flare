@@ -887,7 +887,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => 1,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -900,7 +900,7 @@ class KingdomsControllerTest extends TestCase
             'kingdom_id'   => $kingdom->id,
             'building_id'  => 1,
             'to_level'     => 2,
-            'completed_at' => now()->subMinutes(10),
+            'completed_at' => now()->subDays(1),
             'started_at'   => now()
         ]);
 
