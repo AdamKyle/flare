@@ -13,34 +13,49 @@ One could argue that making a game is very hard and takes a lot of time and dedi
 
 Those people would be right. I fully intend to finish and launch this yet to be titled game.
 
-If you have ideas open a ticket with the title: `Idea for Game Name`
+If you have ideas open a ticket with the appropriate template.
 
 This game is heavily under development but some of the features that you will get to experience are:
 
-# Adventure
+- Fighting Monsters
+- Adventuring
+- Kingdom management
+- Moving around, teleporting and setting sale on an interactive map.
+  - Note for mobile players, the map is not dragable for you, how ever on desktop is.
+  - The map will still function and work on mobile devices and even update its position should you move "off map"
+    or to a position where the map should move automatically.
+- Market board for selling enchanted items.
+- Enchanting/Crafting
+- Skills, including those you can train while fightng and those you can train while doing actions, such as craftin/enchanting.
+- Quest Items and Quest NPC's
+- Travel betwen planes of existance via special quest items.
+- Chat and private message other players.
 
-- Pick a race and a class and begin your adventure!
-- Move around on a 500x500 map that is completely draggable on a 16x16 grid. Explore caves, ancient ruins and more with time based mechanics.
-- Fight monsters, gain loots, gold, experience and levels!
-- Equip your gear and become stronger. Play to your classes strengths and become the strongest character!
-- Chat in real time with other people including private messages.
-- More to come ...
+And many more...
 
-# Kingdoms
+## Common FAQ
 
-> ## ATTN!
->
-> This is a planned feature how ever the game may launch with out it for the initial
-> alpha phase 1.
+- Is this game pay to win? cash shops? Ads?
 
-- Start off with a predefined kingdom on a giant map that can have over 250 thousand kingdoms!
-- Grow your kingdoms, store your gold, rule over other kingdoms in a time based way.
-- Start or Join a clan, conquer the map and farm the plundered villages for scraps of resources.
-- Recruit, build up and gather resources.
-- More the come ...
+No, there is no way for you to spend any money in this game. You cannot buy levels, characters, items, nothing. You want it, you earn it.
 
-This game is completely free and any special gear or bonuses that are similar to the two games mentioned above
-can all be gained in game with no need to spend out side money. This point was very important to me.
+- How does this game make money if there is no cash shop or ads?
+
+It doesn't. It's a completly free, open source game with no intentions to add any form of monitization, accept maybe a "donate" patreon **far, far** in to the future that would not impact players in any way. That is donating would not get you anything in game.
+
+- Are their clans, guilds or resets for the kingdoms or other aspects of the game?
+
+No. It's every person for them selves. There are also no resets.
+
+- Are there energy systems or ways to slow the player down?
+
+No and yes. There are no energy systems, that is there is no feature in game to prevent you from being as active as you want to be. How ever we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few minutes for an adventure to (at most) a couple hours for upgrading buildings (at higher levels) for your kingdom.
+
+The idea is to keep you enaged and playing.
+
+- I can't play all the time, how do I catch up?
+
+There are many ways you can catch up. You could be the type of player who runs adventures all the time - these are the most idle aspect of the game. Maybe you want to rule all the kingdoms on the map, or craft and enchant all the best items and sell them on the market to make a profit.
 
 # Development and Testing
 
@@ -53,7 +68,7 @@ can all be gained in game with no need to spend out side money. This point was v
 - start websockets: `php artisan websocket:serve`
 - listen for queues: `php artisan queue:work --queue=high,default --tries=1`
 - Publish information section: `php artisan move:files` <sup>**</sup>
-- From there you cn register as a new player.
+- From there you can register as a new player.
   - Or since you ran the `create:admn` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
 - Regular players, who sign up, will only see the game section.
 
@@ -95,6 +110,15 @@ PUSHER_APP_CLUSTER=mt1
 
 This game, for the admin section at the time of this writing, requires a way to send out emails. For example you can read [here](https://medium.com/@agavitalis/how-to-send-an-email-in-laravel-using-gmail-smtp-server-53d962f01a0c) about setting up gmail with laravel.
 
+## Telescope for development
+
+We use Laravels Telescope to monitor jobs and queues as well as a few other things when developing to help make sure things are working smoothly.
+
+You can enable this in the env file when you are developing.
+
+If you make changes to a job or event, make sure to restart not just the queue, but the web sockets as well.
+
 ## Testing
 
-- `composer phpunit`
+- `composer phpunit` this will also generate code coverage report.
+- `./vendor/bin/phpunit` this will not generate code coverage but can be used for debugging specific tests via the `--filrer=` option
