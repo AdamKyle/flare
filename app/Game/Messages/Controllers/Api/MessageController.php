@@ -56,7 +56,6 @@ class MessageController extends Controller {
     }
 
     public function postPublicMessage(Request $request) {
-        $character = null;
         $x         = 0;
         $y         = 0;
 

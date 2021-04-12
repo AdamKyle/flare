@@ -26,11 +26,22 @@
     .god-message {
       color: #f8e488;
       font-weight: bold;
+      font-size: 18px;
     }
 
     .error-message {
       color: #fb3b3b;
       font-size: 22px;
+    }
+
+    .global-message {
+      color: #e8b413;
+      font-weight: bold;
+    }
+
+    .drop-message {
+      color: #a6e2a0;
+      font-weight: bold;
     }
 
     .private-message-sent {

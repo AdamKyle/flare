@@ -41,6 +41,7 @@ class Kingdom extends Model implements Auditable
         'current_morale',
         'max_morale',
         'treasury',
+        'published',
     ];
 
     /**
@@ -65,7 +66,12 @@ class Kingdom extends Model implements Auditable
         'current_morale'     => 'float',
         'max_morale'         => 'float',
         'treasury'           => 'integer',
+        'published'          => 'boolean',
     ];
+
+    public function gameMap() {
+        return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
+    }
 
     public function buildings() {
         return $this->hasMany(KingdomBuilding::class, 'kingdom_id', 'id');

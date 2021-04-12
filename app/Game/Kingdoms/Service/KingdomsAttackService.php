@@ -2,8 +2,12 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Mail\GenericMail;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
+use Facades\App\Flare\Values\UserOnlineValue;
+use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
@@ -19,13 +23,13 @@ class KingdomsAttackService {
 
     private $selectedKingdom;
 
-    private $kingdomTransfromer;
+    private $kingdomTransformer;
 
     private $manager;
 
-    public function __construct(SelectedKingdom $selectedKingdom, Manager $manager, KingdomTransformer $kingdomTransfromer) {
+    public function __construct(SelectedKingdom $selectedKingdom, Manager $manager, KingdomTransformer $kingdomTransformer) {
         $this->selectedKingdom    = $selectedKingdom;
-        $this->kingdomTransfromer = $kingdomTransfromer;
+        $this->kingdomTransformer = $kingdomTransformer;
         $this->manager            = $manager;
     }
 
@@ -90,11 +94,15 @@ class KingdomsAttackService {
 
             MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes(2)/*$timeTillFinished*/);
 
-            $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransfromer);
+            $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransformer);
 
             $kingdom  = $this->manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($character->user, $kingdom));
+
+            $this->alertDefenderToAttack($defender);
+
+            $this->globalAttackMessage($defender, $character);
         }
 
         return $this->successResult();
@@ -155,5 +163,27 @@ class KingdomsAttackService {
         }
 
         return $totalTime;
+    }
+
+    protected function globalAttackMessage(Kingdom $defender, Character $character) {
+        $mapName               = $defender->gameMap->name;
+        $defenderCharacterName = $defender->character->name;
+
+        $message = $character->name . ' Has launched an attack against: ' . $defenderCharacterName . ' on the ' . $mapName . ' plane.';
+
+        broadcast(new GlobalMessageEvent($message));
+    }
+
+    protected function alertDefenderToAttack(Kingdom $defender) {
+        $mapName = $defender->gameMap->name;
+        $user    = $defender->character->user;
+
+        $message = 'Your kingdom at: (X/Y) ' . $defender->x_position . '/' . $defender->y_position . ' ('.$mapName.') is under attack!';
+
+        if (UserOnlineValue::isOnline($user)) {
+            event(new KingdomServerMessageEvent($user, 'under-attack', $message));
+        } else if ($user->kingdom_attack_email) {
+            \Mail::to($user->email)->send(new GenericMail($user, $message, 'Kingdom under attack!'));
+        }
     }
 }

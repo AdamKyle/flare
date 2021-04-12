@@ -14,3 +14,8 @@ Broadcast::channel('server-message-{userId}', function ($user, $userId) {
 Broadcast::channel('private-message-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
 });
+
+// When a global message is sent out.
+Broadcast::channel('global-message', function ($user) {
+    return $user;
+});

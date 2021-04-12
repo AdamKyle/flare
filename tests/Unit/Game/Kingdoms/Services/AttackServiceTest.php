@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
@@ -120,8 +119,6 @@ class AttackServiceTest extends TestCase {
 
         $attackService->attack($unitMovementQueue, $character, $defender->id);
 
-        $this->assertTrue(KingdomLog::all()->isEmpty());
-
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
@@ -159,8 +156,6 @@ class AttackServiceTest extends TestCase {
         $attackService = resolve(AttackService::class);
 
         $attackService->attack($unitMovementQueue, $character, $defender->id);
-
-        $this->assertTrue(KingdomLog::all()->isEmpty());
 
         $character = $character->refresh();
 

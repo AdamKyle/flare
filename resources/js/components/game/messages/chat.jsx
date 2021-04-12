@@ -11,12 +11,12 @@ export default class Chat extends React.Component {
 
     this.state = {
       messages: [],
-      serverMessages: [],
       message: '',
       user: {},
     }
 
     this.echo = Echo.join('chat');
+    this.globalMessage = Echo.join('global-message');
     this.serverMessages = Echo.private('server-message-' + this.props.userId);
     this.privateMessages = Echo.private('private-message-' + this.props.userId);
   }
@@ -60,6 +60,19 @@ export default class Chat extends React.Component {
 
       this.setState({
         messages: messages
+      });
+    });
+
+    this.globalMessage.listen('Game.Messages.Events.GlobalMessageEvent', (event) => {
+      const messages = cloneDeep(this.state.messages);
+
+      messages.push({
+        message: event.message,
+        type: 'global-message'
+      });
+
+      this.state({
+        messages: messages,
       });
     });
 
@@ -160,6 +173,14 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id + '_server-message'}>
               <div className="server-message">{message.message}</div>
+            </li>
+          )
+        } else if(message.type === 'global-message') {
+          elements.push(
+            <li key={message.id + '_global-message'}>
+              <div className="god-message">
+                {message.message}
+              </div>
             </li>
           )
         } else if (message.user_id === this.props.userId && message.type === 'private-message') {

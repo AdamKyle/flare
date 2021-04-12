@@ -36,6 +36,7 @@ class User extends Authenticatable
         'upgraded_building_email',
         'kingdoms_update_email',
         'rebuilt_building_email',
+        'kingdom_attack_email',
         'is_test',
     ];
 
@@ -66,6 +67,7 @@ class User extends Authenticatable
         'upgraded_building_email' => 'boolean',
         'kingdoms_update_email'   => 'boolean',
         'rebuilt_building_email'  => 'boolean',
+        'kingdom_attack_email'    => 'boolean',
     ];
 
     public function character() {

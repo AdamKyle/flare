@@ -9,17 +9,23 @@ class KingdomLogStatusValue {
      */
     private $value;
 
-    const ATTACKED = 'attacked';
-    const LOST     = 'lost';
-    const TAKEN    = 'taken';
+    const ATTACKED         = 'attacked kingdom';
+    const LOST             = 'lost attack';
+    const TAKEN            = 'taken kingdom';
+    const LOST_KINGDOM     = 'lost kingdom';
+    const KINGDOM_ATTACKED = 'kingdom attacked';
+    const UNITS_RETURNING  = 'units returning';
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::ATTACKED => 'attacked',
-        self::LOST     => 'lost',
-        self::TAKEN    => 'taken',
+        self::ATTACKED         => 'attacked kingdom',
+        self::LOST             => 'lost attack',
+        self::TAKEN            => 'taken kingdom',
+        self::LOST_KINGDOM     => 'lost kingdom',
+        self::KINGDOM_ATTACKED => 'kingdom attacked',
+        self::UNITS_RETURNING  => 'units returning',
     ];
 
     /**
@@ -43,7 +49,7 @@ class KingdomLogStatusValue {
      *
      * @return bool
      */
-    public function attacked(): bool {
+    public function attackedKingdom(): bool {
         return $this->value === self::ATTACKED;
     }
 
@@ -52,7 +58,7 @@ class KingdomLogStatusValue {
      *
      * @return bool
      */
-    public function lost(): bool {
+    public function lostAttack(): bool {
         return $this->value === self::LOST;
     }
 
@@ -61,7 +67,34 @@ class KingdomLogStatusValue {
      *
      * @return bool
      */
-    public function took(): bool {
+    public function tookKingdom(): bool {
         return $this->value === self::TAKEN;
+    }
+
+    /**
+     * Was defending kingdom attacked?
+     *
+     * @return bool
+     */
+    public function kingdomWasAttacked(): bool {
+        return $this->value === self::KINGDOM_ATTACKED;
+    }
+
+    /**
+     * Was defending kingdom lost?
+     *
+     * @return bool
+     */
+    public function lostKingdom(): bool {
+        return $this->value === self::LOST_KINGDOM;
+    }
+
+    /**
+     * Are units returning?
+     *
+     * @return bool
+     */
+    public function unitsReturning(): bool {
+        return $this->value === self::UNITS_RETURNING;
     }
 }

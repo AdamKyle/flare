@@ -83,14 +83,14 @@ class KingdomHandler {
      * @param array $newRegularUnits
      * @param array $newSiegeUnits
      */
-    public function takeKingdom(UnitMovementQueue $unitMovement, Character $character, array $newUnits): void {
+    public function takeKingdom(UnitMovementQueue $unitMovement, Character $character, $survingUnits): void {
         $kingdom = $unitMovement->toKingdom;
 
         $kingdom->update([
             'character_id' => $character->id,
         ]);
 
-        foreach ($newUnits as $unitInfo) {
+        foreach ($survingUnits as $unitInfo) {
             if (!$unitInfo['settler']) {
                 $unit = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
 

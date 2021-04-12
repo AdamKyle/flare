@@ -27,6 +27,7 @@ class SettingsController extends Controller {
             'new_building_email'      => $request->has('new_building_email'),
             'upgraded_building_email' => $request->has('upgraded_building_email'),
             'rebuilt_building_email'  => $request->has('rebuilt_building_email'),
+            'kingdom_attack_email'    => $request->has('kingdom_attack_email'),
         ]);
 
         return redirect()->back()->with('success', 'Updated email prefrences.');
