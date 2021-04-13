@@ -96,11 +96,15 @@ class UpgradeBuilding implements ShouldQueue
 
         $this->building->kingdom->save();
 
-        $this->building->refresh()->Update([
+        $building = $this->building->refresh();
+
+        $building->Update([
             'level' => $level,
         ]);
 
-        $this->building->refresh()->update([
+        $building = $this->building->refresh();
+
+        $building->update([
             'current_defence'    => $this->building->defence,
             'current_durability' => $this->building->durability,
             'max_defence'        => $this->building->defence,
@@ -111,7 +115,7 @@ class UpgradeBuilding implements ShouldQueue
 
         if ($building->is_farm) {
             $building->kingdom->update([
-                'max_population' => $building->population_increase
+                'max_population' => ($building->level * 100) + 100,
             ]);
         }
 

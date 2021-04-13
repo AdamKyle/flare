@@ -86,6 +86,13 @@ export default class BuildingQueue extends React.Component {
               <dd className="text-success">{this.getIncrease('durability')}</dd>
               <dt><strong>Defence Becomes</strong>:</dt>
               <dd className="text-success">{this.getIncrease('defence')}</dd>
+              { this.state.building.is_farm ?
+                <>
+                  <dt><strong>Population Becomes</strong>:</dt>
+                  <dd className="text-success">{((this.state.building.level + 1) * 100) + 100}</dd>
+                </>
+                : null
+              }
             </dl>
           </div>
         </div>

@@ -66,12 +66,12 @@ export default class Chat extends React.Component {
     this.globalMessage.listen('Game.Messages.Events.GlobalMessageEvent', (event) => {
       const messages = cloneDeep(this.state.messages);
 
-      messages.push({
+      messages.unshift({
         message: event.message,
         type: 'global-message'
       });
 
-      this.state({
+      this.setState({
         messages: messages,
       });
     });
@@ -178,7 +178,7 @@ export default class Chat extends React.Component {
         } else if(message.type === 'global-message') {
           elements.push(
             <li key={message.id + '_global-message'}>
-              <div className="god-message">
+              <div className="global-message">
                 {message.message}
               </div>
             </li>

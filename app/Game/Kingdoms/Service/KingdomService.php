@@ -46,10 +46,6 @@ class KingdomService {
         $this->builder->setRequestAttributes($params);
     }
 
-    public function renameKingdom(Kingdom $kingdom, Character $character, array $params) {
-
-    }
-
     /**
      * Creates the kingdom for the character.
      *
@@ -118,7 +114,7 @@ class KingdomService {
         foreach(GameBuilding::all() as $building) {
             $kingdom->buildings()->create([
                 'game_building_id'    => $building->id,
-                'kingdom_id'         => $kingdom->id,
+                'kingdom_id'          => $kingdom->id,
                 'level'               => 1,
                 'current_defence'     => $building->base_defence,
                 'current_durability'  => $building->base_durability,

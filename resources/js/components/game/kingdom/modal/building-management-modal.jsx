@@ -109,7 +109,6 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   render() {
-    console.log(!this.canRebuild(), !this.isCurrentlyInQueue())
     return (
       <Modal
         dialogAs={DraggableModalDialog}

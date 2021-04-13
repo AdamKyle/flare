@@ -27,17 +27,17 @@ class UnitService {
 
     /**
      * Recruit a specific unit for a kingdom
-     * 
+     *
      * Will dispatch a job delayed for an amount of time.
-     * 
+     *
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
         $timeTillFinished = $gameUnit->time_to_recruit * $amount;
-        $timeTillFinished = now()->addMinutes($timeTillFinished);
-        
+        $timeTillFinished = now()->addSeconds($timeTillFinished);
+
         $queue = UnitInQueue::create([
             'character_id' => $kingdom->character->id,
             'kingdom_id'   => $kingdom->id,
@@ -50,12 +50,12 @@ class UnitService {
 
         RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
     }
-    
+
     /**
      * Update the kingdom resources based on the cost.
-     * 
+     *
      * Subtracts cost from current amount.
-     * 
+     *
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
@@ -75,15 +75,15 @@ class UnitService {
 
     /**
      * Cancel a recturiment order.
-     * 
+     *
      * Can return false if resources gained back are too little.
-     * 
+     *
      * @param UnitInQueue $queue
      * @param Manager $manager
      * @param KingdomTransformer $transfromer
      */
     public function cancelRecruit(UnitInQueue $queue, Manager $manager, KingdomTransformer $transfromer): bool {
-        
+
         $this->resourceCalculation($queue);
 
         if (!($this->totalResources >= .10)) {
@@ -92,7 +92,7 @@ class UnitService {
 
         $unit    = $queue->unit;
         $kingdom = $queue->kingdom;
-        $user    = $kingdom->character->user; 
+        $user    = $kingdom->character->user;
 
         $kingdom = $this->updateKingdomAfterCancelation($kingdom, $unit, $queue);
 

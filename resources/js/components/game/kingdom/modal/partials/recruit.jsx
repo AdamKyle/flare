@@ -60,26 +60,20 @@ export default class Recruit extends React.Component {
 
     const costTypes = ['required_population', 'wood_cost', 'clay_cost', 'stone_cost', 'iron_cost'];
 
-    for (const i = 0; i <= costTypes.length; i++) {
+    let notEnoughTypes = [];
+
+    for (let i = 0; i <= costTypes.length; i++) {
 
       const kingdomCurrent = this.getKingdomAmount(costTypes[i]);
-
-      if (kingdomCurrent === 0) {
-        return false;
-      }
 
       const unitTotalCost = this.props.unit[costTypes[i]] * value;
 
       if (unitTotalCost > kingdomCurrent) {
-        return false;
+        notEnoughTypes.push(costTypes[i])
       }
-
-      if (unitTotalCost < kingdomCurrent) {
-        return true;
-      }
-
-      return true;
     }
+
+    return notEnoughTypes.length === 0;
   }
 
   getKingdomAmount(prop) {

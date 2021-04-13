@@ -10,7 +10,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
 
     /**
      * Gets the response data for the character sheet
-     * 
+     *
      * @param Character $character
      * @return mixed
      */
@@ -18,7 +18,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
 
         return [
             'id'                          => $building->id,
-            'kingdom_id'                 => $building->kingdom_id,
+            'kingdom_id'                  => $building->kingdom_id,
             'name'                        => $building->name,
             'description'                 => $building->description,
             'level'                       => $building->level,

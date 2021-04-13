@@ -88,7 +88,7 @@ export default class EnchantingAction extends React.Component {
     const affixesToAttach = [];
     const prefixId = this.state.prefixId;
     const suffixId = this.state.suffixId;
-    console.log(prefixId, suffixId);
+
     if ((prefixId !== 0 && prefixId !== null)) {
       affixesToAttach.push(prefixId);
     }

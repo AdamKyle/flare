@@ -9,7 +9,7 @@ export default class RecruitUnit extends React.Component {
     super(props);
 
     this.state = {
-      amount: 0,
+      amount: 0
     }
   }
 
@@ -45,7 +45,11 @@ export default class RecruitUnit extends React.Component {
               close={this.props.close}
             />
           </div>
-          <UnitData unit={this.props.unit} amount={this.state.amount} kingdom={this.props.kingdom}/>
+          <UnitData
+            unit={this.props.unit}
+            amount={this.state.amount}
+            kingdom={this.props.kingdom}
+          />
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-danger" onClick={this.props.close}>Close</button>

@@ -87,19 +87,27 @@ class KingdomBuilding extends Model
     }
 
     public function getDurabilityAttribute() {
-        return $this->level * $this->gameBuilding->increase_durability_amount;
+        if ($this->level > 1) {
+            return ($this->level * $this->gameBuilding->increase_durability_amount) + $this->gameBuilding->base_durability;
+        }
+
+        return $this->gameBuilding->base_durability;
     }
 
     public function getDefenceAttribute() {
-        return $this->level * $this->gameBuilding->increase_defence_amount;
+        if ($this->level > 1) {
+            return ($this->level * $this->gameBuilding->increase_defence_amount) + $this->gameBuilding->base_defence;
+        }
+
+        return $this->gameBuilding->base_defence;
     }
 
     public function getFutureDurabilityAttribute() {
-        return ($this->level + 1) * $this->gameBuilding->increase_defence_amount;
+        return (($this->level + 1) * $this->gameBuilding->increase_durability_amount) + $this->gameBuilding->base_durability;
     }
 
     public function getFutureDefenceAttribute() {
-        return ($this->level + 1) * $this->gameBuilding->increase_defence_amount;
+        return (($this->level + 1) * $this->gameBuilding->increase_defence_amount) + $this->gameBuilding->base_defence;
     }
 
     public function getRequiredPopulationAttribute() {
@@ -209,7 +217,7 @@ class KingdomBuilding extends Model
     }
 
     public function getIncreaseInClayAttribute() {
-        return $this->gameBuilding->increase_clay_amount;
+        return $this->level * $this->gameBuilding->increase_clay_amount;
     }
 
     public function getFutureIncreaseInClayAttribute() {
@@ -217,7 +225,7 @@ class KingdomBuilding extends Model
     }
 
     public function getIncreaseInStoneAttribute() {
-        return $this->gameBuilding->increase_stone_amount;
+        return $this->level * $this->gameBuilding->increase_stone_amount;
     }
 
     public function getFutureIncreaseInStoneAttribute() {
@@ -225,7 +233,7 @@ class KingdomBuilding extends Model
     }
 
     public function getIncreaseInIronAttribute() {
-        return $this->gameBuilding->increase_iron_amount;
+        return $this->level * $this->gameBuilding->increase_iron_amount;
     }
 
     public function getFutureIncreaseInIronAttribute() {

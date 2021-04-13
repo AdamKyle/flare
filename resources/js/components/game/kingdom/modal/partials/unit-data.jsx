@@ -30,6 +30,7 @@ export default class UnitData extends React.Component {
       const totalCost = this.props.unit[prop] * amount;
 
       if (totalCost > currentAmount) {
+
         return 'text-danger';
       }
 
@@ -136,8 +137,8 @@ export default class UnitData extends React.Component {
               <dd>{this.props.unit.travel_time} Minutes(s)</dd>
               <dd><strong>Time To Recruit</strong>:</dd>
               <dd
-                className={this.getClass('time_to_recruit', this.props.amount)}>{this.calculateAmount('time_to_recruit', this.props.amount)} Minutes <small
-                className="text-muted">{(this.calculateAmount('time_to_recruit', this.props.amount) / 60).toFixed(2)} Hours</small>
+                className={this.getClass('time_to_recruit', this.props.amount)}>{this.calculateAmount('time_to_recruit', this.props.amount)} Seconds <small
+                className="text-muted">{(this.calculateAmount('time_to_recruit', this.props.amount) / 60).toFixed(2)} Minutes</small>
               </dd>
             </dl>
           </div>

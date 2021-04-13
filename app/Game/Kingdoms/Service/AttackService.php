@@ -111,13 +111,13 @@ class AttackService {
         $this->siegeUnits   = $this->fetchSiegeUnits($attackingUnits);
         $this->regularUnits = $this->getRegularUnits($attackingUnits);
 
-        if (!empty($siegeUnits)) {
+        if (!empty($this->siegeUnits)) {
             $healers               = $this->fetchHealers($attackingUnits);
-            $this->newSiegeUnits   = $this->siegeHandler->attack($defender, $siegeUnits, $healers);
+            $this->newSiegeUnits   = $this->siegeHandler->attack($defender, $this->siegeUnits, $healers);
         }
 
-        if (!empty($regularUnits)) {
-            $this->newRegularUnits = $this->unitHandler->attack($defender, $regularUnits);
+        if (!empty($this->regularUnits)) {
+            $this->newRegularUnits = $this->unitHandler->attack($defender, $this->regularUnits);
         }
 
         $this->unitsSent      = array_merge($this->regularUnits, $this->siegeUnits);
@@ -134,6 +134,8 @@ class AttackService {
         }
 
         $this->newDefender = $defender->load('units')->toArray();
+
+        $this->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
 
         $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
 
@@ -240,14 +242,15 @@ class AttackService {
      * @param Character $character
      */
     protected function handleSettlerUnit(Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
-
-        if ($this->isSettlerTheOnlyUnitLeft($this->newRegularUnits)) {
+        dump('Handle Settler Unit: ');
+        dump($this->newRegularUnits, $this->survivingUnits);
+        if ($this->isSettlerTheOnlyUnitLeft($this->survivingUnits)) {
 
             $this->newDefender = $defender->load('units')->toArray();
 
             $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
 
-            return $this->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
+            return $this->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
         }
 
         return $this->attemptToSettleKingdom($defender, $unitMovement, $character);
@@ -262,6 +265,7 @@ class AttackService {
      * @throws \Exception
      */
     protected function notifyDefender(string $status, Character $character, Kingdom $defender) {
+        dump('Called');
         KingdomLog::create([
             'character_id' => $character->id,
             'status'       => $status,
@@ -417,17 +421,9 @@ class AttackService {
                 'from_y' => $unitMovement->moving_to_y,
             ]);
 
-            $this->attacked($defender, $unitMovement, $character->user);
-
             $unitMovement = $unitMovement->refresh();
 
-            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes($timeToReturn));
-
-            $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
-            $this->notifyAttacker(KingdomLogStatusValue::UNITS_RETURNING, $defender, $unitMovement, $character);
-        } else {
-            $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
-            $this->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes(2, /*$timeToReturn*/));
         }
     }
 
