@@ -68,7 +68,8 @@ export default class Chat extends React.Component {
 
       messages.unshift({
         message: event.message,
-        type: 'global-message'
+        type: 'global-message',
+        id: Math.random().toString(36).substring(7),
       });
 
       this.setState({
@@ -78,6 +79,7 @@ export default class Chat extends React.Component {
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
       const messages = cloneDeep(this.state.messages);
+
       const message = {
         message: event.message,
         type: 'server-message',
@@ -86,8 +88,14 @@ export default class Chat extends React.Component {
         id: Math.random().toString(36).substring(7),
       };
 
+      console.log('message');
+      console.log(message);
+
       messages.unshift(message);
 
+      console.log('messages after');
+      console.log(messages);
+;
       const user = cloneDeep(this.state.user);
 
       user.is_silenced = event.user.is_silenced;

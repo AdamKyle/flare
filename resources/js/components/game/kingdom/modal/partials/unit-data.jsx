@@ -24,6 +24,10 @@ export default class UnitData extends React.Component {
       return '';
     }
 
+    if (this.props.hasOwnProperty('isQueue')) {
+      return '';
+    }
+
     const currentAmount = this.getKingdomAmount(prop);
 
     if (currentAmount !== 0) {

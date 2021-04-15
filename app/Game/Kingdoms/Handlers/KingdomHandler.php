@@ -35,7 +35,7 @@ class KingdomHandler {
         $totalDecrease = 0;
 
         foreach ($this->kingdom->buildings as $building) {
-            if ($building->durability === 0) {
+            if ($building->current_durability === 0 || $building->current_durability === 0.0) {
                 $totalDecrease += $building->morale_decrease;
             }
         }

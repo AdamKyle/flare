@@ -143,8 +143,10 @@ trait DefenderHandler {
         $walls          = $defender->buildings->where('is_walls', true)->where('current_durability', '>', 0)->first();
         $wallsBonus     = 0;
 
-        if ($walls->current_durability > 0) {
-            $wallsBonus = ($walls->level / 100);
+        if (!is_null($walls)) {
+            if ($walls->current_durability > 0) {
+                $wallsBonus = ($walls->level / 100);
+            }
         }
 
         return ($totalDefenders / $totalUnitTypes) + $wallsBonus;

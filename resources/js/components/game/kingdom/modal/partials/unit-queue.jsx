@@ -67,7 +67,12 @@ export default class UnitQueue extends React.Component {
   }
 
   upgradeDetails() {
-    return <UnitData kingdom={this.props.kingdom} unit={this.state.unit} amount={this.state.queue.amount}/>
+    return <UnitData
+      kingdom={this.props.kingdom}
+      unit={this.state.unit}
+      amount={this.state.queue.amount}
+      isQueue={true}
+    />
   }
 
   modalContent() {

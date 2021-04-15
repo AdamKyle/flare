@@ -49,7 +49,7 @@ class LocationService {
      * @var bool $canAttack | false
      */
     private $canAttack = false;
-    
+
     /**
      * @var bool $canSettle | false
      */
@@ -57,14 +57,14 @@ class LocationService {
 
     /**
      * Stores the id and the location information
-     * 
+     *
      * @var array $kingdomToAttack
      */
     private $kingdomToAttack = [];
 
     /**
      * Contructor
-     * 
+     *
      * @param PortService $portService
      * @param KingdomTransformer $kingdomTransformer
      * @param Manager $manager
@@ -76,14 +76,14 @@ class LocationService {
 
     /**
      * Get location data
-     * 
+     *
      * @param Character $character
      * @return array
      */
     public function getLocationData(Character $character): array {
         $this->processLocation($character);
 
-        $this->kingdomManagement($character);  
+        $this->kingdomManagement($character);
 
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),
@@ -108,11 +108,11 @@ class LocationService {
 
     /**
      * Processes the location.
-     * 
+     *
      * We will fetch the location information for the character postion.
-     * 
+     *
      * This includes port details and any relavant adventures the location might have.
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -125,18 +125,18 @@ class LocationService {
             if ($this->location->is_port) {
                 $this->portDetails = $this->portService->getPortDetails($character, $this->location);
             }
-            
+
             $this->adventureDetails = $this->location->adventures()->where('published', true)->get();
         }
     }
 
     /**
      * Determines the action the player can take.
-     * 
+     *
      * Based on he character position, if there is a kingdom or not
      * We determine the action the player can take. That is, can they settle?
      * Can they attack the kingdom or can they manage the kingdom?
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -144,10 +144,16 @@ class LocationService {
         $kingdom   = Kingdom::where('x_position', $character->x_position)
                             ->where('y_position', $character->y_position)
                             ->first();
-        
+
+        // See if the characters kingdoms
+        $units = $character->kingdoms()->where('game_map_id', $character->map->game_map_id)->join('kingdom_units', function($join) {
+            $join->on('kingdoms.id', 'kingdom_units.kingdom_id')
+                 ->where('kingdom_units.amount', '>', 0);
+        })->get();
+
         if (!is_null($kingdom)) {
             if ($character->id !== $kingdom->character->id) {
-                $this->canAttack = true;
+                $this->canAttack = $units->isNotEmpty();
 
                 $this->kingdomToAttack = [
                     'id' => $kingdom->id,

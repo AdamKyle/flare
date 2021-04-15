@@ -9,7 +9,6 @@ export default class QueueModal extends React.Component {
   }
 
   render() {
-    console.log(this.props.queueType);
     if (this.props.queueType === 'building') {
       return <BuildingQueue buildings={this.props.kingdom.buildings} queueData={this.props.queueData}
                             close={this.props.close} show={this.props.show}/>

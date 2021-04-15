@@ -122,8 +122,8 @@ class AttackService {
 
         $this->unitsSent      = array_merge($this->regularUnits, $this->siegeUnits);
         $this->survivingUnits = array_merge($this->newRegularUnits, $this->newSiegeUnits);
-
-        $defender = $this->kingdomHandler->setKingdom($defender)->decreaseMorale()->getKingdom();
+        
+        $defender = $this->kingdomHandler->setKingdom($defender->refresh())->decreaseMorale()->getKingdom();
 
         $settler = $this->findSettlerUnit($this->unitsSent);
 
@@ -135,11 +135,15 @@ class AttackService {
 
         $this->newDefender = $defender->load('units')->toArray();
 
-        $this->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
-
         $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
 
-        $this->returnUnits($defender, $unitMovement, $character);
+        if (!$this->anySurvivingUnits()) {
+            $this->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+        } else {
+            $this->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
+
+            $this->returnUnits($defender, $unitMovement, $character);
+        }
     }
 
     /**
@@ -231,6 +235,21 @@ class AttackService {
         return $regularUnits;
     }
 
+    /**
+     * Are there any surviving units left?
+     *
+     * @return bool
+     */
+    protected function anySurvivingUnits() {
+        foreach ($this->survivingUnits as $unitInfo) {
+            if ($unitInfo['amount'] > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Handles settler actions.
@@ -242,8 +261,6 @@ class AttackService {
      * @param Character $character
      */
     protected function handleSettlerUnit(Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
-        dump('Handle Settler Unit: ');
-        dump($this->newRegularUnits, $this->survivingUnits);
         if ($this->isSettlerTheOnlyUnitLeft($this->survivingUnits)) {
 
             $this->newDefender = $defender->load('units')->toArray();
@@ -265,7 +282,6 @@ class AttackService {
      * @throws \Exception
      */
     protected function notifyDefender(string $status, Character $character, Kingdom $defender) {
-        dump('Called');
         KingdomLog::create([
             'character_id' => $character->id,
             'status'       => $status,

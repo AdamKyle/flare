@@ -139,14 +139,14 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="gameUnit-travel-time">Travel Time: </label>
+                <label for="gameUnit-travel-time">Travel Time (minutes): </label>
                 <input type="number" min="1" class="form-control required" id="gameUnit-travel-time" name="gameUnit-travel-time" wire:model="gameUnit.travel_time">
                 @error('gameUnit.travel_time') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="gameUnit-recruitment-time">Recruitment Time: </label>
+                <label for="gameUnit-recruitment-time">Recruitment Time (seconds): </label>
                 <input type="number" min="1" class="form-control required" id="gameUnit-recruitment-time" name="gameUnit-recruitment-time" wire:model="gameUnit.time_to_recruit">
                 @error('gameUnit.time_to_recruit') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
