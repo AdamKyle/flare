@@ -8,16 +8,12 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use App\Flare\Models\Character;
+use App\Game\Core\Traits\KingdomCache;
 
 class AddKingdomToMap implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    /**
-     * @var array $kingdom
-     */
-    public $kingdom;
+    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
     /**
      * @var User $users
@@ -25,16 +21,19 @@ class AddKingdomToMap implements ShouldBroadcastNow
     public $user;
 
     /**
+     * @var array $kingdoms
+     */
+    public $kingdoms;
+
+    /**
      * Create a new event instance.
      *
-     * @param User $user
-     * @param array $kingdom
-     * @return void
+     * @param Character $character
      */
-    public function __construct(User $user, array $kingdom)
+    public function __construct(Character $character)
     {
-        $this->user    = $user;
-        $this->kingdom = $kingdom;
+        $this->user     = $character->user;
+        $this->kingdoms = $this->getKingdoms($character);
     }
 
     /**

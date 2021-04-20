@@ -24,7 +24,7 @@ class MoveUnits implements ShouldQueue
 
     public $type;
 
-    public function __construct(int $movementId, int $defenderId, string $type, Character $character = null)
+    public function __construct(int $movementId, int $defenderId, string $type, Character $character)
     {
         $this->movementId = $movementId;
         $this->type       = $type;

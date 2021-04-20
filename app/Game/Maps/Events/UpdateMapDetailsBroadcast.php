@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Game\Core\Traits\KingdomCache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -14,7 +15,7 @@ use App\Game\Maps\Services\MovementService;
 
 class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
     /**
      * @var Map $map
@@ -36,12 +37,14 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public $kingdomDetails = [];
 
+    public $updatedKingdoms = [];
+
     /**
      * @var User $user
      */
 
     private $user;
-    
+
     /**
      * Create a new event instance.
      *
@@ -51,8 +54,16 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      * @param array $adventureDetails
      * @return void
      */
-    public function __construct(Map $map, User $user, MovementService $service)
+    public function __construct(Map $map, User $user, MovementService $service, bool $updateKingdoms = false)
     {
+
+        if ($updateKingdoms) {
+            $service->processArea($user->character);
+
+            $this->updatedKingdoms = $this->getKingdoms($user->character);
+        }
+
+
         $this->map              = $map;
         $this->user             = $user;
         $this->portDetails      = $service->portDetails();

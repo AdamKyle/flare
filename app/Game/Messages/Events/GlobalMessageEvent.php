@@ -25,10 +25,6 @@ class GlobalMessageEvent implements ShouldBroadcastNow
      */
     public function __construct(string $message)
     {
-        if (is_null(auth()->user())) {
-            return;
-        }
-
         $this->message = $message;
     }
 

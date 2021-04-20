@@ -15,6 +15,20 @@ class KingdomHandler {
     private $kingdom;
 
     /**
+     * @var TakeKingdomHandler $takeKingdomHandler
+     */
+    private $takeKingdomHandler;
+
+    /**
+     * KingdomHandler constructor.
+     *
+     * @param TakeKingdomHandler $takeKingdomHandler
+     */
+    public function __construct(TakeKingdomHandler $takeKingdomHandler) {
+        $this->takeKingdomHandler = $takeKingdomHandler;
+    }
+
+    /**
      * Sets the kingdom.
      *
      * @param Kingdom $kingdom
@@ -70,37 +84,15 @@ class KingdomHandler {
     }
 
     /**
-     * Take the kingdom from the defending player.
+     * Take the kingdom.
      *
-     * Assigns the kingdom to the attacking player.
-     *
-     * Assigns any left over units to the newly taken kingdom as well.
-     *
-     * The settler is assumed to become a new "adviser".
-     *
-     * @param UnitMovementQueue $unitMovement
+     * @param Kingdom $defender
      * @param Character $character
-     * @param array $newRegularUnits
-     * @param array $newSiegeUnits
+     * @param array $survivingUnits
+     * @return bool
      */
-    public function takeKingdom(UnitMovementQueue $unitMovement, Character $character, $survingUnits): void {
-        $kingdom = $unitMovement->toKingdom;
-
-        $kingdom->update([
-            'character_id' => $character->id,
-        ]);
-
-        foreach ($survingUnits as $unitInfo) {
-            if (!$unitInfo['settler']) {
-                $unit = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
-
-                if (!is_null($unit)) {
-                    $unit->update([
-                        'amount' => $unit->amount + $unitInfo['amount']
-                    ]);
-                }
-            }
-        }
+    public function takeKingdom(Kingdom $defender, Character $character, array $survivingUnits): bool {
+        return $this->takeKingdomHandler->takeKingdom($defender, $character, $survivingUnits);
     }
 
     /**

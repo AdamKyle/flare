@@ -1,7 +1,7 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 
-export default class KingdomModal extends React.Component {
+export default class KingdomSettlementModal extends React.Component {
 
   constructor(props) {
     super(props);
@@ -56,8 +56,8 @@ export default class KingdomModal extends React.Component {
     }
 
     axios.post('/api/kingdoms/' + this.props.characterId + '/settle', params).then((result) => {
-      this.props.updateKingdomData(result.data);
       this.props.close();
+      this.props.openKingdomManagement();
     }).catch((error) => {
       if (error.hasOwnProperty('response')) {
         this.setState({

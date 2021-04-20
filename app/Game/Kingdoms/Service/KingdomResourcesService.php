@@ -149,7 +149,17 @@ class KingdomResourcesService {
         $building = $this->kingdom->buildings->where('is_farm', true)->first();
         $morale   = $this->kingdom->current_morale;
 
-        if ($building->current_durability === 0 || $morale === 0) {
+        if ($morale === 0 || $morale === 0.0) {
+            return;
+        }
+
+        if ($building->current_durability === 0) {
+            if ($this->kingdom->current_population !== $this->kingdom->max_population) {
+                $this->kingdom->update([
+                    'current_population' => $this->kingdom->current_population + 10,
+                ]);
+            }
+
             return;
         }
 

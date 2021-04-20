@@ -25,7 +25,7 @@ export default class UnitSelection extends React.Component {
   componentDidMount() {
     let unitsToSend = {};
 
-    this.props.selectedKingdomData.forEach((kingdom) => {
+    this.props.attackingKingdoms.forEach((kingdom) => {
       if (kingdom.units.length > 0) {
         unitsToSend[kingdom.kingdom_name] = {};
 
@@ -84,7 +84,7 @@ export default class UnitSelection extends React.Component {
 
   getTimeForUnits(kingdomName, unitName) {
 
-    let foundKingdom = this.props.selectedKingdomData.filter((k) => k.kingdom_name === kingdomName);
+    let foundKingdom = this.props.attackingKingdoms.filter((k) => k.kingdom_name === kingdomName);
 
     if (_.isEmpty(foundKingdom)) {
       return 0;
@@ -165,7 +165,7 @@ export default class UnitSelection extends React.Component {
   }
 
   renderKingdomsAccordions() {
-    return this.props.selectedKingdomData.map((kingdom) => {
+    return this.props.attackingKingdoms.map((kingdom) => {
       if (kingdom.units.length > 0) {
         return (
           <Card key={kingdom.kingdom_name}>
@@ -205,10 +205,6 @@ export default class UnitSelection extends React.Component {
             </div>
             :
             <>
-              <div className="alert alert-info">
-                Only showing kingdoms who have units that you can send out.
-              </div>
-
               <Accordion defaultActiveKey="0">
                 {this.renderKingdomsAccordions()}
               </Accordion>

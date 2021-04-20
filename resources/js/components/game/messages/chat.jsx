@@ -88,13 +88,7 @@ export default class Chat extends React.Component {
         id: Math.random().toString(36).substring(7),
       };
 
-      console.log('message');
-      console.log(message);
-
       messages.unshift(message);
-
-      console.log('messages after');
-      console.log(messages);
 ;
       const user = cloneDeep(this.state.user);
 
@@ -310,7 +304,7 @@ export default class Chat extends React.Component {
       user_name: messageData[1],
       message: messageData[2],
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
   }
 

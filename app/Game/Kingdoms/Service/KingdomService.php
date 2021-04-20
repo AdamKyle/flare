@@ -94,20 +94,12 @@ class KingdomService {
      * This will update the current map to add a kingdom at the players location.
      *
      * @param Character $character
-     * @param Kingdom $kingdom
-     * @param KingdomTransformer $transformer
-     * @param Manager $manager
-     *
      * @return array
      */
-    public function addKingdomToMap(Character $character, Kingdom $kingdom, KingdomTransformer $transfromer, Manager $manager): array {
-        $kingdom  = new Item($kingdom, $transfromer);
+    public function addKingdomToMap(Character $character): array {
+        event(new AddKingdomToMap($character));
 
-        $kingdom = $manager->createData($kingdom)->toArray();
-
-        event(new AddKingdomToMap($character->user, $kingdom));
-
-        return $kingdom;
+        return [];
     }
 
     protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {

@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Game\Kingdoms\Handlers\KingdomHandler;
+use App\Game\Kingdoms\Handlers\TakeKingdomHandler;
+use App\Game\Maps\Services\MovementService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 use App\Game\Kingdoms\Handlers\AttackHandler;
@@ -70,8 +72,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UnitHandler;
         });
 
-        $this->app->bind(KingdomHandler::class, function() {
-           return new KingdomHandler;
+        $this->app->bind(TakeKingdomHandler::class, function($app) {
+            return new TakeKingdomHandler($app->make(MovementService::class));
+        });
+
+        $this->app->bind(KingdomHandler::class, function($app) {
+           return new KingdomHandler($app->make(TakeKingdomHandler::class));
         });
 
         $this->app->bind(AttackService::class, function($app) {

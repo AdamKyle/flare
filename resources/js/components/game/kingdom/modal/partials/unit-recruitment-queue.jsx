@@ -10,9 +10,8 @@ export default class UnitRecruitmentQueue extends React.Component {
     super(props);
 
     this.unit_queue_config = {
-      page_size: 25,
-      length_menu: [25],
-      show_filter: true,
+      page_size: 5,
+      length_menu: [5, 10 ,15],
       show_pagination: true,
       pagination: 'advance',
     }

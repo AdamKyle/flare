@@ -2,13 +2,13 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Console\Commands\UpdateKingdom;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use Carbon\Carbon;

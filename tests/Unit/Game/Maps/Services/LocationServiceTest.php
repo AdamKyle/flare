@@ -13,14 +13,15 @@ class LocationServiceTest extends TestCase {
     use RefreshDatabase;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation()
                                                  ->kingdomManagement()
-                                                 ->assignKingdom();
+                                                 ->assignKingdom()
+                                                 ->assignUnits();
     }
 
     public function tearDown(): void {

@@ -2,8 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Console\Commands\UpdateKingdom;
-use App\Flare\Models\Character;
+use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;

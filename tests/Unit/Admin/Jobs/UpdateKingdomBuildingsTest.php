@@ -111,10 +111,10 @@ class UpdateKingdomBuildingsTest extends TestCase
             'kingdom_id' => $kingdom->id,
             'game_building_id' => $building->id,
             'level' => 2,
-            'current_defence' => 100,
-            'current_durability' => 100,
-            'max_defence' => 100,
-            'max_durability' => 100,
+            'current_defence' => 300,
+            'current_durability' => 300,
+            'max_defence' => 300,
+            'max_durability' => 300,
         ]);
 
         UpdateKingdomBuildings::dispatch($building->refresh(), [1], 5);
@@ -122,10 +122,10 @@ class UpdateKingdomBuildingsTest extends TestCase
         $kingdom  = $kingdom->refresh();
         $building = $kingdom->buildings->first();
 
-        $this->assertEquals($building->current_defence, 200);
-        $this->assertEquals($building->current_durability, 100);
-        $this->assertEquals($building->max_defence, 200);
-        $this->assertEquals($building->max_durability, 200);
+        $this->assertEquals($building->current_defence, 300);
+        $this->assertEquals($building->current_durability, 300);
+        $this->assertEquals($building->max_defence, 300);
+        $this->assertEquals($building->max_durability, 300);
 
         Mail::assertNotSent(GenericMail::class);
     }

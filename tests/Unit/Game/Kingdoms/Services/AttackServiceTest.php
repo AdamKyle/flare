@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\KingdomLog;
+use App\Game\Core\Traits\KingdomCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Service\AttackService;
@@ -14,7 +15,7 @@ use Tests\Traits\CreateUnitMovementQueue;
 
 class AttackServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateUnitMovementQueue;
+    use RefreshDatabase, CreateUnitMovementQueue, KingdomCache;
 
     public function setUp(): void {
         parent::setUp();
@@ -115,6 +116,9 @@ class AttackServiceTest extends TestCase {
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
+        $this->addKingdomToCache($character, $attacker->getKingdom());
+        $this->addKingdomToCache($defender->character, $defender);
+
         $attackService = resolve(AttackService::class);
 
         $attackService->attack($unitMovementQueue, $character, $defender->id);
@@ -122,6 +126,8 @@ class AttackServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
+        $this->assertEmpty($this->getKingdoms($defender->character));
+        $this->assertCount(2, $this->getKingdoms($character));
     }
 
     public function testTakeKingdomWhenMoraleIsAlreadyAtZero() {
@@ -153,6 +159,9 @@ class AttackServiceTest extends TestCase {
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
+        $this->addKingdomToCache($character, $attacker->getKingdom());
+        $this->addKingdomToCache($defender->character, $defender);
+
         $attackService = resolve(AttackService::class);
 
         $attackService->attack($unitMovementQueue, $character, $defender->id);
@@ -160,6 +169,8 @@ class AttackServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
+        $this->assertEmpty($this->getKingdoms($defender->character));
+        $this->assertCount(2, $this->getKingdoms($character));
     }
 
     public function testFetchHealers() {

@@ -15,6 +15,9 @@ class CreateUnitMovementQueue extends Migration
     {
         Schema::create('unit_movement_queue', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('character_id');
+            $table->foreign('character_id', 'uimq_cid')
+                ->references('id')->on('characters');
             $table->unsignedBigInteger('from_kingdom_id');
             $table->foreign('from_kingdom_id', 'uimq_from_king_id')
                   ->references('id')->on('kingdoms');

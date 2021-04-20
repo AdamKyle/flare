@@ -132,12 +132,16 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
+
       this.updatePlayerPosition(event.map);
+
+      const myKingdoms = event.hasOwnProperty('updatedKingdoms') ? event.updatedKingdoms : this.state.my_kingdoms;
 
       this.setState({
         currentPort: event.portDetails.current_port,
         portList: event.portDetails.port_list,
-        adventures: event.adventureDetails
+        adventures: event.adventureDetails,
+        kingdoms: myKingdoms,
       }, () => {
         this.props.updateAdventure(event.adventureDetails, [], null);
 
@@ -150,10 +154,10 @@ export default class Map extends React.Component {
         });
 
         this.props.updateKingdoms({
-          my_kingdoms: this.state.kingdoms,
+          my_kingdoms: myKingdoms,
           can_attack: event.kingdomDetails.hasOwnProperty('can_attack') ? event.kingdomDetails.can_attack : false,
           can_settle: event.kingdomDetails.hasOwnProperty('can_settle') ? event.kingdomDetails.can_settle : false,
-          is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
+          is_mine: this.isMyKingdom(myKingdoms, this.state.characterPosition),
           kingdom_to_attack: event.kingdomDetails.kingdom_to_attack
         });
 
@@ -168,12 +172,8 @@ export default class Map extends React.Component {
     });
 
     this.addKingomToMap.listen('Game.Kingdoms.Events.AddKingdomToMap', (event) => {
-      const kingdoms = _.cloneDeep(this.state.kingdoms);
-
-      kingdoms.push(event.kingdom);
-
       this.setState({
-        kingdoms: kingdoms,
+        kingdoms: event.kingdoms,
       }, () => {
         this.props.updateKingdoms({
           my_kingdoms: this.state.kingdoms,

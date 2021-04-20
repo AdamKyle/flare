@@ -74,7 +74,7 @@ class KingdomsControllerTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue(!empty($content));
+        $this->assertTrue(empty($content));
         $this->assertTrue(Cache::has('character-kingdoms-' . $this->character->getCharacter()->id));
 
         $this->assertTrue(
@@ -99,7 +99,7 @@ class KingdomsControllerTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue(!empty($content));
+        $this->assertTrue(empty($content));
         $this->assertEquals(2, count(Cache::get('character-kingdoms-' . $this->character->getCharacter()->id)));
 
         $this->assertTrue(

@@ -22,6 +22,19 @@ class KingdomAttackController extends Controller {
         $this->kingdomAttackService = $kingdomAttackService;
     }
 
+    public function fetchKingdomsWithUnits(Character $character) {
+        $kingdoms = $character->kingdoms()
+                              ->where('game_map_id', $character->map->game_map_id)
+                              ->join('kingdom_units', function($join) {
+                                  $join->on('kingdoms.id', 'kingdom_units.kingdom_id')
+                                       ->where('kingdom_units.amount', '>', 0);
+                              })->select('kingdoms.id', 'kingdoms.name', 'kingdoms.x_position', 'kingdoms.y_position')
+                                ->groupBy('kingdoms.id')
+                                ->get();
+
+        return response()->json($kingdoms, 200);
+    }
+
     public function selectKingdoms(SelectedKingdomsRequest $request, Character $character) {
         $response = $this->kingdomAttackService->fetchSelectedKingdomData($character, $request->selected_kingdoms);
 

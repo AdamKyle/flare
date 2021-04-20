@@ -49,6 +49,7 @@ class UpdateKingdomBuilding implements ShouldQueue
      */
     public function handle(Manager $manager, KingdomTransformer $kingdomTransformer) {
         $this->building->update([
+            'current_durability' => $this->building->durability,
             'current_defence'    => $this->building->defence,
             'max_defence'        => $this->building->defence,
             'max_durability'     => $this->building->durability,

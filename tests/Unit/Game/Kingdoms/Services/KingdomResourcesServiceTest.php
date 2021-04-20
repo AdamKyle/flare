@@ -213,6 +213,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'game_map_id'        => 1,
             'current_wood'       => 500,
             'current_population' => 0,
+            'current_morale'     => 0.10,
         ]);
 
         $kingdom->buildings()->insert([
@@ -224,7 +225,6 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 0,
                 'current_defence'    => 100,
-
             ],
             [
                 'game_building_id'     => $this->createGameBuilding([

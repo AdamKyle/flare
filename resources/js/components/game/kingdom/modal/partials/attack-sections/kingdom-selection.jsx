@@ -53,25 +53,34 @@ export default class KingdomSelection extends React.Component {
             </div>
             : null
         }
-        <div className="alert alert-info mb-2 mt-2">
-          You may only select 10 kingdoms at a time to attack from.
-        </div>
-        <div className="form-group mt-2">
-          <label htmlFor="kingom-select">Select Kingdoms</label>
-          <select
-            multiple={true}
-            value={this.kingdoms_selected}
-            onChange={this.handleChange.bind(this)}
-            className="form-control"
-            id="kingom-select"
-            style={{height: '220px'}}
-          >
-            {this.renderSelectOptions()}
-          </select>
-          <small id="kingom-select" className="form-text text-muted">
-            You can use CTRL/CMD and SHIFT for selections.
-          </small>
-        </div>
+        {
+          this.props.kingdoms.length === 0 ?
+            <div className="alert alert-danger">
+              You have no kingdoms with units to select from.
+            </div>
+            :
+            <>
+              <div className="alert alert-info mb-2 mt-2">
+                You may only select 10 kingdoms at a time to attack from.
+              </div>
+              <div className="form-group mt-2">
+                <label htmlFor="kingom-select">Select Kingdoms</label>
+                <select
+                  multiple={true}
+                  value={this.kingdoms_selected}
+                  onChange={this.handleChange.bind(this)}
+                  className="form-control"
+                  id="kingom-select"
+                  style={{height: '220px'}}
+                >
+                  {this.renderSelectOptions()}
+                </select>
+                <small id="kingom-select" className="form-text text-muted">
+                  You can use CTRL/CMD and SHIFT for selections.
+                </small>
+              </div>
+            </>
+        }
       </div>
     );
   }

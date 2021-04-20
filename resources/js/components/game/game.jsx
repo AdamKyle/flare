@@ -8,7 +8,7 @@ import ActionsSection from './sections/actions-section';
 import PortSection from './sections/port-section';
 import AdeventureActions from './sections/adventure-section';
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
-import KingdomModal from './kingdom/modal/kingdom-modal';
+import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 
 export default class Game extends React.Component {
@@ -43,6 +43,7 @@ export default class Game extends React.Component {
         can_attack: false,
         can_settle: false,
         kingdom_to_attack: [],
+        is_mine: false,
       },
       kingdom: null,
     }
@@ -287,13 +288,13 @@ export default class Game extends React.Component {
 
         {
           this.state.openKingdomModal ?
-            <KingdomModal
+            <KingdomSettlementModal
               characterId={this.state.characterId}
               show={this.state.openKingdomModal}
               x={this.state.current_x}
               y={this.state.current_y}
               close={this.closeKingdomModal.bind(this)}
-              updateKingdomData={this.updateKingdomData.bind(this)}
+              openKingdomManagement={this.openKingdomManagement.bind(this)}
             />
             : null
         }

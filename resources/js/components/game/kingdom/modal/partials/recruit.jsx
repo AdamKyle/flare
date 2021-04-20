@@ -58,6 +58,12 @@ export default class Recruit extends React.Component {
       return false;
     }
 
+    const building = this.props.kingdom.buildings.filter((b) => b.name === this.props.unit.recruited_from.name)[0];
+
+    if (building.current_durability === 0) {
+      return false;
+    }
+
     const costTypes = ['required_population', 'wood_cost', 'clay_cost', 'stone_cost', 'iron_cost'];
 
     let notEnoughTypes = [];

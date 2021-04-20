@@ -20,6 +20,7 @@ class UnitMovementQueue extends Model
      * @var array
      */
     protected $fillable = [
+        'character_id',
         'from_kingdom_id',
         'to_kingdom_id',
         'units_moving',
@@ -55,6 +56,10 @@ class UnitMovementQueue extends Model
         'from_kingdom',
         'to_kingdom',
     ];
+
+    public function character() {
+        return $this->belongsTo(Character::class);
+    }
 
     public function getFromKingdomAttribute() {
         return Kingdom::find($this->from_kingdom_id);

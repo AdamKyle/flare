@@ -2,20 +2,20 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\BuildingInQueue;
-use App\Game\Kingdoms\Requests\KingdomRenameRequest;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Http\Controllers\Controller;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Requests\KingdomRenameRequest;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
@@ -55,13 +55,9 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $kingdom = $kingdomService->createKingdom($character);
+        $kingdomService->createKingdom($character);
 
-        return response()->json(
-            $kingdomService->addKingdomToMap(
-                $character, $kingdom, $this->kingdom, $this->manager
-            ),
-        200);
+        return response()->json($kingdomService->addKingdomToMap($character), 200);
     }
 
     public function rename(KingdomRenameRequest $request, Kingdom $kingdom, KingdomService $kingdomService) {

@@ -136,12 +136,24 @@
                                 <h3>
                                     <span class="header"></span> Character Info <i class="ra ra-muscle-up ml-2"></i>
                                 </h3>
+                                <span class="text-muted">
+                                    You can learn more about <a href="/information/races-and-classes">races and classes</a>
+                                    in the comprehensive help documentation.
+                                </span>
                                 <hr />
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Character Name') }}</label>
+                            <label for="name" class="col-md-4 col-form-label text-md-right">
+                                {{ __('Character Name') }}
+
+                                <i class="far fa-question-circle pl-2 cursor"
+                                   data-toggle="popover"
+                                   title="Character Names"
+                                   data-content="Character names may not contain spaces an can only be 15 characters long and only contain letters and numbers (of any case)."
+                                ></i>
+                            </label>
 
                             <div class="col-md-6">
                                 <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
@@ -204,3 +216,12 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
+@endpush
+

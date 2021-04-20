@@ -9,14 +9,33 @@ export default class RecruitUnit extends React.Component {
     super(props);
 
     this.state = {
-      amount: 0
+      amount: 0,
+      errorMessage: ''
     }
+  }
+
+  componentDidMount() {
+    this.cannotRecruit();
   }
 
   updateAmount(amount) {
     this.setState({
       amount: amount,
     });
+  }
+
+  cannotRecruit() {
+    const building = this.props.kingdom.buildings.filter((b) => b.name === this.props.unit.recruited_from.name)[0];
+
+    if (building.current_durability === 0) {
+      this.setState({
+        errorMessage: 'This building needs to be repaired. You cannot recruit units from it till you do.'
+      });
+    } else {
+      this.setState({
+        errorMessage: ''
+      });
+    }
   }
 
   render() {
@@ -35,6 +54,13 @@ export default class RecruitUnit extends React.Component {
         </Modal.Header>
         <Modal.Body>
           <p className="mb-3 mt-1">{this.props.unit.description}</p>
+          {
+            this.state.errorMessage !== '' ?
+              <div className="alert alert-danger mt-2 mb-2">
+                {this.state.errorMessage}
+              </div>
+              : null
+          }
           <div className="mb-3">
             <Recruit
               currentPopulation={this.props.kingdom.current_population}

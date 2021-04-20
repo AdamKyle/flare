@@ -22,6 +22,7 @@ class UnitMoveQueueFactory extends Factory
     public function definition()
     {
         return [
+            'character_id'    => 1,
             'from_kingdom_id' => 1,
             'to_kingdom_id'   => 1,
             'units_moving'    => [],

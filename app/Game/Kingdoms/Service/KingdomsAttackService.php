@@ -81,6 +81,7 @@ class KingdomsAttackService {
             $timeTillFinished = now()->addMinutes($totalTime);
 
             $unitMovement = UnitMovementQueue::create([
+                'character_id'      => $character->id,
                 'from_kingdom_id'   => $kingdom->id,
                 'to_kingdom_id'     => $defender->id,
                 'units_moving'      => $unitsToSend,
@@ -99,11 +100,11 @@ class KingdomsAttackService {
             $kingdom  = $this->manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($character->user, $kingdom));
-
-            $this->alertDefenderToAttack($defender);
-
-            $this->globalAttackMessage($defender, $character);
         }
+
+        $this->alertDefenderToAttack($defender);
+
+        $this->globalAttackMessage($defender, $character);
 
         return $this->successResult();
     }

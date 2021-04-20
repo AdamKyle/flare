@@ -12,7 +12,7 @@ use Tests\Traits\CreateUnitMovementQueue;
 
 /**
  * Nothing really gets tested in these tests.
- * 
+ *
  * These tests are more to cover the code.
  */
 class MoveUnitsTest extends TestCase {
@@ -20,13 +20,21 @@ class MoveUnitsTest extends TestCase {
     use RefreshDatabase, CreateUnitMovementQueue, CreateKingdom;
 
     public function testJobDoesNotRunForNoQueue() {
-        MoveUnits::dispatch(10, 2, 'attack');
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->givePlayerLocation()
+                                           ->getCharacter();
+
+        MoveUnits::dispatch(10, 2, 'attack', $character);
 
         $this->assertTrue(true);
     }
 
     public function testJobDoesNotRunForTypeThatDoesntMatch() {
-        MoveUnits::dispatch($this->createUnitMovement()->id, 2, 'something');
+        $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->givePlayerLocation()
+                                           ->getCharacter();
+
+        MoveUnits::dispatch($this->createUnitMovement()->id, 2, 'something', $character);
 
         $this->assertTrue(true);
     }
