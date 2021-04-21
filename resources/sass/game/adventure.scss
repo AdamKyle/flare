@@ -3,6 +3,12 @@
     margin: 0 auto;
 }
 
+@include media-breakpoint-down(sm) {
+  .adventure-fight-log {
+    width: auto;
+  }
+}
+
 .log-text {
     p {
         margin-top: -15px;

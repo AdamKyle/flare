@@ -132,10 +132,9 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
-
       this.updatePlayerPosition(event.map);
 
-      const myKingdoms = event.hasOwnProperty('updatedKingdoms') ? event.updatedKingdoms : this.state.my_kingdoms;
+      let myKingdoms = this.fetchKingdoms(event);
 
       this.setState({
         currentPort: event.portDetails.current_port,
@@ -195,6 +194,16 @@ export default class Map extends React.Component {
         adventures: this.props.adventures
       });
     }
+  }
+
+  fetchKingdoms(event) {
+    if (event.hasOwnProperty('updatedKingdoms')) {
+      if (event.updatedKingdoms.length > 0) {
+        return event.updatedKingdoms;
+      }
+    }
+
+    return this.state.kingdoms;
   }
 
   isMyKingdom(kingdoms, characterPosition) {

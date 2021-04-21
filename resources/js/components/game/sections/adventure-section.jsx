@@ -153,10 +153,10 @@ export default class AdeventureActions extends React.Component {
       details.push(
         <div key={adventure.id} className="mb-2">
           <Row>
-            <Col xs={3} sm={3} lg={3} xl={1}>
+            <Col xs={3} sm={3} lg={3} xl={2}>
               <a href={'/adeventures/' + adventure.id} target="_blank"> {adventure.name} </a>
             </Col>
-            <Col xs={9} sm={9} lg={9} xl={11}>
+            <Col xs={9} sm={9} lg={9} xl={9}>
               <Row>
                 <Col xs={9} sm={6} lg={8} xl={2}>
                   <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id}

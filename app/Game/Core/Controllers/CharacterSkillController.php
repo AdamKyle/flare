@@ -11,7 +11,7 @@ class CharacterSkillController extends Controller {
 
     public function __construct() {
         $this->middleware('auth');
-        
+
         $this->middleware('is.character.dead')->only([
             'train'
         ]);
@@ -52,7 +52,7 @@ class CharacterSkillController extends Controller {
     }
 
     public function show(Skill $skill) {
-        return view('game.core.character.skill', [
+        return view('game.character.skill', [
             'skill' => $skill
         ]);
     }

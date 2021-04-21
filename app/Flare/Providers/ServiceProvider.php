@@ -3,6 +3,7 @@
 namespace App\Flare\Providers;
 
 
+use App\Flare\View\Components\EquipmentButtonForm;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;

@@ -64,7 +64,7 @@ export default class KingdomBuildings extends React.Component {
   render() {
     return (
       <div className="row mt-2">
-        <div className="col-md-12">
+        <div className="col-sm-12 overflow-tabs">
           <ReactDatatable
             config={this.config}
             records={this.props.kingdom.buildings}

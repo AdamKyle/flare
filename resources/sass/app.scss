@@ -124,6 +124,10 @@ dd {
   margin-right: -8px;
 }
 
+.overflow-tabs {
+  overflow-x: scroll;
+}
+
 @include media-breakpoint-down(sm) {
   .push-right {
     float: left;
@@ -178,6 +182,6 @@ dd {
 
 @media (max-width: 768px) {
   .container-fluid {
-    padding: 25px 0;
+    padding: 25px;
   }
 }

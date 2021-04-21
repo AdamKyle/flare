@@ -51,14 +51,14 @@ class MovementService {
 
     /**
      * Constructor
-     * 
+     *
      * @param PortService $portService
      * @return void
      */
-    public function __construct(PortService $portService, 
-                                MapTileValue $mapTile, 
+    public function __construct(PortService $portService,
+                                MapTileValue $mapTile,
                                 CoordinatesCache $coordinatesCache,
-                                MapPositionValue $mapPositionValue) 
+                                MapPositionValue $mapPositionValue)
     {
         $this->portService      = $portService;
         $this->mapTile          = $mapTile;
@@ -68,9 +68,9 @@ class MovementService {
 
     /**
      * Update the characters position.
-     * 
+     *
      * Only updates the character position if the character can walk on water
-     * 
+     *
      * @param Character $character
      * @param array $params
      * @return array
@@ -93,11 +93,11 @@ class MovementService {
 
     /**
      * Porcess the area.
-     * 
+     *
      * sets the kingdom data for a specific area.
-     * 
+     *
      * This includes if you are the owner, can settle, can manage or can attack.
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -144,7 +144,7 @@ class MovementService {
 
     /**
      * Process the location for ports and adventures as well as drops.
-     * 
+     *
      * @param Location $location | null
      * @param Character $character
      * @param PortService $portService
@@ -158,18 +158,18 @@ class MovementService {
         $this->giveQuestReward($location, $character);
 
         if ($location->adventures->isNotEmpty()) {
-            $this->adventureDetails = $location->adventures->toArray();
+            $this->adventureDetails = $location->adventures->where('published', true)->toArray();
         }
     }
 
     /**
      * Send off the movement time out.
-     * 
+     *
      * Sets the character's abillity to move to false.
      * Sets the can move again to 10 seconds from now.
-     * 
+     *
      * Sends off the broadcast event to update the front end.
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -178,15 +178,15 @@ class MovementService {
             'can_move'          => false,
             'can_move_again_at' => now()->addSeconds(10),
         ]);
-        
+
         event(new MoveTimeOutEvent($character));
     }
 
     /**
      * Teleport the player to a specified location.
-     * 
+     *
      * The array that is returned is for the response of the controller.
-     * 
+     *
      * @param Character $character
      * @param int $x
      * @param int $y
@@ -224,7 +224,7 @@ class MovementService {
         $character = $character->refresh();
 
         $this->processArea($character);
-        
+
         $this->teleportCharacter($character, $timeout, $cost);
 
         return $this->successResult();
@@ -232,9 +232,9 @@ class MovementService {
 
     /**
      * Set sail.
-     * 
+     *
      * Moves the character fro one port to another assuming they can.
-     * 
+     *
      * @param Character $character
      * @param Location $location
      * @param array $params
@@ -270,7 +270,7 @@ class MovementService {
 
     /**
      * Get the port details
-     * 
+     *
      * @return array
      */
     public function portDetails(): array {
@@ -279,7 +279,7 @@ class MovementService {
 
     /**
      * Get the adventure details
-     * 
+     *
      * @return array
      */
     public function adventureDetails(): array {
@@ -288,7 +288,7 @@ class MovementService {
 
     /**
      * Get the kingdom data
-     * 
+     *
      * @param array
      */
     public function kingdomDetails(): array {
@@ -297,15 +297,15 @@ class MovementService {
 
     /**
      * Moves the character to the new location.
-     * 
-     * 
+     *
+     *
      * @param Character $character
      * @param array $params
      * @return array
      */
     protected function moveCharacter(Character $character, array $params): array {
         $character->map->update($params);
-    
+
         $character = $character->refresh();
 
         $this->processArea($character);
@@ -321,7 +321,7 @@ class MovementService {
 
     /**
      * Teleport the character to a new location.
-     * 
+     *
      * @param Character $character
      * @param int timeout
      * @param int $cost
@@ -334,7 +334,7 @@ class MovementService {
         ]);
 
         $character = $character->refresh();
-        
+
         event(new MoveTimeOutEvent($character, $timeout, true));
         event(new UpdateTopBarEvent($character));
 
@@ -343,7 +343,7 @@ class MovementService {
 
     /**
      * Give the quest reward item
-     * 
+     *
      * @param Location $location
      * @param Character $character
      * @param void
@@ -371,7 +371,7 @@ class MovementService {
 
     /**
      * Move the character to the new port.
-     * 
+     *
      * @param Character $character
      * @param Location $location
      * @param int $timeOutValue
@@ -383,21 +383,21 @@ class MovementService {
         $this->giveQuestReward($location, $character);
 
         $character = $character->refresh();
-        
+
         event(new MoveTimeOutEvent($character, $timeOutValue, true));
         event(new UpdateTopBarEvent($character));
     }
-    
+
     /**
      * Can we teleport to water based locations?
-     * 
+     *
      * @param Character $character
      * @param int $x
      * @param int $y
      */
     protected function canWalkOnwater(Character $character, int $x, int $y): bool {
         $color = $this->mapTile->getTileColor($character, $x, $y);
-        
+
         if ($this->mapTile->isWaterTile((int) $color)) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === 'walk-on-water';

@@ -16,7 +16,7 @@ class CharacterSheetController extends Controller {
         $character     = auth()->user()->character;
         $characterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 
-        return view ('game.core.character.sheet', [
+        return view ('game.character.sheet', [
             'character' => $character,
             'characterInfo' => [
                 'maxAttack' => $characterInfo->buildAttack(),

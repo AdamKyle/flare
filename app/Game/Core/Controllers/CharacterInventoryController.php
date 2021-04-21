@@ -36,8 +36,8 @@ class CharacterInventoryController extends Controller {
     }
 
     public function compare(
-        ComparisonValidation $request, 
-        ValidEquipPositionsValue $validPositions, 
+        ComparisonValidation $request,
+        ValidEquipPositionsValue $validPositions,
         CharacterInventoryService $characterInventoryService,
         Character $character
     ) {
@@ -70,7 +70,7 @@ class CharacterInventoryController extends Controller {
                 'characterId'  => $character->id,
             ];
         }
-        
+
 
         Cache::put($character->user->id . '-compareItemDetails', $viewData, now()->addMinutes(5));
 
@@ -82,7 +82,7 @@ class CharacterInventoryController extends Controller {
             redirect()->to('/')->with('error', 'Item comparison expired.');
         }
 
-        return view('game.core.character.equipment-compare', Cache::pull($user->id . '-compareItemDetails'));
+        return view('game.character.equipment', Cache::pull($user->id . '-compareItemDetails'));
     }
 
     public function equipItem(EquipItemValidation $request, Character $character) {
@@ -134,7 +134,7 @@ class CharacterInventoryController extends Controller {
     }
 
     public function destroy(Request $request, Character $character) {
-        
+
         $slot      = $character->inventory->slots->filter(function($slot) use ($request) {
             return $slot->id === (int) $request->slot_id;
         })->first();

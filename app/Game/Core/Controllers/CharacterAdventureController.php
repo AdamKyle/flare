@@ -19,7 +19,7 @@ class CharacterAdventureController extends Controller {
         $this->middleware('is.character.dead')->only([
             'collectReward'
         ]);
-        
+
         $this->middleware('is.character.adventuring')->only([
             'collectReward'
         ]);
@@ -28,13 +28,13 @@ class CharacterAdventureController extends Controller {
     public function completedAdventures() {
         $character = auth()->user()->character;
 
-        return view('game.core.character.completed-adventures', [
+        return view('game.adventures.completed-adventures', [
             'logs' => $character->adventureLogs->load('adventure'),
         ]);
     }
 
     public function completedAdventure(AdventureLog $adventureLog) {
-        return view('game.core.character.completed-adventure', [
+        return view('game.adventures.completed-adventure', [
             'adventureLog' => $adventureLog,
         ]);
     }
@@ -43,8 +43,8 @@ class CharacterAdventureController extends Controller {
         if (!isset($adventureLog->logs[$name])) {
             return redirect()->back()->with('error', 'Invalid input.');
         }
-        
-        return view('game.core.character.current-adventure', [
+
+        return view('game.adventures.current-adventure', [
             'log'          => $adventureLog->logs[$name],
             'adventureLog' => $adventureLog
         ]);
@@ -54,7 +54,7 @@ class CharacterAdventureController extends Controller {
         $character = auth()->user()->character;
 
         $adventureLog = $character->adventureLogs()->orderBy('id', 'desc')->first();
-        
+
         if (is_null($adventureLog)) {
             return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
         }
@@ -71,8 +71,8 @@ class CharacterAdventureController extends Controller {
         if (is_null($adventureLog->rewards)) {
             event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
         }
-        
-        return view('game.core.character.current-adventure', [
+
+        return view('game.adventures.current-adventure', [
             'log'          => $adventureLog->logs[array_key_last($adventureLog->logs)],
             'adventureLog' => $adventureLog
         ]);
@@ -87,7 +87,7 @@ class CharacterAdventureController extends Controller {
         }
 
         $messages  = $adventureRewardService->distributeRewards($rewards, $character)->getMessages();
-        
+
         $adventureLog->update([
             'rewards' => null,
         ]);
@@ -99,7 +99,7 @@ class CharacterAdventureController extends Controller {
                 'You are a ready for your next adventure!'
             ];
         }
-        
+
         return redirect()->to(route('game'))->with('success', $messages);
     }
 }

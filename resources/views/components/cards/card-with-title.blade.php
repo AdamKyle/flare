@@ -1,6 +1,7 @@
 @props([
-    'title' => 'Example',
-    'route' => null
+    'title'             => 'Example',
+    'route'             => null,
+    'additionalClasses' => '',
 ])
 
 @if (!is_null($route))
@@ -9,7 +10,7 @@
     <h4>{{$title}}</h4>
 @endif
 
-<div class="card">
+<div class="card {{$additionalClasses}}">
     <div class="card-body">
         {{$slot}}
     </div>
