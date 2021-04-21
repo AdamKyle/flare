@@ -38,9 +38,8 @@
                             formRoute="{{ route('cancel.train.skill', [
                                         'skill' => $skill->id
                                     ]) }}"
-                            title="cancel"
+                            buttonTitle="cancel"
                             formId="cancel-skill-train-form"
-
                         >
 
                         </x-forms.button-with-form>

@@ -10,9 +10,9 @@
                 @else
                     <div class="float-right pb-2">
                         <x-forms.button-with-form
-                            form-route="{{route('admin.character-modeling.assign-all', ['character' => $character->id])}}"
-                            form-id="{{'assign-items'}}"
-                            button-title="Assign All"
+                            formRoute="{{route('admin.character-modeling.assign-all', ['character' => $character->id])}}"
+                            formId="{{'assign-items'}}"
+                            buttonTitle="Assign All"
                             class="btn btn-primary btn-sm"
                         >
                             @forelse( $selected as $item)
@@ -20,7 +20,7 @@
                             @empty
                                 <input type="hidden" name="items[]" value="" />
                             @endforelse
-                            
+
                         </x-forms.button-with-form>
                     </div>
                 @endempty
@@ -33,41 +33,41 @@
                             </x-data-tables.header-row>
                         @endguest
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('name')" 
-                            header-text="Name" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('name')"
+                            header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="name"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('type')" 
-                            header-text="Type" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('type')"
+                            header-text="Type"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="type"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('base_damage')" 
-                            header-text="Base Damage" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('base_damage')"
+                            header-text="Base Damage"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="base_damage"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('base_ac')" 
-                            header-text="Base AC" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('base_ac')"
+                            header-text="Base AC"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="base_ac"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('base_ac')" 
-                            header-text="Base AC" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('base_ac')"
+                            header-text="Base AC"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="base_ac"
@@ -111,13 +111,13 @@
                                 <td>{{is_null($item->base_healing) ? 'N/A' : $item->base_healing}}</td>
                                 <td>
                                     <x-forms.button-with-form
-                                        form-route="{{route('admin.character-modeling.assign-item', ['character' => $character->id])}}"
-                                        form-id="{{'assign-item-'.$item->id}}"
-                                        button-title="Assign"
+                                        formRoute="{{route('admin.character-modeling.assign-item', ['character' => $character->id])}}"
+                                        formId="{{'assign-item-'.$item->id}}"
+                                        buttonTitle="Assign"
                                         class="btn btn-primary btn-sm"
                                     >
                                         <input type="hidden" name="item_id" value={{$item->id}} />
-                                    </x-forms.button-with-form> 
+                                    </x-forms.button-with-form>
                                 </td>
                             </tr>
                         @empty

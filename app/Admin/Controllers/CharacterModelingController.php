@@ -21,7 +21,7 @@ use DB;
 class CharacterModelingController extends Controller {
 
     public function __construct() {
-        
+
     }
 
     public function index() {
@@ -32,12 +32,12 @@ class CharacterModelingController extends Controller {
 
         return view('admin.character-modeling.index', [
             'cardTitle'    => $characters->isEmpty() ? 'Modeling' : 'Generate',
-            'characters'   => $characters->paginate(4) 
+            'characters'   => $characters->paginate(4)
         ]);
     }
 
     public function fetchSheet(Character $character) {
-        return view ('game.core.character.sheet', [
+        return view ('game.character.sheet', [
             'character' => $character,
             'characterInfo' => [
                 'maxAttack' => $character->getInformation()->buildAttack(),
@@ -66,7 +66,7 @@ class CharacterModelingController extends Controller {
     }
 
     public function battleResults(CharacterSnapShot $characterSnapShot) {
-        
+
         return view('admin.character-modeling.battle-results', [
             'battleData'  => $characterSnapShot->battle_simmulation_data,
             'monsterId'   => Monster::find($characterSnapShot->battle_simmulation_data['monster_id'])->id,
@@ -85,7 +85,7 @@ class CharacterModelingController extends Controller {
         $request->validate(['item_id' => 'required']);
 
         $freeSlots = ($character->inventory_max - $character->inventory->slots()->count());
-        
+
         if ($freeSlots === 0) {
             return redirect()->back()->with('error', "You don't have the inventory space");
         }
@@ -204,12 +204,12 @@ class CharacterModelingController extends Controller {
             $character = Character::find($id);
 
             if (is_null($character)) {
-                
+
                 return redirect()->back()->with('error', 'Character does not exist for id: ' . $id);
             }
 
             $snapShot  = $character->snapShots()->where('snap_shot->level', $request->character_levels)->first();
-            
+
             if (is_null($snapShot)) {
                 return redirect()->back()->with('error', 'Level entered does not match any snap shot data for character: ' . $character->id);
             }
@@ -221,10 +221,10 @@ class CharacterModelingController extends Controller {
             } else if ($index === $totalCharacters) {
                 $sendEmail = true;
             }
-            
+
             RunTestSimulation::dispatchNow($character->refresh(), $request->type, $request->model_id, $request->total_times, auth()->user(), $sendEmail, $index);
         }
-        
+
         return redirect()->to($route)->with('success', 'Testing under way. You may log out, we will email you when done.');
     }
 }

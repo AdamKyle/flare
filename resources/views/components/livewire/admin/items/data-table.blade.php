@@ -29,9 +29,9 @@
                     @else
                         <div class="float-right pb-2">
                             <x-forms.button-with-form
-                                form-route="{{route('game.shop.buy.bulk', ['character' => $character->id])}}"
-                                form-id="{{'shop-buy-form-item-in-bulk'}}"
-                                button-title="Buy All"
+                                formRoute="{{route('game.shop.buy.bulk', ['character' => $character->id])}}"
+                                formId="{{'shop-buy-form-item-in-bulk'}}"
+                                buttonTitle="Buy All"
                                 class="btn btn-primary btn-sm"
                             >
                                 @forelse( $selected as $item)
@@ -152,11 +152,11 @@
                                         </a>
 
                                         <x-forms.button-with-form
-                                            form-route="{{route('items.delete', [
+                                            formRoute="{{route('items.delete', [
                                                     'item' => $item->id
                                                 ])}}"
-                                            form-id="{{'delete-item-'.$item->id}}"
-                                            button-title="Delete"
+                                            formId="{{'delete-item-'.$item->id}}"
+                                            buttonTitle="Delete"
                                             class="btn btn-danger btn-sm"
                                         />
                                     @else
