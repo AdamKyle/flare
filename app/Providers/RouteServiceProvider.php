@@ -39,6 +39,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutes();
         $this->mapAdminRoutes();
         $this->adventureRoutes();
+        $this->mapKingdomRoutes();
         $this->mapGameCoreRoutes();
 
         // Api Routes:
@@ -116,6 +117,12 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
              ->namespace('App\Game\Core\Controllers')
              ->group(base_path('routes/game/web.php'));
+    }
+
+    protected function mapKingdomRoutes() {
+        Route::middleware('web')
+            ->namespace('App\Game\Kingdoms\Controllers')
+            ->group(base_path('routes/game/kingdoms/web.php'));
     }
 
     protected function mapGameCoreApiRoutes()

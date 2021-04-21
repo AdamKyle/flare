@@ -132,6 +132,10 @@ class Character extends Model
         return $this->hasMany(Kingdom::class, 'character_id', 'id');
     }
 
+    public function kingdomAttackLogs() {
+        return $this->hasMany(KingdomLog::class);
+    }
+
     public function getXpAttribute($value) {
         return number_format($value, 2);
     }
@@ -139,9 +143,9 @@ class Character extends Model
     /**
      * Allows one to get specific information from a character.
      *
-     * By returning the CharacterInformationBuilder class, we can allow you to get 
+     * By returning the CharacterInformationBuilder class, we can allow you to get
      * multiple calulculated sets of data.
-     *  
+     *
      * @return CharacterInformationBuilder
      */
     public function getInformation(): CharacterInformationBuilder {
