@@ -22,7 +22,7 @@ class AttackHandler {
      * @param array $healerUnits
      * @return array
      */
-    public function attackAllKingdomBuildings(Kingdom $defender, Collection $targets, array $unitInfo, array $healerUnits): array {
+    public function attackAllKingdomBuildings(Kingdom $defender, Collection $targets, array $unitInfo): array {
         $totalAttack  = $unitInfo['total_attack'];
         $totalDefence = $unitInfo['total_defence'];
 
@@ -43,7 +43,7 @@ class AttackHandler {
             if ($defenderSiegeUnitsAttack !== 0) {
                 $totalPercentageOfAttackersLost = $this->calculatePerentageLost($defenderSiegeUnitsAttack, $totalDefence);
 
-                $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $this->calculateNewPercentageOfAttackersLost($totalPercentageOfAttackersLost, $healerUnits));
+                $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $totalPercentageOfAttackersLost);
                 $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
             }
         } else {
@@ -51,7 +51,7 @@ class AttackHandler {
             if ($defenderSiegeUnitsAttack !== 0) {
                 $totalPercentageOfAttackersLost = $this->calculatePerentageLost($defenderSiegeUnitsAttack, $totalDefence);
 
-                $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $this->calculateNewPercentageOfAttackersLost($totalPercentageOfAttackersLost, $healerUnits));
+                $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $totalPercentageOfAttackersLost);
                 $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
             }
         }
@@ -67,7 +67,7 @@ class AttackHandler {
      * @param array $healerUnits
      * @return array
      */
-    public function unitAttack(Kingdom $defender, array $unitInfo, array $healerUnits) {
+    public function unitAttack(Kingdom $defender, array $unitInfo) {
         $totalDefenderAttack  = 0;
         $totalDefenderDefence = 0;
         $totalDefenderTypes   = 0;
@@ -90,7 +90,7 @@ class AttackHandler {
             $totalAttackersLost          = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence, true);
 
             $this->updateDefenderUnits($defender, $totalDefenderPercentageLost);
-            $newUnitTotal = $this->getNewUnitTotal($unitInfo['amount'], $this->calculateNewPercentageOfAttackersLost($totalAttackersLost, $healerUnits));
+            $newUnitTotal = $this->getNewUnitTotal($unitInfo['amount'], $totalAttackersLost);
 
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         } else {
@@ -98,7 +98,7 @@ class AttackHandler {
             $totalAttackersLost          = $this->calculatePerentageLost($totalDefenderAttack, $totalDefence);
 
             $this->updateDefenderUnits($defender, $totalDefenderPercentageLost);
-            $newUnitTotal = $this->getNewUnitTotal($unitInfo['amount'], $this->calculateNewPercentageOfAttackersLost($totalAttackersLost, $healerUnits));
+            $newUnitTotal = $this->getNewUnitTotal($unitInfo['amount'], $totalAttackersLost);
 
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         }
@@ -111,10 +111,10 @@ class AttackHandler {
      *
      * @param KingdomBuilding $target
      * @param array $unitInfo
-     * @param array $healerUnits
+     * @param array $healerUnitsattackKingdomBuildings
      * @return array
      */
-    public function attackTarget(KingdomBuilding $target, array $unitInfo, array $healerUnits): array {
+    public function attackTarget(KingdomBuilding $target, array $unitInfo): array {
         $totalAttack = $unitInfo['total_attack'];
 
         if ($totalAttack > $target->current_defence) {
@@ -123,7 +123,7 @@ class AttackHandler {
 
             $this->updateKingdomBuilding($target, $totalPercentageDurabilityLost);
 
-            $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $this->calculateNewPercentageOfAttackersLost($totalPercentageUnitsLost, $healerUnits));
+            $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $totalPercentageUnitsLost);
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         } else {
 
@@ -131,7 +131,7 @@ class AttackHandler {
 
             $this->updateKingdomBuilding($target, 0.01);
 
-            $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $this->calculateNewPercentageOfAttackersLost($totalPercentageUnitsLost, $healerUnits));
+            $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $totalPercentageUnitsLost);
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         }
 
@@ -146,7 +146,7 @@ class AttackHandler {
      * @param array $healers
      * @return array
      */
-    public function primaryAttack(Kingdom $defender, array $unitInfo, array $healers): array {
+    public function primaryAttack(Kingdom $defender, array $unitInfo): array {
         $primaryTarget = $defender->buildings->where('name', $unitInfo['primary_target'])->first();
 
         if (is_null($primaryTarget)) {
@@ -157,7 +157,7 @@ class AttackHandler {
             return $unitInfo;
         }
 
-        return $this->attackTarget($primaryTarget, $unitInfo, $healers);
+        return $this->attackTarget($primaryTarget, $unitInfo);
     }
 
     /**
@@ -168,10 +168,10 @@ class AttackHandler {
      * @param array $healerUnits
      * @return array
      */
-    public function attackKingdomBuildings(Kingdom $defender, array $unitInfo, array $healerUnits): array {
+    public function attackKingdomBuildings(Kingdom $defender, array $unitInfo): array {
         $buildings = $defender->buildings->where('is_walls', false);
 
-        return $this->attackAllKingdomBuildings($defender, $buildings, $unitInfo, $healerUnits);
+        return $this->attackAllKingdomBuildings($defender, $buildings, $unitInfo);
     }
 
     /**
@@ -182,7 +182,7 @@ class AttackHandler {
      * @param array $healers
      * @return array
      */
-    public function fallBackAttack(Kingdom $defender, array $unitInfo, array $healers): array {
+    public function fallBackAttack(Kingdom $defender, array $unitInfo): array {
         $fallBackTarget = $defender->buildings->where('name', $unitInfo['fall_back'])->first();
 
         if (is_null($fallBackTarget)) {
@@ -193,6 +193,6 @@ class AttackHandler {
             return $unitInfo;
         }
 
-        return $this->attackTarget($fallBackTarget, $unitInfo, $healers);
+        return $this->attackTarget($fallBackTarget, $unitInfo);
     }
 }

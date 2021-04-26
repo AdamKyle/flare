@@ -23,8 +23,8 @@ class KingdomLog extends Model
         'status',
         'units_sent',
         'units_survived',
-        'defender_units',
-        'surviving_defender_units',
+        'old_defender',
+        'new_defender',
         'published',
     ];
 
@@ -67,11 +67,11 @@ class KingdomLog extends Model
     }
 
     public function setOldDefenderAttribute($value) {
-        $this->attributes['old_defender'] = json_decode($value);
+        $this->attributes['old_defender'] = json_encode($value);
     }
 
     public function setNewDefenderUnitsAttribute($value) {
-        $this->attributes['new_defender'] = json_decode($value);
+        $this->attributes['new_defender'] = json_encode($value);
     }
 
     protected static function newFactory() {

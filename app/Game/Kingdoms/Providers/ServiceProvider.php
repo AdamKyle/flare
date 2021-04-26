@@ -2,16 +2,20 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Game\Kingdoms\Builders\AttackBuilder;
+use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
+use App\Game\Kingdoms\Handlers\NotifyHandler;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Game\Kingdoms\Builders\KingdomAttackedBuilder;
+use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
 use App\Game\Kingdoms\Handlers\TakeKingdomHandler;
-use App\Game\Maps\Services\MovementService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-
 use App\Game\Kingdoms\Handlers\AttackHandler;
-use App\Game\Kingdoms\Service\UnitReturnService;
-use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Handlers\UnitHandler;
 use App\Game\Kingdoms\Handlers\SiegeHandler;
+use App\Game\Maps\Services\MovementService;
+use App\Game\Kingdoms\Service\UnitReturnService;
+use App\Game\Kingdoms\Service\KingdomLogService;
 use App\Game\Kingdoms\Service\AttackService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
@@ -64,6 +68,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AttackHandler;
         });
 
+        $this->app->bind(AttackBuilder::class, function($app) {
+           return new AttackBuilder();
+        });
+
         $this->app->bind(SiegeHandler::class, function($app) {
             return new SiegeHandler($app->make(AttackHandler::class));
         });
@@ -80,11 +88,32 @@ class ServiceProvider extends ApplicationServiceProvider
            return new KingdomHandler($app->make(TakeKingdomHandler::class));
         });
 
+        $this->app->bind(NotifyHandler::class, function($app) {
+            return new NotifyHandler();
+        });
+
+        $this->app->bind(KingdomAttackedBuilder::class, function() {
+            return new KingdomAttackedBuilder();
+        });
+
+        $this->app->bind(AttackedKingdomBuilder::class, function() {
+            return new AttackedKingdomBuilder();
+        });
+
+        $this->app->bind(KingdomLogService::class, function($app) {
+            return new KingdomLogService(
+                $app->make(KingdomAttackedBuilder::class),
+                $app->make(AttackedKingdomBuilder::class)
+            );
+        });
+
         $this->app->bind(AttackService::class, function($app) {
             return new AttackService(
                 $app->make(SiegeHandler::class),
                 $app->make(UnitHandler::class),
-                $app->make(KingdomHandler::class)
+                $app->make(KingdomHandler::class),
+                $app->make(NotifyHandler::class),
+                $app->make(AttackBuilder::class)
             );
         });
 

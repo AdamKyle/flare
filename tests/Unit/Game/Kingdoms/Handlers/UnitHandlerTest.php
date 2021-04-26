@@ -111,8 +111,6 @@ class UnitHandlerTest extends TestCase {
         $unitsToAttack = $this->createAttackingUnits(1, 1);
         $defender      = $this->createEnemyKingdom()->getKingdom();
 
-        $unitsLeft[0]['amount'] = 1;
-
         $unitAttackHandler = new UnitHandler();
 
         $unitsLeft = $unitAttackHandler->attack($defender, $unitsToAttack);

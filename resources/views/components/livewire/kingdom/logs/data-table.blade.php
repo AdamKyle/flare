@@ -61,7 +61,9 @@
                             <td>
                                 <input type="checkbox" wire:model="selected" value="{{$log->id}}"/>
                             </td>
-                            <td><a href="#">{{$log->status}}</a></td>
+                            <td><a href="{{
+                                route('game.kingdom.attack-log', ['character' => $character, 'kingdomLog' => $log])
+                            }}">{{$log->status}}</a></td>
                             <td>{{$log->from_kingdom_name}}</td>
                             <td>{{$log->to_kingdom_name}}</td>
                             <td>

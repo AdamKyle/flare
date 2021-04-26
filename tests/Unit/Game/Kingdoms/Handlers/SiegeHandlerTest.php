@@ -173,19 +173,6 @@ class SiegeHandlerTest extends TestCase {
         }
     }
 
-    public function testHealSiegeUnits() {
-        $unitsToAttack = $this->createAtackingUnits();
-        $defender      = $this->createEnemyKingdom()->getKingdom();
-
-        $siegeHandler  = resolve(SiegeHandler::class);
-
-        $unitsToAttack = $siegeHandler->attack($defender, $unitsToAttack, $this->createHealingUnits());
-
-        foreach ($unitsToAttack as $unitsInfo) {
-            $this->assertTrue($unitsInfo['amount'] > 9.0);
-        }
-    }
-
     public function testDefenderUnitsGetHealed() {
         $unitsToAttack = $this->createAtackingUnits();
         $defender      = $this->createEnemyKingdom()->assignUnits([

@@ -2,24 +2,23 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Mail\GenericMail;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\BuildingInQueue;
+use Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;;
+use Illuminate\Queue\SerializesModels;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Mail\RebuiltBuilding;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\Kingdoms\Mail\RebuiltBuilding;
 use Facades\App\Flare\Values\UserOnlineValue;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Mail;
 
 class RebuildBuilding implements ShouldQueue
 {

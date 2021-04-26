@@ -252,6 +252,11 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'GitHub' => GrahamCampbell\GitHub\Facades\GitHub::class,
+
+        /**
+         * Game Related
+         */
+        'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
     ],
 
 ];

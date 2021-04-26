@@ -11,5 +11,6 @@
     </div>
     <div class="col-md-6 align-self-right">
         <a href="{{$route}}" class="btn btn-{{$color}} float-right ml-2">{{$link}}</a>
+        {{$slot}}
     </div>
 </div>

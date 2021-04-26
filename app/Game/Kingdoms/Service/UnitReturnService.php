@@ -41,6 +41,8 @@ class UnitReturnService {
                 $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . ' plane. Check your attack logs for more information.';
         }
 
+        $unitMovement->delete();
+
         event(new KingdomServerMessageEvent($character->user, 'units-returned', $message));
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
+use App\Game\Kingdoms\Builders\AttackBuilder;
+use App\Game\Kingdoms\Handlers\NotifyHandler;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
@@ -36,9 +38,14 @@ class AttackService {
     private $kingdomHandler;
 
     /**
-     * @var Character $defendingCharacter
+     * @var NotifyHandler $notifyHandler
      */
-    private $defendingCharacter;
+    private $notifyHandler;
+
+    /**
+     * @var AttackBuilder $attackBuilder
+     */
+    private $attackBuilder;
 
     /**
      * @var array $unitsSent
@@ -76,185 +83,114 @@ class AttackService {
     private $settler = null;
 
     /**
-     * @var array $oldDefender
-     */
-    private $oldDefender = [];
-
-    /**
-     * @var array $newDefender
-     */
-    private $newDefender = [];
-
-    /**
      * AttackService constructor.
      *
      * @param SiegeHandler $siegeHandler
      * @param UnitHandler $unitHandler
      * @param KingdomHandler $kingdomHandler
+     * @param NotifyHandler $notifyHandler
+     * @param AttackBuilder $attackBuilder
      */
-    public function __construct(SiegeHandler $siegeHandler, UnitHandler $unitHandler, KingdomHandler $kingdomHandler) {
+    public function __construct(
+        SiegeHandler $siegeHandler,
+        UnitHandler $unitHandler,
+        KingdomHandler $kingdomHandler,
+        NotifyHandler $notifyHandler,
+        AttackBuilder $attackBuilder
+    ) {
         $this->siegeHandler   = $siegeHandler;
         $this->unitHandler    = $unitHandler;
         $this->kingdomHandler = $kingdomHandler;
+        $this->notifyHandler  = $notifyHandler;
+        $this->attackBuilder  = $attackBuilder;
     }
 
     /**
      * Handles the actual attack.
      *
      * @param UnitMovementQueue $unitMovement
+     * @param Character $character
      * @param int $defenderId
      */
     public function attack(UnitMovementQueue $unitMovement, Character $character, int $defenderId) {
         $attackingUnits = $unitMovement->units_moving;
-        $defender       = Kingdom::where('id', $defenderId)
-                                 ->where('x_position', $unitMovement->moving_to_x)
-                                 ->where('y_position', $unitMovement->moving_to_y)
-                                 ->where('character_id', '!=', $character->id)
-                                 ->first();
+        $defender       = $this->attackBuilder->setDefender($unitMovement, $defenderId, $character)->getDefender();
 
-
-
-        $this->siegeUnits   = $this->fetchSiegeUnits($attackingUnits);
-        $this->regularUnits = $this->getRegularUnits($attackingUnits);
+        $this->notifyHandler    = $this->notifyHandler->setAttackingKingdom($unitMovement->from_kingdom)
+                                                      ->setDefendingKingdom($unitMovement->to_kingdom);
 
         if (is_null($defender)) {
-            $defender       = Kingdom::where('id', $defenderId)
-                                     ->where('x_position', $unitMovement->moving_to_x)
-                                     ->where('y_position', $unitMovement->moving_to_y)
-                                     ->first();
-
-            $this->unitsSent      = [];
-            $this->survivingUnits = array_merge($this->regularUnits, $this->siegeUnits);
-
-            return $this->returnUnits($defender, $unitMovement, $character);
+            return $this->cannotAttackDefender($unitMovement, $defenderId);
         }
 
-        $this->defendingCharacter = $defender->character;
+        $this->notifyHandler = $this->notifyHandler->setDefendingCharacter($this->attackBuilder->getDefendingCharacter())
+                                                   ->setOldDefendingKingdom($defender->load('units', 'buildings')->toArray());
 
-        $this->oldDefender = $defender->load('units', 'buildings')->toArray();
+        $this->handleAttack($attackingUnits, $defender);
 
-        if (!empty($this->siegeUnits)) {
-            $healers               = $this->fetchHealers($attackingUnits);
-            $this->newSiegeUnits   = $this->siegeHandler->attack($defender, $this->siegeUnits, $healers);
-        }
-
-        if (!empty($this->regularUnits)) {
-            $this->newRegularUnits = $this->unitHandler->attack($defender, $this->regularUnits);
-        }
-
-        $this->unitsSent      = array_merge($this->regularUnits, $this->siegeUnits);
-        $this->survivingUnits = array_merge($this->newRegularUnits, $this->newSiegeUnits);
+        $this->notifyHandler = $this->notifyHandler->setSentUnits(array_merge($this->regularUnits, $this->siegeUnits))
+                                                   ->setSurvivingUnits(array_merge($this->newRegularUnits, $this->newSiegeUnits));
 
         $defender = $this->kingdomHandler->setKingdom($defender->refresh())->decreaseMorale()->getKingdom();
 
-        $settler = $this->findSettlerUnit($this->unitsSent);
+        $settler = $this->findSettlerUnit();
 
         if (!is_null($settler)) {
+
             $this->settler = GameUnit::find($settler['unit_id']);
 
             return $this->handleSettlerUnit($defender, $unitMovement, $character);
         }
 
-        $this->newDefender = $defender->load('units', 'buildings')->toArray();
+        $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom(
+            $defender->refresh()->load('units', 'buildings')->toArray()
+        );
 
-        $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
+        $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
         if (!$this->anySurvivingUnits()) {
-            $this->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+
+            $unitMovement->delete();
         } else {
-            $this->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
 
             $this->returnUnits($defender, $unitMovement, $character);
         }
     }
 
     /**
-     * Fetches the healer units.
-     *
-     * This is called when sending siege units into battle.
+     * Handle the actual attack.
      *
      * @param array $attackingUnits
-     * @return array
+     * @param Kingdom $defender
      */
-    public function fetchHealers(array $attackingUnits): array {
-        $healerUnits = [];
+    protected function handleAttack(array $attackingUnits, Kingdom $defender) {
+        $this->siegeUnits       = $this->siegeHandler->fetchSiegeUnits($attackingUnits);
+        $this->regularUnits     = $this->unitHandler->getRegularUnits($attackingUnits);
 
-        foreach ($attackingUnits as $unitInfo) {
-            $gameUnit = GameUnit::where('id', $unitInfo['unit_id'])->where('can_heal', true)->first();
-
-            if (is_null($gameUnit)) {
-                continue;
-            }
-
-            $healerUnits[] = [
-                'amount'   => $unitInfo['amount'],
-                'heal_for' => $gameUnit->heal_percentage * $unitInfo['amount'],
-                'unit_id'  => $gameUnit->id,
-            ];
+        if (!empty($this->siegeUnits)) {
+            $this->newSiegeUnits  = $this->siegeHandler->attack($defender, $this->siegeUnits);
         }
 
-        return $healerUnits;
+        if (!empty($this->regularUnits)) {
+            $this->newRegularUnits = $this->unitHandler->attack($defender, $this->regularUnits);
+        }
     }
 
     /**
-     * Fetches the siege units.
+     * Return units when you cannot attack your own kingdom.
      *
-     * @param array $attackingUnits
-     * @return array
+     * @param UnitMovementQueue $unitMovement
+     * @param int $defenderId
      */
-    public function fetchSiegeUnits(array $attackingUnits): array {
-        $siegeUnits = [];
+    protected function cannotAttackDefender(UnitMovementQueue $unitMovement, int $defenderId) {
+        $defender       = $this->attackBuilder->setDefender($unitMovement, $defenderId)->getDefender();
 
-        forEach($attackingUnits as $unitInfo) {
-            $gameUnit = GameUnit::where('id', $unitInfo['unit_id'])->where('siege_weapon', true)->first();
+        $this->unitsSent      = [];
+        $this->survivingUnits = array_merge($this->regularUnits, $this->siegeUnits);
 
-            if (!is_null($gameUnit)) {
-                $siegeUnits[] = [
-                    'amount'         => $unitInfo['amount'],
-                    'total_attack'   => $gameUnit->attack * $unitInfo['amount'],
-                    'total_defence'  => $gameUnit->defence * $unitInfo['amount'],
-                    'primary_target' => $gameUnit->primary_target,
-                    'fall_back'      => $gameUnit->fall_back,
-                    'unit_id'        => $gameUnit->id,
-                    'time_to_return' => $unitInfo['time_to_return'],
-                    'settler'        => false,
-                ];
-            }
-        }
-
-        return $siegeUnits;
-    }
-
-    /**
-     * Gets the regular non siege units.
-     *
-     * @param array $attackingUnits
-     * @return array
-     */
-    public function getRegularUnits(array $attackingUnits): array {
-        $regularUnits = [];
-
-        forEach($attackingUnits as $unitInfo) {
-            $gameUnit = GameUnit::where('id', $unitInfo['unit_id'])->where('siege_weapon', false)->first();
-
-            if (!is_null($gameUnit)) {
-                $regularUnits[] = [
-                    'amount'           => $unitInfo['amount'],
-                    'total_attack'     => $gameUnit->attack * $unitInfo['amount'],
-                    'total_defence'    => $gameUnit->defence * $unitInfo['amount'],
-                    'primary_target'   => $gameUnit->primary_target,
-                    'fall_back'        => $gameUnit->fall_back,
-                    'unit_id'          => $gameUnit->id,
-                    'healer'           => $gameUnit->can_heal,
-                    'heal_for'         => !is_null($gameUnit->heal_percentage) ? $gameUnit->heal_percentage * $unitInfo['amount'] : 0,
-                    'can_be_healed'    => !$gameUnit->can_not_be_healed,
-                    'settler'          => $gameUnit->is_settler,
-                    'time_to_return'   => $unitInfo['time_to_return'],
-                ];
-            }
-        }
-
-        return $regularUnits;
+        return $this->returnUnits($defender, $unitMovement, $character);
     }
 
     /**
@@ -287,153 +223,12 @@ class AttackService {
 
             $this->newDefender = $defender->load('units')->toArray();
 
-            $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
+            $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
-            return $this->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+            return $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
         }
 
         return $this->attemptToSettleKingdom($defender, $unitMovement, $character);
-    }
-
-    /**
-     * Notify the defender of any messages relating to their kingdom.
-     *
-     * @param string $status
-     * @param Character $character
-     * @param Kingdom $defender
-     * @throws \Exception
-     */
-    protected function notifyDefender(string $status, Character $character, Kingdom $defender) {
-        KingdomLog::create([
-            'character_id' => $character->id,
-            'status'       => $status,
-            'old_defender' => $this->oldDefender,
-            'new_defender' => $this->newDefender,
-            'published'    => true,
-        ]);
-
-        $status = new KingdomLogStatusValue($status);
-
-        $message = '';
-        $type    = '';
-
-        if ($status->kingdomWasAttacked()) {
-
-            $message = 'Your kingdom ' . $defender->name . ' at (X/Y) ' . $defender->x_position .
-                '/' . $defender->y_position . ' on the ' .
-                $defender->gameMap->name . ' plane, was attacked. Check your attack logs for more info.';
-
-            $type = 'kingdom-attacked';
-        }
-
-        if ($status->lostKingdom()) {
-            $message = 'Your kingdom ' . $defender->name . ' at (X/Y) ' . $defender->x_position .
-                '/' . $defender->y_position . ' on the ' .
-                $defender->gameMap->name . ' plane, was taken. Check your attack logs for more info.';
-
-            $type = 'kingdom-taken';
-        }
-
-        $this->sendMessage($character->user, $type, $message);
-    }
-
-    /**
-     * Notify the attacker of any messages related to the attack.
-     *
-     * @param string $status
-     * @param Kingdom $defender
-     * @param UnitMovementQueue $unitMovement
-     * @param Character $character
-     */
-    protected function notifyAttacker(string $status, Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
-
-        $logStatus = new KingdomLogStatusValue($status);
-
-        KingdomLog::create([
-            'character_id'      => $character->id,
-            'from_kingdom_id'   => $defender->id,
-            'to_kingdom_id'     => $unitMovement->to_kingdom->id,
-            'status'            => $status,
-            'units_sent'        => $this->unitsSent,
-            'units_survived'    => $this->survivingUnits,
-            'published'         => !$logStatus->unitsReturning(),
-        ]);
-
-        $mapName = $defender->gameMap->name;
-        $message = '';
-        $type    = '';
-
-        if ($logStatus->attackedKingdom()) {
-            $message = 'You landed for  kingdom at: (X/Y) ' .
-                $defender->x_position . '/' . $defender->y_position .
-                ' on the ' . $mapName . ' plane.';
-
-            $type = 'kingdom-attacked';
-        }
-
-        if ($logStatus->lostAttack()) {
-            $message = 'You lost all your units when attacking kingdom at: (X/Y) ' .
-                $defender->x_position . '/' . $defender->y_position .
-                ' on the ' . $mapName . ' plane. Check the kingdom attack logs for more info.';
-
-            $type = 'all-units-lost';
-        }
-
-        if ($logStatus->tookKingdom()) {
-            $characterName = $defender->character->name;
-
-            $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
-                ' on the ' . $mapName . ' plane. Any surviving units have been added to the kingdoms units. Check the kingdom attack logs for more info.';
-
-            $type = 'kingdom-taken';
-        }
-
-        if ($logStatus->unitsReturning()) {
-            $characterName = $defender->character->name;
-
-            $message = 'Your units are retuning from ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
-                ' on the ' . $mapName . ' plane. When they are back a log will be generated with details';
-
-            if ($defender->character->id === $character->id) {
-                $message = 'Your units are returning from: (X\Y) ' . $defender->x_position . '/' . $defender->y_position . '. You own this kingdom.';
-            }
-
-            $type = 'units-returning';
-        }
-
-        $this->sendMessage($character->user, $type, $message);
-    }
-
-    /**
-     * Send the message to the server.
-     *
-     * @param User $user
-     * @param $type
-     * @param string $message
-     * @return array|void|null
-     */
-    protected function sendMessage(User $user, $type, string $message) {
-        if (!UserOnlineValue::isOnline($user)) {
-            $subjectParts = explode('-', $type);
-            $subject      = ucfirst($subjectParts[0]) . ' ' . ucfirst($subjectParts[1]) . '!';
-
-            return \Mail::to($user->email)->send(new GenericMail($user, $message, $subject));
-        }
-
-        return event(new KingdomServerMessageEvent($user, $type, $message));
-    }
-
-    /**
-     * Broadcast a public message of the kingdom being taken.
-     *
-     * @param $defender
-     * @param Character $character
-     */
-    protected function kingdomHasFallenMessage(Character $defender, Character $character) {
-
-        $message = $defender->name . '\'s kingdom on the ' . $defender->map->gameMap->name . ' plane, has fallen! ' . $character->name . ' is now the rightful ruler!';
-
-        broadcast(new GlobalMessageEvent($message));
     }
 
     /**
@@ -451,7 +246,7 @@ class AttackService {
         if ($timeToReturn > 0) {
             $timeToReturn = now()->addMinutes($timeToReturn);
 
-            $this->notifyAttacker(KingdomLogStatusValue::UNITS_RETURNING, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::UNITS_RETURNING, $defender, $unitMovement, $character);
 
             $unitMovement->update([
                 'units_moving' => [
@@ -487,28 +282,28 @@ class AttackService {
 
                 $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
 
-                $this->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $this->defendingCharacter, $defender);
+                $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
 
-                $this->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
+                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
 
-                $this->kingdomHasFallenMessage($this->defendingCharacter, $character);
+                $this->notifyHandler->kingdomHasFallenMessage($character);
             } else {
                 $this->newDefender = $defender->load('units')->toArray();
 
-                $this->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender->character, $defender);
+                $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
-                $this->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
+                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
 
                 $this->returnUnits($defender, $unitMovement, $character);
             }
         } else {
             $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
 
-            $this->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $this->defendingCharacter, $defender);
+            $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
 
-            $this->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
 
-            $this->kingdomHasFallenMessage($this->defendingCharacter, $character);
+            $this->notifyHandler->kingdomHasFallenMessage($character);
         }
     }
 
@@ -550,23 +345,23 @@ class AttackService {
      *
      * Returns the array of info or null.
      *
-     * @param array $regularUnits
      * @return mixed|null
      */
-    protected function findSettlerUnit(array $regularUnits) {
-        if (empty($regularUnits)) {
+    protected function findSettlerUnit() {
+
+        if (empty($this->newRegularUnits)) {
             return null;
         }
 
         // If there is only one unit and it's a setler
         // Then it dies.
-        if (count($regularUnits) === 1) {
+        if (count($this->newRegularUnits) === 1) {
             return null;
         }
 
         $settler = null;
 
-        foreach ($regularUnits as $unitInfo) {
+        foreach ($this->newRegularUnits as $unitInfo) {
             if ($unitInfo['settler']) {
                 $settler = $unitInfo;
             }

@@ -3,14 +3,27 @@
 namespace App\Game\Kingdoms\Controllers;
 
 use App\Flare\Models\KingdomLog;
+use App\Game\Kingdoms\Service\KingdomLogService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use Illuminate\Http\Request;
 
 class KingdomsController extends Controller {
 
-    public function __construct() {
+    /**
+     * @var KingdomLogService $kingdomLogService
+     */
+    private $kingdomLogService;
+
+    /**
+     * KingdomsController constructor.
+     *
+     * @param KingdomLogService $kingdomLogService
+     */
+    public function __construct(KingdomLogService $kingdomLogService) {
         $this->middleware('auth');
+
+        $this->kingdomLogService = $kingdomLogService;
     }
 
     public function attackLogs(Character $character) {
@@ -18,6 +31,14 @@ class KingdomsController extends Controller {
 
         return view('game.kingdoms.attack-logs', [
             'logs'      => $logs,
+            'character' => $character,
+        ]);
+    }
+
+    public function attackLog(Character $character, KingdomLog $kingdomLog) {
+        return view('game.kingdoms.attack-log', [
+            'log'       => $this->kingdomLogService->setLog($kingdomLog)->attackReport(),
+            'type'      => $kingdomLog->status,
             'character' => $character,
         ]);
     }

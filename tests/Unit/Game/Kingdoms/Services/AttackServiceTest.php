@@ -173,23 +173,6 @@ class AttackServiceTest extends TestCase {
         $this->assertCount(2, $this->getKingdoms($character));
     }
 
-    public function testFetchHealers() {
-        $attacker = $this->createKingdom()->assignUnits([
-            'attack'  => 0,
-            'defence' => 0,
-            'can_heal' => true,
-            'heal_percentage' => 0.01,
-        ]);
-
-        $unitsInMovement = $this->getUnitsInMovement($attacker->getKingdom());
-
-        $attackService = resolve(AttackService::class);
-
-        $healers = $attackService->fetchHealers($unitsInMovement);
-
-        $this->assertTrue(!empty($healers));
-    }
-
     protected function createUnitMovement(Kingdom $defenderKingdom, Kingdom $attackingKingdom): UnitMovementQueue {
         return $this->createUnitMovementQueue([
             'from_kingdom_id'    => $attackingKingdom->id,
