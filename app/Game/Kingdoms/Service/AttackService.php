@@ -135,7 +135,6 @@ class AttackService {
         $settler = $this->findSettlerUnit();
 
         if (!is_null($settler)) {
-            dump('here');
             $this->settler = GameUnit::find($settler['unit_id']);
 
             return $this->handleSettlerUnit($defender, $unitMovement, $character);
@@ -315,7 +314,7 @@ class AttackService {
      */
     protected function isSettlerTheOnlyUnitLeft(): bool {
         $allDead = false;
-        dump($this->survivingUnits);
+
         foreach ($this->survivingUnits as $unitInfo) {
             if (!$unitInfo['settler']) {
                 if ($unitInfo['amount'] === 0.0 || $unitInfo['amount'] === 0) {

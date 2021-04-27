@@ -146,7 +146,6 @@ class NotifyHandler {
      * @throws \Exception
      */
     public function notifyDefender(string $status, Kingdom $defender) {
-        dump($this->newDefender);
 
         $value = new KingdomLogStatusValue($status);
 
