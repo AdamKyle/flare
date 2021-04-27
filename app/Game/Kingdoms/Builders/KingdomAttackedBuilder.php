@@ -31,8 +31,8 @@ class KingdomAttackedBuilder {
         $buildingChanges = [];
 
         foreach ($newDefenderBuildings as $index => $building) {
-            $oldDurability = $oldDefenderBuildings[$index]['durability'];
-            $newDurability = $building['durability'];
+            $oldDurability = $oldDefenderBuildings[$index]['current_durability'];
+            $newDurability = $building['current_durability'];
             $buildingName  = $building['name'];
 
             if ($newDurability === $oldDurability) {

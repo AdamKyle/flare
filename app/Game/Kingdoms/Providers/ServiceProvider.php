@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Providers;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
+use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomAttackedBuilder;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
@@ -129,6 +130,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->commands([DeleteKingdomLogs::class]);
     }
 
     /**

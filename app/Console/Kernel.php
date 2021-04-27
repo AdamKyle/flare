@@ -42,11 +42,15 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->command('clean:notifications')->monthly();
+        $schedule->command('clean:notifications')->monthly()->timezone(config('app.timezone'));;
 
-        $schedule->command('update:kingdom')->hourly();
-        
-        $schedule->command('clean:market-history')->cron('0 0 1 */3 *');
+        $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));;
+
+        // Clean the market every three months, starting in january at 2 am.
+        $schedule->command('clean:market-history')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
+
+        // clean the kingdom logs every week on monday at 2 am.
+        $schedule->command('clean:kingdomLogs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));;
     }
 
     /**

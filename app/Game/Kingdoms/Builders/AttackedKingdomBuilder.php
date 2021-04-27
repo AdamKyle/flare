@@ -26,6 +26,14 @@ class AttackedKingdomBuilder {
     }
 
     public function attackedKingdomReport(): array {
+        return $this->unitAttackInfo();
+    }
+
+    public function lostAttack(): array {
+        return $this->unitAttackInfo();
+    }
+
+    protected function unitAttackInfo(): array {
         $unitsSent     = $this->log->units_sent;
         $unitsSurvived = $this->log->units_survived;
 
@@ -33,18 +41,23 @@ class AttackedKingdomBuilder {
 
         foreach ($unitsSent as $index => $unitInfo) {
             $oldAmount = $unitInfo['amount'];
-            $newAmount = $unitsSurvived[$index]['amount'];
+            $newAmount = $unitInfo['settler'] ? 0 : $unitsSurvived[$index]['amount'];
             $unitName  = GameUnit::find($unitInfo['unit_id'])->name;
 
             $coreChanges = [
                 'total_attack'   => $unitInfo['total_attack'],
                 'total_defence'  => $unitInfo['total_defence'],
-                'total_heal'     => ($unitInfo['heal_for'] * $unitInfo['amount']),
-                'healer'         => $unitInfo['healer'],
                 'settler'        => $unitInfo['settler'],
                 'primary_target' => $unitInfo['primary_target'],
                 'fall_back'      => $unitInfo['fall_back'],
             ];
+
+            if (isset($unitInfo['heal_for']) && isset($unitInfo['healer'])) {
+                $coreChanges[] = [
+                    'total_heal' => ($unitInfo['heal_for'] * $unitInfo['amount']),
+                    'healer'     => $unitInfo['healer'],
+                ];
+            }
 
             if ($oldAmount === $newAmount) {
                 $changes = [

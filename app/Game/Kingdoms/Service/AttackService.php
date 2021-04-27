@@ -128,23 +128,20 @@ class AttackService {
 
         $this->handleAttack($attackingUnits, $defender);
 
-        $this->notifyHandler = $this->notifyHandler->setSentUnits(array_merge($this->regularUnits, $this->siegeUnits))
-                                                   ->setSurvivingUnits(array_merge($this->newRegularUnits, $this->newSiegeUnits));
+        $this->notifyHandler = $this->notifyHandler->setSentUnits($this->unitsSent)->setSurvivingUnits($this->survivingUnits);
 
         $defender = $this->kingdomHandler->setKingdom($defender->refresh())->decreaseMorale()->getKingdom();
 
         $settler = $this->findSettlerUnit();
 
         if (!is_null($settler)) {
-
+            dump('here');
             $this->settler = GameUnit::find($settler['unit_id']);
 
             return $this->handleSettlerUnit($defender, $unitMovement, $character);
         }
 
-        $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom(
-            $defender->refresh()->load('units', 'buildings')->toArray()
-        );
+        $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
 
         $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
@@ -176,6 +173,9 @@ class AttackService {
         if (!empty($this->regularUnits)) {
             $this->newRegularUnits = $this->unitHandler->attack($defender, $this->regularUnits);
         }
+
+        $this->unitsSent     = array_merge($this->regularUnits, $this->siegeUnits);
+        $this->survivingUnits = array_merge($this->newRegularUnits, $this->newSiegeUnits);
     }
 
     /**
@@ -198,7 +198,7 @@ class AttackService {
      *
      * @return bool
      */
-    protected function anySurvivingUnits() {
+    protected function anySurvivingUnits(): bool {
         foreach ($this->survivingUnits as $unitInfo) {
             if ($unitInfo['amount'] > 0) {
                 return true;
@@ -219,9 +219,9 @@ class AttackService {
      * @param Character $character
      */
     protected function handleSettlerUnit(Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
-        if ($this->isSettlerTheOnlyUnitLeft($this->survivingUnits)) {
+        if ($this->isSettlerTheOnlyUnitLeft()) {
 
-            $this->newDefender = $defender->load('units')->toArray();
+            $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
 
             $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
@@ -278,6 +278,8 @@ class AttackService {
         if ($defender->current_morale > 0) {
             $defender = $this->kingdomHandler->updateDefendersMorale($defender, $this->settler);
 
+            $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
+
             if ($defender->current_morale === 0 || $defender->current_morale === 0.0) {
 
                 $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
@@ -288,7 +290,6 @@ class AttackService {
 
                 $this->notifyHandler->kingdomHasFallenMessage($character);
             } else {
-                $this->newDefender = $defender->load('units')->toArray();
 
                 $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
@@ -310,13 +311,12 @@ class AttackService {
     /**
      * Is the settler unit the only one left?
      *
-     * @param array $attackingUnits
      * @return bool
      */
-    protected function isSettlerTheOnlyUnitLeft(array $attackingUnits): bool {
+    protected function isSettlerTheOnlyUnitLeft(): bool {
         $allDead = false;
-
-        foreach ($attackingUnits as $unitInfo) {
+        dump($this->survivingUnits);
+        foreach ($this->survivingUnits as $unitInfo) {
             if (!$unitInfo['settler']) {
                 if ($unitInfo['amount'] === 0.0 || $unitInfo['amount'] === 0) {
                     $allDead = true;

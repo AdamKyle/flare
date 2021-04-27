@@ -36,6 +36,16 @@
                         sort-field="{{$sortField}}"
                         field="to_kingdom_name"
                     />
+                    <x-data-tables.header-row
+                        wire:click.prevent="sortBy('created_at')"
+                        header-text="Happened at: "
+                        sort-by="{{$sortBy}}"
+                        sort-field="{{$sortField}}"
+                        field="created_at"
+                    />
+                    <x-data-tables.header-row>
+                        Notes
+                    </x-data-tables.header-row>
                     <x-data-tables.header-row>
                         Actions
                     </x-data-tables.header-row>
@@ -61,11 +71,27 @@
                             <td>
                                 <input type="checkbox" wire:model="selected" value="{{$log->id}}"/>
                             </td>
-                            <td><a href="{{
-                                route('game.kingdom.attack-log', ['character' => $character, 'kingdomLog' => $log])
-                            }}">{{$log->status}}</a></td>
+                            <td>
+                                @if (!KingdomLogStatus::statusType($log->status)->lostKingdom())
+                                    <a href="{{
+                                        route('game.kingdom.attack-log', ['character' => $character, 'kingdomLog' => $log])
+                                    }}">
+                                        {{$log->status}}
+                                    </a>
+                                @else
+                                    {{$log->status}}
+                                @endif
+                            </td>
                             <td>{{$log->from_kingdom_name}}</td>
                             <td>{{$log->to_kingdom_name}}</td>
+                            <td>{{$log->created_at}}</td>
+                            <td>
+                                @if (KingdomLogStatus::statusType($log->status)->lostKingdom())
+                                    Your kingdom has fallen. There is nothing to show. Best to settle else where.
+                                @else
+                                    N/A
+                                @endif
+                            </td>
                             <td>
                                 <x-forms.button-with-form
                                     formRoute="{{route('game.kingdom.delete-log', [

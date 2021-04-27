@@ -99,13 +99,17 @@ class NotifyHandler {
     }
 
     /**
-     * Set the new defender.
+     * We need to re-find the kingdom that belongs to the defender and load its appropriate relations.
      *
-     * @param array $kingdom
+     * @param Kingdom $kingdom
      * @return $this
      */
-    public function setNewDefendingKingdom(array $kingdom): NotifyHandler {
-        $this->newDefender = $kingdom;
+    public function setNewDefendingKingdom(Kingdom $kingdom): NotifyHandler {
+        $this->newDefender = Kingdom::where('id', $kingdom->id)
+                                    ->where('character_id', $kingdom->character_id)
+                                    ->first()
+                                    ->load('units', 'buildings')
+                                    ->toArray();
 
         return $this;
     }
@@ -138,27 +142,28 @@ class NotifyHandler {
      * Notify the defender of any messages relating to their kingdom.
      *
      * @param string $status
-     * @param Character $character
      * @param Kingdom $defender
      * @throws \Exception
      */
     public function notifyDefender(string $status, Kingdom $defender) {
+        dump($this->newDefender);
+
+        $value = new KingdomLogStatusValue($status);
+
         KingdomLog::create([
             'character_id'    => $this->defendingCharacter->id,
             'status'          => $status,
             'to_kingdom_id'   => $this->defendingKingdom->id,
             'from_kingdom_id' => $this->attackingKingdom->id,
-            'old_defender'    => $this->oldDefender,
-            'new_defender'    => $this->newDefender,
+            'old_defender'    => $value->lostKingdom() ? [] : $this->oldDefender,
+            'new_defender'    => $value->lostKingdom() ? [] :$this->newDefender,
             'published'       => true,
         ]);
-
-        $status = new KingdomLogStatusValue($status);
 
         $message = '';
         $type    = '';
 
-        if ($status->kingdomWasAttacked()) {
+        if ($value->kingdomWasAttacked()) {
 
             $message = 'Your kingdom ' . $defender->name . ' at (X/Y) ' . $defender->x_position .
                 '/' . $defender->y_position . ' on the ' .
@@ -167,7 +172,7 @@ class NotifyHandler {
             $type = 'kingdom-attacked';
         }
 
-        if ($status->lostKingdom()) {
+        if ($value->lostKingdom()) {
             $message = 'Your kingdom ' . $defender->name . ' at (X/Y) ' . $defender->x_position .
                 '/' . $defender->y_position . ' on the ' .
                 $defender->gameMap->name . ' plane, was taken. Check your attack logs for more info.';
