@@ -52,7 +52,6 @@ class TakeKingdomHandler {
         $cache = $this->removeKingdomFromCache($defendingCharacter, $defender);
 
         if (!is_null($cache)) {
-
             event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
 
             $defender->update([

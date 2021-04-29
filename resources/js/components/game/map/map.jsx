@@ -132,6 +132,7 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
+      console.log(event);
       this.updatePlayerPosition(event.map);
 
       let myKingdoms = this.fetchKingdoms(event);
@@ -198,9 +199,7 @@ export default class Map extends React.Component {
 
   fetchKingdoms(event) {
     if (event.hasOwnProperty('updatedKingdoms')) {
-      if (event.updatedKingdoms.length > 0) {
-        return event.updatedKingdoms;
-      }
+      return event.updatedKingdoms;
     }
 
     return this.state.kingdoms;

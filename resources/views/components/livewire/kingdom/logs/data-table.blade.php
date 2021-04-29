@@ -15,34 +15,18 @@
                         <input type="checkbox" wire:model="pageSelected" id="select-all" />
                     </x-data-tables.header-row>
 
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('status')"
-                        header-text="Name"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="status"
-                    />
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('from_kingdom_name')"
-                        header-text="From Kingdom"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="from_kingdom_name"
-                    />
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('to_kingdom_name')"
-                        header-text="Kingdom Attacked"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="to_kingdom_name"
-                    />
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('created_at')"
-                        header-text="Happened at: "
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="created_at"
-                    />
+                    <x-data-tables.header-row>
+                        Name
+                    </x-data-tables.header-row>
+                    <x-data-tables.header-row>
+                        Attacking Kingdom
+                    </x-data-tables.header-row>
+                    <x-data-tables.header-row>
+                        Kingdom Attacked
+                    </x-data-tables.header-row>
+                    <x-data-tables.header-row>
+                        Happened At
+                    </x-data-tables.header-row>
                     <x-data-tables.header-row>
                         Notes
                     </x-data-tables.header-row>
@@ -84,7 +68,7 @@
                             </td>
                             <td>{{$log->from_kingdom_name}}</td>
                             <td>{{$log->to_kingdom_name}}</td>
-                            <td>{{$log->created_at}}</td>
+                            <td>{{$log->time_happened}}</td>
                             <td>
                                 @if (KingdomLogStatus::statusType($log->status)->lostKingdom())
                                     Your kingdom has fallen. There is nothing to show. Best to settle else where.
