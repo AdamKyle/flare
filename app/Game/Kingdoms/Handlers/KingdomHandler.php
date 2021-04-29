@@ -104,4 +104,13 @@ class KingdomHandler {
         return $this->kingdom->refresh();
     }
 
+    /**
+     * gets the old kingdom for the log.
+     *
+     * @return array
+     */
+    public function getOldKingdom(): array {
+        return $this->takeKingdomHandler->getOldKingdom();
+    }
+
 }

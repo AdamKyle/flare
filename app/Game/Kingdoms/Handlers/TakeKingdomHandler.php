@@ -21,6 +21,11 @@ class TakeKingdomHandler {
     private $movementService;
 
     /**
+     * @var array $oldKingdom
+     */
+    private $oldKingdom = [];
+
+    /**
      * TakeKingdomHandler constructor.
      *
      * @param MovementService $movementService
@@ -41,6 +46,8 @@ class TakeKingdomHandler {
      */
     public function takeKingdom(Kingdom $defender, Character $attacker, array $survivingUnits): bool {
         $defendingCharacter = $defender->character;
+
+        $this->setOldKingdom($defender);
 
         $cache = $this->removeKingdomFromCache($defendingCharacter, $defender);
 
@@ -66,6 +73,30 @@ class TakeKingdomHandler {
 
         return false;
     }
+
+    /**
+     * Gets the old kingdom.
+     *
+     * @return array
+     */
+    public function getOldKingdom(): array {
+        return $this->oldKingdom;
+    }
+
+    /**
+     * Sets the old kingdom
+     *
+     * @param Kingdom $kingdom
+     */
+    protected function setOldKingdom(Kingdom $kingdom) {
+        $this->oldKingdom = Kingdom::where('id', $kingdom->id)
+                                   ->where('character_id', $kingdom->character->id)
+                                   ->first()
+                                   ->load('units', 'buildings')
+                                   ->toArray();
+
+    }
+
 
     /**
      * Update the kingdom with any surviving units.

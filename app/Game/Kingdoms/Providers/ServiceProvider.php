@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Providers;
 
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
+use App\Game\Kingdoms\Builders\TookKingdomBuilder;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -101,10 +102,15 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AttackedKingdomBuilder();
         });
 
+        $this->app->bind(TookKingdomBuilder::class, function() {
+           return new TookKingdomBuilder();
+        });
+
         $this->app->bind(KingdomLogService::class, function($app) {
             return new KingdomLogService(
                 $app->make(KingdomAttackedBuilder::class),
-                $app->make(AttackedKingdomBuilder::class)
+                $app->make(AttackedKingdomBuilder::class),
+                $app->make(TookKingdomBuilder::class)
             );
         });
 

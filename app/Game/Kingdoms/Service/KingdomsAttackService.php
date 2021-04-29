@@ -76,30 +76,33 @@ class KingdomsAttackService {
                 return $this->errorResult($e->getMessage());
             }
 
-            $totalTime = $this->fetchTotalTime($units);
+            if (!empty($unitsToSend)) {
 
-            $timeTillFinished = now()->addMinutes($totalTime);
+                $totalTime = $this->fetchTotalTime($units);
 
-            $unitMovement = UnitMovementQueue::create([
-                'character_id'      => $character->id,
-                'from_kingdom_id'   => $kingdom->id,
-                'to_kingdom_id'     => $defender->id,
-                'units_moving'      => $unitsToSend,
-                'completed_at'      => $timeTillFinished,
-                'started_at'        => now(),
-                'moving_to_x'       => $defender->x_position,
-                'moving_to_y'       => $defender->y_position,
-                'from_x'            => $kingdom->x_position,
-                'from_y'            => $kingdom->y_position,
-            ]);
+                $timeTillFinished = now()->addMinutes($totalTime);
 
-            MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes(2)/*$timeTillFinished*/);
+                $unitMovement = UnitMovementQueue::create([
+                    'character_id'    => $character->id,
+                    'from_kingdom_id' => $kingdom->id,
+                    'to_kingdom_id'   => $defender->id,
+                    'units_moving'    => $unitsToSend,
+                    'completed_at'    => $timeTillFinished,
+                    'started_at'      => now(),
+                    'moving_to_x'     => $defender->x_position,
+                    'moving_to_y'     => $defender->y_position,
+                    'from_x'          => $kingdom->x_position,
+                    'from_y'          => $kingdom->y_position,
+                ]);
 
-            $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransformer);
+                MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes(2)/*$timeTillFinished*/);
 
-            $kingdom  = $this->manager->createData($kingdom)->toArray();
+                $kingdom = new Item($kingdom->refresh(), $this->kingdomTransformer);
 
-            event(new UpdateKingdom($character->user, $kingdom));
+                $kingdom = $this->manager->createData($kingdom)->toArray();
+
+                event(new UpdateKingdom($character->user, $kingdom));
+            }
         }
 
         $this->alertDefenderToAttack($defender);

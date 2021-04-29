@@ -7,13 +7,14 @@
         link="Back"
         color="primary"
     ></x-core.page-title>
-    <x-cards.card>
-        @if (KingdomLogStatus::statusType($type)->kingdomWasAttacked())
-            @include('game.kingdoms.partials.kingdom-attacked', ['log' => $log])
-        @elseif (KingdomLogStatus::statusType($type)->attackedKingdom())
-            @include('game.kingdoms.partials.attacked-kingdom', ['log' => $log])
-        @elseif (KingdomLogStatus::statusType($type)->lostAttack())
-            @include('game.kingdoms.partials.attacked-kingdom', ['log' => $log])
-        @endif
-    </x-cards.card>
+
+    @if (KingdomLogStatus::statusType($type)->kingdomWasAttacked())
+        @include('game.kingdoms.partials.kingdom-attacked', ['log' => $log, 'lost' => false])
+    @elseif (KingdomLogStatus::statusType($type)->attackedKingdom())
+        @include('game.kingdoms.partials.attacked-kingdom', ['log' => $log, 'lost' => false])
+    @elseif (KingdomLogStatus::statusType($type)->lostAttack())
+        @include('game.kingdoms.partials.attacked-kingdom', ['log' => $log, 'lost' => true])
+    @elseif(KingdomLogStatus::statusType($type)->tookKingdom())
+        @include('game.kingdoms.partials.took-kingdom', ['log' => $log, 'lost' => false])
+    @endif
 @endsection

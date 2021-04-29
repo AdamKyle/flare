@@ -202,6 +202,7 @@ class NotifyHandler {
                 'status' => $status,
                 'units_sent' => $this->sentUnits,
                 'units_survived' => $this->survivingUnits,
+                'old_defender' => $this->oldDefender,
                 'published' => ($logStatus->lostAttack() || $logStatus->tookKingdom()),
             ]);
         }

@@ -35,28 +35,29 @@ class KingdomAttackedBuilder {
             $newDurability = $building['current_durability'];
             $buildingName  = $building['name'];
 
-            if ($newDurability === $oldDurability) {
+            if (($newDurability === 0 && $oldDurability !== 0) && ($newDurability !== $oldDurability)) {
                 $buildingChanges[$buildingName] = [
-                    'has_fallen'      => false,
-                    'old_durability'  => $oldDurability,
-                    'new_durability'  => $newDurability,
-                    'durability_lost' => 0,
+                    'has_fallen'             => true,
+                    'old_durability'         => $oldDurability,
+                    'new_durability'         => $newDurability,
+                    'durability_lost'        => 1,
+                    'decreases_morale'       => $this->decreasesMorale($building),
+                    'affects_morale'         => $this->affectsMorale($building),
+                    'decrease_morale_amount' => $building['game_building']['decrease_morale_amount'],
+                    'increase_morale_amount' => $building['game_building']['increase_morale_amount'],
                 ];
-            } else if ($newDurability === 0) {
-                $buildingChanges[$buildingName] = [
-                    'has_fallen'      => true,
-                    'old_durability'  => $oldDurability,
-                    'new_durability'  => $newDurability,
-                    'durability_lost' => 1,
-                ];
-            } else {
+            } else if (($newDurability !== 0 && $oldDurability !== 0) && ($newDurability !== $oldDurability)) {
                 $percentage = 1 - ($newDurability / $oldDurability);
 
                 $buildingChanges[$buildingName] = [
-                    'has_fallen'      => false,
-                    'old_durability'  => $oldDurability,
-                    'new_durability'  => $newDurability,
-                    'durability_lost' => $percentage,
+                    'has_fallen'             => false,
+                    'old_durability'         => $oldDurability,
+                    'new_durability'         => $newDurability,
+                    'durability_lost'        => $percentage,
+                    'decreases_morale'       => false,
+                    'affects_morale'         => $this->affectsMorale($building),
+                    'decrease_morale_amount' => $building['game_building']['decrease_morale_amount'],
+                    'increase_morale_amount' => $building['game_building']['increase_morale_amount'],
                 ];
             }
         }
@@ -76,32 +77,34 @@ class KingdomAttackedBuilder {
 
             $unitName = GameUnit::find($unitInfo['game_unit_id'])->name;
 
-            if ($oldAmount === $newAmount) {
-                $unitChanges[$unitName] = [
-                    'lost_all'    => false,
-                    'old_amount'  => $oldAmount,
-                    'new_amount'  => $newAmount,
-                    'lost'        => 0,
-                ];
-            } else if ($newAmount === 0) {
+            if (($newAmount === 0 && $oldAmount !== 0) && $newAmount !== $oldAmount) {
                 $unitChanges[$unitName] = [
                     'lost_all'    => true,
                     'old_amount'  => $oldAmount,
                     'new_amount'  => $newAmount,
                     'lost'        => 1,
                 ];
-            } else {
+            } else if (($newAmount !== 0 && $oldAmount !== 0) && $newAmount !== $oldAmount) {
                 $percentage = 1 - ($newAmount / $oldAmount);
 
                 $unitChanges[$unitName] = [
                     'lost_all'    => true,
                     'old_amount'  => $oldAmount,
                     'new_amount'  => $newAmount,
-                    'lost'        => $percentage,
+                    'lost'        => number_format($percentage, 2),
                 ];
             }
         }
 
         return $unitChanges;
     }
+
+    protected function decreasesMorale(array $building): bool {
+        return $building['current_durability'] === 0 && $building['game_building']['decrease_morale_amount'] > 0;
+    }
+
+    protected function affectsMorale(array $building): bool {
+        return $building['game_building']['decrease_morale_amount'] > 0 && $building['game_building']['increase_morale_amount'] > 0;
+    }
+
 }

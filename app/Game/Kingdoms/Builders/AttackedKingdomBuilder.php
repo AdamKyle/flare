@@ -59,16 +59,7 @@ class AttackedKingdomBuilder {
                 ];
             }
 
-            if ($oldAmount === $newAmount) {
-                $changes = [
-                    'lost_all'       => false,
-                    'old_amount'     => $oldAmount,
-                    'new_amount'     => $newAmount,
-                    'lost'           => 0,
-                ];
-
-                $unitChanges[$unitName] = array_merge($coreChanges, $changes);
-            } else if ($newAmount === 0) {
+            if (($newAmount === 0 && $oldAmount !== 0) && ($oldAmount !== $newAmount)) {
                 $changes = [
                     'lost_all'       => true,
                     'old_amount'     => $oldAmount,
@@ -77,14 +68,14 @@ class AttackedKingdomBuilder {
                 ];
 
                 $unitChanges[$unitName] = array_merge($coreChanges, $changes);
-            } else {
+            } else if (($newAmount !== 0 && $oldAmount !== 0) && ($oldAmount !== $newAmount)) {
                 $percentage = 1 - ($newAmount / $oldAmount);
 
                 $changes = [
                     'lost_all'       => false,
                     'old_amount'     => $oldAmount,
                     'new_amount'     => $newAmount,
-                    'lost'           => $percentage,
+                    'lost'           => number_format($percentage, 2),
                 ];
 
                 $unitChanges[$unitName] = array_merge($coreChanges, $changes);

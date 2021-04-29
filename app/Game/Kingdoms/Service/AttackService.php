@@ -120,7 +120,7 @@ class AttackService {
                                                       ->setDefendingKingdom($unitMovement->to_kingdom);
 
         if (is_null($defender)) {
-            return $this->cannotAttackDefender($unitMovement, $defenderId);
+            return $this->cannotAttackDefender($unitMovement, $character, $defenderId);
         }
 
         $this->notifyHandler = $this->notifyHandler->setDefendingCharacter($this->attackBuilder->getDefendingCharacter())
@@ -183,7 +183,7 @@ class AttackService {
      * @param UnitMovementQueue $unitMovement
      * @param int $defenderId
      */
-    protected function cannotAttackDefender(UnitMovementQueue $unitMovement, int $defenderId) {
+    protected function cannotAttackDefender(UnitMovementQueue $unitMovement, Character $character, int $defenderId) {
         $defender       = $this->attackBuilder->setDefender($unitMovement, $defenderId)->getDefender();
 
         $this->unitsSent      = [];
@@ -283,6 +283,8 @@ class AttackService {
 
                 $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
 
+                $this->notifyHandler = $this->notifyHandler->setOldDefendingKingdom($this->kingdomHandler->getOldKingdom());
+
                 $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
 
                 $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
@@ -298,6 +300,8 @@ class AttackService {
             }
         } else {
             $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
+
+            $this->notifyHandler = $this->notifyHandler->setOldDefendingKingdom($this->kingdomHandler->getOldKingdom());
 
             $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
 
