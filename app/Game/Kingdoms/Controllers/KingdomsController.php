@@ -27,7 +27,7 @@ class KingdomsController extends Controller {
     }
 
     public function attackLogs(Character $character) {
-        $logs = $character->kingdomAttackLogs;
+        $logs = $character->kingdomAttackLogs()->where('published', true)->get();
 
         return view('game.kingdoms.attack-logs', [
             'logs'      => $logs,

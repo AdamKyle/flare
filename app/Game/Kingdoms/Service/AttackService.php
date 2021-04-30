@@ -145,11 +145,11 @@ class AttackService {
         $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
         if (!$this->anySurvivingUnits()) {
-            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $character);
 
             $unitMovement->delete();
         } else {
-            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $character);
 
             $this->returnUnits($defender, $unitMovement, $character);
         }
@@ -224,7 +224,7 @@ class AttackService {
 
             $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
-            return $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $unitMovement, $character);
+            return $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $character);
         }
 
         return $this->attemptToSettleKingdom($defender, $unitMovement, $character);
@@ -245,7 +245,7 @@ class AttackService {
         if ($timeToReturn > 0) {
             $timeToReturn = now()->addMinutes($timeToReturn);
 
-            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::UNITS_RETURNING, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::UNITS_RETURNING, $defender, $character);
 
             $unitMovement->update([
                 'units_moving' => [
@@ -287,14 +287,14 @@ class AttackService {
 
                 $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
 
-                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
+                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $character);
 
                 $this->notifyHandler->kingdomHasFallenMessage($character);
             } else {
 
                 $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
-                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $unitMovement, $character);
+                $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::ATTACKED, $defender, $character);
 
                 $this->returnUnits($defender, $unitMovement, $character);
             }
@@ -305,7 +305,7 @@ class AttackService {
 
             $this->notifyHandler->notifyDefender(KingdomLogStatusValue::LOST_KINGDOM, $defender);
 
-            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $unitMovement, $character);
+            $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $character);
 
             $this->notifyHandler->kingdomHasFallenMessage($character);
         }

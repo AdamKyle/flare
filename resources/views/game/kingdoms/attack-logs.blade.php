@@ -7,7 +7,7 @@
         link="Game"
         color="primary"
     ></x-core.page-title>
-    <div class="alert alert-info">Attack logs are kept for 7 days before being automatically deleted.</div>
+    <div class="alert alert-info">Attack logs are kept for 7 days before being automatically deleted. This table is not updated in real time. Check your unit movement to see when any units might return.</div>
     @livewire('kingdom.logs.data-table', [
         'attackLogs' => $logs,
         'character'  => $character,

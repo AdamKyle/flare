@@ -24,8 +24,9 @@ class UnitReturnService {
         }
 
         $log = KingdomLog::where('character_id', $character->id)
-                         ->where('to_kingdom_id', $unitMovement->from_kingdom_id)
-                         ->where('published', false);
+                         ->where('from_kingdom_id', $unitMovement->from_kingdom_id)
+                         ->where('published', false)
+                         ->first();
 
         $log->update([
             'published' => true,

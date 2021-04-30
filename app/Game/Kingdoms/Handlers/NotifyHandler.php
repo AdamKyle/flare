@@ -187,14 +187,14 @@ class NotifyHandler {
      *
      * @param string $status
      * @param Kingdom $defender
-     * @param UnitMovementQueue $unitMovement
      * @param Character $character
      */
-    public function notifyAttacker(string $status, Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
+    public function notifyAttacker(string $status, Kingdom $defender, Character $character) {
 
         $logStatus = new KingdomLogStatusValue($status);
 
         if (!$logStatus->unitsReturning()) {
+
             KingdomLog::create([
                 'character_id' => $character->id,
                 'from_kingdom_id' => $this->attackingKingdom->id,
