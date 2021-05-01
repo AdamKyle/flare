@@ -55,6 +55,8 @@ class MoveUnits implements ShouldQueue
                 return $attackService->attack($unitMovement, $this->character, $this->defenderId);
             case 'return':
                 return $unitReturnService->returnUnits($unitMovement, $this->character);
+            case 'recalled':
+                return $unitReturnService->recallUnits($unitMovement, $this->character);
             default:
                 return;
         }

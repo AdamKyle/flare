@@ -7,6 +7,7 @@ use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
 use App\Game\Kingdoms\Builders\TookKingdomBuilder;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
+use App\Game\Kingdoms\Service\UnitRecallService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomAttackedBuilder;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
@@ -52,6 +53,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(KingdomService::class, function($app) {
             return new KingdomService($app->make(KingdomBuilder::class));
+        });
+
+        $this->app->bind(UnitRecallService::class, function($app) {
+           return new UnitRecallService();
         });
 
         $this->app->bind(KingdomResourcesService::class, function($app) {

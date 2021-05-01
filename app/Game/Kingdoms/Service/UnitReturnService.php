@@ -49,4 +49,29 @@ class UnitReturnService {
 
         event(new KingdomServerMessageEvent($character->user, 'units-returned', $message));
     }
+
+    public function recallUnits(UnitMovementQueue $unitMovement, Character $character) {
+        $unitsReturning = $unitMovement->units_moving;
+
+        $kingdom = Kingdom::find($unitMovement->from_kingdom_id);
+
+        foreach ($unitsReturning as $unitInfo) {
+            $foundUnits = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
+
+            $foundUnits->update([
+                'amount' => $foundUnits->amount + $unitInfo['amount'],
+            ]);
+        }
+
+        $defender = $unitMovement->to_kingdom;
+
+        $message  = 'Your units have returned home after being recalled from their attack on '. $defender->name .' (X/Y): ' .
+            $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . '.';
+
+        $unitMovement->delete();
+
+        UpdateUnitMovementLogs::dispatch($character);
+
+        event(new KingdomServerMessageEvent($character->user, 'units-recalled', $message));
+    }
 }

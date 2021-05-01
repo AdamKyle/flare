@@ -6,7 +6,6 @@ import Card from '../components/templates/card';
 import KingdomUnitRecallUnit from './modal/kingdom-unit-recall';
 
 export default class KingdomUnitMovement extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -195,6 +194,8 @@ export default class KingdomUnitMovement extends React.Component {
                     show={this.state.showUnitRecallModal}
                     close={this.closeUnitRecall.bind(this)}
                     unitsToRecall={this.state.unitsToRecall}
+                    unitsInMovement={this.state.unitsInMovement}
+                    characterId={this.props.characterId}
                   /> : null
               }
             </>
