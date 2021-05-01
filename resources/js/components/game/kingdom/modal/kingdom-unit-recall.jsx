@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, ModalDialog} from 'react-bootstrap';
+import {Modal, Button} from 'react-bootstrap';
 
 export default class KingdomUnitRecall extends React.Component {
 
@@ -105,19 +105,22 @@ export default class KingdomUnitRecall extends React.Component {
             Canceling unit movement can only be done if they are moving or attacking. You cannot recall if they are returning.
             You also cannot recall if they are about to arrive at their destination.
           </div>
-          <hr />
           {
             this.state.loading ?
-              <div className="progress loading-progress" style={{position: 'relative'}}>
+              <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
                 <div className="progress-bar progress-bar-striped indeterminate">
                 </div>
               </div>
             : null
           }
-          <div className="clearfix">
-            <button className="btn btn-danger float-right" onClick={this.props.close}>Close</button>
-            <button className="btn btn-primary float-right mr-2" disabled={this.props.unitsToRecall.is_returning || this.props.unitsToRecall.is_recalled} onClick={this.recall.bind(this)}>Recall</button>
-          </div>
+          <Modal.Footer>
+            <Button variant="danger" onClick={this.props.close}>
+              Cancel
+            </Button>
+            <Button variant="success" disabled={this.props.unitsToRecall.is_returning || this.props.unitsToRecall.is_recalled} onClick={this.recall.bind(this)}>
+              Recall
+            </Button>
+          </Modal.Footer>
         </Modal.Body>
       </Modal>
     );

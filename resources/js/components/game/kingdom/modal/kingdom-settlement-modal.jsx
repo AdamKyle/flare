@@ -9,6 +9,7 @@ export default class KingdomSettlementModal extends React.Component {
     this.state = {
       kingdom_name: '',
       errorMessage: null,
+      loading: false,
     }
   }
 
@@ -28,7 +29,8 @@ export default class KingdomSettlementModal extends React.Component {
     const kingdomName = this.state.kingdom_name.trim();
 
     this.setState({
-      errorMessage: null
+      errorMessage: null,
+      loading: true,
     });
 
     if (kingdomName === '') {
@@ -53,11 +55,23 @@ export default class KingdomSettlementModal extends React.Component {
       name: this.state.kingdom_name,
       x_position: this.props.x,
       y_position: this.props.y,
+      kingdom_amount: this.props.myKingomsCount,
     }
 
     axios.post('/api/kingdoms/' + this.props.characterId + '/settle', params).then((result) => {
-      this.props.close();
-      this.props.openKingdomManagement();
+      if (result.data.hasOwnProperty('message')) {
+        this.setState({
+          errorMessage: result.data.message,
+          loading: false,
+        });
+      } else {
+        this.setState({
+          loading: false,
+        }, () => {
+          this.props.close();
+          this.props.openKingdomManagement();
+        });
+      }
     }).catch((error) => {
       if (error.hasOwnProperty('response')) {
         this.setState({
@@ -79,19 +93,33 @@ export default class KingdomSettlementModal extends React.Component {
           <>
             {this.state.errorMessage !== null ?
               <div className="alert alert-danger mt-2 mb-2">{this.state.errorMessage}</div> : null}
-            <form>
+
               <div className="form-row">
                 <div className="form-group col-md-12">
                   <label htmlFor="kingdom-name">Kingdom Name</label>
                   <input type="text" className="form-control" id="kingdom-name"
                          value={this.state.kingdom_name} onChange={this.handleNameChange.bind(this)}/>
                 </div>
+                {
+                  this.props.myKingomsCount > 0 ?
+                    <p className="mt-2">
+                      <i className="fas fa-exclamation-triangle text-warning"></i> You currently have: {this.props.myKingomsCount} kingdoms. This kingdom will cost you: {(this.props.myKingomsCount * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} gold.
+                    </p>
+                    : null
+                }
                 <div className="alert alert-info mt-2">
                   <p>Kingdom names may be up to 30 characters long and contain spaces. Kingdom colors will be picked for you based on the
                     plane of existence you are currently on. You may change your kingdom name via the kingdoms screen or individually by visiting the kingdom.</p>
                 </div>
               </div>
-            </form>
+              {
+                this.state.loading ?
+                  <div className="progress loading-progress mt-2" style={{position: 'relative'}}>
+                    <div className="progress-bar progress-bar-striped indeterminate">
+                    </div>
+                  </div>
+                  : null
+              }
           </>
         </Modal.Body>
         <Modal.Footer>

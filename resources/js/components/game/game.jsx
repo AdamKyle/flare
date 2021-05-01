@@ -295,6 +295,7 @@ export default class Game extends React.Component {
               y={this.state.current_y}
               close={this.closeKingdomModal.bind(this)}
               openKingdomManagement={this.openKingdomManagement.bind(this)}
+              myKingomsCount={this.state.kingdomData.my_kingdoms.length}
             />
             : null
         }

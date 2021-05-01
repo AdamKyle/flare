@@ -52,7 +52,21 @@ class KingdomsController extends Controller {
         if (!$kingdomService->canSettle($request->x_position, $request->y_position)) {
             return response()->json([
                 'message' => 'Cannot settle here.'
-            ], 422);
+            ], 200);
+        }
+
+        if ($kingdomService->canAfford($request->kingdom_amount, $character)) {
+            $amount = $request->kingdom_amount * 10000;
+
+            $character->update([
+                'gold' => $character->gold - $amount,
+            ]);
+
+            event(new UpdateTopBarEvent($character->refresh()));
+        } else {
+            return response()->json([
+                'message' => 'You don\'t have the gold.',
+            ], 200);
         }
 
         $kingdomService->createKingdom($character);

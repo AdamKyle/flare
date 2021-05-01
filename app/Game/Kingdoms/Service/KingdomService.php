@@ -75,6 +75,8 @@ class KingdomService {
     public function canSettle(int $x, int $y): bool {
         $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->first();
 
+
+
         if (!is_null($kingdom)) {
             return false;
         }
@@ -83,6 +85,25 @@ class KingdomService {
 
         if (!is_null($location)) {
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Can you afford to settle here?
+     *
+     * @param int $amount
+     * @param Character $character
+     * @return bool
+     */
+    public function canAfford(int $amount, Character $character): bool {
+        if ($amount > 0) {
+            $amount *= 10000;
+
+            if ($character->gold < $amount) {
+                return false;
+            }
         }
 
         return true;
