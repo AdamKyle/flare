@@ -47,7 +47,6 @@ export default class KingdomManagementModal extends React.Component {
     });
 
     this.updateKingdom.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {
-      console.log(event);
       if (this.state.kingdom.id === event.kingdom.id) {
         this.setState({
           kingdom: event.kingdom

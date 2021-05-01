@@ -136,6 +136,10 @@ class Character extends Model
         return $this->hasMany(KingdomLog::class);
     }
 
+    public function unitMovementQueues() {
+        return $this->hasMany(UnitMovementQueue::class);
+    }
+
     public function getXpAttribute($value) {
         return number_format($value, 2);
     }

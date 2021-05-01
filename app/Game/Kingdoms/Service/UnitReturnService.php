@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 
 class UnitReturnService {
 
@@ -43,6 +44,8 @@ class UnitReturnService {
         }
 
         $unitMovement->delete();
+
+        UpdateUnitMovementLogs::dispatch($character);
 
         event(new KingdomServerMessageEvent($character->user, 'units-returned', $message));
     }

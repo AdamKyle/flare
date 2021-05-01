@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -39,8 +40,18 @@ class MoveUnits implements ShouldQueue
             return;
         }
 
+
+
         switch ($this->type) {
             case 'attack':
+                $unitMovement->update([
+                    'is_moving' => false,
+                ]);
+
+                $unitMovement = $unitMovement->refresh();
+
+                UpdateUnitMovementLogs::dispatch($unitMovement->character);
+
                 return $attackService->attack($unitMovement, $this->character, $this->defenderId);
             case 'return':
                 return $unitReturnService->returnUnits($unitMovement, $this->character);

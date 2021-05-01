@@ -68,4 +68,10 @@ class KingdomsController extends Controller {
             'character' => $character
         ])->with('success', 'Deleted log: ' . $name);
     }
+
+    public function unitMovement(Character $character) {
+        return view('game.kingdoms.unit_movement', [
+            'character' => $character
+        ]);
+    }
 }

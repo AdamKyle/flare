@@ -34,6 +34,7 @@ class CreateUnitMovementQueue extends Migration
             $table->boolean('is_attacking')->nullable()->default(false);
             $table->boolean('is_recalled')->nullable()->default(false);
             $table->boolean('is_returning')->nullable()->default(false);
+            $table->boolean('is_moving')->default(true);
             $table->timestamps();
         });
     }

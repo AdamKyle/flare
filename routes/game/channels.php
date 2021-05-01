@@ -34,3 +34,8 @@ Broadcast::channel('add-kingdom-to-map-{userId}', function($user, $userId) {
 Broadcast::channel('update-kingdom-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });
+
+// When the units in movement are updated.
+Broadcast::channel('update-units-in-movement-{userId}', function($user, $userId) {
+   return $user->id === (int) $userId;
+});

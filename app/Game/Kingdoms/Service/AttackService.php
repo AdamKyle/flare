@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
 use App\Game\Kingdoms\Builders\AttackBuilder;
+use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Events\KingdomServerMessageEvent;
@@ -258,11 +259,16 @@ class AttackService {
                 'moving_to_y' => $unitMovement->from_y,
                 'from_x' => $unitMovement->moving_to_x,
                 'from_y' => $unitMovement->moving_to_y,
+                'is_moving' => true,
+                'is_attacking' => false,
+                'is_returning' => true,
             ]);
 
             $unitMovement = $unitMovement->refresh();
 
-            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes(2, /*$timeToReturn*/));
+            UpdateUnitMovementLogs::dispatch($character);
+
+            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes(5 /*$timeToReturn*/));
         }
     }
 

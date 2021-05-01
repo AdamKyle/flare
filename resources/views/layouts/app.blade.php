@@ -38,6 +38,7 @@
     <script src="{{ asset('js/vendor.js') }}"></script>
     <script src="{{ asset('js/manifest.js') }}"></script>
     <script src={{asset('js/market-board.js')}} type="text/javascript"></script>
+    <script src={{asset('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
 </head>
@@ -53,10 +54,10 @@
                             <!-- toggle and nav items -->
                             <!-- ============================================================== -->
                             <ul class="navbar-nav mr-auto mt-md-0 ">
-                                <li class="nav-item"> 
+                                <li class="nav-item">
                                     <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
                                         <i class="fas fa-bars"></i>
-                                    </a> 
+                                    </a>
                                 </li>
                             </ul>
                         @endguest

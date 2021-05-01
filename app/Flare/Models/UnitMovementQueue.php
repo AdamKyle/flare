@@ -30,8 +30,10 @@ class UnitMovementQueue extends Model
         'moving_to_y',
         'from_x',
         'from_y',
+        'is_attacking',
         'is_recalled',
         'is_returning',
+        'is_moving',
     ];
 
     /**
@@ -45,11 +47,12 @@ class UnitMovementQueue extends Model
         'started_at'   => 'datetime',
         'is_recalled'  => 'boolean',
         'is_returning' => 'boolean',
+        'is_moving'    => 'boolean',
+        'is_attacking' => 'boolean',
         'moving_to_x'  => 'integer',
         'moving_to_y'  => 'integer',
         'from_x'       => 'integer',
         'from_y'       => 'integer',
-
     ];
 
     protected $appends = [
