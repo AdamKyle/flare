@@ -35,8 +35,6 @@ export default class AdeventureActions extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
-      console.log('adventure-section');
-      console.log(event);
       const lastLog = event.adventureLogs[event.adventureLogs.length - 1];
       let failed    = false;
       let canceled  = false;
