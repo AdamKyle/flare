@@ -35,10 +35,12 @@ export default class AdeventureActions extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log('adventure-section');
+      console.log(event);
       const lastLog = event.adventureLogs[event.adventureLogs.length - 1];
-      let failed = false;
-      let canceled = false;
-      let tooLong = false;
+      let failed    = false;
+      let canceled  = false;
+      let tooLong   = false;
 
       if (typeof lastLog !== 'undefined') {
         if (!lastLog.in_progress && !event.canceled) {
@@ -136,7 +138,7 @@ export default class AdeventureActions extends React.Component {
 
     let foundAdventure = null;
 
-    const hasAdventureInProgres = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
+    const hasAdventureInProgress = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
 
     const hasCollectedRewards = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.rewards !== null));
 
@@ -160,7 +162,7 @@ export default class AdeventureActions extends React.Component {
               <Row>
                 <Col xs={9} sm={6} lg={8} xl={2}>
                   <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id}
-                          disabled={hasAdventureInProgres || hasCollectedRewards || !this.props.canAdventure()}
+                          disabled={hasAdventureInProgress || hasCollectedRewards || !this.props.canAdventure()}
                           onClick={this.embarkShow.bind(this)}>Embark
                   </button>
                   {
@@ -211,7 +213,7 @@ export default class AdeventureActions extends React.Component {
       );
     }
 
-    const hasAdventureInProgres = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
+    const hasAdventureInProgress = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.in_progress === true));
 
     const hasCollectedRewards = !_.isEmpty(this.state.characterAdventureLogs.filter(al => al.rewards !== null));
 
@@ -229,14 +231,12 @@ export default class AdeventureActions extends React.Component {
             href="/current-adventure/">here</a>.</div> : null}
         {this.state.canceled ?
           <div className="alert alert-success">Adventure canceled. You gained no rewards.</div> : null}
-        {hasCollectedRewards && !hasAdventureInProgres ?
+        {hasCollectedRewards && !hasAdventureInProgress ?
           <div className="alert alert-info">Cannot start adventure till you collect the rewards from the previous
             adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
-        {hasAdventureInProgres ?
+        {hasAdventureInProgress ?
           <div className="alert alert-info">You may only embark on one adventure at a time</div> : null}
-        {!this.props.canAdventure() && !hasAdventureInProgres ?
-          <div className="alert alert-info">You must wait to be able to move and attack in order to
-            embark.</div> : null}
+
         {this.adventures()}
 
         {this.state.showEmbark ? <AdventureEmbark

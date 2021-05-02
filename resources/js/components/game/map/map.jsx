@@ -126,13 +126,18 @@ export default class Map extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log('map');
+      console.log(event);
       this.setState({
         isAdventuring: event.isAdventuring,
+        canMove: event.user.character.can_move,
+      }, () => {
+        this.props.updateAdventure(this.state.adventures, event.adventureLogs, event.canAdAdventureAgainAt);
       });
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
-      console.log(event);
+
       this.updatePlayerPosition(event.map);
 
       let myKingdoms = this.fetchKingdoms(event);

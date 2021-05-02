@@ -63,7 +63,10 @@ export default class BattleAction extends React.Component {
       this.setState({character: character});
     });
 
-    this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+    this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log('battle-action');
+      console.log(event);
+
       this.setState({
         isAdventuring: event.isAdventuring,
       }, () => {
@@ -73,12 +76,14 @@ export default class BattleAction extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log('componentDidUpdate');
+    console.log(prevProps, this.props);
     if (this.props.isDead !== prevProps.isDead) {
       let character = _.cloneDeep(this.state.character);
       character.is_dead = this.props.isDead;
 
       this.setState({
-        character: character
+        character: character,
       });
     }
   }

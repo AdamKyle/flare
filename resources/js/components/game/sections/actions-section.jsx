@@ -148,6 +148,7 @@ export default class ActionsSection extends React.Component {
               updateCanCraft={this.updateCanCraft.bind(this)}
               setMonster={this.setMonster.bind(this)}
               canAttack={this.props.canAttack}
+              isAdventuring={this.state.isAdventuring}
             />
             <CraftingAction
               isDead={this.state.isDead}
