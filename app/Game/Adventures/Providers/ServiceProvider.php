@@ -3,6 +3,7 @@
 namespace App\Game\Adventures\Providers;
 
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Game\Adventures\Console\Commands\DeleteAdventureLogs;
 use App\Game\Adventures\Builders\RewardBuilder;
 use App\Game\Adventures\Services\AdventureFightService;
 use App\Game\Adventures\Services\AdventureService;
@@ -17,7 +18,7 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-        
+
 
         $this->app->singleton(CharacterService::class, function($app) {
             return new CharacterService();
@@ -33,14 +34,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(AdventureService::class, function($app, $parameters) {
             return new AdventureService(
-                $parameters['character'], 
-                $parameters['adventure'], 
+                $parameters['character'],
+                $parameters['adventure'],
                 $parameters['rewardBuilder'],
                 $parameters['name']
             );
         });
 
-        
+        $this->commands([DeleteAdventureLogs::class]);
     }
 
     /**

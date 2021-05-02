@@ -5,8 +5,16 @@
                 <x-data-tables.per-page wire:model="perPage" />
                 <x-data-tables.search wire:model="search" />
             </div>
+            @include('components.livewire.character.adventures.partials.batch-delete', [
+                'character' => $character,
+                'selected'  => $selected,
+            ])
             <x-data-tables.table :collection="$logs">
                 <x-data-tables.header>
+                    <x-data-tables.header-row>
+                        <input type="checkbox" wire:model="pageSelected" id="select-all" />
+                    </x-data-tables.header-row>
+
                     <x-data-tables.header-row
                         wire:click.prevent="sortBy('adventure.name')"
                         header-text="Name"
@@ -46,17 +54,51 @@
                         sort-field="{{$sortField}}"
                         field="rewards"
                     />
+
+                    <x-data-tables.header-row>
+                        Actions
+                    </x-data-tables.header-row>
                 </x-data-tables.header>
                 <x-data-tables.body>
-                    @forelse($logs as $log)
+                    @if ($pageSelected)
                         <tr>
-                            <td><a href="{{route('game.completed.adventure', [
+                            <td colspan="8">
+                                @unless($selectAll)
+                                    <div>
+                                        <span>You have selected <strong>{{$logs->count()}}</strong> items of <strong>{{$logs->total()}}</strong>. Would you like to select all?</span>
+                                        <button class="btn btn-link" wire:click="selectAll">Select all</button>
+                                    </div>
+                                @else
+                                    <span>You are currently selecting all <strong>{{$logs->total()}}</strong> items.</span>
+                                @endunless
+                            </td>
+                        </tr>
+                    @endif
+                    @forelse($logs as $log)
+                        <tr wire:key="adventure-logs-table-{{$log->id}}">
+                            <td>
+                                <input type="checkbox" wire:model="selected" value="{{$log->id}}"/>
+                            </td>
+                            <td>
+                                <a href="{{route('game.completed.adventure', [
                                         'adventureLog' => $log
-                                    ])}}">{{$log->adventure->name}}</a></td>
+                                    ])}}">{{$log->adventure->name}}</a>
+                            </td>
                             <td>{{$log->complete ? 'Yes' : 'No'}}</td>
                             <td>{{$log->last_completed_level}}</td>
                             <td>{{$log->adventure->levels}}</td>
                             <td>{{is_null($log->rewards) ? 'Yes' : 'No'}}</td>
+                            <td>
+                                <x-forms.button-with-form
+                                    formRoute="{{route('game.adventures.delete', [
+                                        'adventureLog' => $log,
+                                    ])}}"
+                                    formId="delete-log-{{$log->id}}"
+                                    buttonTitle="Delete Log"
+                                    class="btn btn-danger"
+                                >
+                                </x-forms.button-with-form>
+                            </td>
                         </tr>
                     @empty
                         <x-data-tables.no-results colspan="5" />

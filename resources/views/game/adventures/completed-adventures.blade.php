@@ -9,7 +9,8 @@
             color="primary"
         ></x-core.page-title>
         @livewire('character.adventures.data-table', [
-            'adventureLogs' => $logs
+            'adventureLogs' => $logs,
+            'character'     => $character,
         ])
     </div>
 @endsection

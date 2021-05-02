@@ -29,7 +29,8 @@ class CharacterAdventureController extends Controller {
         $character = auth()->user()->character;
 
         return view('game.adventures.completed-adventures', [
-            'logs' => $character->adventureLogs->load('adventure'),
+            'logs'      => $character->adventureLogs->load('adventure'),
+            'character' => $character,
         ]);
     }
 
@@ -101,5 +102,25 @@ class CharacterAdventureController extends Controller {
         }
 
         return redirect()->to(route('game'))->with('success', $messages);
+    }
+
+    public function delete(AdventureLog $adventureLog) {
+        $adventureLog->delete();
+
+        return redirect()->route('game.completed.adventures')->with('success', 'Log deleted.');
+    }
+
+    public function batchDelete(Request $request) {
+        $logs = AdventureLog::findMany($request->logs);
+
+        if ($logs->isEmpty()) {
+            return redirect()->back()->with('error', 'No logs exist for selected.');
+        }
+
+        foreach ($logs as $log) {
+            $log->delete();
+        }
+
+        return redirect()->route('game.completed.adventures')->with('success', 'Selected logs have been deleted.');
     }
 }

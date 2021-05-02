@@ -2,13 +2,13 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
 use App\Game\Kingdoms\Builders\TookKingdomBuilder;
-use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
+use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Service\UnitRecallService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\KingdomAttackedBuilder;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
@@ -137,7 +137,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomsAttackService(
                 $app->make(SelectedKingdom::class),
                 $app->make(Manager::class),
-                $app->make(KingdomTransformer::class),
+                $app->make(KingdomTransformer::class)
             );
         });
 
