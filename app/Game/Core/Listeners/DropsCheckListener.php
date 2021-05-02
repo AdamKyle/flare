@@ -47,18 +47,24 @@ class DropsCheckListener
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
         if ($event->character->inventory->slots->count() !== $event->character->inventory_max) {
 
-            $event->character->inventory->slots()->create([
-                'item_id'      => $item->id,
-                'inventory_id' => $event->character->inventory->id,
-            ]);
+            $alreadyHas = $event->character->inventory->slots->filter(function ($slot) use ($item) {
+                return $slot->item_id === $item->id && $item->type === 'quest';
+            })->all();
 
-            if (!is_null($item->effect)) {
-                $message = $event->character->name . ' has found: ' . $item->affix_name;
+            if (empty($alreadyHas)) {
+                $event->character->inventory->slots()->create([
+                    'item_id' => $item->id,
+                    'inventory_id' => $event->character->inventory->id,
+                ]);
 
-                broadcast(new GlobalMessageEvent($message));
+                if (!is_null($item->effect)) {
+                    $message = $event->character->name . ' has found: ' . $item->affix_name;
+
+                    broadcast(new GlobalMessageEvent($message));
+                }
+
+                event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name));
             }
-
-            event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name));
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));
         }

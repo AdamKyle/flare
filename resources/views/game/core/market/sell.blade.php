@@ -3,11 +3,11 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            <x-core.page-title 
+            <x-core.page-title
                 title="Sell items on market board"
-                route="{{url()->previous()}}"
-                link="Back"
-                color="success"
+                route="{{route('game')}}"
+                link="Game"
+                color="primary"
             ></x-core.page-title>
 
             @livewire('character.inventory.data-table', [

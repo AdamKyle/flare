@@ -5,11 +5,11 @@
         <x-core.page-title
             title="Previous Adventures"
             route="{{route('game')}}"
-            link="Home"
+            link="Game"
             color="primary"
         ></x-core.page-title>
         @livewire('character.adventures.data-table', [
-        'adventureLogs' => $logs
+            'adventureLogs' => $logs
         ])
     </div>
 @endsection

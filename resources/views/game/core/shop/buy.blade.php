@@ -3,9 +3,9 @@
 @section('content')
     <x-core.page-title
         title="Buying"
-        route="{{url()->previous()}}"
-        link="Back"
-        color="success"
+        route="{{route('game')}}"
+        link="Game"
+        color="primary"
     ></x-core.page-title>
 
     <div class="row">

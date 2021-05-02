@@ -58,9 +58,15 @@ class RewardBuilder {
         if (!is_null($monster->questItem)) {
             $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $lootingChance, $adventure);
 
-            if ($hasDrop) {
+            $hasItem = $character->inventory->slots->filter(function($slot) use ($monster) {
+               return $slot->item_id === $monster->questItem->id;
+            })->all();
+
+            if ($hasDrop && empty($hasItem)) {
                 return $monster->questItem;
             }
+
+            return null;
         }
 
         return null;
