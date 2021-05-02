@@ -28,6 +28,10 @@ class QuestItem extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
+        if ($this->location->quest_reward_item_id === '') {
+            $this->location->quest_reward_item_id = null;
+        }
+
         $this->location->save();
 
         $message = 'Created location: ' . $this->location->refresh()->name;

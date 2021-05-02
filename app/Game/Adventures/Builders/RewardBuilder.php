@@ -17,7 +17,7 @@ class RewardBuilder {
 
     /**
      * Fetch the Xp Reward
-     * 
+     *
      * @param Monster $monster
      * @param int $characterLevel
      * @param float $xpReduction | 0.0
@@ -28,7 +28,7 @@ class RewardBuilder {
 
     /**
      * Fetch the skill xp reward
-     * 
+     *
      * @param Skill $skill
      * @param Adventure $adventure
      */
@@ -38,7 +38,7 @@ class RewardBuilder {
 
     /**
      * Fetch the drops.
-     * 
+     *
      * @param Monster $monster
      * @param Character $character
      * @param Adventure $adventure
@@ -55,14 +55,22 @@ class RewardBuilder {
                         ->generateItem($character);
         }
 
+        if (!is_null($monster->questItem)) {
+            $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $lootingChance, $adventure);
+
+            if ($hasDrop) {
+                return $monster->questItem;
+            }
+        }
+
         return null;
     }
 
     /**
      * Fetches a gold rush.
-     * 
+     *
      * If a gold rush is not possible, we return the monsters gold.
-     * 
+     *
      * @param Monster $monster
      * @param Character $character
      * @param Adventure $adventure
@@ -71,13 +79,13 @@ class RewardBuilder {
     public function fetchGoldRush(Monster $monster, Character $character, Adventure $adventure): int {
 
         $lootingChance = $character->skills->where('name', 'Looting')->first()->skill_bonus;
-       
+
         $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $lootingChance, $adventure);
 
         if ($hasGoldRush) {
             return $monster->gold + rand(0, 1000);
         }
-        
+
         return $monster->gold;
     }
 }

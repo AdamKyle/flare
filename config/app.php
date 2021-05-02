@@ -257,6 +257,7 @@ return [
          * Game Related
          */
         'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
+        'ItemEffects'      => \App\Flare\Values\ItemEffectsValue::class,
     ],
 
 ];

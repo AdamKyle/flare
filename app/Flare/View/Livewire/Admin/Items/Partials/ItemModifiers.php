@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Items\Partials;
 
+use App\Flare\Values\ItemEffectsValue;
 use Livewire\Component;
 use App\Flare\Models\Item;
 
@@ -11,7 +12,8 @@ class ItemModifiers extends Component
     public $item;
 
     public $effects = [
-        'walk-on-water',
+        ItemEffectsValue::WALKONWATER,
+        ItemEffectsValue::LABYRINTH,
     ];
 
     public $editing = false;
@@ -50,7 +52,7 @@ class ItemModifiers extends Component
         if ($this->editing) {
             $message = 'Updated Item: ' . $this->item->refresh()->name;
         }
-        
+
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',
             'message' => $message,

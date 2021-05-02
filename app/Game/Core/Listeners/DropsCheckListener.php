@@ -7,6 +7,7 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class DropsCheckListener
@@ -15,13 +16,13 @@ class DropsCheckListener
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Battle\UpdateCharacterEvent  $event
+     * @param DropsCheckEvent $event
      * @return void
      */
     public function handle(DropsCheckEvent $event)
     {
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-    
+
         $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $event->adventure);
 
         if ($canGetDrop) {
@@ -33,6 +34,14 @@ class DropsCheckListener
                 $this->attemptToPickUpItem($event, $drop);
             }
         }
+
+        if (!is_null($event->monster->quest_item_id)) {
+            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $event->adventure);
+
+            if ($canGetQuestItem) {
+                $this->attemptToPickUpItem($event, $event->monster->questItem);
+            }
+        }
     }
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
@@ -42,6 +51,12 @@ class DropsCheckListener
                 'item_id'      => $item->id,
                 'inventory_id' => $event->character->inventory->id,
             ]);
+
+            if (!is_null($item->effect)) {
+                $message = $event->character->name . ' has found: ' . $item->affix_name;
+
+                broadcast(new GlobalMessageEvent($message));
+            }
 
             event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name));
         } else {

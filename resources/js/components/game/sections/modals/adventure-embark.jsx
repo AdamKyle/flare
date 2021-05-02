@@ -90,7 +90,7 @@ export default class AdventureEmbark extends React.Component {
               <span className="text-muted"><strong>Total Levels</strong>: {this.state.adventure.levels}</span>
               <br/>
               <span
-                className="text-muted"><strong>Total Time</strong>: {this.state.adventure.levels * this.state.adventure.time_per_level}</span>
+                className="text-muted"><strong>Total Time</strong>: {this.state.adventure.levels * this.state.adventure.time_per_level} minutes</span>
             </div>
           </Modal.Body>
           <Modal.Footer>

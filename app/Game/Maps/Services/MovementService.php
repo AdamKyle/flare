@@ -14,6 +14,7 @@ use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
+use App\Game\Messages\Events\GlobalMessageEvent;
 
 class MovementService {
 
@@ -363,7 +364,15 @@ class MovementService {
                         'item_id'      => $location->questRewardItem->id,
                     ]);
 
-                    event(new ServerMessageEvent($character->user, 'found_item', $location->questRewarditem->affix_name));
+                    $questItem = $location->questRewardItem;
+
+                    if (!is_null($questItem->effect)) {
+                        $message = $character->name . ' has found: ' . $questItem->affix_name;
+
+                        broadcast(new GlobalMessageEvent($message));
+                    }
+
+                    event(new ServerMessageEvent($character->user, 'found_item', $questItem->affix_name));
                 }
             }
         }

@@ -2,8 +2,11 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Messages\Events\GlobalMessageEvent;
 
 class AdventureRewardService {
 
@@ -28,7 +31,7 @@ class AdventureRewardService {
 
     /**
      * Distribute the rewards
-     * 
+     *
      * @param array $rewards
      * @param Character $character
      * @return AdventureRewardService
@@ -46,7 +49,7 @@ class AdventureRewardService {
 
     /**
      * Get messages for display
-     * 
+     *
      * @return array
      */
     public function getMessages(): array {
@@ -75,11 +78,11 @@ class AdventureRewardService {
             $skill->xp += $rewards['skill']['exp'];
             $skill->save();
             $skill->refresh();
-            
+
             if ($skill->xp >= $skill->xp_max) {
                 if ($skill->level <= $skill->max_level) {
                     $level      = $skill->level + 1;
-    
+
                     $skill->update([
                         'level'              => $level,
                         'xp_max'             => $skill->can_train ? rand(100, 150) : rand(100, 200),
@@ -103,12 +106,21 @@ class AdventureRewardService {
     protected function handleItems(array $items, Character $character): void {
         if (!empty($items)) {
             foreach ($items as $item) {
+                $item = Item::find($item['id']);
+
                 $character->inventory->slots()->create([
                     'inventory_id' => $character->inventory->id,
-                    'item_id'      => $item['id'],
+                    'item_id'      => $item->id,
                 ]);
 
-                $this->messages[] = 'You gained the item: ' . $item['name'];
+                $this->messages[] = 'You gained the item: ' . $item->affix_name;
+
+
+                if (!is_null($item->effect)) {
+                    $message = $character->name . ' has found: ' . $item->affix_name;
+
+                    broadcast(new GlobalMessageEvent($message));
+                }
             }
         }
     }
