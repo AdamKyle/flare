@@ -25,6 +25,8 @@ export default class ActionsSection extends React.Component {
       canCraft: true,
       monster: null,
     };
+
+    this.updateActions = Echo.private('update-actions-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -40,6 +42,14 @@ export default class ActionsSection extends React.Component {
         isDead: result.data.character.is_dead,
       }, () => {
         this.props.setCharacterId(this.state.character.id);
+      });
+    });
+
+    this.updateActions.listen('Game.Maps.Events.UpdateActionsBroadcast', (event) => {
+      this.setState({
+        character: event.character,
+        monsters: event.monsters,
+        isDead: event.character.is_dead,
       });
     });
   }

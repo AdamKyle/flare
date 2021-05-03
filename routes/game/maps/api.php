@@ -13,5 +13,8 @@ Route::middleware(['auth:api', 'is.player.banned'])->group(function() {
 
         // Teleport the player:
         Route::post('/map/teleport/{character}', ['uses' => 'Api\MapController@teleport']);
+
+        // Traverse the player:
+        Route::post('/map/traverse/{character}', ['uses' => 'Api\MapController@traverse']);
     });
 });

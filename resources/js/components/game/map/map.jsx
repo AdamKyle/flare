@@ -51,6 +51,7 @@ export default class Map extends React.Component {
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
     this.updateMap = Echo.private('update-map-' + this.props.userId);
     this.addKingomToMap = Echo.private('add-kingdom-to-map-' + this.props.userId);
+    this.updateMapPlane = Echo.private('update-map-plane-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -126,8 +127,6 @@ export default class Map extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
-      console.log('map');
-      console.log(event);
       this.setState({
         isAdventuring: event.isAdventuring,
         canMove: event.user.character.can_move,
@@ -188,6 +187,37 @@ export default class Map extends React.Component {
         });
       });
     });
+
+    this.updateMapPlane.listen('Game.Maps.Events.UpdateMapBroadcast', (event) => {
+      const myKingdoms = event.mapDetails.my_kingdoms;
+      console.log(event);
+      this.setState({
+        mapUrl: event.mapDetails.map_url,
+        locations: event.mapDetails.locations,
+        kingdoms: event.mapDetails.my_kingdoms,
+        portList: event.mapDetails.port_details,
+        adventures: event.mapDetails.adventure_details,
+        currentPort: event.mapDetails.port_details !== null ? event.mapDetails.port_details.current_port : null,
+      }, () => {
+        this.props.updateKingdoms({
+          my_kingdoms: myKingdoms,
+          can_attack: event.mapDetails.my_kingdoms.hasOwnProperty('can_attack') ? event.mapDetails.my_kingdoms.can_attack : false,
+          can_settle: event.mapDetails.can_settle_kingdom,
+          is_mine: this.isMyKingdom(myKingdoms, this.state.characterPosition),
+          kingdom_to_attack: event.mapDetails.kingdom_to_attack
+        });
+
+        this.props.updatePort({
+          currentPort: this.state.currentPort,
+          portList: this.state.portList,
+          characterId: this.state.characterId,
+          characterIsDead: this.state.isDead,
+          canMove: this.state.canMove,
+        });
+
+        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
+      });
+    });
   }
 
   componentDidUpdate() {
@@ -243,6 +273,10 @@ export default class Map extends React.Component {
 
   openTeleport() {
     this.props.openTeleportDetails(true);
+  }
+
+  openTraverse() {
+    this.props.openTraverserDetails(true);
   }
 
   disableMapButtons() {
@@ -380,6 +414,7 @@ export default class Map extends React.Component {
             isDead={this.state.isDead}
             isAdventuring={this.state.isAdventuring}
             disableMapButtons={this.disableMapButtons.bind(this)}
+            openTraverse={this.openTraverse.bind(this)}
             characterPosition={this.state.characterPosition}
             timeRemaining={this.state.timeRemaining}
             move={this.move.bind(this)}

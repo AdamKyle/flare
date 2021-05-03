@@ -51,6 +51,16 @@ class MovementService {
     private $coordinatesCache;
 
     /**
+     * @var MapPositionValue $mapPositionValue
+     */
+    private $mapPositionValue;
+
+    /**
+     * @var TraverseService $traverseService
+     */
+    private $traverseService;
+
+    /**
      * Constructor
      *
      * @param PortService $portService
@@ -59,12 +69,14 @@ class MovementService {
     public function __construct(PortService $portService,
                                 MapTileValue $mapTile,
                                 CoordinatesCache $coordinatesCache,
-                                MapPositionValue $mapPositionValue)
+                                MapPositionValue $mapPositionValue,
+                                TraverseService $traverseService)
     {
         $this->portService      = $portService;
         $this->mapTile          = $mapTile;
         $this->coordinatesCache = $coordinatesCache;
         $this->mapPositionValue = $mapPositionValue;
+        $this->traverseService  = $traverseService;
     }
 
     /**
@@ -93,6 +105,23 @@ class MovementService {
     }
 
     /**
+     * Lets the players traverse from one plane to another.
+     *
+     * @param int $mapId
+     * @param Character $character
+     * @return array
+     */
+    public function updateCharacterPlane(int $mapId, Character $character): array {
+        if (!$this->traverseService->canTravel($mapId, $character)) {
+            return $this->errorResult('You are missing a required item to travel to that plane.');
+        }
+
+        $this->traverseService->travel($mapId, $character);
+
+        return $this->successResult();
+    }
+
+    /**
      * Porcess the area.
      *
      * sets the kingdom data for a specific area.
@@ -105,13 +134,17 @@ class MovementService {
     public function processArea(Character $character): void {
         $location = Location::where('x', $character->x_position)
                             ->where('y', $character->y_position)
+                            ->where('game_map_id', $character->map->game_map_id)
                             ->first();
 
         if (!is_null($location)) {
             $this->processLocation($location, $character);
         }
 
-        $kingdom = Kingdom::where('x_position', $character->x_position)->where('y_position', $character->y_position)->first();
+        $kingdom = Kingdom::where('x_position', $character->x_position)
+                          ->where('y_position', $character->y_position)
+                          ->where('game_map_id', $character->map->game_map_id)
+                          ->first();
 
         $canAttack       = false;
         $canSettle       = false;

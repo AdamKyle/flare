@@ -13,4 +13,6 @@ Route::group(['middleware' => 'throttle:100,1'], function() {
     Route::get('/market-board/{item}/listing-details', ['uses' => 'Api\MarketBoardController@fetchItemDetails']);
     Route::get('/market-board/history', ['uses' => 'Api\MarketBoardController@history']);
     Route::post('/market-board/purchase/{character}', ['uses' => 'Api\MarketBoardController@purchase']);
+
+    Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);
 });

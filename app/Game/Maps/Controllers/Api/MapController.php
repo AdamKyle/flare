@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use App\Game\Maps\Requests\TraverseRequest;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
 use App\Flare\Models\Character;
@@ -24,7 +25,7 @@ class MapController extends Controller {
 
     /**
      * Constructor
-     * 
+     *
      * @param PortService $portService
      * @param MapTileValue $mapTile
      */
@@ -43,6 +44,16 @@ class MapController extends Controller {
         $response = $movementSevice->updateCharacterPosition($character, $request->all());
 
         $status = $response['status'];
+
+        unset($response['status']);
+
+        return response()->json($response, $status);
+    }
+
+    public function traverse(TraverseRequest $request, Character $character, MovementService $movementService) {
+        $response = $movementService->updateCharacterPlane($request->map_id, $character);
+
+        $status   = $response['status'];
 
         unset($response['status']);
 

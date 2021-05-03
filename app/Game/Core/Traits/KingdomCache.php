@@ -19,17 +19,24 @@ trait KingdomCache {
      * @return array
      */
     public function getKingdoms(Character $character): array {
-        if (Cache::has('character-kingdoms-' . $character->id)) {
-            return Cache::get('character-kingdoms-' . $character->id);
+        $plane = $character->map->gameMap->name;
+
+        if (Cache::has('character-kingdoms-'  . $plane . '-' . $character->id)) {
+            return Cache::get('character-kingdoms-' . $plane . '-' . $character->id);
         }
 
         $kingdoms = Kingdom::select('id', 'x_position', 'y_position', 'color', 'name')
                             ->where('character_id', $character->id)
+                            ->where('game_map_id', $character->map->game_map_id)
                             ->get();
 
-        Cache::put('character-kingdoms-' . $character->id, $this->createKingdomArray($kingdoms));
+        if ($kingdoms->isEmpty()) {
+            return [];
+        }
 
-        return Cache::get('character-kingdoms-' . $character->id);
+        Cache::put('character-kingdoms-' . $plane . '-' . $character->id, $this->createKingdomArray($kingdoms));
+
+        return Cache::get('character-kingdoms-' . $plane . '-'  . $character->id);
     }
 
     /**
@@ -42,17 +49,19 @@ trait KingdomCache {
      * @return array
      */
     public function addKingdomToCache(Character $character, Kingdom $kingdom): array {
-        if (Cache::has('character-kingdoms-' . $character->id)) {
-            $cache = Cache::get('character-kingdoms-' . $character->id);
+        $plane = $character->map->gameMap->name;
 
-            Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom, $cache));
+        if (Cache::has('character-kingdoms-'  . $plane . '-' . $character->id)) {
+            $cache = Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
 
-            return Cache::get('character-kingdoms-' . $character->id);
+            Cache::put('character-kingdoms-'  . $plane . '-' . $character->id, $this->addKingdom($kingdom, $cache));
+
+            return Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
         }
 
-        Cache::put('character-kingdoms-' . $character->id, $this->addKingdom($kingdom));
+        Cache::put('character-kingdoms-'  . $plane . '-' . $character->id, $this->addKingdom($kingdom));
 
-        return Cache::get('character-kingdoms-' . $character->id);
+        return Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
     }
 
     /**
@@ -64,13 +73,15 @@ trait KingdomCache {
      * @param Kingdom $kingdom
      * @return array|null
      */
-    public function removeKingdomFromCache(Character $character, KIngdom $kingdom) {
-        if (Cache::has('character-kingdoms-' . $character->id)) {
-            $cache = Cache::get('character-kingdoms-' . $character->id);
+    public function removeKingdomFromCache(Character $character, Kingdom $kingdom): ?array {
+        $plane = $character->map->gameMap->name;
 
-            Cache::put('character-kingdoms-' . $character->id, $this->removeKingdom($kingdom, $cache));
+        if (Cache::has('character-kingdoms-'  . $plane . '-' . $character->id)) {
+            $cache = Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
 
-            return Cache::get('character-kingdoms-' . $character->id);
+            Cache::put('character-kingdoms-'  . $plane . '-' . $character->id, $this->removeKingdom($kingdom, $cache));
+
+            return Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
         }
 
         return null;

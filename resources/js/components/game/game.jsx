@@ -7,9 +7,11 @@ import CharacterInfoTopSection from './sections/character-info-section';
 import ActionsSection from './sections/actions-section';
 import PortSection from './sections/port-section';
 import AdeventureActions from './sections/adventure-section';
+import TraverseSection from "./sections/traverse-section";
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
+
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -30,6 +32,7 @@ export default class Game extends React.Component {
       openPortDetails: false,
       openAdventureDetails: false,
       openTeleportDetails: false,
+      openTraverseDetails: false,
       openKingdomManagement: false,
       openKingdomModal: false,
       openKingdomAttackModal: false,
@@ -80,6 +83,7 @@ export default class Game extends React.Component {
       openPortDetails: open,
       openAdventureDetails: false,
       openTeleportDetails: false,
+      openTraverseDetails: false,
     });
   }
 
@@ -88,6 +92,16 @@ export default class Game extends React.Component {
       openPortDetails: false,
       openAdventureDetails: open,
       openTeleportDetails: false,
+      openTraverseDetails: false,
+    });
+  }
+
+  openTraverseDetails(open) {
+    this.setState({
+      openPortDetails: false,
+      openAdventureDetails: false,
+      openTeleportDetails: false,
+      openTraverseDetails: open,
     });
   }
 
@@ -96,6 +110,7 @@ export default class Game extends React.Component {
       openTeleportDetails: open,
       openPortDetails: false,
       openAdventureDetails: false,
+      openTraverseDetails: false,
     });
   }
 
@@ -249,6 +264,14 @@ export default class Game extends React.Component {
                 />
                 : null
             }
+            {
+              this.state.openTraverseDetails ?
+                <TraverseSection
+                  openTraverseSection={this.openTraverseDetails.bind(this)}
+                  characterId={this.state.characterId}
+                />
+                : null
+            }
           </Col>
           <Col xs={12} sm={12} md={12} lg={6} xl={3}>
             <Map
@@ -260,6 +283,7 @@ export default class Game extends React.Component {
               updatePlayerPosition={this.updatePlayerPosition.bind(this)}
               openPortDetails={this.openPortDetails.bind(this)}
               openAdventureDetails={this.openAdventureDetails.bind(this)}
+              openTraverserDetails={this.openTraverseDetails.bind(this)}
               updateAdventure={this.updateAdventure.bind(this)}
               updateTeleportLoations={this.updateTeleportLoations.bind(this)}
               openTeleportDetails={this.openTeleportDetails.bind(this)}

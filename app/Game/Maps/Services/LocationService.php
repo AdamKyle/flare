@@ -89,7 +89,7 @@ class LocationService {
             'map_url'                => Storage::disk('maps')->url($character->map_url),
             'character_map'          => $character->map,
             'character_id'           => $character->id,
-            'locations'              => Location::with('adventures', 'questRewardItem')->get(),
+            'locations'              => Location::with('adventures', 'questRewardItem')->where('game_map_id', $character->map->game_map_id)->get(),
             'can_move'               => $character->can_move,
             'timeout'                => $character->can_move_again_at,
             'port_details'           => $this->portDetails,
@@ -119,6 +119,7 @@ class LocationService {
     protected function processLocation(Character $character): void {
         $this->location = Location::where('x', $character->x_position)
                                   ->where('y', $character->y_position)
+                                  ->where('game_map_id', $character->map->game_map_id)
                                   ->first();
 
         if (!is_null($this->location)) {

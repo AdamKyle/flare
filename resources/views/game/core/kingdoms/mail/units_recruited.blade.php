@@ -16,14 +16,15 @@
 
         <mj-table>
             <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
-              <th style="padding: 0 15px 0 0;color:#ffffff;">Kingdom Name</th>
-              <th style="padding: 0 0 0 15px;color:#ffffff;">X Position</th>
-              <th style="padding: 0 0 0 15px;color:#ffffff;">Y Position</th>
+                <th style="padding: 0 15px 0 0;color:#ffffff;">Kingdom Name</th>
+                <th style="padding: 0 0 0 15px;color:#ffffff;">X Position</th>
+                <th style="padding: 0 0 0 15px;color:#ffffff;">Y Position</th>
             </tr>
             <tr>
                 <td style="padding: 0 15px 0 0;color:#ffffff;">{{$kingdom->name}}</td>
                 <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom->x_position}}</td>
                 <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom->y_position}}</td>
+                <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom->gameMap->name}}</td>
             </tr>
         </mj-table>
 

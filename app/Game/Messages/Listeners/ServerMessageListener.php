@@ -16,7 +16,7 @@ class ServerMessageListener
 
     /**
      * Constructor
-     * 
+     *
      * @param ServerMessage $serverMessage
      * @return void
      */
@@ -54,42 +54,32 @@ class ServerMessageListener
                 $message = 'You crafted a: ' . $event->forMessage . '!';
 
                 return broadcast(new ServerMessage($event->user, $message));
-            case 'enchanted':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'enchantment_failed':
+            case 'silenced':
+            case 'deleted_affix':
+            case 'deleted_item':
+            case 'building-repair-finished':
+            case 'building-upgrade-finished':
+            case 'adventure':
+            case 'sold_item':
+            case 'new-building':
+            case 'kingdom-resources-update':
+            case 'unit-recruitment-finished':
+            case 'plane-transfer':
+            case 'enchanted':
                 return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'failed_to_craft':
                 $message = 'You failed to craft the item! You lost the investment.';
 
                 return broadcast(new ServerMessage($event->user, $message));
-            case 'adventure':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'building-upgrade-finished':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'building-repair-finished':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'deleted_item':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'deleted_affix':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'silenced':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
             case 'new-skill':
-                $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $event->forMessage; 
-                
+                $message = 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $event->forMessage;
+
                 return broadcast(new ServerMessage($event->user, $message));
             case 'new-damage-stat':
-                $message = 'The Creator has changed your classes damage stat to: ' . $event->forMessage . '. Please adjust your gear accordingly for maximum damage.'; 
-                
+                $message = 'The Creator has changed your classes damage stat to: ' . $event->forMessage . '. Please adjust your gear accordingly for maximum damage.';
+
                 return broadcast(new ServerMessage($event->user, $message));
-            case 'sold_item':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'new-building':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'kingdom-resources-update':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
-            case 'unit-recruitment-finished':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
             default:
                 return broadcast(new ServerMessage($event->user, $this->serverMessage->build($event->type)));
         }

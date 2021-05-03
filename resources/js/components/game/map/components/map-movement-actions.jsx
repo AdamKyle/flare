@@ -6,6 +6,7 @@ export default class MapMovementActions extends React.Component {
 
   constructor(props) {
     super(props);
+
   }
 
   move(e) {
@@ -49,7 +50,9 @@ export default class MapMovementActions extends React.Component {
           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west"
                   disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>West
           </button>
-
+          <button type="button" className="float-left btn btn-primary btn-sm mr-2 " data-direction="traverse"
+                  disabled={this.props.disableMapButtons()} onClick={this.props.openTraverse}>Traverse
+          </button>
           <TimeOutBar
             eventClass={'Game.Maps.Events.ShowTimeOutEvent'}
             channel={'show-timeout-move-' + this.props.userId}

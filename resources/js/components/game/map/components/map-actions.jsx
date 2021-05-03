@@ -16,6 +16,7 @@ export default class MapActions extends React.Component {
   }
 
   render() {
+    console.log(this.props.adventures, this.props.currentPort)
     return (
       <div className="character-position mt-2">
         <div className="mb-2 mt-2 clearfix">

@@ -75,6 +75,7 @@ class UpdateKingdom extends Command
                 'name'       => $kingdom->name,
                 'x_position' => $kingdom->x_position,
                 'y_position' => $kingdom->y_position,
+                'plane'      => $kingdom->gameMap->name,
             ];
         }
 

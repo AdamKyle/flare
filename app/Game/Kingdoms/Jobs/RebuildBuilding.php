@@ -93,13 +93,17 @@ class RebuildBuilding implements ShouldQueue
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $x       = $kingdom->x_position;
             $y       = $kingdom->y_position;
+            $plane   = $kingdom->gameMap->name;
 
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($this->user, $kingdom));
 
-            event(new ServerMessageEvent($this->user, 'building-repair-finished', $this->building->name . ' finished being rebuilt for kingdom: ' . $this->building->kingdom->name . '  (X/Y: '.$x.'/'.$y.').'));
+            $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
+                $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
+
+            event(new ServerMessageEvent($this->user, 'building-repair-finished', ));
         } else if ($this->user->rebuilt_building_email) {
             Mail::to($this->user)->send(new RebuiltBuilding(
                 $this->user,

@@ -19,11 +19,13 @@
               <th style="padding: 0 15px 0 0;color:#ffffff;">Kingdom Name</th>
               <th style="padding: 0 0 0 15px;color:#ffffff;">X Position</th>
               <th style="padding: 0 0 0 15px;color:#ffffff;">Y Position</th>
+                <th style="padding: 0 0 0 15px;color:#ffffff;">Plane</th>
             </tr>
             <tr>
                 <td style="padding: 0 15px 0 0;color:#ffffff;">{{$building->kingdom->name}}</td>
                 <td style="padding: 0 0 0 15px;color:#ffffff;">{{$building->kingdom->x_position}}</td>
                 <td style="padding: 0 0 0 15px;color:#ffffff;">{{$building->kingdom->y_position}}</td>
+                <td style="padding: 0 0 0 15px;color:#ffffff;">{{$building->kingdom->gameMap->name}}</td>
             </tr>
         </mj-table>
 

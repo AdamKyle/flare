@@ -123,6 +123,7 @@ class UpgradeBuilding implements ShouldQueue
 
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
+            $plane   = $kingdom->gameMap->name;
             $kingdom = new Item($kingdom, $kingdomTransformer);
             $kingdom = $manager->createData($kingdom)->toArray();
 
@@ -131,7 +132,13 @@ class UpgradeBuilding implements ShouldQueue
             $x = $this->building->kingdom->x_position;
             $y = $this->building->kingdom->y_position;
 
-            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $this->building->name . ' finished upgrading for kingdom: ' . $this->building->kingdom->name . ' (X/Y: '.$x.'/'.$y.') and is now level: ' . $level));
+            $character = $this->user->character;
+
+            $message = $this->building->name . ' finished upgrading for kingdom: ' .
+                $this->building->kingdom->name . 'on plane: ' . $plane .
+                ' At (X/Y) '.$x.'/'.$y.' and is now level: ' . $level;
+
+            event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));
         } else if ($this->user->upgraded_building_email) {
             Mail::to($this->user)->send(new UpgradedBuilding(
                 $this->user,

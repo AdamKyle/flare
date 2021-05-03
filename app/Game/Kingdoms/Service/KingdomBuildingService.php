@@ -145,7 +145,7 @@ class KingdomBuildingService {
         $this->totalResources = 1 - $this->completed;
     }
 
-    protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building) {
+    protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $this->totalResources),
             'current_clay'       => $kingdom->current_clay + ($building->clay_cost * $this->totalResources),

@@ -112,6 +112,7 @@ class RecruitUnits implements ShouldQueue
         $x       = $kingdom->x_position;
         $y       = $kingdom->y_position;
         $user    = $kingdom->character->user;
+        $plane   = $kingdom->gameMap->name;
 
         if (UserOnlineValue::isOnline($user)) {
             $kingdom = new Item($kingdom, $kingdomTransformer);
@@ -119,7 +120,12 @@ class RecruitUnits implements ShouldQueue
 
             event(new UpdateKingdom($user, $kingdom));
 
-            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $this->unit->name . ' finished recruiting for kingdom: ' . $this->kingdom->name . ' (X/Y: '.$x.'/'.$y.') you have a total of: ' . $amount));
+            $message = $this->unit->name . ' finished recruiting for kingdom: ' .
+                $this->kingdom->name . ' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
+                '. You have a total of: ' . $amount;
+
+
+            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));
         } else {
             Mail::to($user)->send(new RecruitedUnits(
                 $user,

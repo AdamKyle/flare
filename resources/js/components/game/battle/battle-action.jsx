@@ -1,12 +1,8 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import Monster from './monster/monster';
-import Attack from './attack/attack';
 import TimeOutBar from '../timeout/timeout-bar';
-import {getServerMessage} from '../helpers/server_message';
-import CraftingAction from '../crafting/crafting-action';
-import EnchantingAction from '../enchanting/enchanting-action';
-import moment from 'moment';
+import {isEqual} from 'lodash';
 
 export default class BattleAction extends React.Component {
 
@@ -76,8 +72,6 @@ export default class BattleAction extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('componentDidUpdate');
-    console.log(prevProps, this.props);
     if (this.props.isDead !== prevProps.isDead) {
       let character = _.cloneDeep(this.state.character);
       character.is_dead = this.props.isDead;
@@ -85,6 +79,12 @@ export default class BattleAction extends React.Component {
       this.setState({
         character: character,
       });
+    }
+
+    if (!isEqual(this.props.monsters, prevProps.monsters)) {
+      this.setState({
+        monsters: this.props.monsters,
+      })
     }
   }
 
