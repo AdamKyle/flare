@@ -17,7 +17,7 @@ class MovementServiceTest extends TestCase {
     use RefreshDatabase, CreateItem, CreateLocation;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
@@ -61,7 +61,7 @@ class MovementServiceTest extends TestCase {
 
         $character = $character->refresh();
 
-        $movementService->processArea($this->character->getCharacter());
+        $movementService->processArea($character);
 
         $data = $movementService->kingdomDetails();
 

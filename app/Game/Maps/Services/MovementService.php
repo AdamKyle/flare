@@ -145,7 +145,7 @@ class MovementService {
                           ->where('y_position', $character->y_position)
                           ->where('game_map_id', $character->map->game_map_id)
                           ->first();
-
+        dump($character->x_position, $character->y_position, $character->map->game_map_id);
         $canAttack       = false;
         $canSettle       = false;
         $canManage       = false;

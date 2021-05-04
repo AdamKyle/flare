@@ -57,7 +57,7 @@ class MapControllerApiTest extends TestCase
 
     public function testGetMapWithKingdomCache() {
 
-        Cache::put('character-kingdoms-' . $this->character->getCharacter()->id, [['sample']]);
+        Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter()->id, [['sample']]);
 
         $user = $this->character->getUser();
 
@@ -66,7 +66,7 @@ class MapControllerApiTest extends TestCase
                          ->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
         $this->assertEquals(1, count($content->my_kingdoms));
         $this->assertEquals(16, $content->character_map->position_x);
@@ -80,6 +80,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 16,
             'y'           => 16,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $user = $this->character->getUser();
@@ -87,10 +88,10 @@ class MapControllerApiTest extends TestCase
         $response = $this->actingAs($user, 'api')
             ->json('GET', '/api/map/' . $user->id)
             ->response;
-        
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(200, $response->status()); 
+        $this->assertEquals(200, $response->status());
 
         $this->assertNotNull($content->port_details);
     }
@@ -100,10 +101,10 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -120,7 +121,7 @@ class MapControllerApiTest extends TestCase
                          ->response;
 
         $this->assertEquals(200, $response->status());
-        
+
         $character = $this->character->getCharacter();
 
         $this->assertEquals(0, $character->map->position_x);
@@ -133,10 +134,10 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -146,6 +147,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $adventure = $this->createNewAdventure();
@@ -177,10 +179,10 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -190,6 +192,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $item = $location->questRewardItem()->create([
@@ -240,10 +243,10 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -288,7 +291,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals($location->x, $character->map->character_position_x);
         $this->assertEquals($location->y, $character->map->character_position_y);
-        
+
         // Did not gain the item again:
         $this->assertEquals(1, $character->inventory->slots->count());
     }
@@ -304,12 +307,13 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -337,10 +341,10 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -367,10 +371,10 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->andReturn(true);
 
@@ -402,10 +406,10 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
@@ -429,10 +433,10 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->updateCharacter(['gold' => 0])->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -456,10 +460,10 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -491,10 +495,10 @@ class MapControllerApiTest extends TestCase
                                      ->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->andReturn(true);
 
@@ -526,10 +530,10 @@ class MapControllerApiTest extends TestCase
                                      ->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
@@ -564,10 +568,10 @@ class MapControllerApiTest extends TestCase
                 'cost'            => 3000,
             ])
             ->response;
-        
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(422, $response->status()); 
+        $this->assertEquals(422, $response->status());
         $this->assertEquals('Invalid port to set sail from.', $content->message);
     }
 
@@ -598,10 +602,10 @@ class MapControllerApiTest extends TestCase
                 'cost'            => 3000,
             ])
             ->response;
-        
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(422, $response->status()); 
+        $this->assertEquals(422, $response->status());
         $this->assertEquals('You don\'t have the gold', $content->message);
     }
 
@@ -620,10 +624,10 @@ class MapControllerApiTest extends TestCase
         $response = $this->actingAs($user, 'api')
             ->json('POST', '/api/map/set-sail/1/' . $character->id, [])
             ->response;
-        
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(422, $response->status()); 
+        $this->assertEquals(422, $response->status());
 
         $this->assertEquals('Current Port Is required.', $content->errors->current_port_id[0]);
         $this->assertEquals('Cost is required.', $content->errors->cost[0]);
@@ -637,6 +641,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $this->createLocation([
@@ -645,6 +650,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $character = $this->character->getCharacter();
@@ -657,10 +663,10 @@ class MapControllerApiTest extends TestCase
                 'cost'            => 0,
             ])
             ->response;
-        
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(422, $response->status()); 
+        $this->assertEquals(422, $response->status());
 
         $this->assertEquals('The port you are trying to go doesn\'t exist.', $content->message);
     }
@@ -672,6 +678,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $this->createLocation([
@@ -680,6 +687,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
@@ -692,10 +700,10 @@ class MapControllerApiTest extends TestCase
                 'cost'            => 100,
             ])
             ->response;
-        
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(200, $response->status()); 
+        $this->assertEquals(200, $response->status());
 
         $this->assertEquals(64, $content->character_position_details->character_position_x);
         $this->assertEquals(64, $content->character_position_details->character_position_y);
@@ -713,6 +721,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $location = $this->createLocation([
@@ -721,6 +730,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $item = $location->questRewardItem()->create([
@@ -745,12 +755,12 @@ class MapControllerApiTest extends TestCase
             ])
             ->response;
 
-        $this->assertEquals(200, $response->status()); 
+        $this->assertEquals(200, $response->status());
 
         $character = $this->character->getCharacter();
 
         $slots = $character->inventory->slots;
-        
+
         // Gained the item:
         $this->assertTrue($slots->isNotEmpty());
 
@@ -769,6 +779,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $location = $this->createLocation([
@@ -777,6 +788,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $item = $location->questRewardItem()->create([
@@ -793,10 +805,10 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -809,12 +821,12 @@ class MapControllerApiTest extends TestCase
             ])
             ->response;
 
-        $this->assertEquals(200, $response->status()); 
+        $this->assertEquals(200, $response->status());
 
         $character = $this->character->getCharacter();
 
         $slots = $character->inventory->slots;
-        
+
         // Gained the item:
         $this->assertTrue($slots->isNotEmpty());
 
@@ -833,6 +845,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $location = $this->createLocation([
@@ -841,6 +854,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $item = $location->questRewardItem()->create([
@@ -867,8 +881,8 @@ class MapControllerApiTest extends TestCase
             ])
             ->response;
 
-        $this->assertEquals(200, $response->status()); 
-        
+        $this->assertEquals(200, $response->status());
+
         // Did not gain the item again:
         $this->assertEquals(1, $this->character->getCharacter()->inventory->slots->count());
     }
@@ -880,6 +894,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 64,
             'y'           => 64,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $location = $this->createLocation([
@@ -888,6 +903,7 @@ class MapControllerApiTest extends TestCase
             'is_port'     => true,
             'x'           => 32,
             'y'           => 32,
+            'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
         $item = $location->questRewardItem()->create([
@@ -906,10 +922,10 @@ class MapControllerApiTest extends TestCase
         ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter();
         $user      = $this->character->getUser();
 
-        $water = Mockery::mock(MapTileValue::class);
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
-        
+
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
@@ -922,8 +938,8 @@ class MapControllerApiTest extends TestCase
             ])
             ->response;
 
-        $this->assertEquals(200, $response->status()); 
-        
+        $this->assertEquals(200, $response->status());
+
         // Did not gain the item again:
         $this->assertEquals(1, $this->character->getCharacter()->inventory->slots->count());
     }

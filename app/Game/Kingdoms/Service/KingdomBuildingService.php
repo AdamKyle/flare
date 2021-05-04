@@ -142,7 +142,11 @@ class KingdomBuildingService {
 
         $this->completed      = (($current - $start) / ($end - $start));
 
-        $this->totalResources = 1 - $this->completed;
+        if ($this->completed === 0) {
+            $this->totalResources = 0;
+        } else {
+            $this->totalResources = 1 - $this->completed;
+        }
     }
 
     protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {

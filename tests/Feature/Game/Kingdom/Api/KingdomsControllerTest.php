@@ -65,17 +65,18 @@ class KingdomsControllerTest extends TestCase
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
-            'x_position' => 16,
-            'y_position' => 16,
-            'name'       => 'Apple Sauce',
-            'color'      => [193, 66, 66, 1],
+            'x_position'     => 16,
+            'y_position'     => 16,
+            'name'           => 'Apple Sauce',
+            'color'          => [193, 66, 66, 1],
+            'kingdom_amount' => 0
         ])->response;
 
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue(empty($content));
-        $this->assertTrue(Cache::has('character-kingdoms-' . $this->character->getCharacter()->id));
+        $this->assertTrue(Cache::has('character-kingdoms-Sample-' . $this->character->getCharacter()->id));
 
         $this->assertTrue(
             $this->character->getCharacter()->kingdoms->first()->buildings->isNotEmpty()
@@ -83,24 +84,25 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testSettleKingdomWithCache() {
-        Cache::put('character-kingdoms-' . $this->character->getCharacter()->id, [['sample data']]);
+        Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter()->id, [['sample data']]);
 
         $this->createGameBuilding();
 
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
-            'x_position' => 16,
-            'y_position' => 16,
-            'name'       => 'Apple Sauce',
-            'color'      => [193, 66, 66, 1],
+            'x_position'     => 16,
+            'y_position'     => 16,
+            'name'           => 'Apple Sauce',
+            'color'          => [193, 66, 66, 1],
+            'kingdom_amount' => 0,
         ])->response;
 
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue(empty($content));
-        $this->assertEquals(2, count(Cache::get('character-kingdoms-' . $this->character->getCharacter()->id)));
+        $this->assertEquals(2, count(Cache::get('character-kingdoms-Sample-' . $this->character->getCharacter()->id)));
 
         $this->assertTrue(
             $this->character->getCharacter()->kingdoms->first()->buildings->isNotEmpty()
@@ -130,15 +132,16 @@ class KingdomsControllerTest extends TestCase
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
-            'x_position' => 16,
-            'y_position' => 16,
-            'name'       => 'Apple Sauce',
-            'color'      => [193, 66, 66, 1],
+            'x_position'     => 16,
+            'y_position'     => 16,
+            'name'           => 'Apple Sauce',
+            'color'          => [193, 66, 66, 1],
+            'kingdom_amount' => 0,
         ])->response;
 
         $content = json_decode($response->content());
 
-        $this->assertEquals(422, $response->status());
+        $this->assertEquals(200, $response->status());
         $this->assertEquals('Cannot settle here.', $content->message);
     }
 
@@ -157,15 +160,16 @@ class KingdomsControllerTest extends TestCase
         $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
-            'x_position' => 16,
-            'y_position' => 16,
-            'name'       => 'Apple Sauce',
-            'color'      => [193, 66, 66, 1],
+            'x_position'      => 16,
+            'y_position'      => 16,
+            'name'            => 'Apple Sauce',
+            'color'           => [193, 66, 66, 1],
+            'kingdom_amount' => 0
         ])->response;
 
         $content = json_decode($response->content());
 
-        $this->assertEquals(422, $response->status());
+        $this->assertEquals(200, $response->status());
         $this->assertEquals('Cannot settle here.', $content->message);
     }
 
