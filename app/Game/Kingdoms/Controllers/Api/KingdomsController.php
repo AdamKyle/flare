@@ -49,7 +49,7 @@ class KingdomsController extends Controller {
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {
         $kingdomService->setParams($request->all(), $character);
 
-        if (!$kingdomService->canSettle($request->x_position, $request->y_position)) {
+        if (!$kingdomService->canSettle($request->x_position, $request->y_position, $character)) {
             return response()->json([
                 'message' => 'Cannot settle here.'
             ], 200);

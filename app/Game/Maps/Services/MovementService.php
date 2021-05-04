@@ -94,7 +94,7 @@ class MovementService {
         $mapTileColor = $this->mapTile->getTileColor($character, $xPosition, $yPosition);
 
         if ($this->mapTile->isWaterTile((int) $mapTileColor)) {
-            if ($this->canWalkOnwater($character, $xPosition, $yPosition)) {
+            if ($this->mapTile->canWalkOnWater($character, $xPosition, $yPosition)) {
                 return $this->moveCharacter($character, $params);
             } else {
                 return $this->errorResult('cannot walk on water.');
@@ -230,7 +230,7 @@ class MovementService {
      * @return array
      */
     public function teleport(Character $character, int $x, int $y, int $cost, int $timeout): array {
-        $canTeleport = $this->canWalkOnwater($character, $x, $y);
+        $canTeleport = $this->mapTile->canWalkOnWater($character, $x, $y);
 
         if (!$canTeleport) {
             $item = Item::where('effect', 'walk-on-water')->first();
@@ -430,25 +430,5 @@ class MovementService {
         event(new UpdateTopBarEvent($character));
     }
 
-    /**
-     * Can we teleport to water based locations?
-     *
-     * @param Character $character
-     * @param int $x
-     * @param int $y
-     */
-    protected function canWalkOnwater(Character $character, int $x, int $y): bool {
-        $color = $this->mapTile->getTileColor($character, $x, $y);
 
-        if ($this->mapTile->isWaterTile((int) $color)) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
-                return $slot->item->effect === 'walk-on-water';
-            })->isNotEmpty();
-
-            return $hasItem;
-        }
-
-        // We are not water
-        return true;
-    }
 }

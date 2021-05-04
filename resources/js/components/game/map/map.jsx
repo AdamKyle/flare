@@ -136,18 +136,20 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
-
+      console.log(event);
       this.updatePlayerPosition(event.map);
 
       let myKingdoms = this.fetchKingdoms(event);
 
       this.setState({
-        currentPort: event.portDetails.current_port,
-        portList: event.portDetails.port_list,
+        currentPort: event.portDetails.hasOwnProperty('current_port') ? event.portDetails.current_port : null,
+        portList: event.portDetails.hasOwnProperty('port_list') ? event.portDetails.port_list : [],
         adventures: event.adventureDetails,
         kingdoms: myKingdoms,
       }, () => {
         this.props.updateAdventure(event.adventureDetails, [], null);
+
+        this.props.updateTeleportLoations(this.state.teleportLocations, event.map.character_position_x, event.map.character_position_y);
 
         this.props.updatePort({
           currentPort: event.portDetails.hasOwnProperty('current_port') ? event.portDetails.current_port : null,
@@ -189,8 +191,9 @@ export default class Map extends React.Component {
     });
 
     this.updateMapPlane.listen('Game.Maps.Events.UpdateMapBroadcast', (event) => {
-      const myKingdoms = event.mapDetails.my_kingdoms;
       console.log(event);
+      const myKingdoms = event.mapDetails.my_kingdoms;
+
       this.setState({
         mapUrl: event.mapDetails.map_url,
         locations: event.mapDetails.locations,
@@ -198,6 +201,14 @@ export default class Map extends React.Component {
         portList: event.mapDetails.port_details,
         adventures: event.mapDetails.adventure_details,
         currentPort: event.mapDetails.port_details !== null ? event.mapDetails.port_details.current_port : null,
+        controlledPosition: {
+          x: getNewXPosition(event.mapDetails.character_map.character_position_x, event.mapDetails.character_map.position_x),
+          y: getNewYPosition(event.mapDetails.character_map.character_position_y, event.mapDetails.character_map.position_y),
+        },
+        characterPosition: {
+          x: event.mapDetails.character_map.character_position_x,
+          y: event.mapDetails.character_map.character_position_y,
+        },
       }, () => {
         this.props.updateKingdoms({
           my_kingdoms: myKingdoms,
@@ -234,7 +245,9 @@ export default class Map extends React.Component {
 
   fetchKingdoms(event) {
     if (event.hasOwnProperty('updatedKingdoms')) {
-      return event.updatedKingdoms;
+      if (event.updatedKingdoms.hasOwnProperty('kingdom_details')) {
+        return event.updatedKingdoms.kingdom_details;
+      }
     }
 
     return this.state.kingdoms;

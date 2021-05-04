@@ -71,8 +71,6 @@ export default class KingdomModal extends React.Component {
       this.setState({
         errorMessage: error.response.data.message
       });
-
-      console.log(error.response);
     });
   }
 

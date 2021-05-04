@@ -39,10 +39,10 @@
                         <!-- toggle and nav items -->
                         <!-- ============================================================== -->
                         <ul class="navbar-nav mr-auto mt-md-0 info-sidebar-toggler">
-                          <li class="nav-item"> 
+                          <li class="nav-item">
                               <a class="nav-link infoSidebarToggler text-muted" href="javascript:void(0)" onclick="showSideBar()">
                                   <i class="fas fa-bars"></i>
-                              </a> 
+                              </a>
                           </li>
                         </ul>
                         <!-- ============================================================== -->
@@ -87,7 +87,7 @@
               <!-- End Sidebar scroll-->
               <!-- Bottom points-->
               <div class="sidebar-footer">
-                  
+
               </div>
               <!-- End Bottom points-->
           </aside>
@@ -116,9 +116,9 @@
         }
 
         var lightbox = GLightbox();
-        
+
         lightbox.on('open', (target) => {
-            console.log("lightbox opened");
+            // do nothing ...
         });
     </script>
 

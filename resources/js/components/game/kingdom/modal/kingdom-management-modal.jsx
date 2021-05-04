@@ -154,6 +154,11 @@ export default class KingdomManagementModal extends React.Component {
     });
   }
 
+  adjust(color, amount) {
+    return '#' + color.replace(/^#/, '').replace(/../g, color =>
+      ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+  }
+
   render() {
     if (this.state.isLoading) {
       return (
@@ -173,7 +178,7 @@ export default class KingdomManagementModal extends React.Component {
         aria-labelledby="kingdom-management-modal"
         backdrop="static"
       >
-        <Modal.Header closeButton style={{backgroundColor: this.state.kingdom.color}}>
+        <Modal.Header closeButton style={{backgroundColor: this.adjust(this.state.kingdom.color, -40)}}>
           <Modal.Title id="kingdom-management-modal" style={{color: '#fff'}}>
             {this.state.kingdom.name} <i className="fas fa-edit cursor" onClick={this.showEditKingdomNameModal.bind(this)}></i>
           </Modal.Title>

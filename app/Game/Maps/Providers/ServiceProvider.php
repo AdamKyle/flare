@@ -45,7 +45,8 @@ class ServiceProvider extends ApplicationServiceProvider
                $app->make(Manager::class),
                $app->make(CharacterAttackTransformer::class),
                $app->make(MonsterTransfromer::class),
-               $app->make(LocationService::class)
+               $app->make(LocationService::class),
+               $app->make(MapTileValue::class)
            );
         });
 

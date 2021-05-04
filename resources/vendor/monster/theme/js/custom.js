@@ -19,7 +19,6 @@ $(function () {
     $('#sidebarnav li a').on('click', function() {
         const foundElement = $(this).parent().find('ul');
 
-        console.log(foundElement);
         if (foundElement.hasClass('collapse')) {
             foundElement.attr('aria-expanded', true);
             foundElement.removeClass('collapse');

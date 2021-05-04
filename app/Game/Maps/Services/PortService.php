@@ -27,7 +27,7 @@ class PortService {
 
     /**
      * Constructor
-     * 
+     *
      * @param DistanceCalculation $distanceCalculation
      * @param MapPositionValue $mapPositionValue
      * @return void
@@ -39,7 +39,7 @@ class PortService {
 
     /**
      * Get the port details
-     * 
+     *
      * @param Character $character
      * @param Location $location
      * @return array
@@ -55,15 +55,15 @@ class PortService {
 
     /**
      * Does the port match?
-     * 
+     *
      * First we need the other ports that don't match the current one.
-     * 
+     *
      * next we ned to filter out the ports till we find the one that matches by id, based on
      * where you are going to.
-     * 
+     *
      * Next we return a boolean based on if the timeout and the cost matches
      * that of where you are going.
-     * 
+     *
      * @param Character $character
      * @param Location $from
      * @param Location $to
@@ -83,7 +83,7 @@ class PortService {
 
     /**
      * Set sail
-     * 
+     *
      * @param Character $character
      * @param Location $newPort
      * @return Character
@@ -100,12 +100,12 @@ class PortService {
     }
 
     protected function fetchOtherPorts(Character $character, Location $location): Collection {
-        $locations = Location::where('id', '!=', $location->id)->where('is_port', true)->get();
+        $locations = Location::where('id', '!=', $location->id)->where('is_port', true)->where('game_map_id', $character->map->game_map_id)->get();
 
         $locationData = $locations->transform(function($portLocation) use($character, $location) {
             $distance = $this->distanceCalculator->calculatePixel($portLocation->x, $portLocation->y, $location->x, $location->y);
             $time     = $this->distanceCalculator->calculateMinutes($distance);
-            $cost     = ($time * 100); 
+            $cost     = ($time * 100);
 
             $portLocation->distance   = $distance;
             $portLocation->time       = $time;

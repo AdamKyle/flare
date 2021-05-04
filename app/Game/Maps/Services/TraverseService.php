@@ -3,9 +3,11 @@
 namespace App\Game\Maps\Services;
 
 use App\Game\Maps\Events\MoveTimeOutEvent;
+use App\Game\Maps\Values\MapTileValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
+use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Flare\Events\ServerMessageEvent;
@@ -39,6 +41,11 @@ class TraverseService {
     private $locationService;
 
     /**
+     * @var MapTileValue $mapTileValue
+     */
+    private $mapTileValue;
+
+    /**
      * TraverseService constructor.
      *
      * @param Manager $manager
@@ -50,12 +57,14 @@ class TraverseService {
         Manager $manager,
         CharacterAttackTransformer $characterAttackTransformer,
         MonsterTransfromer $monsterTransformer,
-        LocationService $locationService
+        LocationService $locationService,
+        MapTileValue $mapTileValue
     ) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
         $this->monsterTransformer         = $monsterTransformer;
         $this->locationService            = $locationService;
+        $this->mapTileValue               = $mapTileValue;
     }
 
     /**
@@ -96,6 +105,24 @@ class TraverseService {
 
         $character = $character->refresh();
 
+        $xPosition = $character->map->character_position_x;
+        $yPosition = $character->map->character_position_y;
+
+        $cache = CoordinatesCache::getFromCache();
+
+        $character = $this->changeLocation($character, $cache);
+
+        $newXPosition = $character->map->character_position_x;
+        $newYPosition = $character->map->character_position_y;
+
+        if ($newXPosition !== $xPosition && $newYPosition !== $yPosition) {
+            $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
+
+            if ($this->mapTileValue->isWaterTile($color)) {
+                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you can\'t walk on water.'));
+            }
+        }
+
         $this->updateMap($character);
         $this->updateActions($mapId, $character);
         $this->updateCharacterTimeOut($character);
@@ -103,6 +130,24 @@ class TraverseService {
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
         event(new ServerMessageEvent($character->user, 'plane-transfer', $message));
+    }
+
+    protected function changeLocation(Character $character, array $cache) {
+
+        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y)) {
+
+            $x = $cache['x'];
+            $y = $cache['y'];
+
+            $character->map()->update([
+                'character_position_x' => $x[rand(0, count($x) - 1)],
+                'character_position_y' => $y[rand(0, count($y) - 1)],
+            ]);
+
+            return $this->changeLocation($character->refresh(), $cache);
+        }
+
+        return $character->refresh();
     }
 
     /**

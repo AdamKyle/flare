@@ -114,8 +114,6 @@ export default class Teleport extends React.Component {
       this.setState({
         errorMessage: error.response.data.message
       });
-
-      console.log(error.response);
     });
   }
 

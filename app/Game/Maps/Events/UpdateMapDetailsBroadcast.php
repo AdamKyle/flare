@@ -37,6 +37,9 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public $kingdomDetails = [];
 
+    /**
+     * @var array $updatedKingdoms
+     */
     public $updatedKingdoms = [];
 
     /**
@@ -50,19 +53,16 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      *
      * @param Map $map
      * @param User $user
-     * @param array $portDetails
-     * @param array $adventureDetails
-     * @return void
+     * @param MovementService $service
+     * @param bool $updateKingdoms
      */
     public function __construct(Map $map, User $user, MovementService $service, bool $updateKingdoms = false)
     {
-
         if ($updateKingdoms) {
             $service->processArea($user->character);
 
-            $this->updatedKingdoms = $this->getKingdoms($user->character);
+            $this->updatedKingdoms['kingdom_details'] = $this->getKingdoms($user->character);
         }
-
 
         $this->map              = $map;
         $this->user             = $user;

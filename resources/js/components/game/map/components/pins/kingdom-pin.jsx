@@ -30,7 +30,6 @@ export default class KingdomPin extends React.Component {
   }
 
   renderKingdoms() {
-    //console.log(this.props.kingdoms);
     return this.props.kingdoms.map((kingdom) => {
       let style = {
         top: kingdom.y_position,

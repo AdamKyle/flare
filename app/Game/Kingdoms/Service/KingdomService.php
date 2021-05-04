@@ -70,18 +70,17 @@ class KingdomService {
      *
      * @param int $x
      * @param int $y
+     * @param Character $character
      * @return bool
      */
-    public function canSettle(int $x, int $y): bool {
-        $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->first();
-
-
+    public function canSettle(int $x, int $y, Character $character): bool {
+        $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {
             return false;
         }
 
-        $location = Location::where('x', $x)->where('y', $y)->first();
+        $location = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($location)) {
             return false;
