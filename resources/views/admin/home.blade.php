@@ -16,6 +16,11 @@
             </div>
         </div>
     </div>
+    <div class="row mb-3">
+        <div class="col-xl-12">
+            <div id="admin-chat-messages" data-user="{{auth()->user()->id}}"></div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-xl-12">
             <div id="admin-chat"></div>
@@ -23,3 +28,13 @@
     </div>
 </div>
 @endsection
+
+@push('head')
+    <script src={{asset('js/admin-chat-messages.js')}} type="text/javascript"></script>
+@endpush
+
+@push('scripts')
+    <script>
+        renderChatMessages('admin-chat-messages');
+    </script>
+@endpush

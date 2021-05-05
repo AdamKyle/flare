@@ -2,6 +2,7 @@
 
 namespace App\Flare\Jobs;
 
+use App\Admin\Events\UpdateAdminChatEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,5 +46,9 @@ class UpdateSilencedUserJob implements ShouldQueue
         $forMessage = 'You are now able to speak and private message again.';
 
         event(new ServerMessageEvent($this->user->refresh(), 'silenced', $forMessage));
+
+        $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+
+        broadcast(new UpdateAdminChatEvent($adminUser));
     }
 }

@@ -165,7 +165,10 @@ export default class KingdomUnitMovement extends React.Component {
     if (this.state.loading) {
       return (
         <Card>
-
+          <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+            <div className="progress-bar progress-bar-striped indeterminate">
+            </div>
+          </div>
         </Card>
       )
     }

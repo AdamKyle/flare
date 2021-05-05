@@ -6,6 +6,7 @@ use App\Flare\Models\ItemAffix;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 
@@ -13,12 +14,17 @@ class CharacterSheetControllerApiTest extends TestCase {
 
     use RefreshDatabase,
         CreateUser,
+        CreateRole,
         CreateItem;
 
     private $character;
 
     public function setUp(): void {
         parent::setUp();
+
+        $role = $this->createAdminRole();
+
+        $this->createAdmin([], $role);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->equipStartingEquipment()
@@ -139,7 +145,7 @@ class CharacterSheetControllerApiTest extends TestCase {
                          ])
                          ->response;
 
-        json_decode($response->content());
+        $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
         $this->assertEquals('Apples', $this->character->getCharacter()->name);

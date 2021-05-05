@@ -2,6 +2,7 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
+use App\Admin\Events\UpdateAdminChatEvent;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Messages\Events\MessageSentEvent;
@@ -74,6 +75,10 @@ class MessageController extends Controller {
 
         broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();
 
+        $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+
+        broadcast(new UpdateAdminChatEvent($adminUser));
+
         return response()->json([], 200);
     }
 
@@ -95,10 +100,17 @@ class MessageController extends Controller {
             ]);
 
             broadcast(new PrivateMessageEvent($user, $character->user, $request->message));
+
+            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+
+            broadcast(new UpdateAdminChatEvent($adminUser));
+
             return response()->json([], 200);
         }
 
         broadcast(new ServerMessageEvent($user, $this->serverMessage->build('no_matching_user')));
+
+
         return response()->json([], 200);
     }
 }

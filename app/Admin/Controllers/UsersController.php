@@ -52,20 +52,7 @@ class UsersController extends Controller {
             'silence_for' => 'required',
         ]);
 
-        $canSpeakAgainAt = now()->addMinutes((int) $request->silence_for);
-
-        $user->update([
-            'is_silenced' => true,
-            'can_speak_again_at' => $canSpeakAgainAt,
-        ]);
-
-        $user   = $user->refresh();
-
-        $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' ('.(int) $request->silence_for.' Minutes server time) Making accounts to get around this is a bannable offense.';
-        
-        event(new ServerMessageEvent($user, 'silenced', $message));
-
-        UpdateSilencedUserJob::dispatch($user)->delay($canSpeakAgainAt);
+        $this->userService->silence($user, (int) $request->silence_for);
 
         return redirect()->back()->with('success', $user->character->name . ' Has been silenced for: ' . (int) $request->silence_for . ' minutes');
     }
@@ -114,16 +101,16 @@ class UsersController extends Controller {
         ]);
 
         $user = $user->refresh();
-        
+
         $this->userService->sendUserMail($user, $unBanAt);
-        
+
         return redirect()->to(route('users.user', [
             'user' => $user->id
         ]))->with('success', 'User has been banned.');
     }
 
     public function unBanUser(Request $request, User $user) {
-        
+
         $user->update([
             'is_banned'      => false,
             'unbanned_at'    => null,
@@ -148,11 +135,7 @@ class UsersController extends Controller {
     }
 
     public function forceNameChange(Request $request, User $user) {
-        $user->character->update([
-            'force_name_change' => true
-        ]);
-
-        event(new ForceNameChangeEvent($user->character));
+        $this->userService->forceNameChange($user);
 
         return redirect()->back()->with('success', $user->character->name . ' forced to change their name.');
     }

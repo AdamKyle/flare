@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Models\User;
 use App\Http\Controllers\Controller;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
@@ -48,6 +50,10 @@ class CharacterSheetController extends Controller {
             'name'              => $request->name,
             'force_name_change' => false,
         ]);
+
+        $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+
+        broadcast(new UpdateAdminChatEvent($adminUser));
 
         return response()->json([], 200);
     }

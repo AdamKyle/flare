@@ -6,15 +6,21 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Traits\CreateRole;
+use Tests\Traits\CreateUser;
 
 class MessageControllerApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreateRole, CreateUser;
 
     private $character;
 
     public function setUp(): void {
         parent::setUp();
+
+        $role = $this->createAdminRole();
+
+        $this->createAdmin([], $role);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 

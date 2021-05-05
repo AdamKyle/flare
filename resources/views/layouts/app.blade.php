@@ -41,6 +41,8 @@
     <script src={{asset('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
+
+    @stack('head')
 </head>
 <body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">

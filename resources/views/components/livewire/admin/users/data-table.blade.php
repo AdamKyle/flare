@@ -92,24 +92,25 @@
                                     @if (!$user->is_banned)
 
                                         <x-forms.button-with-form
-                                            form-route="{{route('user.reset.password', ['user' => $user->id])}}"
-                                            form-id="{{'un-ban-user-' . $user->id}}"
-                                            button-title="Reset Password"
+                                            formRoute="{{route('user.reset.password', ['user' => $user->id])}}"
+                                            formId="{{'un-ban-user-' . $user->id}}"
+                                            buttonTitle="Reset Password"
                                             class="btn btn-primary btn-sm"
                                         />
 
                                         <x-forms.button-with-form
-                                            form-route="{{route('user.force.name.change', ['user' => $user->id])}}"
-                                            form-id="{{'force-name-change-' . $user->id}}"
-                                            button-title="Force Name Change"
+                                            formRoute="{{route('user.force.name.change', ['user' => $user->id])}}"
+                                            formId="{{'force-name-change-' . $user->id}}"
+                                            buttonTitle="Force Name Change"
                                             class="btn btn-primary btn-sm"
                                         />
 
                                         <x-forms.drop-downs.base
-                                            float-left={{true}}
-                                            btn-type="danger"
-                                            drop-down-id="silence-user"
-                                            drop-down-title="Silence"
+                                            floatLeft="true"
+                                            btnType="danger"
+                                            btnSize="btn-sm"
+                                            dropDownId="silence-user"
+                                            dropDownTitle="Silence"
                                         >
 
                                             <x-forms.button-with-form
@@ -142,10 +143,11 @@
                                         </x-forms.drop-downs.base>
 
                                         <x-forms.drop-downs.base
-                                            float-left={{true}}
-                                            btn-type="danger"
-                                            drop-down-id="ban-user"
-                                            drop-down-title="Ban"
+                                            floatLeft="true"
+                                            btnType="danger"
+                                            btnSize="btn-sm"
+                                            dropDownId="ban-user"
+                                            dropDownTitle="Ban"
                                         >
 
                                             <x-forms.button-with-form

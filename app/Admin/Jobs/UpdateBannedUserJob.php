@@ -34,7 +34,7 @@ class UpdateBannedUserJob implements ShouldQueue
 
     /**
      * Update the user from being banned to not banned.
-     * 
+     *
      * Email the user telling them they are unbanned.
      *
      * @return void
@@ -46,6 +46,6 @@ class UpdateBannedUserJob implements ShouldQueue
             'unbanned_at' => null,
         ]);
 
-        Mail::to($this->user->email)->send(new GenericMail($this->user, 'You are now unbanned and may log in again.', 'You have been unbanned'));
+        return Mail::to($this->user->email)->send(new GenericMail($this->user, 'You are now unbanned and may log in again.', 'You have been unbanned'));
     }
 }

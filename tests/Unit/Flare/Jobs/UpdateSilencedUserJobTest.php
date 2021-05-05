@@ -5,14 +5,20 @@ namespace Tests\Unit\Flare\Jobs;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use Tests\TestCase;
+use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class UpdateSilencedUserJobTest extends TestCase
 {
-    use RefreshDatabase, CreateUser;
+    use RefreshDatabase, CreateUser, CreateRole;
 
     public function testUpdateSilencedJob()
     {
+
+        $role = $this->createAdminRole();
+
+        $this->createAdmin([], $role);
+
         $user = $this->createUser(
             [
                 'is_silenced'            => true,
@@ -30,5 +36,5 @@ class UpdateSilencedUserJobTest extends TestCase
         $this->assertEquals(0, $user->message_throttle_count);
     }
 
-    
+
 }
