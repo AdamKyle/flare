@@ -2,11 +2,14 @@
 
 namespace App\Game\Messages\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\MessageFactory;
 use App\Flare\Models\User;
 
-class Message extends Model
-{
+class Message extends Model {
+
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -27,5 +30,9 @@ class Message extends Model
 
     public function toUser() {
         return $this->belongsTo(User::class, 'to_user', 'id');
+    }
+
+    protected static function newFactory() {
+        return MessageFactory::new();
     }
 }

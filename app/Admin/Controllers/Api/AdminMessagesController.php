@@ -11,7 +11,7 @@ use App\Admin\Services\UserService;
 use App\Game\Messages\Models\Message;
 use Facades\App\Admin\Formatters\MessagesFormatter;
 
-class MessagesController extends Controller {
+class AdminMessagesController extends Controller {
 
     /**
      * @var UserService $userService

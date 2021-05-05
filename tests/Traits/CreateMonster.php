@@ -15,13 +15,13 @@ trait CreateMonster {
 
     public function createMonster(array $options = []): Monster {
         if (empty($options) || !isset($options['game_map_id'])) {
-            
+
             $maps = GameMap::all();
 
             if ($maps->isEmpty()) {
                 $map = $this->createGameMap();
             } else {
-                $map = GameMap::first();
+                $map = $maps->first();
             }
 
             $options['game_map_id'] = $map->id;

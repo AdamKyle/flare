@@ -24,7 +24,7 @@ class SilenceUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'for'     => 'required|string',
+            'for'     => 'required|integer',
             'user_id' => 'required|integer|exists:users,id'
         ];
     }

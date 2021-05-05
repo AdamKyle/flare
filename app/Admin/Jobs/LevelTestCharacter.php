@@ -52,7 +52,7 @@ class LevelTestCharacter implements ShouldQueue
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function handle() {
@@ -65,7 +65,7 @@ class LevelTestCharacter implements ShouldQueue
             'character_id' => $this->character->id,
             'snap_shot'    => $this->character->getAttributes(),
         ]);
-        
+
         for ($i = 1; $i < $this->levelTo; $i++) {
             $characterService = new CharacterService;
 
@@ -98,7 +98,7 @@ class LevelTestCharacter implements ShouldQueue
             $message       = 'All test characters class attributes have been updated.';
             $title         = 'Test Character Class Attribute Update Complete.';
         }
-        
+
         if (!is_null($lastCharacter)) {
             if ($lastCharacter->id === $character->id && Cache::has('updating-test-characters')) {
                 Cache::delete('updating-test-characters');
