@@ -259,7 +259,7 @@ class BattleControllerApiTest extends TestCase
             UpdateTopBarBroadcastEvent::class,
         ]);
 
-        $character   = $this->character->updateSkill('Looting', ['level' => 1000])->getCharacter();
+        $character   = $this->character->updateSkill('Looting', ['level' => 10000000])->getCharacter();
         $user        = $this->character->getUser();
         $monster     = $this->monster->getMonster();
 

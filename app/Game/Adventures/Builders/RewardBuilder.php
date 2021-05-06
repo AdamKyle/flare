@@ -55,21 +55,34 @@ class RewardBuilder {
                         ->generateItem($character);
         }
 
+        return null;
+    }
+
+    /**
+     * Fetches the quest drop from a monnster.
+     *
+     * @param Monster $monster
+     * @param Character $character
+     * @param Adventure $adventure
+     * @param array $rewards
+     * @return mixed|null
+     */
+    public function fetchQuestItemFromMonster(Monster $monster, Character $character, Adventure $adventure, array $rewards) {
         if (!is_null($monster->questItem)) {
+            $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+
             $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $lootingChance, $adventure);
 
             $hasItem = $character->inventory->slots->filter(function($slot) use ($monster) {
-               return $slot->item_id === $monster->questItem->id;
+                return $slot->item_id === $monster->questItem->id;
             })->all();
 
-            if ($hasDrop && empty($hasItem)) {
+            if ($hasDrop && empty($hasItem) && $this->questItemNotInRewards($monster->questItem->id, $rewards['items'])) {
                 return $monster->questItem;
             }
 
             return null;
         }
-
-        return null;
     }
 
     /**
@@ -93,5 +106,29 @@ class RewardBuilder {
         }
 
         return $monster->gold;
+    }
+
+    /**
+     * Make sure the quest item is not already in the list of item rewards.
+     *
+     * @param int $id
+     * @param array $rewardItems
+     * @return bool
+     */
+    protected function questItemNotInRewards(int $id, array $rewardItems): bool {
+        if (empty($rewardItems)) {
+             return true;
+        }
+
+        $has = false;
+
+        foreach ($rewardItems as $item) {
+
+            if ($item['id'] === $id) {
+                $has = true;
+            }
+        }
+
+        return $has;
     }
 }

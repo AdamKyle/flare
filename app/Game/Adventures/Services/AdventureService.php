@@ -57,21 +57,21 @@ class AdventureService {
 
     /**
      * Constructor
-     * 
+     *
      * @param Character $character
      * @param Adventure $adventure
      * @param RewardBuilder $rewardbuilder
      * @param string $name
      */
     public function __construct(
-        Character $character, 
-        Adventure $adventure, 
+        Character $character,
+        Adventure $adventure,
         RewardBuilder $rewardBuilder,
-        string $name) 
+        string $name)
     {
         $this->character          = $character;
         $this->adventure          = $adventure;
-        $this->rewardBuilder      = $rewardBuilder; 
+        $this->rewardBuilder      = $rewardBuilder;
         $this->name               = $name;
 
         $this->createSkillRewardSection();
@@ -79,7 +79,7 @@ class AdventureService {
 
     /**
      * Process the adventure.
-     * 
+     *
      * @param int $currentLevel
      * @param int $maxLevel
      * @return void
@@ -90,7 +90,7 @@ class AdventureService {
 
     /**
      * Get the log information.
-     * 
+     *
      * @return array
      */
     public function getLogInformation(): array {
@@ -104,7 +104,7 @@ class AdventureService {
 
         if (!is_null($skill)) {
             $this->rewards['skill'] = [
-                'skill_name' => $skill->name, 
+                'skill_name' => $skill->name,
                 'exp_towards' => $skill->xp_towards,
                 'exp'   => 0,
             ];
@@ -130,7 +130,7 @@ class AdventureService {
 
             return;
         }
-        
+
         if ($attackService->isMonsterDead()) {
             $this->monsterIsDead($attackService, $adventureLog, $characterModeling);
 
@@ -138,7 +138,7 @@ class AdventureService {
                 if ($characterModeling) {
                     return;
                 }
-                
+
                 $this->adventureIsOver($adventureLog, $currentLevel);
 
                 return;
@@ -150,7 +150,7 @@ class AdventureService {
                 $this->setCharacterModelingLogs($attackService, false, true);
                 return;
             }
-            
+
             $this->adventureTookToLong($attackService, $adventureLog);
 
             $this->adventureIsOver($adventureLog, $currentLevel, true);
@@ -159,8 +159,6 @@ class AdventureService {
         }
 
         $attackService->resetLogInfo();
-
-        return;
     }
 
     protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog) {
@@ -212,7 +210,7 @@ class AdventureService {
         $this->updateAdventureLog($adventureLog, $level, true);
 
         $character = $this->character->refresh();
-        
+
         if (UserOnlineValue::isOnline($character->user)) {
             event(new ServerMessageEvent($character->user, 'dead_character'));
             event(new CharacterIsDeadBroadcastEvent($character->user, true));
@@ -223,16 +221,16 @@ class AdventureService {
             Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
         }
 
-       
+
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
-    } 
+    }
 
     protected function monsterIsDead(FightService $attackService, AdventureLog $adventureLog = null, bool $characterModeling = false) {
         if ($characterModeling) {
             $this->setCharacterModelingLogs($attackService);
             return;
         }
-        
+
         $monster     = $attackService->getMonster();
         $xpReduction = 0.0;
 
@@ -249,12 +247,21 @@ class AdventureService {
 
         $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction);
 
-        $drop = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
-        
+        $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
+
+        $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards);
+
         if (!is_null($drop)) {
             $this->rewards['items'][] = [
                 'id' => $drop->id,
                 'name' => $drop->affix_name,
+            ];
+        }
+
+        if (!is_null($questDrop)) {
+            $this->rewards['items'][] = [
+                'id' => $questDrop->id,
+                'name' => $questDrop->affix_name,
             ];
         }
 
@@ -291,7 +298,7 @@ class AdventureService {
             ]);
         } else {
             $logs[$this->name][] = $attackService->getLogInformation();
-            
+
             $adventureLog->update([
                 'logs' => $logs,
                 'rewards' => $this->rewards,
@@ -317,13 +324,13 @@ class AdventureService {
             $foundItem    = $this->character->inventory->slots->filter(function($slot) use ($rewardItemId) {
                 return $slot->item_id === $rewardItemId;
             })->first();
-    
+
             if (is_null($foundItem)) {
                 $this->character->inventory->slots()->create([
                     'inventory_id' => $this->character->inventory->id,
                     'item_id'      => $rewardItemId,
                 ]);
-    
+
                 event(new ServerMessageEvent($this->character->user, 'found_item', $adventureLog->adventure->itemReward->name));
             }
         }
@@ -339,7 +346,7 @@ class AdventureService {
         }
 
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
-    } 
+    }
 
     protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false, bool $tookTooLong = false) {
         if ($isDead) {
@@ -362,7 +369,7 @@ class AdventureService {
                 'complete'             => true,
                 'rewards'              => $this->rewards,
             ]);
-            
+
         }
     }
 }

@@ -25,9 +25,9 @@ use Tests\Setup\Character\CharacterFactory;
 
 class AdventureServiceTest extends TestCase
 {
-    use RefreshDatabase, 
-        CreateUser, 
-        CreateAdventure, 
+    use RefreshDatabase,
+        CreateUser,
+        CreateAdventure,
         CreateMonster,
         CreateGameSkill,
         CreateItemAffix,
@@ -67,7 +67,7 @@ class AdventureServiceTest extends TestCase
                                             'level' => 10
                                         ])
                                         ->getCharacter();
-        
+
         for ($i = 1; $i <= $adventure->levels; $i++) {
             $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
 
@@ -80,7 +80,7 @@ class AdventureServiceTest extends TestCase
             $this->assertTrue(!empty($character->adventureLogs->first()->rewards));
             $this->assertTrue(!empty($character->adventureLogs->first()->logs));
         }
-        
+
     }
 
     public function testProcessAdventureWithMultipleLevels()
@@ -119,6 +119,128 @@ class AdventureServiceTest extends TestCase
         }
     }
 
+    public function testProcessAdventureWithMultipleLevelsAndGetQuestItem()
+    {
+        $item = $this->createItem([
+            'name' => 'Apples',
+            'type' => 'quest',
+        ]);
+
+        $monster = $this->createMonster([
+            'quest_item_id'          => $item->id,
+            'quest_item_drop_chance' => 0.05,
+        ]);
+
+        $adventure = $this->createNewAdventure($monster, 5);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->levelCharacterUp(10)
+            ->updateCharacter(['can_move' => false])
+            ->createAdventureLog($adventure)
+            ->updateSkill('Accuracy', [
+                'level' => 10,
+                'xp_towards' => 10,
+                'currently_training' => true
+            ])
+            ->updateSkill('Dodge', [
+                'level' => 10
+            ])
+            ->updateSkill('Looting', [
+                'level' => 10
+            ])
+            ->getCharacter();
+
+        $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
+
+        $this->app->instance(DropCheckCalculator::class, $dropCheckCalculator);
+
+        $dropCheckCalculator->shouldReceive('fetchDropCheckChance')->andReturn(true);
+
+        $dropCheckCalculator->shouldReceive('fetchQuestItemDropCheck')->andReturn(true);
+
+        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            $adventureService->processAdventure($i, $adventure->levels);
+        }
+
+        $character = $character->refresh();
+
+        $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
+
+        foreach($character->adventureLogs->first()->logs as $key => $value) {
+            $this->assertEquals(5, count($value));
+        }
+
+        foreach ($character->adventureLogs->first()->rewards as $key => $value) {
+            if ($key === 'items') {
+                $this->assertNotFalse(array_search($item->id, array_column($value, 'id')));
+            }
+        }
+    }
+
+    public function testProcessAdventureWithMultipleLevelsAndCannotReceiveQuestItem()
+    {
+        $item = $this->createItem([
+            'name' => 'Apples',
+            'type' => 'quest',
+        ]);
+
+        $monster = $this->createMonster([
+            'quest_item_id'          => $item->id,
+            'quest_item_drop_chance' => 0.05,
+        ]);
+
+        $adventure = $this->createNewAdventure($monster, 5);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->levelCharacterUp(10)
+            ->updateCharacter(['can_move' => false])
+            ->createAdventureLog($adventure)
+            ->updateSkill('Accuracy', [
+                'level' => 10,
+                'xp_towards' => 10,
+                'currently_training' => true
+            ])
+            ->updateSkill('Dodge', [
+                'level' => 10
+            ])
+            ->updateSkill('Looting', [
+                'level' => 10
+            ])
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
+
+        $this->app->instance(DropCheckCalculator::class, $dropCheckCalculator);
+
+        $dropCheckCalculator->shouldReceive('fetchDropCheckChance')->andReturn(true);
+
+        $dropCheckCalculator->shouldReceive('fetchQuestItemDropCheck')->andReturn(true);
+
+        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            $adventureService->processAdventure($i, $adventure->levels);
+        }
+
+        $character = $character->refresh();
+
+        $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
+
+        foreach($character->adventureLogs->first()->logs as $key => $value) {
+            $this->assertEquals(5, count($value));
+        }
+
+        foreach ($character->adventureLogs->first()->rewards as $key => $value) {
+            if ($key === 'items') {
+                $this->assertFalse(array_search($item->id, array_column($value, 'id')));
+            }
+        }
+    }
+
     public function testProcessAdventureWithMultipleLevelsWithNoDrops()
     {
         $adventure = $this->createNewAdventure(null, 5);
@@ -137,13 +259,13 @@ class AdventureServiceTest extends TestCase
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
         $this->app->instance(DropCheckCalculator::class, $dropCheckCalculator);
-        
+
         $dropCheckCalculator->shouldReceive('fetchDropCheckChance')->andReturn(false);
 
         $goldRushChange = Mockery::mock(GoldRushCheckCalculator::class)->makePartial();
 
         $this->app->instance(GoldRushCheckCalculator::class, $goldRushChange);
-        
+
         $goldRushChange->shouldReceive('fetchGoldRushChance')->andReturn(false);
 
         $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
@@ -187,7 +309,7 @@ class AdventureServiceTest extends TestCase
         for ($i = 1; $i <= $adventure->levels; $i++) {
             $adventureService->processAdventure($i, $adventure->levels, true);
         }
-        
+
         $logs = $adventureService->getLogInformation();
 
         $this->assertNotEmpty($logs);
@@ -414,7 +536,7 @@ class AdventureServiceTest extends TestCase
         ]);
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-        
+
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
@@ -463,7 +585,7 @@ class AdventureServiceTest extends TestCase
         ]);
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-        
+
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
@@ -510,14 +632,14 @@ class AdventureServiceTest extends TestCase
         ]);
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-        
+
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->getCharacter();
-        
+
         Mail::fake();
 
         for ($i = 1; $i <= $adventure->levels; $i++) {

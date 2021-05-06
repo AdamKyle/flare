@@ -29,6 +29,7 @@ class AdventureLogFactory extends Factory
             'last_completed_level' => null,
             'logs'                 => null,
             'rewards'              => null,
+            'created_at'           => now(),
         ];
     }
 }

@@ -24,7 +24,8 @@ class AdventureLog extends Model
         'took_to_long',
         'last_completed_level',
         'logs',
-        'rewards'
+        'rewards',
+        'created_at',
     ];
 
     /**
@@ -39,6 +40,7 @@ class AdventureLog extends Model
         'last_completed_level' => 'integer',
         'logs'                 => 'array',
         'rewards'              => 'array',
+        'created_at'           => 'date',
     ];
 
     public function setLogsAttribute($value) {
