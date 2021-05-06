@@ -3,6 +3,7 @@
 namespace Tests\Traits;
 
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
 use App\Flare\Models\KingdomUnit;
 
 trait CreateKingdom {
@@ -13,5 +14,9 @@ trait CreateKingdom {
 
     public function createKingdomUnit(array $options): KingdomUnit {
         return KingdomUnit::factory()->create($options);
+    }
+
+    public function createKingdomLog(array $options): KingdomLog {
+        return KingdomLog::factory()->create($options);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Flare\Mail\ResetPassword;
 use Cache;
 use Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -89,8 +90,6 @@ class ForgotPasswordControllerTest extends TestCase
 
     public function testFunctionAnswerSecurityQuestions() {
         $user = $this->createUserWithCharacter()->getUser();
-
-        Mail::fake();
 
         $this->visit('/login')
              ->click('Forgot Your Password?')

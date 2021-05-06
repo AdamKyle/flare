@@ -42,8 +42,6 @@ class DataTable extends Component {
 
         if ($this->sortBy === 'asc') {
             $logs = $logs->sortBy($this->sortField);
-        } else {
-            $logs = $logs->sortByDesc($this->sortField);
         }
 
         return $logs->transform(function($log) {

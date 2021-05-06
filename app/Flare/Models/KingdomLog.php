@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\KingdomLogFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\KingdomBuildingFactory;
@@ -75,6 +76,6 @@ class KingdomLog extends Model
     }
 
     protected static function newFactory() {
-        return null;
+        return new KingdomLogFactory();
     }
 }
