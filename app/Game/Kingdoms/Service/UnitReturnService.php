@@ -35,13 +35,8 @@ class UnitReturnService {
 
         $defender = $unitMovement->from_kingdom;
 
-        if (empty($unitMovement->units_moving['old_units'])) {
-            $message  = 'Your units have returned from '. $defender->name .' (X/Y): ' .
-                $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . '.';
-        } else {
-            $message  = 'Your units have returned from their attack at (X/Y): ' .
-                $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . ' plane. Check your attack logs for more information.';
-        }
+        $message  = 'Your units have returned from their attack at (X/Y): ' .
+            $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . ' plane. Check your attack logs for more information.';
 
         $unitMovement->delete();
 

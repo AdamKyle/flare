@@ -31,6 +31,7 @@ class KingdomLogFactory extends Factory
             'old_defender'    => null,
             'new_defender'    => null,
             'published'       => null,
+            'created_at'      => now(),
         ];
     }
 }

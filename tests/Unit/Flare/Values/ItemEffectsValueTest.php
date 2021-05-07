@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare\Transformers;
+namespace Tests\Unit\Flare\Values;
 
 use App\Flare\Values\ItemEffectsValue;
 use Tests\TestCase;

@@ -5,11 +5,9 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
-use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Kingdoms\Traits\UnitInMovementFormatter;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
 
 class KingdomUnitMovementController extends Controller {
 

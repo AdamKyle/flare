@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare\Console;
+namespace Tests\Unit\Game\Maps\Adventure\Console\Commands;
 
 use App\Flare\Models\AdventureLog;
 use Carbon\Carbon;

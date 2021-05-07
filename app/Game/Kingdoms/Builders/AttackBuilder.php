@@ -42,24 +42,18 @@ class AttackBuilder {
     /**
      * Returns the defending character or null.
      *
-     * @return mixed|null
+     * @return Character
      */
-    public function getDefendingCharacter() {
-        $defender = $this->getDefender();
-
-        if (!is_null($defender)) {
-            return $defender->character;
-        }
-
-        return null;
+    public function getDefendingCharacter(): Character {
+        return $this->getDefender()->character;
     }
 
     /**
      * Returns either the defenders kingdom or null.
      *
-     * @return mixed|null
+     * @return Kingdom
      */
-    public function getDefender() {
+    public function getDefender(): Kingdom {
         return $this->defender;
     }
 }

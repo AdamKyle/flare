@@ -44,8 +44,8 @@ class RebuiltBuilding extends Mailable
     {
         return $this->subject('One of your buildings was rebuilt.')
                     ->mjml('game.core.kingdoms.mail.rebuilt', [
-                        'user'        => $this->user,
-                        'kingdomData' => $this->building,
+                        'user'     => $this->user,
+                        'building' => $this->building,
                     ]);
     }
 }

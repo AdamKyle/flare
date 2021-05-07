@@ -2,7 +2,7 @@
 
 Route::get('/kingdoms/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomsController@getLocationData']);
 Route::get('/kingdoms/{character}/kingdoms-with-units', ['as' => 'kingdoms.with.units', 'uses' => 'Api\KingdomAttackController@fetchKingdomsWithUnits']);
-Route::get('/kingdom-unit-movement/{character}', ['as' => 'kingdom.unit.movement', 'uses' => 'Api\KIngdomUnitMovementController@fetchUnitMovement']);
+Route::get('/kingdom-unit-movement/{character}', ['as' => 'kingdom.unit.movement', 'uses' => 'Api\KingdomUnitMovementController@fetchUnitMovement']);
 
 Route::post('/kingdoms/{character}/settle', ['as' => 'kingdoms.settle', 'uses' => 'Api\KingdomsController@settle']);
 Route::post('/kingdom/{kingdom}/rename', ['as' => 'kingdom.rename', 'uses' => 'Api\KingdomsController@rename']);

@@ -21,14 +21,9 @@ trait UnitInMovementFormatter {
             $totalAmount = 0;
 
             forEach ($unitInMovement->units_moving as $key => $unitDetails) {
-
-                if (is_array($unitDetails)) {
-                    if ($key === 'new_units') {
-                        $totalAmount = $this->fetchTotalAmount($unitDetails);
-                    } else if ($key !== 'old_units') {
-                        $totalAmount += $unitDetails['amount'];
-                    }
-                } else {
+                if ($key === 'new_units') {
+                    $totalAmount = $this->fetchTotalAmount($unitDetails);
+                } else if ($key !== 'old_units') {
                     $totalAmount += $unitDetails['amount'];
                 }
             }

@@ -2,7 +2,7 @@
 
 @section('content')
     <x-core.page-title
-        title="Unit Movement Log"
+        title="Units In Movement"
         route="{{route('game')}}"
         link="Game"
         color="primary"

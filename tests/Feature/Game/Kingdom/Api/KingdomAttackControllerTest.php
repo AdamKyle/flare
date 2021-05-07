@@ -296,6 +296,18 @@ class KingdomAttackControllerTest extends TestCase
         $this->assertEquals('The units to send must be an array.', $content->errors->units_to_send[0]);
     }
 
+    public function testGetKingdomsWithUnits() {
+        $response = $this->actingAs($this->character->getUser(), 'api')->json('GET', route('kingdoms.with.units', [
+            'character' => $this->character->getCharacter()->id
+        ]))->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertNotEmpty($content);
+    }
+
     protected function createEnemyKingdom(): Kingdom {
         return (new CharacterFactory)->createBaseCharacter()
                                      ->givePlayerLocation()

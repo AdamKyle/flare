@@ -83,6 +83,55 @@ class KingdomsControllerTest extends TestCase
         );
     }
 
+    public function testCannotAffordToSettleKingdom() {
+        $this->createGameBuilding();
+
+        $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
+
+        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.settle', [
+            'character' => 1
+        ]), [
+            'x_position'     => 26,
+            'y_position'     => 26,
+            'name'           => 'Apple Sauce',
+            'color'          => [193, 66, 66, 1],
+            'kingdom_amount' => 1
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals('You don\'t have the gold.', $content->message);
+    }
+
+    public function testRenameKingdom() {
+        $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
+
+        $response = $this->actingAs($user, 'api')->json('POST', route('kingdom.rename', [
+            'kingdom' => 1
+        ]), [
+            'name' => 'Test Kingdom 456'
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEmpty($content);
+    }
+
+    public function testCannotRenameKingdom() {
+        $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
+
+        $response = $this->actingAs($user, 'api')->json('POST', route('kingdom.rename', [
+            'kingdom' => 1
+        ]))->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('Name is required.', $content->errors->name[0]);
+    }
+
     public function testSettleKingdomWithCache() {
         Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter()->id, [['sample data']]);
 
@@ -215,7 +264,6 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testRebuildKingdomBuildingOffLine() {
-        Mail::fake();
 
         $this->createKingdom([
             'character_id' => 1,
@@ -245,8 +293,6 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertNotEquals(0, $building->current_durability);
         $this->assertEquals(300, $building->current_durability);
-
-        Mail::assertSent(RebuiltBuilding::class);
     }
 
     public function testCannotRebuildKingdomBuildingNotEnoughResources() {
