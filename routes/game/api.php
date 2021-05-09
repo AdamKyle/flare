@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['middleware' => 'throttle:100,1'], function() {
+Route::group(['middleware' => ['throttle:100,1', 'is.character.who.they.say.they.are']], function() {
     Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);
     Route::post('/character-sheet/{character}/name-change', ['uses' => 'Api\CharacterSheetController@nameChange']);

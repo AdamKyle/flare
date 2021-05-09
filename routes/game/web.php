@@ -1,6 +1,8 @@
 <?php
 
-Route::middleware('is.player.banned')->group(function() {
+Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+
+Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
 
     // Core routes for the game related stuff:
     Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);
@@ -22,7 +24,7 @@ Route::middleware('is.player.banned')->group(function() {
     Route::post('/game/unequip/item/{character}', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
     Route::post('/game/destroy/item/{character}', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
 
-    Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+
     Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 

@@ -25,7 +25,7 @@ class MarketController extends Controller {
         $this->middleware('auth');
 
         $this->middleware('is.character.dead');
-        
+
         $this->middleware('is.character.adventuring');
 
         $this->middleware('is.character.at.location');
@@ -58,24 +58,17 @@ class MarketController extends Controller {
         ]);
 
         $slot->delete();
-        
+
         $this->sendUpdate($this->transformer, $this->manager);
-        
+
         return redirect()->to(route('game.market.sell'))->with('success', 'Item listed');
     }
 
     public function currentListings(Character $character) {
-
-        if ($character->id !== auth()->user()->character->id) {
-            return redirect()->to(route('game.current-listings', [
-                'character' => auth()->user()->character->id
-            ]))->with('error', 'You are not allowed to do that.');
-        }
-
         $locked = MarketBoard::where('character_id', $character->id)->where('is_locked', true)->first();
-        
+
         if (!is_null($locked)) {
-            
+
             $locked->update([
                 'is_locked' => false,
             ]);

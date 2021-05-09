@@ -46,7 +46,7 @@ class AdventureControllerApiTest extends TestCase
                     ->visitRoute('map.adventures.adventure', [
                         'adventure' => $this->adventure->id,
                     ])
-                    ->see($this->adventure->name); 
+                    ->see($this->adventure->name);
     }
 
     public function testGetAdventureLogs() {
@@ -115,7 +115,7 @@ class AdventureControllerApiTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(422, $response->status());
-        
+
         $this->assertEquals('You are adventuring, you cannot do that.', $content->error);
     }
 

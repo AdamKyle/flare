@@ -92,7 +92,7 @@ class MarketControllerTest extends TestCase
                                      ->giveItem($this->createitem())
                                      ->getCharacterFactory()
                                      ->getCharacter();
-        
+
         $this->actingAs($character->user)->post(route('game.market.list', [
             'slot' => $character->inventory->slots->first()->id,
         ]), [
@@ -110,7 +110,7 @@ class MarketControllerTest extends TestCase
                                      ->giveItem($this->createitem())
                                      ->getCharacterFactory()
                                      ->getCharacter();
-        
+
         $this->actingAs($character->user)->post(route('game.market.list', [
             'slot' => $character->inventory->slots->first()->id,
         ]), [
@@ -128,7 +128,7 @@ class MarketControllerTest extends TestCase
                                      ->giveItem($this->createitem())
                                      ->getCharacterFactory()
                                      ->getCharacter();
-        
+
         $this->actingAs($character->user)->post(route('game.market.list', [
             'slot' => $character->inventory->slots->first()->id,
         ]))->followRedirects();
@@ -174,12 +174,12 @@ class MarketControllerTest extends TestCase
                                      ->giveItem($this->createitem())
                                      ->getCharacterFactory()
                                      ->getCharacter();
-        
+
         $secondCharacter = (new CharacterFactory)->createBaseCharacter();
 
         $this->actingAs($character->user)->visit(route('game.current-listings', [
             'character' => $secondCharacter->getCharacter()->id,
-        ]))->see('You are not allowed to do that.');
+        ]))->see('You don\'t have permission to do that.');
     }
 
     public function testCanEditListedItem() {

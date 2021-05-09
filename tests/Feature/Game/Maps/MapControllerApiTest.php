@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Maps;
 
+use App\Flare\Models\Character;
 use App\Flare\Values\ItemEffectsValue;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -130,6 +131,27 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals(0, $character->map->position_x);
         $this->assertEquals(48, $character->map->character_position_x);
         $this->assertEquals(48, $character->map->character_position_y);
+    }
+
+    public function testCannotMoveAnotherCharacter() {
+        $character = $this->character->getCharacter();
+        $user      = $this->character->getUser();
+
+        $otherUser = (new CharacterFactory())->createBaseCharacter()->getUser();
+
+        $response = $this->actingAs($otherUser, 'api')
+            ->json('POST', '/api/move/' . $character->id, [
+                'character_position_x' => 48,
+                'character_position_y' => 48,
+                'position_x'           => 0,
+                'position_y'           => 0,
+            ])
+            ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('You don\'t have permission to do that.', $content->error);
     }
 
     public function testMoveCharacterToLocationWithAdventure() {

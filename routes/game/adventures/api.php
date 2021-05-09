@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['auth:api', 'is.player.banned'])->group(function() {
+Route::middleware(['auth:api', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
 
     // Adventure:
     Route::post('/character/{character}/adventure/{adventure}', ['uses' => 'Api\AdventureController@adventure']);

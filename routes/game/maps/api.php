@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['auth:api', 'is.player.banned'])->group(function() {
+Route::middleware(['auth:api', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
     // Map related info:
     Route::get('/map/{user}', ['uses' => 'Api\MapController@mapInformation']);
 

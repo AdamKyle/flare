@@ -127,18 +127,18 @@ class CharacterModelingControllerTest extends TestCase
 
     public function testResetCharacterInventory() {
         $character = (new CharacterFactory)->createBaseCharacter()->equipStartingEquipment();
-        
+
         $item      = $this->createItem(['name' => 'apple sauce']);
 
         $character = $character->inventoryManagement()
                                ->giveItem($item)
                                ->getCharacterFactory()
                                ->getCharacter();
-        
+
         $this->actingAs($this->user)->post(route('admin.character.modeling.reset-inventory', [
             'character' => $character->id
         ]));
-        
+
 
         $foundSlot = $character->refresh()->inventory->slots->filter(function($slot) use($item) {
             return $slot->item_id === $item->id;
@@ -195,7 +195,7 @@ class CharacterModelingControllerTest extends TestCase
         $this->createClass();
 
         $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
-        
+
         $this->assertEquals(1, User::count());
     }
 
@@ -319,7 +319,7 @@ class CharacterModelingControllerTest extends TestCase
             'character_levels' => '1',
             'total_times' => '1',
         ])->response;
-        
+
         $response->assertSessionHas('success', 'Testing under way. You may log out, we will email you when done.');
     }
 
