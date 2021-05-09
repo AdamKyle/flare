@@ -96,11 +96,12 @@ class Skill extends Model
         }
 
         $bonus = ($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level;
+        $bonus += $this->getItemBonuses();
 
         $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
         $looting  = $this->getCharacterSkillBonus($this->character, 'Looting');
         $dodge    = $this->getCharacterSkillBonus($this->character, 'Dodge');
-        
+
         switch ($this->baseSkill->name) {
             case 'Accuracy':
                 return $bonus + $accuracy;
@@ -116,8 +117,20 @@ class Skill extends Model
     protected function getCharacterSkillBonus(Character $character, string $name): float {
         $raceSkillBonusValue  = $character->race->{Str::snake($name . '_mod')};
         $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
-        
+
         return $raceSkillBonusValue + $classSkillBonusValue;
+    }
+
+    protected function getItemBonuses(): float {
+        $bonus = 0.0;
+
+        foreach($this->character->inventory->slots as $slot) {
+            if ($slot->equipped) {
+                $bonus += $slot->item->skill_bonus;
+            }
+        }
+
+        return $bonus;
     }
 
     protected static function newFactory() {

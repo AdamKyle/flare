@@ -46,6 +46,13 @@ export default class ChatMessages extends React.Component {
         </div>,
       },
       {
+        name: "forced-name-change",
+        text: "Forced Name Change?",
+        cell: row => <div data-tag="allowRowEvents">
+          <div>{row.forced_name_change ? 'Yes' : 'No'}</div>
+        </div>,
+      },
+      {
         name: "to-character",
         text: "To Character",
         cell: row => <div data-tag="allowRowEvents">

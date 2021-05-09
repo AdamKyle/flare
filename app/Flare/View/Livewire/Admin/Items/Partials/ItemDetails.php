@@ -90,7 +90,8 @@ class ItemDetails extends Component
         'item.skill_level_required'  => 'nullable',
         'item.skill_level_trivial'   => 'nullable',
         'item.skill_name'            => 'nullable',
-        'item.skill_training_bonus'  => 'nullable',  
+        'item.skill_bonus'           => 'nullable',
+        'item.skill_training_bonus'  => 'nullable',
     ];
 
     protected $messages = [

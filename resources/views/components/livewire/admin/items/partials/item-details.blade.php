@@ -3,7 +3,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="item-name">Name: </label>
-                <input type="text" class="form-control required" id="item-name" name="name" wire:model="item.name"> 
+                <input type="text" class="form-control required" id="item-name" name="name" wire:model="item.name">
                 @error('item.name') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -43,14 +43,14 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-damage">Base Damage: </label>
-                <input type="number" class="form-control" id="item-base-damage" name="item-base-damage" wire:model="item.base_damage" {{($item->type !== 'quest' && $item->type !== 'shield' && $item->type !== 'spell-healing' && in_array($item->type, $itemsWithOutDefaultPosition)) ? '' : 'disabled'}}> 
+                <input type="number" class="form-control" id="item-base-damage" name="item-base-damage" wire:model="item.base_damage" {{($item->type !== 'quest' && $item->type !== 'shield' && $item->type !== 'spell-healing' && in_array($item->type, $itemsWithOutDefaultPosition)) ? '' : 'disabled'}}>
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-ac">Base Ac: </label>
                 <input type="number" class="form-control" id="item-base-ac" name="item-base-ac" wire:model="item.base_ac" {{in_array($item->type, $typesThatCanAffectAC) ? '' : 'disabled'}}>
-                @if ($item->type === 'artifact') 
+                @if ($item->type === 'artifact')
                     <span class="text-muted">Optional for artifacts</span>
                 @endif
             </div>
@@ -58,7 +58,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-healing">Base Healing: </label>
-                <input type="number" class="form-control" id="item-base-healing" name="item-base-healing" wire:model="item.base_healing"> 
+                <input type="number" class="form-control" id="item-base-healing" name="item-base-healing" wire:model="item.base_healing">
             </div>
         </div>
     </div>
@@ -85,7 +85,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-skill-level-required">Skill Level Required: </label>
-                <input type="number" class="form-control" id="item-skill-level-required" name="item-skill-level-required" wire:model="item.skill_level_required" {{$item->can_craft ? '' : 'disabled'}}> 
+                <input type="number" class="form-control" id="item-skill-level-required" name="item-skill-level-required" wire:model="item.skill_level_required" {{$item->can_craft ? '' : 'disabled'}}>
                 <span class="text-muted">Only needed when the item is craftable.</span><br />
                 @error('skill_level_required') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
@@ -93,14 +93,14 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-skill-level-trivial">Skill Level Trivial: </label>
-                <input type="number" class="form-control" id="item-skill-level-trivial" name="item-skill-level-trivial" wire:model="item.skill_level_trivial" {{$item->can_craft ? '' : 'disabled'}}> 
+                <input type="number" class="form-control" id="item-skill-level-trivial" name="item-skill-level-trivial" wire:model="item.skill_level_trivial" {{$item->can_craft ? '' : 'disabled'}}>
                 <span class="text-muted">Only needed when the item is craftable.</span><br />
                 @error('skill_level_trivial') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="item-affects-skill">Affects Skill: </label>
                 <select class="form-control" name="item-affects-skill" wire:model="item.skill_name">
@@ -112,12 +112,20 @@
                 <span class="text-muted">Only needed when the item affects a skill.</span><br />
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="item-skill-training-bonus">Skill Training Bonus: </label>
-                <input type="number" steps="0.01" class="form-control" id="item-skill-training-bonus" name="item-skill-training-bonus" wire:model="item.skill_training_bonus" {{is_null($item->skill_name) || $item->skill_name === "" ? 'disabled' : ''}}> 
-                <span class="text-muted">Only needed when the item affects a skill.</span><br />
+                <input type="number" steps="0.01" class="form-control" id="item-skill-training-bonus" name="item-skill-training-bonus" wire:model="item.skill_training_bonus" {{is_null($item->skill_name) || $item->skill_name === "" ? 'disabled' : ''}}>
+                <span class="text-muted">Applies an xp percentage bonus to the skill in question when training.</span><br />
                 @error('skill_training_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-skill-bonus">Skill Bonus: </label>
+                <input type="number" steps="0.01" class="form-control required" id="item-skill-bonus" name="name" wire:model="item.skill_bonus">
+                <span class="text-muted">Applies a character roll percentage when using said skill.</span><br />
+                @error('skill_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>
@@ -125,7 +133,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="item-cost">Cost: </label>
-                <input type="number" class="form-control" id="item-cost" name="item-cost" wire:model="item.cost" {{$item->type !== 'quest' ? '' : 'disabled'}}> 
+                <input type="number" class="form-control" id="item-cost" name="item-cost" wire:model="item.cost" {{$item->type !== 'quest' ? '' : 'disabled'}}>
                 @error('item.cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>

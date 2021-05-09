@@ -1,7 +1,6 @@
 <?php
 namespace App\Game\Core\Providers;
 
-use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Game\Core\Events\BuyItemEvent;
 use App\Game\Core\Events\SellItemEvent;
@@ -48,7 +47,7 @@ class EventsProvider extends ServiceProvider {
         SellItemEvent::class => [
             SellItemListener::class,
         ],
-        
+
         // When you craft an item.
         CraftedItemTimeOutEvent::class => [
             CraftedItemTimeOutListener::class,

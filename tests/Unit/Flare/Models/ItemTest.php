@@ -60,7 +60,7 @@ class ItemTest extends TestCase
         $item = $this->createItem([
             'item_prefix_id' => $itemSuffix->id
         ]);
-        
+
         $this->assertNotEquals(0, $item->getSkillTrainingBonus('test'));
     }
 
@@ -75,5 +75,28 @@ class ItemTest extends TestCase
         ]);
 
         $this->assertNotEquals(0, $item->getSkillTrainingBonus('test'));
+    }
+
+    public function testGetSkillBonusForItem() {
+        $itemPrefix = $this->createItemAffix([
+            'type'                 => 'prefix',
+            'skill_name'           => 'Sample',
+            'skill_bonus'          => 0.10
+        ]);
+
+        $itemSuffix = $this->createItemAffix([
+            'base_ac_mod'          => 0.05,
+            'skill_name'           => 'Sample',
+            'type'                 => 'suffix',
+        ]);
+
+        $item = $this->createItem([
+            'skill_name'     => 'Sample',
+            'skill_bonus'    => 0.01,
+            'item_suffix_id' => $itemSuffix->id,
+            'item_prefix_id' => $itemPrefix->id,
+        ]);
+
+        $this->assertNotEquals(0, $item->getSkillBonus('Sample'));
     }
 }

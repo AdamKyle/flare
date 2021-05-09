@@ -44,6 +44,7 @@ class Item extends Model
         'can_craft',
         'skill_name',
         'skill_training_bonus',
+        'skill_bonus',
         'skill_level_required',
         'skill_level_trivial',
         'crafting_type',
@@ -71,6 +72,7 @@ class Item extends Model
         'chr_mod'              => 'float',
         'int_mod'              => 'float',
         'skill_training_bonus' => 'float',
+        'skill_bonus'          => 'float',
         'can_craft'            => 'boolean',
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',
@@ -98,7 +100,7 @@ class Item extends Model
 
     /**
      * Gets the affix name attribute.
-     * 
+     *
      * When calling affix_name on the item, it will return the name with all affixes applied.
      */
     public function getAffixNameAttribute() {
@@ -115,16 +117,16 @@ class Item extends Model
 
     /**
      * Gets the total damage value for the item.
-     * 
+     *
      * In some cases an item might not have a base_damage value.
      * how ever might have either prefix or suffix or both.
-     * 
+     *
      * In this case we will set the damage variable to one.
      * this will allow the damage modifiers to be applied to the item.
-     * 
+     *
      * Which in turns allows the player to their total damage increased when
      * attacking.
-     * 
+     *
      * @return int.
      */
     public function scopeGetTotalDamage(): int {
@@ -152,16 +154,16 @@ class Item extends Model
 
     /**
      * Gets the total defence value for the item.
-     * 
+     *
      * In some cases an item might not have a base_ac value.
      * how ever might have either prefix or suffix or both.
-     * 
+     *
      * In this case we will set the ac variable to one.
      * this will allow the ac modifiers to be applied to the item.
-     * 
+     *
      * Which in turns allows the player to their total ac increased when
      * defending from attacks.
-     * 
+     *
      * @return int.
      */
     public function scopeGetTotalDefence(): int {
@@ -189,16 +191,16 @@ class Item extends Model
 
     /**
      * Gets the total healing value for the item.
-     * 
+     *
      * In some cases an item might not have a base_healing value.
      * how ever might have either prefix or suffix or both.
-     * 
+     *
      * In this case we will set the healFor variable to one.
      * this will allow the healing modifiers to be applied to the item.
-     * 
+     *
      * Which in turns allows the player to their total healing increased when
      * attacking.
-     * 
+     *
      * @return int.
      */
     public function scopeGetTotalHealing(): int {
@@ -226,7 +228,7 @@ class Item extends Model
 
     /**
      * Gets the total percentage increase for a stat.
-     * 
+     *
      * @return float
      */
     public function scopeGetTotalPercentageForStat($qeury, string $stat): float {
@@ -247,12 +249,14 @@ class Item extends Model
 
     /**
      * Gets the total skill training bonus
-     * 
+     *
+     * @param $query
+     * @param string $skillName
      * @return float
      */
     public function scopeGetSkillTrainingBonus($query, string $skillName): float {
         $baseSkillTraining = 0.0;
-        
+
         if (!is_null($this->itemPrefix)) {
             if ($this->itemPrefix->skill_name === $skillName) {
                 $stat               = $this->itemPrefix->skill_training_bonus;
@@ -265,12 +269,46 @@ class Item extends Model
                 $stat               = $this->itemSuffix->skill_training_bonus;
                 $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus)) : 0.0;
             }
-            
+
         }
 
         if (!is_null($this->skill_name)) {
             if ($this->skill_name === $skillName) {
                 $baseSkillTraining += $this->skill_training_bonus;
+            }
+        }
+
+        return $baseSkillTraining;
+    }
+
+    /**
+     * Gets the total skill training bonus
+     *
+     * @param $query
+     * @param string $skillName
+     * @return float
+     */
+    public function scopeGetSkillBonus($query, string $skillName): float {
+        $baseSkillTraining = 0.0;
+
+        if (!is_null($this->itemPrefix)) {
+            if ($this->itemPrefix->skill_name === $skillName) {
+                $stat               = $this->itemPrefix->skill_bonus;
+                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_bonus) ? 0.0 : $this->skill_bonus)) : 0.0;
+            }
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            if ($this->itemSuffix->skill_name === $skillName) {
+                $stat               = $this->itemSuffix->skill_bonus;
+                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_bonus) ? 0.0 : $this->skill_bonus)) : 0.0;
+            }
+
+        }
+
+        if (!is_null($this->skill_name)) {
+            if ($this->skill_name === $skillName) {
+                $baseSkillTraining += $this->skill_bonus;
             }
         }
 
