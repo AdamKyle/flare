@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Maps;
 
+use App\Flare\Values\ItemEffectsValue;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -10,6 +11,7 @@ use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
 use Cache;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateAdventure;
 use Tests\Setup\Character\CharacterFactory;
@@ -20,7 +22,8 @@ class MapControllerApiTest extends TestCase
     use RefreshDatabase,
         CreateLocation,
         CreateAdventure,
-        CreateItem;
+        CreateItem,
+        CreateGameMap;
 
     private $character;
 
@@ -942,5 +945,109 @@ class MapControllerApiTest extends TestCase
 
         // Did not gain the item again:
         $this->assertEquals(1, $this->character->getCharacter()->inventory->slots->count());
+    }
+
+    public function testCannotTraverseMissingParams() {
+        $user = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($user, 'api')
+                         ->json('POST', '/api/map/traverse/' . $character->id)
+                         ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('Map id is required.', $content->errors->map_id[0]);
+    }
+
+    public function testMissingItemCannotTraverse() {
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Labyrinth'
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/traverse/' . $character->id, [
+                'map_id' => $gameMap->id,
+            ])
+            ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('You are missing a required item to travel to that plane.', $content->message);
+    }
+
+    public function testMissingItemCannotTraverseToUnknownMap() {
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Bananas'
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/traverse/' . $character->id, [
+                'map_id' => $gameMap->id,
+            ])
+            ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('You are missing a required item to travel to that plane.', $content->message);
+    }
+
+    public function testCanTraverse() {
+        $user      = $this->character->getUser();
+        $character = $this->character->inventoryManagement()->giveItem(
+            $this->createItem(['effect' => ItemEffectsValue::LABYRINTH])
+        )->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Labyrinth'
+        ]);
+
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/traverse/' . $character->id, [
+                'map_id' => $gameMap->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanTraverseBackToSurface() {
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter();
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Surface'
+        ]);
+
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        $response = $this->actingAs($user, 'api')
+            ->json('POST', '/api/map/traverse/' . $character->id, [
+                'map_id' => $gameMap->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
     }
 }

@@ -85,7 +85,7 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->name === 'surface') {
+        if ($gameMap->name === 'Surface') {
             return true;
         }
 
