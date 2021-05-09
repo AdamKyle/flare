@@ -52,8 +52,7 @@ class PrivateMessageEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('private-message-' . $this->user->id);
     }
 }

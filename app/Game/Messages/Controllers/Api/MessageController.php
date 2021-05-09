@@ -3,6 +3,7 @@
 namespace App\Game\Messages\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
+use App\Game\Messages\Values\MapChatColor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Messages\Events\MessageSentEvent;
@@ -59,16 +60,19 @@ class MessageController extends Controller {
     public function postPublicMessage(Request $request) {
         $x         = 0;
         $y         = 0;
+        $color     = null;
 
         if (!auth()->user()->hasRole('Admin')) {
             $character = auth()->user()->character;
 
-            $x = $character->map->character_position_x;
-            $y = $character->map->character_position_y;
+            $x     = $character->map->character_position_x;
+            $y     = $character->map->character_position_y;
+            $color = (new MapChatColor($character->map->gameMap->name))->getColor();
         }
 
         $message = auth()->user()->messages()->create([
             'message'    => $request->message,
+            'color'      => $color,
             'x_position' => $x,
             'y_position' => $y,
         ]);

@@ -47,6 +47,7 @@ export default class Chat extends React.Component {
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
+      console.log(event);
       const message = event.message;
       message['user'] = event.user;
       message['name'] = event.name;
@@ -225,7 +226,7 @@ export default class Chat extends React.Component {
         } else {
           elements.push(
             <li key={message.id}>
-              <div className="message">
+              <div className="message" style={{'color': message.color}}>
                 {message.x !== 0 && message.y !== 0 ? this.fetchLocationInfo(message) : null} <strong
                 onClick={this.messageUser.bind(this)}
                 data-name={message.name}>{message.name}</strong>: {message.message}

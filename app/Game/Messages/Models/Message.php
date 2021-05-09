@@ -18,6 +18,7 @@ class Message extends Model {
         'to_user',
         'x_position',
         'y_position',
+        'color',
     ];
 
     public function user() {

@@ -27,6 +27,7 @@ class CreateMessages extends Migration
             $table->text('message');
             $table->integer('x_position')->nullable()->default(0);
             $table->integer('y_position')->nullable()->default(0);
+            $table->string('color')->nullable();
             $table->timestamps();
         });
     }
