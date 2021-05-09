@@ -53,10 +53,10 @@ class AttackedKingdomBuilder {
             ];
 
             if (isset($unitInfo['heal_for']) && isset($unitInfo['healer'])) {
-                $coreChanges[] = [
+                $coreChanges = array_merge($coreChanges, [
                     'total_heal' => ($unitInfo['heal_for'] * $unitInfo['amount']),
                     'healer'     => $unitInfo['healer'],
-                ];
+                ]);
             }
 
             if (($newAmount === 0 && $oldAmount !== 0) && ($oldAmount !== $newAmount)) {
