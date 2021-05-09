@@ -41,7 +41,7 @@ class SiegeHandlerTest extends TestCase {
                                                 ->assignUnits([
                                                     'can_heal'        => true,
                                                     'heal_percentage' => 0.01
-                                                ], 1000);;
+                                                ], 1000);
     }
 
     public function tearDown(): void {

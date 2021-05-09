@@ -7,10 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Character\KingdomManagement;
+use Tests\Traits\CreateGameUnit;
 
 class UnitHandlerTest extends TestCase {
 
-    use RefreshDatabase;
+    use RefreshDatabase, CreateGameUnit;
 
     private $character;
 
@@ -139,6 +140,49 @@ class UnitHandlerTest extends TestCase {
         foreach ($unitsToAttack as $unitInfo) {
             $this->assertTrue($unitInfo['amount'] > 0);
         }
+    }
+
+    public function testFetchHealingUnits() {
+        $unit = $this->createGameUnit([
+            'can_heal'        => true,
+            'heal_percentage' => 0.01
+        ]);
+
+        $unitsToAttack[] = [
+            'amount'         => 1000,
+            'total_attack'   => 0,
+            'total_defence'  => 0,
+            'unit_id'        => $unit->id,
+            'settler'        => false,
+            'healer'         => true,
+            'heal_for'       => 0.01,
+        ];
+
+        $unitAttackHandler = new UnitHandler();
+
+        $healers = $unitAttackHandler->fetchHealers($unitsToAttack);
+
+        $this->assertNotEmpty($healers);
+    }
+
+    public function testCantFetchHealingUnits() {
+        $unit = $this->createGameUnit();
+
+        $unitsToAttack[] = [
+            'amount'         => 1000,
+            'total_attack'   => 0,
+            'total_defence'  => 0,
+            'unit_id'        => $unit->id,
+            'settler'        => false,
+            'healer'         => false,
+            'heal_for'       => 0.0,
+        ];
+
+        $unitAttackHandler = new UnitHandler();
+
+        $healers = $unitAttackHandler->fetchHealers($unitsToAttack);
+
+        $this->assertEmpty($healers);
     }
 
     protected function createAttackingUnits(int $totalAttack = 100, int $totalDefence = 100): array {

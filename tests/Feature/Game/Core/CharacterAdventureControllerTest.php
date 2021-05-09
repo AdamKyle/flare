@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\AdventureLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -176,7 +177,7 @@ class CharacterAdventureControllerTest extends TestCase
            'You gained a level! Now level: 2',
            'Your skill: Looting gained a level and is now level: 1',
            'You gained the item: Spear',
-        ]); 
+        ]);
     }
 
     public function testCannotDistributeRewardsWhenDead() {
@@ -188,7 +189,7 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
 
-        $response->assertSessionHas('error', "You are dead and must revive before trying to do that. Dead people can't do things."); 
+        $response->assertSessionHas('error', "You are dead and must revive before trying to do that. Dead people can't do things.");
     }
 
     public function testShowDifferentSuccessWhenThereIsNoReward() {
@@ -225,7 +226,7 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
 
-        $response->assertSessionHas('error', "You cannot collect already collected rewards."); 
+        $response->assertSessionHas('error', "You cannot collect already collected rewards.");
     }
 
     public function testCannotDistributeRewardsWhenAdventureing() {
@@ -239,7 +240,7 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
 
-        $response->assertSessionHas('error', "You are adventuring, you cannot do that."); 
+        $response->assertSessionHas('error', "You are adventuring, you cannot do that.");
     }
 
     public function testCannotDistributeRewardsWhenThereAreNoRewards() {
@@ -253,6 +254,30 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
 
-        $response->assertSessionHas('error', "You cannot collect already collected rewards."); 
+        $response->assertSessionHas('error', "You cannot collect already collected rewards.");
+    }
+
+    public function testDeleteAdventureLog() {
+        $this->actingAs($this->character->getUser())->post(route('game.adventures.delete', [
+            'adventureLog' => 1
+        ]));
+
+        $this->assertTrue(AdventureLog::all()->isEmpty());
+    }
+
+    public function testBatchDeleteAdventureLog() {
+        $this->actingAs($this->character->getUser())->post(route('game.adventures.batch-delete'), [
+            'logs' => [1]
+        ]);
+
+        $this->assertTrue(AdventureLog::all()->isEmpty());
+    }
+
+    public function testCannotBatchDeleteAdventureLog() {
+        $response = $this->actingAs($this->character->getUser())->post(route('game.adventures.batch-delete'), [
+            'logs' => [27]
+        ])->response;
+
+        $response->assertSessionHas('error', "No logs exist for selected.");
     }
 }

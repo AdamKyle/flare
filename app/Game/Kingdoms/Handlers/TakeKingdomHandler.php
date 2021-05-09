@@ -7,6 +7,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
 use phpDocumentor\Reflection\Types\Boolean;
@@ -21,6 +22,11 @@ class TakeKingdomHandler {
     private $movementService;
 
     /**
+     * @var UnitRecallService
+     */
+    private $unitRecallService;
+
+    /**
      * @var array $oldKingdom
      */
     private $oldKingdom = [];
@@ -29,9 +35,11 @@ class TakeKingdomHandler {
      * TakeKingdomHandler constructor.
      *
      * @param MovementService $movementService
+     * @param UnitRecallService $unitRecallService
      */
-    public function __construct(MovementService $movementService) {
-        $this->movementService = $movementService;
+    public function __construct(MovementService $movementService, UnitRecallService $unitRecallService) {
+        $this->movementService   = $movementService;
+        $this->unitRecallService = $unitRecallService;
     }
 
     /**
@@ -49,28 +57,24 @@ class TakeKingdomHandler {
 
         $this->setOldKingdom($defender);
 
-        $cache = $this->removeKingdomFromCache($defendingCharacter, $defender);
+        $this->removeKingdomFromCache($defendingCharacter, $defender);
 
-        if (!is_null($cache)) {
-            event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
+        event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
 
-            $defender->update([
-                'character_id' => $attacker->id,
-                'current_morale' => .10
-            ]);
+        $defender->update([
+            'character_id' => $attacker->id,
+            'current_morale' => .10
+        ]);
 
-            $kingdom = $this->updateKingdomsUnits($defender->refresh(), $survivingUnits);
+        $kingdom = $this->updateKingdomsUnits($defender->refresh(), $survivingUnits);
 
-            $this->addKingdomToCache($attacker, $kingdom);
+        $this->addKingdomToCache($attacker, $kingdom);
 
-            $this->stopOtherAttacks($attacker);
+        $this->stopOtherAttacks($attacker);
 
-            event(new UpdateMapDetailsBroadcast($attacker->map, $attacker->user, $this->movementService, true));
+        event(new UpdateMapDetailsBroadcast($attacker->map, $attacker->user, $this->movementService, true));
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -132,9 +136,13 @@ class TakeKingdomHandler {
      * @param Character $attacker
      */
     protected function stopOtherAttacks(Character $attacker) {
-        $unitMovements = UnitMovementQueue::where('character_id', $attacker->id);
+        $unitMovements = UnitMovementQueue::where('character_id', $attacker->id)->get();
 
         foreach ($unitMovements as $unitMovement) {
+            $unitMovementAttributes = $unitMovement->getAttributes();
+
+            $this->unitRecallService->recall($unitMovementAttributes, $attacker);
+
             $unitMovement->delete();
         }
     }

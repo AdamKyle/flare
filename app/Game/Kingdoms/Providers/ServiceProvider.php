@@ -88,7 +88,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(TakeKingdomHandler::class, function($app) {
-            return new TakeKingdomHandler($app->make(MovementService::class));
+            return new TakeKingdomHandler($app->make(MovementService::class), $app->make(UnitRecallService::class));
         });
 
         $this->app->bind(KingdomHandler::class, function($app) {

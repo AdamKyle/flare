@@ -145,9 +145,23 @@ class CharacterSheetControllerApiTest extends TestCase {
                          ])
                          ->response;
 
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals('Apples', $this->character->getCharacter()->name);
+    }
+
+    public function testBasicLocationInformation() {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($character->user, 'api')
+            ->json('GET', '/api/character-location-data/' . $character->id)
+            ->response;
+
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals('Apples', $this->character->getCharacter()->name);
+
+        $this->assertEquals($character->x_position, $content->x_position);
+        $this->assertEquals($character->y_position, $content->y_position);
+        $this->assertEquals($character->gold, $content->gold);
     }
 }
