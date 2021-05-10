@@ -14,8 +14,8 @@ use App\Console\Commands\LevelUpSkillsOnFakeUsers;
 use App\Console\Commands\MoveInfoFiles;
 use App\Console\Commands\UpdateKingdom;
 
-class Kernel extends ConsoleKernel
-{
+class Kernel extends ConsoleKernel {
+
     /**
      * The Artisan commands provided by your application.
      *
@@ -39,17 +39,19 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
-    {
+    protected function schedule(Schedule $schedule) {
 
         // Clean notifications every month.
-        $schedule->command('clean:notifications')->monthly()->timezone(config('app.timezone'));;
+        $schedule->command('clean:notifications')->monthly()->timezone(config('app.timezone'));
 
         // Update kingdoms every hour.
-        $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));;
+        $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
 
         // Clean the market every three months starting at 2am.
         $schedule->command('clean:market-history')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
+
+        // Clean the chat every three months starting at 2am.
+        $schedule->command('clean:chat')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
 
         // clean the kingdom logs every week on monday at 2 am.
         $schedule->command('clean:kingdomLogs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));

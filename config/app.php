@@ -136,6 +136,7 @@ return [
 
     'providers' => [
 
+
         /*
          * Laravel Framework Service Providers...
          */
@@ -180,27 +181,28 @@ return [
         /**
          * Flare Related
          */
-       App\Flare\Providers\ServiceProvider::class,
-       App\Flare\Providers\EventsProvider::class,
-       App\Flare\MapGenerator\Providers\ServiceProvider::class,
+        App\Flare\Providers\ServiceProvider::class,
+        App\Flare\Providers\EventsProvider::class,
+        App\Flare\MapGenerator\Providers\ServiceProvider::class,
 
-       /**
+        /**
         * Admin Related
         */
-       App\Admin\Providers\ServiceProvider::class,
+        App\Admin\Providers\ServiceProvider::class,
 
-       /**
+        /**
         * Game Related
         */
-      App\Game\Core\Providers\ServiceProvider::class,
-      App\Game\Core\Providers\EventsProvider::class,
-      App\Game\Messages\Providers\EventsProvider::class,
-      App\Game\Maps\Providers\EventsProvider::class,
-      App\Game\Adventures\Providers\EventsProvider::class,
-      App\Game\Adventures\Providers\ServiceProvider::class,
-      App\Game\Maps\Providers\ServiceProvider::class,
-      App\Game\Kingdoms\Providers\ServiceProvider::class,
-      App\Game\Skills\Providers\ServiceProvider::class,
+        App\Game\Core\Providers\ServiceProvider::class,
+        App\Game\Core\Providers\EventsProvider::class,
+        App\Game\Messages\Providers\EventsProvider::class,
+        App\Game\Messages\Providers\ServiceProvider::class,
+        App\Game\Maps\Providers\EventsProvider::class,
+        App\Game\Adventures\Providers\EventsProvider::class,
+        App\Game\Adventures\Providers\ServiceProvider::class,
+        App\Game\Maps\Providers\ServiceProvider::class,
+        App\Game\Kingdoms\Providers\ServiceProvider::class,
+        App\Game\Skills\Providers\ServiceProvider::class,
     ],
 
     /*

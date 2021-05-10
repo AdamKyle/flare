@@ -490,7 +490,7 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $this->assertEquals(3.33, $this->character->getCharacter()->xp);
+        $this->assertEquals(3.00, $this->character->getCharacter()->xp);
     }
 
     public function testCharacterSeesErrorForUnknownType() {
