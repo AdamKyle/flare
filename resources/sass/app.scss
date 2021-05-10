@@ -128,6 +128,10 @@ dd {
   overflow-x: scroll;
 }
 
+.topbar{
+  top: 0px;
+}
+
 @include media-breakpoint-down(sm) {
   .push-right {
     float: left;
@@ -137,7 +141,7 @@ dd {
 
 @include media-breakpoint-down(md) {
   .page-wrapper {
-    padding-top: 0px !important;
+    padding-top: 40px !important;
   }
 }
 

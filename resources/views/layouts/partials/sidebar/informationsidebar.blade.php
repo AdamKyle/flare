@@ -9,16 +9,23 @@
     <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
+            'pageName' => 'time-gates'
+          ])}}"><i class="far fa-clock"></i> Time Gates</a>
+    </li>
+    <li class="nav-devider"></li>
+    <li>
+        <a href="{{route('info.page', [
             'pageName' => 'rules'
-        ])}}">Core Rules</a>
+        ])}}"><i class="fas fa-smoking-ban"></i> Core Rules</a>
     </li>
     <li class="nav-devider"></li>
     <li>
       <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character Information</span></a>
       <ul aria-expanded="false" class="collapse">
           <li><a href="{{route('info.page', ['pageName' => 'races-and-classes'])}}">Race and Class</a></li>
-          <li><a href="{{route('info.page', ['pageName' => 'skill-information'])}}">Skills</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'character-stats'])}}">Stats</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'skill-information'])}}">Skills</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'equipment'])}}">Equipment</a></li>
       </ul>
     </li>
     <li class="nav-devider"></li>
@@ -26,12 +33,18 @@
       <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-scroll-unfurled"></i><span class="hide-menu">Map</span></a>
       <ul aria-expanded="false" class="collapse">
           <li><a href="{{route('info.page', ['pageName' => 'movement'])}}">Movement</a></li>
-          <li><a href="form-basic.html">Locations</a></li>
-          <li><a href="form-basic.html">Adventuring</a></li>
-          <li><a href="form-basic.html">Setting Sail</a></li>
-          <li><a href="form-basic.html">Teleporting</a></li>
+          <li><a href="{{route('info.page', [
+            'pageName' => 'locations'
+          ])}}">Locations</a></li>
+          <li><a href="{{route('info.page', [
+            'pageName' => 'adventure'
+          ])}}">Adventuring</a></li>
+          <li><a href={{route('info.page', ['pageName' => 'set-sail'])}}>Setting Sail</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'teleport'])}}">Teleporting</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'traverse'])}}">Traverse</a></li>
       </ul>
     </li>
+    <li class="nav-devider"></li>
     <li>
       <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-guarded-tower"></i><span class="hide-menu">Kingdoms</span></a>
       <ul aria-expanded="false" class="collapse">
@@ -39,41 +52,40 @@
           <li><a href="form-basic.html">Attacking A Kingdom</a></li>
       </ul>
     </li>
-    <li><a href="{{route('info.page', [
-                'pageName' => 'map'
-              ])}}">Map</a></li>
     <li class="nav-devider"></li>
-    <li><a href="{{route('info.page', [
-        'pageName' => 'adventure'
-      ])}}">Adventure</a></li>
+    <li>
+        <a href="{{route('info.page', [
+            'pageName' => 'settings'
+          ])}}"><i class="fas fa-user-cog"></i> Player Settings</a>
+    </li>
     <li class="nav-devider"></li>
     <li>
       <a href="{{route('info.page', [
           'pageName' => 'notifications'
-        ])}}">Notifications</a>
+        ])}}"><i class="fas fa-bell"></i> Notifications</a>
+    </li>
+    <li class="nav-devider"></li>
+    <li>
+        <a href="{{route('info.page', [
+            'pageName' => 'market-board'
+          ])}}"><i class="fas fa-sign"></i> Market Board</a>
     </li>
     <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
             'pageName' => 'crafting'
-          ])}}">Crafting</a>
+          ])}}"><i class="ra ra-anvil"></i> Crafting</a>
     </li>
     <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
             'pageName' => 'enchanting'
-          ])}}">Enchanting</a>
+          ])}}"><i class="ra ra-burning-eye"></i> Enchanting</a>
     </li>
     <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
             'pageName' => 'monsters'
-          ])}}">Monsters List</a>
-    </li>
-    <li class="nav-devider"></li>
-    <li>
-        <a href="{{route('info.page', [
-            'pageName' => 'time-gates'
-          ])}}">Time Gates</a>
+          ])}}"><i class="ra ra-eye-monster"></i> Monsters List</a>
     </li>
 </ul>

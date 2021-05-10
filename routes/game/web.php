@@ -1,6 +1,7 @@
 <?php
 
 Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
 
 Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
 
@@ -24,8 +25,6 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are'])->g
     Route::post('/game/unequip/item/{character}', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
     Route::post('/game/destroy/item/{character}', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
 
-
-    Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 
     Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);

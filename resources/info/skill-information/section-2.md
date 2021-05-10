@@ -19,6 +19,12 @@ Lets break down whats all in a skill, you can see this information by clicking o
 - **Fight Timeout Modifier**: With every kill, comes a timeout of 10 seconds, 20 if the enemy has killed you. These modifiers take a specific percentage off your timer. [Learn more about timers](/information/time-gates)
 - **Skill Bonus Per Level**: The percentage bonus applied per level up (to a maximum of 99.00%)
 
+> ### ATTN!
+> 
+> If a skill makes use of the above mentioned modifiers, it will receive no skill bonus per level, instead the bonus to those modifiers will increase.
+> 
+> Monsters can also have skills that affect these modifiers as well.
+
 When viewing your character skeet, you will see a list of skills. Each one of those skills can be clicked on to get relevant details about said skill and about where you are in training that skill. (see image below).
 
 ## Additional skills can be added
@@ -57,11 +63,13 @@ As you fight you will train that skill over time.
 
 **The more XP you put towards a skill, the less you get in return to level. For example, putting 100% into Looting means all battle (even adventure) XP goes towards that skill.**
 
-For crafting skills, you have to physically craft items of that type. For example on the game page, you can click additional actions and select craft. From there you can select the type of item to craft and then the item its self. [Learn more about Crafting]().
+For crafting skills, you have to physically craft items of that type. For example on the game page, you can click Craft/Enchant actions and select craft. From there you can select the type of item to craft and then the item its self. [Learn more about Crafting](/information/crafting).
 
-As you craft items you will train your crafting skill for that type. Over time you'll get new items of that type to craft.
+You can also checkout [Enchanting](/information/enchanting) for more details.
 
-As you enchant it's the same thing, how ever you'll get more enchantments (or Affixes) to attach on the item.
+As you craft items you will train your crafting skill for that type. Over time, you'll get new items of that type to craft.
+
+As you enchant it's the same thing, however you'll get more enchantments (or Affixes) to attach on the item.
 
 > ### ATTN!
 >
@@ -74,9 +82,9 @@ As you enchant it's the same thing, how ever you'll get more enchantments (or Af
 
 ## Leveling Skills
 
-When you are fighting and your skill levels up, you'll see it popup in chat.
+When you are fighting, and your skill levels up, you'll see it popup in chat.
 
-If you are doing an adventure and you have logged out and have a skill training, you will see the new level when you collect your rewards from that adventure, assuming you have successfully completed the adventure and that the adventure rewards enough xp to level the skill.
+If you are doing an adventure, and you have logged out and have a skill training, you will see the new level when you collect your rewards from that adventure, assuming you have successfully completed the adventure and that the adventure rewards enough xp to level the skill.
 
 [Learn more about adventuring](/information/adventure).
 
@@ -86,11 +94,3 @@ When a skill levels there are two ways the next level xp is calculated. That is 
 
 - **For skills that can be trained**: This value is between 100 and 150 xp needed to level the skill.
 - **For crafting skills**: This value is between 100 and 200xp needed to level that skill.
-
-## Skill Training Modifiers
-
-Some [items, quest items and affixes]() will contain things that affect the training of a skill. For example Lets say you find an item that contains a bonus of 150% (you'll find these with [crafting](/information/crafting) books) xp towards the xp gained for a success of doing that skill.
-
-Every time you craft and item, or enchant, and you have that item in your inventory, you'll get the 150% xp boost on top of what you would get for practicing the skill - which is always base of 10.
-
-Some of these items are easy to come by, such as visiting ports or doing adventures. While others have a tiny drop rate of 1%. Your Looting skill would help in achieving these more harder to achieve items.

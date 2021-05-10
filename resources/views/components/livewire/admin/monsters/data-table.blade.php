@@ -8,57 +8,63 @@
                 </div>
                 <x-data-tables.table :collection="$monsters">
                     <x-data-tables.header>
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('name')" 
-                            header-text="Name" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('name')"
+                            header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="name"
                         />
-
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('max_level')" 
-                            header-text="Max Level" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('game_map_id')"
+                            header-text="Plane"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="game_map_id"
+                        />
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('max_level')"
+                            header-text="Max Level"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="max_level"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('damage_stat')" 
-                            header-text="Damage Stat" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('damage_stat')"
+                            header-text="Damage Stat"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="damage_stat"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('health_range')" 
-                            header-text="Health Range" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('health_range')"
+                            header-text="Health Range"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="health_range"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('attach_range')" 
-                            header-text="Attack Range" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('attach_range')"
+                            header-text="Attack Range"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="attach_range"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('xp')" 
-                            header-text="XP" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('xp')"
+                            header-text="XP"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="xp"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('gold')" 
-                            header-text="Gold" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('gold')"
+                            header-text="Gold"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="gold"
@@ -77,7 +83,10 @@
                             <tr>
                                 <td>
                                     @guest
-                                        {{$monster->name}}
+                                        <a href="{{route('game.monsters.monster', [
+                                                'monster' => $monster->id
+                                            ])}}">{{$monster->name}}
+                                        </a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
                                             <a href="{{route('monsters.monster', [
@@ -90,6 +99,7 @@
                                         @endif
                                     @endguest
                                 </td>
+                                <td>{{$monster->gameMap->name}}</td>
                                 <td>{{$monster->max_level}}</td>
                                 <td>{{$monster->damage_stat}}</td>
                                 <td>{{$monster->health_range}}</td>
@@ -105,7 +115,7 @@
                                                     'monster' => $monster->id,
                                             ])}}" class="btn btn-primary mt-2">Edit</a>
                                         @endif
-                                        
+
                                         @if (!\Cache::has('processing-battle-' . $monster->id) && $testCharacters->isNotEmpty())
                                             <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#monster-test-{{$monster->id}}">
                                                 Test
@@ -115,7 +125,7 @@
                                                 'users'   => $testCharacters,
                                             ])
                                         @endif
-                                        
+
                                         @foreach ($testCharacters as $user)
                                             @if ($user->character->snapShots()->where('battle_simmulation_data->monster_id', $monster->id)->get()->isNotEmpty())
                                                 <a href="{{route('admin.character.modeling.monster-data', ['monster' => $monster])}}" class="btn btn-success mt-2">View Data</a>
@@ -125,7 +135,7 @@
                                     @endif
                                     @if(auth()->user()->hasRole('Admin'))
                                         @if (!$published && !\Cache::has('processing-battle-' . $monster->id))
-                                            <x-forms.button-with-form 
+                                            <x-forms.button-with-form
                                                 form-route="{{route('monster.publish', ['monster' => $monster])}}"
                                                 form-id="publish-monster-{{$monster->id}}"
                                                 button-title="Publish Monster"

@@ -2,7 +2,7 @@
 
 As you were looking through the various races and classes you might have noticed a few extra bits of details, such as Accuracy, Dodge and Looting Modifier and the Defence Modifier.
 
-Both races and classes provide these additional bits of information.
+Both races and classes can provide these additional bonuses.
 
 **Looting**: Refers to your chance to get gold rushes and drops from the enemy. This is also a skill that you can level up over time. The higher the skill bonus percentage, the higher the chance of you getting an item.
 

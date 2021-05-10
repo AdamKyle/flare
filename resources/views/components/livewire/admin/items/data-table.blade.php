@@ -49,7 +49,7 @@
             <x-data-tables.table :collection="$items">
                 <x-data-tables.header>
                     @guest
-                    @else
+                    @elseif (!is_null($character))
                         <x-data-tables.header-row>
                             <input type="checkbox" wire:model="pageSelected"/>
                         </x-data-tables.header-row>
@@ -104,7 +104,7 @@
                     />
 
                     @guest
-                    @else
+                    @elseif (!is_null($character))
                         <x-data-tables.header-row>
                             Actions
                         </x-data-tables.header-row>
@@ -128,7 +128,7 @@
                     @forelse($items as $item)
                         <tr wire:key="items-table-{{$item->id}}">
                             @guest
-                            @else
+                            @elseif (!is_null($character))
                                 <td>
                                     <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
                                 </td>
@@ -159,7 +159,7 @@
                                             buttonTitle="Delete"
                                             class="btn btn-danger btn-sm"
                                         />
-                                    @else
+                                    @elseif (!is_null($character))
                                         <x-forms.button-with-form
                                             form-route="{{route('game.shop.buy.item', ['character' => $character->id])}}"
                                             form-id="{{'shop-buy-form-item-'.$item->id}}"

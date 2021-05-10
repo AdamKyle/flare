@@ -19,9 +19,11 @@
                         </div>
                     @endif
 
+                <div class="mb-3 mt-3">
                     @livewire($section['view'], [
-                        'only' => $section['only']
+                        'only'   => $section['only']
                     ])
+                </div>
                 @else
                     false
                 @endif

@@ -1,56 +1,102 @@
 # Time Gates
 
-Tlessa does not want to stop you from playing the game. How ever, we recognize that we could not just let you spam the attack button, or move, over and over again. Or worse, write a bot to do it for you - see [Rules of Tlessa]().
+Tlessa does not want to stop you from playing the game. However, I recognize that I could not just let you spam the attack button, 
+or move, over and over again. Or worse, write a bot to do it for you - see [Rules of Tlessa](/information/rules).
 
-Instead what Tlessa has implemented is timers. These are client side timers, fed by server side updates that happen in the background. You can switch pages, log out, log in - they are still running - assuming they have not finished.
+Instead, what Tlessa has implemented is timers. These are client side timers, fed by server side updates that happen in the background. 
+You can switch pages, log out, log in - they are still running - assuming they have not finished.
 
-All timers will be visible to players. You can close a panel that has a timer and re-open it and it will still be running.
+All timers will be visible to players. You can close a panel that has a timer and re-open it, and it will still be running.
 
 ## Actions and Timers
 
 Crafting, Attacking, Adventuring, Moving, Setting Sail, Enchanting, Fighting and Teleporting all currently have timers. Each one varies depending on what it is the timer is for. 
 
-All of these are seperate. So you can craft, kill a goblin, and move/set sail or start and adventure, for example (in that order - see [Adventure](/information/adventure) section for what happens when you begin an adventure).
+Even [Kingdoms](/information/kingdoms) has their own timers for upgrading, repairing, unit recruitment and unit movement.
 
-Lets go over these:
+All of these are separate. So you can craft, kill a goblin, and move/set sail or start and adventure, for example (in that order - see [Adventure](/information/adventure) section for what happens when you begin an adventure).
 
-- Crafting: When you craft an item, wether you are sucessful or not, you will recieve a 10 second timer.
-- Fighting: When fighting, all attacks are done client side. Once you or the creature are dead one of two timers can appear:
-  - **If you die**: You will recieve a 20 second time out before you can revive.
-    - You are considered dead and cannot do a lot of things. See [Character Information](/information/character-information).
-  - **If the Monster dies**: You will recieve a ten second time out.
-- Moving: When a character moves, they will recieve a 10 second time out.
-- Setting Sail: The pannel for setting sail will tell you how long in minutes your time out for movement based actions will be.
-- Adventuring: Depending on levels of adventure the time could vary. Each adventure will tell you how long it will take to completly fufil.
-- Enchanting Can give a 10, 20 or 30 second time out depending on if you are applying one enchant, replacing one enchant or replacing two enchants.
-- Teleporting will give you a time out equal to the time mentioned in the teleport box when going from one location to another.
+Let's go over these:
+
+- **Crafting**: When you craft an item, whether you are successful or not, you will receive a 10-second timer.
+- **Fighting**: When fighting, all attacks are done client side. Once you or the creature are dead one of two timers can appear:
+  - **If you die**: You will receive a 20-second time out before you can revive.
+    - You are considered dead and cannot do a lot of things. See bellow.
+  - **If the Monster dies**: You will receive a 10-second time out.
+- **Moving**: When a character moves, they will receive a 10-second time out.
+- **Setting Sail**: The panel for setting sail will tell you how long in minutes your time out for movement based actions will be.
+- **Adventuring**: Depending on levels of adventure the time could vary. Each adventure will tell you how long it will take to completely fulfil.
+- **Enchanting**: Can give a 10, 20 or 30 second time out depending on if you are applying one enchant, replacing one enchant or replacing two enchants.
+- **Teleporting**: Will give you a time out equal to the time mentioned in the teleport panel when going from one location to another.
+- **Traversing**: From one plane to the next, assuming you have the quest item (see [Traversing](/information/traversing)) will give you a 10-second time out for movement based actions.
+- **Kingdoms**: These each have their own set of timers:
+  - **Building upgrade**: Leveling a building has a timer in relation to minutes. The higher the building level, the longer it takes.
+  - **Unit recruitment**: Recruiting units can take seconds, minutes or even hours, depending on the amount of units you are recruiting.
+  - **Building Repair**: Has a timer based on current level of building. Repairs can only be done when a building reaches durability of 0. Leveling a damage building, that is one that has a durability below its max but above 0, will replace current durability with the new max.
+  - **Unit Movement**: All units have a moment speed. This speed is applied to the units regardless of how many you send, but stacks with other units that have a slower or equal movement speed. Distance is also taken into consideration.
+    
+### Character death
+
+Your character can die in a few ways. Fighting monsters and dying in an adventure. When you die, you cannot:
+
+- Move
+- Attack
+- Teleport
+- Set Sail
+- Adventure
+- Craft
+- Enchant
+- Equip/Unequip
+- Sell/Buy from either the shop or market board.
+- Traverse
+- Destroy items
+- Train skills
+- Manage kingdoms.
+
+You will be told to revive and that you are dead and dead people cannot do things.
 
 > ### ATTN!
 >
-> The Adventuring timer can stop unexpectly if you have died in the middle of an adventure. Each floor is processed per floor timer length. That is if a adventure has 10 floors at 2 minutes each, every two minutes we process a floor, so if you are expecting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died.
+> The Adventuring timer can stop unexpectedly if you have died in the middle of an adventure. 
+> 
+> Each floor is processed per floor timer length. That is if an adventure has 10 floors at 2 minutes each, every two minutes I process a floor, 
+> so if you are expecting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died.
 >
-> If hat is the case you will be told. You will also recieve an email, either way (sucess/failure) if you are not signed in and have that email setting enabaled.
+> If hat is the case you will be told. You will also receive an email, either way (success/failure) if you are not signed in and have that email setting enabled.
 
 ## Timers appear beside the action
 
-All timers will appear beside their coresponding action. Movement and setting sail will also have their own timer appearing beside their respecitve action button.
+All timers will appear beside their corresponding action. Movement and setting sail will also have their own timer appearing beside their respective action button.
 
-Adevturing will also have its timer beside the adventure you are embarking on as well as display notices that you cannot do anything till the adventure is over. Again there are stipulations on what you can do while adventuring, please see [Adventure](/information/adventure) section.
+Adventuring will also have its timer beside the adventure you are embarking on as well as display notices that you cannot do anything till the adventure is over. Again there are stipulations on what you can do while adventuring, please see [Adventure](/information/adventure) section.
 
-All actions will be disabled for the coresponding timer, for example if you kill a goblin and click "Atack" - while the timer is still active, youll see a message in chat telling you to wait for the appropriate timer to complete.
+All actions will be disabled for the corresponding timer, for example if you kill a goblin and click "Attack" - while the timer is still active, you'll see a message in chat telling you to wait for the appropriate timer to complete.
+
+### For Kingdoms
+
+Each kingdom on the map, has a management section. Read more in [Kingdoms](/information/kingdoms). In this management section you can see building queues and unit recruitment queues.
+
+You can cancel Building and Unit recruitment.
+
+For unit movement, there is a section in the sidebar for kingdom management, which contains a unit movement section where you can see where the units are going to and even recall them or see if they are returning.
 
 ## Chat Throttling
 
-While not a timer, and please do see [Rules of Tlessa](), you are throttled on how much you can chat. If you spam the chat box you can be timed out and cannot talk for 5 minutes. Youll see this in chat anytime you try and speak.
+While not a timer, and please do see [Rules of Tlessa](/information/rules), you are throttled on how much you can chat. If you spam the chat box you can be timed out and cannot talk for 5 minutes. You'll see this in chat anytime you try and speak.
 
-You'll first be warned to slow down, then told you cannot speak if you continue in the window it has given you, which is 25 messages in a 2 minute span.
+You'll first be warned to slow down, then told you cannot speak if you continue in the window it has given you, which is 25 messages in a 2-minute span.
 
-The Creator, can also silence you for 10, 30 or 60 minutes.
+The Creator (me), can also silence you for 10, 30 or 60 minutes.
 
-The time until you can talk again will be disaplayed in big bright red letters with your local time (client side) of when you can talk again.
+The time until you can talk again will be displayed in big bright red letters with **your local time (client side)** of when you can talk again.
 
 Upon being able to chat you'll see a server message appear telling you can chat again.
 
-If you are not logged in and have the appropriate settings enabled, we will email you when you can talk again.
+If you are not logged in and have the appropriate settings enabled, you will email you when you can talk again.
+
+> ### ATTN!
+> 
+> There is no item you can buy to get around timers. There are SOME quest items and other items you can gain, by playing the game only, that will shorten the length of a timer by
+> a small percentage. You will always have a timer for a corresponding action.
 
 

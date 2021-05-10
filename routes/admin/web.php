@@ -1,5 +1,7 @@
 <?php
 
+Route::get('/affixes/{affix}', ['as' => 'game.affixes.affix', 'uses' => 'AffixesController@show']);
+
 Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
     Route::get('/admin/maps', ['as' => 'maps', 'uses' => 'MapsController@index']);

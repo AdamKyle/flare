@@ -38,11 +38,12 @@
             </p>
         </div>
         <hr />
-        @if (auth()->user()->hasRole('Admin') && $canEdit)
+        @guest
+        @elseif (auth()->user()->hasRole('Admin') && $canEdit)
             <a href="{{route('monster.edit', [
                 'monster' => $monster->id,
             ])}}" class="btn btn-primary mt-2">Edit Monster</a>
-        @endif
+        @endguest
     </div>
 </div>
 

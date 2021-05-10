@@ -60,8 +60,8 @@ class GameSkillsSeeder extends Seeder
                 'fight_time_out_mod_bonus_per_level' => 0.0,
                 'move_time_out_mod_bonus_per_level'  => 0.0,
                 'can_train'                          => false,
-                'max_level'                          => 100,
-                'skill_bonus_per_level'              => 0.01
+                'max_level'                          => 400,
+                'skill_bonus_per_level'              => 0.0025
              ],
              [
                 'name'                               => 'Armour Crafting',
@@ -72,8 +72,8 @@ class GameSkillsSeeder extends Seeder
                 'fight_time_out_mod_bonus_per_level' => 0.0,
                 'move_time_out_mod_bonus_per_level'  => 0.0,
                 'can_train'                          => false,
-                'max_level'                          => 100,
-                'skill_bonus_per_level'              => 0.01
+                'max_level'                          => 400,
+                'skill_bonus_per_level'              => 0.0025
              ],
              [
                 'name'                               => 'Spell Crafting',
@@ -84,8 +84,8 @@ class GameSkillsSeeder extends Seeder
                 'fight_time_out_mod_bonus_per_level' => 0.0,
                 'move_time_out_mod_bonus_per_level'  => 0.0,
                 'can_train'                          => false,
-                'max_level'                          => 100,
-                'skill_bonus_per_level'              => 0.01
+                'max_level'                          => 400,
+                'skill_bonus_per_level'              => 0.0025
              ],
              [
                 'name'                               => 'Ring Crafting',
@@ -96,8 +96,8 @@ class GameSkillsSeeder extends Seeder
                 'fight_time_out_mod_bonus_per_level' => 0.0,
                 'move_time_out_mod_bonus_per_level'  => 0.0,
                 'can_train'                          => false,
-                'max_level'                          => 100,
-                'skill_bonus_per_level'              => 0.01
+                'max_level'                          => 400,
+                'skill_bonus_per_level'              => 0.0025
              ],
              [
                 'name'                               => 'Artifact Crafting',
@@ -108,8 +108,8 @@ class GameSkillsSeeder extends Seeder
                 'fight_time_out_mod_bonus_per_level' => 0.0,
                 'move_time_out_mod_bonus_per_level'  => 0.0,
                 'can_train'                          => false,
-                'max_level'                          => 100,
-                'skill_bonus_per_level'              => 0.01
+                'max_level'                          => 400,
+                'skill_bonus_per_level'              => 0.0025
              ],
              [
                'name'                               => 'Enchanting',
@@ -120,8 +120,8 @@ class GameSkillsSeeder extends Seeder
                'fight_time_out_mod_bonus_per_level' => 0.0,
                'move_time_out_mod_bonus_per_level'  => 0.0,
                'can_train'                          => false,
-               'max_level'                          => 100,
-               'skill_bonus_per_level'              => 0.01
+               'max_level'                          => 400,
+               'skill_bonus_per_level'              => 0.0025
             ],
         ]);
     }

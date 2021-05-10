@@ -25,7 +25,7 @@ class CreateClasses extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0.01,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 0.5,
+                'deffense_mod' => 0.05,
                 'looting_mod'  => 0,
             ],
             [

@@ -8,6 +8,14 @@ For optimal game play, it’s suggested that you equip gear that helps boost you
 
 However, as stated before, you should never feel pigeonholed into one specific class or race because “it’s most optimal.” Experiment.
 
+<div class="mb-4">
+    <a href="/storage/info/character-stats/images/character-sheet.png" class="glightbox">
+        <img src="/storage/info/character-stats/images/character-sheet.png" class="img-fluid" />
+    </a>
+</div>
+
+In the above image you can see, in the inventory section, a **Stat to focus on for max damage**. This is your classes core stat.
+
 The core stats of a character are:
 
 -	Strength (str)
@@ -22,7 +30,7 @@ Each class corresponds to one of these stats for their base damage stat.
 
 When it comes to being able to attack, that is actually hit your enemy, you’ll need to raise your dexterity. This is to counter their AC and their Dodge. Your accuracy plays a role in attempting to land an attack on the enemy. You can compensate for lack of accuracy levels, by equipping gear that has accuracy boosting and/or dexterity boosting items.
 
-When it comes to your skill level in dodging and your dexterity play a role. Again, you can make up for the lack of dodging levels by having gear that increases the skill bonus for dodging.
+When it comes to dodging an attack, your skill level in dodging, and your dexterity play a role. Again, you can make up for the lack of dodging levels by having gear that increases the skill bonus for dodging.
 
 Finally, when it comes to blocking we take into account, just your armour class (AC). 
 
@@ -40,7 +48,7 @@ While that’s fair, you’ll also need gear that helps your dexterity rise in o
 
 What about intelligence to enchant? Unlike crafting you cannot enchant items if you don’t have the intelligence.
 
-This is where having “sets” of armour and weapons, spells and artifacts as well as rings that boost our primary damage stat, your dexterity and your intelligence will come in handy.
+This is where having “sets” of armour and weapons, spells and artifacts as well as rings that boost your primary damage stat, your dexterity and your intelligence will come in handy.
 
 Depending on what you are doing, your gear will affect your stats and skills in some way. 
 
