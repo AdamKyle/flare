@@ -60,12 +60,12 @@ class AdventureJob implements ShouldQueue
      * @return void
      */
     public function __construct(
-        Character $character, 
-        Adventure $adventure, 
-        string $name, 
-        int $currentLevel, 
-        bool $characterModeling = false, 
-        User $user = null, 
+        Character $character,
+        Adventure $adventure,
+        string $name,
+        int $currentLevel,
+        bool $characterModeling = false,
+        User $user = null,
         bool $sendEmail = false
     ) {
         $this->character          = $character;
@@ -90,30 +90,31 @@ class AdventureJob implements ShouldQueue
             return;
         }
 
-        $adevntureService = resolve(AdventureService::class, [
+        $adventureService = resolve(AdventureService::class, [
             'character'           => $this->character->refresh(),
             'adventure'           => $this->adventure,
             'rewardBuilder'       => $rewardBuilder,
             'name'                => $this->name
         ]);
 
-        $adevntureService->processAdventure($this->currentLevel, $this->adventure->levels, $this->characterModeling);
+        $adventureService->processAdventure($this->currentLevel, $this->adventure->levels, $this->characterModeling);
 
-        if ($this->currentLevel === $this->adventure->levels) {
+        if ($this->currentLevel === $this->adventure->levels && !$this->characterModeling) {
             Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
         }
 
         if ($this->characterModeling) {
             $data = [];
-            $data[$this->currentLevel] = $adevntureService->getLogInformation();
+            $data[$this->currentLevel] = $adventureService->getLogInformation();
 
             $snapShot = CharacterSnapShot::where('snap_shot->level', strval($this->character->level))
                                          ->where('character_id', $this->character->id)
                                          ->first();
-            
+
             $snapShot->update(['adventure_simmulation_data' => $data]);
 
             if ($this->currentLevel === $this->adventure->levels) {
+
                 $data         = [];
                 $snapShotData = $snapShot->refresh()->adventure_simmulation_data;
 
@@ -124,17 +125,17 @@ class AdventureJob implements ShouldQueue
                     'adventure_simmulation_data' => $data,
                 ]);
 
-                $snapShot = $snapShot->refresh();
-
                 // Finally reset the character back to level 1000.
                 $this->character->update(
                     $this->character->snapShots()->orderBy('snap_shot->level', 'desc')->first()->snap_shot
                 );
-                
+
                 if ($this->sendEmail) {
                     Mail::to($this->user->email)->send(new GenericMail($this->user, 'Your adventure simulation has completed. Login and see the details for adventure: ' . $this->adventure->name . '.', 'Adventure Simulation Results', false));
 
                     Cache::delete('processing-adventure-' . $this->adventure->id);
+
+                    Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
                 }
             }
         }

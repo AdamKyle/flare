@@ -8,62 +8,62 @@
                 </div>
                 <x-data-tables.table :collection="$adventures">
                     <x-data-tables.header>
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('name')" 
-                            header-text="Name" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('name')"
+                            header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="name"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('levels')" 
-                            header-text="Total Levels" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('levels')"
+                            header-text="Total Levels"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="levels"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('time_per_level')" 
-                            header-text="Tme Per Level" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('time_per_level')"
+                            header-text="Tme Per Level"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="time_per_level"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('gold_rush_chance')" 
-                            header-text="Gold rush chance" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('gold_rush_chance')"
+                            header-text="Gold rush chance"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="gold_rush_chance"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('item_find_chance')" 
-                            header-text="Item find chance" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('item_find_chance')"
+                            header-text="Item find chance"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="item_find_chance"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('skill_exp_bonus')" 
-                            header-text="Skill XP Bonus" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('skill_exp_bonus')"
+                            header-text="Skill XP Bonus"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="skill_exp_bonus"
                         />
                         @guest
                         @else
-                            @if (auth()->user()->hasRole('Admin'))  
+                            @if (auth()->user()->hasRole('Admin'))
                                 <x-data-tables.header-row>
                                     Actions
                                 </x-data-tables.header-row>
-                            @endif 
+                            @endif
                         @endguest
-                        
+
                     </x-data-tables.header>
                     <x-data-tables.body>
                         @forelse($adventures as $adventure)
@@ -86,7 +86,7 @@
                                 <td>{{$adventure->skill_exp_bonus * 100}}%</td>
                                 @guest
                                 @else
-                                    @if (auth()->user()->hasRole('Admin'))  
+                                    @if (auth()->user()->hasRole('Admin'))
                                         <td>
                                             @if (!\Cache::has('processing-adventure-' . $adventure->id))
                                                 <a href="{{route('adventure.edit', [
@@ -112,7 +112,7 @@
                                                         'users'   => $testCharacters,
                                                     ])
                                                 @endif
-                                                
+
                                                 @foreach ($testCharacters as $user)
                                                     @if ($user->character->snapShots()->where('adventure_simmulation_data->adventure_id', $adventure->id)->get()->isNotEmpty())
                                                         <a href="{{route('admin.character.modeling.adventure-data', ['adventure' => $adventure])}}" class="btn btn-success mt-2">View Data</a>
@@ -121,24 +121,24 @@
                                                 @endforeach
                                             @endif
 
-                                            @if (\Cache::has('processing-adventure-' . $adventure->id))
+                                            @if (Cache::has('processing-adventure-' . $adventure->id))
                                                 Testing underway. We will email you when done.
                                             @endif
                                         </td>
-                                    @endif 
+                                    @endif
                                 @endguest
                             </tr>
                         @empty
                             @guest
                                 <x-data-tables.no-results colspan="6" />
                             @else
-                                @if (auth()->user()->hasRole('Admin'))  
+                                @if (auth()->user()->hasRole('Admin'))
                                     <x-data-tables.no-results colspan="7" />
                                 @else
                                     <x-data-tables.no-results colspan="6" />
-                                @endif 
+                                @endif
                             @endguest
-                                
+
                         @endforelse
                     </x-data-tables.body>
                 </x-data-tables.table>

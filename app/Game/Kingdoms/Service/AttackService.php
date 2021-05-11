@@ -268,7 +268,7 @@ class AttackService {
 
             UpdateUnitMovementLogs::dispatch($character);
 
-            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes(5 /*$timeToReturn*/));
+            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes($timeToReturn));
         }
     }
 

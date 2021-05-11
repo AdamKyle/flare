@@ -87,7 +87,7 @@ class KingdomsAttackService {
                     'from_kingdom_id' => $kingdom->id,
                     'to_kingdom_id'   => $defender->id,
                     'units_moving'    => $unitsToSend,
-                    'completed_at'    => now()->addMinutes(5), // temp
+                    'completed_at'    => now()->addMinutes($timeTillFinished),
                     'started_at'      => now(),
                     'moving_to_x'     => $defender->x_position,
                     'moving_to_y'     => $defender->y_position,
@@ -96,7 +96,7 @@ class KingdomsAttackService {
                     'is_attacking'    => true,
                 ]);
 
-                MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes(5)/*$timeTillFinished*/);
+                MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes($timeTillFinished));
 
                 $kingdom = new Item($kingdom->refresh(), $this->kingdomTransformer);
 

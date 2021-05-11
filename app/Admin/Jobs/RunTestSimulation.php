@@ -70,7 +70,7 @@ class RunTestSimulation implements ShouldQueue
 
     /**
      * Processes the type of simmulation test we want.
-     * 
+     *
      * @return void
      */
     public function handle() {
@@ -86,13 +86,24 @@ class RunTestSimulation implements ShouldQueue
 
     protected function processAdventure() {
         $jobName = Str::random(80);
-                
-        Cache::put('character_'.$this->character->id.'_adventure_'.$this->model->id, $jobName, now()->addMinutes(5));
+
+        // Level Completion time plus an extra 5 minutes.
+        $cacheTime = $this->model->levels * $this->model->time_per_level + 5;
+
+        Cache::put('character_'.$this->character->id.'_adventure_'.$this->model->id, $jobName, now()->addMinutes($cacheTime));
+
+        $this->character->adventureLogs()->create([
+            'character_id' => $this->character->id,
+            'adventure_id' => $this->model->id,
+            'in_progress'  => true,
+        ]);
+
+        dump('Send Email: ' . $this->sendEmail);
 
         for ($i = 1; $i <= $this->model->levels; $i++) {
             $delay            = $i === 1 ? $this->model->time_per_level : $i * $this->model->time_per_level;
             $timeTillFinished = now()->addMinutes($delay);
-
+            dump('Adventure Job Current Level: ' . $i);
             AdventureJob::dispatch($this->character, $this->model, $jobName, $i, true, $this->adminUser, $this->sendEmail)->delay($timeTillFinished);
         }
     }

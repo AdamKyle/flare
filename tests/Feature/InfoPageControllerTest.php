@@ -15,7 +15,7 @@ use Tests\Traits\CreateGameSkill;
 
 class InfoPageControllerTest extends TestCase
 {
-    use RefreshDatabase, 
+    use RefreshDatabase,
         CreateAdventure,
         createClass,
         createRace,
@@ -31,9 +31,9 @@ class InfoPageControllerTest extends TestCase
         $files = Storage::disk('info')->allFiles();
 
         Storage::disk('info')->delete($files);
-        
+
         parent::tearDown();
-        
+
         app()->instance('config', $config);
     }
 
@@ -52,7 +52,7 @@ class InfoPageControllerTest extends TestCase
         $this->createRace(['name' => 'Human']);
 
         $this->visitRoute('info.page', [
-            'pageName' => 'character-information'
+            'pageName' => 'races-and-classes'
         ])->see('Human');
     }
 
@@ -66,7 +66,7 @@ class InfoPageControllerTest extends TestCase
 
     public function test404ForInvalidPage() {
         $this->artisan('move:files');
-        
+
         config(['info.home' => null]);
 
         $response = $this->call('GET', route('info.page', [

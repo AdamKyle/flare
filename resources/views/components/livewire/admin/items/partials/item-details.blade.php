@@ -123,7 +123,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="item-skill-bonus">Skill Bonus: </label>
-                <input type="number" steps="0.01" class="form-control required" id="item-skill-bonus" name="name" wire:model="item.skill_bonus">
+                <input type="number" steps="0.01" class="form-control required" id="item-skill-bonus" name="name" wire:model="item.skill_bonus" {{is_null($item->skill_name) || $item->skill_name === "" ? 'disabled' : ''}}>
                 <span class="text-muted">Applies a character roll percentage when using said skill.</span><br />
                 @error('skill_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>

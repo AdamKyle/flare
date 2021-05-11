@@ -151,7 +151,7 @@ class AdventureService {
                 return;
             }
 
-            $this->adventureTookToLong($attackService, $adventureLog);
+            $this->adventureTookToLong($attackService, $adventureLog, $characterModeling);
 
             $this->adventureIsOver($adventureLog, $currentLevel, true);
 
@@ -161,7 +161,12 @@ class AdventureService {
         $attackService->resetLogInfo();
     }
 
-    protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog) {
+    protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog, bool $characterModeling = false) {
+
+        if ($characterModeling) {
+            return $this->setCharacterModelingLogs($this, false, true);
+        }
+
         Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
         $this->character->update([
@@ -187,12 +192,12 @@ class AdventureService {
     }
 
     protected function characterIsDead(FightService $attackService, AdventureLog $adventureLog, int $level, bool $characterModeling = false) {
-        Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
         if ($characterModeling) {
-            $this->setCharacterModelingLogs($attackService, true);
-            return;
+            return $this->setCharacterModelingLogs($attackService, true);
         }
+
+        Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
         $this->character->update([
             'can_move'               => true,

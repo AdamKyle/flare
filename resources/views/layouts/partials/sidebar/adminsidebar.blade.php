@@ -1,5 +1,8 @@
 <ul id="sidebarnav">
     <li>
+        <a href="{{route('home')}}" aria-expanded="false"><i class="fas fa-home"></i><span class="hide-menu ml-2">Home</span></a>
+    </li>
+    <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="fas fa-users"></i><span class="hide-menu"> Manage Users</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('users.list')}}">Users</a></li>

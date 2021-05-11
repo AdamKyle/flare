@@ -198,7 +198,8 @@ class CharacterModelingController extends Controller {
                 break;
         }
 
-        $sendEmail = false;
+        $sendMail  = false;
+        $lastIndex = array_key_last($request->characters);
 
         foreach ($request->characters as $index => $id) {
             $character = Character::find($id);
@@ -216,13 +217,11 @@ class CharacterModelingController extends Controller {
 
             $character->update($snapShot->snap_shot);
 
-            if ($totalCharacters === 1) {
-                $sendEmail = true;
-            } else if ($index === $totalCharacters) {
-                $sendEmail = true;
+            if ($lastIndex === $index) {
+                $sendMail = true;
             }
 
-            RunTestSimulation::dispatchNow($character->refresh(), $request->type, $request->model_id, $request->total_times, auth()->user(), $sendEmail, $index);
+            RunTestSimulation::dispatch($character->refresh(), $request->type, $request->model_id, $request->total_times, auth()->user(), $sendMail);
         }
 
         return redirect()->to($route)->with('success', 'Testing under way. You may log out, we will email you when done.');
