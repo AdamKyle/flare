@@ -74,6 +74,7 @@ export default class PortSection extends React.Component {
           userId={this.props.userId}
           updatePlayerPosition={this.props.updatePlayerPosition}
           updateAdventure={this.props.updateAdventure}
+          closePort={this.hidePort.bind(this)}
         />
       </Card>
     )

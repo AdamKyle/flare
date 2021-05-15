@@ -120,7 +120,15 @@ export default class FightSection extends React.Component {
         }, () => {
           this.props.setMonster(null);
         });
-      });
+      }).catch((err) => {
+        if (error.hasOwnProperty('response')) {
+          const response = error.response;
+
+          if (response.status === 429) {
+            getServerMessage('attacking_to_much');
+          }
+        }
+      });;
     }
   }
 
@@ -137,7 +145,7 @@ export default class FightSection extends React.Component {
       }, () => {
         this.props.isCharacterDead(result.data.character.is_dead);
       });
-    });
+    })
   }
 
   healthMeters() {
@@ -180,7 +188,7 @@ export default class FightSection extends React.Component {
             this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead && this.state.monster !== null ?
               <>
                 <button className="btn btn-primary" onClick={this.attack.bind(this)}
-                        disabled={this.state.isAdventuring}>Attack
+                        disabled={this.props.isAdventuring}>Attack
                 </button>
                 {this.healthMeters()}
               </>

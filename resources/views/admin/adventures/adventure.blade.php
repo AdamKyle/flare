@@ -12,9 +12,21 @@
                 @if (auth()->user()->hasRole('Admin'))
                     <a href="{{route('adventures.list')}}" class="btn btn-primary float-right ml-2">Back</a>
                 @else
-                    <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Back</a>
+                    @guest
+                        <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+                    @else
+                        @php
+                            $url   = url()->previous();
+                            $route = app('router')->getRoutes($url)->match(app('request')->create($url))->getName();
+                        @endphp
+
+                        @if ($route === 'info.page')
+                            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+                        @else
+                            <a href="{{route('game')}}" class="btn btn-primary float-right ml-2">Back</a>
+                        @endif
+                    @endguest
                 @endif
-                
             @endGuest
         </div>
     </div>

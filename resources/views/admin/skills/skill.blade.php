@@ -20,8 +20,8 @@
                         <hr />
                         @if (!$skill->can_train)
                             <p>
-                                This skill cannot be trained by fighting alone. Instead, 
-                                by crafting weapons of this type youll gain some xp towards its level. 
+                                This skill cannot be trained by fighting alone. Instead,
+                                by crafting weapons of this type you'll gain some xp towards its level.
                                 Certain quest items can help increase
                                 the amount of xp you get from training this skill.
                             </p>

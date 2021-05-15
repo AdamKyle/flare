@@ -70,13 +70,19 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="{{route('info.page.adventure', [
+                                        <a href="{{route('game.adventures.adventure', [
                                             'adventure' => $adventure->id
                                         ])}}">{{$adventure->name}}</a>
                                     @else
-                                        <a href="{{route('adventures.adventure', [
-                                            'adventure' => $adventure->id
-                                        ])}}">{{$adventure->name}}</a>
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('adventures.adventure', [
+                                                'adventure' => $adventure->id
+                                            ])}}">{{$adventure->name}}</a>
+                                        @else
+                                            <a href="{{route('game.adventures.adventure', [
+                                                'adventure' => $adventure->id
+                                            ])}}">{{$adventure->name}}</a>
+                                        @endif
                                     @endif
                                 </td>
                                 <td>{{$adventure->levels}}</td>

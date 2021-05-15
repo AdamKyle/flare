@@ -32,7 +32,7 @@ class EquipItemValidation extends FormRequest
 
     public function messages() {
         return [
-            'position.required'   => 'Error. Invalid Input.',
+            'position.required'   => 'You must select a position for your item',
             'position.in'         => 'Error. Invalid Input.',
             'slot_id.required'    => 'Error. Invalid Input.',
             'equip_type.required' => 'Error. Invalid Input.',

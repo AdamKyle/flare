@@ -69,18 +69,16 @@ export default class AdventureEmbark extends React.Component {
               Please make sure you have equipped any items you want for this adventure. <br/>
               Once started you cannot do the following:
             </p>
-            <p>
-              <ul>
-                <li>Craft/Enchant</li>
-                <li>Move/Set Sail or Teleport</li>
-                <li>Manage Equipment (Including equip, unequip or destroy)</li>
-                <li>Fight Monsters</li>
-                <li>Manage/Attack or Settle Kingdoms</li>
-                <li>Train Skills</li>
-                <li>Buy Items (From Shop or Market)</li>
-                <li>List or Sell Items (From Shop or Market)</li>
-              </ul>
-            </p>
+            <ul className="mb-1 mt-2">
+              <li>Craft/Enchant</li>
+              <li>Move/Set Sail or Teleport</li>
+              <li>Manage Equipment (Including equip, unequip or destroy)</li>
+              <li>Fight Monsters</li>
+              <li>Manage/Attack or Settle Kingdoms</li>
+              <li>Train Skills</li>
+              <li>Buy Items (From Shop or Market)</li>
+              <li>List or Sell Items (From Shop or Market)</li>
+            </ul>
             <hr/>
             <p className="mb-0">Should you need additional help, please consider this resource on <a
               href="/information/adventure" target="_blank">adventureing</a>.</p>

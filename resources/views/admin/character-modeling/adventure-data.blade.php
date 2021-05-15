@@ -6,7 +6,7 @@
             <h4 class="mt-3">Adventure Simulation Data For: {{$adventure->name}}</h4>
         </div>
         <div class="col-md-6 align-self-right">
-            <a href="{{url()->previous()}}" class="btn btn-success float-right ml-2">Back</a>
+            <a href="{{route('adventures.list')}}" class="btn btn-success float-right ml-2">Back</a>
             <a href="{{route('adventures.adventure', ['adventure' => $adventure->id])}}" class="btn btn-primary float-right ml-2">View Adventure</a>
         </div>
     </div>

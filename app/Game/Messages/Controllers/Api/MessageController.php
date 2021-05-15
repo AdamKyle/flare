@@ -3,6 +3,7 @@
 namespace App\Game\Messages\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Handlers\MessageThrottledHandler;
 use App\Game\Messages\Values\MapChatColor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -87,6 +88,12 @@ class MessageController extends Controller {
     }
 
     public function generateServerMessage(Request $request) {
+        if ($request->type === 'chatting_to_much') {
+            $handler = resolve(MessageThrottledHandler::class);
+
+            $handler->forUser(auth()->user())->increaseThrottleCount()->silence();
+        }
+
         broadcast(new ServerMessageEvent(auth()->user(), $this->serverMessage->build($request->type)));
 
         return response()->json([], 200);

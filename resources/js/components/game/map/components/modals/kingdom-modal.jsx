@@ -59,6 +59,12 @@ export default class KingdomModal extends React.Component {
     return this.time() * 1000;
   }
 
+  disabled() {
+    const doesNotHaveGold = this.cost() > this.state.character.gold;
+    console.log(this.props.disableMapButtons() || doesNotHaveGold);
+    return this.props.disableMapButtons() || doesNotHaveGold;
+  }
+
   teleport() {
     axios.post('/api/map/teleport/' + this.props.characterId, {
       x: this.props.kingdom.x_position,
@@ -126,7 +132,7 @@ export default class KingdomModal extends React.Component {
           }
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={this.teleport.bind(this)} disabled={this.props.disableMapButtons()}>
+          <Button variant="primary" onClick={this.teleport.bind(this)} disabled={this.disabled()}>
             Teleport To Kingdom
           </Button>
           <Button variant="danger" onClick={this.props.close}>

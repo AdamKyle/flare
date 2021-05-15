@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
@@ -21,11 +24,41 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
-        //
+    public function boot() {
+        $this->configureRateLimiting();
 
         parent::boot();
+    }
+
+    /**
+     * Custom Rate Limiters go here.
+     */
+    protected function configureRateLimiting() {
+
+        // When sending public or private messages
+        RateLimiter::for('chat', function(Request $request) {
+            return Limit::perMinute(25)->by($request->ip());
+        });
+
+        // When fighting monsters
+        RateLimiter::for('fighting', function(Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
+
+        // When crafting items
+        RateLimiter::for('crafting', function(Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
+
+        // When enchanting items
+        RateLimiter::for('enchanting', function(Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
+
+        // When moving around the map (including traversing)
+        RateLimiter::for('moving', function(Request $request) {
+            return Limit::perMinute(15)->by($request->ip());
+        });
     }
 
     /**

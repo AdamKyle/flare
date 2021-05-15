@@ -305,7 +305,13 @@ export default class Chat extends React.Component {
       user_name: messageData[1],
       message: messageData[2],
     }).catch((error) => {
-      console.error(error);
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 429) {
+          getServerMessage('chatting_to_much');
+        }
+      }
     });
   }
 

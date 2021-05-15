@@ -62,6 +62,7 @@ class Character extends Model
         'can_attack'             => 'boolean',
         'can_move'               => 'boolean',
         'can_craft'              => 'boolean',
+        'can_adventure'          => 'boolean',
         'is_dead'                => 'boolean',
         'force_name_change'      => 'boolean',
         'can_move_again_at'      => 'datetime',

@@ -154,7 +154,7 @@ export default class AdeventureActions extends React.Component {
         <div key={adventure.id} className="mb-2">
           <Row>
             <Col xs={3} sm={3} lg={3} xl={2}>
-              <a href={'/adeventures/' + adventure.id} target="_blank"> {adventure.name} </a>
+              <a href={'/adventures/' + adventure.id} target="_blank"> {adventure.name} </a>
             </Col>
             <Col xs={9} sm={9} lg={9} xl={9}>
               <Row>
@@ -234,7 +234,6 @@ export default class AdeventureActions extends React.Component {
             adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         {hasAdventureInProgress ?
           <div className="alert alert-info">You may only embark on one adventure at a time</div> : null}
-
         {this.adventures()}
 
         {this.state.showEmbark ? <AdventureEmbark

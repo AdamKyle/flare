@@ -117,6 +117,30 @@ export default class BattleAction extends React.Component {
     });
   }
 
+  monsterSelectDisabled() {
+    if (this.state.character.is_dead) {
+      return true;
+    }
+
+    if (this.state.isAdventuring) {
+      return true;
+    }
+
+    return false;
+  }
+
+  againDisabled() {
+    if (parseInt(this.state.monster) === 0) {
+      return true;
+    }
+
+    if (this.state.isAdventuring) {
+      return true;
+    }
+
+    return false;
+  }
+
   renderActions() {
     return (
       <>
@@ -133,7 +157,7 @@ export default class BattleAction extends React.Component {
             <select className="form-control monster-select" id="monsters" name="monsters"
                     value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
                     onChange={this.updateActions.bind(this)}
-                    disabled={this.state.character.is_dead || this.state.isAdventuring}>
+                    disabled={this.monsterSelectDisabled()}>
               <option value="" key="0">Please select a monster</option>
               {this.monsterOptions()}
             </select>
@@ -141,7 +165,7 @@ export default class BattleAction extends React.Component {
           <Col xs={3} sm={3} md={3} lg={3} xl={1}>
             <button className="btn btn-primary"
                     type="button"
-                    disabled={this.state.monster !== 0 ? false : true}
+                    disabled={this.againDisabled()}
                     onClick={this.fightAgain.bind(this)}
             >
               Again!

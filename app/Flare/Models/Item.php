@@ -248,7 +248,7 @@ class Item extends Model
     }
 
     /**
-     * Gets the total skill training bonus
+     * Gets the total skill training bonus (XP bonus)
      *
      * @param $query
      * @param string $skillName
@@ -281,8 +281,34 @@ class Item extends Model
         return $baseSkillTraining;
     }
 
+    public function scopeGetItemSkills($query): array {
+        $skills = [];
+
+        if (!is_null($this->itemPrefix)) {
+            if (!is_null($this->itemPrefix->skill_name)) {
+                $skills[] = [
+                    'skill_name'           => $this->itemPrefix->skill_name,
+                    'skill_training_bonus' => $this->itemSuffix->skill_training_bonus,
+                    'skill_bonus'          => $this->itemSuffix->skill_bonus,
+                ];
+            }
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            if (!is_null($this->itemSuffix->skill_name)) {
+                $skills[] = [
+                    'skill_name'           => $this->itemSuffix->skill_name,
+                    'skill_training_bonus' => $this->itemSuffix->skill_training_bonus,
+                    'skill_bonus'          => $this->itemSuffix->skill_bonus,
+                ];
+            }
+        }
+
+        return $skills;
+    }
+
     /**
-     * Gets the total skill training bonus
+     * Gets the total skill training bonus (Bonus when using)
      *
      * @param $query
      * @param string $skillName

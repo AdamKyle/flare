@@ -54,12 +54,6 @@ class Handler extends ExceptionHandler
             return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');
         }
 
-        if ($exception instanceof ThrottleRequestsException) {
-            $handler = resolve(MessageThrottledHandler::class);
-
-            $handler->forUser(auth()->user())->increaseThrottleCount()->silence();
-        }
-
         return parent::render($request, $exception);
     }
 }

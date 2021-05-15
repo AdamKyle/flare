@@ -2,6 +2,7 @@
 
 namespace App\Game\Adventures\Services;
 
+use App\Game\Adventures\Jobs\AdventureJob;
 use Mail;
 use Cache;
 use App\Flare\Models\Adventure;
@@ -122,6 +123,8 @@ class AdventureService {
                              ->where('adventure_id', $this->adventure->id)
                              ->where('in_progress', true)
                              ->first();
+        dump('Before We Process Battle whats the rewards? For id: ' . $this->adventure->id);
+        dump($adventureLog->rewards);
 
         $attackService = $attackService->processBattle();
 
@@ -291,9 +294,14 @@ class AdventureService {
     protected function setLogs(FightService $attackService, AdventureLog $adventureLog) {
 
         $logs = $adventureLog->logs;
+        $emptyLogs = is_null($logs) ? 'Yes' : 'No';
+        dump('Are the logs null?: ' . $emptyLogs);
 
+        dump('Whats in rewards before we update?');
+        dump($adventureLog->rewards);
         if (is_null($logs)) {
-
+            dump('Logs are Empty');
+            dump($logs);
             $logDetails              = [];
             $logDetails[$this->name] = [$attackService->getLogInformation()];
 
@@ -302,13 +310,33 @@ class AdventureService {
                 'rewards' => $this->rewards
             ]);
         } else {
+            dump('Logs say they are empty but they are not:');
+            dump($logs);
             $logs[$this->name][] = $attackService->getLogInformation();
 
+            $rewards = $adventureLog->rewards;
+
+            dump('Rewards From Adventure Log: ');
+            dump($rewards);
+
+            dump('Rewards from This Class: ');
+            dump($this->rewards);
+
+            $rewards['exp']  += $this->rewards['exp'];
+            $rewards['gold'] += $this->rewards['gold'];
+            $rewards['items'] = array_merge($this->rewards['items'], $rewards['items']);
+
+            dump('Rewards before saving: ');
+            dump($rewards);
+
             $adventureLog->update([
-                'logs' => $logs,
-                'rewards' => $this->rewards,
+                'logs'    => $logs,
+                'rewards' => $rewards,
             ]);
         }
+
+        dump('Whats in rewards after we update?');
+        dump($adventureLog->refresh()->rewards);
     }
 
     protected function adventureIsOver(AdventureLog $adventureLog, int $level, bool $tookTooLong = false) {
@@ -372,7 +400,6 @@ class AdventureService {
                 'in_progress'          => false,
                 'last_completed_level' => $level,
                 'complete'             => true,
-                'rewards'              => $this->rewards,
             ]);
 
         }

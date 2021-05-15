@@ -194,6 +194,7 @@ export default class ActionsSection extends React.Component {
               isCharacterDead={this.characterIsDead.bind(this)}
               setMonster={this.setMonster.bind(this)}
               canAttack={this.props.canAttack}
+              isAdventuring={this.state.isAdventuring}
             />
           </Col>
         </Row>

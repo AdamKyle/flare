@@ -4,7 +4,7 @@ Route::middleware(['auth:api', 'is.player.banned', 'is.character.who.they.say.th
     // Map related info:
     Route::get('/map/{user}', ['uses' => 'Api\MapController@mapInformation']);
 
-    Route::group(['middleware' => 'throttle:100,1'], function() {
+    Route::group(['middleware' => 'throttle:moving'], function() {
         // Map Movement:
         Route::post('/move/{character}', ['uses' => 'Api\MapController@move']);
 

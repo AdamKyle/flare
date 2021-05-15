@@ -110,6 +110,8 @@ export default class Teleport extends React.Component {
       y: this.state.selected_y,
       cost: this.cost(),
       timeout: this.time(),
+    }).then(() => {
+      this.closeDetails();
     }).catch((error) => {
       this.setState({
         errorMessage: error.response.data.message

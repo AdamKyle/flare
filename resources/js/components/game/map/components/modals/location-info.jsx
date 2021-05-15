@@ -12,7 +12,7 @@ export default class LocationInfo extends React.Component {
     this.props.location.adventures.forEach((adventure) => {
       adventures.push(
         <li key={adventure.id}>
-          <a href={'/adeventures/' + adventure.id} target="_blank">{adventure.name} -
+          <a href={'/adventures/' + adventure.id} target="_blank">{adventure.name} -
             Levels: {adventure.levels} at: {adventure.time_per_level} minutes per level.</a>
         </li>
       );

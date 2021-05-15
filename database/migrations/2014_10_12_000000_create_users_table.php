@@ -31,7 +31,7 @@ class CreateUsersTable extends Migration
             $table->boolean('adventure_email')->default(true);
             $table->boolean('new_building_email')->default(true);
             $table->boolean('upgraded_building_email')->default(true);
-            $table->boolean('kingdoms_update_email')->default(true);
+            $table->boolean('kingdoms_update_email')->default(false);
             $table->boolean('rebuilt_building_email')->default(true);
             $table->boolean('kingdom_attack_email')->default(true);
             $table->boolean('is_test')->default(false);

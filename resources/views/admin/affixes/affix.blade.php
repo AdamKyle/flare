@@ -35,7 +35,9 @@
                         <dd>{{$itemAffix->chr_mod * 100}}%</dd>
                         <dt>Skill Name:</dt>
                         <dd>{{is_null($itemAffix->skill_name) ? 'N/A' : $itemAffix->skill_name}}</dd>
-                        <dt>Skill Bonus:</dt>
+                        <dt>Skill Training Bonus (XP Bonus):</dt>
+                        <dd>{{is_null($itemAffix->skill_name) ? 0 : $itemAffix->skill_training_bonus * 100}}%</dd>
+                        <dt>Skill Bonus (When Using):</dt>
                         <dd>{{is_null($itemAffix->skill_name) ? 0 : $itemAffix->skill_bonus * 100}}%</dd>
                     </dl>
                 </div>

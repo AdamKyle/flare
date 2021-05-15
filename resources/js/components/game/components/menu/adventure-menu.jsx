@@ -26,7 +26,8 @@ export default class AdventureMenu extends React.Component {
       return getServerMessage('something_went_wrong');
     });
 
-    this.adventureLogs.listen('Game.Maps.Adventure.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+    this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
+      console.log(event);
       this.setState({
         logs: event.adventureLogs,
       });

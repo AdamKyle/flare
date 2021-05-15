@@ -7,7 +7,7 @@
                 <h4 class="mt-3">Data For Fight</h4>
             </div>
             <div class="col-md-6 align-self-right">
-                <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
+                <a href="{{route('admin.character.modeling.adventure-data', ['adventure' => $adventureData['adventure_id']])}}" class="btn btn-success float-right ml-2">Back</a>
                 <a href="{{route('admin.character.modeling.sheet', ['character' => $characterId])}}" class="btn btn-primary float-right ml-2">View Character</a>
                 <a href="{{route('adventures.adventure', ['adventure' => $adventureData['adventure_id']])}}" class="btn btn-primary float-right ml-2">View Adventure</a>
             </div>

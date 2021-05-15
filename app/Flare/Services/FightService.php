@@ -39,14 +39,14 @@ class FightService {
 
     /**
      * Used to stop adventures from going on too long.
-     * 
+     *
      * @var int $counter
      */
     private $counter = 0;
 
     /**
      * used to stop adventures from going on too long.
-     * 
+     *
      * @var bool $tookTooLong
      */
     private $tookTooLong = false;
@@ -71,7 +71,7 @@ class FightService {
 
     /**
      * Get the log information.
-     * 
+     *
      * @return array
      */
     public function getLogInformation(): array {
@@ -80,7 +80,7 @@ class FightService {
 
     /**
      * Reset the log information
-     * 
+     *
      * @return void
      */
     public function resetLogInfo(): void {
@@ -89,7 +89,7 @@ class FightService {
 
     /**
      * Get the monster.
-     * 
+     *
      * @return Monster
      */
     public function getMonster(): Monster {
@@ -98,7 +98,7 @@ class FightService {
 
     /**
      * Is the character dead?
-     * 
+     *
      * @return bool
      */
     public function isCharacterDead(): bool {
@@ -107,7 +107,7 @@ class FightService {
 
     /**
      * Is the monster dead?
-     * 
+     *
      * @return bool
      */
     public function isMonsterDead(): bool {
@@ -116,7 +116,7 @@ class FightService {
 
     /**
      * Did the adventure take too long?
-     * 
+     *
      * @return bool
      */
     public function tooLong(): bool {
@@ -125,9 +125,9 @@ class FightService {
 
     /**
      * Attack the enemy.
-     * 
+     *
      * This attack method mirrors the one on the client side.
-     * 
+     *
      * @param mixed $attacker | Character or Monster
      * @param mixed $defender | Character or Monster
      * @return void
@@ -139,7 +139,7 @@ class FightService {
                 $this->logInformation[] = [
                     'attacker'   => $defender->name,
                     'defender'   => $attacker->name,
-                    'message'    => $attacker->name . 'has been defeated!',
+                    'message'    => $attacker->name . ' has been defeated!',
                     'is_monster' => $defender instanceOf Character ? false : true
                 ];
             }
@@ -173,7 +173,7 @@ class FightService {
             $this->counter += 1;
 
             return $this->attack($defender, $attacker);
-        } 
+        }
 
         if ($this->blockedAttack($defender, $attacker)) {
             $this->logInformation[] = [
@@ -189,19 +189,19 @@ class FightService {
         }
 
         $messages          = $this->completeAttack($attacker, $defender);
-        
+
         $this->counter     = 0;
 
-        $this->tookTooLong = false; 
+        $this->tookTooLong = false;
 
         $this->logInformation[] = [
             'attacker'   => $attacker->name,
             'defender'   => $defender->name,
             'messages'   => $messages,
             'is_monster' => $attacker instanceof Character ? false : true
-        ];  
+        ];
 
-        return $this->attack($defender, $attacker);  
+        return $this->attack($defender, $attacker);
     }
 
     protected function canHit($attacker, $defender): bool {
@@ -223,7 +223,7 @@ class FightService {
             $join->on('game_skills.id', 'skills.game_skill_id')
                  ->where('game_skills.name', 'Accuracy');
         })->first()->skill_bonus;
-        
+
         $ac            = $defender->ac;
 
         if ($defender instanceof Character) {
@@ -237,7 +237,7 @@ class FightService {
         $messages = [];
 
         if ($attacker instanceof Character) {
-            
+
             $characterAttack = $this->characterInformation->buildAttack();
 
             $this->currentMonsterHealth -= $characterAttack;
@@ -265,7 +265,7 @@ class FightService {
             $messages[] = [$this->character->name . ' hit for ' . $characterAttack];
         } else {
             $monsterAttack = $this->fetchMonsterAttack($attacker);
-            
+
             $this->currentCharacterHealth -= $monsterAttack;
 
             $messages[] =  [$attacker->name . ' hit for ' . $monsterAttack];
