@@ -110,8 +110,13 @@ class AdventureJob implements ShouldQueue
             $snapShot = CharacterSnapShot::where('snap_shot->level', strval($this->character->level))
                                          ->where('character_id', $this->character->id)
                                          ->first();
+            if (!is_null($snapShot->adventure_simmulation_data)) {
+                $data = array_merge($snapShot->adventure_simmulation_data, $data);
+            }
 
-            $snapShot->update(['adventure_simmulation_data' => $data]);
+            $snapShot->update([
+                'adventure_simmulation_data' => $data
+            ]);
 
             if ($this->currentLevel === $this->adventure->levels) {
 

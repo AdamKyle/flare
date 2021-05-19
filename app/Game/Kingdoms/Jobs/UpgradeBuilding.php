@@ -135,7 +135,7 @@ class UpgradeBuilding implements ShouldQueue
             $character = $this->user->character;
 
             $message = $this->building->name . ' finished upgrading for kingdom: ' .
-                $this->building->kingdom->name . 'on plane: ' . $plane .
+                $this->building->kingdom->name . ' on plane: ' . $plane .
                 ' At (X/Y) '.$x.'/'.$y.' and is now level: ' . $level;
 
             event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));

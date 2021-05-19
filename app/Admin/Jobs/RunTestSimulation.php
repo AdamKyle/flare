@@ -98,12 +98,10 @@ class RunTestSimulation implements ShouldQueue
             'in_progress'  => true,
         ]);
 
-        dump('Send Email: ' . $this->sendEmail);
-
         for ($i = 1; $i <= $this->model->levels; $i++) {
             $delay            = $i === 1 ? $this->model->time_per_level : $i * $this->model->time_per_level;
             $timeTillFinished = now()->addMinutes($delay);
-            dump('Adventure Job Current Level: ' . $i);
+
             AdventureJob::dispatch($this->character, $this->model, $jobName, $i, true, $this->adminUser, $this->sendEmail)->delay($timeTillFinished);
         }
     }

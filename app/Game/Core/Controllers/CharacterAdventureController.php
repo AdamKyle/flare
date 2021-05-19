@@ -56,9 +56,6 @@ class CharacterAdventureController extends Controller {
 
         $adventureLog = $character->adventureLogs()->orderBy('id', 'desc')->first();
 
-        dump('Current Adventure Rewards');
-        dump($adventureLog);
-
         if (is_null($adventureLog)) {
             return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
         }

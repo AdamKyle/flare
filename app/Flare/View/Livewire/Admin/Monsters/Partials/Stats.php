@@ -39,11 +39,11 @@ class Stats extends Component
         'monster.attack_range.required' => 'Attack range must be set.',
         'monster.drop_check.required'   => 'Drop Check must be set.',
         'monster.damage_stat.required'  => 'Damage stat is missing',
-        'monster.game_map_id.required'  => 'What map is this monster for?', 
+        'monster.game_map_id.required'  => 'What map is this monster for?',
     ];
 
     public $monster;
-    
+
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
@@ -54,9 +54,11 @@ class Stats extends Component
         $this->monster->save();
 
         if ($this->monster->skills->isEmpty()) {
+            $skills = [];
+
             // Get skills:
             foreach(GameSkill::where('specifically_assigned', false)->get() as $skill) {
-                if ($skill->can_train) {
+                if ($skill->can_train && $skill->can_monsters_have_skill) {
                     $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $skill);
                 }
             }
@@ -84,5 +86,5 @@ class Stats extends Component
     public function render() {
         return view('components.livewire.admin.monsters.partials.stats');
     }
-    
+
 }

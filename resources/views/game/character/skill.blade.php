@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title 
+    <x-core.page-title
         title="{{$skill->name}}"
         route="{{url()->previous()}}"
         link="Back"
@@ -15,12 +15,15 @@
                     <p>{{$skill->description}}</p>
                     <hr />
                     @if (!$skill->can_train)
-                        <p>
-                            This skill cannot be trained by fighting alone. Instead, 
-                            by crafting weapons of this type youll gain some xp towards its level. 
-                            Certain quest items can help increase
-                            the amount of xp you get from training this skill.
-                        </p>
+                        @if (stristr($skill->name, 'Crafting') !== false)
+                            <div class="alert alert-info">
+                                This skill can only be trained by crafting.
+                            </div>
+                        @else
+                            <div class="alert alert-info">
+                                This skill can only be trained by enchanting.
+                            </div>
+                        @endif
                     @endif
                     <dl>
                         <dt>Level:</dt>
@@ -38,7 +41,9 @@
                         <dt>Move Timeout Mod:</dt>
                         <dd>{{$skill->move_time_out_mod * 100}}%</dd>
                         <dt>Skill Bonus</dt>
-                        <dd>{{$skill->skill_bonus * 100}}%</dd>
+                        <dd>{{$skill->skill_bonus * 100}}% When Using</dd>
+                        <dt>Skill Training Bonus</dt>
+                        <dd>{{$skill->skill_training_bonus * 100}}% When Skill XP is awarded</dd>
                     </dl>
                 </div>
             </div>

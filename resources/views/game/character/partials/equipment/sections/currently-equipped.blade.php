@@ -37,3 +37,26 @@
     @endif
 @endif
 <hr />
+@if (!empty($details['slot']->item->getItemSkills()))
+    <h4 class="mt-3">Affects the Following Skills:</h4>
+    <hr />
+    <div class="row mt-3">
+        @php
+            $col = (12 / count($details['slot']->item->getItemSkills()));
+        @endphp
+
+        @foreach($details['slot']->item->getItemSkills() as $skill)
+            <div class="col-md-{{$col}}">
+                <dl>
+                    <dt>Skill Name:</dt>
+                    <dd>{{$skill['skill_name']}}</dd>
+                    <dt>Skill XP Bonus (When Training):</dt>
+                    <dd>{{$skill['skill_training_bonus'] * 100}}%</dd>
+                    <dt>Skill Bonus (When using)</dt>
+                    <dd>{{$skill['skill_bonus'] * 100}}%</dd>
+                </dl>
+            </div>
+        @endforeach
+    </div>
+@endif
+<hr />

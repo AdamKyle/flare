@@ -93,7 +93,7 @@
                                 <td>{{is_null($itemAffix->base_damage_mod) ? 'N/A' : ($itemAffix->base_damage_mod * 100) . '%'}}</td>
                                 <td>{{is_null($itemAffix->base_ac_mod) ? 'N/A' : ($itemAffix->base_ac_mod * 100) . '%'}}</td>
                                 <td>{{is_null($itemAffix->base_healing_mod) ? 'N/A' : ($itemAffix->base_healing_mod * 100) . '%'}}</td>
-                                <td>{{is_null($itemAffix->int_required) ? 'N/A' : ($itemAffix->int_required_mod * 100) . '%'}}</td>
+                                <td>{{is_null($itemAffix->int_required) ? 'N/A' : $itemAffix->int_required}}</td>
                                 <td>{{is_null($itemAffix->skill_level_required) ? 'N/A' : $itemAffix->skill_level_required}}</td>
                                 <td>{{is_null($itemAffix->cost) ? 'N/A' : $itemAffix->cost}}</td>
                                 <td>

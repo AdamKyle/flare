@@ -16,7 +16,7 @@ class UpdateSkillListener
      * @return void
      */
     public function handle(UpdateSkillEvent $event)
-    {   
+    {
         if ($event->skill->max_level <= $event->skill->level) {
             return;
         }
@@ -42,7 +42,7 @@ class UpdateSkillListener
                 'xp'                 => 0,
             ]);
 
-            event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh())); 
+            event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
         }
     }
 }

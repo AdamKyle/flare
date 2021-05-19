@@ -24,7 +24,7 @@ class EquipItemService {
 
     /**
      * Set the request
-     * 
+     *
      * @param Request $request
      * @return EquipItemService
      */
@@ -36,7 +36,7 @@ class EquipItemService {
 
     /**
      * Set the character
-     * 
+     *
      * @param Charactr $character
      * @return EquipItemService
      */
@@ -48,7 +48,7 @@ class EquipItemService {
 
     /**
      * Equip the item
-     * 
+     *
      * @return Item
      */
     public function equipItem(): Item {
@@ -62,8 +62,12 @@ class EquipItemService {
         }
 
         $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->position === $this->request->position; 
+            return $slot->position === $this->request->position;
         })->first();
+
+        if (!is_null($itemForPosition)) {
+            $itemForPosition->update(['equipped' => false]);
+        }
 
         $characterSlot->update([
             'equipped' => true,
@@ -77,7 +81,7 @@ class EquipItemService {
 
     /**
      * Get Item stats
-     * 
+     *
      * @param Item $toCompare
      * @param Colection $inventorySlots
      * @return array

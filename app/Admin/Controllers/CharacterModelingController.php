@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Game\Battle\Values\MaxLevel;
 use Illuminate\Http\Request;
 use App\Admin\Jobs\GenerateTestCharacter;
 use App\Admin\Jobs\RunTestSimulation;
@@ -39,6 +40,7 @@ class CharacterModelingController extends Controller {
     public function fetchSheet(Character $character) {
         return view ('game.character.sheet', [
             'character' => $character,
+            'maxLevel'  => MaxLevel::MAX_LEVEL,
             'characterInfo' => [
                 'maxAttack' => $character->getInformation()->buildAttack(),
                 'maxHealth' => $character->getInformation()->buildHealth(),

@@ -201,7 +201,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameMapApiRoutes()
     {
         Route::prefix('api')
-             ->middleware('api')
+             ->middleware('web')
              ->namespace('App\Game\Maps\Controllers')
              ->group(base_path('routes/game/maps/api.php'));
     }

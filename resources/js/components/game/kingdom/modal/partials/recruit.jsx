@@ -105,6 +105,11 @@ export default class Recruit extends React.Component {
         <hr/>
         <h5>Recruitment</h5>
         <hr/>
+        {
+          this.props.kingdom.current_population === 0 ?
+            <div className="alert alert-danger mt-2 mb-2">You have no population. You cannot recruit</div>
+            : null
+        }
         <div className="row">
           <div className="col-md-6">
             <p><strong>Current Population</strong>: {this.state.max}</p>

@@ -37,7 +37,25 @@
                 <span class="text-muted" style="font-size: 12px;"><sup>*</sup> Once a character is at this level or above it, they get 1/3rd the xp</span>
             </p>
         </div>
-        <hr />
+        @if ($monster->skills->isNotEmpty())
+            <hr />
+            <h4>Skills</h4>
+            <div class="row">
+                @php
+                    $colSize = 12 / $monster->skills->count();
+                @endphp
+                @foreach($monster->skills as $skill)
+                    <div class="col-xs-12 col-sm-{{$colSize}}">
+                        <dl>
+                            <dt>Name</dt>
+                            <dd>{{$skill->name}}</dd>
+                            <dt>Bonus</dt>
+                            <dd>{{$skill->skill_bonus * 100}}%</dd>
+                        </dl>
+                    </div>
+                @endforeach
+            </div>
+        @endif
         @guest
         @elseif (auth()->user()->hasRole('Admin') && $canEdit)
             <a href="{{route('monster.edit', [

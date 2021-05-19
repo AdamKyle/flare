@@ -21,7 +21,7 @@ export default class Embezzel extends React.Component {
       if (this.state.totalToEmbezzel <= 0) {
         return this.setState({
           showError: true,
-          errorText: 'Total to embezzel cannot be less then or equal to 0.'
+          errorText: 'Total to embezzle cannot be less then or equal to 0.'
         });
       }
 
@@ -64,7 +64,7 @@ export default class Embezzel extends React.Component {
     return (
       <Modal onHide={this.props.close} backdrop="static" keyboard={false} show={this.props.show}>
         <Modal.Header closeButton>
-          <Modal.Title>Embezzel</Modal.Title>
+          <Modal.Title>Embezzle</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {
@@ -75,9 +75,9 @@ export default class Embezzel extends React.Component {
               : null
           }
 
-          <p>Embezzeling from your kingdom will reduce the kingdoms morale by 5% regardless of the amount you
-            embezzel.</p>
-          <p>You cannot embezzel if your kingdoms morale is 15% or lower.</p>
+          <p>Embezzling from your kingdom will reduce the kingdoms morale by 5% regardless of the amount you
+            embezzle.</p>
+          <p>You cannot embezzle if your kingdoms morale is 15% or lower.</p>
           <div className="mt-2">
             <dl>
               <dt><strong>Total Treasury</strong>:</dt>
@@ -86,17 +86,12 @@ export default class Embezzel extends React.Component {
           </div>
           {
             this.props.morale <= 0.15 ?
-              <p className="text-danger mt-3 mb-2">Your morale is too low. You cannot embezzel.</p>
-              : null
-          }
-          {
-            this.props.treasury <= 0 ?
-              <p className="text-danger mt-3 mb-2">You have no gold in your treasury. You cannot embezzel.</p>
+              <p className="text-danger mt-3 mb-2">Your morale is too low. You cannot embezzle.</p>
               : null
           }
           <div className="mt-2">
             <div className="form-group">
-              <label htmlFor="embezzel-amount">Embezzel Amount</label>
+              <label htmlFor="embezzel-amount">Embezzle Amount</label>
               <input
                 type="number"
                 className="form-control"

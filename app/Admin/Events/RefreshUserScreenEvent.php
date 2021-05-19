@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
 use App\Flare\Models\User;
 
-class BannedUserEvent implements ShouldBroadcastNow
+class RefreshUserScreenEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

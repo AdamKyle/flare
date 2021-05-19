@@ -15,6 +15,7 @@
         <hr />
         <div class="log-text">
             @foreach($adventureData['snap_shot_data'] as $index => $levelData)
+                @dump($adventureData['snap_shot_data'])
                 @foreach($levelData as $levelName => $logData)
                     <x-cards.card-with-title title="Level {{$index + 1}}">
                         <div class="pt-4">

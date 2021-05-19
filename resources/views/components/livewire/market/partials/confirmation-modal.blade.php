@@ -13,12 +13,12 @@
           <p>Are you sure you want to do this?</p>
 
           <p>You will be removing: <x-item-display-color :item="$marketBoard->item" /> from the market board.</p>
-            
+
           <p>Current Listing Price: {{$marketBoard->listed_price}}</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-success" onclick="event.preventDefault();
-            document.getElementById('delist-item-{{$marketBoard->item_id}}').submit();"
+            document.getElementById('delist-item-{{$marketBoard->id}}').submit();"
           >
             Yes
           </button>

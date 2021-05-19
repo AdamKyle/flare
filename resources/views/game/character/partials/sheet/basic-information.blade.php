@@ -6,7 +6,7 @@
     <dt>Character Class:</dt>
     <dd>{{$character->class->name}}</dd>
     <dt>Character Level:</dt>
-    <dd>{{$character->level}}</dd>
+    <dd>{{$character->level}} / {{$maxLevel}}</dd>
     <dt>Character XP:</dt>
     <dd>
         <div class="progress skill-training mb-2">

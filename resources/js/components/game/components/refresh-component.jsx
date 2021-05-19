@@ -9,7 +9,7 @@ export default class RefreshComponent extends React.Component {
   }
 
   componentDidMount() {
-    this.refreshListener.listen('Admin.Events.BannedUserEvent', (event) => {
+    this.refreshListener.listen('Admin.Events.RefreshUserScreenEvent', (event) => {
       location.reload();
     });
   }

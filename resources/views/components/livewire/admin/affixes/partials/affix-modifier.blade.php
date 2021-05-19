@@ -56,11 +56,11 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label for="item-affix-affix-skill-name">Type: </label>
-                <select class="form-control required" name="item-affix-affix-skill-name" wire:model="itemAffix.skill_name">
+                <label for="item-affix-skill-name">Affects Skill: </label>
+                <select class="form-control required" name="item-affix-skill-name" wire:model="itemAffix.skill_name">
                     <option value="">Please select</option>
                     @foreach($skills as $skill)
-                        <option value={{$skill->name}}>{{$skill->name}}</option>
+                        <option value="{{$skill->name}}">{{$skill->name}}</option>
                     @endforeach
                 </select>
             </div>

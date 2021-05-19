@@ -93,7 +93,7 @@ export default class CharacterInfoTopSection extends React.Component {
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Level</strong>:</dt>
-              <dd>{sheet.level}</dd>
+              <dd>{sheet.level} / {sheet.max_level}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>

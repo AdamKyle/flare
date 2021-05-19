@@ -32,14 +32,6 @@ trait SkillCheck {
      * @return mixed
      */
     public function characterRoll(Skill $skill) {
-        $itemBonus = 0.0;
-
-        foreach ($skill->character->inventory->slots as $slot) {
-            if ($slot->equipped) {
-                $itemBonus += $slot->item->getSkillBonus($skill->name);
-            }
-        }
-
-        return (rand(1, 400) * (1 + $skill->skill_bonus) + $itemBonus);
+        return (rand(1, 400) * (1 + $skill->skill_bonus));
     }
 }

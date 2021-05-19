@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Models\Traits\CalculateSkillBonus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\SkillFactory;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 class Skill extends Model
 {
 
-    use HasFactory;
+    use HasFactory, CalculateSkillBonus;
 
     /**
      * The attributes that are mass assignable.
@@ -96,7 +97,7 @@ class Skill extends Model
         }
 
         $bonus = ($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level;
-        $bonus += $this->getItemBonuses();
+        $bonus += $this->getItemBonuses($this->baseSkill->name);
 
         $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
         $looting  = $this->getCharacterSkillBonus($this->character, 'Looting');
@@ -114,6 +115,26 @@ class Skill extends Model
         }
     }
 
+    public function getSkillTrainingBonusAttribute() {
+        if (is_null($this->character)) {
+            return 0;
+        }
+
+        $bonus = 0.0;
+
+        foreach($this->character->inventory->slots as $slot) {
+            if ($slot->equipped) {
+                $bonus += $this->calculateTrainingBonus($slot->item, $this->baseSkill->name);
+            }
+
+            if ($slot->item->type ==='quest') {
+                $bonus += $this->calculateTrainingBonus($slot->item, $this->baseSkill->name);
+            }
+        }
+
+        return $bonus;
+    }
+
     protected function getCharacterSkillBonus(Character $character, string $name): float {
         $raceSkillBonusValue  = $character->race->{Str::snake($name . '_mod')};
         $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
@@ -121,12 +142,16 @@ class Skill extends Model
         return $raceSkillBonusValue + $classSkillBonusValue;
     }
 
-    protected function getItemBonuses(): float {
+    protected function getItemBonuses($skillName): float {
         $bonus = 0.0;
 
         foreach($this->character->inventory->slots as $slot) {
             if ($slot->equipped) {
-                $bonus += $slot->item->skill_bonus;
+                $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name);
+            }
+
+            if ($slot->item->type ==='quest') {
+                $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name);
             }
         }
 

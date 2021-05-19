@@ -31,6 +31,13 @@ export default class UpgradeSection extends React.Component {
             <dd className="text-success">{this.getIncrease('iron')}</dd>
             <dt><strong>Population Gain/hr</strong>:</dt>
             <dd className="text-success">{this.getIncrease('population')}</dd>
+            {
+              this.props.building.is_farm ?
+                <>
+                  <dt><strong>Population Becomes</strong>:</dt>
+                  <dd className="text-success">+100</dd>
+                </> : null
+            }
           </dl>
         </div>
         <div className="col-md-6">

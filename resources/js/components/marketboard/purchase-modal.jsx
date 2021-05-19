@@ -64,7 +64,8 @@ export default class PurchaseModal extends React.Component {
 
           {
             this.belongsToCharacter() ?
-              <div className="alert alert-danger mb-2 mt-2">You cannot purchase your own item.</div> : null
+              <div className="alert alert-danger mb-2 mt-2">You cannot purchase your own item.
+                If you would like to delist this item, head over to your My listings section under the market to delist.</div> : null
           }
           <p>Is this the item you would like to purchase? It
             will <strong>cost</strong>: {this.props.modalData.listed_price * 1.05} Gold (incl. 5% tax)</p>

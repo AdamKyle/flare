@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Game\Battle\Values\MaxLevel;
 use App\Http\Controllers\Controller;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -18,6 +19,7 @@ class CharacterSheetController extends Controller {
 
         return view ('game.character.sheet', [
             'character' => $character,
+            'maxLevel' => MaxLevel::MAX_LEVEL,
             'characterInfo' => [
                 'maxAttack' => $characterInfo->buildAttack(),
                 'maxHealth' => $characterInfo->buildHealth(),

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
+import LoadingModal from "../../components/loading/loading-modal";
 
 export default class AdventureEmbark extends React.Component {
 
@@ -34,26 +35,11 @@ export default class AdventureEmbark extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <>
-          <Modal show={this.props.show} onHide={this.props.embarkClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Loading ....</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>
-                Please wait ....
-              </p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={this.props.embarkClose}>
-                Close
-              </Button>
-              <Button variant="primary" onClick={this.props.embarkClose}>
-                Save Changes
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+        <LoadingModal
+          show={this.props.show}
+          close={this.props.embarkClose}
+          loadingText={"One moment ..."}
+        />
       );
     }
 
@@ -64,6 +50,10 @@ export default class AdventureEmbark extends React.Component {
             <Modal.Title>{this.state.adventure.name}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            <p>
+              {this.state.adventure.description}
+            </p>
+            <hr />
             <h4 className="alert-heading">Before you set off.</h4>
             <p>
               Please make sure you have equipped any items you want for this adventure. <br/>

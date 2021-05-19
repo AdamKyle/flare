@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Game\Battle\Values\MaxLevel;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -13,7 +14,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
 
     /**
      * Gets the response data for the character sheet
-     * 
+     *
      * @param Character $character
      * @return mixed
      */
@@ -32,6 +33,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'class'         => $character->class->name,
             'inventory_max' => $character->inventory_max,
             'level'         => $character->level,
+            'max_level'     => MaxLevel::MAX_LEVEL,
             'xp'            => $character->xp,
             'xp_next'       => $character->xp_next,
             'str'           => $character->str,

@@ -17,6 +17,7 @@ export default class FightSection extends React.Component {
       characterCurrentHealth: this.props.character.health,
       canAttack: this.props.character.can_attack,
       battleMessages: [],
+      missCounter: 0,
     }
 
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
@@ -66,6 +67,7 @@ export default class FightSection extends React.Component {
 
     this.setState({
       battleMessages: [],
+      missCounter: 0,
       monster: this.props.monster,
       monsterCurrentHealth: health,
       monsterMaxHealth: health,
@@ -200,6 +202,14 @@ export default class FightSection extends React.Component {
                 <button className="btn btn-primary" onClick={this.revive.bind(this)}>Revive</button>
                 <p className="mt-3">You are dead. Click revive to live again.</p>
               </>
+              : null
+          }
+          {
+            this.state.missCounter >= 2 ?
+              <p className="text-info text-center">
+                You and the enemy are too evenly matched.<br />
+                Try finding gear that raises your dex or accuracy skill bonus.
+              </p>
               : null
           }
           {this.battleMessages()}

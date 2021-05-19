@@ -2,11 +2,11 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Models\Traits\CalculateSkillBonus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
-use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Traits\WithSearch;
 
 class Item extends Model
@@ -14,7 +14,7 @@ class Item extends Model
 
     use Cloneable;
 
-    use HasFactory, WithSearch;
+    use HasFactory, WithSearch, CalculateSkillBonus;
 
     /**
      * The attributes that are mass assignable.
@@ -50,8 +50,6 @@ class Item extends Model
         'crafting_type',
         'market_sellable',
     ];
-
-    //protected $cloneable_relations = ['itemSuffix', 'itemPrefix'];
 
     /**
      * The attributes that should be cast to native types.
@@ -231,17 +229,17 @@ class Item extends Model
      *
      * @return float
      */
-    public function scopeGetTotalPercentageForStat($qeury, string $stat): float {
+    public function getTotalPercentageForStat(string $stat): float {
         $baseStat = is_null($this->{$stat . '_mod'}) ? 0.0 : $this->{$stat . '_mod'};
 
         if (!is_null($this->itemPrefix)) {
-            $stat      = $this->itemPrefix->{$stat . '_mod'};
-            $baseStat += !is_null($stat) ? $stat : 0.0;
+            $statBonus  = $this->itemPrefix->{$stat . '_mod'};
+            $baseStat  += !is_null($statBonus) ? $statBonus : 0.0;
         }
 
         if (!is_null($this->itemSuffix)) {
-            $stat      = $this->itemSuffix->{$stat . '_mod'};
-            $baseStat += !is_null($stat) ? $stat : 0.0;
+            $statBonus = $this->itemSuffix->{$stat . '_mod'};
+            $baseStat += !is_null($statBonus) ? $statBonus : 0.0;
         }
 
         return $baseStat;
@@ -255,30 +253,7 @@ class Item extends Model
      * @return float
      */
     public function scopeGetSkillTrainingBonus($query, string $skillName): float {
-        $baseSkillTraining = 0.0;
-
-        if (!is_null($this->itemPrefix)) {
-            if ($this->itemPrefix->skill_name === $skillName) {
-                $stat               = $this->itemPrefix->skill_training_bonus;
-                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus)) : 0.0;
-            }
-        }
-
-        if (!is_null($this->itemSuffix)) {
-            if ($this->itemSuffix->skill_name === $skillName) {
-                $stat               = $this->itemSuffix->skill_training_bonus;
-                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_training_bonus) ? 0.0 : $this->skill_training_bonus)) : 0.0;
-            }
-
-        }
-
-        if (!is_null($this->skill_name)) {
-            if ($this->skill_name === $skillName) {
-                $baseSkillTraining += $this->skill_training_bonus;
-            }
-        }
-
-        return $baseSkillTraining;
+        return $this->calculateTrainingBonus($this, $skillName);
     }
 
     public function scopeGetItemSkills($query): array {
@@ -315,30 +290,7 @@ class Item extends Model
      * @return float
      */
     public function scopeGetSkillBonus($query, string $skillName): float {
-        $baseSkillTraining = 0.0;
-
-        if (!is_null($this->itemPrefix)) {
-            if ($this->itemPrefix->skill_name === $skillName) {
-                $stat               = $this->itemPrefix->skill_bonus;
-                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_bonus) ? 0.0 : $this->skill_bonus)) : 0.0;
-            }
-        }
-
-        if (!is_null($this->itemSuffix)) {
-            if ($this->itemSuffix->skill_name === $skillName) {
-                $stat               = $this->itemSuffix->skill_bonus;
-                $baseSkillTraining += !is_null($stat) ? ($stat + (is_null($this->skill_bonus) ? 0.0 : $this->skill_bonus)) : 0.0;
-            }
-
-        }
-
-        if (!is_null($this->skill_name)) {
-            if ($this->skill_name === $skillName) {
-                $baseSkillTraining += $this->skill_bonus;
-            }
-        }
-
-        return $baseSkillTraining;
+        return $this->calculateBonus($this, $skillName);
     }
 
     protected static function newFactory() {

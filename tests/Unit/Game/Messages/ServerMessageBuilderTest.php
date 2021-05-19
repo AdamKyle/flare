@@ -133,7 +133,7 @@ class ServerMessageBuilderTest extends TestCase
     {
         $message = resolve(ServerMessageBuilder::class)->build('chatting_to_much');
 
-        $this->assertEquals('You can only chat so much in a two minute window. Slow down!', $message);
+        $this->assertEquals('You can only chat so much in a one minute window. Slow down!', $message);
     }
 
     public function testGetMessageMessageTooLong()

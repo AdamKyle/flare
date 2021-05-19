@@ -14,38 +14,23 @@ class SkillXPCalculator {
      * a base of 10.
      *
      * @param Skill $skill
-     * @param Adventure $adventure | null
+     * @param Adventure|null $adventure | null
+     * @return float|int
      */
     public function fetchSkillXP(Skill $skill, Adventure $adventure = null) {
-        $equipmentBonus = $this->fetchSkillTrainingBonusFromEquipment($skill);
-        $questItemBonus = $this->fetchSkillTrainingBonusFromQuestItems($skill);
         $adventureBonus = $this->fetchAdventureBonus($adventure);
+        $xpTowards      = !is_null($skill->xp_towards) ? $skill->xp_towards : 0.0;
+        $totalBonus     = $xpTowards + $skill->skill_training_bonus + $adventureBonus;
 
-        return (10 * (1 + ($skill->xp_towards + $equipmentBonus + $questItemBonus + $adventureBonus)));
+        return (10 * ($totalBonus > 1 ? $totalBonus : (1 + $totalBonus)));
     }
 
-    protected function fetchSkillTrainingBonusFromEquipment(Skill $skill): float {
-        $totalSkillBonus = 0.0;
-
-        foreach ($skill->character->inventory->slots as $slot) {
-            if ($slot->equipped) {
-                $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
-            }
-        }
-
-        return $totalSkillBonus;
-    }
-
-    protected function fetchSkillTrainingBonusFromQuestItems(Skill $skill): float {
-        $totalSkillBonus = 0.0;
-
-        foreach ($skill->character->inventory->slots as $slot) {
-            $totalSkillBonus += $slot->item->getSkillTrainingBonus($skill->name);
-        }
-
-        return $totalSkillBonus;
-    }
-
+    /**
+     * Returns the adventure skill training bonus.
+     *
+     * @param Adventure|null $adventure
+     * @return float
+     */
     protected function fetchAdventureBonus(Adventure $adventure = null): float {
         if (!is_null($adventure)) {
             return $adventure->skill_exp_bonus;

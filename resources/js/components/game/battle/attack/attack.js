@@ -10,6 +10,7 @@ export default class Attack {
     this.monsterCurrentHealth = monsterCurrenthealth;
     this.battleMessages = [];
     this.attackerName = '';
+    this.missed       = 0;
   }
 
   attack(attacker, defender, attackAgain, type) {
@@ -40,6 +41,8 @@ export default class Attack {
         message: this.attackerName + ' missed!'
       });
 
+      this.missed += 1;
+
       if (attackAgain) {
         return this.attack(defender, attacker, false, 'monster');
       }
@@ -69,6 +72,7 @@ export default class Attack {
       characterCurrentHealth: this.characterCurrentHealth,
       monsterCurrentHealth: this.monsterCurrentHealth,
       battleMessages: this.battleMessages,
+      missCounter: this.missed
     }
   }
 

@@ -14,7 +14,7 @@
             >
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-4">
-                        @include('game.character.partials.sheet.basic-information', ['character' => $character])
+                        @include('game.character.partials.sheet.basic-information', ['character' => $character, 'maxLevel' => $maxLevel])
                     </div>
 
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-4">

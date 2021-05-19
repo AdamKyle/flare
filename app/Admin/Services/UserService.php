@@ -8,7 +8,7 @@ use App\Admin\Jobs\BanEmail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
-use App\Admin\Events\BannedUserEvent;
+use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
 use App\Game\Messages\Events\MessageSentEvent;
 
@@ -104,7 +104,7 @@ class UserService {
      * @return void
      */
     public function sendUserMail(User $user, $unBanAt): void {
-        event(new BannedUserEvent($user));
+        event(new RefreshUserScreenEvent($user));
 
         $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'For ever.';
         $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $user->banned_reason;

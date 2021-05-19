@@ -10,15 +10,16 @@ class SkillDetails extends Component
     public $skill;
 
     protected $rules = [
-        'skill.name'        => 'required',
-        'skill.description' => 'required',
-        'skill.max_level'   => 'required',
+        'skill.name'                    => 'required',
+        'skill.description'             => 'required',
+        'skill.max_level'               => 'required',
+        'skill.can_monsters_have_skill' => 'nullable'
     ];
 
     protected $messages =[
         'skill.name.required'        => 'Name required.',
         'skill.description.required' => 'Description required.',
-        'skill.max_level.required'   => 'Max Level is required.'
+        'skill.max_level.required'   => 'Max Level is required.',
     ];
 
     protected $listeners = ['validateInput'];
