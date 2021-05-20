@@ -18,6 +18,7 @@ class IsCharacterLoggedInMiddleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
+        dump(Auth::check(), auth()->user());
         if (!Auth::check()) {
 
             return event(new RefreshUserScreenEvent(auth()->user()));

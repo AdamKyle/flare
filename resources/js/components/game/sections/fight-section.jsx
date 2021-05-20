@@ -108,7 +108,7 @@ export default class FightSection extends React.Component {
         is_defender_dead: state.monsterCurrentHealth <= 0,
         defender_type: 'monster',
         monster_id: this.state.monster.id,
-      }).then(() => {
+      }).then((response) => {
         let health = state.characterCurrentHealth;
 
         if (health >= 0) {
@@ -123,11 +123,15 @@ export default class FightSection extends React.Component {
           this.props.setMonster(null);
         });
       }).catch((err) => {
-        if (error.hasOwnProperty('response')) {
-          const response = error.response;
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
 
           if (response.status === 429) {
             getServerMessage('attacking_to_much');
+          }
+
+          if (response.status === 401) {
+            location.reload();
           }
         }
       });;

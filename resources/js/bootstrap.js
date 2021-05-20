@@ -32,6 +32,7 @@ axios.interceptors.request.use(function (config) {
     Authorization: 'Bearer ' + apiToken.content,
     Accept: 'application/json',
     'X-CSRF-TOKEN': token.content,
+    'X-Requested-With': 'XMLHttpRequest'
   };
 
   return config;

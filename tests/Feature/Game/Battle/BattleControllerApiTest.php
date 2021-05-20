@@ -96,7 +96,7 @@ class BattleControllerApiTest extends TestCase
 
         $user     = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/actions', [
                              'user_id' => $user->id
                          ])
@@ -116,7 +116,7 @@ class BattleControllerApiTest extends TestCase
 
         $user     = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/actions', [
                              'user_id' => $user->id
                          ])
@@ -149,7 +149,7 @@ class BattleControllerApiTest extends TestCase
         $user      = $this->character->getUser();
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_character_dead' => true
                          ])
@@ -175,7 +175,7 @@ class BattleControllerApiTest extends TestCase
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type'    => 'monster',
@@ -203,7 +203,7 @@ class BattleControllerApiTest extends TestCase
         $user      = $this->character->getUser();
         $monster   = $this->monster->getMonster();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type'    => 'monster',
@@ -234,7 +234,7 @@ class BattleControllerApiTest extends TestCase
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -277,7 +277,7 @@ class BattleControllerApiTest extends TestCase
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/battle-results/' . $character->id, [
                 'is_defender_dead' => true,
                 'defender_type' => 'monster',
@@ -325,7 +325,7 @@ class BattleControllerApiTest extends TestCase
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/battle-results/' . $character->id, [
                 'is_defender_dead' => true,
                 'defender_type' => 'monster',
@@ -363,7 +363,7 @@ class BattleControllerApiTest extends TestCase
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -393,7 +393,7 @@ class BattleControllerApiTest extends TestCase
         $user        = $this->character->getUser();
         $monster     = $this->monster->getMonster();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -422,7 +422,7 @@ class BattleControllerApiTest extends TestCase
         $user      = $this->character->getUser();
         $monster   = $this->monster->getMonster();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -450,7 +450,7 @@ class BattleControllerApiTest extends TestCase
         $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -480,7 +480,7 @@ class BattleControllerApiTest extends TestCase
         $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -508,7 +508,7 @@ class BattleControllerApiTest extends TestCase
         $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'apple-sauce',
@@ -548,7 +548,7 @@ class BattleControllerApiTest extends TestCase
         $monster   = $this->monster->updateMonster(['max_level' => 5])->getMonster();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'apple-sauce',
@@ -567,7 +567,7 @@ class BattleControllerApiTest extends TestCase
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-revive/' . $character->id)
                          ->response;
 
@@ -599,7 +599,7 @@ class BattleControllerApiTest extends TestCase
         $user    = $this->character->getUser();
         $monster = $this->monster->getMonster();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',
@@ -640,7 +640,7 @@ class BattleControllerApiTest extends TestCase
         $user    = $this->character->getUser();
         $monster = $this->monster->getMonster();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-results/' . $character->id, [
                              'is_defender_dead' => true,
                              'defender_type' => 'monster',

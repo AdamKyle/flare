@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Flare\Handlers\MessageThrottledHandler;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Session\TokenMismatchException;
 use Throwable;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
