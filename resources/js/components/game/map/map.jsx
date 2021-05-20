@@ -367,6 +367,14 @@ export default class Map extends React.Component {
         }
       });
     }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+      }
+
       this.setState({
         characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
       });

@@ -21,8 +21,6 @@ class MessageController extends Controller {
     private $serverMessage;
 
     public function __construct(ServerMessageBuilder $serverMessage) {
-        $this->middleware('auth:api');
-
         $this->serverMessage = $serverMessage;
     }
 

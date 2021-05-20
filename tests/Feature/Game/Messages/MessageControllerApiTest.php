@@ -36,7 +36,7 @@ class MessageControllerApiTest extends TestCase
     public function testFetchUserInfo() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/user-chat-info/' . $user->id)
                          ->response;
 
@@ -48,7 +48,7 @@ class MessageControllerApiTest extends TestCase
     public function testFetchMessages() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/last-chats/')
                          ->response;
 
@@ -58,7 +58,7 @@ class MessageControllerApiTest extends TestCase
     public function testUserCanSendMessage() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/public-message', [
                              'message' => 'sample'
                          ])
@@ -79,7 +79,7 @@ class MessageControllerApiTest extends TestCase
     public function testGetServerMesssageForType() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/server-message', [
                              'type' => 'message_length_0'
                          ])
@@ -102,7 +102,7 @@ class MessageControllerApiTest extends TestCase
         $user = $this->character->getUser();
         $character = (new CharacterFactory)->createBaseCharacter();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/private-message', [
                              'message' => 'sample',
                              'user_name' => $character->getCharacter()->name
@@ -122,7 +122,7 @@ class MessageControllerApiTest extends TestCase
     public function testCannotFindPlayerForPrivateMesssage() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/private-message', [
                              'message' => 'sample',
                              'user_name' => 'Gorge'

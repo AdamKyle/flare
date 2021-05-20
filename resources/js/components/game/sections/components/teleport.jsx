@@ -113,6 +113,14 @@ export default class Teleport extends React.Component {
     }).then(() => {
       this.closeDetails();
     }).catch((error) => {
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
+
       this.setState({
         errorMessage: error.response.data.message
       });

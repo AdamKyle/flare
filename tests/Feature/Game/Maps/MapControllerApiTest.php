@@ -48,7 +48,7 @@ class MapControllerApiTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/map/' . $user->id)
                          ->response;
 
@@ -65,7 +65,7 @@ class MapControllerApiTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/map/' . $user->id)
                          ->response;
 
@@ -89,7 +89,7 @@ class MapControllerApiTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('GET', '/api/map/' . $user->id)
             ->response;
 
@@ -115,7 +115,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 48,
                              'character_position_y' => 48,
@@ -139,7 +139,7 @@ class MapControllerApiTest extends TestCase
 
         $otherUser = (new CharacterFactory())->createBaseCharacter()->getUser();
 
-        $response = $this->actingAs($otherUser, 'api')
+        $response = $this->actingAs($otherUser)
             ->json('POST', '/api/move/' . $character->id, [
                 'character_position_x' => 48,
                 'character_position_y' => 48,
@@ -182,7 +182,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => $location->x,
                              'character_position_y' => $location->y,
@@ -234,7 +234,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => $location->x,
                              'character_position_y' => $location->y,
@@ -301,7 +301,7 @@ class MapControllerApiTest extends TestCase
 
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => $location->x,
                              'character_position_y' => $location->y,
@@ -345,7 +345,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 64,
                              'character_position_y' => 64,
@@ -376,7 +376,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 336,
                              'character_position_y' => 288,
@@ -403,7 +403,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->andReturn(true);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 160,
                              'character_position_y' => 64,
@@ -438,7 +438,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/map/teleport/' . $character->id, [
                              'x'       => 160,
                              'y'       => 64,
@@ -465,7 +465,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/map/teleport/' . $character->id, [
                              'x' => 160,
                              'y' => 64,
@@ -492,7 +492,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/map/teleport/' . $character->id, [
                              'x' => 860,
                              'y' => 864,
@@ -527,7 +527,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->andReturn(true);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/move/' . $character->id, [
                              'character_position_x' => 174,
                              'character_position_y' => 64,
@@ -562,7 +562,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                             ->json('POST', '/api/map/teleport/' . $character->id, [
                                 'x' => 176,
                                 'y' => 64,
@@ -586,7 +586,7 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 3,
                 'time_out_value'  => 1,
@@ -620,7 +620,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 2,
                 'time_out_value'  => 1,
@@ -646,7 +646,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/1/' . $character->id, [])
             ->response;
 
@@ -681,7 +681,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 2,
                 'time_out_value'  => 0,
@@ -718,7 +718,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/1/' . $character->id, [
                 'current_port_id' => 2,
                 'time_out_value'  => 1,
@@ -772,7 +772,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/2/' . $character->id, [
                 'current_port_id' => 1,
                 'time_out_value'  => 1,
@@ -837,7 +837,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/teleport/' . $character->id, [
                 'x' => 32,
                 'y'  => 32,
@@ -898,7 +898,7 @@ class MapControllerApiTest extends TestCase
         ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/set-sail/2/' . $character->id, [
                 'current_port_id' => 1,
                 'time_out_value'  => 1,
@@ -954,7 +954,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/teleport/' . $character->id, [
                 'x' => 32,
                 'y'  => 32,
@@ -973,7 +973,7 @@ class MapControllerApiTest extends TestCase
         $user = $this->character->getUser();
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/map/traverse/' . $character->id)
                          ->response;
 
@@ -991,7 +991,7 @@ class MapControllerApiTest extends TestCase
             'name' => 'Labyrinth'
         ]);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/traverse/' . $character->id, [
                 'map_id' => $gameMap->id,
             ])
@@ -1011,7 +1011,7 @@ class MapControllerApiTest extends TestCase
             'name' => 'Bananas'
         ]);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/traverse/' . $character->id, [
                 'map_id' => $gameMap->id,
             ])
@@ -1040,7 +1040,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/traverse/' . $character->id, [
                 'map_id' => $gameMap->id,
             ])
@@ -1064,7 +1064,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->once()->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/map/traverse/' . $character->id, [
                 'map_id' => $gameMap->id,
             ])

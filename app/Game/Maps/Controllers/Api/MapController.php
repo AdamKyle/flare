@@ -26,7 +26,6 @@ class MapController extends Controller {
     /**
      * Constructor
      *
-     * @param PortService $portService
      * @param MapTileValue $mapTile
      */
     public function __construct(MapTileValue $mapTile) {

@@ -80,6 +80,14 @@ export default class SetSail extends React.Component {
         this.props.updateAdventure(this.state.adventures, [], null);
         this.props.closePort();
       });
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+      }
     });
   }
 
