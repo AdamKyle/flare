@@ -13,7 +13,6 @@ class AdventureController extends Controller {
 
 
     public function __construct() {
-        $this->middleware('auth:api');
         $this->middleware('is.character.dead')->except('getLogs');
         $this->middleware('is.character.adventuring')->except(['cancelAdventure', 'getLogs']);
     }
@@ -68,7 +67,7 @@ class AdventureController extends Controller {
         Cache::forget('character_'.$character->id.'_adventure_'.$adventure->id);
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user, true));
-        
+
         $adventureLog->delete();
 
         return response()->json([

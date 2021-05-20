@@ -48,7 +48,7 @@ class KingdomsControllerTest extends TestCase
             'game_map_id'  => 1,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('GET', route('kingdoms.location', [
+        $response = $this->actingAs($this->character->getUser())->json('GET', route('kingdoms.location', [
             'kingdom' => 1
         ]))->response;
 
@@ -62,7 +62,7 @@ class KingdomsControllerTest extends TestCase
     public function testSettleKingdom() {
         $this->createGameBuilding();
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
             'x_position'     => 16,
@@ -88,7 +88,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.settle', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
             'x_position'     => 26,
@@ -107,7 +107,7 @@ class KingdomsControllerTest extends TestCase
     public function testRenameKingdom() {
         $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdom.rename', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.rename', [
             'kingdom' => 1
         ]), [
             'name' => 'Test Kingdom 456'
@@ -122,7 +122,7 @@ class KingdomsControllerTest extends TestCase
     public function testCannotRenameKingdom() {
         $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdom.rename', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.rename', [
             'kingdom' => 1
         ]))->response;
 
@@ -137,7 +137,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createGameBuilding();
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
             'x_position'     => 16,
@@ -159,7 +159,7 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testFailToSettleKingdomMissingData() {
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]))->response;
 
@@ -178,7 +178,7 @@ class KingdomsControllerTest extends TestCase
             'game_map_id'  => 1,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
             'x_position'     => 16,
@@ -206,7 +206,7 @@ class KingdomsControllerTest extends TestCase
             'y'                    => 16,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.settle', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
             'character' => 1
         ]), [
             'x_position'      => 16,
@@ -250,7 +250,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.rebuild', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.rebuild', [
             'character'  => 1,
             'building'   => 1,
         ]))->response;
@@ -282,7 +282,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.rebuild', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.rebuild', [
             'character'  => 1,
             'building'   => 1,
         ]))->response;
@@ -318,7 +318,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.rebuild', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.rebuild', [
             'character'  => 1,
             'building'   => 1,
         ]))->response;
@@ -341,7 +341,7 @@ class KingdomsControllerTest extends TestCase
             'treasury'     => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
             'kingdom' => 1
         ]), [
             'embezzel_amount' => 2000
@@ -359,7 +359,7 @@ class KingdomsControllerTest extends TestCase
             'treasury'     => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
             'kingdom' => 1
         ]))->response;
 
@@ -377,7 +377,7 @@ class KingdomsControllerTest extends TestCase
             'treasury'     => 0,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
             'kingdom' => 1
         ]), [
             'embezzel_amount' => 2000
@@ -398,7 +398,7 @@ class KingdomsControllerTest extends TestCase
             'treasury'       => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
             'kingdom' => 1
         ]), [
             'embezzel_amount' => 2000
@@ -438,7 +438,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => $gameBuilding->base_durability,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
             'character' => 1,
             'building'  => 1,
         ]))->response;
@@ -466,7 +466,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => $gameBuilding->base_durability,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
             'character' => 1,
             'building'  => 1,
         ]))->response;
@@ -496,7 +496,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => $gameBuilding->base_durability,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
             'character' => 1,
             'building'  => 1,
         ]))->response;
@@ -531,7 +531,7 @@ class KingdomsControllerTest extends TestCase
             'max_durability'     => $gameBuilding->base_durability,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('kingdoms.building.upgrade', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
             'character' => 1,
             'building'  => 1,
         ]))->response;
@@ -557,7 +557,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,
         ]), [
@@ -596,7 +596,7 @@ class KingdomsControllerTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,
         ]), [
@@ -628,7 +628,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,
         ]), [
@@ -665,7 +665,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,
         ]), [
@@ -701,7 +701,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => $this->createGameUnit(['name' => 'Axemen']),
         ]), [
@@ -731,7 +731,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,
         ]), [
@@ -762,7 +762,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units', [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,
         ]), [
@@ -801,7 +801,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units.cancel'), [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units.cancel'), [
             'queue_id' => 1
         ])->response;
 
@@ -819,7 +819,7 @@ class KingdomsControllerTest extends TestCase
     public function testCannotCancelRecruitOrderForNonExistantQueue() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units.cancel'), [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units.cancel'), [
             'queue_id' => 1
         ])->response;
 
@@ -853,7 +853,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.recruit.units.cancel'), [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units.cancel'), [
             'queue_id' => 1
         ])->response;
 
@@ -895,7 +895,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.building.queue.delete'), [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.building.queue.delete'), [
             'queue_id' => 1
         ])->response;
 
@@ -913,7 +913,7 @@ class KingdomsControllerTest extends TestCase
     public function testCannotCancelKingdomBuildingOrderForNonExistantQueue() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.building.queue.delete'), [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.building.queue.delete'), [
             'queue_id' => 1
         ])->response;
 
@@ -956,7 +956,7 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', route('kingdoms.building.queue.delete'), [
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.building.queue.delete'), [
             'queue_id' => 1
         ])->response;
 

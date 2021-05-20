@@ -48,7 +48,13 @@ export default class Recruit extends React.Component {
         this.props.close();
       });
     }).catch((err) => {
-      console.log(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+      }
     });
   }
 

@@ -92,8 +92,14 @@ export default class BuildingManagementModal extends React.Component {
         this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being upgraded). You can see this in the Building Queue tab.');
         this.props.close();
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            location.reload();
+          }
+        }
       });
   }
 
@@ -103,8 +109,14 @@ export default class BuildingManagementModal extends React.Component {
         this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being rebuilt). You can see this in the Building Queue tab.');
         this.props.close();
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            location.reload();
+          }
+        }
       });
   }
 

@@ -30,10 +30,19 @@ export default class ForcedNameChange extends React.Component {
       name: this.state.newName
     }).then((result) => {
       location.reload();
-    }).catch((error) => {
-      this.setState({
-        errorMessage: error.response.data.errors
-      });
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+
+        this.setState({
+          errorMessage: response.data.errors
+        });
+      }
+
     });
   }
 

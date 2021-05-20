@@ -17,8 +17,6 @@ class KingdomUnitMovementController extends Controller {
 
     public function __construct(UnitRecallService $unitRecall) {
         $this->unitRecall = $unitRecall;
-
-        $this->middleware('auth:api');
     }
 
     public function fetchUnitMovement(Character $character) {

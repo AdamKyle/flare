@@ -52,8 +52,14 @@ export default class EnchantingAction extends React.Component {
         inventoryList: result.data.character_inventory,
         loading: false,
       });
-    }).catch((error) => {
-      console.error(error);
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
     });
   }
 
@@ -112,8 +118,14 @@ export default class EnchantingAction extends React.Component {
         suffixId: 0,
         cost: 0,
       });
-    }).catch((error) => {
-      console.error(error.response);
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
     });
 
   }

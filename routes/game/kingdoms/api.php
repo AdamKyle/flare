@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['is.character.who.they.say.they.are', 'auth:api', 'throttle:25,2'])->group(function() {
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,2'])->group(function() {
     Route::get('/kingdoms/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomsController@getLocationData']);
     Route::get('/kingdoms/{character}/kingdoms-with-units', ['as' => 'kingdoms.with.units', 'uses' => 'Api\KingdomAttackController@fetchKingdomsWithUnits']);
     Route::get('/kingdom-unit-movement/{character}', ['as' => 'kingdom.unit.movement', 'uses' => 'Api\KingdomUnitMovementController@fetchUnitMovement']);

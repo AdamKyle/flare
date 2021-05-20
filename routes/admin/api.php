@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['auth:api', 'is.admin'])->group(function() {
+Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/chat-messages', ['uses' => 'Api\AdminMessagesController@index']);
     Route::post('/admin/ban-user', ['uses' => 'Api\AdminMessagesController@banUser']);
     Route::post('/admin/silence-user', ['uses' => 'Api\AdminMessagesController@silenceUser']);

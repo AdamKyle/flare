@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['auth:api', 'is.player.banned', 'is.character.dead', 'is.character.adventuring', 'is.character.who.they.say.they.are'])->group(function() {
+Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.character.adventuring', 'is.character.who.they.say.they.are'])->group(function() {
     // Fetch Items
     Route::get('/crafting/{character}', ['uses' => 'Api\CraftingController@fetchItemsToCraft']);
 

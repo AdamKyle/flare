@@ -49,10 +49,10 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items')->response;
 
         $this->assertEquals(200, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertNotEmpty($content->items);
@@ -70,18 +70,18 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items', [
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items', [
             'type' => 'feet'
         ])->response;
 
         $this->assertEquals(200, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertNotEmpty($content->items);
         $this->assertEquals(10, $content->gold);
     }
-    
+
     public function testGetMarketListingsForItemId() {
 
         $user     = $this->character->getUser();
@@ -93,12 +93,12 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items', [
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items', [
             'item_id' => 1,
         ])->response;
 
         $this->assertEquals(200, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertNotEmpty($content->items);
@@ -116,12 +116,12 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => true,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items', [
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items', [
             'item_id' => 1,
         ])->response;
 
         $this->assertEquals(200, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEmpty($content->items);
@@ -142,7 +142,7 @@ class MarketControllerApiTest extends TestCase
         $response = $this->json('GET', '/api/market-board/items')->response;
 
         $this->assertEquals(401, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEquals('Unauthenticated.', $content->message);
@@ -159,10 +159,10 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => true,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items')->response;
 
         $this->assertEquals(422, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEquals("You are dead and must revive before trying to do that. Dead people can't do things.", $content->error);
@@ -179,10 +179,10 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => true,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items')->response;
 
         $this->assertEquals(422, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEquals("You are adventuring, you cannot do that.", $content->error);
@@ -199,10 +199,10 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => true,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items')->response;
 
         $this->assertEquals(422, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEquals("You must first travel to a port to access the market board. Ports are blue ship icons on the map.", $content->error);
@@ -227,10 +227,10 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => true,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/items')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/items')->response;
 
         $this->assertEquals(422, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEquals("You must first travel to a port to access the market board. Ports are blue ship icons on the map.", $content->error);
@@ -247,10 +247,10 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/1/listing-details')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/1/listing-details')->response;
 
         $this->assertEquals(200, $response->status());
-        
+
         $content = json_decode($response->content());
 
         $this->assertEquals(1, $content->id);
@@ -268,7 +268,7 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('POST', '/api/market-board/purchase/1', [
+        $response = $this->actingAs($user)->json('POST', '/api/market-board/purchase/1', [
             'market_board_id' => 1
         ])->response;
 
@@ -284,7 +284,7 @@ class MarketControllerApiTest extends TestCase
 
         $user     = $this->character->updateCharacter(['gold', 1500])->getUser();
 
-        $response = $this->actingAs($user, 'api')->json('POST', '/api/market-board/purchase/1', [
+        $response = $this->actingAs($user)->json('POST', '/api/market-board/purchase/1', [
             'market_board_id' => 1
         ])->response;
 
@@ -306,7 +306,7 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('POST', '/api/market-board/purchase/1', [
+        $response = $this->actingAs($user)->json('POST', '/api/market-board/purchase/1', [
             'market_board_id' => 1
         ])->response;
 
@@ -328,7 +328,7 @@ class MarketControllerApiTest extends TestCase
             'is_locked'    => false,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('POST', '/api/market-board/purchase/1', [
+        $response = $this->actingAs($user)->json('POST', '/api/market-board/purchase/1', [
             'market_board_id' => 1
         ])->response;
 
@@ -348,7 +348,7 @@ class MarketControllerApiTest extends TestCase
             'sold_for' => 1000,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/history')->response;
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/history')->response;
 
         $this->assertEquals(200, $response->status());
 
@@ -367,7 +367,7 @@ class MarketControllerApiTest extends TestCase
             'sold_for' => 1000,
         ]);
 
-        $response = $this->actingAs($user, 'api')->json('GET', '/api/market-board/history', [
+        $response = $this->actingAs($user)->json('GET', '/api/market-board/history', [
             'type' => 'feet',
         ])->response;
 

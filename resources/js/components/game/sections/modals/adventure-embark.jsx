@@ -26,6 +26,14 @@ export default class AdventureEmbark extends React.Component {
       this.props.updateCharacterAdventures(result.data.adventure_completed_at);
       this.props.embarkClose();
     }).catch((error) => {
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
+
       this.setState({
         errorMessage: 'Invalid input. Please try again.'
       });

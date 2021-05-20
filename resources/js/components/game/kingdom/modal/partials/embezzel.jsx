@@ -36,8 +36,14 @@ export default class Embezzel extends React.Component {
           this.props.embezzeledSuccess(amountEmbzzeled);
           this.props.close();
         });
-      }).catch((error) => {
-        console.error(error);
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            location.reload();
+          }
+        }
       });
     });
   }

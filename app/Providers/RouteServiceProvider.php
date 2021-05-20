@@ -119,7 +119,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameKingdomApiRoutes()
     {
         Route::prefix('api')
-             ->middleware('api')
+             ->middleware('web')
              ->namespace('App\Game\Kingdoms\Controllers')
              ->group(base_path('routes/game/kingdoms/api.php'));
     }
@@ -127,7 +127,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameSkillsApiRoutes()
     {
         Route::prefix('api')
-             ->middleware('api')
+             ->middleware('web')
              ->namespace('App\Game\Skills\Controllers')
              ->group(base_path('routes/game/skills/api.php'));
     }
@@ -148,7 +148,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapAdminApiRoutes() {
         Route::prefix('api')
-            ->middleware('api')
+            ->middleware('web')
             ->namespace('App\Admin\Controllers')
             ->group(base_path('routes/admin/api.php'));
     }
@@ -169,7 +169,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameCoreApiRoutes()
     {
         Route::prefix('api')
-             ->middleware('api')
+             ->middleware('web')
              ->namespace('App\Game\Core\Controllers')
              ->group(base_path('routes/game/api.php'));
     }
@@ -193,7 +193,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGameAdventuresApiRoutes()
     {
         Route::prefix('api')
-             ->middleware('api')
+             ->middleware('web')
              ->namespace('App\Game\Adventures\Controllers')
              ->group(base_path('routes/game/adventures/api.php'));
     }

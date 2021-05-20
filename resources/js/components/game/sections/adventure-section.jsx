@@ -95,7 +95,13 @@ export default class AdeventureActions extends React.Component {
         canAdventureAgainAt: null,
       });
     }).catch((error) => {
-      console.error(error);
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+      }
     });
   }
 

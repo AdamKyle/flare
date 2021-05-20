@@ -41,7 +41,7 @@ class KingdomUnitMovementApiTest extends TestCase
 
         $this->createUnitMovement($this->character->getKingdom(), $attacker->getKingdom());
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('GET', route('kingdom.unit.movement', [
+        $response = $this->actingAs($this->character->getUser())->json('GET', route('kingdom.unit.movement', [
             'character' => $this->character->getCharacter()->id,
         ]))->response;
 
@@ -78,7 +78,7 @@ class KingdomUnitMovementApiTest extends TestCase
             'is_returning'       => false,
         ]);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('GET', route('kingdom.unit.movement', [
+        $response = $this->actingAs($this->character->getUser())->json('GET', route('kingdom.unit.movement', [
             'character' => $this->character->getCharacter()->id,
         ]))->response;
 
@@ -99,7 +99,7 @@ class KingdomUnitMovementApiTest extends TestCase
 
         $unitMovementQueue = $this->createUnitMovement($this->character->getKingdom(), $attacker->getKingdom());
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('recall.units', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('recall.units', [
             'character'         => $this->character->getCharacter()->id,
             'unitMovementQueue' => $unitMovementQueue->id,
         ]))->response;
@@ -122,7 +122,7 @@ class KingdomUnitMovementApiTest extends TestCase
 
         $unitMovementQueue = $this->createUnitMovement($this->character->getKingdom(), $attacker->getKingdom(), 10, 11);
 
-        $response = $this->actingAs($this->character->getUser(), 'api')->json('POST', route('recall.units', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('recall.units', [
             'character'         => $this->character->getCharacter()->id,
             'unitMovementQueue' => $unitMovementQueue->id,
         ]))->response;

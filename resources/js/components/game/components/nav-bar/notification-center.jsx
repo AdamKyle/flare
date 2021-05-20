@@ -41,7 +41,13 @@ export default class NotificationCenter extends React.Component {
     e.preventDefault();
 
     axios.post('/api/notifications/clear').catch((err) => {
-      console.log(error);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload()
+        }
+      }
     });
   }
 
@@ -49,7 +55,13 @@ export default class NotificationCenter extends React.Component {
     axios.post('/api/notifications/' + notification.id + '/clear').then((result) => {
       window.location = notification.url;
     }).catch((err) => {
-      console.log(error);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload()
+        }
+      }
     });
   }
 

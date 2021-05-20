@@ -30,7 +30,6 @@ class KingdomsController extends Controller {
     private $kingdom;
 
     public function __construct(Manager $manager, KingdomTransformer $kingdom) {
-        $this->middleware('auth:api');
         $this->middleware('is.character.dead');;
 
         $this->manager = $manager;

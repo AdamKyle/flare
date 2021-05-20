@@ -50,6 +50,14 @@ export default class UnitQueue extends React.Component {
     }).then((result) => {
       this.props.close();
     }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
+
       this.setState({
         error: err.response.data.message,
       });

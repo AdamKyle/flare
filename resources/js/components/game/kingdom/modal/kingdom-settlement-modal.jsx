@@ -74,8 +74,14 @@ export default class KingdomSettlementModal extends React.Component {
       }
     }).catch((error) => {
       if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+
         this.setState({
-          errorMessage: error.response.data.errors.name[0],
+          errorMessage: response.data.errors.name[0],
         });
       } else {
         console.error(error);

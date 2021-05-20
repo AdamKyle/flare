@@ -52,7 +52,7 @@ class AdventureControllerApiTest extends TestCase
     public function testGetAdventureLogs() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/character/adventure/logs')
                          ->response;
 
@@ -63,7 +63,7 @@ class AdventureControllerApiTest extends TestCase
         $user      = $this->character->getUser();
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id, [
                              'levels_at_a_time' => 'all'
                          ])
@@ -81,7 +81,7 @@ class AdventureControllerApiTest extends TestCase
 
         $this->createLog($character, $this->adventure, false, 1);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id, [
                              'levels_at_a_time' => 'all'
                          ])
@@ -106,7 +106,7 @@ class AdventureControllerApiTest extends TestCase
 
         $this->createLog($character, $this->adventure, true, 1);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                             ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id, [
                                 'levels_at_a_time' => 'all'
                             ])
@@ -132,7 +132,7 @@ class AdventureControllerApiTest extends TestCase
 
         $this->createLog($character, $this->adventure, true, 1);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', 'api/character/'.$character->id.'/adventure/' . $this->adventure->id . '/cancel')
                          ->response;
 

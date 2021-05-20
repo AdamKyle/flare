@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-        <x-core.page-title 
+        <x-core.page-title
             title="{{$adventureLog->adventure->name}}"
             route="{{url()->previous()}}"
             link="Back"
@@ -27,7 +27,7 @@
             <div class="card mt-2">
             <div class="card-body">
                 <h4 class="card-title">Rewards</h4>
-                
+
                 <dl>
                     <dt>Total XP: </dt>
                     <dd>{{$adventureLog->rewards['exp']}}</dd>
@@ -68,7 +68,8 @@
                 </dl>
 
                 @if (!is_null($adventureLog->adventure->itemReward))
-                    <p style="font-size: 12px" class="text-muted"><sup>*</sup> This item has already been awarded to you upon a <strong>successful</strong> completion of the adventure, once.</p>
+                    <p class="text-muted mt-2"><sup>*</sup> This item will be rewarded once and only <strong>once</strong> upon a <strong>successful</strong>
+                        completion of the adventure</p>
                 @endif
             </div>
             <hr />

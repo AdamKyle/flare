@@ -47,7 +47,7 @@ class CharacterSheetControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/character-sheet/' . $character->id)
                          ->response;
 
@@ -62,7 +62,7 @@ class CharacterSheetControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/character-sheet/' . $character->id)
                          ->response;
 
@@ -77,7 +77,7 @@ class CharacterSheetControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/character-sheet/' . $character->id)
                          ->response;
 
@@ -92,7 +92,7 @@ class CharacterSheetControllerApiTest extends TestCase {
         $character = $this->character->inventoryManagement()->unequipAll()->getCharacterFactory()->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/character-sheet/' . $character->id)
                          ->response;
 
@@ -126,7 +126,7 @@ class CharacterSheetControllerApiTest extends TestCase {
 
         $user     = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/character-sheet/' . $character->id)
                          ->response;
 
@@ -139,7 +139,7 @@ class CharacterSheetControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/character-sheet/'.$character->id.'/name-change', [
                              'name' => 'Apples'
                          ])
@@ -152,7 +152,7 @@ class CharacterSheetControllerApiTest extends TestCase {
     public function testBasicLocationInformation() {
         $character = $this->character->givePlayerLocation()->getCharacter();
 
-        $response = $this->actingAs($character->user, 'api')
+        $response = $this->actingAs($character->user)
             ->json('GET', '/api/character-location-data/' . $character->id)
             ->response;
 

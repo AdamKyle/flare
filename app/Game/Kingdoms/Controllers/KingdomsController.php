@@ -21,8 +21,6 @@ class KingdomsController extends Controller {
      * @param KingdomLogService $kingdomLogService
      */
     public function __construct(KingdomLogService $kingdomLogService) {
-        $this->middleware('auth');
-
         $this->kingdomLogService = $kingdomLogService;
     }
 

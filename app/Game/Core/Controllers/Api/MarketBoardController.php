@@ -25,10 +25,8 @@ class MarketBoardController extends Controller {
     private $transformer;
 
     public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
-        $this->middleware('auth:api');
-
         $this->middleware('is.character.dead');
-        
+
         $this->middleware('is.character.adventuring');
 
         $this->middleware('is.character.at.location');
@@ -47,13 +45,13 @@ class MarketBoardController extends Controller {
                             ->where('items.id', $request->item_id);
             })->where('market_board.is_locked', false)
               ->select('market_board.*')
-              ->get();  
+              ->get();
         } else if ($request->has('type')) {
-            
+
             $items = MarketBoard::where('is_locked', false)->join('items', function($join) use($request) {
                 return $join->on('market_board.item_id', '=', 'items.id')
                             ->where('items.type', $request->type);
-            })->select('market_board.*')->get();           
+            })->select('market_board.*')->get();
         } else {
             $items = MarketBoard::where('is_locked', false)->get();
         }
@@ -91,7 +89,7 @@ class MarketBoardController extends Controller {
         }
 
         $totalPrice = ($listing->listed_price * 1.05);
-       
+
         if (!($character->gold > $totalPrice)) {
             return response()->json(['message' => 'You don\'t have the gold to puchase this item.'], 422);
         }
@@ -122,11 +120,11 @@ class MarketBoardController extends Controller {
         event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
 
         $listing->delete();
-        
+
         $items = MarketBoard::all();
         $items = new Collection($items, $this->transformer);
         $items = $this->manager->createData($items)->toArray();
-        
+
         $character = $character->refresh();
 
         event(new UpdateMarketBoardBroadcastEvent($character->user, $items, $character->gold));

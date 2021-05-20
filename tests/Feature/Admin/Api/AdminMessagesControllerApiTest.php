@@ -48,7 +48,7 @@ class AdminMessagesControllerApiTest extends TestCase {
 
         $this->createMessage($this->character->getUser());
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
                          ->json('GET', '/api/admin/chat-messages')
                          ->response;
 
@@ -63,7 +63,7 @@ class AdminMessagesControllerApiTest extends TestCase {
 
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/ban-user', [
                 'ban_for'     => 'one-day',
                 'ban_message' => 'because',
@@ -86,7 +86,7 @@ class AdminMessagesControllerApiTest extends TestCase {
 
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/ban-user', [
                 'ban_for'     => 'perm',
                 'ban_message' => 'because',
@@ -109,7 +109,7 @@ class AdminMessagesControllerApiTest extends TestCase {
 
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/ban-user', [
                 'ban_for'     => 'perm',
                 'ban_message' => 'because',
@@ -134,7 +134,7 @@ class AdminMessagesControllerApiTest extends TestCase {
 
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/ban-user', [
                 'ban_for'     => 'apple-sauce',
                 'ban_message' => 'because',
@@ -158,7 +158,7 @@ class AdminMessagesControllerApiTest extends TestCase {
     public function testCanSilenceUser() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/silence-user', [
                 'for'     => 10,
                 'user_id' => $user->id,
@@ -171,7 +171,7 @@ class AdminMessagesControllerApiTest extends TestCase {
     public function testCannotSilenceUser() {
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/silence-user', [
                 'user_id' => $character->user->id,
             ])
@@ -189,7 +189,7 @@ class AdminMessagesControllerApiTest extends TestCase {
     public function testForceNameChange() {
         $character = $this->character->getCharacter();
 
-        $response = $this->actingAs($this->admin, 'api')
+        $response = $this->actingAs($this->admin)
             ->json('POST', '/api/admin/force-name-change/' . $character->user->id)
             ->response;
 

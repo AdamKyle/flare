@@ -44,7 +44,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->getgold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $this->createItem([
                     'name' => 'sample',
@@ -82,14 +82,14 @@ class CharacterSkillControllerApiTest extends TestCase {
           ->getCharacterFactory()
           ->getCharacter();
 
-        $response = $this->actingAs($character->user, 'api')->json('GET', '/api/enchanting/' . $character->id)->response;
+        $response = $this->actingAs($character->user)->json('GET', '/api/enchanting/' . $character->id)->response;
 
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
 
         $this->assertNotEmpty($content);
-        
+
     }
 
     public function testCanEnchantItem() {
@@ -121,7 +121,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $user        = $this->character->getUser();
         $slot        = $character->inventory->slots->first();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [1],
@@ -167,7 +167,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $user        = $this->character->getUser();
         $slot        = $character->inventory->slots->first();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [1],
@@ -216,7 +216,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $user        = $this->character->getUser();
         $slot        = $character->inventory->slots->first();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [1, 2],
@@ -258,10 +258,10 @@ class CharacterSkillControllerApiTest extends TestCase {
         $craftingSkillService = Mockery::mock(EnchantItemService::class)->makePartial();
 
         $this->app->instance(EnchantItemService::class, $craftingSkillService);
-        
+
         $craftingSkillService->shouldReceive('characterRoll')->once()->andReturn(0);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [1],
@@ -279,7 +279,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $skill = $this->createGameSkill([
             'name' => 'Enchanting'
         ]);
-        
+
         $character = $this->character->updateCharacter(['gold' => 10000])
                                      ->assignSkill($skill, 400)
                                      ->inventoryManagement()
@@ -299,7 +299,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [1],
@@ -318,7 +318,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => 2,
                 'type' => 'Weapon',
@@ -339,13 +339,13 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                     ->json('POST', '/api/enchant/' . $character->id, [
                         'slot_id'   => 100,
                         'affix_ids' => [4],
                         'cost'      => 1000,
                     ])->response;
-        
+
         $this->assertEquals(422, $response->status());
         $this->assertTrue($currentGold === $character->refresh()->gold);
     }
@@ -356,7 +356,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $this->createItem([
                     'name' => 'sample',
@@ -390,7 +390,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $this->createItem([
                     'name' => 'sample',
@@ -406,14 +406,14 @@ class CharacterSkillControllerApiTest extends TestCase {
             ->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
         $this->assertTrue($content->items[0]->name === 'sample 2');
         $this->assertEquals(1, count($content->items));
         $this->assertTrue($currentGold === $character->refresh()->gold);
     }
 
-    
+
     public function testCantEnchantItemTooHard() {
         $this->createItemAffix([
             'skill_level_required' => 10
@@ -443,7 +443,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->refresh()->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [1],
@@ -470,11 +470,11 @@ class CharacterSkillControllerApiTest extends TestCase {
         ]);
 
         $character = $this->character->getCharacter();
-        $user      = $this->character->getUser(); 
+        $user      = $this->character->getUser();
 
         $this->assertEquals(0, $character->skills->where('name', 'Weapon Crafting')->first()->xp);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $this->createItem([
                     'name' => 'sample',
@@ -502,7 +502,7 @@ class CharacterSkillControllerApiTest extends TestCase {
     }
 
     public function testCanEnchantItemTooEasy() {
-        
+
         $this->createItemAffix([
             'skill_level_required' => 1
         ]);
@@ -532,7 +532,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $currentGold = $character->gold;
         $currentXp   = $character->skills->where('name', 'Enchanting')->first()->xp;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [1],
@@ -554,7 +554,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $this->createItem([
                     'name' => 'sample',
@@ -602,16 +602,16 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $currentGold = $character->gold;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [1],
                             'cost'      => 1000,
                             'extraTime' => 'double'
                          ])->response;
-        
+
         $character = $this->character->getCharacter();
-        
+
         $item      = $character->inventory->slots->first()->item;
 
         $this->assertEquals(422, $response->status());
@@ -626,7 +626,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $this->createItem([
                     'name' => 'sample',
@@ -689,7 +689,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'skill_level_trivial' => 10,
         ])->id;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $itemId,
                 'type' => 'weapon',
@@ -734,7 +734,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $itemId,
                 'type' => 'weapon',
@@ -765,7 +765,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'skill_level_trivial' => 10,
         ])->id;
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
                 'item_to_craft' => $itemId,
                 'type' => 'Weapon',
@@ -790,7 +790,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/crafting/' . $character->id, [
                              'crafting_type' => 'Weapon'
                          ])
@@ -816,7 +816,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/crafting/' . $character->id, [
                              'crafting_type' => 'Weapon'
                          ])
@@ -842,7 +842,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
         $user      = $this->character->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/crafting/' . $character->id, [
                              'crafting_type' => 'Weapon'
                          ])

@@ -39,8 +39,14 @@ export default class PurchaseModal extends React.Component {
     }).then((result) => {
       this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
       this.props.closeModal();
-    }).catch((error) => {
-      console.error(error);
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+      }
     });
   }
 

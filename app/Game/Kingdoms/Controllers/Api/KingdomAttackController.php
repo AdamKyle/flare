@@ -16,7 +16,6 @@ class KingdomAttackController extends Controller {
     private $kingdomAttackService;
 
     public function __construct(KingdomsAttackService $kingdomAttackService) {
-        $this->middleware('auth:api');
         $this->middleware('is.character.dead');
 
         $this->kingdomAttackService = $kingdomAttackService;

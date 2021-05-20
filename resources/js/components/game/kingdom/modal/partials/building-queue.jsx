@@ -47,8 +47,14 @@ export default class BuildingQueue extends React.Component {
       queue_id: this.props.queueData.id
     }).then(() => {
       this.props.close();
-    }).catch((result) => {
-      console.error(result);
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+      }
     });
   }
 

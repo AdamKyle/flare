@@ -18,7 +18,6 @@ class CharacterSheetController extends Controller {
     private $characterSheetTransformer;
 
     public function __construct(Manager $manager, CharacterSheetTransformer $characterSheetTransformer) {
-        $this->middleware('auth:api');
 
         $this->manager                   = $manager;
         $this->characterSheetTransformer = $characterSheetTransformer;

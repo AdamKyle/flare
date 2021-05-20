@@ -125,7 +125,13 @@ export default class KingdomAttackModal extends React.Component {
         this.props.close();
       });
     }).catch((err) => {
-      console.error(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
 
       this.props.close();
     });
@@ -140,8 +146,14 @@ export default class KingdomAttackModal extends React.Component {
         currentStep: this.state.currentStep + 1,
         attackingKingdoms: result.data,
       })
-    }).catch((error) => {
-      console.error(error);
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
 
       this.props.close();
     });

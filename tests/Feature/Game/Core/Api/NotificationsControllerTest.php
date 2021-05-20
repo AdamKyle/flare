@@ -45,7 +45,7 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ]);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/notifications')
                          ->response;
 
@@ -72,7 +72,7 @@ class NotificationsControllerTest extends TestCase {
         ]);
 
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('GET', '/api/notifications')
                          ->response;
 
@@ -96,7 +96,7 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ]);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/notifications/clear')
                          ->response;
 
@@ -120,7 +120,7 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ], 2);
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/notifications/1/clear')
                          ->response;
 
@@ -145,7 +145,7 @@ class NotificationsControllerTest extends TestCase {
 
         $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
-        $response = $this->actingAs($user, 'api')
+        $response = $this->actingAs($user)
                          ->json('POST', '/api/notifications/1/clear')
                          ->response;
 

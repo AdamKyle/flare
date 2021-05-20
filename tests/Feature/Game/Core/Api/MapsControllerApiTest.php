@@ -29,7 +29,7 @@ class MapsControllerApiTest extends TestCase {
         $this->createGameMap([
             'name' => 'Apples'
         ]);
-        $response = $this->actingAs($this->character->getUser(), 'api')
+        $response = $this->actingAs($this->character->getUser())
                          ->json('GET', '/api/maps/' . $this->character->getCharacter()->id)
                          ->response;
 

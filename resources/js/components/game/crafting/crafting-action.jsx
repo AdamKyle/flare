@@ -99,6 +99,14 @@ export default class CraftingAction extends React.Component {
             itemsToCraft: result.data.items,
             itemToCraft: result.data.items[0].id,
           });
+        }).catch((err) => {
+          if (err.hasOwnProperty('response')) {
+            const response = err.response;
+
+            if (response.status === 401) {
+              return location.reload();
+            }
+          }
         });
       }
     });
@@ -143,6 +151,14 @@ export default class CraftingAction extends React.Component {
           this.setState({
             itemsToCraft: result.data.items
           });
+        }
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            return location.reload();
+          }
         }
       });
     });

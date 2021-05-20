@@ -67,7 +67,13 @@ export default class ChatMessageActions extends React.Component {
           this.props.close();
         });
       }).catch((err) => {
-        console.err(err);
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            return location.reload();
+          }
+        }
       });
     });
   }
