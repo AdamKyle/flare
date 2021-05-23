@@ -2,13 +2,17 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Import\Items\ItemsImport;
+use App\Admin\Requests\ItemsImport as ItemsImportRequest;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class ItemsController extends Controller {
 
@@ -30,6 +34,27 @@ class ItemsController extends Controller {
             'item' => $item,
             'editing' => true,
         ]);
+    }
+
+    public function exportItems() {
+        return view('admin.items.export');
+    }
+
+    public function importItems() {
+        return view('admin.items.import');
+    }
+
+    public function export() {
+        $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
+    }
+
+    public function importData(ItemsImportRequest $request) {
+        Excel::import(new ItemsImport, $request->items_import);
+
+        return redirect()->back()->with('success', 'imported item data.');
     }
 
     public function delete(Item $item) {

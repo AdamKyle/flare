@@ -28,6 +28,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
     Route::post('/admin/monsters/{monster}/pblish', ['as' => 'monster.publish', 'uses' => 'MonstersController@publish']);
 
+    Route::get('/admin/items/export-items', ['as' => 'items.export', 'uses' => 'ItemsController@exportItems']);
+    Route::get('/admin/items/import-items', ['as' => 'items.import', 'uses' => 'ItemsController@importItems']);
+    Route::post('/admin/items/export-data', ['as' => 'items.export-data', 'uses' => 'ItemsController@export']);
+    Route::post('/admin/items/import-data', ['as' => 'items.import-data', 'uses' => 'ItemsController@importData']);
+
     Route::get('/admin/items', ['as' => 'items.list', 'uses' => 'ItemsController@index']);
     Route::get('/admin/items/create', ['as' => 'items.create', 'uses' => 'ItemsController@create']);
     Route::get('/admin/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);

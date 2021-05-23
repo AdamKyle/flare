@@ -11,13 +11,13 @@ use Facades\App\Flare\Values\UserOnlineValue;
 use Mail;
 
 class AssignSkillService {
-    
+
     /**
      * Assign the skill or throw an exception.
-     * 
+     *
      * `$for` should be of: `all`, `select-monsters` or `select-class`
      * anything else, throws an error.
-     * 
+     *
      * @param string $for
      * @param GameSkill $skill
      * @param int $monsterId | null
@@ -36,7 +36,10 @@ class AssignSkillService {
                 return;
             case 'select-class':
                 $this->assignSkillToClasses($skill, $classId);
-                return; 
+                return;
+            case 'only-characters':
+                $this->assignSkillToCharacters($skill);
+                return;
             default:
                 throw new \Exception('Could not determine who to assign skill to. $for: ' . $for);
         }
@@ -51,7 +54,7 @@ class AssignSkillService {
             Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'New character skill'));
         }
     }
-    
+
     protected function assignSkillToClasses(GameSkill $skill, int $classId) {
         Character::where('game_class_id', $classId)->chunkById(1000, function($characters) use($skill) {
             foreach ($characters as $character) {
@@ -84,10 +87,10 @@ class AssignSkillService {
                 $this->alertUser($character, $skill);
             }
         });
-    } 
+    }
 
     protected function assignSkillToMonsters(GameSkill $skill) {
-        
+
         Monster::chunkById(1000, function($monsters) use ($skill) {
             foreach ($monsters as $monster) {
                 $foundSkill = $monster->skills->where('game_skill_id', $skill->id)->first();
@@ -95,7 +98,7 @@ class AssignSkillService {
                 if (!is_null($foundSkill)) {
                     continue;
                 }
-                
+
                 $monster->skills()->create([
                     'monster_id' => $monster->id,
                     'game_skill_id' => $skill->id,
@@ -104,7 +107,7 @@ class AssignSkillService {
                 ]);
             }
         });
-    } 
+    }
 
     protected function assignSkillToMonster(GameSkill $skill, int $monsterId) {
         $monster = Monster::find($monsterId);
@@ -129,5 +132,5 @@ class AssignSkillService {
         $skill->update([
             'specifically_assigned' => true,
         ]);
-    } 
+    }
 }

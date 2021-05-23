@@ -1,0 +1,66 @@
+<table>
+    <thead>
+    <tr>
+        <th>item_suffix_id</th>
+        <th>item_prefix_id</th>
+        <th>market_sellable</th>
+        <th>name</th>
+        <th>type</th>
+        <th>description</th>
+        <th>default_position</th>
+        <th>base_damage</th>
+        <th>base_healing</th>
+        <th>base_ac</th>
+        <th>cost</th>
+        <th>base_damage_mod</th>
+        <th>base_healing_mod</th>
+        <th>base_ac_mod</th>
+        <th>str_mod</th>
+        <th>dur_mod</th>
+        <th>dex_mod</th>
+        <th>chr_mod</th>
+        <th>int_mod</th>
+        <th>effect</th>
+        <th>can_craft</th>
+        <th>skill_level_required</th>
+        <th>skill_level_trivial</th>
+        <th>crafting_type</th>
+        <th>skill_name</th>
+        <th>skill_bonus</th>
+        <th>skill_training_bonus</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($items as $item)
+        <tr>
+            <td>{{is_null($item->itemSuffix) ? null :$item->itemSuffix->name}}</td>
+            <td>{{is_null($item->itemPrefix) ? null :$item->itemPrefix->name}}</td>
+            <td>{{$item->market_sellable}}</td>
+            <td>{{$item->name}}</td>
+            <td>{{$item->type}}</td>
+            <td>{{$item->description}}</td>
+            <td>{{$item->default_position}}</td>
+            <td>{{$item->base_damage}}</td>
+            <td>{{$item->base_healing}}</td>
+            <td>{{$item->base_ac}}</td>
+            <td>{{$item->cost}}</td>
+            <td>{{$item->base_damage_mod}}</td>
+            <td>{{$item->base_healing_mod}}</td>
+            <td>{{$item->base_ac_mod}}</td>
+            <td>{{$item->str_mod}}</td>
+            <td>{{$item->dur_mod}}</td>
+            <td>{{$item->dex_mod}}</td>
+            <td>{{$item->chr_mod}}</td>
+            <td>{{$item->int_mod}}</td>
+            <td>{{$item->effect}}</td>
+            <td>{{$item->can_craft}}</td>
+            <td>{{$item->skill_level_required}}</td>
+            <td>{{$item->skill_level_trivial}}</td>
+            <td>{{$item->crafting_type}}</td>
+            <td>{{$item->skill_name}}</td>
+            <td>{{$item->skill_bonus}}</td>
+            <td>{{$item->skill_training_bonus}}</td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>
