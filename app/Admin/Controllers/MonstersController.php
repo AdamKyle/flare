@@ -4,7 +4,8 @@ namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Monster;
-use Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Admin\Exports\Monsters\MonstersExport;
 
 class MonstersController extends Controller {
 
@@ -36,6 +37,27 @@ class MonstersController extends Controller {
             'monster' => $monster,
             'editing' => true,
         ]);
+    }
+
+    public function exportItems() {
+        return view('admin.monsters.export');
+    }
+
+    public function importItems() {
+        return view('admin.monsters.import');
+    }
+
+    public function export() {
+        $response = Excel::download(new MonstersExport, 'monsters.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
+    }
+
+    public function importData(MonstersImportRequest $request) {
+        Excel::import(new MonstersImport, $request->items_import);
+
+        return redirect()->back()->with('success', 'imported item data.');
     }
 
     public function publish(Monster $monster) {

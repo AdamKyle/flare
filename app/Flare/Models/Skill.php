@@ -50,6 +50,10 @@ class Skill extends Model
         return $this->belongsTo(Character::class);
     }
 
+    public function monster() {
+        return $this->belongsTo(Monster::class, 'monster_id', 'id');
+    }
+
     public function getNameAttribute() {
         return $this->baseSkill->name;
     }

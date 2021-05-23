@@ -1,0 +1,26 @@
+<table>
+    <thead>
+    <tr>
+        <th>monster_id</th>
+        <th>currently_training</th>
+        <th>level</th>
+        <th>xp</th>
+        <th>xp_max</th>
+        <th>xp_towards</th>
+        <th>game_skill_id</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($monsterSkills as $monsterSkill)
+        <tr>
+            <td>{{$monsterSkill->monster->name}}</td>
+            <td>{{$monsterSkill->currently_training}}</td>
+            <td>{{$monsterSkill->level}}</td>
+            <td>{{$monsterSkill->xp}}</td>
+            <td>{{$monsterSkill->xp_max}}</td>
+            <td>{{$monsterSkill->xp_towards}}</td>
+            <td>{{$monsterSkill->baseSkill->name}}</td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>

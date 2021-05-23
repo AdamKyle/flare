@@ -1,0 +1,48 @@
+<table>
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>str</th>
+        <th>dur</th>
+        <th>dex</th>
+        <th>chr</th>
+        <th>int</th>
+        <th>ac</th>
+        <th>max_level</th>
+        <th>damage_stat</th>
+        <th>xp</th>
+        <th>drop_check</th>
+        <th>gold</th>
+        <th>health_range</th>
+        <th>attack_range</th>
+        <th>published</th>
+        <th>quest_item_id</th>
+        <th>quest_item_drop_chance</th>
+        <th>game_map_id</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($monsters as $monster)
+        <tr>
+            <td>{{$monster->name}}</td>
+            <td>{{$monster->str}}</td>
+            <td>{{$monster->dur}}</td>
+            <td>{{$monster->dex}}</td>
+            <td>{{$monster->chr}}</td>
+            <td>{{$monster->int}}</td>
+            <td>{{$monster->ac}}</td>
+            <td>{{$monster->max_level}}</td>
+            <td>{{$monster->damage_stat}}</td>
+            <td>{{$monster->xp}}</td>
+            <td>{{$monster->drop_check}}</td>
+            <td>{{$monster->gold}}</td>
+            <td>{{$monster->health_range}}</td>
+            <td>{{$monster->attack_range}}</td>
+            <td>{{$monster->published}}</td>
+            <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
+            <td>{{$monster->quest_item_drop_chance}}</td>
+            <td>{{$monster->gameMap->name}}</td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>

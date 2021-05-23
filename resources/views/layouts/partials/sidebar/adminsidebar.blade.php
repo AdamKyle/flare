@@ -58,6 +58,8 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('monsters.list')}}">Monsters</a></li>
             <li><a href="{{route('monsters.create')}}">Create Monster</a></li>
+            <li><a href="{{route('monsters.export')}}">Export</a></li>
+            <li><a href="{{route('monsters.import')}}">Import</a></li>
         </ul>
     </li>
     <li>
