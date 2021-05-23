@@ -25,6 +25,8 @@
                     <dd>{{$monster->attack_range}}</dd>
                     <dt>Drop Check</dt>
                     <dd>{{$monster->drop_check * 100}}%</dd>
+                    <dt>AC</dt>
+                    <dd>{{$monster->ac}}</dd>
                     <dt>XP</dt>
                     <dd>{{$monster->xp}}</dd>
                     <dt>Max Level<sup>*</sup></dt>

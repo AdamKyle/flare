@@ -9,7 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
-use App\Game\Kingdoms\Mail\RebuiltBuilding;
 use App\Game\Kingdoms\Mail\RecruitedUnits;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;

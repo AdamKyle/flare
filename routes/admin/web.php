@@ -91,5 +91,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/kingdoms/units/edit/{gameUnit}', ['as' => 'units.edit', 'uses' => 'UnitsController@edit']);
 
     Route::get('/admin/kingdoms/export', ['as' => 'kingdoms.export', 'uses' => 'KingdomsController@index']);
+    Route::get('/admin/kingdoms/import', ['as' => 'kingdoms.import', 'uses' => 'KingdomsController@import']);
     Route::post('/admin/kingdoms/export-data', ['as' => 'kingdoms.export-data', 'uses' => 'KingdomsController@export']);
+    Route::post('/admin/kingdoms/import-data', ['as' => 'kingdoms.import-data', 'uses' => 'KingdomsController@importData']);
+
 });

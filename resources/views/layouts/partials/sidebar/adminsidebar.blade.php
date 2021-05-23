@@ -50,6 +50,7 @@
             <li><a href="{{route('buildings.list')}}">Buildings</a></li>
             <li><a href="{{route('units.list')}}">Units</a></li>
             <li><a href="{{route('kingdoms.export')}}">Export</a></li>
+            <li><a href="{{route('kingdoms.import')}}">Import</a></li>
         </ul>
     </li>
     <li>

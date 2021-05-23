@@ -16,9 +16,8 @@
             </p>
 
             <p>
-                It is not recommended that you use this to make changes to production kingdoms as that can affect all players,
-                sending out tons of emails or notifications. The purpose of this export is to help you get started in production before
-                you launch.
+                <strong>Do not</strong> use this to make changes to your kingdoms. If there is kingdom data already in the database your import
+                will fail. Make changes in the system instead.
             </p>
 
             <p>

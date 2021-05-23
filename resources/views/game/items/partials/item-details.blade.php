@@ -31,6 +31,19 @@
     @endif
 </dl>
 
+@if ($item->can_craft)
+<h4 class="mt-3">Crafting Info</h4>
+<hr />
+<dl>
+    <dt>Crafting Type</dt>
+    <dd>{{$item->crafting_type}}</dd>
+    <dt>Skill Level Required</dt>
+    <dd>{{$item->skill_level_required}}</dd>
+    <dt>Skill Level Trivial</dt>
+    <dd>{{$item->skill_level_trivial}}</dd>
+</dl>
+@endif
+
 @if (!empty($item->getItemSkills()))
     <h4 class="mt-3">Affects the Following Skills:</h4>
     <hr />

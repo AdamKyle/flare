@@ -263,8 +263,8 @@ class Item extends Model
             if (!is_null($this->itemPrefix->skill_name)) {
                 $skills[] = [
                     'skill_name'           => $this->itemPrefix->skill_name,
-                    'skill_training_bonus' => $this->itemSuffix->skill_training_bonus,
-                    'skill_bonus'          => $this->itemSuffix->skill_bonus,
+                    'skill_training_bonus' => $this->itemPrefix->skill_training_bonus,
+                    'skill_bonus'          => $this->itemPrefix->skill_bonus,
                 ];
             }
         }

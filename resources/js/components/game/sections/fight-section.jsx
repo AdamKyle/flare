@@ -212,7 +212,7 @@ export default class FightSection extends React.Component {
             this.state.missCounter >= 2 ?
               <p className="text-info text-center">
                 You and the enemy are too evenly matched.<br />
-                Try finding gear that raises your dex or accuracy skill bonus.
+                Try finding gear that raises your stats and skill bonuses.
               </p>
               : null
           }

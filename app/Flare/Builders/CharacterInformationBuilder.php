@@ -19,7 +19,7 @@ class CharacterInformationBuilder {
 
     /**
      * Set the character and fetch it's inventory.
-     * 
+     *
      * @param Character $character
      * @return CharactrInformationBuilder
      */
@@ -33,10 +33,10 @@ class CharacterInformationBuilder {
 
     /**
      * Get the characters total stat mode for a stat
-     * 
+     *
      * Applies all bonuses to that stat based on equipped items in the
      * inventory assuming the user has anything equipped at all.
-     * 
+     *
      * @param Character $character
      * @return float
      */
@@ -64,13 +64,13 @@ class CharacterInformationBuilder {
 
     /**
      * Build the attack
-     * 
+     *
      * Fetches the damage stat with all modifications and applies all skill bonuses.
-     * 
+     *
      * @return int
      */
     public function buildAttack(): int {
-        
+
         $characterDamageStat = $this->statMod($this->character->damage_stat);
         $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
 
@@ -79,10 +79,10 @@ class CharacterInformationBuilder {
 
     /**
      * Build the defence
-     * 
+     *
      * Fetches the defence based off a base of ten plus the equipment, skills and other
      * bonuses.
-     * 
+     *
      * @return int
      */
     public function buildDefence(): int {
@@ -91,9 +91,9 @@ class CharacterInformationBuilder {
 
     /**
      * Build the heal for
-     * 
+     *
      * Fetches the total healing amount based on skills and equipment.
-     * 
+     *
      * @return int
      */
     public function buildHealFor(): int {
@@ -102,10 +102,10 @@ class CharacterInformationBuilder {
 
     /**
      * Build total health
-     * 
+     *
      * Build the characters health based off equipment, plus the characters health and
      * a base of 10.
-     * 
+     *
      * @return int
      */
     public function buildHealth(): int {
@@ -121,13 +121,13 @@ class CharacterInformationBuilder {
                 $totalPercentage += $slot->item->getTotalPercentageForStat('dur');
             }
         }
-        
+
         return ($this->character->dur + 10) * $totalPercentage;
     }
 
     /**
      * Does the character have any artifacts?
-     * 
+     *
      * @return bool
      */
     public function hasArtifacts(): bool {
@@ -138,7 +138,7 @@ class CharacterInformationBuilder {
 
     /**
      * Does the character have any items with affixes?
-     * 
+     *
      * @return bool
      */
     public function hasAffixes(): bool {
@@ -149,7 +149,7 @@ class CharacterInformationBuilder {
 
     /**
      * Does the character have any damage spells
-     * 
+     *
      * @return bool
      */
     public function hasDamageSpells(): bool {
@@ -170,7 +170,7 @@ class CharacterInformationBuilder {
 
     protected function fetchSkillHealingMod(): float {
         $percentageBonus = 0.0;
-        
+
         foreach ($this->character->skills as $skill) {
             $percentageBonus += $skill->base_healing_mod + ($skill->level / 100);
         }
@@ -180,7 +180,7 @@ class CharacterInformationBuilder {
 
     protected function fetchSkillACMod(): float {
         $percentageBonus = 0.0;
-        
+
         foreach ($this->character->skills as $skill) {
             $percentageBonus += $skill->base_ac_mod = ($skill->level / 100);
         }
@@ -202,10 +202,13 @@ class CharacterInformationBuilder {
         $defence = 0;
 
         foreach ($this->inventory as $slot) {
+
             $defence += $slot->item->getTotalDefence();
         }
 
-        return $defence;
+        if ($defence !== 10) {
+            return $defence / 8;
+        }
     }
 
     protected function fetchHealingAmount(): int {

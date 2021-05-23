@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Kingdom\Api;
+namespace Tests\Feature\Game\Kingdom;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;

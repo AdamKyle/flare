@@ -88,8 +88,8 @@
                     />
 
                     <x-data-tables.header-row
-                        wire:click.prevent="sortBy('base_ac')"
-                        header-text="Base AC"
+                        wire:click.prevent="sortBy('base_healing')"
+                        header-text="Base Healing"
                         sort-by="{{$sortBy}}"
                         sort-field="{{$sortField}}"
                         field="base_ac"

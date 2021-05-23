@@ -68,6 +68,7 @@ export default class Attack {
   }
 
   getState() {
+    console.log(this.missed);
     return {
       characterCurrentHealth: this.characterCurrentHealth,
       monsterCurrentHealth: this.monsterCurrentHealth,
