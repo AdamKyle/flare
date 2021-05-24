@@ -32,7 +32,6 @@ class ItemDetails extends Component
         'body',
         'leggings',
         'feet',
-        'hands',
         'sleeves',
         'helmet',
         'gloves',
