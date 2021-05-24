@@ -23,6 +23,6 @@ class MonstersSkillsSheet implements FromView, WithTitle, ShouldAutoSize {
      * @return string
      */
     public function title(): string {
-        return 'Buildings';
+        return 'Monsters Skills';
     }
 }
