@@ -3,7 +3,7 @@
 namespace App\Admin\Import\Items;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Import\Items\Sheets\AffixesSheet;
+use App\Admin\Import\Items\Sheets\ItemsSheet;
 
 class ItemsImport implements WithMultipleSheets
 {
@@ -11,7 +11,7 @@ class ItemsImport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            0 => new AffixesSheet,
+            0 => new ItemsSheet,
         ];
     }
 }

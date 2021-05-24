@@ -72,17 +72,16 @@
     </li>
     <li class="nav-devider"></li>
     <li>
-        <a href="{{route('info.page', [
-            'pageName' => 'crafting'
-          ])}}"><i class="ra ra-anvil"></i> Crafting</a>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-anvil"></i><span class="hide-menu">Crafting/Enchanting</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'crafting'])}}">Crafting</a>
+            </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'enchanting'])}}">Enchanting</a>
+            </li>
+        </ul>
     </li>
-    <li class="nav-devider"></li>
-    <li>
-        <a href="{{route('info.page', [
-            'pageName' => 'enchanting'
-          ])}}"><i class="ra ra-burning-eye"></i> Enchanting</a>
-    </li>
-    <li class="nav-devider"></li>
     <li>
         <a href="{{route('info.page', [
             'pageName' => 'monsters'

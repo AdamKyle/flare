@@ -1,5 +1,5 @@
 import React from 'react';
-import Embezzel from './Embezzel';
+import Embezzel from './embezzel';
 import {Alert} from 'react-bootstrap';
 
 export default class KingdomInfo extends React.Component {
@@ -79,7 +79,7 @@ export default class KingdomInfo extends React.Component {
   embezzeledSuccess(amount) {
     this.setState({
       showSuccess: true,
-      successMessage: 'Embezzeled ' + amount + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
+      successMessage: 'Embezzled ' + amount + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
     });
   }
 

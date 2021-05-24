@@ -164,7 +164,7 @@ export default class AdeventureActions extends React.Component {
             </Col>
             <Col xs={9} sm={9} lg={9} xl={9}>
               <Row>
-                <Col xs={9} sm={6} lg={8} xl={2}>
+                <Col xs={9} sm={6} lg={8} xl={3}>
                   <button className="mr-2 btn btn-sm btn-primary" data-adventure-id={adventure.id}
                           disabled={hasAdventureInProgress || hasCollectedRewards || !this.props.canAdventure()}
                           onClick={this.embarkShow.bind(this)}>Embark
@@ -178,7 +178,7 @@ export default class AdeventureActions extends React.Component {
                       : null
                   }
                 </Col>
-                <Col xs={3} sm={6} lg={4} xl={10}>
+                <Col xs={3} sm={6} lg={4} xl={9}>
                   {
                     foundAdventure !== null ?
                       foundAdventure.adventure_id === adventure.id ?

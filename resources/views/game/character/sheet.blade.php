@@ -3,8 +3,9 @@
 @section('content')
     <x-core.page-title
         title="Character Sheet"
-        route="{{route('game')}}"
-        link="Game"
+        route="{{auth()->user()->hasRole('Admin') ? route('admin.character.modeling') : route('game')}}"
+        link="{{auth()->user()->hasRole('Admin') ? 'Back' : 'Game'}}"
+        color="{{auth()->user()->hasRole('Admin') ? 'success' : 'primary'}}"
     ></x-core.page-title>
     <hr />
     <div class="row">

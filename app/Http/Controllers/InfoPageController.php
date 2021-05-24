@@ -21,7 +21,7 @@ class InfoPageController extends Controller
     public function viewPage(Request $request, string $pageName)
     {
         $files = Storage::disk('info')->files($pageName);
-
+        dump($files, $pageName);
         if (empty($files)) {
             abort(404);
         }

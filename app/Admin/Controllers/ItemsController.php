@@ -2,13 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use App\Admin\Exports\Items\AffixesExport;
-use App\Admin\Import\Items\AffixesImport;
 use App\Admin\Requests\ItemsImport as ItemsImportRequest;
+use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Import\Items\ItemsImport;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
@@ -45,14 +46,14 @@ class ItemsController extends Controller {
     }
 
     public function export() {
-        $response = Excel::download(new AffixesExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
     }
 
     public function importData(ItemsImportRequest $request) {
-        Excel::import(new AffixesImport, $request->items_import);
+        Excel::import(new ItemsImport, $request->items_import);
 
         return redirect()->back()->with('success', 'imported item data.');
     }

@@ -19,7 +19,7 @@
                 <div class="col-md-4">
                     @if (!auth()->user()->hasRole('Admin'))
                         <button
-                            class="btn btn-primary btn-sm mb-2 train-skill-btn"
+                            class="btn btn-{{$skill->currently_training ? 'success' : 'primary'}} btn-sm mb-2 train-skill-btn"
                             data-toggle="modal"
                             data-target="#skill-train-{{$skill->id}}"
                             {{!$character->can_adventure ? 'disabled' : ''}}
@@ -38,7 +38,7 @@
                             formRoute="{{ route('cancel.train.skill', [
                                         'skill' => $skill->id
                                     ]) }}"
-                            buttonTitle="cancel"
+                            buttonTitle="Stop"
                             formId="cancel-skill-train-form"
                         >
 
