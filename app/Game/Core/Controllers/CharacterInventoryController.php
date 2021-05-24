@@ -26,13 +26,9 @@ class CharacterInventoryController extends Controller {
 
         $this->middleware('auth');
 
-        $this->middleware('is.character.dead')->only([
-            'compare', 'equipItem', 'destroy'
-        ]);
+        $this->middleware('is.character.dead');
 
-        $this->middleware('is.character.adventuring')->only([
-            'compare', 'equipItem', 'destroy'
-        ]);
+        $this->middleware('is.character.adventuring');
     }
 
     public function compare(
