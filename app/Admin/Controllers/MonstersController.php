@@ -2,10 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+
 use App\Http\Controllers\Controller;
-use App\Flare\Models\Monster;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Flare\Models\Monster;
+use App\Admin\Import\Monsters\MonstersImport;
 use App\Admin\Exports\Monsters\MonstersExport;
+use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 
 class MonstersController extends Controller {
 
@@ -55,9 +58,9 @@ class MonstersController extends Controller {
     }
 
     public function importData(MonstersImportRequest $request) {
-        Excel::import(new MonstersImport, $request->items_import);
+        Excel::import(new MonstersImport, $request->monsters_import);
 
-        return redirect()->back()->with('success', 'imported item data.');
+        return redirect()->back()->with('success', 'imported monster data.');
     }
 
     public function publish(Monster $monster) {

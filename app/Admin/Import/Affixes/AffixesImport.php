@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Admin\Import\Items;
+namespace App\Admin\Import\Affixes;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Import\Items\Sheets\AffixesSheet;
+use App\Admin\Import\Affixes\Sheets\AffixesSheet;
 
-class ItemsImport implements WithMultipleSheets
+class AffixesImport implements WithMultipleSheets
 {
 
     public function sheets(): array

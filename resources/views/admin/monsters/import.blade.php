@@ -7,7 +7,8 @@
     <x-cards.card>
         <div class="alert alert-warning">
             <p>
-                <strong>Please note</strong>: If an monster has a skill or item reward that does not exist, that monster will be skipped.
+                <strong>Please note</strong>: If a monster has an quest item that doesn't exist the monster will be skipped.
+                If the monster has a skill that doesn't exist, the skill for that monster will be skipped.
             </p>
         </div>
 

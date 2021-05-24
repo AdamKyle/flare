@@ -76,6 +76,8 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('affixes.list')}}">Affixes</a></li>
             <li><a href="{{route('affixes.create')}}">Create Affix</a></li>
+            <li><a href="{{route('affixes.export')}}">Export</a></li>
+            <li><a href="{{route('affixes.import')}}">Import</a></li>
         </ul>
     </li>
     <li>

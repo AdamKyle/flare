@@ -45,6 +45,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);
     Route::post('/admin/items/delete-all', ['as' => 'items.delete.all', 'uses' => 'ItemsController@deleteAll']);
 
+    Route::get('/admin/affixes/export-affixes', ['as' => 'affixes.export', 'uses' => 'AffixesController@exportItems']);
+    Route::get('/admin/affixes/import-affixes', ['as' => 'affixes.import', 'uses' => 'AffixesController@importItems']);
+    Route::post('/admin/affixes/export-data', ['as' => 'affixes.export-data', 'uses' => 'AffixesController@export']);
+    Route::post('/admin/affixes/import-data', ['as' => 'affixes.import-data', 'uses' => 'AffixesController@importData']);
+
     Route::get('/admin/affixes', ['as' => 'affixes.list', 'uses' => 'AffixesController@index']);
     Route::get('/admin/affixes/create', ['as' => 'affixes.create', 'uses' => 'AffixesController@create']);
     Route::get('/admin/affixes/{affix}', ['as' => 'affixes.affix', 'uses' => 'AffixesController@show']);

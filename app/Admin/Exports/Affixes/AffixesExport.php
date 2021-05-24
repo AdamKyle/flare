@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Admin\Exports\Items;
+namespace App\Admin\Exports\Affixes;
 
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Exports\Items\Sheets\AffixesSheet;
+use App\Admin\Exports\Affixes\Sheets\AffixesSheet;
 
-class ItemsExport implements WithMultipleSheets {
+class AffixesExport implements WithMultipleSheets {
 
     use Exportable;
 

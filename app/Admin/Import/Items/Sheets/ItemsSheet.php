@@ -47,6 +47,13 @@ class ItemsSheet implements ToCollection {
 
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
+
+                if ($key === 'item_suffix_id') {
+                    $value = ItemAffix::where('name', $value)->first()->id;
+                }else if ($key === 'item_prefix_id') {
+                    $value = ItemAffix::where('name', $value)->first()->id;
+                }
+
                 $cleanData[$key] = $value;
             }
         }
