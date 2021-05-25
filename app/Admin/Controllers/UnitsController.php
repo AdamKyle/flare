@@ -27,8 +27,11 @@ class UnitsController extends Controller {
         }
 
         return view('admin.kingdoms.units.unit', [
-            'unit'        => $gameUnit,
-            'building'    => $belongsToKingdomBuilding
+            'unit'          => $gameUnit,
+            'building'      => $belongsToKingdomBuilding,
+            'requiredLevel' => GameBuildingUnit::where('game_building_id', $belongsToKingdomBuilding->id)
+                                               ->where('game_unit_id', $gameUnit->id)
+                                               ->first()->required_level
         ]);
     }
 
@@ -38,5 +41,5 @@ class UnitsController extends Controller {
             'editing' => true,
         ]);
     }
-    
+
 }

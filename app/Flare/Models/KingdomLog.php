@@ -41,7 +41,6 @@ class KingdomLog extends Model
         'old_defender'   => 'array',
         'new_defender'   => 'array',
         'published'      => 'boolean',
-        'created_at'     => 'date',
     ];
 
     protected $appends = [

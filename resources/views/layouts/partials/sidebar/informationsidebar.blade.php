@@ -49,7 +49,7 @@
       <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-guarded-tower"></i><span class="hide-menu">Kingdoms</span></a>
       <ul aria-expanded="false" class="collapse">
           <li><a href="{{route('info.page', ['pageName' => 'kingdoms'])}}">Kingdoms</a></li>
-          <li><a href="form-basic.html">Attacking A Kingdom</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'attacking-kingdoms'])}}">Attacking A Kingdom</a></li>
       </ul>
     </li>
     <li class="nav-devider"></li>

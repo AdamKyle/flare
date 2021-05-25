@@ -86,7 +86,7 @@ export default class Map extends React.Component {
           currentPort: this.state.currentPort,
           portList: this.state.portList,
           characterId: this.state.characterId,
-          characterIsDead: this.state.isDead,
+          isDead: this.state.isDead,
           canMove: this.state.canMove,
         });
 
@@ -114,7 +114,7 @@ export default class Map extends React.Component {
           currentPort: this.state.currentPort,
           portList: this.state.portList,
           characterId: this.state.characterId,
-          characterIsDead: this.state.isDead,
+          isDead: this.state.isDead,
           canMove: event.canMove,
         });
       });
@@ -155,7 +155,7 @@ export default class Map extends React.Component {
           currentPort: event.portDetails.hasOwnProperty('current_port') ? event.portDetails.current_port : null,
           portList: event.portDetails.hasOwnProperty('port_list') ? event.portDetails.port_list : [],
           characterId: this.state.characterId,
-          characterIsDead: this.state.isDead,
+          isDead: this.state.isDead,
           canMove: this.state.canMove,
         });
 
@@ -222,7 +222,7 @@ export default class Map extends React.Component {
           currentPort: this.state.currentPort,
           portList: this.state.portList,
           characterId: this.state.characterId,
-          characterIsDead: this.state.isDead,
+          isDead: this.state.isDead,
           canMove: this.state.canMove,
         });
 
@@ -342,7 +342,7 @@ export default class Map extends React.Component {
           currentPort: this.state.currentPort,
           portList: this.state.portList,
           characterId: this.state.characterId,
-          characterIsDead: this.state.isDead,
+          isDead: this.state.isDead,
           canMove: this.state.canMove,
         });
 

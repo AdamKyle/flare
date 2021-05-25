@@ -17,6 +17,8 @@ export default class ItemDetails extends React.Component {
   }
 
   renderAffixDetails(type) {
+    const item = this.props.item['item_' + type];
+
     return (
       <>
         <h5 className="mb-2">{type.charAt(0).toUpperCase() + type.slice(1)}</h5>
@@ -24,27 +26,27 @@ export default class ItemDetails extends React.Component {
         <hr/>
         <dl>
           <dt>Name:</dt>
-          <dd>{this.props.item['item_' + type].name}</dd>
+          <dd>{item.name}</dd>
           <dt>Base Damage Modifier:</dt>
-          <dd>{this.props.item['item_' + type].base_damage_mod * 100}%</dd>
+          <dd>{item.base_damage_mod !== null ? item.base_damage_mod.toFixed() * 100 : 0}%</dd>
           <dt>Base AC Modifier:</dt>
-          <dd>{this.props.item['item_' + type].base_ac_mod * 100}%</dd>
+          <dd>{item.base_ac_mod !== null ? item.base_ac_mod.toFixed() * 100 : 0}%</dd>
           <dt>Base Healing Modifier:</dt>
-          <dd>{this.props.item['item_' + type].base_healing_mod * 100}%</dd>
+          <dd>{item.base_healing_mod !== null ? item.base_healing_mod.toFixed() * 100 : 0}%</dd>
           <dt>Str Modifier:</dt>
-          <dd>{this.props.item['item_' + type].str_mod * 100}%</dd>
+          <dd>{item.str_mod !== null ? item.str_mod.toFixed() * 100 : 0}%</dd>
           <dt>Dex Modifier:</dt>
-          <dd>{this.props.item['item_' + type].dex_mod * 100}%</dd>
+          <dd>{item.dex_mod !== null ? item.dex_mod.toFixed() * 100 : 0}%</dd>
           <dt>Dur Modifier:</dt>
-          <dd>{this.props.item['item_' + type].dur_mod * 100}%</dd>
+          <dd>{item.dur_mod !== null ? item.dur_mod.toFixed() * 100 : 0}%</dd>
           <dt>Int Modifier:</dt>
-          <dd>{this.props.item['item_' + type].int_mod * 100}%</dd>
+          <dd>{item.int_mod !== null ? item.int_mod.toFixed() * 100 : 0}%</dd>
           <dt>Chr Modifier:</dt>
-          <dd>{this.props.item['item_' + type].chr_mod * 100}%</dd>
+          <dd>{item.chr_mod !== null ? item.chr_mod.toFixed() * 100 : 0}%</dd>
           <dt>Skill Name:</dt>
-          <dd>{this.props.item['item_' + type].skill_name === null ? 'N/A' : this.props.item['item_' + type].skill_name}</dd>
+          <dd>{item.skill_name === null ? 'N/A' : this.props.item['item_' + type].skill_name}</dd>
           <dt>Skill Bonus:</dt>
-          <dd>{this.props.item['item_' + type].skill_name === null ? 0 : this.props.item['item_' + type].skill_bonus * 100}%</dd>
+          <dd>{item.skill_name === null ? 0 : this.props.item['item_' + type].skill_bonus.toFixed() * 100}%</dd>
         </dl>
         <hr/>
       </>

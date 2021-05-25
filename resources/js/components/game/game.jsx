@@ -49,7 +49,20 @@ export default class Game extends React.Component {
         is_mine: false,
       },
       kingdom: null,
+      isDead: false,
     }
+
+    this.isDead = Echo.private('character-is-dead-' + this.props.userId);
+  }
+
+  componentDidMount() {
+    this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
+      console.log('Called');
+
+      this.setState({
+        isDead: event.isDead,
+      });
+    });
   }
 
   updatePort(portDetails) {
@@ -205,7 +218,15 @@ export default class Game extends React.Component {
   }
 
   canAdventure() {
-    return this.state.canAttack && this.state.portDetails.canMove;
+    if (this.state.isDead) {
+      return false;
+    }
+
+    if (!this.state.canAttack || !this.state.portDetails.canMove) {
+      return false;
+    }
+
+    return true;
   }
 
   render() {

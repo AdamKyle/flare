@@ -65,7 +65,7 @@ export default class PortSection extends React.Component {
         close={this.hidePort.bind(this)}
       >
         <SetSail
-          characterIsDead={this.state.portDetails.characterIsDead}
+          characterIsDead={this.state.portDetails.isDead}
           currentPort={this.state.portDetails.currentPort}
           portList={this.state.portDetails.portList}
           characterId={this.state.portDetails.characterId}

@@ -8,65 +8,65 @@
                 </div>
                 <x-data-tables.table :collection="$units">
                     <x-data-tables.header>
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('name')" 
-                            header-text="Name" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('name')"
+                            header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="name"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('attack')" 
-                            header-text="Attack" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('attack')"
+                            header-text="Attack"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="attack"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('defence')" 
-                            header-text="Defence" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('defence')"
+                            header-text="Defence"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="defence"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('wood_cost')" 
-                            header-text="Wood Cost" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('wood_cost')"
+                            header-text="Wood Cost"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="wood_cost"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('clay_cost')" 
-                            header-text="Clay Cost" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('clay_cost')"
+                            header-text="Clay Cost"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="clay_cost"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('stone_cost')" 
-                            header-text="Stone Cost" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('stone_cost')"
+                            header-text="Stone Cost"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="stone_cost"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('iron_cost')" 
-                            header-text="Iron Cost" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('iron_cost')"
+                            header-text="Iron Cost"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="iron_cost"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('required_population')" 
-                            header-text="Required Population" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('required_population')"
+                            header-text="Required Population"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="required_population"
@@ -74,9 +74,9 @@
 
                         @if (!$units->isEmpty())
                             @if(!is_null($units->first()->required_level))
-                                <x-data-tables.header-row 
-                                    wire:click.prevent="sortBy('required_level')" 
-                                    header-text="Required Level" 
+                                <x-data-tables.header-row
+                                    wire:click.prevent="sortBy('required_level')"
+                                    header-text="Required Level"
                                     sort-by="{{$sortBy}}"
                                     sort-field="{{$sortField}}"
                                     field="required_level"
@@ -97,17 +97,29 @@
                         @forelse($units as $unit)
                             <tr>
                                 <td>
-                                    <a href="{{route('units.unit', [
-                                        'gameUnit' => $unit->id
-                                    ])}}">{{$unit->name}}</a>
+                                    @guest
+                                        <a href="{{route('game.units.unit', [
+                                                'gameUnit' => $unit->id
+                                            ])}}">{{$unit->name}}</a>
+                                    @else
+                                        @if (auth()->user()->hasRole('Admin'))
+                                            <a href="{{route('units.unit', [
+                                                'gameUnit' => $unit->id
+                                            ])}}">{{$unit->name}}</a>
+                                        @else
+                                            <a href="{{route('game.units.unit', [
+                                                'gameUnit' => $unit->id
+                                            ])}}">{{$unit->name}}</a>
+                                        @endif
+                                    @endguest
                                 </td>
-                                <td>{{$unit->attack}}</td> 
+                                <td>{{$unit->attack}}</td>
                                 <td>{{$unit->defence}}</td>
-                                <td>{{$unit->wood_cost}}</td> 
-                                <td>{{$unit->clay_cost}}</td> 
-                                <td>{{$unit->stone_cost}}</td> 
-                                <td>{{$unit->iron_cost}}</td> 
-                                <td>{{$unit->required_population}}</td> 
+                                <td>{{$unit->wood_cost}}</td>
+                                <td>{{$unit->clay_cost}}</td>
+                                <td>{{$unit->stone_cost}}</td>
+                                <td>{{$unit->iron_cost}}</td>
+                                <td>{{$unit->required_population}}</td>
 
                                 @if (!is_null($unit))
                                     @if (!is_null($unit->required_level))
@@ -133,7 +145,7 @@
                                 @if (auth()->user()->hasRole('Admin'))
                                     <x-data-tables.no-results colspan="9"/>
                                 @else
-                                    <x-data-tables.no-results colspan="8"/> 
+                                    <x-data-tables.no-results colspan="8"/>
                                 @endif
                             @endguest
                         @endforelse

@@ -6,9 +6,22 @@
     </div>
     <p class="mb-3 mt-3">{{$unit->description}}</p>
     @if (!is_null($building))
-        <p>Can be recruited from: <a href="{{route('buildings.building', [
-            'building' => $building->id
-        ])}}">{{$building->name}}</a></p>
+        @guest
+            <p><strong>Can be recruited from: <a href="{{route('game.buildings.building', [
+                'building' => $building->id
+            ])}}">{{$building->name}}</a> At Level: {{$requiredLevel}}</strong></p>
+        @else
+            @if (auth()->user()->hasRole('Admin')))
+                <p><strong>Can be recruited from: <a href="{{route('buildings.building', [
+                    'building' => $building->id
+                ])}}">{{$building->name}}</a> At Level: {{$requiredLevel}}</strong></p>
+            @else
+                <p><strong>Can be recruited from: <a href="{{route('game.buildings.building', [
+                    'building' => $building->id
+                ])}}">{{$building->name}}</a> At Level: {{$requiredLevel}}</strong></p>
+            @endif
+        @endguest
+
     @endif
     <dl>
         <dd><strong>Cost in wood</strong>:</dd>

@@ -276,6 +276,10 @@ export default class EnchantingAction extends React.Component {
       return true;
     }
 
+    if (this.state.gold < this.state.cost) {
+      return true;
+    }
+
     return this.state.isAdventuring;
   }
 
@@ -388,7 +392,7 @@ export default class EnchantingAction extends React.Component {
         <Row>
           <Col xs={12}>
             <div className="mt-2">
-              <strong>Cost: </strong> {this.state.cost}
+              <strong>Cost: </strong> {this.state.cost} {this.state.cost > this.state.gold ? <span className="text-danger">You don't have the gold</span> : null}
             </div>
           </Col>
         </Row>
