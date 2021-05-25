@@ -251,7 +251,9 @@ class AdventureService {
             $this->rewards['skill']['exp'] += $this->rewardBuilder->fetchSkillXPReward($foundSkill, $this->adventure);
         }
 
-        $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction);
+        $xpBonus = $this->adventure->exp_bonus;
+
+        $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction) * ($xpBonus > 1 ? $xpBonus : (1 + $xpBonus));
 
         $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
 

@@ -23,6 +23,7 @@ class CreateAdventures extends Migration
             $table->float('gold_rush_chance', 5, 4)->nullable()->default(0);
             $table->float('item_find_chance', 5, 4)->nullable()->default(0);
             $table->float('skill_exp_bonus', 5, 4)->nullable()->default(0);
+            $table->float('exp_bonus', 5, 4)->nullable()->default(0);
             $table->boolean('published')->nullable()->default(true);
             $table->timestamps();
         });

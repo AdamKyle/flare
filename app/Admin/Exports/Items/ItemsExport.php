@@ -4,7 +4,7 @@ namespace App\Admin\Exports\Items;
 
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Exports\Items\Sheets\AffixesSheet;
+use App\Admin\Exports\Items\Sheets\ItemsSheet;
 
 class ItemsExport implements WithMultipleSheets {
 
@@ -16,7 +16,7 @@ class ItemsExport implements WithMultipleSheets {
     public function sheets(): array {
         $sheets   = [];
 
-        $sheets[] = new AffixesSheet;
+        $sheets[] = new ItemsSheet();
 
         return $sheets;
     }

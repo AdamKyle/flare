@@ -26,6 +26,7 @@ class Adventure extends Model
         'gold_rush_chance',
         'item_find_chance',
         'skill_exp_bonus',
+        'exp_bonus',
         'published',
     ];
 
@@ -40,6 +41,7 @@ class Adventure extends Model
         'gold_rush_chance' => 'float',
         'item_find_chance' => 'float',
         'skill_exp_bonus'  => 'float',
+        'exp_bonus'        => 'float',
         'published'        => 'boolean',
     ];
 

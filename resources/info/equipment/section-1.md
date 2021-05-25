@@ -5,20 +5,36 @@ The body will always increase stats the most (all your core stats), while weapon
 
 Let’s equip some items. If you do not have any you can head over to shop:
 
-[menu image]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/shop-menu.png" class="glightbox">
+        <img src="/storage/info/equipment/images/shop-menu.png" class="img-fluid" />
+    </a>
+</div>
 
 Or the market:
 
-[menu image]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/market-menu.png" class="glightbox">
+        <img src="/storage/info/equipment/images/market-menu.png" class="img-fluid" />
+    </a>
+</div>
 
 If you are at a port [location](/information/locations) (blue ship icon) to purchase some gear.
 Once you have some pieces head over to the character sheet:
 
-[menu image]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/inventory-section.png" class="glightbox">
+        <img src="/storage/info/equipment/images/inventory-section.png" class="img-fluid" />
+    </a>
+</div>
 
 Click on the equip tab above your inventory table:
 
-[Image]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/equipped-section.png" class="glightbox">
+        <img src="/storage/info/equipment/images/equipped-section.png" class="img-fluid" />
+    </a>
+</div>
 
 Here you can see that we are already have an item equipped. All items in both the inventory and equipped table as well as any other table showing an item (shops, market board, information section …) can be clicked on to get more details about the item.
 
@@ -26,7 +42,11 @@ However, we got us some nice weapons and armour, lets head back to the inventory
 In that dropdown you can choose to destroy the item, or you can equip the item. If the item is already equipped to you, it will appear in the equipped section, allowing you to unequip it.
 Once you selected an item you want to equip, go ahead and click the actions dropdown and click equip to come to the next page, the compare page:
 
-[compare page]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/basic-compare.png" class="glightbox">
+        <img src="/storage/info/equipment/images/basic-compare.png" class="img-fluid" />
+    </a>
+</div>
 
 There are variations of this page, sometimes you get to select the position you want the item to be equipped into, and sometimes you do not (armor, except shields).
 You generally have two slots for most things, except armor. Two ring slots left or right hand for weapons and shields, two spell slots and two artifact slots. Armor is already determined for you, so all you have to do is compare and equip or not.
@@ -36,21 +56,37 @@ You generally have two slots for most things, except armor. Two ring slots left 
 
 If an item increases your stats the numbers will be green, you will also see what item you currently have equipped, as you see below:
 
-[image]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/increases-stats.png" class="glightbox">
+        <img src="/storage/info/equipment/images/increases-stats.png" class="img-fluid" />
+    </a>
+</div>
 
 You will also see any information about skills, such as bonuses and attached affixes, if the item has any.
 
-[Possible image]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/attached-affixes.png" class="glightbox">
+        <img src="/storage/info/equipment/images/attached-affixes.png" class="img-fluid" />
+    </a>
+</div>
 
 When you place equipment in an already occupied slot, that item will be replaced and put back into your inventory for you to sell, destroy or put up for sale on the [market board](/information/market-board).
 If an item is worse off then what you have you will see the stats for it go red.
 Some items will let you replace one of two position for that item, in either case the item currently equipped will show as well in the comparison section of the page:
 
-[Image of two items]
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/replacing-on-of-two.png" class="glightbox">
+        <img src="/storage/info/equipment/images/replacing-on-of-two.png" class="img-fluid" />
+    </a>
+</div>
 
 In this case you can replace one of the items and see which one might be better to replace.
 
 > ### ATTN!
 > Some gear might be bad for you, stat wise – even dragging them down, however, if you are looking at crafting lots of items and want the xp bonuses skill bonuses, pay attention to items with affix drops. Here is an example of item that would drag my stats down but see how it has a crafting affix?
-> [Image]
+> <div class="mb-4">
+>    <a href="/storage/info/equipment/images/affects-skills.png" class="glightbox">
+>        <img src="/storage/info/equipment/images/affects-skills.png" class="img-fluid" />
+>    </a>
+> </div>
 > Obviously, you will want to craft better gear with the same affix (enchanting), but it might do for now, till you find or craft better gear.

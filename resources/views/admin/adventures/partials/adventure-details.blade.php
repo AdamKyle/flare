@@ -2,13 +2,13 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-name">Name: <span class="danger">*</span> </label>
-            <input type="text" class="form-control required" id=" adventure-name" name="name" value={{!is_null($adventure) ? $adventure->name : ''}}> 
+            <input type="text" class="form-control required" id=" adventure-name" name="name" value={{!is_null($adventure) ? $adventure->name : ''}}>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-description">Description: <span class="danger">*</span> </label>
-            <textarea class="form-control required" id="adventure-description" name="description">{{!is_null($adventure) ? $adventure->description : ''}}</textarea> 
+            <textarea class="form-control required" id="adventure-description" name="description">{{!is_null($adventure) ? $adventure->description : ''}}</textarea>
         </div>
     </div>
 </div>
@@ -49,13 +49,13 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-levels">Levels: <span class="danger">*</span> </label>
-            <input type="number" class="form-control required" id=" adventure-levels" name="levels" value={{!is_null($adventure) ? $adventure->levels : ''}}> 
+            <input type="number" class="form-control required" id=" adventure-levels" name="levels" value={{!is_null($adventure) ? $adventure->levels : ''}}>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-time-per-level">Time Per Level: <span class="danger">*</span> </label>
-            <input type="number" class="form-control required" id="adventure-time-per-level" name="time_per_level" value={{!is_null($adventure) ? $adventure->time_per_level : ''}}> 
+            <input type="number" class="form-control required" id="adventure-time-per-level" name="time_per_level" value={{!is_null($adventure) ? $adventure->time_per_level : ''}}>
         </div>
     </div>
 </div>
@@ -64,7 +64,7 @@
     <div class="col-md-4">
         <div class="form-group">
             <label for="adventure-gold-rush-chance">Gold Rush Chance: <span class="danger">*</span> </label>
-            <input type="number" step="0.01" class="form-control required" id="adventure-gold-rush-chance" name="gold_rush_chance" value={{!is_null($adventure) ? $adventure->gold_rush_chance : ''}}> 
+            <input type="number" step="0.01" class="form-control required" id="adventure-gold-rush-chance" name="gold_rush_chance" value={{!is_null($adventure) ? $adventure->gold_rush_chance : ''}}>
         </div>
     </div>
     <div class="col-md-4">
@@ -77,6 +77,13 @@
         <div class="form-group">
             <label for="adventure-skill-exp-bonus">Skill EXP Bonus: <span class="danger">*</span> </label>
             <input type="number" step="0.01" class="form-control required" id="adventure-item-find-chance" name="skill_exp_bonus" value={{!is_null($adventure) ? $adventure->skill_exp_bonus : ''}}>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="adventure-skill-exp-bonus">EXP Bonus: <span class="danger">*</span> </label>
+            <input type="number" step="0.01" class="form-control required" id="adventure-item-find-chance"
+                   name="exp_bonus" value={{!is_null($adventure) ? $adventure->exp_bonus : ''}}>
         </div>
     </div>
 </div>

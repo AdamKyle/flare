@@ -13,6 +13,8 @@
             <dd>{{$adventure->gold_rush_chance * 100}}%</dd>
             <dt>Skill Bonus EXP</dt>
             <dd>{{$adventure->skill_exp_bonus * 100}}%</dd>
+            <dt>EXP Bonus</dt>
+            <dd>{{$adventure->exp_bonus * 100}}%</dd>
         </dl>
         <hr />
         @guest
