@@ -244,7 +244,7 @@ class AttackService {
         $timeToReturn = $this->getTotalReturnTime($this->survivingUnits, $unitMovement);
 
         if ($timeToReturn > 0) {
-            $timeToReturn = now()->addMinutes($timeToReturn);
+            $timeToReturnTimeStamp = now()->addMinutes($timeToReturn);
 
             $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::UNITS_RETURNING, $defender, $character);
 
@@ -253,7 +253,7 @@ class AttackService {
                     'new_units' => $this->survivingUnits,
                     'old_units' => $this->unitsSent
                 ],
-                'completed_at' => $timeToReturn,
+                'completed_at' => $timeToReturnTimeStamp,
                 'started_at' => now(),
                 'moving_to_x' => $unitMovement->from_x,
                 'moving_to_y' => $unitMovement->from_y,

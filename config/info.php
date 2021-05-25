@@ -20,6 +20,14 @@ return [
     'set-sail'          => [],
     'teleport'          => [],
     'locations'         => [],
+    'attacking-kingdoms' => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.kingdoms.units.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ],
+    ],
     'races-and-classes' => [
         [
             'livewire'            => true,
