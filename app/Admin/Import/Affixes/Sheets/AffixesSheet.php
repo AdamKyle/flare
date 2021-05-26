@@ -15,7 +15,7 @@ class AffixesSheet implements ToCollection {
                 $affix = array_combine($rows[0]->toArray(), $row->toArray());
 
                 $affixData = $this->returnCleanAffix($affix);
-                dump($affixData);
+
                 if (is_null($affixData)) {
                     continue;
                 } else {

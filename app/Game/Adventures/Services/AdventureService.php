@@ -146,10 +146,9 @@ class AdventureService {
             }
         }
 
-        if ($currentLevel === $maxLevel && $attackService->tooLong()) {
+        if ($attackService->tooLong()) {
             if ($characterModeling) {
                 $this->setCharacterModelingLogs($attackService, false, true);
-                return;
             }
 
             $this->adventureTookToLong($attackService, $adventureLog, $characterModeling);
@@ -163,12 +162,11 @@ class AdventureService {
     }
 
     protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog, bool $characterModeling = false) {
-
         if ($characterModeling) {
             return $this->setCharacterModelingLogs($this, false, true);
         }
 
-        Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+        Cache::delete('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
         $this->character->update([
             'can_move'               => true,

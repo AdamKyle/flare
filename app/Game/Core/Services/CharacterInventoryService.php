@@ -27,7 +27,7 @@ class CharacterInventoryService {
 
     /**
      * Set the character
-     * 
+     *
      * @param Character $character
      * @return CharacterInventoryService
      */
@@ -39,7 +39,7 @@ class CharacterInventoryService {
 
     /**
      * Set the inventory slot
-     * 
+     *
      * @param InventorySlot $inventorySlot
      * @return CharacterInventoryService
      */
@@ -51,7 +51,7 @@ class CharacterInventoryService {
 
     /**
      * Set the positions
-     * 
+     *
      * @param array $positions
      * @return CharacterInventoryService
      */
@@ -63,7 +63,7 @@ class CharacterInventoryService {
 
     /**
      * Set the inventory
-     * 
+     *
      * @param Request $request
      * @return CharacterInventoryService
      */
@@ -86,7 +86,7 @@ class CharacterInventoryService {
 
     /**
      * Return the inventory
-     * 
+     *
      * @return Collection
      */
     public function inventory(): Collection {
@@ -95,7 +95,7 @@ class CharacterInventoryService {
 
     /**
      * Fetches the type of the item.
-     * 
+     *
      * @param Request $request
      * @param Item $item
      * @return string
@@ -103,7 +103,7 @@ class CharacterInventoryService {
     public function getType(Request $request, Item $item): string {
         if ($request->has('item_to_equip_type')) {
             return $this->fetchType($request->item_to_equip_type);
-        } 
+        }
 
         return $item->crafting_type;
     }

@@ -85,14 +85,14 @@
         @include('game.character.partials.equipment.sections.equip.details.stat-details', ['details' => $details, 'hasDefaultPosition' => true])
     @else
         <div class="row">
-            <div class="col-md-6">
-                @include('game.character.partials.equipment.sections.equip.details.stat-details', ['details' => $details, 'hasDefaultPosition' => false])
-            </div>
+            @include('game.character.partials.equipment.sections.equip.details.stat-details', ['details' => $details, 'hasDefaultPosition' => false])
 
-            <div class="col-md-6">
-                <p class="mt-4">If equipped as second item:</p>
-                @include('game.character.partials.equipment.sections.equip.details.item-stat-details', ['item' => $item])
-            </div>
+            @if (count(array_keys($details)) < 2)
+                <div class="col-md-6 mt-4">
+                    <p>If Equipped As Second Item:</p>
+                    @include('game.character.partials.equipment.sections.equip.details.item-stat-details', ['item' => $item])
+                </div>
+            @endif
         </div>
     @endif
 

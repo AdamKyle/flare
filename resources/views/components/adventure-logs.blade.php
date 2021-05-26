@@ -2,7 +2,7 @@
     @foreach ($logs as $level => $logsForLevel)
         <div class="card adventure-fight-log mb-3">
             <div class="card-body">
-                <h4>Level: {{$level + 1}}</h4>
+                <h4>Level: {{$level + 1}}, Monster: {{$logsForLevel[0]['defender']}}</h4>
                 <hr />
                 @include('components.partials.adventure-level-log', [
                     'levelLog' => $logsForLevel

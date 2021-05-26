@@ -215,7 +215,13 @@ class FightService {
                      ->where('game_skills.name', 'Dodge');
         })->first()->skill_bonus;
 
-        return ($attacker->dex * (1 + $accuracyBonus)) > ($defender->dex * (1 + $dodgeBonus));
+        $attackerDex = $attacker->dex;
+
+        if ($attacker instanceof Character) {
+            $attackerDex = $this->characterInformation->statMod('dex');
+        }
+
+        return ($attackerDex * (1 + $accuracyBonus)) > ($defender->dex * (1 + $dodgeBonus));
     }
 
     protected function blockedAttack($defender, $attacker): bool {

@@ -2,7 +2,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-name">Name: <span class="danger">*</span> </label>
-            <input type="text" class="form-control required" id=" adventure-name" name="name" value={{!is_null($adventure) ? $adventure->name : ''}}>
+            <input type="text" class="form-control required" id=" adventure-name" name="name" value="{{!is_null($adventure) ? $adventure->name : ''}}">
         </div>
     </div>
     <div class="col-md-6">
