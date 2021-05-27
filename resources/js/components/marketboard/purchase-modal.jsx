@@ -57,6 +57,7 @@ export default class PurchaseModal extends React.Component {
         onHide={this.props.closeModal}
         backdrop="static"
         keyboard={false}
+        dialogClassName="large-modal "
         size="lg"
       >
         <Modal.Header closeButton>

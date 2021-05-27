@@ -9,7 +9,7 @@ class ItemTransfromer extends TransformerAbstract {
 
     /**
      * Gets the response data for the character sheet
-     * 
+     *
      * @param Character $character
      * @return mixed
      */
@@ -28,8 +28,12 @@ class ItemTransfromer extends TransformerAbstract {
             'type'                 => $item->type,
             'skill_name'           => $item->skill_training_name,
             'skill_training_bonus' => $item->skill_training_bonus,
+            'skill_bonus'          => $item->skill_bonus,
             'item_prefix'          => $item->itemPrefix,
             'item_suffix'          => $item->itemSuffix,
+            'crafting_type'        => $item->crafting_type,
+            'skill_level_req'      => $item->skill_level_required,
+            'skill_level_trivial'  => $item->skill_level_trivial,
         ];
     }
 }

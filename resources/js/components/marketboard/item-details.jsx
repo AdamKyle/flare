@@ -1,5 +1,5 @@
 import React from 'react';
-import {Accordion, Card, Button} from 'react-bootstrap';
+import {Accordion, Card, Button, Row, Col} from 'react-bootstrap';
 
 export default class ItemDetails extends React.Component {
 
@@ -28,25 +28,27 @@ export default class ItemDetails extends React.Component {
           <dt>Name:</dt>
           <dd>{item.name}</dd>
           <dt>Base Damage Modifier:</dt>
-          <dd>{item.base_damage_mod !== null ? item.base_damage_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.base_damage_mod !== null ? item.base_damage_mod * 100 : 0}%</dd>
           <dt>Base AC Modifier:</dt>
-          <dd>{item.base_ac_mod !== null ? item.base_ac_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.base_ac_mod !== null ? item.base_ac_mod * 100 : 0}%</dd>
           <dt>Base Healing Modifier:</dt>
-          <dd>{item.base_healing_mod !== null ? item.base_healing_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.base_healing_mod !== null ? item.base_healing_mod * 100 : 0}%</dd>
           <dt>Str Modifier:</dt>
-          <dd>{item.str_mod !== null ? item.str_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.str_mod !== null ? item.str_mod * 100 : 0}%</dd>
           <dt>Dex Modifier:</dt>
-          <dd>{item.dex_mod !== null ? item.dex_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.dex_mod !== null ? item.dex_mod * 100 : 0}%</dd>
           <dt>Dur Modifier:</dt>
-          <dd>{item.dur_mod !== null ? item.dur_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.dur_mod !== null ? item.dur_mod * 100 : 0}%</dd>
           <dt>Int Modifier:</dt>
-          <dd>{item.int_mod !== null ? item.int_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.int_mod !== null ? item.int_mod * 100 : 0}%</dd>
           <dt>Chr Modifier:</dt>
-          <dd>{item.chr_mod !== null ? item.chr_mod.toFixed() * 100 : 0}%</dd>
+          <dd>{item.chr_mod !== null ? item.chr_mod * 100 : 0}%</dd>
           <dt>Skill Name:</dt>
-          <dd>{item.skill_name === null ? 'N/A' : this.props.item['item_' + type].skill_name}</dd>
+          <dd>{item.skill_name === null ? 'N/A' : item.skill_name}</dd>
+          <dt>Skill Training Bonus:</dt>
+          <dd>{item.skill_name === null ? 0 : item.skill_training_bonus * 100}%</dd>
           <dt>Skill Bonus:</dt>
-          <dd>{item.skill_name === null ? 0 : this.props.item['item_' + type].skill_bonus.toFixed() * 100}%</dd>
+          <dd>{item.skill_name === null ? 0 : item.skill_bonus * 100}%</dd>
         </dl>
         <hr/>
       </>
@@ -62,16 +64,60 @@ export default class ItemDetails extends React.Component {
       );
     }
 
+    let colSize = 12;
+
+    if (this.props.item.item_prefix !== null && this.props.item.item_suffix !== null) {
+      return (
+        <>
+          <Col xs={6}>
+            <Card>
+              <Card.Body>
+                {this.renderAffixDetails('prefix')}
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={6}>
+            <Card>
+              <Card.Body>
+                {this.renderAffixDetails('suffix')}
+              </Card.Body>
+            </Card>
+          </Col>
+        </>
+      );
+    }
+
     if (this.props.item.item_prefix !== null) {
-      return this.renderAffixDetails('prefix');
+      return (
+        <>
+          <Col xs={12}>
+            <Card>
+              <Card.Body>
+                {this.renderAffixDetails('prefix')}
+              </Card.Body>
+            </Card>
+          </Col>
+        </>
+      );
     }
 
     if (this.props.item.item_suffix !== null) {
-      return this.renderAffixDetails('suffix');
+      return (
+        <>
+            <Col xs={12}>
+              <Card>
+                <Card.Body>
+                  {this.renderAffixDetails('suffix')}
+                </Card.Body>
+              </Card>
+            </Col>
+        </>
+      );
     }
   }
 
   render() {
+    console.log(this.props.item);
     return (
       <Accordion>
         <Card>
@@ -82,71 +128,66 @@ export default class ItemDetails extends React.Component {
           </Card.Header>
           <Accordion.Collapse eventKey="0">
             <Card.Body>
-              <div className="row mb-3">
-                <div className="col-md-12">
-                  <h3 className="mb-2">Item Details</h3>
-                  <dl>
-                    <dt>Base Damage:</dt>
-                    <dd>{this.props.item.base_damage} <em>(With all modifiers)</em></dd>
-                    <dt>Base AC:</dt>
-                    <dd>{this.props.item.base_ac} <em>(With all modifiers)</em></dd>
-                    <dt>Base Healing:</dt>
-                    <dd>{this.props.item.base_healing} <em>(With all modifiers)</em></dd>
-                    <dt>Type:</dt>
-                    <dd>{this.props.item.type}</dd>
-                    <dt>Effect:</dt>
-                    <dd>
-                      {this.getEffect(this.props.item)}
-                    </dd>
-
-                    {
-                      this.props.item.type === 'quest' ?
-                        <>
-                          <dt>Affects Skill Name:</dt>
-                          <dd>{this.props.item.skill_name === null ? 'N/A' : this.props.item.skill_name}</dd>
-                          <dt>Bonus (XP) When Training:</dt>
-                          <dd>{this.props.item.skill_training_bonus === null ? 'N/A' : this.props.item.skill_training_bonus * 100}%</dd>
-                        </> : null
-                    }
-                  </dl>
-                </div>
-              </div>
-              <hr/>
-              <div className="row mb-3">
-                <div className="col-md-12">
-                  <h3 className="mb-2">Base Equip Stats</h3>
-                  <p className="text-muted mb-2 mt-2" style={{fontSize: '12px', fontStyle: 'italic'}}>All values include
-                    any attached affixes and any additional modifiers.</p>
-                  <dl className="mt-2">
-                    <dt>Attack:</dt>
-                    <dd><span className='text-success'>{this.props.item.base_damage} </span></dd>
-                    <dt>AC:</dt>
-                    <dd><span className='text-success'>{this.props.item.base_ac} </span></dd>
-                    <dt>Healing:</dt>
-                    <dd><span className='text-success'>{this.props.item.base_healing} </span></dd>
-                    <dt>Str Modifier:</dt>
-                    <dd><span className='text-success'>{this.props.item.str_modifier * 100}% </span></dd>
-                    <dt>Dur Modifier:</dt>
-                    <dd><span className='text-success'>{this.props.item.dur_modifier * 100}% </span></dd>
-                    <dt>Dex Modifier:</dt>
-                    <dd><span className='text-success'>{this.props.item.dex_modifier * 100}% </span></dd>
-                    <dt>Chr Modifier:</dt>
-                    <dd><span className='text-success'>{this.props.item.chr_modifier * 100}% </span></dd>
-                    <dt>Int Modifier:</dt>
-                    <dd><span className='text-success'>{this.props.item.int_modifier * 100}% </span></dd>
-                    <dt>Skill Name:</dt>
-                    <dd>{this.props.item.skill_name !== null ? this.props.item.skill_nam : 'N/A'}</dd>
-                    <dt>Skill Bonus:</dt>
-                    <dd>{this.props.item.skill_training_bonus !== null ? this.props.item.skill_training_bonus * 100 + '%' : '0%'}</dd>
-                  </dl>
-                </div>
-              </div>
-              <hr/>
-              <div className="row mb-3">
-                <div className="col-md-12">
-                  {this.renderAffixes()}
-                </div>
-              </div>
+              <Row>
+                <Col xs={6}>
+                  <h3>Item Details</h3>
+                  <Card>
+                    <Card.Body>
+                      <dl>
+                        <dt><strong>Base Damage</strong>:</dt>
+                        <dd>{this.props.item.base_damage} (With all modifiers)</dd>
+                        <dt><strong>Base AC</strong>:</dt>
+                        <dd>{this.props.item.base_ac} (With all modifiers)</dd>
+                        <dt><strong>Base Healing</strong>:</dt>
+                        <dd>{this.props.item.base_healing} (With all modifiers)</dd>
+                        <dt><strong>Type</strong>:</dt>
+                        <dd>{this.props.item.type}</dd>
+                      </dl>
+                      <hr />
+                      <h4>Crafting Details</h4>
+                      <dl>
+                        <dt><strong>Crafting Type</strong>:</dt>
+                        <dd>{this.props.item.crafting_type}</dd>
+                        <dt><strong>Skill Level Required</strong>:</dt>
+                        <dd>{this.props.item.skill_level_req}</dd>
+                        <dt><strong>Skill Level Trivial</strong>:</dt>
+                        <dd>{this.props.item.skill_level_trivial}</dd>
+                      </dl>
+                      <hr />
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col xs={6}>
+                  <h3>Base Equip Stats</h3>
+                  <Card>
+                    <Card.Body>
+                      <dl>
+                        <dt><strong>Base Damage</strong>:</dt>
+                        <dd className="text-success">{this.props.item.base_damage}</dd>
+                        <dt><strong>Base AC</strong>:</dt>
+                        <dd className="text-success">{this.props.item.base_ac}</dd>
+                        <dt><strong>Base Healing</strong>:</dt>
+                        <dd className="text-success">{this.props.item.base_healing}</dd>
+                        <dt><strong>Strength</strong>:</dt>
+                        <dd className="text-success">{this.props.item.str_modifier * 100}%</dd>
+                        <dt><strong>Durability</strong>:</dt>
+                        <dd className="text-success">{this.props.item.dur_modifier * 100}%</dd>
+                        <dt><strong>Dexterity</strong>:</dt>
+                        <dd className="text-success">{this.props.item.dex_modifier * 100}%</dd>
+                        <dt><strong>Charisma</strong>:</dt>
+                        <dd className="text-success">{this.props.item.chr_modifier * 100}%</dd>
+                        <dt><strong>Intelligence</strong>:</dt>
+                        <dd className="text-success">{this.props.item.int_modifier * 100}%</dd>
+                      </dl>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+              <hr />
+              <h3>Item Affixes</h3>
+              <Row>
+                {this.renderAffixes()}
+              </Row>
             </Card.Body>
           </Accordion.Collapse>
         </Card>
