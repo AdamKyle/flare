@@ -43,6 +43,14 @@ export default class ActionsSection extends React.Component {
       }, () => {
         this.props.setCharacterId(this.state.character.id);
       });
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal();
+        }
+      }
     });
 
     this.updateActions.listen('Game.Maps.Events.UpdateActionsBroadcast', (event) => {

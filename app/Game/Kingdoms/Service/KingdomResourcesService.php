@@ -164,7 +164,7 @@ class KingdomResourcesService {
         }
 
         if (!is_null($building)) {
-            $newCurrent = $this->kingdom->current_population + $building->population_increase;
+            $newCurrent = $this->kingdom->current_population + round($building->population_increase / 2);
 
             if ($newCurrent > $this->kingdom->max_population) {
                 $newCurrent = $this->kingdom->max_population;

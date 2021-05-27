@@ -37,6 +37,7 @@ class User extends Authenticatable
         'kingdoms_update_email',
         'rebuilt_building_email',
         'kingdom_attack_email',
+        'timeout_until',
         'is_test',
     ];
 
@@ -61,6 +62,7 @@ class User extends Authenticatable
         'message_throttle_count'  => 'integer',
         'is_banned'               => 'boolean',
         'unbanned_at'             => 'datetime',
+        'timeout_until'           => 'datetime',
         'adventure_email'         => 'boolean',
         'new_building_email'      => 'boolean',
         'is_test'                 => 'boolean',

@@ -1,5 +1,7 @@
 <?php
 
+Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
+
 Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.say.they.are']], function() {
     Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);

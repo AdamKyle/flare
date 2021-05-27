@@ -236,7 +236,18 @@ export default class EnchantingAction extends React.Component {
   }
 
   buildInventoryOptions() {
-    return this.state.inventoryList.map((slot) => {
+    const inventory = this.state.inventoryList;
+    const newInventory = [];
+
+    for (const slot of inventory) {
+      if (slot.item.item_prefix === null && slot.item.item_suffix == null) {
+        newInventory.unshift(slot);
+      } else {
+        newInventory.push(slot);
+      }
+    }
+
+    return newInventory.map((slot) => {
       return (<option key={'item-' + slot.id} value={slot.item.id}>{slot.item.affix_name}</option>);
     });
   }

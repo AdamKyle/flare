@@ -39,3 +39,16 @@ Broadcast::channel('update-kingdom-{userId}', function($user, $userId) {
 Broadcast::channel('update-units-in-movement-{userId}', function($user, $userId) {
    return $user->id === (int) $userId;
 });
+
+// When the user does too many actions.
+Broadcast::channel('global-timeout-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+// When a user is timed out and they refresh or do some other action that they cannot.
+Broadcast::channel('open-timeout-modal-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+
+

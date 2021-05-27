@@ -5,6 +5,7 @@ namespace App\Flare\Providers;
 
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
+use App\Flare\Middleware\IsGloballyTimedOut;
 use App\Flare\View\Components\EquipmentButtonForm;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
@@ -126,6 +127,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $router->aliasMiddleware('is.player.banned', IsPlayerBannedMiddleware::class);
         $router->aliasMiddleware('is.character.who.they.say.they.are', IsCharacterWhoTheySayTheyAreMiddleware::class);
         $router->aliasMiddleware('is.character.logged.in', IsCharacterLoggedInMiddleware::class);
+        $router->aliasMiddleware('is.globally.timed.out', IsGloballyTimedOut::class);
 
         // Blade Components - Cross System:
         Blade::component('item-display-color', ItemDisplayColor::class);

@@ -30,7 +30,7 @@ export default class UpgradeSection extends React.Component {
             <dt><strong>Iron Gain/hr</strong>:</dt>
             <dd className="text-success">{this.getIncrease('iron')}</dd>
             <dt><strong>Population Gain/hr</strong>:</dt>
-            <dd className="text-success">{this.getIncrease('population')}</dd>
+            <dd className="text-success">{Math.ceil(this.getIncrease('population') / 2)}</dd>
             {
               this.props.building.is_farm ?
                 <>

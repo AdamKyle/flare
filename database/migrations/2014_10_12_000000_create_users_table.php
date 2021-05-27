@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->string('ip_address')->nullable()->default('0.0.0.0');
             $table->boolean('is_banned')->default(false);
             $table->dateTime('unbanned_at')->nullable();
+            $table->dateTime('timeout_until')->nullable();
             $table->string('banned_reason')->nullable();
             $table->string('un_ban_request')->nullable();
             $table->boolean('adventure_email')->default(true);

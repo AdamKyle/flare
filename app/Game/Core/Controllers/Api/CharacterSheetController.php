@@ -4,6 +4,8 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Models\User;
+use App\Game\Core\Events\GlobalTimeOut;
+use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Http\Controllers\Controller;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
@@ -55,5 +57,19 @@ class CharacterSheetController extends Controller {
         broadcast(new UpdateAdminChatEvent($adminUser));
 
         return response()->json([], 200);
+    }
+
+    public function globalTimeOut() {
+        $timeout = now()->addMinutes(2);
+
+        auth()->user()->update([
+            'timeout_until' => $timeout,
+        ]);
+
+        EndGlobalTimeOut::dispatch(auth()->user())->delay($timeout);
+
+        return response()->json([
+            'timeout_until' => $timeout,
+        ]);
     }
 }

@@ -11,6 +11,7 @@ import TraverseSection from "./sections/traverse-section";
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
+import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 
 
 export default class Game extends React.Component {
@@ -25,6 +26,7 @@ export default class Game extends React.Component {
         isDead: false,
         canMove: true,
       },
+      timeOutFor: 0,
       adventureDetails: [],
       adventureLogs: [],
       position: {},
@@ -36,6 +38,7 @@ export default class Game extends React.Component {
       openKingdomManagement: false,
       openKingdomModal: false,
       openKingdomAttackModal: false,
+      openTimeOutModal: false,
       characterId: null,
       canAdventureAgainAt: null,
       canAttack: true,
@@ -57,8 +60,6 @@ export default class Game extends React.Component {
 
   componentDidMount() {
     this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
-      console.log('Called');
-
       this.setState({
         isDead: event.isDead,
       });
@@ -229,6 +230,13 @@ export default class Game extends React.Component {
     return true;
   }
 
+  openTimeOutModal(timeOutUntil) {
+    this.setState({
+      openTimeOutModal: true,
+      timeOutFor: typeof timeOutUntil !== 'undefined' ? timeOutUntil : 0,
+    });
+  }
+
   render() {
     return (
       <>
@@ -237,6 +245,7 @@ export default class Game extends React.Component {
             <CharacterInfoTopSection
               characterId={this.props.characterId}
               userId={this.props.userId}
+              openTimeOutModal={this.openTimeOutModal.bind(this)}
             />
             <ActionsSection
               userId={this.props.userId}
@@ -245,6 +254,7 @@ export default class Game extends React.Component {
               openKingdomManagement={this.openKingdomManagement.bind(this)}
               openKingdomModal={this.openKingdomModal.bind(this)}
               openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
+              openTimeOutModal={this.openTimeOutModal.bind(this)}
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}
               character_y={this.state.current_y}
@@ -355,6 +365,10 @@ export default class Game extends React.Component {
               characterId={this.state.characterId}
             />
             : null
+        }
+        {
+          this.state.openTimeOutModal ?
+            <TimeoutDialogue userId={this.props.userId} show={this.state.openTimeOutModal} timeOutFor={this.state.timeOutFor}/> : null
         }
       </>
     )
