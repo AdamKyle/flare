@@ -35,6 +35,7 @@ class CreateUsersTable extends Migration
             $table->boolean('kingdoms_update_email')->default(false);
             $table->boolean('rebuilt_building_email')->default(false);
             $table->boolean('kingdom_attack_email')->default(false);
+            $table->boolean('unit_recruitment_email')->default(false);
             $table->boolean('is_test')->default(false);
             $table->rememberToken();
             $table->timestamps();
