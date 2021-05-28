@@ -46,6 +46,7 @@ class ItemsController extends Controller {
     }
 
     public function export() {
+        ob_start();
         $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 

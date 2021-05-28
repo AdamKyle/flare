@@ -49,9 +49,17 @@ class UnitsControllerTest extends TestCase
         $this->actingAs($this->user)->visitRoute('units.edit', [
             'gameUnit' => 1
         ])->see('Edit Unit: Sample Unit')->see('Unit Details');
-    } 
+    }
 
     public function testCanSeeShow() {
+        $building = $this->createGameBuilding();
+
+        $building->units()->create([
+            'game_building_id' => $building->id,
+            'game_unit_id'     => 1,
+            'required_level'   => 1,
+        ]);
+
         $this->actingAs($this->user)->visitRoute('units.unit', [
             'gameUnit' => 1
         ])->see('Sample Unit')->see('Attributes');

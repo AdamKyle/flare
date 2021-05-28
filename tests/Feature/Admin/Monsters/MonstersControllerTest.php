@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Admin\Monsters;
 
+use App\Admin\Exports\Monsters\MonstersExport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Monster;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
@@ -75,5 +78,29 @@ class MonstersControllerTest extends TestCase
         $this->actingAs($this->user)->post(route('monster.publish', ['monster' => $monster]));
 
         $this->assertTrue($monster->refresh()->published);
+    }
+
+    public function testCanExportItems() {
+        Excel::fake();
+
+        $this->actingAs($this->user)->visit(route('monsters.export'))->see('Export');
+
+        $this->actingAs($this->user)->post(route('monsters.export-data'));
+
+        Excel::assertDownloaded('monsters.xlsx', function(MonstersExport $export) {
+            return true;
+        });
+    }
+
+    public function testCanSeeImportPage() {
+        $this->actingAs($this->user)->visit(route('monsters.import'))->see('Import Monster Data');
+    }
+
+    public function testCanImportMonsters() {
+        $this->actingAs($this->user)->post(route('monsters.import-data', [
+            'monsters_import' => new UploadedFile(resource_path('data-imports/monsters.xlsx'), 'monsters.xlsx')
+        ]));
+
+        $this->assertTrue(Monster::all()->isNotEmpty());
     }
 }

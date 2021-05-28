@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Admin\Items;
 
+use App\Admin\Exports\Items\ItemsExport;
 use Event;
+use Illuminate\Http\UploadedFile;
+use Maatwebsite\Excel\Facades\Excel;
 use Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -145,5 +148,29 @@ class ItemsControllerTest extends TestCase
         ]))->response;
 
         $response->assertSessionHas('error', 'Invalid input.');
+    }
+
+    public function testCanExportItems() {
+        Excel::fake();
+
+        $this->actingAs($this->user)->visit(route('items.export'))->see('Export');
+
+        $this->actingAs($this->user)->post(route('items.export-data'));
+
+        Excel::assertDownloaded('items.xlsx', function(ItemsExport $export) {
+            return true;
+        });
+    }
+
+    public function testCanSeeImportPage() {
+        $this->actingAs($this->user)->visit(route('items.import'))->see('Import Item Data');
+    }
+
+    public function testCanImportMonsters() {
+        $this->actingAs($this->user)->post(route('items.import-data', [
+            'items_import' => new UploadedFile(resource_path('data-imports/items.xlsx'), 'items.xlsx')
+        ]));
+
+        $this->assertTrue(Item::all()->isNotEmpty());
     }
 }

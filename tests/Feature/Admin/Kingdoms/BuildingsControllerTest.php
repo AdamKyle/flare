@@ -2,11 +2,15 @@
 
 namespace Tests\Feature\Admin\Kingdoms;
 
+use App\Admin\Exports\Kingdoms\KingdomsExport;
+use App\Flare\Models\GameBuilding;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BuildingsControllerTest extends TestCase
 {
@@ -47,11 +51,35 @@ class BuildingsControllerTest extends TestCase
         $this->actingAs($this->user)->visitRoute('buildings.edit', [
             'building' => 1
         ])->see('Edit Building: Test Building')->see('Building Details');
-    } 
+    }
 
     public function testCanSeeShow() {
         $this->actingAs($this->user)->visitRoute('buildings.building', [
             'building' => 1
         ])->see('Test Building')->see('Base Details');
+    }
+
+    public function testCanExportBuildings() {
+        Excel::fake();
+
+        $this->actingAs($this->user)->visit(route('kingdoms.export'))->see('Export Kingdom Data');
+
+        $this->actingAs($this->user)->post(route('kingdoms.export-data'));
+
+        Excel::assertDownloaded('kingdoms.xlsx', function(KingdomsExport $export) {
+            return true;
+        });
+    }
+
+    public function testCanSeeImportPage() {
+        $this->actingAs($this->user)->visit(route('kingdoms.import'))->see('Import Kingdom Data');
+    }
+
+    public function testCanImportKingdomData() {
+        $this->actingAs($this->user)->post(route('kingdoms.import-data', [
+            'kingdom_import' => new UploadedFile(resource_path('data-imports/kingdoms.xlsx'), 'kingdoms.xlsx')
+        ]));
+
+        $this->assertTrue(GameBuilding::all()->isNotEmpty());
     }
 }

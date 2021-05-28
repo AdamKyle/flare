@@ -11,6 +11,7 @@ use App\Flare\Models\Item;
 class MonstersSheet implements ToCollection {
 
     public function collection(Collection $rows) {
+
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
                 $monster = array_combine($rows[0]->toArray(), $row->toArray());

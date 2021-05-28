@@ -163,7 +163,7 @@ class AdventureService {
 
     protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog, bool $characterModeling = false) {
         if ($characterModeling) {
-            return $this->setCharacterModelingLogs($this, false, true);
+            return $this->setCharacterModelingLogs($attackService, false, true);
         }
 
         Cache::delete('character_'.$this->character->id.'_adventure_'.$this->adventure->id);

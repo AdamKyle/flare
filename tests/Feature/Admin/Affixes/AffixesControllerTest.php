@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Admin\Affixes;
 
+use App\Admin\Exports\Affixes\AffixesExport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Tests\TestCase;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\ItemAffix;
@@ -73,5 +76,29 @@ class AffixesControllerTest extends TestCase
 
 
         $this->assertNull(ItemAffix::find($this->affix->id));
+    }
+
+    public function testCanExportAffixes() {
+        Excel::fake();
+
+        $this->actingAs($this->user)->visit(route('affixes.export'))->see('Export');
+
+        $this->actingAs($this->user)->post(route('affixes.export-data'));
+
+        Excel::assertDownloaded('affixes.xlsx', function(AffixesExport $export) {
+            return true;
+        });
+    }
+
+    public function testCanSeeImportPage() {
+        $this->actingAs($this->user)->visit(route('affixes.import'))->see('Import Affix Data');
+    }
+
+    public function testCanImportMonsters() {
+        $this->actingAs($this->user)->post(route('affixes.import-data', [
+            'affixes_import' => new UploadedFile(resource_path('data-imports/affixes.xlsx'), 'affixes.xlsx')
+        ]));
+
+        $this->assertTrue(ItemAffix::all()->isNotEmpty());
     }
 }

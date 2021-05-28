@@ -84,12 +84,6 @@
                   </nav>
                   <!-- End Sidebar navigation -->
               </div>
-              <!-- End Sidebar scroll-->
-              <!-- Bottom points-->
-              <div class="sidebar-footer">
-
-              </div>
-              <!-- End Bottom points-->
           </aside>
 
           <div class="page-wrapper page">

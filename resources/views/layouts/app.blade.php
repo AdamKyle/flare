@@ -44,7 +44,11 @@
 
     @stack('head')
 </head>
-<body class="fix-header fix-sidebar card-no-border mini-sidebar">
+@php
+    $previousUrlIsInfo = strpos(url()->previous(), 'information') !== false;
+@endphp
+
+<body class="fix-header fix-sidebar card-no-border {{!$previousUrlIsInfo ? 'mini-sidebar' : ''}}">
     <div id="main-wrapper">
         <div id="app">
             <header class="topbar">
@@ -93,41 +97,34 @@
 
             @guest
             @else
-                <aside class="left-sidebar">
-                    <!-- Sidebar scroll-->
-                    <div class="scroll-sidebar">
-                        <!-- Sidebar navigation-->
-                        <nav class="sidebar-nav">
-                            @if (auth()->user()->hasRole('Admin'))
-                                @include('layouts.partials.sidebar.adminsidebar')
-                            @else
-                                @include('layouts.partials.sidebar.playersidebar')
-                            @endif
-                        </nav>
-                        <!-- End Sidebar navigation -->
-                    </div>
-                    <!-- End Sidebar scroll-->
-                    <!-- Bottom points-->
-                    <div class="sidebar-footer">
-                        <!-- item-->
-                        <a href="{{route('user.settings', ['user' => auth()->user()])}}" class="link" data-toggle="tooltip" title="Settings"><i class="fas fa-cog"></i></a>
-                        <!-- item-->
-                        <a href="" class="link" data-toggle="tooltip" title="Bug Report"><i class="ra ra-beetle"></i></a>
-                        <!-- item-->
-                        <a class="link" href="{{ route('logout') }}"
-                           data-toggle="tooltip"
-                           title="Logout"
-                           onclick="event.preventDefault();
-                                         document.getElementById('logout-form').submit();">
-                            <i class="fas fa-power-off"></i>
-                        </a>
-
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                    </div>
-                    <!-- End Bottom points-->
-                </aside>
+                @if ($previousUrlIsInfo)
+                    <aside class="left-sidebar info-sidebar" id="info-left-sidebar">
+                        <!-- Sidebar scroll-->
+                        <div class="scroll-sidebar">
+                            <!-- Sidebar navigation-->
+                            <nav class="sidebar-nav info-nav">
+                                @include('layouts.partials.sidebar.informationsidebar')
+                            </nav>
+                            <!-- End Sidebar navigation -->
+                        </div>
+                    </aside>
+                @else
+                    <aside class="left-sidebar">
+                        <!-- Sidebar scroll-->
+                        <div class="scroll-sidebar">
+                            <!-- Sidebar navigation-->
+                            <nav class="sidebar-nav">
+                                @if (auth()->user()->hasRole('Admin'))
+                                    @include('layouts.partials.sidebar.adminsidebar')
+                                @else
+                                    @include('layouts.partials.sidebar.playersidebar')
+                                @endif
+                            </nav>
+                            <!-- End Sidebar navigation -->
+                        </div>
+                        <!-- End Sidebar scroll-->
+                    </aside>
+                @endif
             @endguest
 
             @guest
