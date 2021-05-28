@@ -14,8 +14,7 @@ Lets go over some basics.
   - The longer the adventure, the greater the chance for random items, quest items from monsters and gold rushes.
 - Adventures can give bonuses to your chance at a gold rush, finding items and training skills. These are calculated at the end of each successful floor.
   - You can see this in the adventure details for each adventure at that specific location.
-
-Adventures can belong to more the one location, but will always count as the same adventure in your log.
+  - Some adventures may even give exp bonuses.
 
 Adventures come with a set of monsters, these are picked at random per floor. So even though you do the same adventure 5 times (more on that later), the monsters per floor are always randomly picked.
 
@@ -65,23 +64,23 @@ This includes, a sum total of xp, gold, skill xp and items as well as the advent
 
 To collect these rewards - simply click the collect button as shown in the below image:
 
-![]()
+[missing image]
 
 ### Failing the adventure gives you no rewards.
 
-Doesn't matter where you died in the adventure be it level one or level 10. You have died and its assumed you were robbed of all the treasures that you had found. 
+Doesn't matter where you died in the adventure be it level one or level ten. You have died and its assumed you were robbed of all the treasures that you had found. 
 
 ### The adventure took to long.
 
-This can happen in some instances where you and the enemy have bad RNG and you either both miss, both block - over and over again. To solve this issue we only allow the floor to take so long, ten rounds at most. If all the floors in the adventure "take too long" then you essentially bail out of that floor. This can also result in no rewards as you never defeated your foe.
+This can happen in some instances where you, and the enemy have bad RNG, and you either both miss, both block - over and over again. To solve this issue we only allow the floor to take so long, ten rounds at most. If all the floors in the adventure "take too long" then you essentially bail out of that floor. This can also result in no rewards as you never defeated your foe.
 
 > ### ATTN!
 >
-> Should you encounter adventures that take too long, check out the monsters and their stats involved and compare hem to yours. two things might be happening, **one**: your gear and stats are too closley aligned - dod you have something that boosts that dexterity a smidge higher? or **ore likely, two:** the monsters are unbalanced and needs to be rebalanced. (consider it a bug to be reported on the [github repo](https://github.com/AdamKyle/flare)
+> Should you encounter adventures that take too long, check out the monsters, and their stats involved and compare hem to yours. two things might be happening, **one**: your gear and stats are too closely aligned - did you have something that boosts that dexterity higher? 
 
 ## Repeating Adventures
 
-You can repeat adventures over and over again as much as you like. You will how ever only receive the quest reward item once if that adventure has one.
+You can repeat adventures over and over again as much as you like. You will however only receive the quest reward item once if that adventure has one.
 
 ## Canceling Adventures
 

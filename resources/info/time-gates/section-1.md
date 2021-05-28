@@ -32,7 +32,7 @@ Let's go over these:
 - **Kingdoms**: These each have their own set of timers:
   - **Building upgrade**: Leveling a building has a timer in relation to minutes. The higher the building level, the longer it takes.
   - **Unit recruitment**: Recruiting units can take seconds, minutes or even hours, depending on the amount of units you are recruiting.
-  - **Building Repair**: Has a timer based on current level of building. Repairs can only be done when a building reaches durability of 0. Leveling a damage building, that is one that has a durability below its max but above 0, will replace current durability with the new max.
+  - **Building Repair**: Has a timer based on current level of building. Repairs can only be done when a building reaches durability of 0. Leveling a damaged building, that is one that has a durability below its max but above 0, will replace current durability with the new max.
   - **Unit Movement**: All units have a moment speed. This speed is applied to the units regardless of how many you send, but stacks with other units that have a slower or equal movement speed. Distance is also taken into consideration.
     
 ### Character death
@@ -60,9 +60,9 @@ You will be told to revive and that you are dead and dead people cannot do thing
 > The Adventuring timer can stop unexpectedly if you have died in the middle of an adventure. 
 > 
 > Each floor is processed per floor timer length. That is if an adventure has 10 floors at 2 minutes each, every two minutes I process a floor, 
-> so if you are expecting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died.
+> so if you are expecting the adventure to take twenty minutes and 4 minutes in the timer leaves - chances are - you died, or the adventure took too long.
 >
-> If hat is the case you will be told. You will also receive an email, either way (success/failure) if you are not signed in and have that email setting enabled.
+> If that is the case you will be told. You will also receive an email, either way (success/failure) if you are not signed in and have that email setting enabled.
 
 ## Timers appear beside the action
 
@@ -84,7 +84,7 @@ For unit movement, there is a section in the sidebar for kingdom management, whi
 
 While not a timer, and please do see [Rules of Tlessa](/information/rules), you are throttled on how much you can chat. If you spam the chat box you can be timed out and cannot talk for 5 minutes. You'll see this in chat anytime you try and speak.
 
-You'll first be warned to slow down, then told you cannot speak if you continue in the window it has given you, which is 25 messages in a 2-minute span.
+You'll first be warned to slow down, then told you cannot speak if you continue in the window it has given you, which is 25 messages in a 1-minute span.
 
 The Creator (me), can also silence you for 10, 30 or 60 minutes.
 
@@ -96,7 +96,10 @@ If you are not logged in and have the appropriate settings enabled, you will ema
 
 > ### ATTN!
 > 
-> There is no item you can buy to get around timers. There are SOME quest items and other items you can gain, by playing the game only, that will shorten the length of a timer by
-> a small percentage. You will always have a timer for a corresponding action.
-
+> There is no item you can buy to get around timers.
+> 
+> Should you manage to do too many actions in a short amount of time you will be globally timed out and see a modal that will not 
+> disappear, even if you, log out and back in.
+> 
+> Global timeouts last for two minutes and refresh your screen when they are over.
 

@@ -39,7 +39,7 @@ There is something for everyone, it just depends on what you want to do. Run the
 >
 > At any time you may come back to this help section, while logged in.
 >
-> Simple click the help in the drop down menu at the top right:
+> Simple click help in the drop down menu at the top right:
 >
 > <div class="mb-4">
 >    <a href="/storage/info/home/images/help.png" class="glightbox">

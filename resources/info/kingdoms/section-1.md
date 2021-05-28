@@ -14,11 +14,7 @@ First, to settle a kingdom you simply move to any location that is not a port or
 
 From here you may click Settle Kingdom, this will open a popup:
 
-<div class="mb-4">
-    <a href="/storage/info/kingdoms/images/settle-modal.png" class="glightbox">
-        <img src="/storage/info/kingdoms/images/settle-modal.png" class="img-fluid" />
-    </a>
-</div>
+[New Image of Kingdom Management]
 
 You’ll type in a name. Kingdom names must be between 5 and 30 characters. Spaces are allowed.
 
@@ -135,9 +131,15 @@ When your kingdom gains resources per hour you’ll see:
     </a>
 </div>
 
-In chat. If you are not logged in, you’ll receive an email for each kingdom that updated. Again, you can turn this off in the settings page.
+In the chat section. However, for your own sanity, I have made the choice to turn off the email notification for you. You can in the [Settings]() 
+section turn this back on. If you turn it on, you will get one email per hour (if you are not logged in) of all the kingdoms that had their resources updated.
+We do not show you the list of new resource values for those kingdoms, just present you a table with kingdom, location and that it was updated.
 
 Resources are gained once per hour.
+
+> ### ATTN!
+> 
+> You cannot buy resources with gold or real world money. You cannot move resources between kingdoms or request resources from other kingdoms.
 
 ## Units
 
@@ -183,9 +185,7 @@ As we can see, we can recruit some of these spearmen because the unit cost is al
 
 We can see how much population this will be required, we also see the time that it will take. The more you recruit the longer it takes.
 
-In our case ...
-
-We also can see that these are defender-based units. They can be sent off to attack, more on that later, however they are best as defenders.
+We also can see that these are defender-based units. They can be sent off to attack, more on that later.
 
 When we are ready to recruit, we can click Recruit Selected beside the slider. If the recruit button is disabled, that means our unit cost has some red in it, and that means we don’t have the resources to recruit the amount we want.
 
@@ -215,7 +215,13 @@ All timers are server side with client-side representations. You are free to log
 
 ## Managing multiple kingdoms.
 
-In order to manage your many kingdoms, as they grow – The creator decided not to allow you to have an overall kingdom management section. Instead, you must physically move to your kingdoms. This is why a lot of people will end up settling kingdoms next to each other, eventually creating what are called plexes.
+In order to manage your many kingdoms, as they grow – The creator decided not to allow you to 
+have an overall kingdom management section. Instead, you must physically move to your kingdoms. 
+This is why a lot of people will end up settling kingdoms next to each other, eventually creating what are called plexes.
+
+> ### ATTN!
+>
+> Plexes is a term borrowed from racewarkingdoms, this is where you have, for example: 50 kingdoms (or less) in a square or a line. Usually a giant square filled in with kingdoms.
 
 You can always get back to a kingdom by teleporting to it. Click on the kingdom on the map and click teleport - assuming you can move and have the gold.
 
@@ -225,19 +231,12 @@ You can always get back to a kingdom by teleporting to it. Click on the kingdom 
     </a>
 </div>
 
-> ### ATTN!
->
-> Plexes is a term borrowed from racewarkingdoms, this is where you have, for example: 50 kingdoms (or less) in a square or a line. Usually a giant square filled in with kingdoms.
 
 ## Attacking other kingdoms
 
 We will discuss this in further detail in the attacking section of this guide, however, as you noticed your kingdoms show up for you and only you on the map:
 
-<div class="mb-4">
-    <a href="/storage/info/kingdoms/images/settled-kingdoms.png" class="glightbox">
-        <img src="/storage/info/kingdoms/images/settled-kingdoms.png" class="img-fluid" />
-    </a>
-</div>
+[Show new map with kingdoms on it ...]
 
 To find another person’s kingdom, you must travel around the map. Once you find another person’s kingdom, you’ll see an attack button appear in the action section:
 
@@ -247,7 +246,7 @@ To find another person’s kingdom, you must travel around the map. Once you fin
     </a>
 </div>
 
-You won’t see their kingdom on the map, but this button indicates you found someone’s kingdom and can attack it. More on that in the [Attacking a kingdom](/information/attack-kingdoms) section.
+You won’t see their kingdom on the map, but this button indicates you found someone’s kingdom and can attack it. More on that in the [Attacking a kingdom](/information/attacking-kingdoms) section.
 
 ## Embezzling 
 
@@ -261,14 +260,9 @@ If your kingdom is taken, by another player, your treasury will be lost and give
 
 ## Additional Tips
 
-- Settling one kingdom is free, settling additional kingdoms cost 10,000 gold per kingdom you own. For example, if you have 5 kingdoms, your 6th will cost 50,000 gold. If you don’t have the gold, you can Attack other kingdoms, reduce their morale to 0 and send in a special unit called a “settler” who will settle the kingdom. See [Attacking a kingdom]().
-- If you are banned for ever, see [rules](), and you have not requested a “unban” or have been rejected for one, after 72 hours of the ban taking affect the kingdoms will be taken from your kingdom and given to an NPC (legit just called NPC). The NPC will hold the kingdom at 0% Morale. All a player has to do is either message the NPC and ask to take the kingdom (cost is total Kingdoms you own * 10,000 gold / 2 – half price!) or you can send a settler in and just take the kingdom.
-  - When a player is banned, and their kingdoms are handed over to the NPC, players in chat will see a gold
-    message appearing saying that Player x’s kingdoms were handed to an NPC.
-    - No location data will be given. Go hunting.
-  - If you request an unban after the 72-hour period and are acquitted (unbanned) your kingdoms will be lost for ever, and you have to start all over.
-- Once a kingdom loses all its morale it will gain no treasury, and limited resources/population.
-  - Buildings with zero durability will need to be repaired at half the cost of the building cost for that level, before you can upgrade or (in the case of the Barracks) recruit additional units.
+- Settling one kingdom is free, settling additional kingdoms cost 10,000 gold per kingdom you own. For example, if you have 5 kingdoms, 
+  your 6th will cost 50,000 gold. If you don’t have the gold, you can Attack other kingdoms, reduce their morale to 
+  0 and send in a special unit called a “settler” who will settle the kingdom. See [Attacking a kingdom](/information/attacking-kingdoms).
 
 > ### ATTN!
 > 

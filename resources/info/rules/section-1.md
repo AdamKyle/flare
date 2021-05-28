@@ -80,11 +80,11 @@ If a character name is deemed to be offensive, that is it contains a racial slur
 
 Any attempt to circumvent changing your name including scripts, third party tools or hacks will get your account banned for ever.
 
-Once this popup shows up, even if you logout and back in or refresh the page, this popup will stay.
+Once this popup shows up, even if you log out and back in or refresh the page, this popup will stay.
 
 ## Chat Throttling
 
-A player may only send 25 messages every 2 minutes. Failure to heed this and the system will auto silence you for 5 minutes. If you are not logged in when you can speak again, and have the email settings enabled, you will be emailed when you can speak again.
+A player may only send 25 messages every 1 minutes. Failure to heed this, and the system will auto silence you for 5 minutes. If you are not logged in when you can speak again, and have the email settings enabled, you will be emailed when you can speak again.
 
 ## Core Rules
 

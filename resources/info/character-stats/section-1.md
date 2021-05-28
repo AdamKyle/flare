@@ -40,6 +40,12 @@ Gear that can balance, dexterity, damage stat, accuracy and dodge while increasi
 
 **Items are randomly generated when they drop off enemies**
 
+> ### ATTN!
+> 
+> All gear you can buy from the in game shop will affect your core stats. Body will always have the highest followed by weapon. When buying new gear you will want to 
+> replace your body and weapon first, assuming you can afford it. There are some affixes that can also increase one or more stats, some affixes are designed to raise a classes core 
+> stat, while others give bonuses to skills and even all stats.
+
 ## Other stats matter too
 
 You might think: “ok, I am a Dark Dwarf who is a Vampire. All I need is durability gear.”
@@ -53,6 +59,11 @@ This is where having “sets” of armour and weapons, spells and artifacts as w
 Depending on what you are doing, your gear will affect your stats and skills in some way. 
 
 You are never just a Dark Dwarf with the class of Vampire and the damage stat of durability. You are also a crafter, enchanter, looter of dungeons and so much more (if you want to be).
+
+> ### ATTN!
+> 
+> Some gear might be bad for you, however it might have an affix or two attached that help, for example, increase your weapon crafting skill.
+> While the gear might be considered bad to fight monsters with, it could be useful for crafting weapons.
 
 ## Final Note
 
