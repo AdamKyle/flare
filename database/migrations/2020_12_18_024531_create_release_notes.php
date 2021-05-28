@@ -17,6 +17,7 @@ class CreateReleaseNotes extends Migration
             $table->id();
             $table->string('name');
             $table->string('url');
+            $table->string('version');
             $table->date('release_date');
             $table->text('body');
             $table->timestamps();

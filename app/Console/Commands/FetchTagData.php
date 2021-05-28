@@ -41,10 +41,11 @@ class FetchTagData extends Command
     public function handle()
     {
         $latest = GitHub::repo()->releases()->latest('AdamKyle', 'flare');
-
+        dump($latest);
         if (is_null(ReleaseNote::where('url', $latest['html_url'])->first())) {
             ReleaseNote::create([
-                'name'         => $latest['tag_name'],
+                'name'         => $latest['name'],
+                'version'      => $latest['tag_name'],
                 'url'          => $latest['html_url'],
                 'release_date' => Carbon::parse($latest['published_at']),
                 'body'         => $latest['body'],

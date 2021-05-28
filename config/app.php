@@ -259,6 +259,7 @@ return [
          * Game Related
          */
         'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
+        'GameVersion'      => \App\Flare\Values\GameVersionHelper::class,
     ],
 
 ];

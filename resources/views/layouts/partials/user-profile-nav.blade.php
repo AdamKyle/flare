@@ -1,6 +1,15 @@
 <ul class="navbar-nav my-lg-0">
+    <li class="nav-item ml-4">
+        <a class="nav-link" href="#"><i class="fab fa-discord fa-lg text-info"></i></a>
+    </li>
+    <li class="nav-item ml-4">
+        <a class="nav-link" href="#"><i class="fab fa-github fa-lg text-info"></i></a>
+    </li>
+    <li class="nav-item ml-4">
+        <a class="nav-link" href="/releases" target="_blank">Vs: {{GameVersion::version()}}</a>
+    </li>
     @if (!auth()->user()->hasRole('Admin'))
-        <li class="nav-item ml-4" id="notification-center"> 
+        <li class="nav-item ml-4" id="notification-center">
         </li>
     @endif
     <li class="nav-item dropdown">
@@ -23,7 +32,7 @@
                             </a>
                         @endif
                     @endif
-                    
+
 
                     <a class="link" href="{{ route('logout') }}"
                         data-toggle="tooltip"

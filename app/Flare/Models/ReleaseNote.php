@@ -17,6 +17,7 @@ class ReleaseNote extends Model {
      */
     protected $fillable = [
         'name',
+        'version',
         'url',
         'release_date',
         'body',
