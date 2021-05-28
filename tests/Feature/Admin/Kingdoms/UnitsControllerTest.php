@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Admin\Kingdoms;
 
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameBuildingUnit;
+use App\Flare\Models\GameUnit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameUnit;
@@ -38,6 +41,14 @@ class UnitsControllerTest extends TestCase
     }
 
     public function testCanSeeIndex() {
+        $this->createGameBuilding();
+
+        GameBuildingUnit::create([
+            'game_building_id' => GameBuilding::first()->id,
+            'game_unit_id'     => GameUnit::first()->id,
+            'required_level'   => 3,
+        ]);
+
         $this->actingAs($this->user)->visitRoute('units.list')->see('Units')->see('Sample Unit');
     }
 

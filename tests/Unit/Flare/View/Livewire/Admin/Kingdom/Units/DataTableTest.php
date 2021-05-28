@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Kingdom\Units;
 
+use App\Flare\Models\GameBuildingUnit;
 use Livewire;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\View\Livewire\Admin\Kingdoms\Units\DataTable;
@@ -20,6 +21,13 @@ class DataTableTest extends TestCase
     public function testTheComponentLoads()
     {
         $this->createGameUnit();
+        $this->createGameBuilding();
+
+        GameBuildingUnit::create([
+            'game_unit_id' => 1,
+            'game_building_id' => 1,
+            'required_level' => 1,
+        ]);
 
         Livewire::test(DataTable::class)
             ->assertSee('Sample Unit')

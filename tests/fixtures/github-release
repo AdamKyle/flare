@@ -305,3 +305,80 @@
             redirect_time_us: 0
             starttransfer_time_us: 416293
             total_time_us: 416416
+-
+    request:
+        method: GET
+        url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+        headers:
+            Host: api.github.com
+            Accept-Encoding: ''
+            User-Agent: 'php-github-api (http://github.com/KnpLabs/php-github-api)'
+            Accept: application/vnd.github.v3+json
+            Authorization: 'token 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'
+    response:
+        status:
+            http_version: '1.1'
+            code: '404'
+            message: 'Not Found'
+        headers:
+            Server: GitHub.com
+            Date: 'Fri, 28 May 2021 20:54:24 GMT'
+            Content-Type: 'application/json; charset=utf-8'
+            Content-Length: '113'
+            X-OAuth-Scopes: 'admin:enterprise, admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete:packages, delete_repo, gist, notifications, repo, user, workflow, write:discussion, write:packages'
+            X-Accepted-OAuth-Scopes: repo
+            X-GitHub-Media-Type: 'github.v3; format=json'
+            X-RateLimit-Limit: '5000'
+            X-RateLimit-Remaining: '4998'
+            X-RateLimit-Reset: '1622238507'
+            X-RateLimit-Used: '2'
+            X-RateLimit-Resource: core
+            Access-Control-Expose-Headers: 'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, Deprecation, Sunset'
+            Access-Control-Allow-Origin: '*'
+            Strict-Transport-Security: 'max-age=31536000; includeSubdomains; preload'
+            X-Frame-Options: deny
+            X-Content-Type-Options: nosniff
+            X-XSS-Protection: '0'
+            Referrer-Policy: 'origin-when-cross-origin, strict-origin-when-cross-origin'
+            Content-Security-Policy: 'default-src ''none'''
+            Vary: 'Accept-Encoding, Accept, X-Requested-With'
+            X-GitHub-Request-Id: 'FE66:2F5F:F43141:1ABF45D:60B15880'
+        body: '{"message":"Not Found","documentation_url":"https://docs.github.com/rest/reference/repos#get-the-latest-release"}'
+        curl_info:
+            url: 'https://api.github.com/repos/AdamKyle/flare/releases/latest'
+            content_type: 'application/json; charset=utf-8'
+            http_code: 404
+            header_size: 1268
+            request_size: 250
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.4347
+            namelookup_time: 0.049785
+            connect_time: 0.150957
+            pretransfer_time: 0.287422
+            size_upload: !!float 0
+            size_download: !!float 113
+            speed_download: !!float 260
+            speed_upload: !!float 0
+            download_content_length: !!float 113
+            upload_content_length: !!float -1
+            starttransfer_time: 0.43428
+            redirect_time: !!float 0
+            redirect_url: ''
+            primary_ip: 140.82.113.5
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 192.168.0.14
+            local_port: 65126
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: HTTPS
+            appconnect_time_us: 287306
+            connect_time_us: 150957
+            namelookup_time_us: 49785
+            pretransfer_time_us: 287422
+            redirect_time_us: 0
+            starttransfer_time_us: 434280
+            total_time_us: 434700

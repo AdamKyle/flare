@@ -36,7 +36,7 @@ class DataTable extends Component
                 return $query;
             })->select('game_units.*');
 
-            return $this->format($gameUnits);
+            return $this->format($gameUnits->get());
         }
 
         $gameUnits = GameUnit::dataTableSearch($this->search)->get();

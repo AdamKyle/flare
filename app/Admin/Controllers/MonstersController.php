@@ -51,7 +51,6 @@ class MonstersController extends Controller {
     }
 
     public function export() {
-        ob_start();
         $response = Excel::download(new MonstersExport, 'monsters.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 

@@ -627,6 +627,10 @@ class KingdomsControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
+        $user->update([
+            'unit_recruitment_email' => true,
+        ]);
+
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
             'kingdom'  => 1,
             'gameUnit' => 1,

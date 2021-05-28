@@ -57,7 +57,6 @@ class AffixesController extends Controller {
     }
 
     public function export() {
-        ob_start();
         $response = Excel::download(new AffixesExport, 'affixes.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 

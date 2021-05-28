@@ -11,7 +11,7 @@ class AffixesImportTest extends TestCase {
     use RefreshDatabase;
 
     public function testImport() {
-        Excel::import(new AffixesImport(), resource_path('data-imports/affixes.xlsx'));
+        Excel::import(new AffixesImport, resource_path('data-imports/affixes.xlsx'));
 
         $this->assertTrue(true);
     }

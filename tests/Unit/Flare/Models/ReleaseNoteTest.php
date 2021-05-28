@@ -17,7 +17,8 @@ class ReleaseNoteTest extends TestCase
             'name'         => 'sample',
             'url'          => 'http://google.ca',
             'release_date' => now(),
-            'body'         => 'Sample'
+            'body'         => 'Sample',
+            'version'      => '2.0.0',
         ]);
 
         $this->assertNotNull(ReleaseNote::first());
