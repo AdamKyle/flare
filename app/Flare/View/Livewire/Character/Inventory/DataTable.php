@@ -49,20 +49,24 @@ class DataTable extends Component
                 $join->where('items.type', '!=', 'quest');
             }
 
+            if ($this->batchSell) {
+                $join->whereNull('items.item_prefix_id')->whereNull('items.item_suffix_id');
+            }
+
             if ($this->marketBoard) {
                 $join->where('items.market_sellable', true);
             }
 
             return $join;
         });
-        
+
         return $slots->select('inventory_slots.*')
               ->where('equipped', $this->includeEquipped)
               ->orderBy($this->sortField, $this->sortBy);
     }
 
     public function getDataProperty() {
-        
+
         return $this->dataQuery->paginate($this->perPage);
     }
 
@@ -73,7 +77,7 @@ class DataTable extends Component
     public function render()
     {
         $this->selectAllRenderHook();
-        
+
         return view('components.livewire.character.inventory.data-table', [
             'slots' => $this->fetchSlots(),
         ]);

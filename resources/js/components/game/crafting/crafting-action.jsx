@@ -217,11 +217,9 @@ export default class CraftingAction extends React.Component {
 
     return (
       <>
-        <div className={"container justify-content-center " + (!this.state.showSuccess ? 'hide' : '')}>
-          <div className="row">
-            <div className="col-md-10">
-              <div className="alert alert-success">You got new items to craft! Check the list.</div>
-            </div>
+        <div className={"row mb-3 " + (!this.state.showSuccess ? 'hide' : '')}>
+          <div className="col-md-10">
+            <div className="alert alert-success">You got new items to craft! Check the list.</div>
           </div>
         </div>
 

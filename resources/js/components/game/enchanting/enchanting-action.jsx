@@ -10,9 +10,9 @@ export default class EnchantingAction extends React.Component {
     this.state = {
       affixList: [],
       inventoryList: [],
-      itemToEnchant: null,
-      suffixId: null,
-      prefixId: null,
+      itemToEnchant: "0",
+      suffixId: "0",
+      prefixId: "0",
       canCraft: true,
       isDead: this.props.isDead,
       showEnchanting: false,
@@ -88,6 +88,18 @@ export default class EnchantingAction extends React.Component {
         isAdventuring: this.props.isAdventuring,
       });
     }
+
+    if (prevState.affixList.length !== this.state.affixList.length && (this.state.affixList.length !== 0 && prevState.affixList.length !== 0)) {
+      this.setState({
+        showSuccess: true
+      }, () => {
+        setTimeout(() => {
+          this.setState({
+            showSuccess: false
+          });
+        }, 3000);
+      })
+    }
   }
 
   enchant() {
@@ -131,8 +143,8 @@ export default class EnchantingAction extends React.Component {
   }
 
   setItemToEnchant(event) {
-    let cost = 0;
-    const value = parseInt(event.target.value);
+    let cost       = 0;
+    const value    = parseInt(event.target.value);
     let foundAffix = null;
 
     if (this.state.suffixId !== null && this.state.suffixId !== 0) {
@@ -159,6 +171,11 @@ export default class EnchantingAction extends React.Component {
   }
 
   getPrefixCost(foundAffix, itemToEnchant) {
+
+    if (typeof foundAffix === 'undefined') {
+      return 0;
+    }
+
     let cost = foundAffix.cost;
     let time = null;
 
@@ -174,6 +191,10 @@ export default class EnchantingAction extends React.Component {
   }
 
   getSuffixCost(foundAffix, itemToEnchant) {
+    if (typeof foundAffix === 'undefined') {
+      return 0;
+    }
+
     let cost = foundAffix.cost;
 
     if (itemToEnchant !== null && itemToEnchant !== 0) {
@@ -213,10 +234,10 @@ export default class EnchantingAction extends React.Component {
   }
 
   setSuffixId(event) {
-    const value = parseInt(event.target.value);
+    const value     = parseInt(event.target.value);
     const oldSuffix = this.state.affixList.filter((a) => a.id === this.state.suffixId)[0];
-    let foundAffix = null;
-    let cost = this.state.cost;
+    let foundAffix  = null;
+    let cost        = this.state.cost;
 
     if ((value === 0 || value !== 0) && (this.state.suffixId !== 0 && this.state.suffixId !== null) && (this.state.itemToEnchant === 0 && this.state.itemToEnchant === null) && typeof oldSuffix !== 'undefined') {
       foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
@@ -224,7 +245,14 @@ export default class EnchantingAction extends React.Component {
       cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
     } else if ((this.state.itemToEnchant !== 0 || this.state.itemToEnchant !== null)) {
       foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
-      cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
+
+      if (typeof foundAffix === 'undefined') {
+        const foundOldAffix = this.state.affixList.filter((a) => a.id === this.state.suffixId)[0];
+
+        cost -= this.getSuffixCost(foundOldAffix, this.state.itemToEnchant);
+      } else {
+        cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
+      }
     } else if ((this.state.itemToEnchant === 0 || this.state.itemToEnchant === null)) {
       cost = 0;
     }
@@ -330,15 +358,18 @@ export default class EnchantingAction extends React.Component {
         </div>
       );
     }
-
+    console.log()
     return (
       <>
-        <div
-          className={"container justify-content-center " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>
-          <div className="row">
-            <div className="col-md-10">
-              <div className="alert alert-danger">You have no items to enchant.</div>
-            </div>
+        <div className={"row mt-3 " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>
+          <div className="col-md-10">
+            <div className="alert alert-danger">You have no items to enchant.</div>
+          </div>
+        </div>
+
+        <div className={"row mb-3 " + (!this.state.showSuccess ? 'hide' : '')}>
+          <div className="col-md-10">
+            <div className="alert alert-success">You got new items to craft! Check the list.</div>
           </div>
         </div>
 
@@ -348,7 +379,7 @@ export default class EnchantingAction extends React.Component {
               <Col xs={12} sm={12} md={12} lg={12} xl={4}>
                 <select
                   className="form-control mt-2" id="crafting" name="crafting"
-                  value={this.state.itemToEnchant !== null ? this.state.itemToEnchant : 0}
+                  value={this.state.itemToEnchant}
                   onChange={this.setItemToEnchant.bind(this)}
                   disabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
                 >
@@ -359,7 +390,7 @@ export default class EnchantingAction extends React.Component {
               <Col xs={12} sm={12} md={12} lg={12} xl={4}>
                 <select
                   className="form-control mt-2" id="crafting" name="crafting"
-                  value={this.state.prefixId !== null ? this.state.prefixId : 0}
+                  value={this.state.prefixId}
                   onChange={this.setPrefixId.bind(this)}
                   disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
                 >
@@ -370,7 +401,7 @@ export default class EnchantingAction extends React.Component {
               <Col xs={12} sm={12} md={12} lg={12} xl={4}>
                 <select
                   className="form-control mt-2" id="crafting" name="crafting"
-                  value={this.state.suffixId !== null ? this.state.suffixId : 0}
+                  value={this.state.suffixId}
                   onChange={this.setSuffixId.bind(this)}
                   disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
                 >

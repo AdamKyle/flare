@@ -72,6 +72,22 @@
                             field="required_population"
                         />
 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('building_name')"
+                            header-text="From Building"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="building_name"
+                        />
+
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('level_required')"
+                            header-text="Required Building Level"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="level_required"
+                        />
+
                         @if (!$units->isEmpty())
                             @if(!is_null($units->first()->required_level))
                                 <x-data-tables.header-row
@@ -120,6 +136,8 @@
                                 <td>{{$unit->stone_cost}}</td>
                                 <td>{{$unit->iron_cost}}</td>
                                 <td>{{$unit->required_population}}</td>
+                                <td>{{$unit->building_name}}</td>
+                                <td>{{$unit->level_required}}</td>
 
                                 @if (!is_null($unit))
                                     @if (!is_null($unit->required_level))

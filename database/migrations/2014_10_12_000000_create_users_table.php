@@ -31,10 +31,10 @@ class CreateUsersTable extends Migration
             $table->string('un_ban_request')->nullable();
             $table->boolean('adventure_email')->default(true);
             $table->boolean('new_building_email')->default(true);
-            $table->boolean('upgraded_building_email')->default(true);
+            $table->boolean('upgraded_building_email')->default(false);
             $table->boolean('kingdoms_update_email')->default(false);
-            $table->boolean('rebuilt_building_email')->default(true);
-            $table->boolean('kingdom_attack_email')->default(true);
+            $table->boolean('rebuilt_building_email')->default(false);
+            $table->boolean('kingdom_attack_email')->default(false);
             $table->boolean('is_test')->default(false);
             $table->rememberToken();
             $table->timestamps();

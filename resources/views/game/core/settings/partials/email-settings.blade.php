@@ -58,7 +58,19 @@
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
                         By selecting this, you are saying that, when any building in your queue finishes, you'll get an email.
-                        <p class="mt-2"><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each.</p>
+                        <p class="mt-2"><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each that finishes.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check move-down-30">
+                            <input id="unitRecruitment" class="form-check-input" type="checkbox" data-toggle="toggle" name="unit_recruitment_email" value="1" {{$user->unit_recruitment_email ? 'checked' : ''}}>
+                            <label for="unitRecruitment" class="form-check-label ml-2">Unit Recruitment Email</label>
+                        </div>
+                    </div>
+                    <div class="col-md-8 move-down-30 alert alert-info">
+                        By selecting this, you are saying that, when units in queue finish, you'll get an email.
+                        <p class="mt-2"><strong>Note</strong>: Multiple units in queue? You'll get multiple emails, one for each that finishes.</p>
                     </div>
                 </div>
                 <div class="row">

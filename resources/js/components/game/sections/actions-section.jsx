@@ -100,7 +100,7 @@ export default class ActionsSection extends React.Component {
 
   setMonster(monster) {
     this.setState({
-      monster: monster
+      monster: monster,
     });
   }
 
@@ -204,6 +204,7 @@ export default class ActionsSection extends React.Component {
               canAttack={this.props.canAttack}
               isAdventuring={this.state.isAdventuring}
             />
+
           </Col>
         </Row>
       </Card>

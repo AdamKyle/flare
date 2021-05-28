@@ -39,14 +39,14 @@ class EnchantingService {
 
     /**
      * Only set if the affix to be applied was too easy to enchant.
-     * 
+     *
      * @var bool $wasTooEasy
      */
     private $wasTooEasy = false;
 
     /**
      * Constructor
-     * 
+     *
      * @param CharacterInformationBuilder $characterInformationBuilder
      * @param EnchantItemService $enchantItemService
      * @return void
@@ -58,9 +58,9 @@ class EnchantingService {
 
     /**
      * Fetches the affixes for a character.
-     * 
+     *
      * Only returns that which the player has the skill level and intelligence for.
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -76,17 +76,17 @@ class EnchantingService {
 
     /**
      * Enchant an item.
-     * 
+     *
      * Attamepts to enchant an item with the supplied afixes and slot.
-     * 
+     *
      * The params passed in must be the request params coming back from the request.
-     * 
-     * The array returned contains the the status and the details, either a list of 
+     *
+     * The array returned contains the the status and the details, either a list of
      * the characters inventory and their affixes they can enchant or a error message.
-     * 
-     * eg, ['message' => '', 'status' => 422] or 
+     *
+     * eg, ['message' => '', 'status' => 422] or
      * ['affixes' => Collection, 'character_inventory' => [...], 'status' => 200]
-     * 
+     *
      * @param Character $character
      * @param array $params
      */
@@ -94,7 +94,7 @@ class EnchantingService {
         $characterInfo   = $this->characterInformationBuilder->setCharacter($character);
         $enchantingSkill = $this->getEnchantingSkill($character);
         $slot            = $this->getSlotFromInventory($character, $params['slot_id']);
-        
+
         if (is_null($slot)) {
             return $this->errorResult('No such inventory slot.');
         }
@@ -120,7 +120,7 @@ class EnchantingService {
             return $this->errorResult($e->getMessage());
         }
     }
-    
+
     protected function getEnchantingSkill(Character $character): Skill {
         return $character->skills()->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
     }
@@ -137,7 +137,7 @@ class EnchantingService {
 
         })->all();
     }
-    
+
     protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
         return ItemAffix::where('int_required', '<=', $builder->statMod('int'))
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
@@ -187,9 +187,9 @@ class EnchantingService {
             }
 
             /**
-             * If the affix wasn't too easy to atach, attempt to enchant with the difficulty check 
+             * If the affix wasn't too easy to atach, attempt to enchant with the difficulty check
              * in place.
-             * 
+             *
              * If we fail to do this then we retrun from the loop.
              */
             if (!$this->wasTooEasy) {
@@ -217,7 +217,7 @@ class EnchantingService {
     }
 
     protected function appliedEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
-        $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->name; 
+        $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
 
         event(new ServerMessageEvent($character->user, 'enchanted', $message));
 
@@ -227,8 +227,8 @@ class EnchantingService {
     }
 
     protected function failedToApplyEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character) {
-        $message = 'You failed to apply '.$affix->name.' to: ' . $slot->item->name . '. The item shatters before you. You lost the investment.';
-    
+        $message = 'You failed to apply '.$affix->name.' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
+
         event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
 
         $this->enchantItemService->deleteSlot($slot);
