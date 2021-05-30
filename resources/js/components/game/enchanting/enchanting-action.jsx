@@ -358,7 +358,7 @@ export default class EnchantingAction extends React.Component {
         </div>
       );
     }
-    console.log()
+
     return (
       <>
         <div className={"row mt-3 " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>

@@ -27,12 +27,14 @@
                 </div>
             </div>
         </div>
-        <hr />
-        <div class="row">
-            <div class="col-md-12">
-                <h4>Item Affixes</h4>
-                @include('game.items.partials.item-affixes', ['item' => $item])
+        @if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix))
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Item Affixes</h4>
+                    @include('game.items.partials.item-affixes', ['item' => $item])
+                </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>

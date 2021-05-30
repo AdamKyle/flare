@@ -47,7 +47,6 @@ export default class Chat extends React.Component {
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
-      console.log(event);
       const message = event.message;
       message['user'] = event.user;
       message['name'] = event.name;

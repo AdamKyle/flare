@@ -26,7 +26,6 @@ export default class AdventureMenu extends React.Component {
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
-      console.log(event);
       this.setState({
         logs: event.adventureLogs,
       });

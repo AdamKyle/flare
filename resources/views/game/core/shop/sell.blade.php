@@ -12,7 +12,7 @@
         @if ($isLocation)
             <p>
                 You enter the old and musty shop. Along the walls you an see various weapons, armor
-                and other types of items that might benifit you on your journies.
+                and other types of items that might benefit you on your journeys.
             </p>
             <p>
                 Counting your gold, you walk in with confidence, knowing you will walk out with
@@ -24,7 +24,7 @@
 
             <p><strong>Shop Keeper</strong>: <em>Hello! welcome! what can I get for you?</em></p>
         @else
-            <p>On your journey you come across a merhant on the road. He is carrying his bag full of trinkets and goodies.</p>
+            <p>On your journey you come across a merchant on the road. He is carrying his bag full of trinkets and goodies.</p>
             <p>As you approach, he takes off his backpack and warmly greets you:</p>
             <p><strong>Shop Keeper</strong>: <em>These roads are dangerous my friend! What can I get you?</em></p>
         @endif
@@ -36,8 +36,9 @@
 
     <h4>Your Items To Sell</h4>
     <div class="alert alert-warning">
-        You can click "Sell all" (beside the page drop down) to auto sell all items or select items you want to sell and click the "Sell all selected" on the table
-        to sell just those specific items.
+        <p>You can click "Sell all" (beside the page drop down) to auto sell all items or select items you want to sell and click the "Sell all selected" on the table
+            to sell just those specific items.</p>
+        <p></p><strong>Note:</strong> There is a 5% tax applied to all items you sell.</p>
     </div>
     @livewire('character.inventory.data-table', [
         'batchSell' => true,

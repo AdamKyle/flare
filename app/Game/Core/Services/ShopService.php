@@ -11,15 +11,15 @@ class ShopService {
 
     /**
      * Sell all the items in the inventory.
-     * 
+     *
      * Sell all that are not equipped and not a quest item.
-     * 
+     *
      * @param Character $character
      * @return int
      */
     public function sellAllItemsInInventory(Character $character): int {
         $itemsToSell = $character->inventory->slots->filter(function($slot) {
-            return !$slot->equipped && $slot->item->type !== 'quest';
+            return !$slot->equipped && $slot->item->type !== 'quest' && (is_null($slot->item->itemPrefix) && is_null($slot->item->itemSuffix));
         })->all();
 
         $itemsToSell = collect($itemsToSell);
@@ -41,7 +41,7 @@ class ShopService {
 
     /**
      * Fetch the total sold for amount.
-     * 
+     *
      * @param Collection $inventorySlots
      * @param Character $character
      * @return int

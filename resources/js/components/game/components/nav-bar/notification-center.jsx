@@ -25,7 +25,7 @@ export default class NotificationCenter extends React.Component {
         loading: false,
       });
     }).catch((err) => {
-      console.log(err);
+      console.err(err);
       return getServerMessage('something_went_wrong');
     });
 

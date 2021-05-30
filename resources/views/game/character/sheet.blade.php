@@ -52,7 +52,7 @@
 
                 <dl>
                     <dt>Total gold:</dt>
-                    <dd>{{$character->gold}}</dd>
+                    <dd>{{number_format($character->gold)}}</dd>
                     <dt>Used / Max inventory space:</dt>
                     <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
                     <dt>Stat to focus on for max damage:</dt>

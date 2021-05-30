@@ -124,7 +124,7 @@
                             <td>{{is_null($slot->item->base_ac) ? 'N/A' : $slot->item->base_ac}}</td>
                             <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
                             @if (!$marketBoard)
-                                <td>{{is_null($slot->item->Cost) ? 'N/A' : $slot->item->cost}}</td>
+                                <td>{{is_null($slot->item->cost) ? 'N/A' : number_format($slot->item->cost)}}</td>
                             @endif
                             <td>
                                 @if ($allowInventoryManagement && $slot->item->type !== 'quest')

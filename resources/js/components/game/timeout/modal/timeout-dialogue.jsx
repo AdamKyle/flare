@@ -28,7 +28,7 @@ export default class TimeoutDialogue extends React.Component {
     }
 
     this.timeout.listen('Game.Core.Events.GlobalTimeOut', (event) => {
-      console.log(event);
+
       if (event.user.timeout_until === null) {
         location.reload();
       }

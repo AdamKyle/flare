@@ -140,7 +140,7 @@
                             <td>{{is_null($item->base_damage) ? 'N/A' : $item->base_damage}}</td>
                             <td>{{is_null($item->base_ac) ? 'N/A' : $item->base_ac}}</td>
                             <td>{{is_null($item->base_healing) ? 'N/A' : $item->base_healing}}</td>
-                            <td>{{is_null($item->cost) ? 'N/A' : $item->cost}}</td>
+                            <td>{{is_null($item->cost) ? 'N/A' : number_format($item->cost)}}</td>
                             @guest
                             @else
                                 <td>

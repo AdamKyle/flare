@@ -61,7 +61,7 @@ export default class KingdomModal extends React.Component {
 
   disabled() {
     const doesNotHaveGold = this.cost() > this.state.character.gold;
-    console.log(this.props.disableMapButtons() || doesNotHaveGold);
+
     return this.props.disableMapButtons() || doesNotHaveGold;
   }
 

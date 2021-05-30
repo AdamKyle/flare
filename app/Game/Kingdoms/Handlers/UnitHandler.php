@@ -120,11 +120,11 @@ class UnitHandler {
         }
 
         $defenceBonus = $this->getTotalDefenceBonus($defender);
-        dump($defenceBonus);
+
         $totalDefenderDefence = $totalDefenderDefence * ($defenceBonus > 1 ? $defenceBonus : 1 + $defenceBonus);
-        dump($totalDefenderDefence);
+
         if ($totalAttack > $totalDefenderDefence) {
-            dump('greator then');
+
             $totalAttackingUnitsLost = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence, true);
             $totalDefenderUnitsLost  = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence);
 
@@ -132,7 +132,7 @@ class UnitHandler {
 
             $this->updateDefenderUnits($defender, $totalDefenderUnitsLost);
         } else {
-            dump('less then');
+
             $totalAttackingUnitsLost = $this->calculatePerentageLost($totalAttackingDefence, $totalDefenderAttack, true);
             $totalDefenderUnitsLost  = $this->calculatePerentageLost($totalAttackingDefence, $totalDefenderAttack);
 

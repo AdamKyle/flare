@@ -20,17 +20,17 @@ class CharacterSheetController extends Controller {
 
         return view ('game.character.sheet', [
             'character' => $character,
-            'maxLevel' => MaxLevel::MAX_LEVEL,
+            'maxLevel'  => number_format(MaxLevel::MAX_LEVEL),
             'characterInfo' => [
-                'maxAttack' => $characterInfo->buildAttack(),
-                'maxHealth' => $characterInfo->buildHealth(),
-                'maxHeal'   => $characterInfo->buildHealFor(),
-                'maxAC'     => $characterInfo->buildDefence(),
-                'str'       => $characterInfo->statMod('str'),
-                'dur'       => $characterInfo->statMod('dur'),
-                'dex'       => $characterInfo->statMod('dex'),
-                'chr'       => $characterInfo->statMod('chr'),
-                'int'       => $characterInfo->statMod('int'),
+                'maxAttack' => number_format($characterInfo->buildAttack()),
+                'maxHealth' => number_format($characterInfo->buildHealth()),
+                'maxHeal'   => number_format($characterInfo->buildHealFor()),
+                'maxAC'     => number_format($characterInfo->buildDefence()),
+                'str'       => number_format($characterInfo->statMod('str')),
+                'dur'       => number_format($characterInfo->statMod('dur')),
+                'dex'       => number_format($characterInfo->statMod('dex')),
+                'chr'       => number_format($characterInfo->statMod('chr')),
+                'int'       => number_format($characterInfo->statMod('int')),
             ],
         ]);
     }

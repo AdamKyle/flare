@@ -117,7 +117,7 @@ export default class ItemDetails extends React.Component {
   }
 
   render() {
-    console.log(this.props.item);
+
     return (
       <Accordion>
         <Card>
@@ -168,6 +168,12 @@ export default class ItemDetails extends React.Component {
                         <dd className="text-success">{this.props.item.base_ac}</dd>
                         <dt><strong>Base Healing</strong>:</dt>
                         <dd className="text-success">{this.props.item.base_healing}</dd>
+                        <dt><strong>Base Damage Mod</strong>:</dt>
+                        <dd className="text-success">{this.props.item.base_damage_mod * 100}%</dd>
+                        <dt><strong>Base AC</strong>:</dt>
+                        <dd className="text-success">{this.props.item.base_ac_mod * 100}%</dd>
+                        <dt><strong>Base Healing</strong>:</dt>
+                        <dd className="text-success">{this.props.item.base_healing_mod * 100}%</dd>
                         <dt><strong>Strength</strong>:</dt>
                         <dd className="text-success">{this.props.item.str_modifier * 100}%</dd>
                         <dt><strong>Durability</strong>:</dt>
