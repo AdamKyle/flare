@@ -78,7 +78,7 @@
                         field="items.base_healing"
                     />
 
-                    @if (!$marketBoard)
+                    @if (!$marketBoard && $batchSell)
                         <x-data-tables.header-row
                             wire:click.prevent="sortBy('items.cost')"
                             header-text="Cost"
@@ -123,7 +123,7 @@
                             <td>{{is_null($slot->item->base_damage) ? 'N/A' : $slot->item->base_damage}}</td>
                             <td>{{is_null($slot->item->base_ac) ? 'N/A' : $slot->item->base_ac}}</td>
                             <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
-                            @if (!$marketBoard)
+                            @if (!$marketBoard && $batchSell)
                                 <td>{{is_null($slot->item->cost) ? 'N/A' : number_format($slot->item->cost)}}</td>
                             @endif
                             <td>

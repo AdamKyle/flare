@@ -49,14 +49,8 @@ export default class BattleAction extends React.Component {
     });
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
-      const character = this.state.character;
-
-      character.ac = event.characterSheet.ac;
-      character.attack = event.characterSheet.attack;
-      character.health = event.characterSheet.health;
-      character.gold = event.characterSheet.gold;
-
-      this.setState({character: character});
+      console.log(event.characterSheet);
+      this.setState({character: event.characterSheet});
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
