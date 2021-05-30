@@ -10,9 +10,9 @@ export default class EnchantingAction extends React.Component {
     this.state = {
       affixList: [],
       inventoryList: [],
-      itemToEnchant: "0",
-      suffixId: "0",
-      prefixId: "0",
+      itemToEnchant: "",
+      suffixId: "",
+      prefixId: "",
       canCraft: true,
       isDead: this.props.isDead,
       showEnchanting: false,
@@ -117,7 +117,7 @@ export default class EnchantingAction extends React.Component {
 
     const params = {
       slot_id: this.state.inventoryList.filter((s) => s.item.id === this.state.itemToEnchant)[0].id,
-      affix_ids: affixesToAttach,
+      affix_ids: affixesToAttach.filter((affix) => { return affix !== ""; }),
       cost: this.state.cost,
     }
 
@@ -383,7 +383,7 @@ export default class EnchantingAction extends React.Component {
                   onChange={this.setItemToEnchant.bind(this)}
                   disabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
                 >
-                  <option key={'item-0'} value="0">Please Select Item</option>
+                  <option key={'item-0'} value="">Please Select Item</option>
                   {this.buildInventoryOptions()}
                 </select>
               </Col>
@@ -394,7 +394,7 @@ export default class EnchantingAction extends React.Component {
                   onChange={this.setPrefixId.bind(this)}
                   disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
                 >
-                  <option key={'prefix-0'} value="0">Please Select Prefix</option>
+                  <option key={'prefix-0'} value="">Please Select Prefix</option>
                   {this.buildPrefixOptions()}
                 </select>
               </Col>
@@ -405,7 +405,7 @@ export default class EnchantingAction extends React.Component {
                   onChange={this.setSuffixId.bind(this)}
                   disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
                 >
-                  <option key={'affix-0'} value="0">Please Select Suffix</option>
+                  <option key={'affix-0'} value="">Please Select Suffix</option>
                   {this.buildSuffixOptions()}
                 </select>
               </Col>
