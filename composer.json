@@ -33,7 +33,7 @@
         "barryvdh/laravel-ide-helper": "^2.8.1",
         "beyondcode/laravel-dump-server": "1.7.0",
         "facade/ignition": "^2.3.6",
-        "fzaninotto/faker": "^1.9.2",
+        "fzaninotto/faker": "dev-master",
         "laravel/browser-kit-testing": "^6.1.0",
         "laravel/telescope": "^4.0",
         "mockery/mockery": "^1.4.2",
