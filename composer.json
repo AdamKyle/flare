@@ -15,7 +15,6 @@
         "christianessl/landmap-generation": "^1.0",
         "consoletvs/charts": "7.*",
         "fideloper/proxy": "^4.0",
-        "graham-campbell/github": "^9.7",
         "graham-campbell/markdown": "^13.1",
         "laravel/framework": "^8.0",
         "laravel/helpers": "^1.2",
