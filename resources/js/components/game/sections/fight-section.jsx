@@ -23,7 +23,7 @@ export default class FightSection extends React.Component {
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
     this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
-    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -47,8 +47,8 @@ export default class FightSection extends React.Component {
       });
     });
 
-    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
-      this.setState({character: {...this.state.character, ...event.characterSheet}});
+    this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
+      this.setState({character: event.character});
     });
 
     this.timeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {

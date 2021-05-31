@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Game\Core\Events\UpdateAttackStats;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
@@ -19,6 +20,7 @@ use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Flare\Models\User;
 use App\Flare\Transformers\MonsterTransfromer;
+use League\Fractal\Resource\ResourceAbstract;
 
 class BattleController extends Controller {
 
@@ -60,6 +62,9 @@ class BattleController extends Controller {
             event(new CharacterIsDeadBroadcastEvent($character->user, true));
             event(new UpdateTopBarEvent($character));
 
+            $characterData = new Item($character, $this->character);
+            event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
             return response()->json([], 200);
         }
 
@@ -73,6 +78,9 @@ class BattleController extends Controller {
                     event(new DropsCheckEvent($character, $monster));
                     event(new GoldRushCheckEvent($character, $monster));
                     event(new AttackTimeOutEvent($character));
+
+                    $characterData = new Item($character, $this->character);
+                    event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
                     break;
                 default:
                     return response()->json([

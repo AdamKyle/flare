@@ -6,11 +6,19 @@ For example, for any where, if you click traverse, a new section will popup allo
 
 If you then select the location and click traverse, you will be taken directly to that plane with a 10 second time out.
 
-[Image of traverse]
+<div class="mb-4">
+    <a href="/storage/info/traverse/images/traverse.png" class="glightbox">
+        <img src="/storage/info/traverse/images/traverse.png" class="img-fluid" />
+    </a>
+</div>
 
 If you do not have the appropriate item, you will be told you cannot traverse
 
-[Image]
+<div class="mb-4">
+    <a href="/storage/info/traverse/images/traverse-error.png" class="glightbox">
+        <img src="/storage/info/traverse/images/traverse-error.png" class="img-fluid" />
+    </a>
+</div>
 
 >	### ATTN!
 >

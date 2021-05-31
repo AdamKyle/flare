@@ -20,3 +20,8 @@ Broadcast::channel('character-is-dead-{userId}', function ($user, $userId) {
 Broadcast::channel('update-actions-{userId}', function ($user, $userId) {
    return $user->id === (int) $userId;
 });
+
+// When character attack stats are to be updated.
+Broadcast::channel('update-character-attack-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

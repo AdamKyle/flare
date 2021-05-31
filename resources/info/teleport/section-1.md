@@ -2,13 +2,17 @@
 
 Teleporting works much the same way as setting sail. Assuming you can move and are not dead, you can open the teleport section, by clicking teleport on the map.
 
-[Map]
+<div class="mb-4">
+    <a href="/storage/info/teleport/images/map.png" class="glightbox">
+        <img src="/storage/info/teleport/images/map.png" class="img-fluid" />
+    </a>
+</div>
 
-[Teleport]
-
-From here you can select the coordinates, which then show you the cost in gold, and the time out value.
-
-[Screen Shot]
+<div class="mb-4">
+    <a href="/storage/info/teleport/images/teleport.png" class="glightbox">
+        <img src="/storage/info/teleport/images/teleport.png" class="img-fluid" />
+    </a>
+</div>
 
 From here you can click teleport to go instantly to that new location assuming:
 

@@ -2,15 +2,30 @@
 
 namespace App\Game\Core\Services;
 
+use App\Game\Core\Events\UpdateAttackStats;
+use League\Fractal\Manager;
+
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
-use App\Flare\Models\Item;
+use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Exceptions\EquipItemException;
 
+
 class EquipItemService {
+
+    /**
+     * @var Manager $manager
+     */
+    private $manager;
+
+    /**
+     * @var CharacterAttackTransformer $characterTransformer
+     */
+    private $characterTransformer;
 
     /**
      * @var Request $request
@@ -21,6 +36,17 @@ class EquipItemService {
      * @var Character $character
      */
     private $character;
+
+    /**
+     * EquipItemService constructor.
+     *
+     * @param Manager $manager
+     * @param CharacterAttackTransformer $characterTransformer
+     */
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer) {
+        $this->manager              = $manager;
+        $this->characterTransformer = $characterTransformer;
+    }
 
     /**
      * Set the request
@@ -74,7 +100,12 @@ class EquipItemService {
             'position' => $this->request->position,
         ]);
 
-        event(new UpdateTopBarEvent($this->character));
+        $character = $this->character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new Item($character, $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         return $characterSlot->item;
     }
@@ -83,7 +114,7 @@ class EquipItemService {
      * Get Item stats
      *
      * @param Item $toCompare
-     * @param Colection $inventorySlots
+     * @param Collection $inventorySlots
      * @return array
      */
     public function getItemStats(Item $toCompare, Collection $inventorySlots): array {

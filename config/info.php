@@ -17,9 +17,16 @@ return [
     'market-board'      => [],
     'equipment'         => [],
     'traverse'          => [],
-    'set-sail'          => [],
     'teleport'          => [],
-    'locations'         => [],
+    'locations'         => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.locations.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ],
+    ],
+    'set-sail'          => [],
     'attacking-kingdoms' => [
         [
             'livewire'            => true,

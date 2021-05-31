@@ -27,7 +27,7 @@ export default class BattleAction extends React.Component {
       isAdventuring: false,
     }
 
-    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
   }
 
@@ -48,9 +48,8 @@ export default class BattleAction extends React.Component {
       this.props.canAttack(this.state.canAttack);
     });
 
-    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
-      console.log(event.characterSheet);
-      this.setState({character: event.characterSheet});
+    this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
+      this.setState({character: event.character});
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {

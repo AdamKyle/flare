@@ -2,7 +2,11 @@
 
 Locations in the game can show up as three icons:
 
-[Map]
+<div class="mb-4">
+    <a href="/storage/info/locations/images/map.png" class="glightbox">
+        <img src="/storage/info/locations/images/map.png" class="img-fluid" />
+    </a>
+</div>
 
 One is the kingdom icon, the other is a location icon, and the final is a port icon.
 
@@ -11,6 +15,4 @@ One is the kingdom icon, the other is a location icon, and the final is a port i
   - Locations themselves can also drop quest items for simply moving to that location.
 - Ports are where you set sail from or visit the market board to list and sell items. 
   - All ports share the same market board.
-
-[List of locations]
 
