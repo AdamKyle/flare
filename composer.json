@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.2",
+        "php": ">=7.2",
         "asahasrabuddhe/laravel-mjml": "^0.4.0",
         "beyondcode/laravel-websockets": "^2.0.0-beta.36",
         "bkwld/cloner": "^3.9",
