@@ -2,10 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\ReleaseNote;
 use GitHub;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Flare\Models\ReleaseNote;
+
 
 class FetchTagData extends Command
 {

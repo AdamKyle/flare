@@ -67,10 +67,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/var-dumper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/finder" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/deprecation-contracts" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/promises" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/psr7" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/routing" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/guzzle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/http-client-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-intl-normalizer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpoption/phpoption" />
@@ -145,10 +143,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/dnoegel/php-xdg-base-dir" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/beyondcode/laravel-websockets" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/barryvdh/reflection-docblock" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/httplug" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/asahasrabuddhe/laravel-mjml" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/promise" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/php-http/guzzle6-adapter" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/christianessl/landmap-generation" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/livewire/livewire" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/voku/portable-ascii" />
