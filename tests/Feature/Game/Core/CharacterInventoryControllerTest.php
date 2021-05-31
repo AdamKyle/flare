@@ -181,7 +181,7 @@ class CharacterInventoryControllerTest extends TestCase
     }
 
     public function testSeeComparePage() {
-        
+
         $user = $this->character->inventoryManagement()
                                 ->giveitem($this->createItem([
                                     'name' => 'Spear',
@@ -200,7 +200,7 @@ class CharacterInventoryControllerTest extends TestCase
     }
 
     public function testSeeComparePageForSpell() {
-        
+
         $user = $this->character->inventoryManagement()
                                 ->giveitem($this->createItem([
                                     'name' => 'spell',
@@ -325,7 +325,7 @@ class CharacterInventoryControllerTest extends TestCase
                                     'default_position' => 'hands',
                                     'crafting_type'    => 'armour',
                                 ]))
-                                ->equipItem(2, 'hands')
+                                ->equipItem('hands', 2)
                                 ->getCharacterFactory()
                                 ->getUser();
 

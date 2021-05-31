@@ -14,7 +14,7 @@ class InventoryManagement {
 
     /**
      * Constructor
-     * 
+     *
      * @param Character $character
      */
     public function __construct(Character $character, CharacterFactory $characterFactory = null) {
@@ -24,7 +24,7 @@ class InventoryManagement {
 
     /**
      * Equip the left hand with an item that isn't already equipped.
-     * 
+     *
      * @param int $slotId | 1
      * @return InventoryManagement
      */
@@ -43,7 +43,7 @@ class InventoryManagement {
 
     /**
      * Equip the right hand.
-     * 
+     *
      * @param int $slotId | 1
      * @return InventoryManagement
      */
@@ -62,14 +62,14 @@ class InventoryManagement {
 
     /**
      * Equip the Spell slot
-     * 
+     *
      * Accepted: spell-one, spell-two
-     * 
+     *
      * @param int $slotId | 1
      * @param string $position | spell-one, spell-two
      * @return InventoryManagement
      */
-    public function equipSpellSlot(int $slotId = 1, string $position = 'spell-one'): InventoryManagement {
+    public function equipSpellSlot(string $position = 'spell-one', int $slotId = 1): InventoryManagement {
         $slot = $this->fetchSlot($slotId);
 
         $slot->update([
@@ -84,12 +84,12 @@ class InventoryManagement {
 
     /**
      * Equip an artifact.
-     * 
+     *
      * @param int $slotId
      * @param string $position | artifact-one, artifact-two
      * @return InventoryManagement
      */
-    public function equipArtifact(int $slotId = 1, string $position = 'artifact-one'): InventoryManagement {
+    public function equipArtifact(string $position = 'artifact-one', int $slotId = 1): InventoryManagement {
         $slot = $this->fetchSlot($slotId);
 
         $slot->update([
@@ -104,12 +104,12 @@ class InventoryManagement {
 
     /**
      * Equip an item.
-     * 
+     *
      * @param int $slotId | 1
      * @param string $position
      * @return InventoryManagement
      */
-    public function equipItem(int $slotId = 1, string $position): InventoryManagement {
+    public function equipItem(string $position, int $slotId = 1): InventoryManagement {
         $slot = $this->fetchSlot($slotId);
 
         $slot->update([
@@ -124,9 +124,9 @@ class InventoryManagement {
 
     /**
      * Give item to the character.
-     * 
+     *
      * Ignores the inventory max limit.
-     * 
+     *
      * @param Item $item
      * @return InventoryManagement
      */
@@ -143,7 +143,7 @@ class InventoryManagement {
 
     /**
      * Unequip all items.
-     * 
+     *
      * @return InventoryManagement
      */
     public function unequipAll(): InventoryManagement {
@@ -161,7 +161,7 @@ class InventoryManagement {
 
     /**
      * Get the character factory.
-     * 
+     *
      * @return CharacterFactory
      */
     public function getCharacterFactory(): CharacterFactory {
@@ -170,7 +170,7 @@ class InventoryManagement {
 
     /**
      * Get the character back.
-     * 
+     *
      * @return Character
      */
     public function getCharacter(): Character {
@@ -181,13 +181,13 @@ class InventoryManagement {
         $foundMatching = $this->character->inventory->slots->filter(function($slot) use($slotId) {
             return $slot->id === $slotId && !$slot->equipped;
          })->first();
- 
+
          if (is_null($foundMatching)) {
              throw new \Exception('Item is not in inventory or is already equipped');
          }
- 
+
          $slot = $this->character->inventory->slots->find($slotId);
- 
+
          if (is_null($slot)) {
              throw new \Exception('Slot is not found, did you give the item to the player?');
          }

@@ -50,14 +50,14 @@ class ItemComparisonTest extends TestCase
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);
-        
+
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                ->inventoryManagement()
                                                ->giveItem($itemForCharacter)
                                                ->equipLeftHand()
                                                ->getCharacterFactory();
     }
-    
+
 
     public function testFetchComparisonIsEmpty()
     {
@@ -73,7 +73,7 @@ class ItemComparisonTest extends TestCase
         $itemComparison  = new ItemComparison();
         $character = $this->character->getCharacter();
         $comparisonDetails = $itemComparison->fetchDetails($this->item, $character->inventory->slots);
- 
+
         $this->assertFalse(empty($comparisonDetails));
 
         $this->assertTrue($comparisonDetails['left-hand']['is_better']);
@@ -92,7 +92,7 @@ class ItemComparisonTest extends TestCase
         $character = $this->character->getCharacter();
 
         $comparisonDetails = $itemComparison->fetchDetails($this->item, $character->inventory->slots);
- 
+
         $this->assertFalse(empty($comparisonDetails));
 
         $this->assertTrue($comparisonDetails['left-hand']['is_better']);
@@ -109,9 +109,9 @@ class ItemComparisonTest extends TestCase
                           ->unequipAll()
                           ->giveItem($this->item)
                           ->getCharacterFactory();
-        
-        
-        $character = $character->inventoryManagement()->equipItem(2, 'left-hand')->getCharacter();
+
+
+        $character = $character->inventoryManagement()->equipItem( 'left-hand', 2)->getCharacter();
 
         $downGradedItem = $character->inventory->slots->first()->item;
 
@@ -160,9 +160,9 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem(2, 'hands')
+                                     ->equipItem('hands', 2)
                                      ->getCharacter();
-        
+
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', $itemToEquip->default_position)->get();
 
         $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
@@ -192,7 +192,7 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem(2, 'hands')
+                                     ->equipItem('hands', 2)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', $itemToEquip->default_position)->get();
@@ -222,9 +222,9 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem(2, 'spell_one')
+                                     ->equipItem('spell_one', 2)
                                      ->getCharacter();
-                        
+
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', 'spell_one')->get();
 
         $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
@@ -252,7 +252,7 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem(2, 'spell_one')
+                                     ->equipItem('spell_one', 2)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', 'spell_one')->get();
@@ -284,7 +284,7 @@ class ItemComparisonTest extends TestCase
 
         $character = $this->character->InventoryManagement()
                                      ->giveitem($itemToEquip)
-                                     ->equipItem(2, 'spell_one')
+                                     ->equipItem('spell_one', 2)
                                      ->getCharacter();
 
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', 'spell_one')->get();
@@ -311,7 +311,7 @@ class ItemComparisonTest extends TestCase
         $inventory = $character->inventory->slots()->where('equipped', true)->where('position', $itemForComparison->default_position)->get();
 
         $comparison = $itemComparison->fetchDetails($itemForComparison, $inventory);
-        
+
         $this->assertTrue(empty($comparison));
     }
 }
