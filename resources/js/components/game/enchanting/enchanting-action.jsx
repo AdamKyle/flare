@@ -27,6 +27,7 @@ export default class EnchantingAction extends React.Component {
     }
 
     this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
+    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -44,6 +45,10 @@ export default class EnchantingAction extends React.Component {
       }, () => {
         this.props.updateCanCraft(event.canCraft);
       });
+    });
+
+    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
+      this.setState({gold: event.characterSheet.gold});
     });
 
     axios.get('/api/enchanting/' + this.props.characterId).then((result) => {
