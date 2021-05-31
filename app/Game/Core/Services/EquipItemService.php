@@ -7,7 +7,8 @@ use League\Fractal\Manager;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\Resource\Item;
+use League\Fractal\Resource\Item as ResourceItem;
+use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -104,7 +105,7 @@ class EquipItemService {
 
         event(new UpdateTopBarEvent($character));
 
-        $characterData = new Item($character, $this->characterTransformer);
+        $characterData = new ResourceItem($character, $this->characterTransformer);
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         return $characterSlot->item;
