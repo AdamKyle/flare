@@ -311,8 +311,10 @@ class AdventureService {
 
             $cleanItems = [];
 
-            foreach(array_merge($this->rewards['items'], $rewards['items'])['items'] as $item) {
-                $cleanItems[] = $item;
+            foreach(array_merge($this->rewards['items'], $rewards['items']) as $item) {
+                if (empty($cleanItems)) {
+                    $cleanItems[] = $item;
+                }
 
                 foreach ($cleanItems as $cleanItem) {
                     if ($cleanItem['id'] !== $item['id']) {
@@ -322,8 +324,6 @@ class AdventureService {
             }
 
             $rewards['items'] = $cleanItems;
-
-            dump($rewards);
 
             $adventureLog->update([
                 'logs'    => $logs,
