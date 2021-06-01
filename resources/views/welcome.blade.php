@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center lg-padding">
+        <div class="row justify-content-center">
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6">
                     <div class="card game-feature-card">
@@ -153,16 +153,62 @@
                     <div class="card game-feature-card">
                         <div class="card-body">
                             <div class="game-feature-icon">
-                                <i class="ra ra-scroll-unfurled"></i>
+                                <i class="ra  ra-wooden-sign "></i>
                             </div>
                             <div class="game-feature">
                                 <h5>
-                                    <a href="#">Quest items!</a>
+                                    <a href="{{route('info.page', [
+                                        'pageName' => 'market-board',
+                                    ])}}">Market Board</a>
                                 </h5>
-                                <p>Quest items let you travel on water and so much more! They are even easy to complete!</p>
+                                <p>Buy and sell from the market board. Craft and Enchant items for others and make a profit!</p>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center lg-padding">
+            <div class="col-xl-7 col-lg-8">
+                <div class="snippit-section">
+                    <h2 class="text-center">
+                        <i class="far fa-question-circle"></i>
+                        FAQ
+                    </h2>
+
+                    <dl class="mt-3">
+                        <dt>Are There Cash Shops?</dt>
+                        <dd>
+                            No, and there never will be. You cannot buy anything in this game, no weapons, gear, armor,
+                            advantages, nothing. You want it, you will earn it.
+                        </dd>
+                        <dt>Are there Adds?</dt>
+                        <dd>
+                            No. There are no adds what so ever.
+                        </dd>
+                        <dt>Is it persistent?</dt>
+                        <dd>
+                            Yes. You can log out if you are in the middle of an adventure or are launching an attack
+                            on another kingdom. Assuming you have the right settings enabled, you will be
+                            emailed when the action is finished.
+                        </dd>
+                        <dt>Is it idle?</dt>
+                        <dd>
+                            No and yes. The majority of the game is not idle based, but aspects such as managing
+                            your kingdom, or going on adventures are considered idle. Adventures can range from 10-60 minutes
+                            in length and disable you from doing pretty much anything. You can log out and be emailed, when it's done.
+                            Kingdoms are also idle based in the fact that it takes time to recruit, build and attack.
+                        </dd>
+                        <dt>Does it use energy systems?</dt>
+                        <dd>
+                            No. Tlessa uses what's called: Time Gates. These apply to actions you do and time you out
+                            from doing that action again for a matter of seconds or minutes. However, the goal of Tlessa is
+                            not to keep you engaged, so for example you could: Fight, Craft, Move and then wait for their respective timers
+                            to end before doing the same thing. In the aforementioned example: Killing a monster gates you a 10 second time
+                            out before being able to kill the monster again, but being killed by said monster, gives you a 20 second time out before being able
+                            to revive.
+                        </dd>
+                    </dl>
                 </div>
             </div>
         </div>

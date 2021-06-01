@@ -308,7 +308,22 @@ class AdventureService {
 
             $rewards['exp']  += $this->rewards['exp'];
             $rewards['gold'] += $this->rewards['gold'];
-            $rewards['items'] = array_merge($this->rewards['items'], $rewards['items']);
+
+            $cleanItems = [];
+
+            foreach(array_merge($this->rewards['items'], $rewards['items'])['items'] as $item) {
+                $cleanItems[] = $item;
+
+                foreach ($cleanItems as $cleanItem) {
+                    if ($cleanItem['id'] !== $item['id']) {
+                        $cleanItems[] = $item;
+                    }
+                }
+            }
+
+            $rewards['items'] = $cleanItems;
+
+            dump($rewards);
 
             $adventureLog->update([
                 'logs'    => $logs,

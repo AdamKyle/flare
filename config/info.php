@@ -8,7 +8,6 @@ return [
     'home'              => [],
     'character-stats'   => [],
     'movement'          => [],
-    'kingdoms'          => [],
     'time-gates'        => [],
     'rules'             => [],
     'map'               => [],
@@ -18,6 +17,14 @@ return [
     'equipment'         => [],
     'traverse'          => [],
     'teleport'          => [],
+    'kingdoms'          => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.kingdoms.units.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ],
+    ],
     'locations'         => [
         [
             'livewire'            => true,
