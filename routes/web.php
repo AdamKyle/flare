@@ -15,7 +15,7 @@ Route::get('/', function () {
     if (!Auth::check()) {
         return view('welcome');
     }
-    
+
     if (auth()->user()->hasRole('Admin')) {
         return redirect()->route('home');
     }
@@ -28,6 +28,11 @@ Route::get('/information/race/{race}', ['as' => 'info.page.race', 'uses' => 'Inf
 Route::get('/information/class/{class}', ['as' => 'info.page.class', 'uses' => 'InfoPageController@viewClass']);
 Route::get('/information/skill/{skill}', ['as' => 'info.page.skill', 'uses' => 'InfoPageController@viewSkill']);
 Route::get('/information/adventure/{adventure}', ['as' => 'info.page.adventure', 'uses' => 'InfoPageController@viewAdventure']);
+Route::get('/information/monster/{monster}', ['as' => 'info.page.monster', 'uses' => 'InfoPageController@viewMonster']);
+Route::get('/information/locations/{location}', ['as' => 'info.page.location', 'uses' => 'InfoPageController@viewLocation']);
+Route::get('/information/unit/{unit}', ['as' => 'info.page.unit', 'uses' => 'InfoPageController@viewUnit']);
+Route::get('/information/item/{item}', ['as' => 'info.page.item', 'uses' => 'InfoPageController@viewItem']);
+Route::get('/information/affix/{affix}', ['as' => 'info.page.affix', 'uses' => 'InfoPageController@viewAffix']);
 
 Route::get('/releases', ['as' => 'releases.list', 'uses' => 'ReleasesController@index']);
 

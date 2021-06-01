@@ -133,9 +133,35 @@
                                     <input type="checkbox" wire:model="selected" value="{{$item->id}}"/>
                                 </td>
                             @endguest
-                            <td><a href="{{route('items.item', [
-                                    'item' => $item->id
-                                ])}}"><x-item-display-color :item="$item" /></a></td>
+                            @guest
+                                <td>
+                                    <a href="{{route('info.page.item', [
+                                        'item' => $item->id
+                                    ])}}">
+                                        <x-item-display-color :item="$item" />
+                                    </a>
+                                </td>
+                            @else
+                                @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
+                                        <td>
+                                            <a href="{{route('info.page.item', [
+                                                'item' => $item->id
+                                            ])}}">
+                                                <x-item-display-color :item="$item" />
+                                            </a>
+                                        </td>
+                                @else
+                                    <td>
+                                        <a href="{{route('items.item', [
+                                            'item' => $item->id
+                                        ])}}">
+                                            <x-item-display-color :item="$item" />
+                                        </a>
+                                    </td>
+                                @endif
+                            @endguest
+
+
                             <td>{{$item->type}}</td>
                             <td>{{is_null($item->base_damage) ? 'N/A' : $item->base_damage}}</td>
                             <td>{{is_null($item->base_ac) ? 'N/A' : $item->base_ac}}</td>

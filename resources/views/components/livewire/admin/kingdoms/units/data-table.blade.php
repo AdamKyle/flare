@@ -114,8 +114,8 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="{{route('game.units.unit', [
-                                                'gameUnit' => $unit->id
+                                        <a href="{{route('info.page.unit', [
+                                                'unit' => $unit->id
                                             ])}}">{{$unit->name}}</a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
@@ -123,8 +123,8 @@
                                                 'gameUnit' => $unit->id
                                             ])}}">{{$unit->name}}</a>
                                         @else
-                                            <a href="{{route('game.units.unit', [
-                                                'gameUnit' => $unit->id
+                                            <a href="{{route('info.page.unit', [
+                                                'unit' => $unit->id
                                             ])}}">{{$unit->name}}</a>
                                         @endif
                                     @endguest

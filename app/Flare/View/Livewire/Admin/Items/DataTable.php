@@ -41,13 +41,15 @@ class DataTable extends Component
             return $items->orderBy($this->sortField, $this->sortBy);
         }
 
-        if (auth()->user()->hasRole('Admin')) {
-            if (!is_null($this->affixId)) {
-                $items = $items->where('item_suffix_id', $this->affixId)
-                               ->orWhere('item_prefix_id', $this->affixId);
-            }
+        if (auth()->user()) {
+            if (auth()->user()->hasRole('Admin')) {
+                if (!is_null($this->affixId)) {
+                    $items = $items->where('item_suffix_id', $this->affixId)
+                        ->orWhere('item_prefix_id', $this->affixId);
+                }
 
-            return $items->orderBy($this->sortField, $this->sortBy);
+                return $items->orderBy($this->sortField, $this->sortBy);
+            }
         }
 
         return $items->where('type', '!=', 'quest')

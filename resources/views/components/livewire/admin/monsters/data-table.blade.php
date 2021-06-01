@@ -83,7 +83,7 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="{{route('game.monsters.monster', [
+                                        <a href="{{route('info.page.monster', [
                                                 'monster' => $monster->id
                                             ])}}">{{$monster->name}}
                                         </a>
@@ -93,9 +93,15 @@
                                                 'monster' => $monster->id
                                             ])}}">{{$monster->name}}</a>
                                         @else
-                                            <a href="{{route('game.monsters.monster', [
-                                                'monster' => $monster->id
-                                            ])}}">{{$monster->name}}</a>
+                                            @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
+                                                <a href="{{route('info.page.monster', [
+                                                    'monster' => $monster->id
+                                                ])}}">{{$monster->name}}</a>
+                                            @else
+                                                <a href="{{route('game.monsters.monster', [
+                                                    'monster' => $monster->id
+                                                ])}}">{{$monster->name}}</a>
+                                            @endif
                                         @endif
                                     @endguest
                                 </td>

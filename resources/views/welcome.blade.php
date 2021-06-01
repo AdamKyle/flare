@@ -13,7 +13,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row justify-content-center mb-2 mt-2">
             <div class="col-lg-12">
                 <img src="{{asset('promotion/game.png')}}" class="w-100" />
@@ -41,8 +41,8 @@
                                 <div class="game-feature">
                                     <h5>
                                         <a href="{{route('info.page', [
-                                            'pageName' => 'character-information'
-                                        ])}}">Customize your character!</a>
+                                            'pageName' => 'equipment'
+                                        ])}}">Equip your character!</a>
                                     </h5>
                                     <p>Buy/sell weapons, armor, rings, artifacts and more and out fit your character for the road ahead. Who knows what beasties you might find!</p>
                                 </div>
@@ -53,13 +53,15 @@
                         <div class="card game-feature-card">
                             <div class="card-body">
                                 <div class="game-feature-icon">
-                                    <i class="ra ra-battered-axe"></i>
+                                    <i class="ra ra-player-king "></i>
                                 </div>
                                 <div class="game-feature">
                                     <h5>
-                                        <a href="#">Find powerful items!</a>
+                                        <a href="{{route('info.page', [
+                                            'pageName' => 'kingdoms'
+                                        ])}}">Rule Kingdoms</a>
                                     </h5>
-                                    <p>Fighting monsters and going on adventures have a chance to reward you with powerful items that can help you the road!</p>
+                                    <p>In a game where there are no resets, can your kingdom survive? Or will it be taken by those more powerful?</p>
                                 </div>
                             </div>
                         </div>
@@ -90,10 +92,10 @@
                     <a href="{{route('info.page', [
                         'pageName' => 'map',
                     ])}}" class="btn btn-primary map-btn">Learn more</a>
-                </div> 
+                </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <img src="{{asset('promotion/map.png')}}" class="w-100 move-image-down" />
-                </div> 
+                </div>
             </div>
         </div>
 
@@ -140,7 +142,7 @@
                                 <h5>
                                     <a href="{{route('info.page', [
                                         'pageName' => 'enchanting',
-                                    ])}}">Enchanting is even easier</a>
+                                    ])}}">Enchant Gear!</a>
                                 </h5>
                                 <p>All you need is to destroy an item with an affix on it for the recipe! How easy is that!</p>
                             </div>
@@ -155,7 +157,7 @@
                             </div>
                             <div class="game-feature">
                                 <h5>
-                                    <a href="#">Quest items</a>
+                                    <a href="#">Quest items!</a>
                                 </h5>
                                 <p>Quest items let you travel on water and so much more! They are even easy to complete!</p>
                             </div>

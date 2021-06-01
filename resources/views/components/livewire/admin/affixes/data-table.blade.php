@@ -77,7 +77,7 @@
                         @foreach($itemAffixes as $itemAffix)
                             <tr>
                                 @guest
-                                    <td><a href="{{route('game.affixes.affix', [
+                                    <td><a href="{{route('info.page.affix', [
                                     'affix' => $itemAffix->id
                                     ])}}">{{$itemAffix->name}}</a></td>
                                 @elseif (auth()->user()->hasRole('Admin'))
@@ -85,9 +85,17 @@
                                         'affix' => $itemAffix->id
                                     ])}}">{{$itemAffix->name}}</a></td>
                                 @else
-                                    <td><a href="{{route('game.affixes.affix', [
-                                    'affix' => $itemAffix->id
-                                    ])}}">{{$itemAffix->name}}</a></td>
+                                    @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
+                                        <td><a href="{{route('info.page.affix', [
+                                            'affix' => $itemAffix->id
+                                        ])}}">{{$itemAffix->name}}</a></td>
+                                    @else
+                                        <td><a href="{{route('game.affixes.affix', [
+                                            'affix' => $itemAffix->id
+                                        ])}}">{{$itemAffix->name}}</a></td>
+                                    @endif
+
+
                                 @endguest
                                 <td>{{$itemAffix->type}}</td>
                                 <td>{{is_null($itemAffix->base_damage_mod) ? 'N/A' : ($itemAffix->base_damage_mod * 100) . '%'}}</td>

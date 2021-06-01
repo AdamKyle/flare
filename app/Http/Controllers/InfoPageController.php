@@ -3,9 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Flare\Models\Adventure;
+use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
 use Cache;
 use Illuminate\Http\Request;
 use Storage;
@@ -87,6 +93,46 @@ class InfoPageController extends Controller
 
         return view('information.adventures.adventure', [
             'adventure' => $adventure,
+        ]);
+    }
+
+    public function viewMonster(Request $request, Monster $monster) {
+        return view('information.monsters.monster', [
+            'monster' => $monster,
+        ]);
+    }
+
+    public function viewLocation(Request $request, Location $location) {
+        return view('information.locations.location', [
+            'location' => $location
+        ]);
+    }
+
+    public function viewUnit(Request $request, GameUnit $unit) {
+        $belongsToKingdomBuilding = GameBuildingUnit::where('game_unit_id', $unit->id)->first();
+
+        if (!is_null($belongsToKingdomBuilding)) {
+            $belongsToKingdomBuilding = $belongsToKingdomBuilding->gameBuilding;
+        }
+
+        return view('information.units.unit', [
+            'unit'          => $unit,
+            'building'      => $belongsToKingdomBuilding,
+            'requiredLevel' => GameBuildingUnit::where('game_building_id', $belongsToKingdomBuilding->id)
+                                               ->where('game_unit_id', $unit->id)
+                                               ->first()->required_level
+        ]);
+    }
+
+    public function viewItem(Request $request, Item $item) {
+        return view('information.items.item', [
+            'item' => $item
+        ]);
+    }
+
+    public function viewAffix(Request $request, ItemAffix $affix) {
+        return view('information.affixes.affix', [
+            'itemAffix' => $affix
         ]);
     }
 

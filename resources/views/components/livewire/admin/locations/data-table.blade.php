@@ -8,33 +8,33 @@
                 </div>
                 <x-data-tables.table :collection="$locations">
                     <x-data-tables.header>
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('name')" 
-                            header-text="Name" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('name')"
+                            header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="name"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('game_maps.name')" 
-                            header-text="Map" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('game_maps.name')"
+                            header-text="Map"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="game_maps.name"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('x')" 
-                            header-text="X Coordinate" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('x')"
+                            header-text="X Coordinate"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="x"
                         />
 
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('y')" 
-                            header-text="Y Coordinate" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('y')"
+                            header-text="Y Coordinate"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="y"
@@ -45,19 +45,27 @@
                             <tr>
                                 <td>
                                     @guest
-                                        {{$location->name}}
+                                        <a href="{{route('info.page.location', [
+                                                'location' => $location->id
+                                            ])}}">{{$location->name}}</a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
                                             <a href="{{route('locations.location', [
                                                 'location' => $location->id
                                             ])}}">{{$location->name}}</a>
                                         @else
-                                            <a href="{{route('game.locations.location', [
-                                                'location' => $location->id
-                                            ])}}">{{$location->name}}</a>
+                                            @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
+                                                <a href="{{route('info.page.location', [
+                                                    'location' => $location->id
+                                                ])}}">{{$location->name}}</a>
+                                            @else
+                                                <a href="{{route('game.locations.location', [
+                                                    'location' => $location->id
+                                                ])}}">{{$location->name}}</a>
+                                            @endif
                                         @endif
                                     @endguest
-                                   
+
                                 </td>
                                 <td>{{$location->map->name}}</td>
                                 <td>{{$location->x}}</td>

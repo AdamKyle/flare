@@ -70,7 +70,7 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="{{route('game.adventures.adventure', [
+                                        <a href="{{route('info.page.adventure', [
                                             'adventure' => $adventure->id
                                         ])}}">{{$adventure->name}}</a>
                                     @else
@@ -79,7 +79,7 @@
                                                 'adventure' => $adventure->id
                                             ])}}">{{$adventure->name}}</a>
                                         @else
-                                            <a href="{{route('game.adventures.adventure', [
+                                            <a href="{{route('info.page.adventure', [
                                                 'adventure' => $adventure->id
                                             ])}}">{{$adventure->name}}</a>
                                         @endif

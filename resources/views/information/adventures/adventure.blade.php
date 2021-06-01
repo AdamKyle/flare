@@ -1,12 +1,14 @@
 @extends('layouts.information', [
-    'pageTitle' => 'adventure'
+    'pageTitle' => 'Adventure'
 ])
 
 @section('content')
-    <div class="mt-5">
-        @include('admin.adventures.adventure', [
+    <div class="mt-3">
+        @include('admin.adventures.partials.adventure', [
             'adventure' => $adventure,
-            'customClass' => 'mt-5'
+            'customUrl' => route('info.page', [
+                'pageName' => 'adventure'
+            ]),
         ])
     </div>
 @endsection

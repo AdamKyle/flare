@@ -1,8 +1,8 @@
 
 <x-cards.card-with-title title="Attributes">
     <div class="alert alert-info mb-3 mt-2">
-        Please note, these values repersent the recruitment of one unit. These values are then
-        multipled by the amount of units you want to recruit or move (Travel Time)
+        <strong>Please note</strong>, these values represent the recruitment of one unit. These values are then
+        multiplied by the amount of units you want to recruit. Movement time is for total units of this type.
     </div>
     <p class="mb-3 mt-3">{{$unit->description}}</p>
     @if (!is_null($building))

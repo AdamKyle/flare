@@ -1,5 +1,5 @@
 @extends('layouts.information', [
-    'pageTitle' => 'character-information'
+    'pageTitle' => 'Race'
 ])
 
 @section('content')

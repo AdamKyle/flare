@@ -1,5 +1,5 @@
 @extends('layouts.information', [
-    'pageTitle' => 'character-information'
+    'pageTitle' => 'Class'
 ])
 
 @section('content')
@@ -12,7 +12,7 @@
                 <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
             </div>
         </div>
-    
+
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card">
