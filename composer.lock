@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cdebc02d3409d4c96cd80cbaf2eb394d",
+    "content-hash": "7e65e2f735e0c01dc6178b262493f6b7",
     "packages": [
         {
             "name": "asahasrabuddhe/laravel-mjml",
@@ -12880,7 +12880,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2"
+        "php": ">=8.0.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"
