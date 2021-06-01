@@ -84,7 +84,7 @@ return [
         /*
          * Here you can specify the interval in seconds at which statistics should be logged.
          */
-        'interval_in_seconds' => 60,
+        'interval_in_seconds' => 259200,
 
         /*
          * When the clean-command is executed, all recorded statistics older than

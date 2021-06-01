@@ -87,7 +87,7 @@
         <div class="row">
             @include('game.character.partials.equipment.sections.equip.details.stat-details', ['details' => $details, 'hasDefaultPosition' => false])
 
-            @if (count(array_keys($details)) < 2 && is_null($item->default_position))
+            @if (count(array_keys($details)) < 2 && $item->crafting_type !== 'armour')
                 <div class="col-md-6 mt-4">
                     <p>If Equipped As Second Item:</p>
                     @include('game.character.partials.equipment.sections.equip.details.item-stat-details', ['item' => $item])
