@@ -1,5 +1,10 @@
 # Kingdoms
 
+> ### ATTN!
+>
+> Pay attention to chat if you are logged in, as that's where all the server messages for your kingdom upgrades will show up.
+> If you are not logged in, you will get an email - assuming you have those settings turned on.
+
 One of the key aspects of Planes of Tlessa is to allow you to settle kingdoms. Kingdoms in Tlessa work differently than other kingdom management games you might have played or are used to. With some similarities but my own spin on it.
 
 Borrowing the idea of settling kingdoms from [racewarkingdoms](), I have made some changes to way they work here.

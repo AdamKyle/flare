@@ -52,6 +52,8 @@ export default class Attack {
           message: defender.name + ' blocked the attack!'
         });
 
+        this.missed += 1;
+
         if (attackAgain) {
           return this.attack(defender, attacker, false, 'monster');
         }
