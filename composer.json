@@ -25,6 +25,7 @@
         "laravel/helpers": "^1.2",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
+        "laravel/telescope": "^4.0",
         "league/fractal": "^0.18.0",
         "livewire/livewire": "^2.2",
         "maatwebsite/excel": "^3.1",
@@ -39,7 +40,6 @@
         "facade/ignition": "^2.3.6",
         "fzaninotto/faker": "dev-master",
         "laravel/browser-kit-testing": "^6.1.0",
-        "laravel/telescope": "^4.0",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
         "php-vcr/php-vcr": "^1.5",
@@ -53,9 +53,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-                "laravel/telescope"
-            ]
+            "dont-discover": []
         }
     },
     "autoload": {
