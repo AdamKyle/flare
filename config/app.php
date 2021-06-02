@@ -178,6 +178,8 @@ return [
         App\Providers\TelescopeServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        Laravel\Telescope\TelescopeApplicationServiceProvider::class,
+
         /**
          * Flare Related
          */

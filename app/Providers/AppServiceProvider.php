@@ -26,7 +26,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
         $this->app->register(\App\Providers\TelescopeServiceProvider::class);
-        $this->app->register(Laravel\Telescope\TelescopeApplicationServiceProvider::class);
 
         Paginator::useBootstrap();
     }
