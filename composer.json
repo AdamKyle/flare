@@ -25,7 +25,6 @@
         "laravel/helpers": "^1.2",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.0",
-        "laravel/telescope": "^4.0",
         "league/fractal": "^0.18.0",
         "livewire/livewire": "^2.2",
         "maatwebsite/excel": "^3.1",
@@ -78,8 +77,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
-            "@php artisan vendor:publish --force --tag=livewire:assets --ansi",
-            "@php artisan telescope:publish --ansi"
+            "@php artisan vendor:publish --force --tag=livewire:assets --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

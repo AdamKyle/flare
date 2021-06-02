@@ -102,15 +102,6 @@ This game, for the admin section at the time of this writing, requires a way to 
 
 For example, you can read [here](https://medium.com/@agavitalis/how-to-send-an-email-in-laravel-using-gmail-smtp-server-53d962f01a0c) about setting up gmail with laravel.
 
-## Telescope for development
-
-I use Laravel Telescope to monitor jobs and queues as well as a few other things when developing to 
-help make sure things are working smoothly.
-
-You can enable this in the env file when you are developing.
-
-If you make changes to a job or event, make sure to restart not just the queue, but the web sockets as well.
-
 ## Testing
 
 - `composer phpunit` this will also generate code coverage report.

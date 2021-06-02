@@ -58,8 +58,6 @@ class Kernel extends ConsoleKernel {
 
         // clean the adventure logs every week on monday at 2 am.
         $schedule->command('clean:adventure-logs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
-
-        $schedule->command('telescope:clear')->dailyAt('2:00')->timezone(config('app.timezone'));
     }
 
     /**
