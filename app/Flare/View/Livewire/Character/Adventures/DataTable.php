@@ -17,7 +17,7 @@ class DataTable extends Component
 
     public $search             = '';
 
-    public $sortField          = 'items.type';
+    public $sortField          = 'items.name';
 
     public $perPage            = 10;
 

@@ -21,8 +21,6 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'password',
-        'game_key',
-        'private_game_key',
         'message_throttle_count',
         'can_speak_again_at',
         'is_silenced',

@@ -80,17 +80,13 @@ class RegisterController extends Controller
             throw new \Exception('You have been banned until: ' . $until);
         }
 
-        if (User::where('ip_address', $ip)->count() >= 10) {
+        if (User::where('ip_address', $ip)->count() >= 1) {
             throw new \Exception('You cannot register anymore characters.');
         }
-        
-        $token = Str::random(80);
 
         return User::create([
             'email'            => $data['email'],
             'password'         => Hash::make($data['password']),
-            'game_key'         => hash('sha256', $token),
-            'private_game_key' => $token,
             'ip_address'       => $ip,
         ]);
     }
@@ -146,7 +142,7 @@ class RegisterController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        $user = $this->createSecurityQuestions($request, $user);        
+        $user = $this->createSecurityQuestions($request, $user);
 
         event(new Registered($user));
 

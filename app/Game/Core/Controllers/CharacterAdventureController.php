@@ -105,6 +105,10 @@ class CharacterAdventureController extends Controller {
     }
 
     public function delete(AdventureLog $adventureLog) {
+        if ($adventureLog->in_progress) {
+            return redirect()->back()->with('error', 'Cannot delete log currently in progress.');
+        }
+
         $adventureLog->delete();
 
         return redirect()->route('game.completed.adventures')->with('success', 'Log deleted.');
@@ -118,9 +122,11 @@ class CharacterAdventureController extends Controller {
         }
 
         foreach ($logs as $log) {
-            $log->delete();
+            if (!$log->in_progress) {
+                $log->delete();
+            }
         }
 
-        return redirect()->route('game.completed.adventures')->with('success', 'Selected logs have been deleted.');
+        return redirect()->route('game.completed.adventures')->with('success', 'Selected logs have been deleted, with the exception of currently running adventure logs.');
     }
 }

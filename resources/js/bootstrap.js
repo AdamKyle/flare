@@ -24,12 +24,10 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-let apiToken = document.head.querySelector('meta[name="game_key"]');
 let token = document.head.querySelector('meta[name="csrf-token"]');
 
 axios.interceptors.request.use(function (config) {
   config.headers = {
-    Authorization: 'Bearer ' + apiToken.content,
     Accept: 'application/json',
     'X-CSRF-TOKEN': token.content,
     'X-Requested-With': 'XMLHttpRequest'
@@ -55,7 +53,7 @@ window.Echo = new Echo({
   key: process.env.MIX_PUSHER_APP_KEY,
   wsHost: window.location.hostname,
   wsPort: 6001,
-  wssPort: 6001,
+  wssPort: 443,
   disableStats: true,
   enabledTransports: ['ws', 'wss'],
   namespace: 'App',

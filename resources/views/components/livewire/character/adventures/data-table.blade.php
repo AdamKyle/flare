@@ -80,9 +80,13 @@
                                 <input type="checkbox" wire:model="selected" value="{{$log->id}}"/>
                             </td>
                             <td>
-                                <a href="{{route('game.completed.adventure', [
+                                @if ($log->in_progress)
+                                    {{$log->adventure->name}} <em>(Currently in progress)</em>
+                                @else
+                                    <a href="{{route('game.completed.adventure', [
                                         'adventureLog' => $log
                                     ])}}">{{$log->adventure->name}}</a>
+                                @endif
                             </td>
                             <td>{{$log->complete ? 'Yes' : 'No'}}</td>
                             <td>{{$log->last_completed_level}}</td>

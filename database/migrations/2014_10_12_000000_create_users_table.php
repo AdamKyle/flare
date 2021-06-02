@@ -18,8 +18,6 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('game_key')->unique()->nullable()->default(null);
-            $table->string('private_game_key')->unique()->nullable()->default(null);
             $table->integer('message_throttle_count')->nullable()->default(0);
             $table->dateTime('can_speak_again_at')->nullable();
             $table->boolean('is_silenced')->default(false);
