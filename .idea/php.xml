@@ -183,6 +183,7 @@
       <path value="$PROJECT_DIR$/vendor/deployer/deployer" />
       <path value="$PROJECT_DIR$/vendor/marcj/topsort" />
       <path value="$PROJECT_DIR$/vendor/laravel/telescope" />
+      <path value="$PROJECT_DIR$/vendor/laravel/horizon" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.0">
