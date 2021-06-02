@@ -32,7 +32,7 @@ class AdventureFightService {
 
     /**
      * Constructor
-     * 
+     *
      * @param Character $character
      * @param Adventure $adventure
      * @return void
@@ -40,7 +40,7 @@ class AdventureFightService {
     public function __construct(Character $character, Adventure $adventure) {
 
         $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-        
+
         $this->character     = $character;
         $this->adventure     = $adventure;
 
@@ -49,7 +49,7 @@ class AdventureFightService {
 
     /**
      * Process the battle
-     * 
+     *
      * @return void
      */
     public function processBattle(): FightService {
@@ -62,7 +62,6 @@ class AdventureFightService {
             'character' => $this->character,
             'monster'   => $this->monster,
         ]);
-        
 
         $fightService->attack($this->character, $this->monster);
 

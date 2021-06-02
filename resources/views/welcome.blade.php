@@ -59,7 +59,7 @@
                                     <h5>
                                         <a href="{{route('info.page', [
                                             'pageName' => 'kingdoms'
-                                        ])}}">Rule Kingdoms</a>
+                                        ])}}">Rule Kingdoms!</a>
                                     </h5>
                                     <p>In a game where there are no resets, can your kingdom survive? Or will it be taken by those more powerful?</p>
                                 </div>
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center lg-padding">
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6">
                     <div class="card game-feature-card">
@@ -168,7 +168,7 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center lg-padding">
+        <div class="row justify-content-center" style="margin-bottom: 70px;">
             <div class="col-xl-7 col-lg-8">
                 <div class="snippit-section">
                     <h2 class="text-center">
@@ -201,12 +201,16 @@
                         </dd>
                         <dt>Does it use energy systems?</dt>
                         <dd>
-                            No. Tlessa uses what's called: Time Gates. These apply to actions you do and time you out
+                            No. Tlessa uses what's called: <a href="/information/time-gates">Time Gates</a>. These apply to actions you do and time you out
                             from doing that action again for a matter of seconds or minutes. However, the goal of Tlessa is
                             not to keep you engaged, so for example you could: Fight, Craft, Move and then wait for their respective timers
                             to end before doing the same thing. In the aforementioned example: Killing a monster gates you a 10 second time
                             out before being able to kill the monster again, but being killed by said monster, gives you a 20 second time out before being able
                             to revive.
+                        </dd>
+                        <dt>Are they're factions/guilds/clans?</dt>
+                        <dd>
+                            No. In Tlessa, it's every person for them selves. There is no guild or clan system in Tlessa.
                         </dd>
                     </dl>
                 </div>

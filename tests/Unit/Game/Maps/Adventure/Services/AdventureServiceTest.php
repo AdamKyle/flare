@@ -45,8 +45,7 @@ class AdventureServiceTest extends TestCase
     public function testProcessAdventureCharacterLives()
     {
         $adventure = $this->createNewAdventure();
-
-        $item = $this->createItem(['name' => 'Item Name']);
+        $item      = $this->createItem(['name' => 'Item Name']);
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                         ->updateCharacter(['can_move' => false])
@@ -104,7 +103,7 @@ class AdventureServiceTest extends TestCase
                                         ])
                                         ->getCharacter();
 
-        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+         $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
 
         for ($i = 1; $i <= $adventure->levels; $i++) {
             $adventureService->processAdventure($i, $adventure->levels);
@@ -163,6 +162,8 @@ class AdventureServiceTest extends TestCase
         for ($i = 1; $i <= $adventure->levels; $i++) {
             $adventureService->processAdventure($i, $adventure->levels);
         }
+
+        $this->assertTrue(true);
 
         $character = $character->refresh();
 

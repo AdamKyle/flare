@@ -41,10 +41,6 @@ class DataTable extends Component
         $slots = $character->inventory->slots()->join('items', function($join) {
             $join = $join->on('inventory_slots.item_id', '=', 'items.id');
 
-            if ($this->search !== '') {
-                $join->where('items.name', 'like', '%'.$this->search.'%');
-            }
-
             if (!$this->includeQuestItems) {
                 $join->where('items.type', '!=', 'quest');
             }
@@ -66,8 +62,15 @@ class DataTable extends Component
     }
 
     public function getDataProperty() {
+        $slots = $this->dataQuery->get();
 
-        return $this->dataQuery->paginate($this->perPage);
+        if ($this->search !== '') {
+            return collect($slots->filter(function ($slot) {
+                return str_contains($slot->item->affix_name, $this->search) || str_contains($slot->item->name, $this->search);
+            })->all())->paginate($this->perPage);
+        }
+
+        return $slots->paginate($this->perPage);
     }
 
     public function fetchSlots() {

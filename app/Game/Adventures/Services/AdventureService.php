@@ -147,6 +147,7 @@ class AdventureService {
         }
 
         if ($attackService->tooLong()) {
+
             if ($characterModeling) {
                 $this->setCharacterModelingLogs($attackService, false, true);
             }
@@ -309,19 +310,7 @@ class AdventureService {
             $rewards['exp']  += $this->rewards['exp'];
             $rewards['gold'] += $this->rewards['gold'];
 
-            $cleanItems = [];
-
-            foreach(array_merge($this->rewards['items'], $rewards['items']) as $item) {
-                if (empty($cleanItems)) {
-                    $cleanItems[] = $item;
-                }
-
-                foreach ($cleanItems as $cleanItem) {
-                    if ($cleanItem['id'] !== $item['id']) {
-                        $cleanItems[] = $item;
-                    }
-                }
-            }
+            $cleanItems = collect(array_merge($this->rewards['items'], $rewards['items']))->unique('id');
 
             $rewards['items'] = $cleanItems;
 
