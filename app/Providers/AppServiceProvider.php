@@ -24,9 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app->isLocal()) {
-            $this->app->register(TelescopeServiceProvider::class);
-        }
+        $this->app->register(TelescopeServiceProvider::class);
 
         Paginator::useBootstrap();
     }
