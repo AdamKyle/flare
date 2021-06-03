@@ -374,7 +374,7 @@ export default class EnchantingAction extends React.Component {
 
         <div className={"row mb-3 " + (!this.state.showSuccess ? 'hide' : '')}>
           <div className="col-md-10">
-            <div className="alert alert-success">You got new items to craft! Check the list.</div>
+            <div className="alert alert-success">You got new affixes to enchant! Check the lists.</div>
           </div>
         </div>
 
