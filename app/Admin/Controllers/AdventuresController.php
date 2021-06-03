@@ -27,7 +27,7 @@ class AdventuresController extends Controller {
             'adventure' => null,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::where('published', true)->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->orderBy('max_level', 'asc')->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -36,7 +36,7 @@ class AdventuresController extends Controller {
             'adventure' => $adventure,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::where('published', true)->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->orderBy('max_level', 'asc')->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -47,7 +47,7 @@ class AdventuresController extends Controller {
 
         $adventure->locations()->sync($request->location_ids);
         $adventure->monsters()->sync($request->monster_ids);
-        
+
         return redirect()->route('adventures.adventure', [
             'adventure' => $adventure->id
         ])->with('success', $adventure->name . ' updated!');
@@ -61,7 +61,7 @@ class AdventuresController extends Controller {
         $adventure->locations()->attach($request->location_ids);
 
         $adventure->monsters()->attach($request->monster_ids);
-        
+
         return redirect()->route('adventures.adventure', [
             'adventure' => $adventure->id
         ])->with('success', $adventure->name . ' created!');

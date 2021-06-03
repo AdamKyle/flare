@@ -17,7 +17,7 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
     public function handle($request, Closure $next, $guard = null)
     {
         if (auth()->user()->hasRole('Admin')) {
-            return $next($request);
+            return redirect()->route('home');
         }
 
         $character = $request->route('character');
