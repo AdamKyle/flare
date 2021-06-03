@@ -74,7 +74,7 @@ class CreateAdminAccount extends Command
         $token = app('Password')::getRepository()->create($user);
 
         // Mail the user their new credentials.
-        Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new GeneratedAdmin($user, $token));
+        Mail::to($user->email)->send((new GeneratedAdmin($user, $token)));
 
         return $this->info('User created successfully. Email has been sent.');
     }

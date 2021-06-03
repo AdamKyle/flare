@@ -56,7 +56,7 @@ class UpdateKingdom extends Command
                     if ($user->kingdoms_update_email && !UserOnlineValue::isOnline($user)) {
                         $kingdoms = $this->getKingdomEmailData(Cache::pull('kingdoms-updated-' . $user->id));
 
-                        Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new KingdomsUpdated($user, $kingdoms));
+                        Mail::to($user->email)->send((new KingdomsUpdated($user, $kingdoms)));
                     } else {
                         Cache::delete('kingdoms-updated-' . $user->id);
                     }

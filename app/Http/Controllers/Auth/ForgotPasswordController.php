@@ -78,7 +78,7 @@ class ForgotPasswordController extends Controller
 
         $token = app('Password')::getRepository()->create($user);
 
-        Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new ResetPassword($user, $token));
+        Mail::to($user->email)->send((new ResetPassword($user, $token)));
 
         Cache::delete($user->id . '-email');
 
