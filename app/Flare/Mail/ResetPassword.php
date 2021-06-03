@@ -42,7 +42,8 @@ class ResetPassword extends Mailable
      */
     public function build()
     {
-        return $this->subject('Password reset')
+        return $this->from(config('mail.username'), 'Please Of Tlessa')
+                    ->subject('Password reset')
                     ->view('flare.email.password_reset', [
                         'token' => $this->token,
                     ]);

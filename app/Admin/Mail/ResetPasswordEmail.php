@@ -32,7 +32,8 @@ class ResetPasswordEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Password Reset Requested')
+        return $this->from(config('mail.username'), 'Please Of Tlessa Admin')
+                    ->subject('Password Reset Requested')
                     ->mjml('admin.email.password_reset', [
                         'token' => $this->token,
                     ]);

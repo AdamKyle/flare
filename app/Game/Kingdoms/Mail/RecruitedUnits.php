@@ -50,7 +50,8 @@ class RecruitedUnits extends Mailable
      */
     public function build()
     {
-        return $this->subject('Upgraded Building')
+        return $this->from(config('mail.username'), 'Please Of Tlessa')
+                    ->subject('Upgraded Building')
                     ->mjml('game.core.kingdoms.mail.units_recruited', [
                         'user'    => $this->user,
                         'unit'    => $this->unit,

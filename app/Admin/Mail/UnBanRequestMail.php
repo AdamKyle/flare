@@ -34,7 +34,8 @@ class UnBanRequestMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('UnBan Request from: ' . $this->user->character->name)
+        return $this->from(config('mail.username'), 'Please Of Tlessa Admin')
+                    ->subject('UnBan Request from: ' . $this->user->character->name)
                     ->mjml('flare.email.unban_request', [
                         'user' => $this->user
                     ]);
