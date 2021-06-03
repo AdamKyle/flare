@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Admin\Adventures;
 
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\GameMap;
@@ -83,8 +86,8 @@ class AdventuresControllerTest extends TestCase
         $this->actingAs($this->user)->visit(route('adventures.create'))->see('Create Adventure')->submitForm('Create Adventure', [
             'name'             => 'Sample Adventure',
             'description'      => 'sample',
-            'location_ids'     => [1],
-            'monster_ids'      => [1],
+            'location_ids'     => [Location::first()->id],
+            'monster_ids'      => [Monster::first()->id],
             'reward_item_id'   => 1,
             'levels'           => 1,
             'time_per_level'   => 1,
@@ -96,7 +99,7 @@ class AdventuresControllerTest extends TestCase
         // Make sure the adventure was actually created:
 
         $this->assertNotNull(Adventure::first());
-        $this->assertEquals(Adventure::First()->name, 'Sample Adventure');
+        $this->assertEquals(Adventure::first()->name, 'Sample Adventure');
     }
 
     public function testCannotCreateAdventure()
@@ -119,7 +122,7 @@ class AdventuresControllerTest extends TestCase
         $this->createNewAdventure();
 
         $this->actingAs($this->user)->visit(route('adventures.adventure', [
-            'adventure' => 1,
+            'adventure' => Adventure::first()->id,
         ]))->see(Adventure::first()->name);
 
     }
@@ -132,9 +135,9 @@ class AdventuresControllerTest extends TestCase
         ]))->see('Edit Adventure: ' . $adventure->name)->submitForm('Update Adventure', [
             'name'             => 'New Adventure Name',
             'description'      => 'New Description',
-            'location_ids'     => [1],
-            'monster_ids'      => [1],
-            'reward_item_id'   => 1,
+            'location_ids'     => [Location::first()->id],
+            'monster_ids'      => [Monster::first()->id],
+            'reward_item_id'   => Item::first()->id,
             'levels'           => 1,
             'time_per_level'   => 1,
             'gold_rush_chance' => 0.01,
@@ -159,9 +162,9 @@ class AdventuresControllerTest extends TestCase
     public function testPublishAdventure() {
         $adventure = $this->createNewAdventure(null, 1, 'Sample', false);
 
-        $response = $this->actingAs($this->user)->call('POST', route('adventure.publish', [
+        $response = $this->actingAs($this->user)->post(route('adventure.publish', [
             'adventure' => $adventure->id
-        ]));
+        ]))->response;
 
         $this->assertTrue($adventure->refresh()->published);
     }

@@ -71,7 +71,7 @@ class AdventuresController extends Controller {
         $adventure->update(['published' => true]);
 
         return redirect()->to(route('adventures.adventure', [
-            'adventure' => $adventure
+            'adventure' => $adventure->refresh()
         ]))->with('success', 'Adventure published.');
     }
 }

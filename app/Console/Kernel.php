@@ -6,11 +6,6 @@ use App\Console\Commands\CleanMarketHistory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CleanNotifications;
-use App\Console\Commands\CreateFakeUsers;
-use App\Console\Commands\GiveCharacterGold;
-use App\Console\Commands\GiveItem;
-use App\Console\Commands\LevelFakeUsers;
-use App\Console\Commands\LevelUpSkillsOnFakeUsers;
 use App\Console\Commands\MoveInfoFiles;
 use App\Console\Commands\UpdateKingdom;
 
@@ -22,13 +17,8 @@ class Kernel extends ConsoleKernel {
      * @var array
      */
     protected $commands = [
-        GiveItem::class,
-        GiveCharacterGold::class,
         CleanNotifications::class,
         MoveInfoFiles::class,
-        CreateFakeUsers::class,
-        LevelUpSkillsOnFakeUsers::class,
-        LevelFakeUsers::class,
         CleanMarketHistory::class,
         UpdateKingdom::class,
     ];
