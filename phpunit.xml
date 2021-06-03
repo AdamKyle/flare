@@ -20,15 +20,15 @@
     </testsuite>
   </testsuites>
   <php>
-    <ini name="memory_limit" value="-1" />
-    <env name="APP_ENV" value="testing"/>
-    <env name="BCRYPT_ROUNDS" value="4"/>
-    <env name="CACHE_DRIVER" value="array"/>
-    <env name="MAIL_DRIVER" value="array"/>
-    <env name="QUEUE_CONNECTION" value="sync"/>
-    <env name="DB_CONNECTION" value="sqlite"/>
-    <env name="SESSION_DRIVER" value="array"/>
-    <env name="BROADCAST_DRIVER" value="log"/>
-    <env name="TELESCOPE_ENABLED" value="false"/>
+      <ini name="memory_limit" value="-1" />
+      <env name="APP_ENV" value="testing"/>
+      <env name="BCRYPT_ROUNDS" value="4"/>
+      <env name="CACHE_DRIVER" value="array"/>
+      <env name="MAIL_DRIVER" value="array"/>
+      <env name="QUEUE_CONNECTION" value="sync"/>
+      <env name="DB_CONNECTION" value="sqlite"/>
+      <env name="SESSION_DRIVER" value="array"/>
+      <env name="BROADCAST_DRIVER" value="log"/>
+      <env name="TIME_ZONE" value="America/Edmonton"/>
   </php>
 </phpunit>
