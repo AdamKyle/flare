@@ -186,7 +186,7 @@ class KingdomsAttackService {
         if (UserOnlineValue::isOnline($user)) {
             event(new KingdomServerMessageEvent($user, 'under-attack', $message));
         } else if ($user->kingdom_attack_email) {
-            \Mail::to($user->email)->send(new GenericMail($user, $message, 'Kingdom under attack!'));
+            \Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new GenericMail($user, $message, 'Kingdom under attack!'));
         }
     }
 }
