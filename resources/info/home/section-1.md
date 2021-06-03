@@ -85,7 +85,7 @@ Emails are only sent if you are not online at the time of this happening. Some o
 
 - **How do you make money, are there adds?**: There are no adds, I make no money off this game what so ever. It is completely open source. In order to pay for server costs, I have a job and a credit card.
 
-- **How do I get rid of [time gates](/information/time-gates)**: You don't. This is how we slow you down a bit and stop you from overwhelming the server. There are some quest items that you can obtain by playing the game that will reduce time gates by a small degree.
+- **How do I get rid of [time gates](/information/time-gates)**: You don't. This is how we slow you down a bit and stop you from overwhelming the server. 
 
 - **What Browsers are supported?**: Anything other than any version of Internet Explorer. This game will never support Internet Explorer, but we do support Edge. (Javascript is a must)
 

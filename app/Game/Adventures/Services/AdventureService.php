@@ -357,7 +357,7 @@ class AdventureService {
             event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $user));
             event(new ServerMessageEvent($user, 'adventure', 'Adventure completed! Check your logs for more details.'));
         } else if ($user->adventure_email) {
-            Mail::to($user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
+            Mail::to($user->email)->from(config('mail.username'), 'Planes Of Tlessa')->send(new AdventureCompleted($adventureLog->refresh(), $character));
         }
 
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));

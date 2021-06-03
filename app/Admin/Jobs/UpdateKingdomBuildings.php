@@ -79,7 +79,7 @@ class UpdateKingdomBuildings implements ShouldQueue
 
                         event(new ServerMessageEvent($user, 'new-building', $message));
                     } else if ($user->new_building_email) {
-                        Mail::to($user->email)->send(new GenericMail($character->user, $message, 'New KingdomBuilding!'));
+                        Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new GenericMail($character->user, $message, 'New KingdomBuilding!'));
                     }
                 }
             });

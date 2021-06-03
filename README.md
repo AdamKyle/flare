@@ -56,7 +56,7 @@ There are many ways you can catch up. You could be the type of player who runs a
 - `composer install && yarn && php artisan migrate --seed && php artisan create:admin email && yarn dev`
 - start redis: eg, `redis-server /usr/local/etc/redis.conf` (you need redis-server and php redis, `pecl install redis`)
 - start websockets: `php artisan websocket:serve`
-- listen for queues: `php artisan queue:work --queue=high,default --tries=1`
+- listen for queues: `php artisan horizon`
 - Publish information section: `php artisan move:files` <sup>**</sup>
 - From there you can register as a new player.
   - Or since you ran the `create:admn` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
@@ -95,6 +95,10 @@ PUSHER_APP_KEY=test
 PUSHER_APP_SECRET=test
 PUSHER_APP_CLUSTER=mt1
 ```
+
+## Horizon
+
+This game uses horizon to monitor it's jobs. For local development, just go to /horizon.
 
 ## Setting up Email:
 

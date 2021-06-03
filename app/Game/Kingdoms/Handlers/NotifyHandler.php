@@ -280,7 +280,7 @@ class NotifyHandler {
             $subjectParts = explode('-', $type);
             $subject      = ucfirst($subjectParts[0]) . ' ' . ucfirst($subjectParts[1]) . '!';
 
-            return \Mail::to($user->email)->send(new GenericMail($user, $message, $subject));
+            return \Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new GenericMail($user, $message, $subject));
         }
 
         return event(new KingdomServerMessageEvent($user, $type, $message));

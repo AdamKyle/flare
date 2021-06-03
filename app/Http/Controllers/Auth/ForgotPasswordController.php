@@ -36,7 +36,7 @@ class ForgotPasswordController extends Controller
         if (is_null($user)) {
             return redirect()->back()->with('error', 'This email does not match our records.');
         }
-        
+
         if ($user->hasRole('Admin')) {
             $response = $this->broker()->sendResetLink(
                 $this->credentials($request)
@@ -78,7 +78,7 @@ class ForgotPasswordController extends Controller
 
         $token = app('Password')::getRepository()->create($user);
 
-        Mail::to($user->email)->send(new ResetPassword($user, $token));
+        Mail::to($user->email)->from(config('mail.username'), 'Planes of Tlessa')->send(new ResetPassword($user, $token));
 
         Cache::delete($user->id . '-email');
 
