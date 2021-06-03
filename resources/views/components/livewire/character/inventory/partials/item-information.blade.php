@@ -26,7 +26,8 @@
         </h5>
       </div>
       <div id="collapse-market-prices-{{$item->id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion-{{$item->id}}">
-        <div id="item-market-board-{{$item->id}}" data-item-id="{{$item->id}}"></div>
+          <div class="mt-2 alert alert-info">Items will only show here if they match in name (completely)</div>
+          <div id="item-market-board-{{$item->id}}" data-item-id="{{$item->id}}"></div>
       </div>
     </div>
   </div>
