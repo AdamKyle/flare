@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Core\Events\UpdateAttackStats;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -15,14 +17,22 @@ use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class CharacterInventoryController extends Controller {
 
     private $equipItemService;
 
-    public function __construct(EquipItemService $equipItemService) {
+    private $characterTransformer;
 
-        $this->equipItemService = $equipItemService;
+    private $manager;
+
+    public function __construct(EquipItemService $equipItemService, CharacterAttackTransformer $characterTransformer, Manager $manager) {
+
+        $this->equipItemService     = $equipItemService;
+        $this->characterTransformer = $characterTransformer;
+        $this->manager              = $manager;
 
         $this->middleware('auth');
 
@@ -113,6 +123,9 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
+        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
         return redirect()->back()->with('success', 'Unequipped item.');
     }
 
@@ -125,6 +138,9 @@ class CharacterInventoryController extends Controller {
         });
 
         event(new UpdateTopBarEvent($character->refresh()));
+
+        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         return redirect()->back()->with('success', 'All items have been removed.');
     }
