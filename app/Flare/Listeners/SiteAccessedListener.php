@@ -26,6 +26,10 @@ class SiteAccessedListener {
 
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
 
+            if (is_null($adminUser)) {
+                return;
+            }
+
             return broadcast(new UpdateSiteStatisticsChart($adminUser));
         }
 
@@ -35,6 +39,10 @@ class SiteAccessedListener {
             $adminUser = User::with('roles')->whereHas('roles', function ($q) {
                 $q->where('name', 'Admin');
             })->first();
+
+            if (is_null($adminUser)) {
+                return;
+            }
 
             return broadcast(new UpdateSiteStatisticsChart($adminUser));
         }
@@ -49,6 +57,10 @@ class SiteAccessedListener {
                 $q->where('name', 'Admin');
             })->first();
 
+            if (is_null($adminUser)) {
+                return;
+            }
+
             return broadcast(new UpdateSiteStatisticsChart($adminUser));
         }
 
@@ -60,6 +72,10 @@ class SiteAccessedListener {
             $adminUser = User::with('roles')->whereHas('roles', function ($q) {
                 $q->where('name', 'Admin');
             })->first();
+
+            if (is_null($adminUser)) {
+                return;
+            }
 
             return broadcast(new UpdateSiteStatisticsChart($adminUser));
         }
@@ -76,6 +92,10 @@ class SiteAccessedListener {
             $adminUser = User::with('roles')->whereHas('roles', function ($q) {
                 $q->where('name', 'Admin');
             })->first();
+
+            if (is_null($adminUser)) {
+                return;
+            }
 
             return broadcast(new UpdateSiteStatisticsChart($adminUser));
         }
