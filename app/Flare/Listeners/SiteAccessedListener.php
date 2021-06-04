@@ -81,8 +81,6 @@ class SiteAccessedListener {
         }
 
         if ($event->loggedOut && !is_null($lastRecord->amount_signed_in)) {
-            dump('Logging Out');
-
             $newAmount = $lastRecord->amount_signed_in - 1;
 
             UserSiteAccessStatistics::create([
