@@ -119,3 +119,8 @@ For example, you can read [here](https://medium.com/@agavitalis/how-to-send-an-e
 
 - `composer phpunit` this will also generate code coverage report.
 - `./vendor/bin/phpunit` this will not generate code coverage but can be used for debugging specific tests via the `--filrer=` option
+
+## Tip For Deploying
+
+- when it comes to the mjml emails you might get an error about how it could not find mjml in your directory where you deployed to.
+  All you have to do is install MJML (`npm -i -g mjml`) as a global package.

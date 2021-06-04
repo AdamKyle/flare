@@ -32,9 +32,8 @@
                     Planes Of Tlessa
                 </mj-text>
                 <mj-text color="#fff" align="center" font-size="13px" padding-top="0" font-weight="bold" text-transform="uppercase" letter-spacing="1px" line-height="20px">
-                    Something happend while you were away.
+                    Something happened while you were away.
                 </mj-text>
-
             </mj-column>
         </mj-section>
 
