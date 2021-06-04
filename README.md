@@ -98,7 +98,16 @@ PUSHER_APP_CLUSTER=mt1
 
 ## Horizon
 
-This game uses horizon to monitor it's jobs. For local development, just go to /horizon.
+This game uses' horizon to monitor its jobs. For local development, just go to /horizon.
+
+## Extra Config
+
+In the ENV example file is some extra bits you can set:
+
+- TIME_ZONE: The time zone name you want your game to run in, ie: America/Edmonton (mandatory)
+- GITHUB_TOKEN: The token which the app uses to fetch release information.
+- HORIZON_EMAIL: For prod, so you do not commit your email in the code base.
+- ALLOW_MUlTIPLE_SIGNIN: 1 or 0 only. 1 means yes, up to 10 per IP, 0 means no. 1 per ip. Great for dev.
 
 ## Setting up Email:
 

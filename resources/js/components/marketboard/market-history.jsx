@@ -90,7 +90,7 @@ export default class MarketHistory extends React.Component {
         <Line
           data={this.state.data}
           width={300}
-          height={50}
+          height={75}
           options={{maintainAspectRatio: true, scales: {xAxes: [{ticks: {display: false}}]}}}
         />
       </div>

@@ -1,6 +1,8 @@
 <?php
 namespace App\Flare\Providers;
 
+use App\Flare\Events\SiteAccessedEvent;
+use App\Flare\Listeners\SiteAccessedListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
@@ -40,6 +42,11 @@ class EventsProvider extends ServiceProvider {
         // When a character trains a skill:
         UpdateSkillEvent::class => [
             UpdateSkillListener::class,
+        ],
+
+        // When a user updates or visits the site:
+        SiteAccessedEvent::class => [
+            SiteAccessedListener::class,
         ],
     ];
 

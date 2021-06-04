@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Flare\Models\User;
-use App\Http\Controllers\Controller;
+
 use Auth;
 use Cache;
 use Hash;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Flare\Events\SiteAccessedEvent;
+use App\Flare\Models\User;
 use Password;
 
 class ResetPasswordController extends Controller
@@ -95,7 +97,9 @@ class ResetPasswordController extends Controller
         $user = $this->createSecurityQuestions($request, $user);
 
         Auth::login($user);
-        
+
+        event(new SiteAccessedEvent(true));
+
         return redirect()->to('/');
     }
 

@@ -56,7 +56,7 @@
                                 <h3>
                                     <span class="header"></span> Security Questions <i class="fas fa-lock ml-2"></i>
                                 </h3>
-                                <span class="text-muted">All security answers are encrypted.</span>
+                                <span class="text-muted">All security answers are encrypted. All questions and answers must be unique.</span>
                                 <hr />
                             </div>
                         </div>

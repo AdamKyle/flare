@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Flare\Events\SiteAccessedEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
 use Illuminate\Support\Str;
@@ -80,7 +81,8 @@ class RegisterController extends Controller
             throw new \Exception('You have been banned until: ' . $until);
         }
 
-        if (User::where('ip_address', $ip)->count() >= 1) {
+        // For dev you can set: ALLOW_MUlTIPLE_SIGNIN to a 1 to get 10 extra accounts to create.
+        if (User::where('ip_address', $ip)->count() >= (((int) env('ALLOW_MUlTIPLE_SIGNIN')) === 1 ? 10 : 1)) {
             throw new \Exception('You cannot register anymore characters.');
         }
 
@@ -150,6 +152,8 @@ class RegisterController extends Controller
 
         $this->guard()->login($user);
 
+        event(new SiteAccessedEvent(true, true));
+
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());
     }
@@ -161,7 +165,6 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm()
     {
-
         return view('auth.register', [
             'races' => GameRace::pluck('name', 'id'),
             'classes' => GameClass::pluck('name', 'id'),

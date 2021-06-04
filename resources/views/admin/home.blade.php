@@ -8,10 +8,24 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-xl-6">
+        <div class="col-xl-4">
             <div class="card">
                 <div class="card-body">
                     <div id="admin-market-history"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <div id="admin-sign-in-history" data-user="{{auth()->user()->id}}"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <div id="admin-register-history" data-user="{{auth()->user()->id}}"></div>
                 </div>
             </div>
         </div>
@@ -31,10 +45,13 @@
 
 @push('head')
     <script src={{asset('js/admin-chat-messages.js')}} type="text/javascript"></script>
+    <script src={{asset('js/admin-site-stats-components.js')}} type="text/javascript"></script>
 @endpush
 
 @push('scripts')
     <script>
         renderChatMessages('admin-chat-messages');
+        renderSignIn('admin-sign-in-history');
+        renderRegister('admin-register-history');
     </script>
 @endpush
