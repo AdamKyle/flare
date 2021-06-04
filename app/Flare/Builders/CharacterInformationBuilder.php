@@ -209,6 +209,8 @@ class CharacterInformationBuilder {
         if ($defence !== 10) {
             return $defence / 8;
         }
+
+        return $defence;
     }
 
     protected function fetchHealingAmount(): int {

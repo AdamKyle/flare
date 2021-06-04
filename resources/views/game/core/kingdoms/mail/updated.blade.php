@@ -6,30 +6,29 @@
 @section('content')
     <mj-column width="400px">
 
-        <mj-text color="#dedede">
+        <mj-text color="#637381">
             Hello {{$user->character->name}}, the following are a list of kingdoms that have been updated.
         </mj-text>
 
         <mj-table>
-            <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
-                <th style="padding: 0 15px 0 0;color:#ffffff;">Kingdom Name</th>
-                <th style="padding: 0 0 0 15px;color:#ffffff;">X Position</th>
-                <th style="padding: 0 0 0 15px;color:#ffffff;">Y Position</th>
-                <th style="padding: 0 0 0 15px;color:#ffffff;">Plane</th>
+            <tr style="border-bottom:1px solid #2D2424;text-align:left;padding:15px 0;">
+                <th style="padding: 0 15px 0 0;color:#637381;">Kingdom Name</th>
+                <th style="padding: 0 0 0 15px;color:#637381;">X Position</th>
+                <th style="padding: 0 0 0 15px;color:#637381;">Y Position</th>
+                <th style="padding: 0 0 0 15px;color:#637381;">Plane</th>
             </tr>
             @foreach ($kingdomData as $kingdom)
                 <tr>
-                    <td style="padding: 0 15px 0 0;color:#ffffff;">{{$kingdom['name']}}</td>
-                    <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom['x_position']}}</td>
-                    <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom['y_position']}}</td>
-                    <td style="padding: 0 0 0 15px;color:#ffffff;">{{$kingdom['plane']}}</td>
+                    <td style="padding: 0 15px 0 0;color:#637381;">{{$kingdom['name']}}</td>
+                    <td style="padding: 0 0 0 15px;color:#637381;">{{$kingdom['x_position']}}</td>
+                    <td style="padding: 0 0 0 15px;color:#637381;">{{$kingdom['y_position']}}</td>
+                    <td style="padding: 0 0 0 15px;color:#637381;">{{$kingdom['plane']}}</td>
                 </tr>
             @endforeach
         </mj-table>
 
-        <mj-button background-color="#388a2d"
-                href="{{route('login')}}">
-            Login!
+        <mj-button background-color="#21A52C" align="center" color="#637381;" font-size="17px" font-weight="bold" href="{{route('login')}}" width="300px">
+            Login
         </mj-button>
 
     </mj-column>
