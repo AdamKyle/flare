@@ -28,7 +28,7 @@ export default class Attack {
 
     if (this.isCharacterDead()) {
       this.battleMessages.push({
-        message: 'You must ressurect first!'
+        message: 'You must resurrect first!'
       });
 
       this.characterCurrentHealth = 0;
@@ -134,7 +134,7 @@ export default class Attack {
       }
 
       this.battleMessages.push({
-        message: attacker.name + ' hit for ' + attacker.attack
+        message: attacker.name + ' hit for ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
 
@@ -145,7 +145,7 @@ export default class Attack {
       this.characterCurrentHealth = this.characterCurrentHealth - attack;
 
       this.battleMessages.push({
-        message: attacker.name + ' hit for ' + attack
+        message: attacker.name + ' hit for ' + attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
   }
