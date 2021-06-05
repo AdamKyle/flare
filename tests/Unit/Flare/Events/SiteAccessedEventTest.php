@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Flare\Events;
 
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateRole;
@@ -27,7 +29,7 @@ class SiteAccessedEventTest extends TestCase {
     }
 
     public function testSetsRecord() {
-        event(new SiteAccessedEvent(true, true));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(!is_null(UserSiteAccessStatistics::first()));
     }
@@ -35,7 +37,7 @@ class SiteAccessedEventTest extends TestCase {
     public function testSetsRecordWhenOneExists() {
         $this->createUserSiteAccessStatistics();
 
-        event(new SiteAccessedEvent(true, true));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
@@ -43,7 +45,7 @@ class SiteAccessedEventTest extends TestCase {
     public function testSetsRecordWhenJustSigningIn() {
         $this->createUserSiteAccessStatistics();
 
-        event(new SiteAccessedEvent(true, false));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
@@ -51,7 +53,7 @@ class SiteAccessedEventTest extends TestCase {
     public function testSetsRecordWhenLoggingOut() {
         $this->createUserSiteAccessStatistics();
 
-        event(new SiteAccessedEvent(false, false, true));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
@@ -59,7 +61,7 @@ class SiteAccessedEventTest extends TestCase {
     public function testSetsRecordWithOutAdmin() {
         User::first()->delete();
 
-        event(new SiteAccessedEvent(true, true));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(!is_null(UserSiteAccessStatistics::first()));
     }
@@ -69,7 +71,7 @@ class SiteAccessedEventTest extends TestCase {
 
         $this->createUserSiteAccessStatistics();
 
-        event(new SiteAccessedEvent(true, true));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
@@ -79,7 +81,7 @@ class SiteAccessedEventTest extends TestCase {
 
         $this->createUserSiteAccessStatistics();
 
-        event(new SiteAccessedEvent(true, false));
+        event(new Login('auth', User::first(), false));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
@@ -89,7 +91,7 @@ class SiteAccessedEventTest extends TestCase {
 
         $this->createUserSiteAccessStatistics();
 
-        event(new SiteAccessedEvent(false, false, true));
+        event(new Logout('auth', null));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }

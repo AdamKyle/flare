@@ -3,7 +3,13 @@ namespace App\Flare\Providers;
 
 use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Listeners\SiteAccessedListener;
+use App\Flare\Listeners\UserLoggedInListener;
+use App\Flare\Listeners\UserLoggedOutListener;
+use App\Flare\Listeners\UserRegisteredListener;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Auth\Events\Logout;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Events\UpdateCharacterSheetEvent;
 use App\Flare\Events\UpdateCharacterInventoryEvent;
@@ -44,10 +50,22 @@ class EventsProvider extends ServiceProvider {
             UpdateSkillListener::class,
         ],
 
-        // When a user updates or visits the site:
-        SiteAccessedEvent::class => [
-            SiteAccessedListener::class,
+        // When a user Logs out
+        Logout::class => [
+            UserLoggedOutListener::class,
         ],
+
+        // When a user logs in.
+        Login::class => [
+            UserLoggedInListener::class,
+        ],
+
+        // When a user is registered.
+        Registered::class => [
+            UserRegisteredListener::class,
+        ]
+
+
     ];
 
     /**

@@ -98,8 +98,6 @@ class ResetPasswordController extends Controller
 
         Auth::login($user);
 
-        event(new SiteAccessedEvent(true));
-
         return redirect()->to('/');
     }
 
