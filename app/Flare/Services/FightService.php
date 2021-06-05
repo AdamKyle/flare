@@ -268,13 +268,13 @@ class FightService {
                 $messages[] = ['Light floods your eyes as your wounds heal over.'];
             }
 
-            $messages[] = [$this->character->name . ' hit for ' . $characterAttack];
+            $messages[] = [$this->character->name . ' hit for ' . number_format($characterAttack)];
         } else {
             $monsterAttack = $this->fetchMonsterAttack($attacker);
 
             $this->currentCharacterHealth -= $monsterAttack;
 
-            $messages[] =  [$attacker->name . ' hit for ' . $monsterAttack];
+            $messages[] =  [$attacker->name . ' hit for ' . number_format($monsterAttack)];
         }
 
         return $messages;
