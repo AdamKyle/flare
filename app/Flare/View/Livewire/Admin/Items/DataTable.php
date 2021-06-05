@@ -20,6 +20,7 @@ class DataTable extends Component
     public $only         = null;
     public $character    = null;
     public $isHelp       = false;
+    public $type         = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -52,12 +53,25 @@ class DataTable extends Component
             }
         }
 
-        return $items->where('type', '!=', 'quest')
-                     ->where('item_suffix_id', null)
-                     ->where('item_prefix_id', null)
-                     ->orderBy($this->sortField, $this->sortBy);
+        $items = $items->where('type', '!=', 'quest')
+                       ->where('item_suffix_id', null)
+                       ->where('item_prefix_id', null);
+
+        if (!is_null($this->type)) {
+            $items = $items->where('type', $this->type);
+        }
+
+
+        return $items->orderBy($this->sortField, $this->sortBy);
     }
 
+    public function setType($type) {
+        if ($type === 'reset') {
+            $this->type = null;
+        } else {
+            $this->type = $type;
+        }
+    }
 
 
     public function fetchItems() {

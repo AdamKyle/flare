@@ -35,18 +35,6 @@ class SiteAccessedListener {
 
         $lastRecord = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
-        if (is_null($lastRecord)) {
-            $adminUser = User::with('roles')->whereHas('roles', function ($q) {
-                $q->where('name', 'Admin');
-            })->first();
-
-            if (is_null($adminUser)) {
-                return;
-            }
-
-            return broadcast(new UpdateSiteStatisticsChart($adminUser));
-        }
-
         if ($event->signIn && $event->register) {
             UserSiteAccessStatistics::create([
                 'amount_signed_in' => is_null($lastRecord->amount_signed_in) ? 1 : $lastRecord->amount_signed_in + 1,

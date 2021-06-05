@@ -21,10 +21,17 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
         }
 
         $character = $request->route('character');
+        $user      = $request->route('user');
         $canAccess = true;
 
         if (!is_null($character)) {
             if (auth()->user()->character->id !== $character->id) {
+                $canAccess = false;
+            }
+        }
+
+        if (!is_null($user)) {
+            if (auth()->user()->id !== $user->id) {
                 $canAccess = false;
             }
         }

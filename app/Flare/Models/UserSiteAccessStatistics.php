@@ -2,9 +2,13 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\UserSiteAccessStatisticsFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class UserSiteAccessStatistics extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -26,4 +30,8 @@ class UserSiteAccessStatistics extends Model {
         'amount_signed_in'  => 'integer',
         'amount_registered' => 'integer',
     ];
+
+    protected static function newFactory() {
+        return UserSiteAccessStatisticsFactory::new();
+    }
 }
