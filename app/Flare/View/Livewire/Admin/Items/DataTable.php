@@ -49,6 +49,10 @@ class DataTable extends Component
                         ->orWhere('item_prefix_id', $this->affixId);
                 }
 
+                if (!is_null($this->type)) {
+                    $items = $items->where('type', $this->type);
+                }
+
                 return $items->orderBy($this->sortField, $this->sortBy);
             }
         }

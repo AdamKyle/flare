@@ -3,7 +3,7 @@
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage">
-                    @if(!is_null($character))
+                    @if(!is_null($character) || auth()->user()->hasRole('Admin'))
                         <div class="btn-group">
                             <button type="button" class="ml-2 btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Type

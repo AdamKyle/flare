@@ -240,7 +240,7 @@ export default class AdeventureActions extends React.Component {
             adventure. You can do so <a href="/current-adventure/">here</a>.</div> : null}
         {hasAdventureInProgress ?
           <div className="alert alert-info">You may only embark on one adventure at a time</div> : null}
-        {!hasAdventureInProgress && hasCollectedRewards && !this.props.canAdventure() ?
+        {!hasAdventureInProgress && !this.props.canAdventure() ?
           <div className="alert alert-info">You must be able to fight and move to embark.</div> : null}
 
         {this.adventures()}
