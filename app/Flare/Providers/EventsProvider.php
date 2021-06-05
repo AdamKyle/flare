@@ -1,8 +1,6 @@
 <?php
 namespace App\Flare\Providers;
 
-use App\Flare\Events\SiteAccessedEvent;
-use App\Flare\Listeners\SiteAccessedListener;
 use App\Flare\Listeners\UserLoggedInListener;
 use App\Flare\Listeners\UserLoggedOutListener;
 use App\Flare\Listeners\UserRegisteredListener;

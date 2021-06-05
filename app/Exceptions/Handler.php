@@ -49,6 +49,7 @@ class Handler extends ExceptionHandler
     {
 
         if ($exception instanceof TokenMismatchException) {
+            dump('made it');
             return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');
         }
 

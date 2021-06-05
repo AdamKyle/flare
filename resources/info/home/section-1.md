@@ -77,6 +77,13 @@ Email is only sent for:
 
 Emails are only sent if you are not online at the time of this happening. Some of these you can turn off in the [settings](/information/settings) section.
 
+## A Word On Sessions
+
+When your session times out, that is - you have been gone for 15 minutes or longer, your screen may look frozen, timer's might have stopped, adventures might have completed but
+show no notices. Your session has timed out, and you can fix this by refreshing.
+
+I also kill your session when you close the browser or tab.
+
 ## FAQ
 
 <div class="mb-3">
