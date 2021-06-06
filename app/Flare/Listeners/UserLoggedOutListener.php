@@ -17,6 +17,22 @@ class UserLoggedOutListener {
      */
     public function handle(Logout $event) {
 
+        if (is_null(UserSiteAccessStatistics::first())) {
+
+            UserSiteAccessStatistics::create([
+                'amount_signed_in'  => 0,
+                'amount_registered' => 0,
+            ]);
+
+            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+
+            if (is_null($adminUser)) {
+                return;
+            }
+
+            return broadcast(new UpdateSiteStatisticsChart($adminUser));
+        }
+
         $lastRecord = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
         UserSiteAccessStatistics::create([
