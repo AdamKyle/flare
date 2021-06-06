@@ -78,16 +78,8 @@ class AffixesControllerTest extends TestCase
         $this->assertNull(ItemAffix::find($this->affix->id));
     }
 
-    public function testCanExportAffixes() {
-        Excel::fake();
-
+    public function testCanSeeExportAffixes() {
         $this->actingAs($this->user)->visit(route('affixes.export'))->see('Export');
-
-        $this->actingAs($this->user)->post(route('affixes.export-data'));
-
-        Excel::assertDownloaded('affixes.xlsx', function(AffixesExport $export) {
-            return true;
-        });
     }
 
     public function testCanSeeImportPage() {

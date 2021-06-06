@@ -35,11 +35,10 @@ class DropCheckCalculator {
      * Fetches the adventure bonues, if applies and applies it to the looting bonus against the monster quest_item_drop_chance.
      *
      * @param Monster $monster
-     * @param float $lootingChance
      * @param Adventure|null $adventure
      * @return bool
      */
-    public function fetchQuestItemDropCheck(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null): bool {
+    public function fetchQuestItemDropCheck(Monster $monster, Adventure $adventure = null): bool {
         $adventureBonus = $this->getAdventureBonus($adventure);
 
         if ($adventureBonus >= 1) {
@@ -50,7 +49,7 @@ class DropCheckCalculator {
             return true;
         }
 
-        return (rand(1, 100) * (1 + ($lootingChance + $adventureBonus)))  > (100 - (100 * $monster->quest_item_drop_chance));
+        return (rand(1, 100) * (1 + ($adventureBonus)))  > (100 - (100 * $monster->quest_item_drop_chance));
     }
 
     /**

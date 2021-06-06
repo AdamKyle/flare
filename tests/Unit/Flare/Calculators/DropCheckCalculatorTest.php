@@ -46,7 +46,7 @@ class DropCheckCalculatorTest extends TestCase
         ]);
 
         $chance = DropCheckCalculator::fetchQuestItemDropCheck(
-            $this->createMonster(), 100, $adventure->refresh()
+            $this->createMonster(), $adventure->refresh()
         );
 
         $this->assertTrue($chance);

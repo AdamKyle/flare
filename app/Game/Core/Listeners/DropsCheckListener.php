@@ -36,7 +36,7 @@ class DropsCheckListener
         }
 
         if (!is_null($event->monster->quest_item_id)) {
-            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $event->adventure);
+            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $event->adventure);
 
             if ($canGetQuestItem) {
                 $this->attemptToPickUpItem($event, $event->monster->questItem);
