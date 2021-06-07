@@ -12,9 +12,9 @@
     <hr />
     <x-cards.card-with-title title="{{$cardTitle}}">
 
-        @if (\Cache::has('generating-characters')) 
+        @if (\Cache::has('generating-characters'))
             <div class="alert alert-info">
-                Charactrs are being generated. You will be emailed you when it's done.
+                Characters are being generated. You will be emailed you when it's done.
             </div>
         @elseif ($characters->isEmpty())
             <div class="text-center">
@@ -64,6 +64,6 @@
                 </div>
             </div>
         @endif
-        
+
     </x-cards.card-with-title>
 @endsection
