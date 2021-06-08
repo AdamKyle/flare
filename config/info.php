@@ -17,6 +17,7 @@ return [
     'equipment'         => [],
     'traverse'          => [],
     'teleport'          => [],
+    'planes'            => [],
     'kingdoms'          => [
         [
             'livewire'            => true,

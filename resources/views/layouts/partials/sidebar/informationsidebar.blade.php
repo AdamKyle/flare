@@ -42,6 +42,7 @@
           <li><a href={{route('info.page', ['pageName' => 'set-sail'])}}>Setting Sail</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'teleport'])}}">Teleporting</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'traverse'])}}">Traverse</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'planes'])}}">Planes</a></li>
       </ul>
     </li>
     <li class="nav-devider"></li>
