@@ -4,6 +4,7 @@ namespace App\Flare\Listeners;
 
 use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Events\UpdateSiteStatisticsChart;
+use App\Flare\Models\Session;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
 
@@ -20,7 +21,7 @@ class SiteAccessedListener {
         if (is_null(UserSiteAccessStatistics::first()) && !$event->loggedOut && ($event->signIn || $event->register)) {
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in' => $event->signIn ? 1 : 0,
+                'amount_signed_in' => $event->signIn ? Session::count() : 0,
                 'amount_registered' => $event->register ? 1 : 0,
             ]);
 
@@ -37,7 +38,7 @@ class SiteAccessedListener {
 
         if ($event->signIn && $event->register) {
             UserSiteAccessStatistics::create([
-                'amount_signed_in' => is_null($lastRecord->amount_signed_in) ? 1 : $lastRecord->amount_signed_in + 1,
+                'amount_signed_in' => Session::count(),
                 'amount_registered' => is_null($lastRecord->amount_registered) ? 1 : $lastRecord->amount_registered + 1,
             ]);
 
@@ -54,7 +55,7 @@ class SiteAccessedListener {
 
         if ($event->signIn) {
             UserSiteAccessStatistics::create([
-                'amount_signed_in' => is_null($lastRecord->amount_signed_in) ? 1 : $lastRecord->amount_signed_in + 1,
+                'amount_signed_in' => is_null($lastRecord->amount_signed_in) ? 0 : Session::count(),
             ]);
 
             $adminUser = User::with('roles')->whereHas('roles', function ($q) {
@@ -69,10 +70,8 @@ class SiteAccessedListener {
         }
 
         if ($event->loggedOut && !is_null($lastRecord->amount_signed_in)) {
-            $newAmount = $lastRecord->amount_signed_in - 1;
-
             UserSiteAccessStatistics::create([
-                'amount_signed_in' => $newAmount < 0 ? 0 : $newAmount
+                'amount_signed_in' => Session::count()
             ]);
 
             $adminUser = User::with('roles')->whereHas('roles', function ($q) {
