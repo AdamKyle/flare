@@ -71,7 +71,7 @@ class RewardBuilder {
         if (!is_null($monster->questItem)) {
             $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
-            $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $adventure);
+            $hasDrop = DropCheckCalculator::fetchQuestItemDropCheck($monster, $lootingChance, $adventure);
 
             $hasItem = $character->inventory->slots->filter(function($slot) use ($monster) {
                 return $slot->item_id === $monster->questItem->id;
