@@ -25,7 +25,8 @@
                     <div class="snippit-section text-center">
                         <h2>Stay logged in!</h2>
                         <p>
-                            There is no set it and forget it. This game requires you be engaged. Timers and such only last minutes at best, with attack and movement timers being set to seconds.
+                            There is no set it and forget it. This game requires you be engaged.
+                            Timers and such only last minutes at best, with attack and movement timers being set to seconds.
                         </p>
                     </div>
                 </div>
@@ -44,7 +45,8 @@
                                             'pageName' => 'equipment'
                                         ])}}">Equip your character!</a>
                                     </h5>
-                                    <p>Buy/sell weapons, armor, rings, artifacts and more and out fit your character for the road ahead. Who knows what beasties you might find!</p>
+                                    <p>Buy/sell weapons, armor, rings, artifacts and more and out fit your character
+                                        for the road ahead. Who knows what beasties you might find!</p>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +90,7 @@
             <div class="row map-feature">
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 text-center snippit-section map-feature-text">
                     <h2>See where you're going!</h2>
-                    <p>Adventure on a map by clicking the action buttons. Certian locations will have adventures and some you can set sail from, such as ports!</p>
+                    <p>Adventure on a map by clicking the action buttons. Certain locations will have adventures and some you can set sail from, such as ports!</p>
                     <a href="{{route('info.page', [
                         'pageName' => 'map',
                     ])}}" class="btn btn-primary map-btn">Learn more</a>
@@ -109,7 +111,8 @@
                         </span>
                         Put that credit card away!
                     </h2>
-                    <p>This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear, to the stongest kingdoms to abillity to travel from one plane to the next is all only attainable by playing the game.</p>
+                    <p>This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear,
+                        to the strongest kingdoms to ability to travel from one plane to the next is all only attainable by playing the game.</p>
                 </div>
             </div>
         </div>

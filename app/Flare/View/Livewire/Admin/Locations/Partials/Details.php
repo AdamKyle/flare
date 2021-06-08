@@ -21,6 +21,7 @@ class Details extends Component
         'location.x'           => 'required',
         'location.y'           => 'required',
         'location.game_map_id' => 'required',
+        'location.is_port'     => 'nullable'
     ];
 
     protected $messages = [
@@ -42,6 +43,10 @@ class Details extends Component
 
     public function validateInput(string $functionName, int $index) {
         $this->validate();
+
+        if (is_null($this->location->is_port)) {
+            $this->location->is_port = false;
+        }
 
         $this->location->save();
 

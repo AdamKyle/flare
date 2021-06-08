@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Events\Logout;
 use Throwable;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -49,7 +50,7 @@ class Handler extends ExceptionHandler
     {
 
         if ($exception instanceof TokenMismatchException) {
-            dump('made it');
+            event(new Logout('auth', null));
             return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');
         }
 
