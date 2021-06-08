@@ -17,6 +17,16 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
     public function handle($request, Closure $next, $guard = null)
     {
         if (auth()->user()->hasRole('Admin')) {
+            $letAdminThrough = [
+                'game.inventory.compare',
+                'game.inventory.compare-items',
+                'game.equip.item',
+            ];
+
+            if (in_array($request->route()->getName(), $letAdminThrough)) {
+                return $next($request);
+            }
+
             return redirect()->route('home');
         }
 
