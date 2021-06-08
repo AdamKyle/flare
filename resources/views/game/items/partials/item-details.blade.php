@@ -15,6 +15,9 @@
                 @case('walk-on-water')
                     Walk On Water
                     @break
+                @case('labyrinth')
+                    Access Labyrinth Plane
+                    @break
                 @default
                     N/A
             @endswitch
