@@ -89,7 +89,7 @@ class EquipItemService {
         }
 
         $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->position === $this->request->position;
+            return $slot->position === $this->request->position && $slot->equipped;
         })->first();
 
         if (!is_null($itemForPosition)) {

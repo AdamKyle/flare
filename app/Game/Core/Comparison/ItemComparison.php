@@ -9,7 +9,7 @@ class ItemComparison {
 
     /**
      * Fetch Comparison Details for an item of the same type currently equipped.
-     * 
+     *
      * @param Item $toCompare
      * @param Collection $inventorySlots
      * @return array
@@ -28,7 +28,7 @@ class ItemComparison {
 
     /**
      * Get Total Damage Increase
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @return int
@@ -42,7 +42,7 @@ class ItemComparison {
 
     /**
      * Get Total Damage Decrease
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @return int
@@ -60,7 +60,7 @@ class ItemComparison {
 
     /**
      * Get Total Ac Increase
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @return int
@@ -78,7 +78,7 @@ class ItemComparison {
 
     /**
      * Get Total Ac Decrease
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @return int
@@ -96,7 +96,7 @@ class ItemComparison {
 
     /**
      * Get Total Heal Increase
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @return int
@@ -110,7 +110,7 @@ class ItemComparison {
 
     /**
      * Get Total Heal Decrease
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @return int
@@ -128,7 +128,7 @@ class ItemComparison {
 
     /**
      * Get Total Stat Increase
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @param string $stat
@@ -144,7 +144,7 @@ class ItemComparison {
 
     /**
      * Get Total Stat Decrease
-     * 
+     *
      * @param Item $toCompare
      * @param Item $equipped
      * @param string $stat
@@ -166,36 +166,46 @@ class ItemComparison {
         $foundPosition = $inventorySlots->filter(function($slot) use ($hand) {
             return $slot->position === $hand;
         })->first();
-        
+
         if ($this->isItemBetter($toCompare, $foundPosition->item)) {
             return [
-                'is_better'          => true,
-                'replaces_item'      => $foundPosition->item,
-                'slot'               => $foundPosition,
-                'position'           => $foundPosition->position,
-                'damage_adjustment'  => $this->getDamageIncrease($toCompare, $foundPosition->item),
-                'ac_adjustment'      => $this->getAcIncrease($toCompare, $foundPosition->item),
-                'healing_adjustment' => $this->getHealIncrease($toCompare, $foundPosition->item),
-                'str_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'str'),
-                'dur_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'dur'),
-                'dex_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'dex'),
-                'chr_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'chr'),
-                'int_adjustment'     => $this->getStatIncrease($toCompare, $foundPosition->item, 'int'),
+                'is_better'               => true,
+                'replaces_item'           => $foundPosition->item,
+                'slot'                    => $foundPosition,
+                'position'                => $foundPosition->position,
+                'damage_adjustment'       => $this->getDamageIncrease($toCompare, $foundPosition->item),
+                'ac_adjustment'           => $this->getAcIncrease($toCompare, $foundPosition->item),
+                'healing_adjustment'      => $this->getHealIncrease($toCompare, $foundPosition->item),
+                'base_damage_adjustment'  => $toCompare->base_damage_mod - $foundPosition->base_damage_mod,
+                'base_healing_adjustment' => $toCompare->base_healing_mod - $foundPosition->base_healing_mod,
+                'base_ac_adjustment'      => $toCompare->base_ac_mod - $foundPosition->base_ac_mod,
+                'str_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'str'),
+                'dur_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'dur'),
+                'dex_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'dex'),
+                'chr_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'chr'),
+                'int_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'int'),
             ];
         } else {
+            $baseDamageAdjustment  = $toCompare->base_damage_mod < $foundPosition->item->base_damage_mod ? $toCompare->base_damage_mod - $foundPosition->item->base_damage_mod : 0;
+            $baseHealingAdjustment = $toCompare->base_healing_mod < $foundPosition->item->base_healing_mod ? $toCompare->base_healing_mod - $foundPosition->item->base_healing_mod : 0;
+            $baseAcAdjustment     = $toCompare->base_ac_mod < $foundPosition->item->base_ac_mod ? $toCompare->base_ac_mod - $foundPosition->item->base_ac_mod : 0;
+
             return [
-                'is_better'          => false,
-                'replaces_item'      => null,
-                'slot'               => $foundPosition,
-                'position'           => $foundPosition->position,
-                'damage_adjustment'  => $this->getDamageDecrease($toCompare, $foundPosition->item),
-                'ac_adjustment'      => $this->getAcDecrease($toCompare, $foundPosition->item),
-                'healing_adjustment' => $this->getHealDecrease($toCompare, $foundPosition->item),
-                'str_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'str'),
-                'dur_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'dur'),
-                'dex_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'dex'),
-                'chr_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'chr'),
-                'int_adjustment'     => $this->getStatDecrease($toCompare, $foundPosition->item, 'int'),
+                'is_better'               => false,
+                'replaces_item'           => null,
+                'slot'                    => $foundPosition,
+                'position'                => $foundPosition->position,
+                'damage_adjustment'       => $this->getDamageDecrease($toCompare, $foundPosition->item),
+                'ac_adjustment'           => $this->getAcDecrease($toCompare, $foundPosition->item),
+                'healing_adjustment'      => $this->getHealDecrease($toCompare, $foundPosition->item),
+                'str_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'str'),
+                'dur_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'dur'),
+                'dex_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'dex'),
+                'chr_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'chr'),
+                'int_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'int'),
+                'base_damage_adjustment'  => $baseDamageAdjustment,
+                'base_healing_adjustment' => $baseHealingAdjustment,
+                'base_ac_adjustment'      => $baseAcAdjustment,
             ];
         }
     }
