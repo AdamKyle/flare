@@ -59,7 +59,7 @@ class CharacterInformationBuilder {
             }
         }
 
-        return $base;
+        return round($base);
     }
 
     /**
