@@ -15,6 +15,7 @@
         "christianessl/landmap-generation": "^1.0",
         "consoletvs/charts": "7.*",
         "deployer/deployer": "^7.0",
+        "doctrine/dbal": "^3.1",
         "fideloper/proxy": "^4.0",
         "graham-campbell/github": "^10.3",
         "graham-campbell/markdown": "^13.1",
