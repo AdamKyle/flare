@@ -20,7 +20,7 @@ class MarketItemsTransfromer extends TransformerAbstract {
             'character_id'   => $marketListing->character_id,
             'item_id'        => $marketListing->item_id,
             'name'           => $marketListing->item->affix_name,
-            'listed_price'   => number_format($marketListing->listed_price),
+            'listed_price'   => $marketListing->listed_price,
             'character_name' => $marketListing->character->name,
             'type'           => $marketListing->item->type,
         ];

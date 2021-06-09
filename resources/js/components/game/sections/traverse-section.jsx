@@ -45,6 +45,14 @@ export default class TraverseSection extends React.Component {
             this.setState({
               error_message: err.response.data.message,
             });
+
+            if (err.response.status === 429) {
+              location.reload();
+            }
+
+            if (err.response.status === 401) {
+              location.reload();
+            }
           } else {
             console.err(err);
           }

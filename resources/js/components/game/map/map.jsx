@@ -373,6 +373,10 @@ export default class Map extends React.Component {
         if (response.status === 401) {
           location.reload();
         }
+
+        if (response.status === 429) {
+          location.reload();
+        }
       }
 
       this.setState({

@@ -119,6 +119,11 @@ export default class Teleport extends React.Component {
         if (response.status === 401) {
           return location.reload();
         }
+
+        if (response.status === 429) {
+          // Reload to show them their notification.
+          location.reload();
+        }
       }
 
       this.setState({

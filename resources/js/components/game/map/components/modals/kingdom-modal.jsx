@@ -74,9 +74,16 @@ export default class KingdomModal extends React.Component {
     }).then(() => {
       this.props.close();
     }).catch((error) => {
-      this.setState({
-        errorMessage: error.response.data.message
-      });
+      if (error.hasOwnProperty('response')) {
+        if (error.response.status === 429) {
+          // Reload to show them their notification.
+          location.reload();
+        }
+
+        this.setState({
+          errorMessage: error.response.data.message
+        });
+      }
     });
   }
 

@@ -28,7 +28,10 @@ export default class Board extends Component {
       {
         key: "listed_price",
         text: "Listed For",
-        sortable: true
+        sortable: true,
+        cell: row => <div data-tag="allowRowEvents">
+          <div>{row.listed_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+        </div>,
       },
     ];
 
@@ -65,6 +68,7 @@ export default class Board extends Component {
           item_id: this.props.itemId,
         }
       }).then((result) => {
+        console.log(result.data.items);
         this.setState({
           records: result.data.items,
           gold: result.data.gold,
