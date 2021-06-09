@@ -19,9 +19,9 @@ class CraftingService {
 
     /**
      * Fetch all craftable items for a character.
-     * 
+     *
      * The params variable is the request params.
-     * 
+     *
      * @param Character $character
      * @param array $params
      * @return Collection
@@ -34,12 +34,12 @@ class CraftingService {
 
     /**
      * Attempts to craft the item.
-     * 
+     *
      * The params are the request params.
-     * 
+     *
      * Gold is only taken from a player if they can pick up the item they crafted or
      * if they fail to craft them item.
-     * 
+     *
      * @param Character $character
      * @param array params
      * @return array
@@ -86,7 +86,7 @@ class CraftingService {
 
         $characterRoll = $this->characterRoll($skill);
         $dcCheck       = $this->getDCCheck($skill);
-        
+
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
 
@@ -110,12 +110,13 @@ class CraftingService {
                     ->where('skill_level_required', '<=', $skill->level)
                     ->where('item_prefix_id', null)
                     ->where('item_suffix_id', null)
+                    ->orderBy('cost', 'asc')
                     ->get();
     }
 
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
         if ($this->attemptToPickUpItem($character, $item)) {
-            
+
             if (!$tooEasy) {
                 event(new UpdateSkillEvent($skill));
                 $this->updateCharacterGold($character, $item->cost);
@@ -134,11 +135,11 @@ class CraftingService {
             event(new ServerMessageEvent($character->user, 'crafted', $item->name));
 
             return true;
-        } 
+        }
 
         event(new ServerMessageEvent($character->user, 'inventory_full'));
 
         return false;
     }
-    
+
 }

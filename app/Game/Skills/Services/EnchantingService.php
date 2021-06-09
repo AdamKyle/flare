@@ -141,6 +141,7 @@ class EnchantingService {
     protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
         return ItemAffix::where('int_required', '<=', $builder->statMod('int'))
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
+                        ->orderBy('cost', 'asc')
                         ->get();
     }
 
