@@ -6,15 +6,12 @@
 </dl>
 <hr />
 
-@if (is_null($details['slot']->item->itemPrefix) && is_null($details['slot']->item->itemSuffix))
-    <div class="alert alert-info">
-        There are no affixes on this item.
-    </div>
-@else
+@if (!is_null($details['slot']->item->itemPrefix) || !is_null($details['slot']->item->itemSuffix))
     <div class="container">
         <h4>Attached Affixes</h4>
-        <hr />
+
         @if (!is_null($details['slot']->item->itemPrefix))
+            <hr />
             <div class="row">
                 <div class="col-md-6">
                     <dl>
@@ -86,10 +83,11 @@
             </div>
         @endif
     </div>
+    <hr />
 @endif
 
 @if (!empty($details['slot']->item->getItemSkills()))
-    <hr />
+
     <h4 class="mt-3">Affects the Following Skills:</h4>
     <hr />
     <div class="row mt-3">
@@ -110,5 +108,5 @@
             </div>
         @endforeach
     </div>
+    <hr />
 @endif
-<hr />

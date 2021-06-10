@@ -15,8 +15,4 @@
     <dd><span class='text-success'>{{$item->getTotalPercentageForStat('chr') * 100}}% </span></dd>
     <dt>Int Modifier:</dt>
     <dd><span class='text-success'>{{$item->getTotalPercentageForStat('int') * 100}}% </span></dd>
-    <dt>Skill Name:</dt>
-    <dd>{{!is_null($item->skill_name) ? $item->skill_nam : 'N/A'}}</dd>
-    <dt>Skill Bonus:</dt>
-    <dd>{{!is_null($item->skill_training_bonus) ? $item->skill_training_bonus * 100 . '%' : '0%'}}</dd>
 </dl>

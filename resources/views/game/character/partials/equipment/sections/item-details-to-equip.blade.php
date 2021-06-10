@@ -1,8 +1,9 @@
 @if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix))
     <div class="container">
         <h4>Attached Affixes</h4>
-        <hr />
+
         @if (!is_null($item->itemPrefix))
+            <hr />
             <div class="row">
                 <div class="col-md-6">
                     <dl>
@@ -76,6 +77,25 @@
     </div>
     <hr />
 @endif
+@if (!is_null($item->skill_name))
+    <div class="container">
+        <h4>Affects Skills</h4>
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+                <dl>
+                    <dt>Skill Name:</dt>
+                    <dd>{{$item->skill_name}}</dd>
+                    <dt>Skill XP Bonus (When Training):</dt>
+                    <dd>{{$item->skill_training_bonus * 100}}%</dd>
+                    <dt>Skill Bonus (When using)</dt>
+                    <dd>{{$item->skill_bonus * 100}}%</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <hr />
+@endif
 <h6>Stat Details:</h6>
 <p>These stat increases so <span class="text-success">green for any increase</span> and <span class="text-danger"> red for any decrease</span></p>
 @if (empty($details))
@@ -87,7 +107,7 @@
         <div class="row">
             @include('game.character.partials.equipment.sections.equip.details.stat-details', ['details' => $details, 'hasDefaultPosition' => false])
 
-            @if (count(array_keys($details)) < 2 && $item->crafting_type !== 'armour')
+            @if (count(array_keys($details)) < 2 && ($item->crafting_type !== 'armour' || $item->type === 'shield'))
                 <div class="col-md-6 mt-4">
                     <p>If Equipped As Second Item:</p>
                     @include('game.character.partials.equipment.sections.equip.details.item-stat-details', ['item' => $item])

@@ -279,6 +279,14 @@ class Item extends Model
             }
         }
 
+        if (!is_null($this->skill_name)) {
+            $skills[] = [
+                'skill_name'           => $this->skill_name,
+                'skill_training_bonus' => $this->skill_training_bonus,
+                'skill_bonus'          => $this->skill_bonus,
+            ];
+        }
+
         return $skills;
     }
 
