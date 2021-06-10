@@ -132,7 +132,8 @@ export default class FightSection extends React.Component {
           const response = err.response;
 
           if (response.status === 429) {
-            getServerMessage('attacking_to_much');
+            // Reload to show them their notification.
+            location.reload();
           }
 
           if (response.status === 401) {
@@ -156,6 +157,18 @@ export default class FightSection extends React.Component {
       }, () => {
         this.props.isCharacterDead(result.data.character.is_dead);
       });
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          location.reload();
+        }
+
+        if (response.status === 429) {
+          location.reload();
+        }
+      }
     })
   }
 

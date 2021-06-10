@@ -115,7 +115,7 @@ export default class CraftingAction extends React.Component {
   buildCraftableItemsOptions() {
     if (this.state.itemsToCraft !== null) {
       return this.state.itemsToCraft.map((item) => {
-        return <option key={item.id} value={item.id}>{item.name} --> Cost to craft: {item.cost} Gold</option>
+        return <option key={item.id} value={item.id}>{item.name} --> Cost to craft: {item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold</option>
       });
     }
   }
@@ -158,6 +158,11 @@ export default class CraftingAction extends React.Component {
 
           if (response.status === 401) {
             return location.reload();
+          }
+
+          if (response.status === 429) {
+            // Reload to show them their notification.
+            location.reload();
           }
         }
       });

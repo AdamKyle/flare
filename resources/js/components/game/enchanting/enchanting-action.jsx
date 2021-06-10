@@ -16,7 +16,7 @@ export default class EnchantingAction extends React.Component {
       canCraft: true,
       isDead: this.props.isDead,
       showEnchanting: false,
-      chracterId: this.props.characterId,
+      characterId: this.props.characterId,
       timeRemaining: this.props.timeRemaining,
       showSuccess: false,
       gold: 0,
@@ -141,6 +141,11 @@ export default class EnchantingAction extends React.Component {
 
         if (response.status === 401) {
           return location.reload();
+        }
+
+        if (response.status === 429) {
+          // Reload to show them their notification.
+          location.reload();
         }
       }
     });
@@ -289,7 +294,7 @@ export default class EnchantingAction extends React.Component {
     return this.state.affixList.map((affix) => {
       if (affix.type === 'suffix') {
         return (
-          <option key={'suffix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost}</option>);
+          <option key={'suffix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</option>);
       }
     });
   }
@@ -298,7 +303,7 @@ export default class EnchantingAction extends React.Component {
     return this.state.affixList.map((affix) => {
       if (affix.type === 'prefix') {
         return (
-          <option key={'prefix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost}</option>);
+          <option key={'prefix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</option>);
       }
     });
   }

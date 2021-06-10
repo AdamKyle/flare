@@ -87,6 +87,10 @@ export default class SetSail extends React.Component {
         if (response.status === 401) {
           location.reload();
         }
+
+        if (response.status === 429) {
+          location.reload();
+        }
       }
     });
   }

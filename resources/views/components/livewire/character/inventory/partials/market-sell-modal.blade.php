@@ -15,7 +15,7 @@
               'slot' => $slot,
             ])
           </div>
-          <div class="mb-3">
+          <div class="mb-3 mt-2 alert alert-warning">
             <p>Please note that all transactions come with a 5% tax. This tax is applied when you buy and item
             from the market board and when your item sells.</p>
             <p>All items can be removed from the market, by visiting the board and clicking: remove, while on the market board.</p>

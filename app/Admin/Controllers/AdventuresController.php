@@ -27,7 +27,7 @@ class AdventuresController extends Controller {
             'adventure' => null,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::where('published', true)->orderBy('max_level', 'asc')->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->orderBy('max_level', 'asc')->orderBy('game_map_id', 'desc')->pluck('name', 'id')->toArray(),
         ]);
     }
 

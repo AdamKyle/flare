@@ -7,7 +7,7 @@
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring-one">
-            Left Finger
+            Ring One (Left Finger)
 
             @if (!empty($details))
                 @if (isset($details['ring-one']))
@@ -19,7 +19,7 @@
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring-two">
-            Right Finger
+            Ring Two (Right Finger)
 
             @if (!empty($details))
                 @if (isset($details['ring-two']))
