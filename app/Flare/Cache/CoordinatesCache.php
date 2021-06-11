@@ -34,7 +34,7 @@ class CoordinatesCache {
     public function buildXCoordinates(): array {
 
         $start = 0;
-        $max   = 496;
+        $max   = 480;
         $coordinates = [$start];
 
         $current = $start;
