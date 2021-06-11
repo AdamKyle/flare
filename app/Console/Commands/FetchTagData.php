@@ -42,8 +42,9 @@ class FetchTagData extends Command
     public function handle()
     {
         $latest = GitHub::repo()->releases()->latest('AdamKyle', 'flare');
+        $notes  = ReleaseNote::where('url', $latest['html_url'])->first();
 
-        if (is_null(ReleaseNote::where('url', $latest['html_url'])->first())) {
+        if (is_null($notes)) {
             ReleaseNote::create([
                 'name'         => $latest['name'],
                 'version'      => $latest['tag_name'],
