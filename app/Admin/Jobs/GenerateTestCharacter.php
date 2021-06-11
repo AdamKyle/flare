@@ -59,7 +59,7 @@ class GenerateTestCharacter implements ShouldQueue
 
     /**
      * Attempt to assign the skill.
-     * 
+     *
      * If the skill should fail to be asigned to the intended target for any reason, we email
      * the administrator with the error message.
      *
@@ -67,12 +67,7 @@ class GenerateTestCharacter implements ShouldQueue
      * @return void
      */
     public function handle(AssignSkillService $service) {
-        $map = GameMap::where('default', true)->first(); 
-
-        $user = User::factory()->create([
-            'is_test'    => true,
-            'ip_address' => null
-        ]);
+        $map = GameMap::where('default', true)->first();
 
         $character = (new CharacterBuilder)->setRace($this->race)
                               ->setClass($this->class)
@@ -84,7 +79,7 @@ class GenerateTestCharacter implements ShouldQueue
             'character_id' => $character->id,
             'snap_shot'    => $character->getAttributes(),
         ]);
-        
+
         for ($i = 1; $i < $this->levelTo; $i++) {
             $characterService = new CharacterService;
 
@@ -100,7 +95,7 @@ class GenerateTestCharacter implements ShouldQueue
 
         if (!is_null($this->adminUser)) {
             Cache::forget('generating-characters');
-            
+
             Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, 'Your character modeling generation is done.', 'Character modeling complete.', false));
         }
     }

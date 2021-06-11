@@ -112,4 +112,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/kingdoms/export-data', ['as' => 'kingdoms.export-data', 'uses' => 'KingdomsController@export']);
     Route::post('/admin/kingdoms/import-data', ['as' => 'kingdoms.import-data', 'uses' => 'KingdomsController@importData']);
 
+    Route::get('/admin/npcs/index', ['as' => 'npcs.index', 'uses' => 'NpcsController@index']);
+    Route::get('/admin/npcs/create', ['as' => 'npcs.create', 'uses' => 'NpcsController@create']);
+    Route::get('/admin/npcs/edit/{npc}', ['as' => 'npcs.edit', 'uses' => 'NpcsController@edit']);
+    Route::get('/admin/npcs/{npc}', ['as' => 'npcs.show', 'uses' => 'NpcsController@show']);
+    Route::post('/admin/npcs/add', ['as' => 'npcs.edit', 'uses' => 'NpcsController@store']);
+    Route::post('/admin/npcs/update', ['as' => 'npcs.show', 'uses' => 'NpcsController@update']);
+
 });

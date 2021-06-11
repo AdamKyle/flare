@@ -31,7 +31,7 @@ class CharacterBuilder {
 
     /**
      * Set the chosen race
-     * 
+     *
      * @param GameRace $race
      * @return CharacterBuilder
      */
@@ -43,7 +43,7 @@ class CharacterBuilder {
 
     /**
      * Set the chosen class
-     * 
+     *
      * @param GameClass $class
      * @return CharacterBuilder
      */
@@ -55,12 +55,12 @@ class CharacterBuilder {
 
     /**
      * Create the character.
-     * 
+     *
      * This includes the inventory, a basic weapon that is then equipped
      * as well as your map position.
-     * 
+     *
      * We also set the characters base stats based on any racial and class modifications.
-     * 
+     *
      * @param User $user
      * @param GameMap $map
      * @param string $name
@@ -105,10 +105,55 @@ class CharacterBuilder {
     }
 
     /**
+     * Creates a test character with out a user.
+     *
+     * @param GameMap $map
+     * @param string $name
+     * @return $this
+     */
+    public function createTestCharacter(GameMap $map, string $name): CharacterBuilder {
+        $baseStat = resolve(BaseStatValue::class)->setRace($this->race)->setClass($this->class);
+
+        $this->character = Character::create([
+            'game_race_id'  => $this->race->id,
+            'game_class_id' => $this->class->id,
+            'name'          => $name,
+            'damage_stat'   => $this->class->damage_stat,
+            'xp'            => 0,
+            'xp_next'       => 100,
+            'str'           => $baseStat->str(),
+            'dur'           => $baseStat->dur(),
+            'dex'           => $baseStat->dex(),
+            'chr'           => $baseStat->chr(),
+            'int'           => $baseStat->int(),
+            'ac'            => $baseStat->ac(),
+            'is_test'       => true,
+        ]);
+
+        $this->character->inventory()->create([
+            'character_id' => $this->character->id
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => Item::first()->id,
+            'equipped'     => true,
+            'position'     => 'left-hand',
+        ]);
+
+        $this->character->map()->create([
+            'character_id' => $this->character->id,
+            'game_map_id'  => $map->id,
+        ]);
+
+        return $this;
+    }
+
+    /**
      * Assign skills to the user.
-     * 
+     *
      * This assigns all skills in the database.
-     * 
+     *
      * @return CharacterBuilder
      */
     public function assignSkills(): CharacterBuilder {
@@ -123,7 +168,7 @@ class CharacterBuilder {
 
     /**
      * Get the character object
-     * 
+     *
      * @return Character
      */
     public function character(): Character {

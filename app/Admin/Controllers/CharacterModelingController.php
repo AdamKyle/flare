@@ -27,9 +27,7 @@ class CharacterModelingController extends Controller {
 
     public function index() {
 
-        $characters = Character::whereHas('user', function($query) {
-            return $query->where('is_test', true);
-        })->get();
+        $characters = Character::where('is_test', true)->get();
 
         return view('admin.character-modeling.index', [
             'cardTitle'    => $characters->isEmpty() ? 'Modeling' : 'Generate',
