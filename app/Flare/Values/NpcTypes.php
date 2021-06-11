@@ -2,6 +2,8 @@
 
 namespace App\Flare\Values;
 
+use Exception;
+
 class NpcTypes
 {
 
@@ -20,19 +22,51 @@ class NpcTypes
     ];
 
     /**
+     * @var string[] $namedValues
+     */
+    protected static $namedValues = [
+      0 => 'Kingdom Holder',
+    ];
+
+    /**
      * KingdomLogStatusValue constructor.
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param string $value
-     * @throws \Exception
+     * @param int $value
+     * @throws Exception
      */
-    public function __construct(string $value)
+    public function __construct(int $value)
     {
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * Get all the named values.
+     *
+     * @return string[]
+     */
+    public static function getNamedValues(): array {
+        return self::$namedValues;
+    }
+
+    /**
+     * See if the name exists in a named value.
+     *
+     * If it does return it, if not throw an exception.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getNamedValue(): string {
+        if (isset(self::$namedValues[$this->value])) {
+            return self::$namedValues[$this->value];
+        }
+
+        throw new Exception($this->value . ' does not exist for named value');
     }
 }

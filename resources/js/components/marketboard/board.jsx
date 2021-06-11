@@ -68,7 +68,6 @@ export default class Board extends Component {
           item_id: this.props.itemId,
         }
       }).then((result) => {
-        console.log(result.data.items);
         this.setState({
           records: result.data.items,
           gold: result.data.gold,

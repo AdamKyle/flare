@@ -23,6 +23,8 @@ class CreateNpcs extends Migration
             $table->boolean('moves_around_map')->default(false);
             $table->boolean('must_be_at_same_location')->default(false);
             $table->string('text_command_to_message');
+            $table->integer('x_position');
+            $table->integer('y_position');
             $table->timestamps();
         });
     }

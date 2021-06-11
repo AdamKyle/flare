@@ -18,7 +18,7 @@ class CreateNpcCommands extends Migration
             $table->bigInteger('npc_id')->unsigned();
             $table->foreign('npc_id')
                   ->references('id')->on('npcs');
-            $table->string('command');
+            $table->string('command')->unique();
             $table->integer('command_type');
             $table->timestamps();
         });

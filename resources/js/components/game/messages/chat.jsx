@@ -86,6 +86,7 @@ export default class Chat extends React.Component {
         user: event.user,
         user_id: event.user.id,
         id: Math.random().toString(36).substring(7),
+        is_npc: event.npc,
       };
 
       messages.unshift(message);
@@ -174,7 +175,7 @@ export default class Chat extends React.Component {
         if (message.user_id === this.props.userId && message.type === 'server-message') {
           elements.push(
             <li key={message.id + '_server-message'}>
-              <div className="server-message">{message.message}</div>
+              <div className={message.is_npc ? "npc-message" : "server-message"}>{message.message}</div>
             </li>
           )
         } else if(message.type === 'global-message') {

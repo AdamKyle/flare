@@ -4,7 +4,7 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class NpcCommands extends Model {
+class NpcCommand extends Model {
 
     /**
      * The attributes that are mass assignable.

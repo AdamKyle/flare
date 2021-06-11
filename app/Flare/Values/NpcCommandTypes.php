@@ -2,7 +2,7 @@
 
 namespace App\Flare\Values;
 
-class NpcTypes
+class NpcCommandTypes
 {
 
     /**
@@ -19,7 +19,12 @@ class NpcTypes
      */
     protected static $values = [
         self::QUEST => 0,
-        self::TAKE_KINGOOM => 1,
+        self::TAKE_KINGDOM => 1,
+    ];
+
+    protected static $namedValues = [
+        0 => 'Quest',
+        1 => 'Take Kingdom',
     ];
 
     /**
@@ -55,5 +60,30 @@ class NpcTypes
      */
     public function isTakeKingdom(): bool {
         return $this->value = self::TAKE_KINGDOM;
+    }
+
+    /**
+     * Get all the named values.
+     *
+     * @return string[]
+     */
+    public static function getNamedValues(): array {
+        return self::$namedValues;
+    }
+
+    /**
+     * See if the name exists in a named value.
+     *
+     * If it does return it, if not throw an exception.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getNamedValue(): string {
+        if (isset(self::$namedValues[$this->value])) {
+            return self::$namedValues[$this->value];
+        }
+
+        throw new Exception($this->value . ' does not exist for named value');
     }
 }

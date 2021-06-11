@@ -51,7 +51,7 @@ export default class SignInChart extends React.Component {
     }).catch((error) => {
       console.error(error);
     });
-    console.log(this.update);
+
     this.update.listen('Flare.Events.UpdateSiteStatisticsChart', (event) => {
       let dataset = {...this.state.data};
 

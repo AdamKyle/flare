@@ -54,6 +54,8 @@ class ServerMessageBuilder {
                 return 'You can only chat so much in a one minute window. Slow down!';
             case 'message_length_max':
                 return 'Your message is far too long.';
+            case 'no_matching_command':
+                return 'The NPC does not understand you. Their eyes blink in confusion.';
             default:
                 return '';
         }

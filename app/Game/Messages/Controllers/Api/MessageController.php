@@ -2,9 +2,7 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
-use App\Admin\Events\UpdateAdminChatEvent;
-use App\Flare\Handlers\MessageThrottledHandler;
-use App\Game\Messages\Values\MapChatColor;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Messages\Events\MessageSentEvent;
@@ -14,14 +12,21 @@ use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
 use App\Flare\Models\User;
-use Carbon\Carbon;
+use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Handlers\MessageThrottledHandler;
+use App\Flare\Models\Npc;
+use App\Game\Messages\Values\MapChatColor;
+use App\Game\Messages\Handlers\NpcCommandHandler;
 
 class MessageController extends Controller {
 
     private $serverMessage;
 
-    public function __construct(ServerMessageBuilder $serverMessage) {
-        $this->serverMessage = $serverMessage;
+    private $npcCommandHandler;
+
+    public function __construct(ServerMessageBuilder $serverMessage, NpcCommandHandler $npcCommandHandler) {
+        $this->serverMessage     = $serverMessage;
+        $this->npcCommandHandler = $npcCommandHandler;
     }
 
     public function fetchUserInfo(Request $request, User $user) {
@@ -113,6 +118,22 @@ class MessageController extends Controller {
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
 
             broadcast(new UpdateAdminChatEvent($adminUser));
+
+            return response()->json([], 200);
+        }
+
+        $npc = Npc::where('name', $request->user_name)->first();
+
+        if (!is_null($npc)) {
+            $command = $npc->commands->where('command', $request->message)->first();
+
+            if (!is_null($command)) {
+                $this->npcCommandHandler->handleForType($command->command_type, $npc->name, auth()->user());
+
+                return response()->json([], 200);
+            }
+
+            broadcast(new ServerMessageEvent($user, $this->serverMessage->build('no_matching_command')));
 
             return response()->json([], 200);
         }
