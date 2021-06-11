@@ -34,7 +34,7 @@ There is tons of room for new kingdoms and new wars to be waged!
 - **Monster Strength**: Medium - Higher Stats are needed as even easier monsters are difficult.
 - **Ports**: Yes
 - **Adventures**: Yes
-- **Quest Item**: Key of the Labyrinth, drops off of: [Labyrinth Fiend](/information/monster/22)
+- **Quest Item**: Key of the Labyrinth, drops off of: [Labyrinth Fiend](/information/monster/22) - *surface monster*
 - **Drop Chance**: 1% (Adventure Bonuses and Looting Skill Bonuses will apply towards check.)
 
 <div class="mb-4">
