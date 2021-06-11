@@ -3,29 +3,31 @@
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage">
-                    @if(!is_null($character) || auth()->user()->hasRole('Admin'))
-                        <div class="btn-group">
-                            <button type="button" class="ml-2 btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Type
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" wire:click="setType('weapon')">Weapon</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('body')">Body</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('shield')">Shield</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('feet')">Feet</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('leggings')">Leggings</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('sleeves')">Sleeves</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('helmet')">Helmet</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('gloves')">Gloves</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('spell-healing')">Spells Healing</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('spell-damage')">Spells Damage</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('ring')">Ring</a>
-                                <a class="dropdown-item" href="#" wire:click="setType('artifact')">Artifact</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" href="#" wire:click="setType('reset')">Reset</a>
+                    @auth
+                        @if(!is_null($character) || auth()->user()->hasRole('Admin'))
+                            <div class="btn-group">
+                                <button type="button" class="ml-2 btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Type
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#" wire:click="setType('weapon')">Weapon</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('body')">Body</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('shield')">Shield</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('feet')">Feet</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('leggings')">Leggings</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('sleeves')">Sleeves</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('helmet')">Helmet</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('gloves')">Gloves</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('spell-healing')">Spells Healing</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('spell-damage')">Spells Damage</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('ring')">Ring</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('artifact')">Artifact</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#" href="#" wire:click="setType('reset')">Reset</a>
+                                </div>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    @endauth
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />
             </div>
