@@ -135,6 +135,14 @@ export default class BattleAction extends React.Component {
   }
 
   renderActions() {
+    let monsterId = 0;
+
+    if (typeof this.state.monster !== 'undefined') {
+      if (this.state.monster.hasOwnProperty('id')) {
+        monsterId = this.state.monster.id
+      }
+    }
+
     return (
       <>
         {this.state.isAdventuring
@@ -148,7 +156,7 @@ export default class BattleAction extends React.Component {
         <Row>
           <Col xs={12} sm={12} md={12} lg={6} xl={8}>
             <select className="form-control monster-select" id="monsters" name="monsters"
-                    value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
+                    value={monsterId}
                     onChange={this.updateActions.bind(this)}
                     disabled={this.monsterSelectDisabled()}>
               <option value="" key="0">Please select a monster</option>
