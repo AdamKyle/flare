@@ -154,7 +154,7 @@ export default class BattleAction extends React.Component {
           null
         }
         <Row>
-          <Col xs={12} sm={12} md={12} lg={6} xl={8}>
+          <Col xs={12} sm={12} md={12} lg={6} xl={6}>
             <select className="form-control monster-select" id="monsters" name="monsters"
                     value={monsterId}
                     onChange={this.updateActions.bind(this)}
@@ -163,7 +163,7 @@ export default class BattleAction extends React.Component {
               {this.monsterOptions()}
             </select>
           </Col>
-          <Col xs={3} sm={3} md={3} lg={3} xl={1}>
+          <Col xs={3} sm={3} md={3} lg={3} xl={3}>
             <button className="btn btn-primary"
                     type="button"
                     disabled={this.againDisabled()}

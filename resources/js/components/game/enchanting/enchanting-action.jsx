@@ -193,7 +193,7 @@ export default class EnchantingAction extends React.Component {
       const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant)[0];
 
       if (foundSlot.item.item_prefix !== null) {
-        cost += (foundSlot.item.item_prefix.cost / 2)
+        cost += 1000
       }
     }
 
@@ -212,7 +212,7 @@ export default class EnchantingAction extends React.Component {
 
       if (foundSlot.item.item_suffix !== null) {
 
-        cost += (foundSlot.item.item_suffix.cost / 2)
+        cost += 1000
       }
     }
 
