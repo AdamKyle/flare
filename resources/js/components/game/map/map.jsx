@@ -12,6 +12,7 @@ import MapMovementActions from './components/map-movement-actions';
 import MapActions from './components/map-actions';
 import Locations from './components/locations';
 import KingdomPin from './components/pins/kingdom-pin';
+import NpcKingdomPin from "./components/pins/npc-kingdom-pin";
 
 export default class Map extends React.Component {
 
@@ -39,6 +40,7 @@ export default class Map extends React.Component {
       portList: [],
       adventureLogs: [],
       teleportLocations: [],
+      npcKingdoms: [],
       canAdventureAgainAt: null,
       timeRemaining: null,
       isDead: false,
@@ -81,6 +83,7 @@ export default class Map extends React.Component {
         isAdventuring: !_.isEmpty(result.data.adventure_logs.filter(al => al.in_progress)),
         teleportLocations: result.data.teleport,
         kingdoms: result.data.my_kingdoms,
+        npcKingdoms: result.data.npc_kingdoms,
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -146,6 +149,7 @@ export default class Map extends React.Component {
         portList: event.portDetails.hasOwnProperty('port_list') ? event.portDetails.port_list : [],
         adventures: event.adventureDetails,
         kingdoms: myKingdoms,
+        npcKingdoms: event.npcKingdoms,
       }, () => {
         this.props.updateAdventure(event.adventureDetails, [], null);
 
@@ -415,6 +419,9 @@ export default class Map extends React.Component {
                     kingdoms={this.state.kingdoms}
                     characterId={this.state.characterId}
                     disableMapButtons={this.disableMapButtons.bind(this)}
+                  />
+                  <NpcKingdomPin
+                    npcKingdoms={this.state.npcKingdoms}
                   />
                   <div className="map-x-pin" style={this.playerIcon()}></div>
                 </div>

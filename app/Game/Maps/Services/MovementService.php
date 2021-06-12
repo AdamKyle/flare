@@ -35,6 +35,8 @@ class MovementService {
      */
     private $kingdomData = [];
 
+    private $npcKingdoms = [];
+
     /**
      * @var PortService $portService
      */
@@ -141,6 +143,8 @@ class MovementService {
             $this->processLocation($location, $character);
         }
 
+        $this->npcKingdoms = Kingdom::whereNull('character_id')->where('npc_owned', true)->get();
+
         $kingdom = Kingdom::where('x_position', $character->x_position)
                           ->where('y_position', $character->y_position)
                           ->where('game_map_id', $character->map->game_map_id)
@@ -152,16 +156,18 @@ class MovementService {
         $kingdomToAttack = [];
 
         if (!is_null($kingdom)) {
-            if ($kingdom->character->id !== $character->id) {
-                $canAttack = true;
+            if (!is_null($kingdom->character_id)) {
+                if ($kingdom->character->id !== $character->id) {
+                    $canAttack = true;
 
-                $kingdomToAttack = [
-                    'id'         => $kingdom->id,
-                    'x_position' => $kingdom->x_position,
-                    'y_position' => $kingdom->y_position,
-                ];
-            } else {
-                $canManage = true;
+                    $kingdomToAttack = [
+                        'id' => $kingdom->id,
+                        'x_position' => $kingdom->x_position,
+                        'y_position' => $kingdom->y_position,
+                    ];
+                } else {
+                    $canManage = true;
+                }
             }
         } else if (is_null($location)) {
             $canSettle = true;
@@ -323,10 +329,19 @@ class MovementService {
     /**
      * Get the kingdom data
      *
-     * @param array
+     * @return array
      */
     public function kingdomDetails(): array {
         return $this->kingdomData;
+    }
+
+    /**
+     * Gets the NPC owned kingdoms.
+     *
+     * @return array
+     */
+    public function npcOwnedKingdoms(): array {
+        return $this->npcKingdoms;
     }
 
     /**

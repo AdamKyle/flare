@@ -42,6 +42,7 @@ class Kingdom extends Model implements Auditable
         'max_morale',
         'treasury',
         'published',
+        'npc_owned',
     ];
 
     /**
@@ -67,6 +68,7 @@ class Kingdom extends Model implements Auditable
         'max_morale'         => 'float',
         'treasury'           => 'integer',
         'published'          => 'boolean',
+        'npc_owned'          => 'boolean',
     ];
 
     public function gameMap() {

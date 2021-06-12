@@ -33,6 +33,11 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
     public $adventureDetails;
 
     /**
+     * @var array $npcKingdoms
+     */
+    public $npcKingdoms = [];
+
+    /**
      * @var array $kingdomDetails
      */
     public $kingdomDetails = [];
@@ -69,6 +74,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
         $this->portDetails      = $service->portDetails();
         $this->adventureDetails = $service->adventureDetails();
         $this->kingdomDetails   = $service->kingdomDetails();
+        $this->npcKingdoms      = $service->npcOwnedKingdoms();
     }
 
     /**

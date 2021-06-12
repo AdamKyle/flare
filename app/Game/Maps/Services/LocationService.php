@@ -103,6 +103,7 @@ class LocationService {
             'can_manage_kingdom'     => $this->canManage,
             'kingdom_to_attack'      => $this->kingdomToAttack,
             'my_kingdoms'            => $this->getKingdoms($character),
+            'npc_kingdoms'           => Kingdom::whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
         ];
     }
 

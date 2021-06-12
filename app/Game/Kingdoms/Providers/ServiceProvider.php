@@ -2,6 +2,8 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Game\Kingdoms\Console\Commands\GiveKingdomsToNpc;
+use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
@@ -141,7 +143,14 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->commands([DeleteKingdomLogs::class]);
+        $this->app->bind(GiveKingdomsToNpcHandler::class, function($app) {
+            return new GiveKingdomsToNpcHandler($app->make(MovementService::class));
+        });
+
+        $this->commands([
+            DeleteKingdomLogs::class,
+            GiveKingdomsToNpc::class,
+        ]);
     }
 
     /**
