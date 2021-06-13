@@ -93,11 +93,17 @@ export default class BuildingManagementModal extends React.Component {
         this.props.close();
       })
       .catch((err) => {
+        this.props.close();
+
         if (err.hasOwnProperty('response')) {
           const response = err.response;
 
           if (response.status === 401) {
             location.reload();
+          }
+
+          if (response.status === 429) {
+            this.props.openTimeOutModal();
           }
         }
       });

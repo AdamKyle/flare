@@ -24,8 +24,12 @@ export default class KingdomModal extends React.Component {
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
-        if (response.status === 401  || response.status === 429) {
+        if (response.status === 401) {
           return location.reload();
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
         }
       }
 
@@ -80,10 +84,15 @@ export default class KingdomModal extends React.Component {
     }).then(() => {
       this.props.close();
     }).catch((error) => {
+      this.props.close();
+
       if (error.hasOwnProperty('response')) {
         if (error.response.status === 429) {
-          // Reload to show them their notification.
-          location.reload();
+          return this.props.openTimeOutModal();
+        }
+
+        if (error.response.status === 401) {
+          return location.reload();
         }
 
         this.setState({

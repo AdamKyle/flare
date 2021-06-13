@@ -43,11 +43,17 @@ export default class KingdomManagementModal extends React.Component {
         isLoading: false,
       })
     }).catch((err) => {
+      this.props.close();
+
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
-        if (response.status === 401  || response.status === 429) {
+        if (response.status === 401) {
           return location.reload();
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
         }
       }
     });
@@ -225,7 +231,7 @@ export default class KingdomManagementModal extends React.Component {
               <KingdomBuildingQueue kingdom={this.state.kingdom} queueData={this.queueData.bind(this)}/>
             </Tab>
             <Tab eventKey="unit-queue" title="Unit Queue">
-              <UnitBuildingQueue kingdom={this.state.kingdom} queueData={this.unitQueueData.bind(this)}/>
+              <UnitBuildingQueue kingdom={this.state.kingdom} queueData={this.unitQueueData.bind(this)} />
             </Tab>
           </Tabs>
         </Modal.Body>
@@ -240,6 +246,7 @@ export default class KingdomManagementModal extends React.Component {
             characterId={this.props.characterId}
             updateKingdomData={this.props.updateKingdomData}
             queue={this.state.kingdom.building_queue}
+            openTimeOutModal={this.openTimeOutModal.bind(this)}
           /> : null}
 
         {this.state.openQueueData ?
@@ -250,6 +257,7 @@ export default class KingdomManagementModal extends React.Component {
             buildings={this.state.kingdom.buildings}
             queueType={this.state.queueType}
             kingdom={this.state.kingdom}
+            openTimeOutModal={this.openTimeOutModal.bind(this)}
           /> : null
         }
 
@@ -262,6 +270,7 @@ export default class KingdomManagementModal extends React.Component {
             kingdom={this.state.kingdom}
             characterId={this.props.characterId}
             updateKingdomData={this.props.updateKingdomData}
+            openTimeOutModal={this.openTimeOutModal.bind(this)}
           /> : null
         }
 
@@ -271,6 +280,7 @@ export default class KingdomManagementModal extends React.Component {
             show={this.state.openKingdomEditNameModal}
             kingdomName={this.state.kingdom.name}
             kingdomId={this.state.kingdom.id}
+            openTimeOutModal={this.openTimeOutModal.bind(this)}
           /> : null
         }
       </Modal>

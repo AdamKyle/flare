@@ -103,7 +103,7 @@ export default class AdeventureActions extends React.Component {
         }
 
         if (response.status === 429) {
-          location.reload();
+          this.props.openTimeOutModal()
         }
       }
     });
@@ -254,6 +254,7 @@ export default class AdeventureActions extends React.Component {
           embarkClose={this.embarkClose.bind(this)}
           updateMessage={this.updateMessage.bind(this)}
           updateCharacterAdventures={this.updateCharacterAdventures.bind(this)}
+          openTimeOutModal={this.props.openTimeOutModal}
         /> : null}
       </Card>
     )

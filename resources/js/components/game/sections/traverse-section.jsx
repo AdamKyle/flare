@@ -26,8 +26,12 @@ export default class TraverseSection extends React.Component {
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
-        if (response.status === 401  || response.status === 429) {
+        if (response.status === 401) {
           return location.reload();
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
         }
       }
     });
@@ -48,17 +52,17 @@ export default class TraverseSection extends React.Component {
           this.hideTraverse();
         }).catch((err) => {
           if (err.hasOwnProperty('response')) {
-            this.setState({
-              error_message: err.response.data.message,
-            });
-
             if (err.response.status === 429) {
-              location.reload();
+              return this.props.openTimeOutModal()
             }
 
             if (err.response.status === 401) {
-              location.reload();
+              return location.reload();
             }
+
+            this.setState({
+              error_message: err.response.data.message,
+            });
           } else {
             console.err(err);
           }

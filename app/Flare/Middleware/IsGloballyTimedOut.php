@@ -2,7 +2,6 @@
 
 namespace App\Flare\Middleware;
 
-use App\Flare\Events\OpenTimeOutModal;
 use Closure;
 use Illuminate\Support\Facades\Route;
 

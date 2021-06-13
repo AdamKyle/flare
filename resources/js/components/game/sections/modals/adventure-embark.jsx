@@ -26,6 +26,8 @@ export default class AdventureEmbark extends React.Component {
       this.props.updateCharacterAdventures(result.data.adventure_completed_at);
       this.props.embarkClose();
     }).catch((error) => {
+      this.props.embarkClose();
+
       if (error.hasOwnProperty('response')) {
         const response = error.response;
 
@@ -34,7 +36,7 @@ export default class AdventureEmbark extends React.Component {
         }
 
         if (response.status === 429) {
-          location.reload();
+          return this.props.openTimeOutModal()
         }
       }
 

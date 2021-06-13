@@ -69,6 +69,10 @@ export default class KingdomRenameModal extends React.Component {
           return location.reload();
         }
 
+        if (response.status === 429) {
+          this.props.openTimeOutModal();
+        }
+
         this.setState({
           errorMessage: response.data.errors.name[0],
         });

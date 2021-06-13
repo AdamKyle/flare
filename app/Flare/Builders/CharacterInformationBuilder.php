@@ -59,7 +59,7 @@ class CharacterInformationBuilder {
             }
 
             if ($percentageIncrease !== 0.0) {
-                $base += ($base * $percentageIncrease);
+                $base *= $percentageIncrease;
             }
         }
 
@@ -129,7 +129,7 @@ class CharacterInformationBuilder {
                     $percentage = 1 + $percentage;
                 }
 
-                $baseHealth += $baseHealth * $percentage;
+                $baseHealth *= $percentage;
             }
         }
 

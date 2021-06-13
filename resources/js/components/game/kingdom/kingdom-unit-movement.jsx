@@ -75,8 +75,12 @@ export default class KingdomUnitMovement extends React.Component {
       if (error.hasOwnProperty('response')) {
         const response = error.response;
 
-        if (response.status === 401 || response.status === 429) {
+        if (response.status === 401) {
           return location.reload()
+        }
+
+        if (response.status === 429) {
+          return window.location.replace('/game');
         }
       }
     });

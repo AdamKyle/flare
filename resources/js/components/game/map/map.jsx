@@ -107,8 +107,12 @@ export default class Map extends React.Component {
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
-        if (response.status === 401 || response.status === 429) {
+        if (response.status === 401) {
           return location.reload()
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
         }
       }
     });
@@ -383,8 +387,8 @@ export default class Map extends React.Component {
           location.reload();
         }
 
-        if (response.status === 429) {
-          location.reload();
+        if (error.response.status === 429) {
+          return this.props.openTimeOutModal();
         }
       }
 
@@ -424,6 +428,7 @@ export default class Map extends React.Component {
                     kingdoms={this.state.kingdoms}
                     characterId={this.state.characterId}
                     disableMapButtons={this.disableMapButtons.bind(this)}
+                    openTimeOutModal={this.props.openTimeOutModal}
                   />
                   <div className="map-x-pin" style={this.playerIcon()}></div>
                 </div>

@@ -111,8 +111,12 @@ export default class CraftingAction extends React.Component {
           if (err.hasOwnProperty('response')) {
             const response = err.response;
 
-            if (response.status === 401 || response.status === 429) {
+            if (response.status === 401) {
               return location.reload()
+            }
+
+            if (response.status === 429) {
+              this.props.openTimeOutModal()
             }
           }
         });
