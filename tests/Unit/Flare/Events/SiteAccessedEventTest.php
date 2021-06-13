@@ -50,14 +50,6 @@ class SiteAccessedEventTest extends TestCase {
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
 
-    public function testSetsRecordWhenLoggingOut() {
-        $this->createUserSiteAccessStatistics();
-
-        event(new Login('auth', User::first(), false));
-
-        $this->assertTrue(UserSiteAccessStatistics::count() > 1);
-    }
-
     public function testSetsRecordWithOutAdmin() {
         User::first()->delete();
 
@@ -82,16 +74,6 @@ class SiteAccessedEventTest extends TestCase {
         $this->createUserSiteAccessStatistics();
 
         event(new Login('auth', User::first(), false));
-
-        $this->assertTrue(UserSiteAccessStatistics::count() > 1);
-    }
-
-    public function testSetsRecordWhenLoggingOutWithOutAdmin() {
-        User::first()->delete();
-
-        $this->createUserSiteAccessStatistics();
-
-        event(new Logout('auth', null));
 
         $this->assertTrue(UserSiteAccessStatistics::count() > 1);
     }
