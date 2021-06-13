@@ -37,10 +37,11 @@ class ServerMessageEvent
      * @param mixed $forMessage | null
      * @return void
      */
-    public function __construct(User $user, string $type, $forMessage = null)
+    public function __construct(User $user, string $type, $forMessage = null, $link = null)
     {
         $this->type        = $type;
         $this->user        = $user;
         $this->forMessage  = $forMessage;
+        $this->link        = $link;
     }
 }

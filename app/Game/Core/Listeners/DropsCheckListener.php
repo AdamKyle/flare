@@ -63,7 +63,9 @@ class DropsCheckListener
                     broadcast(new GlobalMessageEvent($message));
                 }
 
-                event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name));
+                event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name, route('items.item', [
+                    'item' => $item
+                ])));
             }
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));

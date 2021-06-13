@@ -54,8 +54,12 @@ class CharacterInformationBuilder {
         foreach ($equipped as $slot) {
             $percentageIncrease = $this->fetchModdedStat($stat, $slot->item);
 
+            if ($percentageIncrease < 1) {
+                $percentageIncrease = 1 + $percentageIncrease;
+            }
+
             if ($percentageIncrease !== 0.0) {
-                $base += ($base * $this->fetchModdedStat($stat, $slot->item));
+                $base += ($base * $percentageIncrease);
             }
         }
 

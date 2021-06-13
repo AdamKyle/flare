@@ -229,12 +229,12 @@ export default class CraftingAction extends React.Component {
         </div>
 
         <Row>
-          <Col xs={12} sm={12} md={8} lg={8} xl={8}>
+          <Col xs={12} sm={12} md={8} lg={8} xl={6}>
             {this.renderCraftingDropDowns()}
           </Col>
-          <Col xs={12} sm={12} md={4} lg={4} xl={4}>
+          <Col xs={12} sm={12} md={4} lg={4} xl={6}>
             <Row>
-              <Col xs={4}>
+              <Col xs={3}>
                 {this.renderCraftingButton()}
               </Col>
               <Col xs={8}>

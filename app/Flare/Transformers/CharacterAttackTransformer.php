@@ -13,19 +13,19 @@ class CharacterAttackTransformer extends TransformerAbstract {
 
     /**
      * creates response data for character attack data.
-     * 
+     *
      * @param Character $character
      * @return mixed
      */
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-
+       
         return [
             'id'                  => $character->id,
             'ac'                  => $characterInformation->buildDefence(),
             'name'                => $character->name,
             'dex'                 => $characterInformation->statMod('dex'),
-            'base_stat'           => $character->{$character->class->damage_stat},
+            'base_stat'           => $characterInformation->statMod($character->class->damage_stat),
             'attack'              => $characterInformation->buildAttack(),
             'health'              => $characterInformation->buildHealth(),
             'has_artifacts'       => $characterInformation->hasArtifacts(),
