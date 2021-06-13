@@ -11,7 +11,7 @@ export default class EnchantingAction extends React.Component {
     this.state = {
       affixList: [],
       inventoryList: [],
-      itemToEnchant: "",
+      itemToEnchant: null,
       suffixId: "",
       prefixId: "",
       canCraft: true,
@@ -111,8 +111,8 @@ export default class EnchantingAction extends React.Component {
 
   enchant() {
     const affixesToAttach = [];
-    const prefixId = this.state.prefixId;
-    const suffixId = this.state.suffixId;
+    const prefixId = parseInt(this.state.prefixId) || null;
+    const suffixId = parseInt(this.state.suffixId) || null;
 
     if (!this.state.canCraft) {
       return getServerMessage('cant_craft');
@@ -256,7 +256,6 @@ export default class EnchantingAction extends React.Component {
     let cost        = this.state.cost;
 
     if ((value === 0 || value !== 0) && (this.state.suffixId !== 0 && this.state.suffixId !== null) && (this.state.itemToEnchant === 0 && this.state.itemToEnchant === null) && typeof oldSuffix !== 'undefined') {
-
       foundAffix = this.state.affixList.filter((a) => a.id === value)[0];
       cost -= this.getSuffixCost(oldSuffix, this.state.itemToEnchant);
       cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
@@ -268,17 +267,18 @@ export default class EnchantingAction extends React.Component {
 
         cost -= this.getSuffixCost(foundOldAffix, this.state.itemToEnchant);
       } else {
-       if ((this.state.suffixId !== null || typeof this.state.suffixId !== 'undefined' || this.state.suffixId !== 0) && cost !== 0) {
-         let foundPreviouslySelected = this.state.affixList.filter((a) => a.id === this.state.suffixId);
+         if (cost !== 0) {
 
-         if (foundPreviouslySelected.length > 0) {
-           foundPreviouslySelected = foundPreviouslySelected[0];
+            let foundPreviouslySelected = this.state.affixList.filter((a) => a.id === this.state.suffixId);
+
+            if (foundPreviouslySelected.length > 0) {
+              foundPreviouslySelected = foundPreviouslySelected[0];
+
+              cost -= this.getSuffixCost(foundPreviouslySelected, this.state.itemToEnchant)
+            }
          }
 
-         cost -= this.getSuffixCost(foundPreviouslySelected, this.state.itemToEnchant)
-       }
-
-       cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
+         cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
       }
     } else if ((this.state.itemToEnchant === 0 || this.state.itemToEnchant === null)) {
       cost = 0;

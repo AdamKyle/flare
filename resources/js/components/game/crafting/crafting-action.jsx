@@ -134,7 +134,9 @@ export default class CraftingAction extends React.Component {
     const foundItem = this.state.itemsToCraft.filter(item => item.id === this.state.itemToCraft)[0];
 
     if (foundItem.cost > this.state.gold) {
-      return getServerMessage('not_enough_gold');
+      this.setState({canCraft: true}, () => {
+        return getServerMessage('not_enough_gold');
+      });
     }
 
     this.setState({
