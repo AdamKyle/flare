@@ -193,7 +193,7 @@ class CharacterInformationBuilder {
         $percentageBonus = 0.0;
 
         foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_ac_mod = ($skill->level / 100);
+            $percentageBonus += $skill->base_ac_mod + ($skill->level / 100);
         }
 
         return $percentageBonus;
