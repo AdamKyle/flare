@@ -29,6 +29,7 @@ export default class BattleAction extends React.Component {
 
     this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
+    this.canAttack = Echo.private('show-timeout-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -50,6 +51,10 @@ export default class BattleAction extends React.Component {
 
     this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
       this.setState({character: event.character});
+    });
+
+    this.canAttack.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
+      this.setState({canAttack: event.canAttack});
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
@@ -127,7 +132,15 @@ export default class BattleAction extends React.Component {
       return true;
     }
 
+    if (this.state.character.is_dead) {
+      return true;
+    }
+
     if (this.state.isAdventuring) {
+      return true;
+    }
+
+    if (!this.state.canAttack) {
       return true;
     }
 

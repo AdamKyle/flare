@@ -79,7 +79,7 @@ export default class Chat extends React.Component {
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
       const messages = cloneDeep(this.state.messages);
-      console.log(event);
+
       const message = {
         message: event.message,
         type: 'server-message',

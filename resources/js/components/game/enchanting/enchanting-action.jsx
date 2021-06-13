@@ -1,6 +1,7 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
+import {getServerMessage} from "../helpers/server_message";
 
 export default class EnchantingAction extends React.Component {
 
@@ -39,6 +40,7 @@ export default class EnchantingAction extends React.Component {
     });
 
     this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
+
       this.setState({
         canCraft: event.canCraft,
         timeRemaining: event.canCraft ? 0 : event.timeout,
@@ -111,6 +113,10 @@ export default class EnchantingAction extends React.Component {
     const affixesToAttach = [];
     const prefixId = this.state.prefixId;
     const suffixId = this.state.suffixId;
+
+    if (!this.state.canCraft) {
+      return getServerMessage('cant_craft');
+    }
 
     if ((prefixId !== 0 && prefixId !== null)) {
       affixesToAttach.push(prefixId);
