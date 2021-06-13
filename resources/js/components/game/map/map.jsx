@@ -30,7 +30,6 @@ export default class Map extends React.Component {
       rightBounds: 0,
       isLoading: true,
       characterId: 0,
-      leftDrag: 0,
       showCharacterInfo: false,
       canMove: true,
       showMessage: false,
@@ -53,36 +52,9 @@ export default class Map extends React.Component {
     this.updateMap = Echo.private('update-map-' + this.props.userId);
     this.addKingomToMap = Echo.private('add-kingdom-to-map-' + this.props.userId);
     this.updateMapPlane = Echo.private('update-map-plane-' + this.props.userId);
-
-    // Listen for the screen to resize
-    window.addEventListener("resize", this.resize.bind(this));
-  }
-
-  resize() {
-    // Allow the drag at different window sizes.
-    if (window.innerWidth >= 1200 && window.innerWidth <= 1500 ) {
-      this.setState({
-        leftDrag: -100,
-      });
-    } else if (window.innerWidth > 1500) {
-      this.setState({
-        leftDrag: 0,
-      });
-    } else if (window.innerWidth > 501 && window.innerWidth < 992) {
-      this.setState({
-        leftDrag: -50,
-      });
-    }  else if (window.innerWidth <= 500) {
-      this.setState({
-        leftDrag: -100,
-      });
-    }
   }
 
   componentDidMount() {
-
-    // Resize on load.
-    this.resize();
 
     axios.get('/api/map/' + this.props.userId).then((result) => {
       this.setState({
@@ -427,7 +399,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
               position={this.state.controlledPosition}
-              bounds={{top: -160, left: this.state.leftDrag, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+              bounds={{top: -160, left: -100, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
               handle=".handle"
               defaultPosition={{x: 0, y: 0}}
               grid={[16, 16]}
