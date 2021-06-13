@@ -51,6 +51,11 @@ class BattleController extends Controller {
     }
 
     public function battleResults(Request $request, Character $character) {
+
+        if ($character->is_dead || !$character->can_attack) {
+            return response()->json(['message' => 'invalid input.'], 429);
+        }
+
         if ($request->is_character_dead) {
 
             $character->update(['is_dead' => true]);

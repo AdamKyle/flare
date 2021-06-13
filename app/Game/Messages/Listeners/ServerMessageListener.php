@@ -44,7 +44,7 @@ class ServerMessageListener
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gained_item':
                 $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse!';
-                dump($event);
+
                 return broadcast(new ServerMessage($event->user, $message, true, $event->link));
             case 'found_item':
                 $message = 'You happen upon a: ' . $event->forMessage . '!';
