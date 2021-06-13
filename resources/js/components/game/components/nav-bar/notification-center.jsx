@@ -25,7 +25,14 @@ export default class NotificationCenter extends React.Component {
         loading: false,
       });
     }).catch((err) => {
-      console.err(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401 || response.status === 429) {
+          return location.reload()
+        }
+      }
+
       return getServerMessage('something_went_wrong');
     });
 

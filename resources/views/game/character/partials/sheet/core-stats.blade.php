@@ -1,12 +1,12 @@
 <dl>
     <dt>Strength:</dt>
-    <dd>{{$character->str}} (Modded: {{$characterInfo['str']}})</dd>
+    <dd>{{$character->str}} (Modded: {{number_format($characterInfo['str'])}})</dd>
     <dt>Durability:</dt>
-    <dd>{{$character->dur}} (Modded: {{$characterInfo['dur']}})</dd>
+    <dd>{{$character->dur}} (Modded: {{number_format($characterInfo['dur'])}})</dd>
     <dt>Dexterity:</dt>
-    <dd>{{$character->dex}} (Modded: {{$characterInfo['dex']}})</dd>
+    <dd>{{$character->dex}} (Modded: {{number_format($characterInfo['dex'])}})</dd>
     <dt>Charisma:</dt>
-    <dd>{{$character->chr}} (Modded: {{$characterInfo['chr']}})</dd>
+    <dd>{{$character->chr}} (Modded: {{number_format($characterInfo['chr'])}})</dd>
     <dt>Intelligence:</dt>
-    <dd>{{$character->int}} (Modded: {{$characterInfo['int']}})</dd>
+    <dd>{{$character->int}} (Modded: {{number_format($characterInfo['int'])}})</dd>
 </dl>

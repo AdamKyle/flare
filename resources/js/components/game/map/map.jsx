@@ -103,6 +103,14 @@ export default class Map extends React.Component {
           kingdom_to_attack: result.data.kingdom_to_attack,
         });
       });
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401 || response.status === 429) {
+          return location.reload()
+        }
+      }
     });
 
     this.echo.listen('Game.Maps.Events.ShowTimeOutEvent', (event) => {

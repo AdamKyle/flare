@@ -43,14 +43,13 @@ export default class KingdomManagementModal extends React.Component {
         isLoading: false,
       })
     }).catch((err) => {
-      if (error.hasOwnProperty('response')) {
+      if (err.hasOwnProperty('response')) {
         const response = err.response;
 
         if (response.status === 401  || response.status === 429) {
           return location.reload();
         }
       }
-      console.error(err);
     });
 
     this.updateKingdom.listen('Game.Kingdoms.Events.UpdateKingdom', (event) => {

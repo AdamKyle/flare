@@ -47,8 +47,8 @@ export default class ActionsSection extends React.Component {
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
-        if (response.status === 429) {
-          this.props.openTimeOutModal();
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
         }
       }
     });

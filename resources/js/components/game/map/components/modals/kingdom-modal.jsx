@@ -21,7 +21,13 @@ export default class KingdomModal extends React.Component {
         loading: false,
       });
     }).catch((err) => {
-      console.error(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
 
       this.props.close();
     });

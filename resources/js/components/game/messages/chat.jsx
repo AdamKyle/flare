@@ -27,7 +27,15 @@ export default class Chat extends React.Component {
       this.setState({
         user: result.data.user,
       });
-    })
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
+    });
 
     axios.get('/api/last-chats/').then((result) => {
       let messages = [];
@@ -44,6 +52,14 @@ export default class Chat extends React.Component {
         messages: messages
       });
 
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {

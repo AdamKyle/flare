@@ -1,10 +1,10 @@
 <dl>
     <dt>Max Health:</dt>
-    <dd>{{$characterInfo['maxHealth']}}</dd>
+    <dd>{{number_format($characterInfo['maxHealth'])}}</dd>
     <dt>Max Attack:</dt>
-    <dd>{{$characterInfo['maxAttack']}}</dd>
+    <dd>{{number_format($characterInfo['maxAttack'])}}</dd>
     <dt>Max Heal For:</dt>
-    <dd>{{$characterInfo['maxHeal']}}</dd>
+    <dd>{{number_format($characterInfo['maxHeal'])}}</dd>
     <dt>Max AC:</dt>
-    <dd>{{$characterInfo['maxAC']}}</dd>
+    <dd>{{number_format($characterInfo['maxAC'])}}</dd>
 </dl>

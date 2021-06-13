@@ -23,7 +23,13 @@ export default class TraverseSection extends React.Component {
         currentMap: result.data.current_map,
       })
     }).catch((err) => {
-      console.error(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
     });
   }
 

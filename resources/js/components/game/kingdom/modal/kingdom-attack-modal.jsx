@@ -34,8 +34,13 @@ export default class KingdomAttackModal extends React.Component {
         kingdoms: result.data,
       });
     }).catch((err) => {
-      this.props.close();
-      console.error(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401 || response.status === 429) {
+          return location.reload()
+        }
+      }
     });
   }
 
