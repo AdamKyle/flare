@@ -37,12 +37,19 @@ export default class KingdomManagementModal extends React.Component {
   }
 
   componentDidMount() {
-    axios.get('/api/kingdoms/' + this.props.kingdomId).then((result) => {
+    axios.get('/api/kingdoms/' + this.props.characterId + '/' + this.props.kingdomId).then((result) => {
       this.setState({
         kingdom: result.data,
         isLoading: false,
       })
     }).catch((err) => {
+      if (error.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
       console.error(err);
     });
 
