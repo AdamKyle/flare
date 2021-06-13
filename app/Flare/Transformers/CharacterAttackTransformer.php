@@ -19,7 +19,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
      */
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-       
+
         return [
             'id'                  => $character->id,
             'ac'                  => $characterInformation->buildDefence(),
