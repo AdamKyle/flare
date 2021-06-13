@@ -16,7 +16,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <p>{{$skill->description}}</p>
+                        <p>{!! nl2br(e($skill->description)) !!}</p>
                         <hr />
                         @if (!$skill->can_train)
                             <p>
@@ -40,9 +40,13 @@
                             <dt>Move Timeout Mod:</dt>
                             <dd>{{$skill->move_time_out_mod_bonus_per_level * 100}}%</dd>
                             <dt>Skill Bonus/lv</dt>
-                            <dd>{{$skill->skill_bonus_per_level}}%</dd>
-                            <dt>Final Bonus At Max Level:</dt>
                             <dd>{{$skill->skill_bonus_per_level * 100}}%</dd>
+                            <dt>Final Bonus At Max Level:</dt>
+                            @if ($skill->can_train)
+                                <dd>{{($skill->skill_bonus_per_level * 99) * 100}}% (Bonuses from equipment can make this higher)</dd>
+                            @else
+                                <dd>{{($skill->skill_bonus_per_level * 399) * 100}}% (Bonuses from equipment can make this higher)</dd>
+                            @endif
                         </dl>
                         @guest
                         @else

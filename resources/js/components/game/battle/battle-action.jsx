@@ -163,7 +163,7 @@ export default class BattleAction extends React.Component {
               {this.monsterOptions()}
             </select>
           </Col>
-          <Col xs={3} sm={3} md={3} lg={3} xl={3}>
+          <Col xs={3} sm={3} md={3} lg={3} xl={1}>
             <button className="btn btn-primary"
                     type="button"
                     disabled={this.againDisabled()}

@@ -42,7 +42,7 @@ class AdventureCompleted extends Mailable
      */
     public function build()
     {
-        return $this->from(config('mail.username'), 'Please Of Tlessa')
+        return $this->from(config('mail.username'), 'Planes of Tlessa')
                     ->subject('An adventure has been completed!')
                     ->mjml('game.core.adventures.mail.completed', [
                         'adventureLog' => $this->adventureLog,

@@ -41,7 +41,7 @@ class KingdomsUpdated extends Mailable
      */
     public function build()
     {
-        return $this->from(config('mail.username'), 'Please Of Tlessa')
+        return $this->from(config('mail.username'), 'Planes of Tlessa')
                     ->subject('Your kingdoms were updated!')
                     ->mjml('game.core.kingdoms.mail.updated', [
                         'user'        => $this->user,

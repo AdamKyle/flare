@@ -241,7 +241,7 @@ export default class Game extends React.Component {
     return (
       <>
         <Row>
-          <Col xs={12} sm={12} md={12} lg={6} xl={9}>
+          <Col xs={12} sm={12} md={12} lg={6} xl={8}>
             <CharacterInfoTopSection
               characterId={this.props.characterId}
               userId={this.props.userId}
@@ -304,7 +304,7 @@ export default class Game extends React.Component {
                 : null
             }
           </Col>
-          <Col xs={12} sm={12} md={12} lg={6} xl={3}>
+          <Col xs={12} sm={12} md={12} lg={6} xl={4}>
             <Map
               apiUrl={this.apiUrl}
               userId={this.props.userId}

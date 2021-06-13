@@ -42,7 +42,7 @@ class RebuiltBuilding extends Mailable
      */
     public function build()
     {
-        return $this->from(config('mail.username'), 'Please Of Tlessa')
+        return $this->from(config('mail.username'), 'Planes of Tlessa')
                     ->subject('One of your buildings was rebuilt.')
                     ->mjml('game.core.kingdoms.mail.rebuilt', [
                         'user'     => $this->user,
