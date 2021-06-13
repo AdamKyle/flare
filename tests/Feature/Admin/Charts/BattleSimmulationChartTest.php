@@ -90,9 +90,10 @@ class BattleSimmulationChartTest extends TestCase {
             'monsterId' => 1,
         ]))->response;
 
+
         $content = json_decode($response->content());
 
-        $this->assertEquals(1, $content->datasets[0]->values[0]);
+        $this->assertEquals(1, $content->datasets[0]->values[2]);
     }
 
     protected function createBattleResults(int $times = 1, array $monsterOptions = []) {
