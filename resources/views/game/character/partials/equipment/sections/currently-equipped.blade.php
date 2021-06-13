@@ -18,30 +18,30 @@
                         <dt>Name:</dt>
                         <dd>{{$details['slot']->item->itemPrefix->name}}</dd>
                         <dt>Base Damage:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->base_damage_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->base_damage_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->base_damage_mod * 100}}%</dd>
                         <dt>Base AC:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->base_ac_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->base_ac_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
                         @php $name = $details['slot']->item->itemPrefix->skill_name; @endphp
                         <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
                         <dt>XP Bonus (when using):</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->skill_training_bonus * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->skill_bonus * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->skill_bonus * 100}}%</dd>
                     </dl>
                 </div>
                 <div class="col-md-6">
                     <dl>
                         <dt>Str mod:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->str_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->str_mod * 100}}%</dd>
                         <dt>Dur mod:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->dur_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->dur_mod * 100}}%</dd>
                         <dt>Dex mod:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->dex_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->dex_mod * 100}}%</dd>
                         <dt>Chr mod:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->chr_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->int_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->int_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>
@@ -54,30 +54,30 @@
                         <dt>Name:</dt>
                         <dd>{{$details['slot']->item->itemSuffix->name}}</dd>
                         <dt>Base Damage:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->base_damage_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->base_damage_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->base_damage_mod * 100}}%</dd>
                         <dt>Base AC:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->base_ac_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->base_ac_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
                         @php $name = $details['slot']->item->itemSuffix->skill_name; @endphp
-                        <dd>{{is_null($name) ? 'N/A' : $name}}</dd>
+                        <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
                         <dt>XP Bonus (when using):</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->skill_training_bonus * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->skill_bonus * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->skill_bonus * 100}}%</dd>
                     </dl>
                 </div>
                 <div class="col-md-6">
                     <dl>
                         <dt>Str mod:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->str_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->str_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->str_mod * 100}}%</dd>
                         <dt>Dur mod:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->dur_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->dur_mod * 100}}%</dd>
                         <dt>Dex mod:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->dex_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->dex_mod * 100}}%</dd>
                         <dt>Chr mod:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->chr_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->int_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->int_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>
@@ -101,9 +101,9 @@
                     <dt>Skill Name:</dt>
                     <dd>{{$skill['skill_name']}}</dd>
                     <dt>Skill XP Bonus (When Training):</dt>
-                    <dd>{{$skill['skill_training_bonus'] * 100}}%</dd>
+                    <dd class="{{$skill['skill_training_bonus'] > 0.0 ? 'text-success' : ''}}">{{$skill['skill_training_bonus'] * 100}}%</dd>
                     <dt>Skill Bonus (When using)</dt>
-                    <dd>{{$skill['skill_bonus'] * 100}}%</dd>
+                    <dd class="{{$skill['skill_bonus'] > 0.0 ? 'text-success' : ''}}">{{$skill['skill_bonus'] * 100}}%</dd>
                 </dl>
             </div>
         @endforeach

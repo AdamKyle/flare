@@ -10,30 +10,30 @@
                         <dt>Name:</dt>
                         <dd>{{$item->itemPrefix->name}}</dd>
                         <dt>Base Damage:</dt>
-                        <dd>{{$item->itemPrefix->base_damage_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod * 100}}%</dd>
                         <dt>Base AC:</dt>
-                        <dd>{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
                         @php $name = $item->itemPrefix->skill_name; @endphp
                         <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
                         <dt>XP Bonus (when using):</dt>
-                        <dd>{{$item->itemPrefix->skill_training_bonus * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
-                        <dd>{{$item->itemPrefix->skill_bonus * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->skill_bonus * 100}}%</dd>
                     </dl>
                 </div>
                 <div class="col-md-6">
                     <dl>
                         <dt>Str mod:</dt>
-                        <dd>{{$item->itemPrefix->str_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->str_mod * 100}}%</dd>
                         <dt>Dur mod:</dt>
-                        <dd>{{$item->itemPrefix->dur_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dur_mod * 100}}%</dd>
                         <dt>Dex mod:</dt>
-                        <dd>{{$item->itemPrefix->dex_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dex_mod * 100}}%</dd>
                         <dt>Chr mod:</dt>
-                        <dd>{{$item->itemPrefix->chr_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
-                        <dd>{{$item->itemPrefix->int_mod * 100}}%</dd>
+                        <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->int_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>
@@ -46,30 +46,30 @@
                         <dt>Name:</dt>
                         <dd>{{$item->itemSuffix->name}}</dd>
                         <dt>Base Damage:</dt>
-                        <dd>{{$item->itemSuffix->base_damage_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_damage_mod * 100}}%</dd>
                         <dt>Base AC:</dt>
-                        <dd>{{$item->itemSuffix->base_ac_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
                         @php $name = $item->itemSuffix->skill_name; @endphp
                         <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
                         <dt>XP Bonus (when using):</dt>
-                        <dd>{{$item->itemSuffix->skill_training_bonus * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
-                        <dd>{{$item->itemSuffix->skill_bonus * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->skill_bonus * 100}}%</dd>
                     </dl>
                 </div>
                 <div class="col-md-6">
                     <dl>
                         <dt>Str mod:</dt>
-                        <dd>{{$item->itemSuffix->str_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->str_mod * 100}}%</dd>
                         <dt>Dur mod:</dt>
-                        <dd>{{$item->itemSuffix->dur_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dur_mod * 100}}%</dd>
                         <dt>Dex mod:</dt>
-                        <dd>{{$item->itemSuffix->dex_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dex_mod * 100}}%</dd>
                         <dt>Chr mod:</dt>
-                        <dd>{{$item->itemSuffix->chr_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
-                        <dd>{{$item->itemSuffix->int_mod * 100}}%</dd>
+                        <dd class="{{$item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->int_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>

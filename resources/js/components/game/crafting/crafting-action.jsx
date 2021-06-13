@@ -23,6 +23,8 @@ export default class CraftingAction extends React.Component {
     }
 
     this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
+    this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+
   }
 
   componentDidMount() {
@@ -39,6 +41,12 @@ export default class CraftingAction extends React.Component {
         timeRemaining: event.canCraft ? 0 : 10,
       }, () => {
         this.props.updateCanCraft(event.canCraft);
+      });
+    });
+
+    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
+      this.setState({
+        gold: event.characterSheet.gold,
       });
     });
   }
@@ -133,12 +141,8 @@ export default class CraftingAction extends React.Component {
 
     const foundItem = this.state.itemsToCraft.filter(item => item.id === this.state.itemToCraft)[0];
 
-    if (foundItem.cost > this.state.gold) {
-      return getServerMessage('not_enough_gold');
-    }
-
     this.setState({
-      canCraft: false,
+      canCraft: this.state.gold < foundItem.cost ? true : false,
       showSuccess: false,
     }, () => {
       this.props.updateCanCraft(event.canCraft);
@@ -229,12 +233,12 @@ export default class CraftingAction extends React.Component {
         </div>
 
         <Row>
-          <Col xs={12} sm={12} md={8} lg={8} xl={8}>
+          <Col xs={12} sm={12} md={8} lg={8} xl={6}>
             {this.renderCraftingDropDowns()}
           </Col>
-          <Col xs={12} sm={12} md={4} lg={4} xl={4}>
+          <Col xs={12} sm={12} md={4} lg={4} xl={6}>
             <Row>
-              <Col xs={4}>
+              <Col xs={3}>
                 {this.renderCraftingButton()}
               </Col>
               <Col xs={8}>

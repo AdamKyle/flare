@@ -1,10 +1,10 @@
 <dl>
     <dt>Base Damage:</dt>
-    <dd>{{$item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
+    <dd class="{{$item->getTotalDamage() > 0 ? 'text-success' : ''}}">{{$item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
     <dt>Base AC:</dt>
-    <dd>{{$item->getTotalDefence()}} <em>(With all modifiers)</em></dd>
+    <dd class="{{$item->getTotalDefence() > 0 ? 'text-success' : ''}}">{{$item->getTotalDefence()}} <em>(With all modifiers)</em></dd>
     <dt>Base Healing:</dt>
-    <dd>{{$item->getTotalHealing()}} <em>(With all modifiers)</em></dd>
+    <dd class="{{$item->getTotalHealing() > 0 ? 'text-success' : ''}}">{{$item->getTotalHealing()}} <em>(With all modifiers)</em></dd>
     <dt>Type:</dt>
     <dd>{{$item->type}}</dd>
 

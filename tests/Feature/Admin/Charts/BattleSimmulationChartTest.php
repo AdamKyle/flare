@@ -92,7 +92,7 @@ class BattleSimmulationChartTest extends TestCase {
 
         $content = json_decode($response->content());
 
-        $this->assertEquals(1, $content->datasets[0]->values[2]);
+        $this->assertEquals(1, $content->datasets[0]->values[0]);
     }
 
     protected function createBattleResults(int $times = 1, array $monsterOptions = []) {
@@ -107,7 +107,7 @@ class BattleSimmulationChartTest extends TestCase {
         $this->createItem();
 
         $this->actingAs($this->user)->post(route('admin.character.modeling.generate'));
-        
+
         $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
             'model_id' => $this->createMonster($monsterOptions)->id,
             'type' => 'monster',

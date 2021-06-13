@@ -86,6 +86,8 @@ export default class Chat extends React.Component {
         user: event.user,
         user_id: event.user.id,
         id: Math.random().toString(36).substring(7),
+        isLink: event.isLink,
+        link: event.link,
       };
 
       messages.unshift(message);
@@ -172,11 +174,19 @@ export default class Chat extends React.Component {
 
       this.state.messages.map((message) => {
         if (message.user_id === this.props.userId && message.type === 'server-message') {
-          elements.push(
-            <li key={message.id + '_server-message'}>
-              <div className="server-message">{message.message}</div>
-            </li>
-          )
+          if (message.isLink) {
+            elements.push(
+              <li key={message.id + '_server-message_link'}>
+                <div className="server-message"><a href={message.link} target="_blank">{message.message}</a></div>
+              </li>
+            )
+          } else {
+            elements.push(
+              <li key={message.id + '_server-message'}>
+                <div className="server-message">{message.message}</div>
+              </li>
+            )
+          }
         } else if(message.type === 'global-message') {
           elements.push(
             <li key={message.id + '_global-message'}>

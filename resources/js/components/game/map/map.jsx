@@ -55,6 +55,7 @@ export default class Map extends React.Component {
   }
 
   componentDidMount() {
+
     axios.get('/api/map/' + this.props.userId).then((result) => {
       this.setState({
         mapUrl: result.data.map_url,

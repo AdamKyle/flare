@@ -118,7 +118,7 @@ class EquipItemService {
      * @param Collection $inventorySlots
      * @return array
      */
-    public function getItemStats(Item $toCompare, Collection $inventorySlots): array {
-       return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots);
+    public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array {
+       return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots, $character);
     }
 }

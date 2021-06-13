@@ -2,10 +2,13 @@
 
 namespace App\Game\Core\Comparison;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison {
+
+    private $character;
 
     /**
      * Fetch Comparison Details for an item of the same type currently equipped.
@@ -14,7 +17,10 @@ class ItemComparison {
      * @param Collection $inventorySlots
      * @return array
      */
-    public function fetchDetails(Item $toCompare, Collection $inventorySlots): array {
+    public function fetchDetails(Item $toCompare, Collection $inventorySlots, Character $character): array {
+
+        $this->character = $character;
+
         $comparison = [];
 
         foreach($inventorySlots as $slot) {
@@ -154,7 +160,7 @@ class ItemComparison {
         $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
         $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
 
-        if ($totalPercentageForCompare < $totalPercentageForEquipped) {
+        if ($totalPercentageForCompare > $totalPercentageForEquipped) {
             return $totalPercentageForCompare - $totalPercentageForEquipped;
         }
 
@@ -219,6 +225,15 @@ class ItemComparison {
 
         $totalHealingEquipped = $equipped->getTotalHealing();
         $totalHealingCompare  = $toCompare->getTotalHealing();
+
+        $totalStatForEquipped = $equipped->getTotalPercentageForStat($this->character->damage_stat);
+        $totalStatForCompare  = $toCompare->getTotalPercentageForStat($this->character->damage_stat);
+
+        if ($totalStatForEquipped > 0.0) {
+            if ($totalStatForCompare > $totalStatForEquipped) {
+                return true;
+            }
+        }
 
         if ($totalDamageForCompare > $totalDamageForEquipped) {
             return true;
