@@ -350,6 +350,10 @@ class MovementService {
             'port_details'      => $this->portDetails(),
             'adventure_details' => $this->adventureDetails(),
             'kingdom_details'   => $this->kingdomDetails(),
+            'characters_on_map' => Character::join('maps', function($query) use ($character) {
+                $mapId = $character->map->game_map_id;
+                $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
+            })->count()
         ]);
     }
 

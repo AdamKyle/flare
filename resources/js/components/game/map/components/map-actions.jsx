@@ -50,6 +50,11 @@ export default class MapActions extends React.Component {
               </div>
             </Col>
           </Row>
+          <Row>
+            <Col xs={12}>
+              Characters on map: {this.props.charactersOnMap}
+            </Col>
+          </Row>
         </div>
       </div>
     )

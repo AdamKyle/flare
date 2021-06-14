@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Services;
 
 use App\Game\Maps\Events\MoveTimeOutEvent;
+use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Values\MapTileValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -99,6 +100,8 @@ class TraverseService {
      * @param Character $character
      */
     public function travel(int $mapId, Character $character) {
+        $oldMap = $character->map->game_map_id;
+
         $character->map()->update([
             'game_map_id' => $mapId
         ]);
@@ -123,6 +126,7 @@ class TraverseService {
             }
         }
 
+        $this->updateGlobalCharacterMapCount($oldMap);
         $this->updateMap($character);
         $this->updateActions($mapId, $character);
         $this->updateCharacterTimeOut($character);
@@ -188,6 +192,25 @@ class TraverseService {
      */
     protected function updateMap(Character $character) {
 
-        broadcast(new UpdateMapBroadcast($this->locationService->getLocationData($character), $character->user));
+        broadcast(new UpdateMapBroadcast($this->locationService->getLocationData($character->refresh()), $character->user));
+    }
+
+    /**
+     * When the character traverses, lets update the global character count for all planes.
+     *
+     * @param int $oldMap
+     */
+    protected function updateGlobalCharacterMapCount(int $oldMap) {
+        $maps = GameMap::where('id', '=', $oldMap)->get();
+
+        foreach ($maps as $map) {
+            broadcast(new UpdateGlobalCharacterCountBroadcast($map));
+        }
+
+        $maps = GameMap::where('id', '!=', $oldMap)->get();
+
+        foreach ($maps as $map) {
+            broadcast(new UpdateGlobalCharacterCountBroadcast($map));
+        }
     }
 }

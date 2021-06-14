@@ -93,6 +93,7 @@ class LocationService {
             'can_move'               => $character->can_move,
             'timeout'                => $character->can_move_again_at,
             'port_details'           => $this->portDetails,
+            'map_name'               => $character->map->gameMap->name,
             'adventure_details'      => $this->adventureDetails,
             'adventure_logs'         => $character->adventureLogs,
             'adventure_completed_at' => $character->can_adventure_again_at,
@@ -103,6 +104,10 @@ class LocationService {
             'can_manage_kingdom'     => $this->canManage,
             'kingdom_to_attack'      => $this->kingdomToAttack,
             'my_kingdoms'            => $this->getKingdoms($character),
+            'characters_on_map'      => Character::join('maps', function($query) use ($character) {
+                $mapId = $character->map->game_map_id;
+                $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
+            })->count(),
         ];
     }
 

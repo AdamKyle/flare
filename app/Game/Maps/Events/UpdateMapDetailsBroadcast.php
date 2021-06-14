@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Flare\Models\Character;
 use App\Game\Core\Traits\KingdomCache;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -43,6 +44,11 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
     public $updatedKingdoms = [];
 
     /**
+     * @var int $charactersOnMap
+     */
+    public $charactersOnMap = 0;
+
+    /**
      * @var User $user
      */
 
@@ -69,6 +75,10 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
         $this->portDetails      = $service->portDetails();
         $this->adventureDetails = $service->adventureDetails();
         $this->kingdomDetails   = $service->kingdomDetails();
+        $this->charactersOnMap  = Character::join('maps', function($query) use ($user) {
+            $mapId = $user->character->map->game_map_id;
+            $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
+        })->count();
     }
 
     /**
