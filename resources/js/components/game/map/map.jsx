@@ -391,7 +391,7 @@ export default class Map extends React.Component {
           location.reload();
         }
 
-        if (error.response.status === 429) {
+        if (response.status === 429) {
           return this.props.openTimeOutModal();
         }
       }
