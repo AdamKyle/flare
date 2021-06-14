@@ -79,7 +79,7 @@ export default class Attack {
   }
 
   canHit(attacker, defender, type) {
-    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus / 2;
+    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
 
     if (attackerAccuracy < 1) {
