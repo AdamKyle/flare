@@ -376,7 +376,17 @@ export default class Chat extends React.Component {
   }
 
   handleOnClick() {
-    this.postMessage();
+    if (this.state.message.length < 1) {
+      getServerMessage('message_length_0');
+    } else if (this.state.message.length > 140) {
+      getServerMessage('message_length_max');
+    } else {
+      if (this.state.message.includes('/m')) {
+        this.postPrivateMessage()
+      } else {
+        this.postMessage();
+      }
+    }
   }
 
   handleOnChange(e) {

@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Events;
 
+use App\Flare\Models\Kingdom;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -26,14 +27,24 @@ class AddKingdomToMap implements ShouldBroadcastNow
     public $kingdoms;
 
     /**
+     * @var array $npcKingdoms
+     */
+    public $npcKingdoms;
+
+    /**
      * Create a new event instance.
      *
      * @param Character $character
      */
     public function __construct(Character $character)
     {
-        $this->user     = $character->user;
-        $this->kingdoms = $this->getKingdoms($character);
+        $this->user        = $character->user;
+        $this->kingdoms    = $this->getKingdoms($character);
+        $this->npcKingdoms = Kingdom::select('x_position', 'y_position', 'id')
+                                ->whereNull('character_id')
+                                ->where('game_map_id', $character->map->game_map_id)
+                                ->get()
+                                ->toArray();
     }
 
     /**

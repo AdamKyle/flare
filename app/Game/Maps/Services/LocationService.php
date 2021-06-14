@@ -154,16 +154,18 @@ class LocationService {
         })->get();
 
         if (!is_null($kingdom)) {
-            if ($character->id !== $kingdom->character->id) {
-                $this->canAttack = $units->isNotEmpty();
+            if (!is_null($kingdom->character_id)) {
+                if ($character->id !== $kingdom->character->id) {
+                    $this->canAttack = $units->isNotEmpty();
 
-                $this->kingdomToAttack = [
-                    'id' => $kingdom->id,
-                    'x_position' => $kingdom->x_position,
-                    'y_position' => $kingdom->y_position,
-                ];
-            } else {
-                $this->canManage = true;
+                    $this->kingdomToAttack = [
+                        'id' => $kingdom->id,
+                        'x_position' => $kingdom->x_position,
+                        'y_position' => $kingdom->y_position,
+                    ];
+                } else {
+                    $this->canManage = true;
+                }
             }
         } else if (is_null($this->location)) {
             $this->canSettle = true;

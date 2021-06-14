@@ -67,15 +67,16 @@ class NpcCommandHandler {
      */
     protected function handleTakingKingdom(User $user, string $npcName): bool {
         $character      = $user->character;
-        $characterX     = $character->map->x_position;
-        $characterY     = $character->map->y_position;
+        $characterX     = $character->map->character_position_x;
+        $characterY     = $character->map->character_position_y;
         $characterMapId = $character->map->game_map_id;
         $tookKingdom    = false;
 
-        $kingdom = Kingdom::where('character_id', '!=', $character->id)
+        $kingdom = Kingdom::whereNull('character_id')
                           ->where('x_position', $characterX)
                           ->where('y_position', $characterY)
                           ->where('game_map_id', $characterMapId)
+                          ->where('npc_owned', true)
                           ->first();
 
         if (is_null($kingdom)) {
@@ -99,7 +100,7 @@ class NpcCommandHandler {
                 'character_id' => $character->id
             ]);
 
-            $this->addKingdomToCache($character->refresh(), $kingdom->refrssh());
+            $this->addKingdomToCache($character->refresh(), $kingdom->refresh());
 
             event(new AddKingdomToMap($character));
 

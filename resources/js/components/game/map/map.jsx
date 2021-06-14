@@ -197,6 +197,7 @@ export default class Map extends React.Component {
     this.addKingomToMap.listen('Game.Kingdoms.Events.AddKingdomToMap', (event) => {
       this.setState({
         kingdoms: event.kingdoms,
+        npcKingdoms: event.npcKingdoms,
       }, () => {
         this.props.updateKingdoms({
           my_kingdoms: this.state.kingdoms,
