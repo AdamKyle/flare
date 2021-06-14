@@ -104,6 +104,12 @@ class LocationService {
             'can_manage_kingdom'     => $this->canManage,
             'kingdom_to_attack'      => $this->kingdomToAttack,
             'my_kingdoms'            => $this->getKingdoms($character),
+            'other_kingdoms'         => Kingdom::select('x_position', 'y_position', 'id', 'color')
+                                               ->whereNotNull('character_id')
+                                               ->where('character_id', '!=', $character->id)
+                                               ->where('game_map_id', $character->map->game_map_id)
+                                               ->get()
+                                               ->toArray(),
             'characters_on_map'      => Character::join('maps', function($query) use ($character) {
                 $mapId = $character->map->game_map_id;
                 $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);

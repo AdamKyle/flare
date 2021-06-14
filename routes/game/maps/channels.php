@@ -14,3 +14,8 @@ Broadcast::channel('update-map-plane-{userId}', function($user, $userId) {
 Broadcast::channel('global-character-count-plane', function($user) {
     return $user;
 });
+
+// When a kingdom is settled.
+BroadCast::channel('global-map-update', function($user) {
+   return $user;
+});

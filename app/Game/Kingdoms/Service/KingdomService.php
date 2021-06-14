@@ -11,6 +11,7 @@ use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
@@ -118,6 +119,9 @@ class KingdomService {
      */
     public function addKingdomToMap(Character $character): array {
         event(new AddKingdomToMap($character));
+
+        broadcast(new UpdateGlobalMap($character));
+
 
         return [];
     }
