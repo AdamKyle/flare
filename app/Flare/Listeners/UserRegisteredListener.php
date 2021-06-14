@@ -36,7 +36,7 @@ class UserRegisteredListener {
 
         $lastRecord = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
-        if ($lastRecord->created_at->lt(Carbon::now())) {
+        if ($lastRecord->created_at->lt(Carbon::today(config('app.timezone')))) {
             UserSiteAccessStatistics::create([
                 'amount_signed_in'  => 0,
                 'amount_registered' => 1,
