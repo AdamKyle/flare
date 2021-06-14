@@ -81,10 +81,8 @@ class BattleController extends Controller {
 
                     event(new UpdateCharacterEvent($character, $monster));
 
-                    if ($this->canCheckForDrop()) {
-                        event(new DropsCheckEvent($character, $monster));
-                        event(new GoldRushCheckEvent($character, $monster));
-                    }
+                    event(new DropsCheckEvent($character, $monster));
+                    event(new GoldRushCheckEvent($character, $monster));
 
                     event(new AttackTimeOutEvent($character));
 
@@ -116,16 +114,4 @@ class BattleController extends Controller {
         ], 200);
     }
 
-    /**
-     * Can the player even attempt to get a drop?
-     *
-     * @return bool
-     */
-    public function canCheckForDrop(): bool {
-        if (rand(1, 100) >= 65) {
-            return true;
-        }
-
-        return false;
-    }
 }

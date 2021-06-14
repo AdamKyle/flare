@@ -258,11 +258,9 @@ class AdventureService {
         $questDrop = null;
         $gold      = 0;
 
-        if ($this->canGetDrop()) {
-            $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
-            $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards);
-            $gold      = $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
-        }
+        $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
+        $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards);
+        $gold      = $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
 
         if (!is_null($drop)) {
             $this->rewards['items'][] = [
@@ -281,19 +279,6 @@ class AdventureService {
         $this->rewards['gold'] += $gold;
 
         $this->setLogs($attackService, $adventureLog);
-    }
-
-    /**
-     * Can the player even attempt to get a drop?
-     *
-     * @return bool
-     */
-    public function canGetDrop(): bool {
-        if (rand(1, 100) >= 50) {
-            return true;
-        }
-
-        return false;
     }
 
     protected function setCharacterModelingLogs(FightService $attackService, bool $dead = false, bool $tookTooLong = false) {
