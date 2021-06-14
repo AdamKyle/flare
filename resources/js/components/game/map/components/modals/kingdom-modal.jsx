@@ -87,11 +87,11 @@ export default class KingdomModal extends React.Component {
       this.props.close();
 
       if (error.hasOwnProperty('response')) {
-        if (error.response.status === 429) {
+        if (response.status === 429) {
           return this.props.openTimeOutModal();
         }
 
-        if (error.response.status === 401) {
+        if (response.status === 401) {
           return location.reload();
         }
 
