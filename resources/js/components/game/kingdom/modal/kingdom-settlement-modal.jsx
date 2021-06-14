@@ -85,6 +85,7 @@ export default class KingdomSettlementModal extends React.Component {
         }
 
         this.setState({
+          loading: false,
           errorMessage: response.data.errors.name[0],
         });
       } else {
