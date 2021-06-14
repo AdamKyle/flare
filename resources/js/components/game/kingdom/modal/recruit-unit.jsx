@@ -69,7 +69,7 @@ export default class RecruitUnit extends React.Component {
               updateAmount={this.updateAmount.bind(this)}
               updateKingdomData={this.props.updateKingdomData}
               close={this.props.close}
-              openTimeOutModal={this.openTimeOutModal.bind(this)}
+              openTimeOutModal={this.props.openTimeOutModal.bind(this)}
             />
           </div>
           <UnitData
