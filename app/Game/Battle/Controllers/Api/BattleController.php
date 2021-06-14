@@ -80,8 +80,12 @@ class BattleController extends Controller {
                     $monster = Monster::find($request->monster_id);
 
                     event(new UpdateCharacterEvent($character, $monster));
-                    event(new DropsCheckEvent($character, $monster));
-                    event(new GoldRushCheckEvent($character, $monster));
+
+                    if ($this->canCheckForDrop()) {
+                        event(new DropsCheckEvent($character, $monster));
+                        event(new GoldRushCheckEvent($character, $monster));
+                    }
+
                     event(new AttackTimeOutEvent($character));
 
                     $characterData = new Item($character, $this->character);
@@ -110,5 +114,18 @@ class BattleController extends Controller {
         return response()->json([
             'character' => $this->manager->createData($character)->toArray()
         ], 200);
+    }
+
+    /**
+     * Can the player even attempt to get a drop?
+     *
+     * @return bool
+     */
+    public function canCheckForDrop(): bool {
+        if (rand(1, 100) >= 65) {
+            return true;
+        }
+
+        return false;
     }
 }

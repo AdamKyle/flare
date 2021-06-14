@@ -36,7 +36,7 @@ export default class Attack {
       return this;
     }
 
-    if (!this.canHit(attacker, defender)) {
+    if (!this.canHit(attacker, defender, type)) {
       this.battleMessages.push({
         message: this.attackerName + ' missed!'
       });
@@ -47,7 +47,7 @@ export default class Attack {
         return this.attack(defender, attacker, false, 'monster');
       }
     } else {
-      if (this.blockedAttack(defender, attacker)) {
+      if (this.blockedAttack(defender, attacker, type)) {
         this.battleMessages.push({
           message: defender.name + ' blocked the attack!'
         });
@@ -78,17 +78,55 @@ export default class Attack {
     }
   }
 
-  canHit(attacker, defender) {
-    const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
-    const defenderDodge = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+  canHit(attacker, defender, type) {
+    let attackerAccuracy = (attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus / 2);
+    let defenderDodge = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
 
-    return (attacker.dex * (1 + attackerAccuracy)) > (defender.dex * (1 + defenderDodge));
+    if (attackerAccuracy < 1) {
+      attackerAccuracy = 1 + attackerAccuracy
+    }
+
+    if (defenderDodge < 1) {
+      attackerAccuracy = 1 + attackerAccuracy
+    }
+
+    const baseStatBonus      = attacker.base_stat - Math.ceil(attacker.base_stat * .50);
+    const enemyBaseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
+
+    if (type === 'player') {
+      const levelDiff = this.getLevelDiff(attacker.level, defender.max_level);
+
+      if (levelDiff >= 0.45) {
+        const max = levelDiff >= 1 ? attacker.level : defender.max_level - Math.ceil(defender.max_level * levelDiff);
+
+        if (max >= attacker.level) {
+          return (attacker.dex + (baseStatBonus * attackerAccuracy)) > (defender.dex + (enemyBaseStatBonus * (1 + defenderDodge)));
+        }
+
+        if (this.generateRandomNumber(attacker.level, max) > max) {
+          return (attacker.dex + (baseStatBonus * attackerAccuracy)) > (defender.dex + (enemyBaseStatBonus * (1 + defenderDodge)));
+        }
+
+        return false;
+      } else {
+        return false;
+      }
+    }
+
+    return (attacker.dex + (baseStatBonus * attackerAccuracy)) > (defender.dex + (enemyBaseStatBonus * (1 + defenderDodge)));
   }
 
-  blockedAttack(defender, attacker) {
-    const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
+  blockedAttack(defender, attacker, type) {
+    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
 
-    return (attacker.base_stat * (1 + attackerAccuracy)) + 10 < defender.ac;
+    if (attackerAccuracy < 1) {
+      attackerAccuracy = 1 + attackerAccuracy
+    }
+
+    let dexBonus      = attacker.dex - Math.ceil(attacker.dex * .90);
+    let baseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .90);
+    
+    return ((attacker.base_stat  * attackerAccuracy) + dexBonus) < defender.ac + baseStatBonus;
   }
 
   isMonsterDead() {
@@ -97,6 +135,21 @@ export default class Attack {
 
   isCharacterDead() {
     return this.characterCurrentHealth <= 0;
+  }
+
+  generateRandomNumber(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  getLevelDiff(attackerLevel, defenderLevel) {
+    if (attackerLevel > defenderLevel) {
+      return 1;
+    }
+
+    return defenderLevel / attackerLevel;
   }
 
   doAttack(attacker, type) {

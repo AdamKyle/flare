@@ -12,7 +12,7 @@ class MonsterTransfromer extends TransformerAbstract {
 
     /**
      * Fetches the monster response data
-     * 
+     *
      * @param Monster $monster
      */
     public function transform(Monster $monster) {
@@ -31,6 +31,7 @@ class MonsterTransfromer extends TransformerAbstract {
             'attack_range' => $monster->attack_range,
             'skills'       => $this->fetchSkills($monster->skills),
             'base_stat'    => $monster->{$monster->damage_stat},
+            'max_level'    => $monster->max_level,
         ];
     }
 }
