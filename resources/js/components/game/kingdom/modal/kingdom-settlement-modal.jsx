@@ -41,7 +41,7 @@ export default class KingdomSettlementModal extends React.Component {
 
     if (kingdomName.length < 5) {
       this.setState({
-        errorMessage: 'Kingdom name must be minum of 5 characters.'
+        errorMessage: 'Kingdom name must be minimum of 5 characters.'
       })
     }
 
@@ -69,6 +69,7 @@ export default class KingdomSettlementModal extends React.Component {
           loading: false,
         }, () => {
           this.props.close();
+          this.props.openKingdomManagement()
         });
       }
     }).catch((error) => {
@@ -80,7 +81,7 @@ export default class KingdomSettlementModal extends React.Component {
         }
 
         if (response.status === 429) {
-          return this.props.openKingdomManagement(2)
+          return this.props.openTimeOutModal()
         }
 
         this.setState({
