@@ -24,7 +24,6 @@ class UnbanRequestController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (is_null($user)) {
-            // dd('here');
             return redirect()->back()->with('error', 'This email does not match our records.');
         }
 

@@ -93,11 +93,7 @@ class ItemComparison {
         $totalDefenceForEquipped = $equipped->getTotalDefence();
         $totalDefenceForCompare  = $toCompare->getTotalDefence();
 
-        if ($totalDefenceForCompare < $totalDefenceForEquipped) {
-            return $totalDefenceForCompare - $totalDefenceForEquipped;
-        }
-
-        return 0;
+        return $totalDefenceForCompare - $totalDefenceForEquipped;
     }
 
     /**
@@ -125,11 +121,7 @@ class ItemComparison {
         $totalHealForEquipped = $equipped->getTotalHealing();
         $totalHealForCompare  = $toCompare->getTotalHealing();
 
-        if ($totalHealForCompare < $totalHealForEquipped) {
-            return $totalHealForCompare - $totalHealForEquipped;
-        }
-
-        return 0;
+        return $totalHealForCompare - $totalHealForEquipped;
     }
 
     /**
@@ -160,11 +152,7 @@ class ItemComparison {
         $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
         $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
 
-        if ($totalPercentageForCompare > $totalPercentageForEquipped) {
-            return $totalPercentageForCompare - $totalPercentageForEquipped;
-        }
-
-        return 0.0;
+        return $totalPercentageForCompare - $totalPercentageForEquipped;
     }
 
     protected function fetchHandComparison(Item $toCompare, Collection $inventorySlots, string $hand): array {

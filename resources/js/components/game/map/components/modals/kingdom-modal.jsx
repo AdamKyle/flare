@@ -112,7 +112,7 @@ export default class KingdomModal extends React.Component {
         />
       );
     }
-    console.log(this.props.kingdom.color);
+
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
         <Modal.Header closeButton style={{backgroundColor: this.props.kingdom.color}}>
