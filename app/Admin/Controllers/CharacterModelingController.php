@@ -77,6 +77,7 @@ class CharacterModelingController extends Controller {
     }
 
     public function adventureResults(CharacterSnapShot $characterSnapShot) {
+
         return view('admin.character-modeling.adventure-results', [
             'adventureData' => $characterSnapShot->adventure_simmulation_data,
             'characterId'   => $characterSnapShot->character_id,

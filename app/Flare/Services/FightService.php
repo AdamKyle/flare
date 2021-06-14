@@ -251,12 +251,12 @@ class FightService {
 
         if ($defender instanceof  Character) {
             $dexBonus = $this->characterInformation->statMod('dex');
-            $baseStat = $this->characterInformation->statMod($defender->{$defender->damage_stat});
+            $baseStat = $this->characterInformation->statMod($defender->damage_stat);
         }
 
         if ($attacker instanceof Character) {
             $dexBonus = $this->characterInformation->statMod('dex');
-            $baseStat = $this->characterInformation->statMod($attacker->{$attacker->damage_stat});
+            $baseStat = $this->characterInformation->statMod($attacker->damage_stat);
         }
 
         if ($defender instanceof Character) {
