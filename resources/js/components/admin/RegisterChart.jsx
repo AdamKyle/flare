@@ -48,8 +48,18 @@ export default class SignInChart extends React.Component {
         data: dataset,
         loading: false,
       });
-    }).catch((error) => {
-      console.error(error);
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
+        }
+      }
     });
 
     this.update.listen('Flare.Events.UpdateSiteStatisticsChart', (event) => {

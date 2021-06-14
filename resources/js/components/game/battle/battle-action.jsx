@@ -29,6 +29,7 @@ export default class BattleAction extends React.Component {
 
     this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
+    this.canAttack = Echo.private('show-timeout-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -50,6 +51,10 @@ export default class BattleAction extends React.Component {
 
     this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
       this.setState({character: event.character});
+    });
+
+    this.canAttack.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
+      this.setState({canAttack: event.canAttack});
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
@@ -127,7 +132,15 @@ export default class BattleAction extends React.Component {
       return true;
     }
 
+    if (this.state.character.is_dead) {
+      return true;
+    }
+
     if (this.state.isAdventuring) {
+      return true;
+    }
+
+    if (!this.state.canAttack) {
       return true;
     }
 
@@ -135,6 +148,14 @@ export default class BattleAction extends React.Component {
   }
 
   renderActions() {
+    let monsterId = 0;
+
+    if (typeof this.state.monster !== 'undefined') {
+      if (this.state.monster.hasOwnProperty('id')) {
+        monsterId = this.state.monster.id
+      }
+    }
+
     return (
       <>
         {this.state.isAdventuring
@@ -146,9 +167,9 @@ export default class BattleAction extends React.Component {
           null
         }
         <Row>
-          <Col xs={12} sm={12} md={12} lg={6} xl={8}>
+          <Col xs={12} sm={12} md={12} lg={6} xl={6}>
             <select className="form-control monster-select" id="monsters" name="monsters"
-                    value={this.state.monster.hasOwnProperty('id') ? this.state.monster.id : 0}
+                    value={monsterId}
                     onChange={this.updateActions.bind(this)}
                     disabled={this.monsterSelectDisabled()}>
               <option value="" key="0">Please select a monster</option>

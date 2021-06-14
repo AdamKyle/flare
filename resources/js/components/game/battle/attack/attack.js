@@ -36,7 +36,7 @@ export default class Attack {
       return this;
     }
 
-    if (!this.canHit(attacker, defender)) {
+    if (!this.canHit(attacker, defender, type)) {
       this.battleMessages.push({
         message: this.attackerName + ' missed!'
       });
@@ -47,7 +47,7 @@ export default class Attack {
         return this.attack(defender, attacker, false, 'monster');
       }
     } else {
-      if (this.blockedAttack(defender, attacker)) {
+      if (this.blockedAttack(defender, attacker, type)) {
         this.battleMessages.push({
           message: defender.name + ' blocked the attack!'
         });
@@ -78,17 +78,29 @@ export default class Attack {
     }
   }
 
-  canHit(attacker, defender) {
-    const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
-    const defenderDodge = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+  canHit(attacker, defender, type) {
+    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
+    let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
 
-    return (attacker.dex * (1 + attackerAccuracy)) > (defender.dex * (1 + defenderDodge));
+    if (attackerAccuracy < 1) {
+      attackerAccuracy = 1 + attackerAccuracy
+    }
+
+    if (defenderDodge < 1) {
+      defenderDodge = 1 + defenderDodge
+    }
+
+    const baseStatBonus      = attacker.base_stat - Math.ceil(attacker.base_stat * .50);
+    const enemyBaseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
+
+    return (attacker.dex + (baseStatBonus * attackerAccuracy)) > (defender.dex + (enemyBaseStatBonus * defenderDodge));
   }
 
-  blockedAttack(defender, attacker) {
-    const attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
+  blockedAttack(defender, attacker, type) {
+    let dexBonus      = attacker.dex - Math.ceil(attacker.dex * .50);
+    let baseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
 
-    return (attacker.base_stat * (1 + attackerAccuracy)) + 10 < defender.ac;
+    return Math.ceil((attacker.base_stat / 2) + dexBonus) < (defender.ac + baseStatBonus);
   }
 
   isMonsterDead() {

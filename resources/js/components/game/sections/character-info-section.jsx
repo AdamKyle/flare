@@ -32,6 +32,18 @@ export default class CharacterInfoTopSection extends React.Component {
             this.props.openTimeOutModal(result.data.sheet.timeout_until)
           }
         });
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            return location.reload()
+          }
+
+          if (response.status === 429) {
+            this.props.openTimeOutModal()
+          }
+        }
       });
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {

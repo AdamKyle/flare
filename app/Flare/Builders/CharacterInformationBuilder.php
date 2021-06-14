@@ -54,8 +54,12 @@ class CharacterInformationBuilder {
         foreach ($equipped as $slot) {
             $percentageIncrease = $this->fetchModdedStat($stat, $slot->item);
 
+            if ($percentageIncrease < 1) {
+                $percentageIncrease = 1 + $percentageIncrease;
+            }
+
             if ($percentageIncrease !== 0.0) {
-                $base += ($base * $this->fetchModdedStat($stat, $slot->item));
+                $base *= $percentageIncrease;
             }
         }
 
@@ -115,14 +119,21 @@ class CharacterInformationBuilder {
         }
 
         $totalPercentage = 1.0;
+        $baseHealth      = $this->character->dur + 10;
 
         foreach ($this->character->inventory->slots as $slot) {
             if ($slot->equipped) {
-                $totalPercentage += $slot->item->getTotalPercentageForStat('dur');
+                $percentage = $slot->item->getTotalPercentageForStat('dur');
+
+                if ($percentage < 1) {
+                    $percentage = 1 + $percentage;
+                }
+
+                $baseHealth *= $percentage;
             }
         }
 
-        return ($this->character->dur + 10) * $totalPercentage;
+        return $baseHealth;
     }
 
     /**
@@ -182,7 +193,7 @@ class CharacterInformationBuilder {
         $percentageBonus = 0.0;
 
         foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_ac_mod = ($skill->level / 100);
+            $percentageBonus += $skill->base_ac_mod + ($skill->level / 100);
         }
 
         return $percentageBonus;

@@ -48,11 +48,6 @@ class EventsProvider extends ServiceProvider {
             UpdateSkillListener::class,
         ],
 
-        // When a user Logs out
-        Logout::class => [
-            UserLoggedOutListener::class,
-        ],
-
         // When a user logs in.
         Login::class => [
             UserLoggedInListener::class,
@@ -62,8 +57,6 @@ class EventsProvider extends ServiceProvider {
         Registered::class => [
             UserRegisteredListener::class,
         ]
-
-
     ];
 
     /**

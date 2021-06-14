@@ -33,15 +33,29 @@ class ServerMessageEvent implements ShouldBroadcastNow
     public $npc;
 
     /**
-     * Create a new event instance.
+     * @var bool $isLink
+     */
+    public $isLink;
+
+    /**
+     * @var string|null $link
+     */
+    public $link;
+
+    /**
+     * ServerMessageEvent constructor.
      *
      * @param User $user
      * @param string $message
      * @param bool $npc
+     * @param bool $isLink
+     * @param string|null $link
      */
-    public function __construct(User $user, string $message, bool $npc = false) {
+    public function __construct(User $user, string $message, bool $npc = false, bool $isLink = false, string $link = null) {
         $this->user    = $user;
         $this->message = $message;
+        $this->isLink  = $isLink;
+        $this->link    = $link;
         $this->npc     = $npc;
     }
 

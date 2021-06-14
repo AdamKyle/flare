@@ -48,7 +48,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('GET', route('kingdoms.location', [
-            'kingdom' => 1
+            'kingdom' => 1,
+            'character' => $this->character->getCharacter()->id,
         ]))->response;
 
         $content = json_decode($response->content());

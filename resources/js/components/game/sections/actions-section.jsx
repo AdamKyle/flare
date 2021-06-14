@@ -47,8 +47,8 @@ export default class ActionsSection extends React.Component {
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
-        if (response.status === 429) {
-          this.props.openTimeOutModal();
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
         }
       }
     });
@@ -179,6 +179,7 @@ export default class ActionsSection extends React.Component {
               timeRemaining={this.state.character.can_craft_again_at}
               updateCanCraft={this.updateCanCraft.bind(this)}
               isAdventuring={this.state.isAdventuring}
+              openTimeOutModal={this.props.openTimeOutModal}
             />
             {this.state.showEnchanting ?
               <EnchantingAction
@@ -191,6 +192,7 @@ export default class ActionsSection extends React.Component {
                 timeRemaining={this.state.character.can_craft_again_at}
                 updateCanCraft={this.updateCanCraft.bind(this)}
                 isAdventuring={this.state.isAdventuring}
+                openTimeOutModal={this.props.openTimeOutModal}
               />
               : null
             }
@@ -203,6 +205,7 @@ export default class ActionsSection extends React.Component {
               setMonster={this.setMonster.bind(this)}
               canAttack={this.props.canAttack}
               isAdventuring={this.state.isAdventuring}
+              openTimeOutModal={this.props.openTimeOutModal}
             />
 
           </Col>

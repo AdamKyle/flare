@@ -44,11 +44,11 @@ export default class MapMovementActions extends React.Component {
           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="south"
                   disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>South
           </button>
-          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east"
-                  disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>East
-          </button>
           <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="west"
                   disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>West
+          </button>
+          <button type="button" className="float-left btn btn-primary mr-2 btn-sm" data-direction="east"
+                  disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>East
           </button>
           <button type="button" className="float-left btn btn-primary btn-sm mr-2 " data-direction="traverse"
                   disabled={this.props.disableMapButtons()} onClick={this.props.openTraverse}>Traverse

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
+import {getServerMessage} from "../helpers/server_message";
 
 export default class EnchantingAction extends React.Component {
 
@@ -10,7 +11,7 @@ export default class EnchantingAction extends React.Component {
     this.state = {
       affixList: [],
       inventoryList: [],
-      itemToEnchant: "",
+      itemToEnchant: null,
       suffixId: "",
       prefixId: "",
       canCraft: true,
@@ -39,6 +40,7 @@ export default class EnchantingAction extends React.Component {
     });
 
     this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
+
       this.setState({
         canCraft: event.canCraft,
         timeRemaining: event.canCraft ? 0 : event.timeout,
@@ -62,7 +64,11 @@ export default class EnchantingAction extends React.Component {
         const response = err.response;
 
         if (response.status === 401) {
-          return location.reload();
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
         }
       }
     });
@@ -109,8 +115,12 @@ export default class EnchantingAction extends React.Component {
 
   enchant() {
     const affixesToAttach = [];
-    const prefixId = this.state.prefixId;
-    const suffixId = this.state.suffixId;
+    const prefixId = parseInt(this.state.prefixId) || null;
+    const suffixId = parseInt(this.state.suffixId) || null;
+
+    if (!this.state.canCraft) {
+      return getServerMessage('cant_craft');
+    }
 
     if ((prefixId !== 0 && prefixId !== null)) {
       affixesToAttach.push(prefixId);
@@ -144,8 +154,7 @@ export default class EnchantingAction extends React.Component {
         }
 
         if (response.status === 429) {
-          // Reload to show them their notification.
-          location.reload();
+          return this.props.openTimeOutModal();
         }
       }
     });
@@ -193,7 +202,7 @@ export default class EnchantingAction extends React.Component {
       const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant)[0];
 
       if (foundSlot.item.item_prefix !== null) {
-        cost += (foundSlot.item.item_prefix.cost / 2)
+        cost += 1000
       }
     }
 
@@ -212,7 +221,7 @@ export default class EnchantingAction extends React.Component {
 
       if (foundSlot.item.item_suffix !== null) {
 
-        cost += (foundSlot.item.item_suffix.cost / 2)
+        cost += 1000
       }
     }
 
@@ -261,7 +270,18 @@ export default class EnchantingAction extends React.Component {
 
         cost -= this.getSuffixCost(foundOldAffix, this.state.itemToEnchant);
       } else {
-        cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
+         if (cost !== 0) {
+
+            let foundPreviouslySelected = this.state.affixList.filter((a) => a.id === this.state.suffixId);
+
+            if (foundPreviouslySelected.length > 0) {
+              foundPreviouslySelected = foundPreviouslySelected[0];
+
+              cost -= this.getSuffixCost(foundPreviouslySelected, this.state.itemToEnchant)
+            }
+         }
+
+         cost += this.getSuffixCost(foundAffix, this.state.itemToEnchant);
       }
     } else if ((this.state.itemToEnchant === 0 || this.state.itemToEnchant === null)) {
       cost = 0;

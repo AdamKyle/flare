@@ -14,17 +14,17 @@
                 title="Character Info"
             >
                 <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-4">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
                         @include('game.character.partials.sheet.basic-information', ['character' => $character, 'maxLevel' => $maxLevel])
                     </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-4">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
                         @include('game.character.partials.sheet.attack-stats', ['character' => $character])
                     </div>
-
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-4">
-                        @include('game.character.partials.sheet.core-stats', ['character' => $character])
-                    </div>
+                </div>
+                <hr />
+                <div class="row mt-2">
+                    @include('game.character.partials.sheet.core-stats', ['character' => $character])
                 </div>
             </x-cards.card-with-title>
 

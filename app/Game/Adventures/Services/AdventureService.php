@@ -254,9 +254,13 @@ class AdventureService {
 
         $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction) * ($xpBonus > 1 ? $xpBonus : (1 + $xpBonus));
 
-        $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
+        $drop      = null;
+        $questDrop = null;
+        $gold      = 0;
 
+        $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
         $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards);
+        $gold      = $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
 
         if (!is_null($drop)) {
             $this->rewards['items'][] = [
@@ -272,7 +276,7 @@ class AdventureService {
             ];
         }
 
-        $this->rewards['gold'] += $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
+        $this->rewards['gold'] += $gold;
 
         $this->setLogs($attackService, $adventureLog);
     }

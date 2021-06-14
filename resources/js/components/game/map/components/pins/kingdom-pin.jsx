@@ -63,6 +63,7 @@ export default class KingdomPin extends React.Component {
               close={this.closeKingdomModal.bind(this)}
               characterId={this.props.characterId}
               disableMapButtons={this.props.disableMapButtons}
+              openTimeOutModal={this.props.openTimeOutModal}
             />
             : null
         }

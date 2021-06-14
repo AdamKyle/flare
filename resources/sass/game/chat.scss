@@ -21,6 +21,11 @@
     .server-message {
       color: #ec7b7b;
       font-weight: bold;
+
+      a {
+        text-decoration: underline;
+        color: #eadba5;
+      }
     }
 
     .god-message {

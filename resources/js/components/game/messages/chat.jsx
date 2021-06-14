@@ -27,7 +27,15 @@ export default class Chat extends React.Component {
       this.setState({
         user: result.data.user,
       });
-    })
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
+    });
 
     axios.get('/api/last-chats/').then((result) => {
       let messages = [];
@@ -44,6 +52,14 @@ export default class Chat extends React.Component {
         messages: messages
       });
 
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
@@ -87,6 +103,8 @@ export default class Chat extends React.Component {
         user_id: event.user.id,
         id: Math.random().toString(36).substring(7),
         is_npc: event.npc,
+        isLink: event.isLink,
+        link: event.link,
       };
 
       messages.unshift(message);
@@ -173,11 +191,19 @@ export default class Chat extends React.Component {
 
       this.state.messages.map((message) => {
         if (message.user_id === this.props.userId && message.type === 'server-message') {
-          elements.push(
-            <li key={message.id + '_server-message'}>
-              <div className={message.is_npc ? "npc-message" : "server-message"}>{message.message}</div>
-            </li>
-          )
+          if (message.isLink) {
+            elements.push(
+              <li key={message.id + '_server-message_link'}>
+                <div className="server-message"><a href={message.link} target="_blank">{message.message}</a></div>
+              </li>
+            )
+          } else {
+            elements.push(
+              <li key={message.id + '_server-message'}>
+                <div className={message.is_npc ? "npc-message" : "server-message"}>{message.message}</div>
+              </li>
+            )
+          }
         } else if(message.type === 'global-message') {
           elements.push(
             <li key={message.id + '_global-message'}>

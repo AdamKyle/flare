@@ -22,6 +22,10 @@ At level 400, with no additional modifiers from equipment or items, you will hav
 
 If the item already has an enchantment on it, for each additional enchantment the item has an additional ten seconds will be added to the default ten seconds.
 
+> ###ATTN!
+>
+> If the item already has an enchantment on it, the cost to replace will be 1000 gold + New Affix Cost. 
+
 For example if a Rusty Bloody Broken Dagger has a suffix on it, and you are attempting to replace the suffix, you will receive a 20-second time out. However, if you wanted to add a prefix it would be 10 second timeout.
 
 If, however, you are attempting to replace two enchantments on an item, it will be a 30-second timeout.

@@ -133,11 +133,11 @@ export default class FightSection extends React.Component {
 
           if (response.status === 429) {
             // Reload to show them their notification.
-            location.reload();
+            return this.props.openTimeOutModal();
           }
 
           if (response.status === 401) {
-            location.reload();
+            return location.reload();
           }
         }
       });;

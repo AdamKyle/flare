@@ -22,6 +22,18 @@ export default class AdventureMenu extends React.Component {
         logs: result.data,
       });
     }).catch(function (error) {
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
+        }
+      }
+
       return getServerMessage('something_went_wrong');
     });
 

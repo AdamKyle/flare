@@ -1,5 +1,6 @@
 <dl>
     <dt>Max Health:</dt>
+
     <dd>{{$characterInfo['maxHealth']}}</dd>
     <dt>Max Attack:</dt>
     <dd>{{$characterInfo['maxAttack']}}</dd>

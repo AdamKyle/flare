@@ -68,7 +68,7 @@ class CharacterInventoryController extends Controller {
 
         if ($service->inventory()->isNotEmpty()) {
             $viewData = [
-                'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory()),
+                'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory(), $character),
                 'itemToEquip'  => $itemToEquip->item,
                 'type'         => $service->getType($request, $itemToEquip->item),
                 'slotId'       => $itemToEquip->id,

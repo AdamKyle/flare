@@ -73,7 +73,13 @@ export default class Board extends Component {
           gold: result.data.gold,
         });
       }).catch((error) => {
-        console.error(error);
+        if (error.hasOwnProperty('response')) {
+          const response = error.response;
+
+          if (response.status === 401  || response.status === 429) {
+            return location.reload();
+          }
+        }
       });
 
       if (!this.state.hasItemId) {
@@ -153,7 +159,13 @@ export default class Board extends Component {
         gold: result.data.gold,
       });
     }).catch((error) => {
-      console.error(error);
+      if (error.hasOwnProperty('response')) {
+        const response = error.response;
+
+        if (response.status === 401  || response.status === 429) {
+          return location.reload();
+        }
+      }
     });
   }
 

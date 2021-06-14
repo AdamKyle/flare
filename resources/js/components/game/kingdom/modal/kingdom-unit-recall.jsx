@@ -73,7 +73,11 @@ export default class KingdomUnitRecall extends React.Component {
         const response = err.response;
 
         if (response.status === 401) {
-          location.reload();
+          return location.reload();
+        }
+
+        if (response.status == 429) {
+          return window.location.replace('/game');
         }
       }
     });

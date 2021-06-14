@@ -2,21 +2,50 @@
 
 namespace App\Game\Messages\Handlers;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Flare\Values\NpcCommandTypes;
+use App\Game\Core\Traits\KingdomCache;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
+use Illuminate\Broadcasting\PendingBroadcast;
 
 class NpcCommandHandler {
 
+    use KingdomCache;
+
+    /**
+     * @var NpcServerMessageBuilder $npcServerMessageBuilder
+     */
     private $npcServerMessageBuilder;
 
+    /**
+     * KINGDOM_COST
+     */
+    private const KINGDOM_COST = 10000;
+
+    /**
+     * NpcCommandHandler constructor.
+     *
+     * @param NpcServerMessageBuilder $npcServerMessageBuilder
+     */
     public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder) {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
+    /**
+     * Handle the command.
+     *
+     * @param int $type
+     * @param string $npcName
+     * @param User $user
+     * @return PendingBroadcast
+     * @throws Exception
+     */
     public function handleForType(int $type, string $npcName, User $user) {
         $type = new NpcCommandTypes($type);
 
@@ -29,7 +58,14 @@ class NpcCommandHandler {
         }
     }
 
-    protected function handleTakingKingdom(User $user, string $npcName) {
+    /**
+     * Handles taking the kingdom.
+     *
+     * @param User $user
+     * @param string $npcName
+     * @return bool
+     */
+    protected function handleTakingKingdom(User $user, string $npcName): bool {
         $character      = $user->character;
         $characterX     = $character->map->x_position;
         $characterY     = $character->map->y_position;
@@ -44,6 +80,30 @@ class NpcCommandHandler {
 
         if (is_null($kingdom)) {
             broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('cannot_have', $npcName), true));
+        } else {
+            $gold         = $character->gold;
+            $kingdomCount = $character->kingdoms()->where('game_map_id', $character->map->game_map_id)->count();
+            $cost         = ($kingdomCount * self::KINGDOM_COST);
+
+            if ($gold < $cost) {
+                broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('not_enough_gold', $npcName), true));
+            } else {
+                $character->update([
+                    'gold' => $gold - $cost,
+                ]);
+
+                event(new UpdateTopBarEvent($character->refresh()));
+            }
+
+            $kingdom->update([
+                'character_id' => $character->id
+            ]);
+
+            $this->addKingdomToCache($character->refresh(), $kingdom->refrssh());
+
+            event(new AddKingdomToMap($character));
+
+            $tookKingdom = true;
         }
 
         return $tookKingdom;

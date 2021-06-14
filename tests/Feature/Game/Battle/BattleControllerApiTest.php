@@ -2,17 +2,7 @@
 
 namespace Tests\Feature\Game\Battle;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\AttackTimeOutEvent;
-use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\ShowTimeOutEvent;
-use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
@@ -25,6 +15,18 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateSkill;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\Traits\CreateItemAffix;
+use App\Game\Battle\Controllers\Api\BattleController;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\GoldRushCheckEvent;
+use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
+use App\Game\Core\Events\DropsCheckEvent;
+use App\Game\Core\Events\ShowTimeOutEvent;
+use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 
 class BattleControllerApiTest extends TestCase
 {

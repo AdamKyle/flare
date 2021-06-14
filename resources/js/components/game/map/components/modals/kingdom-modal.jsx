@@ -21,7 +21,17 @@ export default class KingdomModal extends React.Component {
         loading: false,
       });
     }).catch((err) => {
-      console.error(err);
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+
+        if (response.status === 429) {
+          this.props.openTimeOutModal()
+        }
+      }
 
       this.props.close();
     });
@@ -74,10 +84,15 @@ export default class KingdomModal extends React.Component {
     }).then(() => {
       this.props.close();
     }).catch((error) => {
+      this.props.close();
+
       if (error.hasOwnProperty('response')) {
         if (error.response.status === 429) {
-          // Reload to show them their notification.
-          location.reload();
+          return this.props.openTimeOutModal();
+        }
+
+        if (error.response.status === 401) {
+          return location.reload();
         }
 
         this.setState({
@@ -100,7 +115,7 @@ export default class KingdomModal extends React.Component {
 
     return (
       <Modal show={this.props.show} onHide={this.props.close}>
-        <Modal.Header closeButton style={{backgroundColor: this.convertToHex(this.props.kingdom.color)}}>
+        <Modal.Header closeButton style={{backgroundColor: this.props.kingdom.color}}>
           <Modal.Title style={{color: '#fff'}}>{this.props.kingdom.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>

@@ -51,6 +51,11 @@ class BattleController extends Controller {
     }
 
     public function battleResults(Request $request, Character $character) {
+
+        if ($character->is_dead || !$character->can_attack) {
+            return response()->json(['message' => 'invalid input.'], 429);
+        }
+
         if ($request->is_character_dead) {
 
             $character->update(['is_dead' => true]);
@@ -75,8 +80,10 @@ class BattleController extends Controller {
                     $monster = Monster::find($request->monster_id);
 
                     event(new UpdateCharacterEvent($character, $monster));
+
                     event(new DropsCheckEvent($character, $monster));
                     event(new GoldRushCheckEvent($character, $monster));
+
                     event(new AttackTimeOutEvent($character));
 
                     $characterData = new Item($character, $this->character);
@@ -106,4 +113,5 @@ class BattleController extends Controller {
             'character' => $this->manager->createData($character)->toArray()
         ], 200);
     }
+
 }

@@ -36,7 +36,7 @@ class KingdomsController extends Controller {
         $this->kingdom = $kingdom;
     }
 
-    public function getLocationData(Kingdom $kingdom) {
+    public function getLocationData(Character $character, Kingdom $kingdom) {
         $kingdom  = new Item($kingdom, $this->kingdom);
 
         return response()->json(

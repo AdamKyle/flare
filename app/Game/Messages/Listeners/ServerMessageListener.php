@@ -28,7 +28,7 @@ class ServerMessageListener
     /**
      * Handle the event.
      *
-     * @param  \App\Flare\Events\CreateCharacterEvent  $event
+     * @param ServerMessageEvent $event
      * @return void
      */
     public function handle(ServerMessageEvent $event)
@@ -45,7 +45,7 @@ class ServerMessageListener
             case 'gained_item':
                 $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse!';
 
-                return broadcast(new ServerMessage($event->user, $message));
+                return broadcast(new ServerMessage($event->user, $message, false, true, $event->link));
             case 'found_item':
                 $message = 'You happen upon a: ' . $event->forMessage . '!';
 

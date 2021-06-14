@@ -54,6 +54,10 @@ export default class Recruit extends React.Component {
         if (response.status === 401) {
           location.reload();
         }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal();
+        }
       }
     });
   }

@@ -21,8 +21,14 @@ export default class PurchaseModal extends React.Component {
           loading: false,
         })
       }).catch((error) => {
-      console.error(error);
-    });
+        if (error.hasOwnProperty('response')) {
+          const response = error.response;
+
+          if (response.status === 401  || response.status === 429) {
+            return location.reload();
+          }
+        }
+      });
   }
 
   hasEnoughGold() {

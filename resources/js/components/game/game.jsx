@@ -13,7 +13,6 @@ import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 
-
 export default class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -230,11 +229,13 @@ export default class Game extends React.Component {
     return true;
   }
 
-  openTimeOutModal(timeOutUntil) {
-    this.setState({
-      openTimeOutModal: true,
-      timeOutFor: typeof timeOutUntil !== 'undefined' ? timeOutUntil : 0,
-    });
+  openTimeOutModal() {
+    if (!this.state.openTimeOutModal) {
+      this.setState({
+        openTimeOutModal: true,
+        timeOutFor: 0
+      });
+    }
   }
 
   render() {
@@ -267,6 +268,7 @@ export default class Game extends React.Component {
                   userId={this.props.userId}
                   openPortDetails={this.openPortDetails.bind(this)}
                   updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
                 : null
             }
@@ -281,6 +283,7 @@ export default class Game extends React.Component {
                   openAdventureDetails={this.openAdventureDetails.bind(this)}
                   adventureAgainAt={this.state.canAdventureAgainAt}
                   adventureLogs={this.state.adventureLogs}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
                 : null
             }
@@ -292,6 +295,7 @@ export default class Game extends React.Component {
                   currentX={this.state.current_x}
                   currentY={this.state.current_y}
                   characterId={this.props.characterId}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
                 : null
             }
@@ -300,6 +304,7 @@ export default class Game extends React.Component {
                 <TraverseSection
                   openTraverseSection={this.openTraverseDetails.bind(this)}
                   characterId={this.state.characterId}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
                 : null
             }
@@ -318,6 +323,7 @@ export default class Game extends React.Component {
               updateAdventure={this.updateAdventure.bind(this)}
               updateTeleportLoations={this.updateTeleportLoations.bind(this)}
               openTeleportDetails={this.openTeleportDetails.bind(this)}
+              openTimeOutModal={this.openTimeOutModal.bind(this)}
               updateKingdoms={this.updateKingdoms.bind(this)}
             />
           </Col>
@@ -337,6 +343,7 @@ export default class Game extends React.Component {
               updateKingdomData={this.updateKingdomData.bind(this)}
               characterId={this.state.characterId}
               userId={this.props.userId}
+              openTimeOutModal={this.openTimeOutModal.bind(this)}
             />
             : null
         }
@@ -351,6 +358,7 @@ export default class Game extends React.Component {
               close={this.closeKingdomModal.bind(this)}
               openKingdomManagement={this.openKingdomManagement.bind(this)}
               myKingomsCount={this.state.kingdomData.my_kingdoms.length}
+              openTimeOutModal={this.openTimeOutModal.bind(this)}
             />
             : null
         }
@@ -363,6 +371,7 @@ export default class Game extends React.Component {
               kingdoms={this.state.kingdomData.my_kingdoms}
               kingdomToAttack={this.state.kingdomData.kingdom_to_attack}
               characterId={this.state.characterId}
+              openTimeOutModal={this.openTimeOutModal.bind(this)}
             />
             : null
         }

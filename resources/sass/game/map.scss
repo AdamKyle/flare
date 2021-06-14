@@ -3,6 +3,8 @@
   max-height: 350px;
 
   .game-map {
+    margin: 0 auto;
+
     .map-x-pin, .location-x-pin, .port-x-pin, .kingdom-x-pin {
       background-color: black; /* So we can see where the pixel is */
       height: 1px;

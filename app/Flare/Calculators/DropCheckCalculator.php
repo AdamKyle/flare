@@ -26,7 +26,15 @@ class DropCheckCalculator {
             return true;
         }
 
-        return (rand(1, 100) * (1 + ($lootingChance + $adventureBonus)))  > (100 - (100 * $monster->drop_check));
+        $bonus = $lootingChance + $adventureBonus;
+
+        if ($bonus < 1) {
+            $bonus += 1;
+        } else if ($bonus > 1) {
+            return (rand(1, 400) * $bonus)  > (400 - (400 * $monster->drop_check));
+        }
+
+        return (rand(1, 100) * $bonus)  > (100 - (100 * $monster->drop_check));
     }
 
     /**
@@ -44,10 +52,8 @@ class DropCheckCalculator {
 
         if ($totalBonus < 1) {
             $totalBonus = 1 + $totalBonus;
-        }
-
-        if ($totalBonus >= 1) {
-            return true;
+        } else if ($totalBonus >= 1) {
+            return (rand(1, 1000) * $totalBonus)  > (1000 - (1000 * $monster->quest_item_drop_chance));
         }
 
         if ($monster->quest_item_drop_chance >= 1) {

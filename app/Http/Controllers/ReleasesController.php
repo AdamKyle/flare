@@ -8,8 +8,8 @@ class ReleasesController extends Controller {
 
     public function index() {
         return view('releases.list', [
-            'releases' => ReleaseNote::all()->sortBy('desc')->paginate(10),
+            'releases' => ReleaseNote::orderBy('version', 'desc')->paginate(10),
         ]);
     }
-    
+
 }

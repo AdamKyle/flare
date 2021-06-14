@@ -2,6 +2,7 @@
 
 namespace App\Flare\Listeners;
 
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Login;
 use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Models\User;
@@ -34,10 +35,19 @@ class UserLoggedInListener {
 
         $lastRecord = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
-        UserSiteAccessStatistics::create([
-            'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
-            'amount_registered' => $lastRecord->amount_registered,
-        ]);
+        if ($lastRecord->created_at->lt(Carbon::today(config('app.timezone')))) {
+            UserSiteAccessStatistics::create([
+                'amount_signed_in'  => 1,
+                'amount_registered' => 0,
+            ]);
+        } else {
+            UserSiteAccessStatistics::create([
+                'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                'amount_registered' => $lastRecord->amount_registered,
+            ]);
+        }
+
+
 
         $adminUser = User::with('roles')->whereHas('roles', function ($q) {
             $q->where('name', 'Admin');

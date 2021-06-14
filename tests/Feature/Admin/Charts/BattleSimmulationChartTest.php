@@ -42,14 +42,23 @@ class BattleSimmulationChartTest extends TestCase {
     }
 
     public function testGetResultsWhereEveryOneLives() {
-        $this->createBattleResults();
+        $this->createBattleResults(1, [
+            'str'          => 0,
+            'dur'          => 0,
+            'dex'          => 0,
+            'chr'          => 0,
+            'int'          => 0,
+            'ac'           => 0,
+            'health_range' => '1-8',
+            'attack_range' => '1-6',
+        ]);
 
         $response = $this->actingAs($this->user)->json('GET', route('charts.battle_simmulation_chart', [
             'monsterId' => 1,
         ]))->response;
 
         $content = json_decode($response->content());
-
+        
         $this->assertEquals(1, $content->datasets[0]->values[0]);
     }
 
@@ -90,6 +99,7 @@ class BattleSimmulationChartTest extends TestCase {
             'monsterId' => 1,
         ]))->response;
 
+
         $content = json_decode($response->content());
 
         $this->assertEquals(1, $content->datasets[0]->values[2]);
@@ -107,7 +117,7 @@ class BattleSimmulationChartTest extends TestCase {
         $this->createItem();
 
         $this->actingAs($this->user)->post(route('admin.character.modeling.generate'));
-        
+
         $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
             'model_id' => $this->createMonster($monsterOptions)->id,
             'type' => 'monster',
