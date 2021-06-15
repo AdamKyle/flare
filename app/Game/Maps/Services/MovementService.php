@@ -178,7 +178,7 @@ class MovementService {
         $owner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->name . ' (NPC)';
 
         if (!is_null($kingdom)) {
-            if ($kingdom->has('character')) {
+            if (!is_null($kingdom->character_id)) {
                 $owner = $kingdom->character->name;
             }
         }

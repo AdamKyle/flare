@@ -89,7 +89,7 @@ class NpcCommandHandler {
             $cost         = ($kingdomCount * self::KINGDOM_COST);
 
             if ($gold < $cost) {
-                broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('not_enough_gold', $npcName), true));
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('not_enough_gold', $npcName), true));
             } else {
                 $character->update([
                     'gold' => $gold - $cost,

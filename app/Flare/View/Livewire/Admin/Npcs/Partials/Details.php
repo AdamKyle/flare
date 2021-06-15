@@ -41,6 +41,10 @@ class Details extends Component {
     public $coordinates = [];
 
     public function validateInput(string $functionName, int $index) {
+        $this->npc->name = str_replace(' ', '', $this->npc->name);
+
+        $this->npc->text_command_to_message = '/m ' . $this->npc->name . ':';
+
         $this->validate();
 
         if (is_null($this->npc->moves_around_map)) {
@@ -50,10 +54,6 @@ class Details extends Component {
         if (is_null($this->npc->must_be_at_same_location)) {
             $this->npc->must_be_at_same_location = false;
         }
-
-        $this->npc->name = str_replace(' ', '', $this->npc->name);
-
-        $this->npc->text_command_to_message = '/m ' . $this->npc->name . ':';
 
         $this->npc->save();
 
