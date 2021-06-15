@@ -10,6 +10,7 @@ use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
+use App\Admin\Console\Commands\GiveKingdomsToNpcs;
 use App\Charts\BattleSimulationChart;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -37,7 +38,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UserService();
         });
 
-        $this->commands([CreateAdminAccount::class]);
+        $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);
     }
 
     /**

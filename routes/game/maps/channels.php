@@ -19,3 +19,8 @@ Broadcast::channel('global-character-count-plane', function($user) {
 BroadCast::channel('global-map-update', function($user) {
    return $user;
 });
+
+// When the NPC Kingdoms update.
+Broadcast::channel('npc-kingdoms-update', function($user) {
+   return $user;
+});

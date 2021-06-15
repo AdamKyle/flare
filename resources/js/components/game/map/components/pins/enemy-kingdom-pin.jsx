@@ -51,7 +51,6 @@ export default class EnemyKingdomPin extends React.Component {
   }
 
   render() {
-    console.log(this.state.kingdom);
     return (
       <>
         {this.renderKingdoms()}

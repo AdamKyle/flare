@@ -36,6 +36,7 @@ class MapTileValue {
      * @return bool
      */
     public function isWaterTile(int $color): bool {
+        dump($color);
         // These represents water:
         $invalidColors = [
             115217255, 114217255, 112219255, 112217247, 106222255, 117217251,

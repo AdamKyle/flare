@@ -59,6 +59,7 @@ export default class Map extends React.Component {
     this.updateMapPlane = Echo.private('update-map-plane-' + this.props.userId);
     this.globalCharacterCount = Echo.join('global-character-count-plane');
     this.globalMapUpdate = Echo.join('global-map-update');
+    this.globaNPCKingdomUpdate = Echo.join('npc-kingdoms-update');
   }
 
   componentDidMount() {
@@ -125,6 +126,15 @@ export default class Map extends React.Component {
         if (response.status === 429) {
           this.props.openTimeOutModal()
         }
+      }
+    });
+
+    this.globaNPCKingdomUpdate.listen('Game.Kingdoms.Events.UpdateNPCKingdoms', (event) => {
+      console.log(event);
+      if (event.mapName === this.state.characterMapName) {
+        this.setState({
+          npcKingdoms: event.npcKingdoms,
+        });
       }
     });
 

@@ -9,6 +9,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\Npc;
+use App\Flare\Values\NpcTypes;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
@@ -143,7 +145,7 @@ class MovementService {
             $this->processLocation($location, $character);
         }
 
-        $this->npcKingdoms = Kingdom::whereNull('character_id')->where('npc_owned', true)->get();
+        $this->npcKingdoms = Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('npc_owned', true)->where('game_map_id', $character->map->game_map_id)->get();
 
         $kingdom = Kingdom::where('x_position', $character->x_position)
                           ->where('y_position', $character->y_position)
@@ -173,8 +175,16 @@ class MovementService {
             $canSettle = true;
         }
 
+        $owner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->name . ' (NPC)';
+
+        if (!is_null($kingdom)) {
+            if ($kingdom->has('character')) {
+                $owner = $kingdom->character->name;
+            }
+        }
+
         $this->kingdomData = [
-            'owner'             => is_null($kingdom) ? 'No one' : $kingdom->character->name,
+            'owner'             => $owner,
             'can_attack'        => $canAttack,
             'can_manage'        => $canManage,
             'can_settle'        => $canSettle,

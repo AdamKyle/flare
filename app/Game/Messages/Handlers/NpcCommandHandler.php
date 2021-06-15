@@ -8,6 +8,8 @@ use App\Flare\Models\User;
 use App\Flare\Values\NpcCommandTypes;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -103,6 +105,8 @@ class NpcCommandHandler {
             $this->addKingdomToCache($character->refresh(), $kingdom->refresh());
 
             event(new AddKingdomToMap($character));
+            event(new UpdateGlobalMap($character));
+            event(new UpdateNPCKingdoms($character->map->gameMap));
 
             $tookKingdom = true;
         }

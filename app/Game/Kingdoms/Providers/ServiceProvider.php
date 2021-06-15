@@ -2,8 +2,6 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-use App\Game\Kingdoms\Console\Commands\GiveKingdomsToNpc;
-use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
@@ -28,8 +26,8 @@ use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Kingdoms\Service\KIngdomsAttackService;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
+use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Flare\Transformers\KingdomTransformer;
-
 use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -149,7 +147,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->commands([
             DeleteKingdomLogs::class,
-            GiveKingdomsToNpc::class,
         ]);
     }
 
