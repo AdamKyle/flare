@@ -30,7 +30,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
-    
+
     @livewireStyles
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
@@ -51,10 +51,10 @@
                             <!-- toggle and nav items -->
                             <!-- ============================================================== -->
                             <ul class="navbar-nav mr-auto mt-md-0 ">
-                                <li class="nav-item"> 
+                                <li class="nav-item">
                                     <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
                                         <i class="fas fa-bars"></i>
-                                    </a> 
+                                    </a>
                                 </li>
                             </ul>
                         @endguest
@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                <footer class="footer"> © 2020 Flare </footer>
+                <footer class="footer"></footer>
             @endif
         </div>
     </div>

@@ -21,6 +21,12 @@ return [
     'kingdoms'          => [
         [
             'livewire'            => true,
+            'view'                => 'admin.kingdoms.buildings.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ],
+        [
+            'livewire'            => true,
             'view'                => 'admin.kingdoms.units.data-table',
             'only'                => null,
             'insert_before_table' => null,

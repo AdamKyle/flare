@@ -1,6 +1,5 @@
 import React from 'react';
-import KingdomModal from '../modals/kingdom-modal';
-import EnemyKingdomName from "../modals/enemy-kingdom-name";
+import EnemyKingdomModal from "../modals/enemy-kingdom-modal";
 
 export default class EnemyKingdomPin extends React.Component {
   constructor(props) {
@@ -52,14 +51,15 @@ export default class EnemyKingdomPin extends React.Component {
   }
 
   render() {
+    console.log(this.state.kingdom);
     return (
       <>
         {this.renderKingdoms()}
 
         {
           this.state.openKingdomModal ?
-            <EnemyKingdomName show={this.state.openKingdomModal} close={this.closeKingdomModal.bind(this)}
-                              kingdom={this.state.kingdom}/>
+            <EnemyKingdomModal show={this.state.openKingdomModal} close={this.closeKingdomModal.bind(this)}
+                               kingdom={this.state.kingdom}/>
             : null
         }
       </>

@@ -38,6 +38,11 @@ class UpdateGlobalMap implements ShouldBroadcastNow
                                       ->whereNotNull('character_id')
                                       ->where('game_map_id', $character->map->game_map_id)
                                       ->get()
+                                      ->transform(function($kingdom) {
+                                          $kingdom->character_name = $kingdom->character->name;
+
+                                          return $kingdom;
+                                      })
                                       ->toArray();
     }
 

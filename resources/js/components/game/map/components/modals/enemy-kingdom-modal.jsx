@@ -2,7 +2,7 @@ import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 import LoadingModal from '../../../components/loading/loading-modal'
 
-export default class EnemyKingdomName extends React.Component {
+export default class EnemyKingdomModal extends React.Component {
 
   constructor(props) {
     super(props);
