@@ -13,7 +13,7 @@ import MapActions from './components/map-actions';
 import Locations from './components/locations';
 import KingdomPin from './components/pins/kingdom-pin';
 import NpcKingdomPin from "./components/pins/npc-kingdom-pin";
-
+import EnemyKingdomPin from "./components/pins/enemy-kingdom-pin";
 export default class Map extends React.Component {
 
   constructor(props) {
@@ -26,6 +26,7 @@ export default class Map extends React.Component {
       characterPosition: {
         x: 16, y: 32
       },
+      charactersOnMap: 0,
       mapUrl: null,
       bottomBounds: 0,
       rightBounds: 0,
@@ -46,6 +47,8 @@ export default class Map extends React.Component {
       isDead: false,
       isAdventuring: false,
       kingdoms: [],
+      characterMapName: null,
+      otherKingdoms: [],
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -54,6 +57,8 @@ export default class Map extends React.Component {
     this.updateMap = Echo.private('update-map-' + this.props.userId);
     this.addKingomToMap = Echo.private('add-kingdom-to-map-' + this.props.userId);
     this.updateMapPlane = Echo.private('update-map-plane-' + this.props.userId);
+    this.globalCharacterCount = Echo.join('global-character-count-plane');
+    this.globalMapUpdate = Echo.join('global-map-update');
   }
 
   componentDidMount() {
@@ -85,6 +90,9 @@ export default class Map extends React.Component {
         teleportLocations: result.data.teleport,
         kingdoms: result.data.my_kingdoms,
         npcKingdoms: result.data.npc_kingdoms,
+        otherKingdoms: result.data.other_kingdoms,
+        charactersOnMap: result.data.characters_on_map,
+        characterMapName: result.data.character_map.game_map.name,
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -120,6 +128,22 @@ export default class Map extends React.Component {
       }
     });
 
+    this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event) => {
+      if (event.mapName === this.state.characterMapName) {
+        this.setState({
+          otherKingdoms: event.otherKingdoms.filter((ok) => ok.character_id !== this.state.characterId),
+        });
+      }
+    });
+
+    this.globalCharacterCount.listen('Game.Maps.Events.UpdateGlobalCharacterCountBroadcast', (event) => {
+      if (event.mapName === this.state.characterMapName) {
+        this.setState({
+          charactersOnMap: event.characterCount,
+        });
+      }
+    });
+
     this.echo.listen('Game.Maps.Events.ShowTimeOutEvent', (event) => {
       this.setState({
         canMove: event.canMove,
@@ -152,7 +176,6 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
-
       this.updatePlayerPosition(event.map);
 
       let myKingdoms = this.fetchKingdoms(event);
@@ -209,7 +232,6 @@ export default class Map extends React.Component {
     });
 
     this.updateMapPlane.listen('Game.Maps.Events.UpdateMapBroadcast', (event) => {
-
       const myKingdoms = event.mapDetails.my_kingdoms;
 
       this.setState({
@@ -227,6 +249,8 @@ export default class Map extends React.Component {
           x: event.mapDetails.character_map.character_position_x,
           y: event.mapDetails.character_map.character_position_y,
         },
+        charactersOnMap: event.mapDetails.characters_on_map,
+        otherKingdoms: event.mapDetails.other_kingdoms,
       }, () => {
         this.props.updateKingdoms({
           my_kingdoms: myKingdoms,
@@ -355,6 +379,7 @@ export default class Map extends React.Component {
           x: getNewXPosition(x, this.state.controlledPosition.x),
           y: getNewYPosition(y, this.state.controlledPosition.y)
         },
+        charactersOnMap: result.data.characters_on_map,
       }, () => {
         this.props.updatePort({
           currentPort: this.state.currentPort,
@@ -438,6 +463,11 @@ export default class Map extends React.Component {
                   <NpcKingdomPin
                     npcKingdoms={this.state.npcKingdoms}
                   />
+                  <EnemyKingdomPin
+                    kingdoms={this.state.otherKingdoms}
+                    characterId={this.state.characterId}
+                    disableMapButtons={true}
+                  />
                   <div className="map-x-pin" style={this.playerIcon()}></div>
                 </div>
               </div>
@@ -453,6 +483,7 @@ export default class Map extends React.Component {
                 openAdventureDetails={this.openAdventureDetails.bind(this)}
                 openPortDetails={this.openPortDetails.bind(this)}
                 openTeleport={this.openTeleport.bind(this)}
+                charactersOnMap={this.state.charactersOnMap}
               />
             </div>
           </div>

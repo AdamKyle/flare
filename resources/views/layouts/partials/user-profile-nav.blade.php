@@ -8,6 +8,9 @@
     <li class="nav-item ml-4">
         <a class="nav-link" href="/releases" target="_blank">Vs: {{GameVersion::version()}}</a>
     </li>
+    <li class="nav-item ml-4">
+        <a class="nav-link btn-link" href="/information/home" target="_blank">Help! I'm Stuck</a>
+    </li>
     @if (!auth()->user()->hasRole('Admin'))
         <li class="nav-item ml-4" id="notification-center">
         </li>

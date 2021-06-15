@@ -58,7 +58,7 @@ class BattleSimmulationChartTest extends TestCase {
         ]))->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(1, $content->datasets[0]->values[0]);
     }
 

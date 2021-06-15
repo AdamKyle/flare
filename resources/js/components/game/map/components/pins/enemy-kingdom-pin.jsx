@@ -1,7 +1,7 @@
 import React from 'react';
-import KingdomModal from '../modals/kingdom-modal';
+import EnemyKingdomModal from "../modals/enemy-kingdom-modal";
 
-export default class KingdomPin extends React.Component {
+export default class EnemyKingdomPin extends React.Component {
   constructor(props) {
     super(props);
 
@@ -11,9 +11,9 @@ export default class KingdomPin extends React.Component {
     }
   }
 
-  openKingdomModal(event) {
+  openEnemyKingdomModal(event) {
     const kingdom = this.props.kingdoms.filter(
-      l => l.id === parseInt(event.target.getAttribute('data-kingdom-id'))
+      l => l.id === parseInt(event.target.getAttribute('data-enemy-kingdom-id'))
     )[0];
 
     this.setState({
@@ -34,16 +34,16 @@ export default class KingdomPin extends React.Component {
       let style = {
         top: kingdom.y_position,
         left: kingdom.x_position,
-        '--kingdom-color': kingdom.color,
+        '--kingdom-color': '#e82b13',
       };
 
       return (
         <div
           key={Math.random().toString(36).substring(7) + '-' + kingdom.id}
-          data-kingdom-id={kingdom.id}
+          data-enemy-kingdom-id={kingdom.id}
           className="kingdom-x-pin"
           style={style}
-          onClick={this.openKingdomModal.bind(this)}
+          onClick={this.openEnemyKingdomModal.bind(this)}
         >
         </div>
       );
@@ -51,23 +51,18 @@ export default class KingdomPin extends React.Component {
   }
 
   render() {
+    console.log(this.state.kingdom);
     return (
       <>
         {this.renderKingdoms()}
 
         {
           this.state.openKingdomModal ?
-            <KingdomModal
-              kingdom={this.state.kingdom}
-              show={this.state.openKingdomModal}
-              close={this.closeKingdomModal.bind(this)}
-              characterId={this.props.characterId}
-              disableMapButtons={this.props.disableMapButtons}
-              openTimeOutModal={this.props.openTimeOutModal}
-            />
+            <EnemyKingdomModal show={this.state.openKingdomModal} close={this.closeKingdomModal.bind(this)}
+                               kingdom={this.state.kingdom}/>
             : null
         }
       </>
-    )
+    );
   }
 }

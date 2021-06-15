@@ -7,9 +7,10 @@
 
 One of the key aspects of Planes of Tlessa is to allow you to settle kingdoms. Kingdoms in Tlessa work differently than other kingdom management games you might have played or are used to. With some similarities but my own spin on it.
 
-Borrowing the idea of settling kingdoms from [racewarkingdoms](), I have made some changes to way they work here.
+Borrowing the idea of settling kingdoms from a game I used to play way back when. I have made some changes to way they work here.
 
-First, to settle a kingdom you simply move to any location that is not a port or special location. You’ll know if you can settle a kingdom by seeing this button appear in the actions section:
+First, to settle a kingdom you simply move to any location that is not a port or special location. You’ll know if you can 
+settle a kingdom by seeing this button appear in the actions section:
 
 <div class="mb-4">
     <a href="/storage/info/kingdoms/images/settle-action.png" class="glightbox">
@@ -25,9 +26,15 @@ From here you may click Settle Kingdom, this will open a popup:
     </a>
 </div>
 
-You’ll type in a name. Kingdom names must be between 5 and 30 characters. Spaces are allowed.
+You’ll type in a name. Kingdom names must be between 5 and 30 characters. You may use spaces in the kingdom name.
+
 
 > ### ATTN!
+> 
+> You may not settle a kingdom within 1 movement of any location or port. That is, for ports and locations, move up two spaces 
+> and you can settle a kingdom. This is help players see ports and locations on the map.
+> 
+> ## Multiple Kingdoms?
 > 
 > Should you already have one kingdom on the plane you settled on, additional kingdoms will cost you gold.
 > 
@@ -43,6 +50,28 @@ You’ll type in a name. Kingdom names must be between 5 and 30 characters. Spac
 > **Calculation of cost**: Total Kingdoms owned * 10,000 gold. (ie, 6 kingdoms, 60,000 gold to settle a seventh).
 > 
 > There is no way to use real world money to get additional kingdoms.
+> 
+> ## Kingdoms Show up on the map
+> 
+> When you or someone else settles a kingdom, you will see the map update with their kingdom, which is shown in red on the map.
+>
+> <div class="mb-4">
+>    <a href="/storage/info/kingdoms/images/kingdoms-on-map.png" class="glightbox">
+>        <img src="/storage/info/kingdoms/images/kingdoms-on-map.png" class="img-fluid" />
+>    </a>
+> </div>
+>
+> As you can see, there is a blue icon for your kingdom (under the player (the orange man)), and a red icon for enemy kingdoms
+>
+> Clicking on any of the red kingdom icons will show you:
+>
+> <div class="mb-4">
+>    <a href="/storage/info/kingdoms/images/enemy-kingdom-details.png" class="glightbox">
+>        <img src="/storage/info/kingdoms/images/enemy-kingdom-details.png" class="img-fluid" />
+>    </a>
+> </div>
+>
+> All enemy kingdoms are red by default across all planes.
 
 Once that’s done, you’ll click settle and from there a new modal window will popup:
 
@@ -127,7 +156,7 @@ Once the building is done, assuming you are logged in you’ll see it in chat:
 If you are not logged in, you’ll receive an email.
 
 > ### ATTN!
-> 
+>
 > If you have multiple buildings in queue and you logout, you’ll receive multiple emails when they are finished, one for each building that finishes when its finished. You can turn this off in the settings page.
 
 The same will happen for units (see below).
@@ -140,31 +169,11 @@ When your kingdom gains resources per hour you’ll see:
     </a>
 </div>
 
-In the chat section. However, for your own sanity, I have made the choice to turn off the email notification for you. You can in the [Settings]() 
+In the chat section. However, for your own sanity, I have made the choice to turn off the email notification for you. You can in the [Settings]()
 section turn this back on. If you turn it on, you will get one email per hour (if you are not logged in) of all the kingdoms that had their resources updated.
 We do not show you the list of new resource values for those kingdoms, just present you a table with kingdom, location and that it was updated.
 
 Resources are gained once per hour.
-
-> ### ATTN!
-> 
-> You cannot buy resources with gold or real world money. You cannot move resources between kingdoms or request resources from other kingdoms.
-
-## Units
-
-Now that we have upgraded a building, lets discuss units.
-
-With in kingdom management you can click Unit Recruitment beside the Buildings at the bottom:
-
-<div class="mb-4">
-    <a href="/storage/info/kingdoms/images/unit-table.png" class="glightbox">
-        <img src="/storage/info/kingdoms/images/unit-table.png" class="img-fluid" />
-    </a>
-</div>
-
-You might be thinking: Where are all my units, I only have one unit.
-
-That’s because you need to upgrade the barracks, at specific levels you can gain more units to recruit. See the unit table below:
 
 
 

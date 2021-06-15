@@ -1,18 +1,29 @@
 
-As you can see each unit has its own building, level that building must be to recruit and the costs associated with the units them selves.
+As you can see each unit has its own building, level that building must be to recruit, and the costs associated with the units themselves.
 
-Now that you have some units, where are all the kingdoms?
+Now that we have some units, lets see how we attack, first lets look at the map:
 
 <div class="mb-4">
-    <a href="/storage/info/attacking-kingdoms/images/map-kingdom.png" class="glightbox">
-        <img src="/storage/info/attacking-kingdoms/images/map-kingdom.png" class="img-fluid" />
+    <a href="/storage/info/attacking-kingdoms/images/kingdoms-on-map.png" class="glightbox">
+        <img src="/storage/info/attacking-kingdoms/images/kingdoms-on-map.png" class="img-fluid" />
     </a>
 </div>
 
+As you can see, below you (the man on the map) is a kingdom. To the left is a red kingdom, all other kingdoms that are not
+yours, are enemy kingdoms. You can click on these to show you some basic details:
 
-This is the fun part, you must move around the map, until you see, in the actions section, attack kingdom.
+<div class="mb-4">
+    <a href="/storage/info/attacking-kingdoms/images/enemy-kingdom-details.png" class="glightbox">
+        <img src="/storage/info/attacking-kingdoms/images/enemy-kingdom-details.png" class="img-fluid" />
+    </a>
+</div>
 
-This makes use of the map aside from moving around to locations and ports. Once you find another players kingdom you can begin the attack process:
+> ### ATTN!
+> 
+> You have to be at the same location as the kingdom on the map to attack the kingdom in question.
+
+
+Once you arrive at another player's kingdom you can begin the attack process:
 
 <div class="mb-4">
     <a href="/storage/info/attacking-kingdoms/images/attack-button.png" class="glightbox">
@@ -28,7 +39,8 @@ This makes use of the map aside from moving around to locations and ports. Once 
     </a>
 </div>
 
-From here your first step is to select the kingdoms you want to attack from. Each kingdom has its own set of units, and the further away a kingdom is from the target, the longer it takes the units to travel there, but also to return from there.
+From here your first step is to select the kingdoms you want to attack from. Each kingdom has its own set of units, 
+and the further away a kingdom is from the target, the longer it takes the units to travel there, but also to return from there.
 
 > ## ATTN
 > 
