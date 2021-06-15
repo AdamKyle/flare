@@ -12,6 +12,7 @@ import MapMovementActions from './components/map-movement-actions';
 import MapActions from './components/map-actions';
 import Locations from './components/locations';
 import KingdomPin from './components/pins/kingdom-pin';
+import EnemyKingdomPin from "./components/pins/enemy-kingdom-pin";
 
 export default class Map extends React.Component {
 
@@ -128,7 +129,7 @@ export default class Map extends React.Component {
     this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event) => {
       if (event.mapName === this.state.characterMapName) {
         this.setState({
-          otherKingdoms: event.otherKingdoms
+          otherKingdoms: event.otherKingdoms.filter((ok) => ok.character_id !== this.state.characterId),
         });
       }
     });
@@ -430,6 +431,8 @@ export default class Map extends React.Component {
       return <CardLoading/>
     }
 
+    console.log(this.state.kingdoms, this.state.otherKingdoms);
+
     return (
       <div className="card mb-4 map-card">
         <div className="card-body">
@@ -454,13 +457,11 @@ export default class Map extends React.Component {
                     characterId={this.state.characterId}
                     disableMapButtons={this.disableMapButtons.bind(this)}
                     openTimeOutModal={this.props.openTimeOutModal}
-                    enemyKingdom={false}
                   />
-                  <KingdomPin
+                  <EnemyKingdomPin
                     kingdoms={this.state.otherKingdoms}
                     characterId={this.state.characterId}
                     disableMapButtons={true}
-                    enemyKingdom={true}
                   />
                   <div className="map-x-pin" style={this.playerIcon()}></div>
                 </div>
