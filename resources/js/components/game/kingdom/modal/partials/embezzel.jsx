@@ -81,7 +81,7 @@ export default class Embezzel extends React.Component {
               : null
           }
 
-          <p>Embezzling from your kingdom will reduce the kingdoms morale by 5% regardless of the amount you
+          <p>Embezzling from your kingdom will reduce the kingdoms morale by 15% regardless of the amount you
             embezzle.</p>
           <p>You cannot embezzle if your kingdoms morale is 15% or lower.</p>
           <div className="mt-2">
