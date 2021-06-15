@@ -78,7 +78,7 @@ export default class Attack {
     }
   }
 
-  canHit(attacker, defender, type) {
+  canHit(attacker, defender) {
     let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
 
@@ -90,17 +90,49 @@ export default class Attack {
       defenderDodge = 1 + defenderDodge
     }
 
-    const baseStatBonus      = attacker.base_stat - Math.ceil(attacker.base_stat * .50);
-    const enemyBaseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
+    const attackerDexPercentage      = this.calculatePercentage(attacker.dex);
+    const attackerBaseStatPercentage = this.calculatePercentage(attacker.base_stat);
+    const defenderDexPercentage      = this.calculatePercentage(defender.dex);
+    const defenderBaseStatPercentage = this.calculatePercentage(defender.base_stat);
 
-    return (attacker.dex + (baseStatBonus * attackerAccuracy)) > (defender.dex + (enemyBaseStatBonus * defenderDodge));
+    const baseHitPercentage   = Math.round(100*Math.log(attacker.base_stat)/Math.log(10))/100;
+    const baseDodgePercentage = Math.round(100*Math.log(defender.dex)/Math.log(10))/100;
+
+    const attack = (attackerDexPercentage + attackerBaseStatPercentage) * (attackerAccuracy > 1 ? attackerAccuracy : (1 + attackerAccuracy));
+    const dodge  = (defenderDexPercentage + defenderBaseStatPercentage) * (defenderDodge > 1 ? defenderDodge : (1 + defenderDodge));
+
+    return attack * (1 + (baseHitPercentage / 100)) > dodge * (1 + (baseDodgePercentage / 100));
   }
 
-  blockedAttack(defender, attacker, type) {
-    let dexBonus      = attacker.dex - Math.ceil(attacker.dex * .50);
-    let baseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
+  blockedAttack(defender, attacker) {
+    const attackerBaseStatPercentage = this.calculatePercentage(attacker.base_stat);
 
-    return Math.ceil((attacker.base_stat / 2) + dexBonus) < (defender.ac + baseStatBonus);
+    return defender.ac > attackerBaseStatPercentage;
+  }
+
+  calculatePercentage(number) {
+    let statThousands = Math.round(100*Math.log(number)/Math.log(10))/100;
+    let stat          = number;
+
+    switch (statThousands) {
+      case 3:
+        stat = Math.round(stat / 100);
+        break;
+      case 4:
+        stat = Math.round(stat / 1000);
+        break;
+      case 5:
+        stat = Math.round(stat / 10000);
+        break;
+      case 6:
+        stat = Math.round(stat / 100000);
+        break;
+      case 7:
+        stat = Math.round(stat / 1000000);
+        break;
+    }
+
+    return stat / 100;
   }
 
   isMonsterDead() {
