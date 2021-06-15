@@ -7,9 +7,10 @@
 
 One of the key aspects of Planes of Tlessa is to allow you to settle kingdoms. Kingdoms in Tlessa work differently than other kingdom management games you might have played or are used to. With some similarities but my own spin on it.
 
-Borrowing the idea of settling kingdoms from [racewarkingdoms](), I have made some changes to way they work here.
+Borrowing the idea of settling kingdoms from a game I used to play way back when. I have made some changes to way they work here.
 
-First, to settle a kingdom you simply move to any location that is not a port or special location. You’ll know if you can settle a kingdom by seeing this button appear in the actions section:
+First, to settle a kingdom you simply move to any location that is not a port or special location. You’ll know if you can 
+settle a kingdom by seeing this button appear in the actions section:
 
 <div class="mb-4">
     <a href="/storage/info/kingdoms/images/settle-action.png" class="glightbox">
@@ -25,9 +26,15 @@ From here you may click Settle Kingdom, this will open a popup:
     </a>
 </div>
 
-You’ll type in a name. Kingdom names must be between 5 and 30 characters. Spaces are allowed.
+You’ll type in a name. Kingdom names must be between 5 and 30 characters. You may use spaces in the kingdom name.
+
 
 > ### ATTN!
+> 
+> You may not settle a kingdom within 1 movement of any location or port. That is, for ports and locations, move up two spaces 
+> and you can settle a kingdom. This is help players see ports and locations on the map.
+> 
+> ## Multiple Kingdoms?
 > 
 > Should you already have one kingdom on the plane you settled on, additional kingdoms will cost you gold.
 > 
