@@ -431,8 +431,6 @@ export default class Map extends React.Component {
       return <CardLoading/>
     }
 
-    console.log(this.state.kingdoms, this.state.otherKingdoms);
-
     return (
       <div className="card mb-4 map-card">
         <div className="card-body">
