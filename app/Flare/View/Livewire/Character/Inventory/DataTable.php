@@ -31,7 +31,7 @@ class DataTable extends Component
 
     public $marketBoard              = false;
 
-    public $craftOnly                = true;
+    public $craftOnly                = false;
 
     public $character;
 
@@ -49,14 +49,18 @@ class DataTable extends Component
 
             if ($this->batchSell) {
                 $join->whereNull('items.item_prefix_id')->whereNull('items.item_suffix_id');
+                $join->where('items.craft_only', $this->craftOnly);
             }
 
             if ($this->marketBoard) {
                 $join->where('items.market_sellable', true);
             }
 
+            if ($this->craftOnly) {
+                $join->where('items.craft_only', $this->craftOnly);
+            }
 
-            return $join->where('items.craft_only', $this->craftOnly);
+            return $join;
         });
 
         return $slots->select('inventory_slots.*')
