@@ -83,6 +83,26 @@ class RandomItemDropBuilder {
     protected function attachAffix(Item $item, ItemAffix $itemAffix): Item {
         $item->update(['item_'.$itemAffix->type.'_id' => $itemAffix->id]);
 
+        if ($itemAffix->type === 'suffix') {
+            if (!is_null($item->itemPrefix)) {
+                if ($item->itemPrefix->cost > 1000000) {
+                    $affixes = $this->itemAffixes->where('type', 'prefix')->all();
+
+                    $item->update(['item_prefix_id' => $affixes[rand(0, count($affixes) - 1)]]);
+                }
+            }
+        }
+
+        if ($itemAffix->type === 'prefix') {
+            if (!is_null($item->itemSuffix)) {
+                if ($item->itemSuffix->cost > 1000000) {
+                    $affixes = $this->itemAffixes->where('type', 'suffix')->all();
+
+                    $item->update(['item_suffix_id' => $affixes[rand(0, count($affixes) - 1)]]);
+                }
+            }
+        }
+
         return $item->refresh();
     }
 

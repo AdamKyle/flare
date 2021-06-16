@@ -23,7 +23,7 @@ class BaseSkillValue {
             'currently_training' => false,
             'level'              => 1,
             'xp'                 => 0,
-            'xp_max'             => $skill->can_train ? rand(150, 700) : rand(150, 900),
+            'xp_max'             => $skill->can_train ? rand(350, 700) : rand(350, 900),
         ];
     }
 

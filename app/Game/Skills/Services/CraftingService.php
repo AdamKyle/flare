@@ -96,8 +96,6 @@ class CraftingService {
         event(new ServerMessageEvent($character->user, 'failed_to_craft'));
 
         $this->updateCharacterGold($character, $item->cost, $skill);
-
-        return;
     }
 
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
