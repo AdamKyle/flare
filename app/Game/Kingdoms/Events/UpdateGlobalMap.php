@@ -34,7 +34,7 @@ class UpdateGlobalMap implements ShouldBroadcastNow
      */
     public function __construct(Character $character) {
         $this->mapName       = $character->map->gameMap->name;
-        $this->otherKingdoms = $this->getEnemyKingdoms(true);
+        $this->otherKingdoms = $this->getEnemyKingdoms($character, true);
     }
 
     /**

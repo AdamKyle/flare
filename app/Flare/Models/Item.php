@@ -49,6 +49,8 @@ class Item extends Model
         'skill_level_trivial',
         'crafting_type',
         'market_sellable',
+        'can_drop',
+        'craft_only',
     ];
 
     /**

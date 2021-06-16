@@ -31,6 +31,8 @@ class DataTable extends Component
 
     public $marketBoard              = false;
 
+    public $craftOnly                = true;
+
     public $character;
 
     public function getDataQueryProperty() {
@@ -53,7 +55,8 @@ class DataTable extends Component
                 $join->where('items.market_sellable', true);
             }
 
-            return $join;
+
+            return $join->where('items.craft_only', $this->craftOnly);
         });
 
         return $slots->select('inventory_slots.*')

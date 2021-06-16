@@ -35,6 +35,7 @@ class ItemAffix extends Model
         'int_required',
         'skill_level_required',
         'skill_level_trivial',
+        'can_drop',
     ];
 
     /**
