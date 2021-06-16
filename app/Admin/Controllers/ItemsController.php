@@ -46,6 +46,8 @@ class ItemsController extends Controller {
     }
 
     public function export() {
+//         (new ItemsExport)->queue('items.xlsx');
+//         return redirect()->back()->with('success', 'Working it, you will be emailed when done.');
         $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 

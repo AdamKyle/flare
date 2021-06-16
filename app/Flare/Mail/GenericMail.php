@@ -31,14 +31,14 @@ class GenericMail extends Mailable
      */
     public $dontShowLogin = false;
 
+
     /**
      * Create a new message instance.
      *
      * @param User $user
-     * @param string $genericSubject
+     * @param string $genericMessage
      * @param string $genericSubject
      * @param bool $dontShowLogin | false
-     * @return void
      */
     public function __construct(User $user, string $genericMessage, string $genericSubject, bool $dontShowLogin = false)
     {
@@ -55,7 +55,7 @@ class GenericMail extends Mailable
      */
     public function build()
     {
-        return $this->from(config('mail.username'), 'Planes of Tlessa')
+        $mail = $this->from(config('mail.username'), 'Planes of Tlessa')
                     ->subject($this->genericSubject)
                     ->mjml('flare.email.generic_mail', [
                         'user'           => $this->user,

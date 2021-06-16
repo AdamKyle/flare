@@ -28,7 +28,7 @@ export const dragMap = (position, bottomBounds, rightBounds) => {
   const xBounds = Math.sign(position.x);
   let bottomMapBounds = bottomBounds;
   let rightMapBounds = rightBounds;
-
+  console.log(x, y);
   if (yBounds === -1) {
     bottomMapBounds += Math.abs(yBounds);
   } else {
