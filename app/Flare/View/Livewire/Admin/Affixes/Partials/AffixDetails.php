@@ -42,7 +42,7 @@ class AffixDetails extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
-        if (is_nullable($this->itemAffix->can_drop)) {
+        if (is_null($this->itemAffix->can_drop)) {
             $this->itemAffix->can_drop = true;
         }
 
