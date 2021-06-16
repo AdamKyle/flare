@@ -30,11 +30,9 @@ class DropCheckCalculator {
 
         if ($bonus < 1) {
             $bonus += 1;
-        } else if ($bonus > 1) {
-            return (rand(1, 400) * $bonus)  > (400 - (400 * $monster->drop_check));
         }
 
-        return (rand(1, 100) * $bonus)  > (100 - (100 * $monster->drop_check));
+        return (rand(1, 1000) * $bonus)  > (1000 - (1000 * $monster->drop_check));
     }
 
     /**

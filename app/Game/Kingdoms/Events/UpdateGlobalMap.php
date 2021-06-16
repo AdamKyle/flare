@@ -34,16 +34,7 @@ class UpdateGlobalMap implements ShouldBroadcastNow
      */
     public function __construct(Character $character) {
         $this->mapName       = $character->map->gameMap->name;
-        $this->otherKingdoms = Kingdom::select('x_position', 'y_position', 'id', 'color', 'character_id')
-                                      ->whereNotNull('character_id')
-                                      ->where('game_map_id', $character->map->game_map_id)
-                                      ->get()
-                                      ->transform(function($kingdom) {
-                                          $kingdom->character_name = $kingdom->character->name;
-
-                                          return $kingdom;
-                                      })
-                                      ->toArray();
+        $this->otherKingdoms = $this->getEnemyKingdoms(true);
     }
 
     /**
