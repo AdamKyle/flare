@@ -14,7 +14,7 @@ class AddCanDropToItemAffixes extends Migration {
     public function up()
     {
         Schema::table('item_affixes', function (Blueprint $table) {
-            $table->boolean('cran_drop')->default(true);
+            $table->boolean('can_drop')->default(true);
         });
     }
 

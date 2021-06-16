@@ -27,7 +27,7 @@ class DropsCheckListener
 
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
-                        ->setItemAffixes(ItemAffix::all())
+                        ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
                         ->generateItem($event->character);
 
             if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {

@@ -57,6 +57,7 @@ class ItemAffix extends Model
         'int_required'         => 'integer',
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',
+        'can_drop'             => 'boolean',
     ];
 
     protected static function newFactory() {
