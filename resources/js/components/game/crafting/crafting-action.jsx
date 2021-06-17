@@ -116,7 +116,7 @@ export default class CraftingAction extends React.Component {
             }
 
             if (response.status === 429) {
-              this.props.openTimeOutModal()
+              return this.props.openTimeOutModal()
             }
           }
         });
@@ -170,7 +170,7 @@ export default class CraftingAction extends React.Component {
 
           if (response.status === 429) {
             // Reload to show them their notification.
-            location.reload();
+            return this.props.openTimeOutModal();
           }
         }
       });

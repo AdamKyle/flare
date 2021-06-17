@@ -95,6 +95,10 @@ export default class KingdomModal extends React.Component {
           return location.reload();
         }
 
+        if (response.status === 429) {
+          return this.props.openTimeOutModal();
+        }
+
         this.setState({
           errorMessage: error.response.data.message
         });

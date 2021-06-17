@@ -219,10 +219,10 @@ class KingdomResourcesService {
         }
 
         if ($this->kingdom->current_morale > 0.50) {
-            return $this->updateTreasury(100);
+            return $this->updateTreasury(1000);
         }
 
-        return $this->updateTreasury(50);
+        return $this->updateTreasury(100);
     }
 
 

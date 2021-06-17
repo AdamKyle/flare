@@ -121,7 +121,7 @@ export default class Teleport extends React.Component {
         }
 
         if (response.status === 429) {
-          this.props.openTeleportDetails(2);
+          return this.props.openTeleportDetails(2);
         }
       }
 

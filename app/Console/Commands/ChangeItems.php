@@ -105,27 +105,73 @@ class ChangeItems extends Command
             'Artifact Hunter',
         ];
 
+        $this->info('Cleaning Characters ...');
+        $this->newLine();
+
+        $deletingAffixes = $this->output->createProgressBar(count($affixesToDelete));
+
+        $deletingAffixes->start();
+
         foreach ($affixesToDelete as $affixToDelete) {
-            $affix = ItemAffix::where('name', $affixesToDelete)->first();
+
+            $affix = ItemAffix::where('name', $affixToDelete)->first();
 
             if (!is_null($affix)) {
                 $itemAffixService->deleteAffix($affix);
             }
+
+            $deletingAffixes->advance();
         }
+
+        $deletingAffixes->finish();
+
+        $this->newLine();
+
+        $this->info('Deleting items with suffixes ...');
+
+        $this->newLine();
 
         $items = Item::whereNotNull('item_suffix_id')->get();
 
+        $suffixes = $this->output->createProgressBar($items->count());
+
+        $suffixes->start();
+
         foreach ($items as $item) {
             $this->deleteItem($item);
+
+            $suffixes->advance();
         }
+
+        $suffixes->finish();
+
+        $this->newLine();
 
         $items = Item::whereNotNull('item_prefix_id')->get();
 
+        $this->info('Deleting items with prefixes ...');
+
+        $this->newLine();
+
+        $prefixes = $this->output->createProgressBar($items->count());
+
+        $prefixes->start();
+
         foreach ($items as $item) {
             $this->deleteItem($item);
+
+            $prefixes->advance();
         }
 
+        $prefixes->finish();
+
+        $this->newLine();
+
+        $this->info('Resetting Skills ...');
+
         $this->resetSkills();
+
+        $this->info('Finished :)');
     }
 
     protected function deleteItem(Item $item) {

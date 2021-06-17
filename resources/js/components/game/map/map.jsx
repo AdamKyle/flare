@@ -121,7 +121,7 @@ export default class Map extends React.Component {
         }
 
         if (response.status === 429) {
-          this.props.openTimeOutModal()
+          return this.props.openTimeOutModal()
         }
       }
     });
@@ -410,7 +410,7 @@ export default class Map extends React.Component {
         const response = err.response;
 
         if (response.status === 401) {
-          location.reload();
+          return location.reload();
         }
 
         if (response.status === 429) {

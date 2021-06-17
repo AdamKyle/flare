@@ -24,7 +24,7 @@ class EnchantItemService {
 
     /**
      * Attach the affix to the item.
-     * 
+     *
      */
     public function attachAffix(Item $item, ItemAffix $affix, Skill $enchantingSkill, bool $tooEasy = false) {
         if ($tooEasy) {
@@ -32,7 +32,7 @@ class EnchantItemService {
         } else {
             $dcCheck       = $this->getDCCheck($enchantingSkill, $this->dcIncrease);
             $characterRoll = $this->characterRoll($enchantingSkill);
-            
+
             if ($dcCheck > $characterRoll) {
                 return false;
             } else {
@@ -45,7 +45,7 @@ class EnchantItemService {
 
     public function updateSlot(InventorySlot $slot) {
         if (!is_null($this->item)) {
-            
+
             if ($this->getCountOfMatchingItems() > 1) {
                 $slot->update([
                     'item_id' => $this->findMatchingItemId(),
@@ -55,7 +55,7 @@ class EnchantItemService {
                     'item_id' => $this->item->id,
                 ]);
             }
-        } 
+        }
     }
 
     public function deleteSlot(InventorySlot $slot) {
@@ -86,7 +86,7 @@ class EnchantItemService {
         }
 
         $clonedItem = $item->duplicate();
-        
+
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
         $clonedItem->market_sellable = true;
 
