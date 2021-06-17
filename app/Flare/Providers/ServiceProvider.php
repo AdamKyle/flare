@@ -3,6 +3,7 @@
 namespace App\Flare\Providers;
 
 
+use App\Flare\Handlers\CheatingCheck;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -111,6 +112,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(FightService::class, function($app, $paramters) {
             return new FightService($paramters['character'], $paramters['monster']);
+        });
+
+        $this->app->bind(CheatingCheck::class, function($app, $paramters) {
+            return new CheatingCheck();
         });
     }
 

@@ -2,6 +2,9 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Flare\Handlers\CheatingCheck;
+use App\Game\Core\Jobs\EndGlobalTimeOut;
+use Cache;
 use App\Game\Core\Events\UpdateAttackStats;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
@@ -50,7 +53,11 @@ class BattleController extends Controller {
         ], 200);
     }
 
-    public function battleResults(Request $request, Character $character) {
+    public function battleResults(Request $request, Character $character, CheatingCheck $cheatingCheck) {
+
+        if ($cheatingCheck->isCheatingInBattle($character)) {
+            return response()->json([], 429);
+        }
 
         if ($character->is_dead || !$character->can_attack) {
             return response()->json(['message' => 'invalid input.'], 429);
