@@ -5,9 +5,13 @@ namespace App\Console\Commands;
 use App\Admin\Services\ItemAffixService;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\MarketHistory;
+use App\Flare\Models\Skill;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Console\Command;
 
@@ -120,6 +124,8 @@ class ChangeItems extends Command
         foreach ($items as $item) {
             $this->deleteItem($item);
         }
+
+        $this->resetSkills();
     }
 
     protected function deleteItem(Item $item) {
@@ -127,7 +133,8 @@ class ChangeItems extends Command
         $name  = $item->affix_name;
 
         if ($slots->isEmpty()) {
-            $item->delete();
+
+            $this->clearItem($item);
 
             return;
         }
@@ -139,13 +146,47 @@ class ChangeItems extends Command
 
             $gold = SellItemCalculator::fetchTotalSalePrice($item);
 
-            $character->gold += $gold;
+            $character->gold += ($gold - ($gold * .75));
             $character->save();
 
             $character = $character->refresh();
 
             event(new ServerMessageEvent($character->user, 'deleted_item', $name));
             event(new UpdateTopBarEvent($character));
+        }
+
+        $this->clearItem($item);
+    }
+
+    protected function resetSkills() {
+        Character::chunkById(100, function($characters) {
+           foreach ($characters as $character) {
+               foreach ($character->skills as $skill) {
+                   $skill->update([
+                       'level' => 1,
+                       'xp'    => 0,
+                       'xp_max' => $skill->can_train ? rand(350, 700) : rand(350, 900)
+                   ]);
+               }
+           }
+        });
+    }
+
+    protected function clearItem(Item $item) {
+        $itemsForSale = MarketBoard::where('item_id', $item->id)->get();
+
+        if ($itemsForSale->isNotEmpty()) {
+            foreach($itemsForSale as $forSale) {
+                $forSale->delete();
+            }
+        }
+
+        $itemsHistory = MarketHistory::where('item_id', $item->id)->get();
+
+        if ($itemsHistory->isNotEmpty()) {
+            foreach($itemsHistory as $history) {
+                $history->delete();
+            }
         }
 
         $item->delete();

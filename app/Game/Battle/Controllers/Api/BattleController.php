@@ -53,11 +53,7 @@ class BattleController extends Controller {
         ], 200);
     }
 
-    public function battleResults(Request $request, Character $character, CheatingCheck $cheatingCheck) {
-
-        if ($cheatingCheck->isCheatingInBattle($character)) {
-            return response()->json([], 429);
-        }
+    public function battleResults(Request $request, Character $character) {
 
         if ($character->is_dead || !$character->can_attack) {
             return response()->json(['message' => 'invalid input.'], 429);
