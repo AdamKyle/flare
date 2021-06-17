@@ -3,8 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Admin\Services\ItemAffixService;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Console\Command;
 
 class ChangeItems extends Command
@@ -40,14 +44,6 @@ class ChangeItems extends Command
      */
     public function handle(ItemAffixService $itemAffixService)
     {
-        $itemNames = [
-            'Balanced Energies',
-            'Natures Balancing Bliss',
-            'Queens Blessing',
-            'Wishing Spell',
-            'Chakra Alignment',
-            'Earth Tuned',
-        ];
 
         $affixesToDelete = [
             'Devils Arrow',
@@ -113,16 +109,45 @@ class ChangeItems extends Command
             }
         }
 
-        foreach ($itemNames as $itemName) {
-            $affix = ItemAffix::where('name', $itemName)->first();
+        $items = Item::whereNotNull('item_suffix_id')->get();
 
-            $items = Item::where('item_suffix_id', $affix->id)->get();
-
-            foreach ($items as $item) {
-                $item->update([
-                    'item_prefix_id' => $affix->id,
-                ]);
-            }
+        foreach ($items as $item) {
+            $this->deleteItem($item);
         }
+
+        $items = Item::whereNotNull('item_prefix_id')->get();
+
+        foreach ($items as $item) {
+            $this->deleteItem($item);
+        }
+    }
+
+    protected function deleteItem(Item $item) {
+        $slots = InventorySlot::where('item_id', $item->id)->get();
+        $name  = $item->affix_name;
+
+        if ($slots->isEmpty()) {
+            $item->delete();
+
+            return;
+        }
+
+        foreach($slots as $slot) {
+            $character = $slot->inventory->character;
+
+            $slot->delete();
+
+            $gold = SellItemCalculator::fetchTotalSalePrice($item);
+
+            $character->gold += $gold;
+            $character->save();
+
+            $character = $character->refresh();
+
+            event(new ServerMessageEvent($character->user, 'deleted_item', $name));
+            event(new UpdateTopBarEvent($character));
+        }
+
+        $item->delete();
     }
 }
