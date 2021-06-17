@@ -43,7 +43,7 @@ class ServerMessageBuilder {
             case 'cant_craft':
                 return 'You must wait for the timer (beside Craft/Enchant) to state: Ready!';
             case 'to_hard_to_craft':
-                return 'You lost your investment and epically failed to craft this item.';
+                return 'You are too low level and thus, you lost your investment and epically failed to craft this item!';
             case 'to_easy_to_craft':
                 return 'This is far too easy to craft! You will get no experience for this item.';
             case 'something_went_wrong':

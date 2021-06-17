@@ -112,6 +112,7 @@ class EnchantingService {
 
             event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
 
+
             return $this->successResult([
                 'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
                 'character_inventory' => array_values($this->fetchCharacterInventory($character)),
@@ -139,8 +140,7 @@ class EnchantingService {
     }
 
     protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
-        return ItemAffix::where('int_required', '<=', $builder->statMod('int'))
-                        ->where('skill_level_required', '<=', $enchantingSkill->level)
+        return ItemAffix::select('name', 'cost', 'id', 'type')->where('int_required', '<=', $builder->statMod('int'))
                         ->orderBy('cost', 'asc')
                         ->get();
     }
