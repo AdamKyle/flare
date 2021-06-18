@@ -140,9 +140,7 @@ export default class Map extends React.Component {
       if (this.state.otherKingdoms.length > 0) {
         let otherKingdoms = this.state.otherKingdoms;
 
-        console.log(otherKingdoms);
-
-        otherKingdoms.find((ok) => ok.id === event.id).current_morale = event.current_morale;
+        otherKingdoms.find((ok) => ok.id === event.enemyMorale.id).current_morale = event.enemyMorale.current_morale;
 
         this.setState({
           otherKingdoms: otherKingdoms,
@@ -298,18 +296,13 @@ export default class Map extends React.Component {
   }
 
   getMaxLeft() {
-    console.log(this.state.windowWidth);
     if (this.state.windowWidth > 1700) {
-      console.log('1700');
       return -100
     } else if (this.state.windowWidth < 450) {
-      console.log('450');
       return -150
     } else if (this.state.windowWidth < 992) {
-      console.log('992');
       return -100
     } else if (this.state.windowWidth < 1200) {
-      console.log('1200');
       return 0;
     }
 

@@ -281,7 +281,7 @@ class AttackService {
      * @param Character $character
      */
     protected function attemptToSettleKingdom(Kingdom $defender, UnitMovementQueue $unitMovement, Character $character) {
-        if ($defender->current_morale > 0) {
+        if ($defender->current_morale > 0 || $defender->current_morale > 0.0) {
             $defender = $this->kingdomHandler->updateDefendersMorale($defender, $this->settler);
 
             $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);

@@ -118,7 +118,7 @@ trait KingdomCache {
      * @param array $cache
      * @return array
      */
-    protected function removeKingdom(Kingdom $kingdom, array $cache): array {
+    protected function removeKingdom(Kingdom $kingdom, array $cache = []): array {
         foreach ($cache as $index => $kingdomData) {
             if ($kingdomData['id'] === $kingdom->id) {
                 array_splice($cache, $index, 1);
