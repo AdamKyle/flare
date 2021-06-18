@@ -25,7 +25,7 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function fetchMonsters() {
-        if ($search !== '') {
+        if ($this->search !== '') {
             $this->page = 1;
         }
 

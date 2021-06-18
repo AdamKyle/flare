@@ -12,6 +12,7 @@ use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
@@ -137,6 +138,25 @@ class KingdomService {
 
         broadcast(new UpdateGlobalMap($character));
 
+        $count = $character->refresh()->kingdoms()->count();
+
+        if ($count === 100) {
+            $message = $character->name . ' Has settled their 100th kingdom. They are becoming unstoppable!';
+
+            broadcast(new GlobalMessageEvent($message));
+        }
+
+        if ($count === 500) {
+            $message = $character->name . ' Has settled their 500th kingdom. The lands choke under their grip.';
+
+            broadcast(new GlobalMessageEvent($message));
+        }
+
+        if ($count === 1000) {
+            $message = $character->name . ' Has settled their 1000th kingdom. Even The Creator trembles in fear.';
+
+            broadcast(new GlobalMessageEvent($message));
+        }
 
         return [];
     }

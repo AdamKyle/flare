@@ -22,6 +22,7 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
                 'game.inventory.compare-items',
                 'game.equip.item',
                 'game.inventory.unequip',
+                'skill.character.info',
             ];
 
             if (in_array($request->route()->getName(), $letAdminThrough)) {

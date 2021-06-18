@@ -24,7 +24,7 @@ class DataTable extends Component
     public function fetchGameSkills() {
         $search = strtolower($this->search);
 
-        if ($search !== '') {
+        if ($this->search !== '') {
             $this->page = 1;
         }
 

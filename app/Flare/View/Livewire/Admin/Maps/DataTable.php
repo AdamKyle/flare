@@ -18,7 +18,7 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function fetchMaps() {
-        if ($search !== '') {
+        if ($this->search !== '') {
             $this->page = 1;
         }
 

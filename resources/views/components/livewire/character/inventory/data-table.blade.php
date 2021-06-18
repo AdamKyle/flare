@@ -22,7 +22,7 @@
                     @endif
 
 
-                    @if ($allowMassDestroy && $pageSelected)
+                    @if ($allowMassDestroy && ($pageSelected || $selected))
                         <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
                     @endif
                 </x-data-tables.per-page>
@@ -103,6 +103,11 @@
                         <tr>
                             <td colspan="8">
                                 @unless($selectAll)
+                                    @if ($allowMassDestroy)
+                                        <div class="alert alert-info">
+                                            Selecting all items, will <strong>not</strong> destroy currently equipped or quest items. Everything else <strong>will be</strong> destroyed.
+                                        </div>
+                                    @endif
                                     <div>
                                         <span>You have selected <strong>{{$slots->count()}}</strong> items of <strong>{{$slots->total()}}</strong>. Would you like to select all?</span>
                                         <button class="btn btn-link" wire:click="selectAll">Select all</button>
@@ -112,6 +117,12 @@
                                 @endunless
                             </td>
                         </tr>
+                    @endif
+
+                    @if (empty($pageSelected) && !empty($selected))
+                        <div class="alert alert-info">
+                            Selecting all items, will <strong>not</strong> destroy currently equipped or quest items. Everything else <strong>will be</strong> destroyed.
+                        </div>
                     @endif
 
                     @forelse($slots as $slot)
