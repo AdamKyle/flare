@@ -31,6 +31,10 @@ class DataTable extends Component
 
     public function render()
     {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         return view('components.livewire.admin.adventures.data-table', [
             'adventures' => Adventure::dataTableSearch($this->search)
                                  ->where('published', $this->published)

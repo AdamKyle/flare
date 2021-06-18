@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
 use App\Game\Kingdoms\Builders\AttackBuilder;
+use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use Facades\App\Flare\Values\UserOnlineValue;
@@ -297,6 +298,14 @@ class AttackService {
 
                 $this->notifyHandler->kingdomHasFallenMessage($character);
             } else {
+
+                $defender->current_morale -= .10;
+
+                $defender->save();
+
+                $defender = $defender->refresh();
+
+                broadcast(new UpdateEnemyKingdomsMorale($defender));
 
                 $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 

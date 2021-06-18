@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
@@ -80,6 +81,7 @@ class KingdomResourcesService {
             $kingdom = new Item($kingdom, $this->kingdomTransformer);
             $kingdom = $this->manager->createData($kingdom)->toArray();
 
+            broadcast(new UpdateEnemyKingdomsMorale($kingdom));
             event(new UpdateKingdom($user, $kingdom));
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
         } else {

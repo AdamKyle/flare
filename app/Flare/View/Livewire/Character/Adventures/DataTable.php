@@ -29,6 +29,8 @@ class DataTable extends Component
         $character = $this->character;
 
         if (strval($this->search) !== '') {
+            $this->page = 1;
+
             $logs = $logs->filter(function($log) {
                 if (strpos($log->adventure->name, strval($this->search)) !== false) {
                     return $log;

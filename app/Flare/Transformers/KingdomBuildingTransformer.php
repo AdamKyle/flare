@@ -58,6 +58,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
             'is_maxed'                    => $building->is_at_max_level,
             'future_defence_increase'     => $building->future_defence,
             'future_durability_increase'  => $building->future_durability,
+            'max_level'                   => $building->gameBuilding->max_level,
         ];
     }
 }

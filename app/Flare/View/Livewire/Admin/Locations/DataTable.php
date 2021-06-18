@@ -18,8 +18,12 @@ class DataTable extends Component
     public $perPage     = 10;
 
     protected $paginationTheme = 'bootstrap';
-    
+
     public function fetchLocations() {
+
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
 
         if ($this->sortField === 'game_maps.name') {
             $location = Location::join('game_maps', function($join) {
@@ -39,7 +43,7 @@ class DataTable extends Component
             }
 
             $column = ($this->sortField !== 'game_maps.name' ? 'locations.name' : 'game_maps.name');
-            
+
             return $location->orderBy($column, $this->sortBy)
                             ->select('locations.*')
                             ->paginate($this->perPage);
@@ -53,7 +57,7 @@ class DataTable extends Component
             }
 
             $column = 'locations.' . $this->sortField;
-            
+
 
             return $location->orderBy($column, $this->sortBy)
                             ->select('locations.*')

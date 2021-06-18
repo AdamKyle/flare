@@ -59,6 +59,7 @@ export default class Map extends React.Component {
     this.updateMapPlane = Echo.private('update-map-plane-' + this.props.userId);
     this.globalCharacterCount = Echo.join('global-character-count-plane');
     this.globalMapUpdate = Echo.join('global-map-update');
+    this.enemyKingdomMoraleUpdate = Echo.join('enemy-kingdom-morale-update');
   }
 
   componentDidMount() {
@@ -131,6 +132,20 @@ export default class Map extends React.Component {
       if (event.mapName === this.state.characterMapName) {
         this.setState({
           otherKingdoms: event.otherKingdoms.filter((ok) => ok.character_id !== this.state.characterId),
+        });
+      }
+    });
+
+    this.enemyKingdomMoraleUpdate.listen('Game.Kingdoms.Events.UpdateEnemyKingdomsMorale', (event) => {
+      if (this.state.otherKingdoms.length > 0) {
+        let otherKingdoms = this.state.otherKingdoms;
+
+        console.log(otherKingdoms);
+
+        otherKingdoms.find((ok) => ok.id === event.id).current_morale = event.current_morale;
+
+        this.setState({
+          otherKingdoms: otherKingdoms,
         });
       }
     });

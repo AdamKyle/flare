@@ -38,6 +38,10 @@ class DataTable extends Component
     public $character;
 
     public function getDataQueryProperty() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         if (!is_null($this->character)) {
             $character = $this->character;
         }

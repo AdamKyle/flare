@@ -24,6 +24,9 @@ class DataTable extends Component
     public $building     = null;
 
     public function fetch() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
 
         if (!is_null($this->building)) {
             $gameUnits = GameBuildingUnit::where('game_building_id', $this->building->id)->join('game_units', function($join) {

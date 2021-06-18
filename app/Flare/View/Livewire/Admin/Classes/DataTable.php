@@ -21,6 +21,10 @@ class DataTable extends Component
 
     public function fetchClasses() {
         if ($this->search !== '') {
+            $this->page = 1;
+        }
+
+        if ($this->search !== '') {
             return GameClass::where('name', 'like', '%'.$this->search.'%')
                            ->orderBy($this->sortField, $this->sortBy ? 'asc' : 'desc')
                            ->paginate($this->perPage);

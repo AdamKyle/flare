@@ -28,6 +28,10 @@ export default class BuildingManagementModal extends React.Component {
     const kingdom = this.props.kingdom;
     const building = this.props.building;
 
+    if (building.level >= building.max_level) {
+      return false
+    }
+
     if (building.wood_cost > kingdom.current_wood) {
       return false;
     }
@@ -186,32 +190,41 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          <BuildingCostSection
-            building={this.props.building}
-            canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
-          />
+          {/*<BuildingCostSection*/}
+          {/*  building={this.props.building}*/}
+          {/*  canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}*/}
+          {/*/>*/}
+
+          { this.props.building.level >= this.props.building.max_level ?
+            <div className="alert alert-success mt-5">
+              This building is already max level and cannot upgrade any further.
+            </div>
+          : <BuildingCostSection
+              building={this.props.building}
+              canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
+            />}
 
           {!this.isCurrentlyInQueue() ?
             <div className="alert alert-warning mb-2 mt-2">
               Cannot upgrade building. Currently in queue. Please wait till it's finished.
             </div>
-            : !this.canUpgrade() ?
+            : !this.canUpgrade() && !(this.props.building.level >= this.props.building.max_level) ?
               <div className="alert alert-warning mb-2 mt-2">
                 You don't seem to have the resources to upgrade this building. You can move this modal
                 by clicking and dragging on the title, to compare the required resources with what you currently have.
               </div>
-              : !this.buildingNeedsToBeRebuilt() ?
+              : !this.buildingNeedsToBeRebuilt() && !(this.props.building.level >= this.props.building.max_level) ?
                 <>
                   <hr/>
                   <h5 className="mt-1">Gain Upon Upgrading</h5>
                   <hr/>
                   <UpgradeSection building={this.props.building}/>
                 </>
-                :
+                  : !(this.props.building.level >= this.props.building.max_level) ?
                 <div className="alert alert-info mt-5">
                   Rebuilding the building will require the amount of resources to upgrade to the current level.
                   You can see this in the Cost section above.
-                </div>
+                </div> : null
           }
         </Modal.Body>
         <Modal.Footer>

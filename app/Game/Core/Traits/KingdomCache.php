@@ -51,7 +51,7 @@ trait KingdomCache {
         if (Cache::has('enemy-kingdoms-'  . $plane) && !$refresh) {
             Cache::has('enemy-kingdoms-'  . $plane);
         } else {
-            $kingdoms = Kingdom::select('x_position', 'y_position', 'id', 'color', 'character_id')
+            $kingdoms = Kingdom::select('x_position', 'y_position', 'id', 'color', 'character_id', 'name', 'current_morale')
                 ->whereNotNull('character_id')
                 ->where('game_map_id', $character->map->game_map_id)
                 ->get()

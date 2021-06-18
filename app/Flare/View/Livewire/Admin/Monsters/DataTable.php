@@ -25,6 +25,10 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function fetchMonsters() {
+        if ($search !== '') {
+            $this->page = 1;
+        }
+
         $monsters = Monster::dataTableSearch($this->search);
 
         if (!is_null($this->adventureId)) {
@@ -44,7 +48,7 @@ class DataTable extends Component
 
         $this->testCharacters = User::with('character')->where('is_test', true)->get();
     }
-    
+
     public function render()
     {
         return view('components.livewire.admin.monsters.data-table', [

@@ -30,6 +30,9 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
 
         $items = Item::dataTableSearch($this->search);
 

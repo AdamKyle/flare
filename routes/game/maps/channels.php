@@ -19,3 +19,8 @@ Broadcast::channel('global-character-count-plane', function($user) {
 BroadCast::channel('global-map-update', function($user) {
    return $user;
 });
+
+// When a enemy kingdoms morale gets updated.
+broadCast::channel('enemy-kingdom-morale-update', function($user) {
+    return $user;
+});

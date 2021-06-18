@@ -212,7 +212,7 @@ class NotifyHandler {
         $type    = '';
 
         if ($logStatus->attackedKingdom()) {
-            $message = 'You landed for  kingdom at: (X/Y) ' .
+            $message = 'You landed an attack on a kingdom at: (X/Y) ' .
                 $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane.';
 

@@ -93,6 +93,12 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
+        if ($building->level + 1 > $building->gameBuilding->max_level) {
+            return response()->json([
+                'message' => "Building is already max level."
+            ], 422);
+        }
+
         $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
         $buildingService->upgradeKingdomBuilding($building, $character);

@@ -23,6 +23,8 @@ class DataTable extends Component
         $users = User::doesntHave('roles');
 
         if ($this->search !== '') {
+            $this->page = 1;
+
             $users = $users->join('characters', function($join) {
                 $join->on('users.id', 'characters.user_id')
                      ->where('characters.name', 'like', '%'.$this->search.'%');
@@ -30,7 +32,7 @@ class DataTable extends Component
         } else if ($this->sortField == 'characters.name') {
             $users->join('characters', function($join) {
                 $join->on('users.id', 'characters.user_id');
-            })->orderBy($this->sortField, $this->sortBy)->select('users.*'); 
+            })->orderBy($this->sortField, $this->sortBy)->select('users.*');
         } else {
             $users = $users->orderBy('un_ban_request', $this->sortBy)->orderBy($this->sortField, $this->sortBy);
         }
