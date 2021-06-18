@@ -55,7 +55,7 @@
             <td>{{$item->int_mod}}</td>
             <td>{{$item->effect}}</td>
             <td>{{$item->can_craft}}</td>
-            <td>{{$item->dan_drop}}</td>
+            <td>{{$item->can_drop}}</td>
             <td>{{$item->skill_level_required}}</td>
             <td>{{$item->skill_level_trivial}}</td>
             <td>{{$item->crafting_type}}</td>
@@ -88,6 +88,7 @@
             <td>{{$item->int_mod}}</td>
             <td>{{$item->effect}}</td>
             <td>{{$item->can_craft}}</td>
+            <td>{{$item->can_drop}}</td>
             <td>{{$item->skill_level_required}}</td>
             <td>{{$item->skill_level_trivial}}</td>
             <td>{{$item->crafting_type}}</td>

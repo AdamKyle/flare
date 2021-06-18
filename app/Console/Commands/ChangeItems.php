@@ -117,7 +117,7 @@ class ChangeItems extends Command
             $affix = ItemAffix::where('name', $affixToDelete)->first();
 
             if (!is_null($affix)) {
-                $itemAffixService->deleteAffix($affix);
+                $itemAffixService->doNotGiveGold()->deleteAffix($affix);
             }
 
             $deletingAffixes->advance();
@@ -186,19 +186,18 @@ class ChangeItems extends Command
         }
 
         foreach($slots as $slot) {
-            $character = $slot->inventory->character;
+//            $character = $slot->inventory->character;
 
             $slot->delete();
 
-            $gold = SellItemCalculator::fetchTotalSalePrice($item);
-
-            $character->gold += ($gold - ($gold * .75));
-            $character->save();
-
-            $character = $character->refresh();
-
-            event(new ServerMessageEvent($character->user, 'deleted_item', $name));
-            event(new UpdateTopBarEvent($character));
+//            $gold = SellItemCalculator::fetchTotalSalePrice($item);
+//
+//            $character->save();
+//
+//            $character = $character->refresh();
+//
+//            event(new ServerMessageEvent($character->user, 'deleted_item', $name));
+//            event(new UpdateTopBarEvent($character));
         }
 
         $this->clearItem($item);

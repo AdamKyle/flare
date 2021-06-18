@@ -45,6 +45,10 @@ class ItemsSheet implements ToCollection {
     protected function returnCleanItem(array $item) {
         $cleanData = [];
 
+        if (!isset($item['can_drop'])) {
+            $item['can_drop'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
 
@@ -57,13 +61,17 @@ class ItemsSheet implements ToCollection {
                         $value = $foundSuffix->id;
                     }
 
-                }else if ($key === 'item_prefix_id') {
+                } else if ($key === 'item_prefix_id') {
                     $foundPrefix = ItemAffix::where('name', $value)->first();
 
                     if (is_null($foundPrefix)) {
                         $value = null;
                     } else {
                         $value = $foundPrefix->id;
+                    }
+                } else if ($key === 'can_drop') {
+                    if (is_null($value)) {
+                        $value = false;
                     }
                 }
 
