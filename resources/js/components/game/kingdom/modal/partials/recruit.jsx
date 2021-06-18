@@ -129,10 +129,10 @@ export default class Recruit extends React.Component {
         <div className="row">
           <div className="col-md-6">
             <p><strong>Current Population</strong>: {this.state.max}</p>
-            <input type="number" min={0} max={this.state.max} value={this.state.value} onChange={this.amountChange.bind(this)} />
+            <input className="form-control" type="number" min={0} max={this.state.max} value={this.state.value} onChange={this.amountChange.bind(this)} />
           </div>
           <div className="col-md-6">
-            <button className="btn btn-primary mt-2" disabled={this.state.canRecruit ? false : true}
+            <button className="btn btn-primary unit-recruit-button" disabled={this.state.canRecruit ? false : true}
                     onClick={this.recruitUnits.bind(this)}>Recruit Selected Amount
             </button>
           </div>

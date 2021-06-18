@@ -8,9 +8,20 @@
     margin-top: -10px;
 }
 
+.unit-recruit-button {
+  position: relative;
+  top: 38px;
+}
+
 @include media-breakpoint-down(sm) {
-    .treasury-btn {
-        margin-top: -10px;
-        margin-left: -10px;
-    }
+  .treasury-btn {
+      margin-top: -10px;
+      margin-left: -10px;
   }
+
+  .unit-recruit-button {
+    position: inherit;
+    top: 0;
+    margin-top: 20px;
+  }
+}
