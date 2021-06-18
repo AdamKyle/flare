@@ -20,6 +20,11 @@
                             class="btn btn-danger btn-sm ml-2"
                         />
                     @endif
+
+
+                    @if ($allowMassDestroy && $pageSelected)
+                        <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
+                    @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />
             </div>
@@ -32,7 +37,7 @@
 
             <x-data-tables.table :collection="$slots">
                 <x-data-tables.header>
-                    @if ($batchSell)
+                    @if ($batchSell || $allowMassDestroy)
                         <x-data-tables.header-row>
                             <input type="checkbox" wire:model="pageSelected" id="select-all" />
                         </x-data-tables.header-row>
@@ -111,7 +116,7 @@
 
                     @forelse($slots as $slot)
                         <tr wire:key="slots-table-{{$slot->id}}">
-                            @if ($batchSell)
+                            @if ($batchSell || $allowMassDestroy)
                                 <td>
                                     <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
                                 </td>

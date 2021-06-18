@@ -33,6 +33,8 @@ class DataTable extends Component
 
     public $craftOnly                = false;
 
+    public $allowMassDestroy         = false;
+
     public $character;
 
     public function getDataQueryProperty() {
@@ -82,6 +84,16 @@ class DataTable extends Component
 
     public function fetchSlots() {
         return $this->data;
+    }
+
+    public function destroyAllItems() {
+        $this->character->inventory->slots->filter(function($slot) {
+            if (!$slot->equipped && $slot->item->type !== 'quest') {
+                $slot->delete();
+            }
+        });
+
+        $this->resetSelect();
     }
 
     public function render()

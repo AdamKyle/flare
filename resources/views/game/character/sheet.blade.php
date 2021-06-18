@@ -70,6 +70,7 @@
                             'includeQuestItems'        => true,
                             'allowInventoryManagement' => true,
                             'character'                => $character,
+                            'allowMassDestroy'         => true,
                         ])
                     </x-tabs.tab-content-section>
                     <x-tabs.tab-content-section tab="equipped">

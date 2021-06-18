@@ -18,6 +18,12 @@ trait WithSelectAll {
         }
     }
 
+    public function resetSelect() {
+        $this->selected      = [];
+        $this->pageSelected  = [];
+        $this->selectAll     = false;
+    }
+
     public function selectAll() {
         $this->selectAll = true;
     }
