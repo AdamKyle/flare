@@ -170,6 +170,8 @@ class LocationService {
                     ];
                 } else {
                     $this->canManage = true;
+
+                    $kingdom->updateLastWalked();
                 }
             }
         } else if (is_null($this->location)) {

@@ -162,6 +162,8 @@ class MovementService {
                 ];
             } else {
                 $canManage = true;
+
+                $kingdom->updateLastwalked();
             }
         } else if (is_null($location)) {
             $canSettle = true;

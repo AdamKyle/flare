@@ -14,7 +14,7 @@ class KingdomBuilder {
 
     /**
      * Creates the base params for the kingdom based off the request.
-     * 
+     *
      * @param array $params
      * @return void
      */
@@ -24,7 +24,7 @@ class KingdomBuilder {
 
     /**
      * Creates the kingdom
-     * 
+     *
      * @param Character $character
      * @return Kingdom
      */
@@ -45,6 +45,7 @@ class KingdomBuilder {
             'current_morale'          => .50,
             'max_morale'              => .50,
             'treasury'                => 0,
+            'last_walked'             => now(),
         ];
 
         return Kingdom::create(array_merge($kingdom, $this->kingdom));
