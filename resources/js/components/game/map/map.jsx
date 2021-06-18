@@ -32,6 +32,7 @@ export default class Map extends React.Component {
       rightBounds: 0,
       isLoading: true,
       characterId: 0,
+      windowWidth: 0,
       showCharacterInfo: false,
       canMove: true,
       showMessage: false,
@@ -267,6 +268,37 @@ export default class Map extends React.Component {
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
       });
     });
+
+    this.setState({
+      windowWidth: window.innerWidth,
+    });
+
+    window.addEventListener("resize", this.updateWidth.bind(this));
+  }
+
+  updateWidth() {
+    this.setState({
+      windowWidth: window.innerWidth
+    });
+  }
+
+  getMaxLeft() {
+    console.log(this.state.windowWidth);
+    if (this.state.windowWidth > 1700) {
+      console.log('1700');
+      return -100
+    } else if (this.state.windowWidth < 450) {
+      console.log('450');
+      return -150
+    } else if (this.state.windowWidth < 992) {
+      console.log('992');
+      return -100
+    } else if (this.state.windowWidth < 1200) {
+      console.log('1200');
+      return 0;
+    }
+
+    return -150;
   }
 
   componentDidUpdate() {
@@ -437,7 +469,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
               position={this.state.controlledPosition}
-              bounds={{top: -160, left: -150, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+              bounds={{top: -160, left: this.getMaxLeft(), right: this.state.rightBounds, bottom: this.state.bottomBounds}}
               handle=".handle"
               defaultPosition={{x: 0, y: 0}}
               grid={[16, 16]}

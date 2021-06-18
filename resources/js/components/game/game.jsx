@@ -309,7 +309,7 @@ export default class Game extends React.Component {
                 : null
             }
           </Col>
-          <Col xs={12} sm={12} md={12} lg={6} xl={3}>
+          <Col xs={12} sm={8} md={8} lg={6} xl={3}>
             <Map
               apiUrl={this.apiUrl}
               userId={this.props.userId}
