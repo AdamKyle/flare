@@ -60,7 +60,7 @@ class AtrributesTest extends TestCase
         Livewire::test(Attributes::class, [
             'gameBuilding' => $this->createGameBuilding(),
         ])->set('gameBuilding.is_walls', true)->call('validateInput', 'nextStep', 2);
-        
+
         $this->assertNotNull(GameBuilding::where('is_walls', true)->first());
     }
 
@@ -78,7 +78,7 @@ class AtrributesTest extends TestCase
         Livewire::test(Attributes::class, [
             'gameBuilding' => $this->createGameBuilding(),
         ])->set('selectedUnits', [$unit->id])
-          ->set('gameBuilding.units_per_level', 30)
+          ->set('gameBuilding.units_per_level', 300)
           ->call('validateInput', 'nextStep', 2)
           ->assertSee('Your selected units and units per level are greator then your max level.');
     }
