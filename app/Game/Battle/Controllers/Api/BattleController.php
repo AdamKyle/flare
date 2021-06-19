@@ -2,6 +2,9 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Flare\Handlers\CheatingCheck;
+use App\Game\Core\Jobs\EndGlobalTimeOut;
+use Cache;
 use App\Game\Core\Events\UpdateAttackStats;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;

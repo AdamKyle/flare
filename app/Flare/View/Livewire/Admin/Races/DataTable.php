@@ -21,6 +21,8 @@ class DataTable extends Component
 
     public function fetchRaces() {
         if ($this->search !== '') {
+            $this->page = 1;
+
             return GameRace::where('name', 'like', '%'.$this->search.'%')
                            ->orderBy($this->sortField, $this->sortBy ? 'asc' : 'desc')
                            ->paginate($this->perPage);

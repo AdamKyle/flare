@@ -43,6 +43,7 @@ class Kingdom extends Model implements Auditable
         'treasury',
         'published',
         'npc_owned',
+        'last_walked',
     ];
 
     /**
@@ -69,7 +70,17 @@ class Kingdom extends Model implements Auditable
         'treasury'           => 'integer',
         'published'          => 'boolean',
         'npc_owned'          => 'boolean',
+        'last_walked'        => 'datetime',
     ];
+
+    /**
+     * Update the last walked automatically.
+     */
+    public function updateLastWalked() {
+        $this->update([
+            'last_walked' => now(),
+        ]);
+    }
 
     public function gameMap() {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');

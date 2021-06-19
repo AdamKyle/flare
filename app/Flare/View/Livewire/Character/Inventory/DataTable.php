@@ -31,9 +31,17 @@ class DataTable extends Component
 
     public $marketBoard              = false;
 
+    public $craftOnly                = false;
+
+    public $allowMassDestroy         = false;
+
     public $character;
 
     public function getDataQueryProperty() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         if (!is_null($this->character)) {
             $character = $this->character;
         }
@@ -47,10 +55,15 @@ class DataTable extends Component
 
             if ($this->batchSell) {
                 $join->whereNull('items.item_prefix_id')->whereNull('items.item_suffix_id');
+                $join->where('items.craft_only', $this->craftOnly);
             }
 
             if ($this->marketBoard) {
                 $join->where('items.market_sellable', true);
+            }
+
+            if ($this->craftOnly) {
+                $join->where('items.craft_only', $this->craftOnly);
             }
 
             return $join;
@@ -75,6 +88,16 @@ class DataTable extends Component
 
     public function fetchSlots() {
         return $this->data;
+    }
+
+    public function destroyAllItems() {
+        $this->character->inventory->slots->filter(function($slot) {
+            if (!$slot->equipped && $slot->item->type !== 'quest') {
+                $slot->delete();
+            }
+        });
+
+        $this->resetSelect();
     }
 
     public function render()

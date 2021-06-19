@@ -18,6 +18,10 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function fetchMaps() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         $maps = GameMap::dataTableSearch($this->search)->get();
 
         $maps->transform(function($map) {

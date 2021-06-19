@@ -1,6 +1,6 @@
 <?php
 
-Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+Route::get('/items/{item}', ['as' => 'game.items.item', 'uses' => 'ItemsController@show']);
 Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
 Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 
@@ -38,16 +38,19 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::post('/current-adventures/delete/{adventureLog}', ['as' => 'game.adventures.delete', 'uses' => 'CharacterAdventureController@delete']);
     Route::post('/current-adventure/{adventureLog}/distribute-rewards', ['as' => 'game.current.adventure.reward', 'uses' => 'CharacterAdventureController@collectReward']);
 
-    Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
-    Route::get('/market/sell', ['as' => 'game.market.sell', 'uses' => 'MarketController@sell']);
-    Route::post('/market/list/{slot}', ['as' => 'game.market.list', 'uses' => 'MarketController@list']);
+    Route::group(['middleware' => 'throttle:150,1'], function () {
+        Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
+        Route::get('/market/sell', ['as' => 'game.market.sell', 'uses' => 'MarketController@sell']);
+        Route::post('/market/list/{slot}', ['as' => 'game.market.list', 'uses' => 'MarketController@list']);
 
-    Route::get('/market/current-listings/{character}', ['as' => 'game.current-listings', 'uses' => 'MarketController@currentListings']);
-    Route::get('/market/current-listings/edit/{marketBoard}', ['as' => 'game.edit.current-listings', 'uses' => 'MarketController@editCurrentListings']);
-    Route::post('/market/current-listing/{marketBoard}/update', ['as' => 'game.update.current-listing', 'uses' => 'MarketController@updateCurrentListing']);
-    Route::post('/market/current-listing/{marketBoard}/delist', ['as' => 'game.delist.current-listing', 'uses' => 'MarketController@delist']);
+        Route::get('/market/current-listings/{character}', ['as' => 'game.current-listings', 'uses' => 'MarketController@currentListings']);
+        Route::get('/market/current-listings/edit/{marketBoard}', ['as' => 'game.edit.current-listings', 'uses' => 'MarketController@editCurrentListings']);
+        Route::post('/market/current-listing/{marketBoard}/update', ['as' => 'game.update.current-listing', 'uses' => 'MarketController@updateCurrentListing']);
+        Route::post('/market/current-listing/{marketBoard}/delist', ['as' => 'game.delist.current-listing', 'uses' => 'MarketController@delist']);
+    });
 
     Route::get('/settings/{user}', ['as' => 'user.settings', 'uses' => 'SettingsController@index']);
+    Route::post('/settings/{user}/chat-settings', ['as' => 'user.settings.chat', 'uses' => 'SettingsController@chatSettings']);
     Route::post('/settings/{user}/email-settings', ['as' => 'user.settings.email', 'uses' => 'SettingsController@emailSettings']);
     Route::post('/settings/{user}/character-name', ['as' => 'user.settings.character', 'uses' => 'SettingsController@characterSettings']);
     Route::post('/settings/{user}/security', ['as' => 'user.settings.security', 'uses' => 'SettingsController@securityQuestions']);

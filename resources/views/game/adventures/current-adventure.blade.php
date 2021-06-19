@@ -44,7 +44,7 @@
                     @if (!is_null($adventureLog->adventure->itemReward))
                         <dt>Adventure Reward Item<sup>*</sup>:</dt>
                         <dd>
-                            <a href="{{route('items.item', [
+                            <a href="{{route('game.items.item', [
                                 'item' => $adventureLog->adventure->itemReward->id
                             ])}}">
                                 <x-item-display-color :item="$adventureLog->adventure->itemReward" />
@@ -58,7 +58,7 @@
                         <dd>
                             <ul>
                                 @foreach($adventureLog->rewards['items'] as $item)
-                                    <li><a href="{{route('items.item', [
+                                    <li><a href="{{route('game.items.item', [
                                         'item' => $item['id']
                                     ])}}">{{$item['name']}}</a></li>
                                 @endforeach

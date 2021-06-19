@@ -19,6 +19,10 @@ class DataTable extends Component
 
     public function render()
     {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         return view('components.livewire.admin.affixes.data-table', [
             'itemAffixes' => ItemAffix::dataTableSearch($this->search)
                                       ->orderBy($this->sortField, $this->sortBy)

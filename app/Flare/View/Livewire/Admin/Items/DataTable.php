@@ -20,6 +20,7 @@ class DataTable extends Component
     public $only         = null;
     public $character    = null;
     public $isHelp       = false;
+    public $craftOnly    = true;
     public $type         = null;
 
     protected $paginationTheme = 'bootstrap';
@@ -29,6 +30,9 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
 
         $items = Item::dataTableSearch($this->search);
 
@@ -59,11 +63,13 @@ class DataTable extends Component
 
         $items = $items->where('type', '!=', 'quest')
                        ->where('item_suffix_id', null)
-                       ->where('item_prefix_id', null);
+                       ->where('item_prefix_id', null)
+                       ->where('craft_only', $this->craftOnly);
 
         if (!is_null($this->type)) {
             $items = $items->where('type', $this->type);
         }
+
 
 
         return $items->orderBy($this->sortField, $this->sortBy);

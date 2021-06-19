@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Flare\Events\SiteAccessedEvent;
+use App\Flare\Handlers\CheatingCheck;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;

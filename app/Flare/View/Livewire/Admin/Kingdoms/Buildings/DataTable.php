@@ -11,15 +11,19 @@ class DataTable extends Component
 {
     use WithPagination;
     use WithSorting;
-    
+
     protected $paginationTheme = 'bootstrap';
-    
+
     public $search       = '';
     public $sortField    = 'name';
     public $perPage      = 10;
     public $editing      = false;
 
     public function fetch() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         return GameBuilding::dataTableSearch($this->search)->orderBy($this->sortField, $this->sortBy)->paginate($this->perPage);
     }
 

@@ -31,7 +31,7 @@ export default class TraverseSection extends React.Component {
         }
 
         if (response.status === 429) {
-          this.props.openTimeOutModal()
+          return this.props.openTimeOutModal()
         }
       }
     });

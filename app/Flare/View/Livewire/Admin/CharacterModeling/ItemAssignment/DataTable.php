@@ -11,9 +11,9 @@ use App\Flare\View\Livewire\Core\DataTables\WithSelectAll;
 class DataTable extends Component
 {
     use WithPagination, WithSorting, WithSelectAll;
-    
+
     public $affixId = null;
-    
+
     public $search       = '';
     public $sortField    = 'type';
     public $perPage      = 10;
@@ -27,6 +27,10 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         return Item::dataTableSearch($this->search)->where('type', '!=', 'quest')->orderBy($this->sortField, $this->sortBy);
     }
 

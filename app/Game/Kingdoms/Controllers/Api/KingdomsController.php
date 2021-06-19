@@ -46,6 +46,12 @@ class KingdomsController extends Controller {
     }
 
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {
+        $kingdom = Kingdom::where('name', $request->name)->where('game_map_id', $character->map->game_map_id)->first();
+
+        if (!is_null($kingdom)) {
+            return respone()->json(['message' => 'Name is taken'], 422);
+        }
+
         $kingdomService->setParams($request->all(), $character);
 
         if (!$kingdomService->canSettle($request->x_position, $request->y_position, $character)) {
@@ -90,6 +96,12 @@ class KingdomsController extends Controller {
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources."
+            ], 422);
+        }
+
+        if ($building->level + 1 > $building->gameBuilding->max_level) {
+            return response()->json([
+                'message' => "Building is already max level."
             ], 422);
         }
 

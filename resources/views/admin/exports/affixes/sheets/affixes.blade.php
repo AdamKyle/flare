@@ -17,6 +17,7 @@
             <th>skill_name</th>
             <th>skill_bonus</th>
             <th>skill_training_bonus</th>
+            <th>can_drop</th>
             <th>cost</th>
             <th>type</th>
         </tr>
@@ -40,6 +41,7 @@
             <td>{{$affix->skill_name}}</td>
             <td>{{$affix->skill_bonus}}</td>
             <td>{{$affix->skill_training_bonus}}</td>
+            <td>{{$affix->can_drop}}</td>
             <td>{{$affix->cost}}</td>
             <td>{{$affix->type}}</td>
         </tr>

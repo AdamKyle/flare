@@ -8,7 +8,7 @@ export default class Recruit extends React.Component {
 
     this.state = {
       max: Math.round(this.props.currentPopulation / this.props.unit.required_population),
-      value: 0,
+      value: "",
       canRecruit: false,
     }
   }
@@ -23,7 +23,13 @@ export default class Recruit extends React.Component {
   }
 
   amountChange(event) {
-    const value = parseInt(event.target.value);
+    let value = parseInt(event.target.value) || '';
+
+    if (value !== '') {
+      if (value > this.state.max) {
+        value = this.state.max;
+      }
+    }
 
     this.setState({
       value: value,
@@ -64,7 +70,7 @@ export default class Recruit extends React.Component {
 
   canRecruit(value) {
 
-    if (value === 0) {
+    if (value === "" || value === 0) {
       return false;
     }
 
@@ -123,18 +129,10 @@ export default class Recruit extends React.Component {
         <div className="row">
           <div className="col-md-6">
             <p><strong>Current Population</strong>: {this.state.max}</p>
-            <RangeSlider
-              value={this.state.value}
-              onChange={this.amountChange.bind(this)}
-              min={0}
-              max={this.state.max}
-              size='lg'
-              tooltipPlacement='bottom'
-              tooltip='on'
-            />
+            <input className="form-control" type="number" min={0} max={this.state.max} value={this.state.value} onChange={this.amountChange.bind(this)} />
           </div>
           <div className="col-md-6">
-            <button className="btn btn-primary mt-2" disabled={this.state.canRecruit ? false : true}
+            <button className="btn btn-primary unit-recruit-button" disabled={this.state.canRecruit ? false : true}
                     onClick={this.recruitUnits.bind(this)}>Recruit Selected Amount
             </button>
           </div>

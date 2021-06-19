@@ -158,18 +158,18 @@ class MovementService {
         $kingdomToAttack = [];
 
         if (!is_null($kingdom)) {
-            if (!is_null($kingdom->character_id)) {
-                if ($kingdom->character->id !== $character->id) {
-                    $canAttack = true;
+            if ($kingdom->character->id !== $character->id) {
+                $canAttack = true;
 
-                    $kingdomToAttack = [
-                        'id' => $kingdom->id,
-                        'x_position' => $kingdom->x_position,
-                        'y_position' => $kingdom->y_position,
-                    ];
-                } else {
-                    $canManage = true;
-                }
+                $kingdomToAttack = [
+                    'id'         => $kingdom->id,
+                    'x_position' => $kingdom->x_position,
+                    'y_position' => $kingdom->y_position,
+                ];
+            } else {
+                $canManage = true;
+
+                $kingdom->updateLastwalked();
             }
         } else if (is_null($location)) {
             $canSettle = true;

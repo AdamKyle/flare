@@ -24,6 +24,7 @@ class AffixDetails extends Component
         'itemAffix.int_required'         => 'required',
         'itemAffix.skill_level_required' => 'required',
         'itemAffix.skill_level_trivial'  => 'required',
+        'itemAffix.can_drop'             => 'nullable',
     ];
 
     protected $messages = [
@@ -38,8 +39,12 @@ class AffixDetails extends Component
 
     protected $listeners = ['validateInput'];
 
-    public function validateInput(string $functionName, int $index) {     
+    public function validateInput(string $functionName, int $index) {
         $this->validate();
+
+        if (is_null($this->itemAffix->can_drop)) {
+            $this->itemAffix->can_drop = true;
+        }
 
         $this->itemAffix->save();
 

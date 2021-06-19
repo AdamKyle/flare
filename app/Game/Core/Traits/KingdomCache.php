@@ -40,6 +40,34 @@ trait KingdomCache {
     }
 
     /**
+     * Gets the enemy kingdoms cache.
+     *
+     * @param Character $character
+     * @return mixed
+     */
+    public function getEnemyKingdoms(Character $character, bool $refresh = false) {
+        $plane = $character->map->gameMap->name;
+
+        if (Cache::has('enemy-kingdoms-'  . $plane) && !$refresh) {
+            Cache::has('enemy-kingdoms-'  . $plane);
+        } else {
+            $kingdoms = Kingdom::select('x_position', 'y_position', 'id', 'color', 'character_id', 'name', 'current_morale')
+                ->whereNotNull('character_id')
+                ->where('game_map_id', $character->map->game_map_id)
+                ->get()
+                ->transform(function($kingdom) {
+                    $kingdom->character_name = $kingdom->character->name;
+
+                    return $kingdom;
+                })->all();
+
+            Cache::put('enemy-kingdoms-' . $plane, $kingdoms);
+        }
+
+        return Cache::get('enemy-kingdoms-' . $plane);
+    }
+
+    /**
      * Adds a kingdom to the cache.
      *
      * If the cache does not exist, we will create the cache.
@@ -90,7 +118,7 @@ trait KingdomCache {
      * @param array $cache
      * @return array
      */
-    protected function removeKingdom(Kingdom $kingdom, array $cache): array {
+    protected function removeKingdom(Kingdom $kingdom, array $cache = []): array {
         foreach ($cache as $index => $kingdomData) {
             if ($kingdomData['id'] === $kingdom->id) {
                 array_splice($cache, $index, 1);

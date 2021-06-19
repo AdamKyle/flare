@@ -24,6 +24,10 @@ class DataTable extends Component
     public function fetchGameSkills() {
         $search = strtolower($this->search);
 
+        if ($this->search !== '') {
+            $this->page = 1;
+        }
+
         if ($search === 'yes') {
             return GameSkill::where('can_train', true)
                             ->orderBy($this->sortField, $this->sortBy)
@@ -40,7 +44,7 @@ class DataTable extends Component
                         ->orderBy($this->sortField, $this->sortBy)
                         ->paginate($this->perPage);
     }
-    
+
     public function render()
     {
         return view('components.livewire.admin.skills.data-table', [

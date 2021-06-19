@@ -20,7 +20,14 @@ BroadCast::channel('global-map-update', function($user) {
    return $user;
 });
 
+
 // When the NPC Kingdoms update.
 Broadcast::channel('npc-kingdoms-update', function($user) {
-   return $user;
+    return $user;
+});
+
+// When a enemy kingdoms morale gets updated.
+broadCast::channel('enemy-kingdom-morale-update', function($user) {
+    return $user;
+
 });

@@ -10,7 +10,7 @@ export const getServerMessage = (type) => {
       }
 
       if (response.status === 429) {
-        this.props.openTimeOutModal()
+        return this.props.openTimeOutModal()
       }
     }
   });

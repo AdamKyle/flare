@@ -79,6 +79,8 @@ class ItemDetails extends Component
         'item.name'                  => 'required',
         'item.type'                  => 'required',
         'item.description'           => 'required',
+        'item.can_drop'              => 'nullable',
+        'item.craft_only'            => 'nullable',
         'item.default_position'      => 'nullable',
         'item.base_damage'           => 'nullable',
         'item.base_ac'               => 'nullable',
@@ -107,6 +109,14 @@ class ItemDetails extends Component
         $this->validate();
 
         if ($itemValidator->validate($this, $this->item)) {
+
+            if (is_null($this->item->can_drop)) {
+                $this->item->can_drop = true;
+            }
+
+            if (is_null($this->item->craft_only)) {
+                $this->item->craft_only = false;
+            }
 
             $this->item->save();
 

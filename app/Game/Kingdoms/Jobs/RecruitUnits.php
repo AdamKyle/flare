@@ -120,12 +120,14 @@ class RecruitUnits implements ShouldQueue
 
             event(new UpdateKingdom($user, $kingdom));
 
-            $message = $this->unit->name . ' finished recruiting for kingdom: ' .
-                $this->kingdom->name . ' on plane: '.$plane.' at: (X/Y) '.$x.'/'.$y.
-                '. You have a total of: ' . $amount;
+            if ($user->show_unit_recruitment_messages) {
+                $message = $this->unit->name . ' finished recruiting for kingdom: ' .
+                    $this->kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
+                    '. You have a total of: ' . $amount;
 
 
-            event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));
+                event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));
+            }
         } else if ($user->unit_recruitment_email) {
             Mail::to($user)->send(new RecruitedUnits(
                 $user,

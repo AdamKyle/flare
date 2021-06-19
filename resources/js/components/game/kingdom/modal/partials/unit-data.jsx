@@ -12,7 +12,7 @@ export default class UnitData extends React.Component {
   }
 
   calculateAmount(prop, amount) {
-    if (amount === 0) {
+    if (amount === 0 || amount === '') {
       return this.props.unit[prop];
     }
 
@@ -20,7 +20,7 @@ export default class UnitData extends React.Component {
   }
 
   getClass(prop, amount) {
-    if (amount === 0) {
+    if (amount === 0 || amount === '') {
       return '';
     }
 

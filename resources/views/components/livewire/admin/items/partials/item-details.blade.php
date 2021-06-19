@@ -129,8 +129,20 @@
             </div>
         </div>
     </div>
-    <div clas="row">
-        <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="item-can-drop" wire:model="item.can_drop">
+                <label class="form-check-label" for="item-can-drop">Can this item drop?</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="item-can-drop" wire:model="item.craft_only">
+                <label class="form-check-label" for="item-can-drop">Can only craft item?</label>
+            </div>
+        </div>
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="item-cost">Cost: </label>
                 <input type="number" class="form-control" id="item-cost" name="item-cost" wire:model="item.cost" {{$item->type !== 'quest' ? '' : 'disabled'}}>

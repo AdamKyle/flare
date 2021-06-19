@@ -42,6 +42,7 @@
     </div>
     @livewire('character.inventory.data-table', [
         'batchSell' => true,
+        'craftOnly' => false,
         'character' => $character,
     ])
 @endsection

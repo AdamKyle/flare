@@ -100,10 +100,13 @@ class RebuildBuilding implements ShouldQueue
 
             event(new UpdateKingdom($this->user, $kingdom));
 
-            $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
-                $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
+            if ($this->user->show_building_rebuilt_messages) {
+                $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
+                    $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
-            event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
+                event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
+            }
+
         } else if ($this->user->rebuilt_building_email) {
             Mail::to($this->user)->send(new RebuiltBuilding(
                 $this->user,

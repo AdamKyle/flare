@@ -10,29 +10,29 @@ class BaseSkillValue {
 
     /**
      * Get the base character skill value for a character.
-     * 
+     *
      * @param Charcater $character
      * @param GameSkill $skill
-     * @return array 
+     * @return array
      */
     public function getBaseCharacterSkillValue(Character $character, GameSkill $skill): array {
-        
+
        return [
             'character_id'       => $character->id,
             'game_skill_id'      => $skill->id,
             'currently_training' => false,
             'level'              => 1,
             'xp'                 => 0,
-            'xp_max'             => $skill->can_train ? rand(100, 150) : rand(100, 200),
+            'xp_max'             => $skill->can_train ? rand(150, 350) : rand(100, 250),
         ];
     }
 
     /**
      * Get the base character skill value for a monster.
-     * 
+     *
      * @param Monster $monster
      * @param GameSkill $skill
-     * @return array 
+     * @return array
      */
     public function getBaseMonsterSkillValue(Monster $monster, GameSkill $skill): array {
 

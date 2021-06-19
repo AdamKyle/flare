@@ -31,22 +31,24 @@ export default class EnemyKingdomPin extends React.Component {
 
   renderKingdoms() {
     return this.props.kingdoms.map((kingdom) => {
-      let style = {
-        top: kingdom.y_position,
-        left: kingdom.x_position,
-        '--kingdom-color': '#e82b13',
-      };
+      if (kingdom.character_id !== this.props.characterId) {
+        let style = {
+          top: kingdom.y_position,
+          left: kingdom.x_position,
+          '--kingdom-color': '#e82b13',
+        };
 
-      return (
-        <div
-          key={Math.random().toString(36).substring(7) + '-' + kingdom.id}
-          data-enemy-kingdom-id={kingdom.id}
-          className="kingdom-x-pin"
-          style={style}
-          onClick={this.openEnemyKingdomModal.bind(this)}
-        >
-        </div>
-      );
+        return (
+          <div
+            key={Math.random().toString(36).substring(7) + '-' + kingdom.id}
+            data-enemy-kingdom-id={kingdom.id}
+            className="kingdom-x-pin"
+            style={style}
+            onClick={this.openEnemyKingdomModal.bind(this)}
+          >
+          </div>
+        );
+      }
     });
   }
 

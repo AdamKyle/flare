@@ -30,6 +30,12 @@ class ItemsController extends Controller {
         ]);
     }
 
+    public function show(Item $item) {
+        return view('game.items.item', [
+            'item' => $item,
+        ]);
+    }
+
     public function edit(Item $item) {
         return view('admin.items.manage', [
             'item' => $item,

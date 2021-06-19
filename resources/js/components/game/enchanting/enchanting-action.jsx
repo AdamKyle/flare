@@ -68,7 +68,7 @@ export default class EnchantingAction extends React.Component {
         }
 
         if (response.status === 429) {
-          this.props.openTimeOutModal()
+          return this.props.openTimeOutModal()
         }
       }
     });
@@ -196,12 +196,15 @@ export default class EnchantingAction extends React.Component {
     }
 
     let cost = foundAffix.cost;
-    let time = null;
 
     if (itemToEnchant !== null && itemToEnchant !== 0) {
-      const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant)[0];
+      const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant);
 
-      if (foundSlot.item.item_prefix !== null) {
+      if (foundSlot.length === 0) {
+        return cost;
+      }
+
+      if (foundSlot[0].item.item_prefix !== null) {
         cost += 1000
       }
     }
@@ -217,10 +220,13 @@ export default class EnchantingAction extends React.Component {
     let cost = foundAffix.cost;
 
     if (itemToEnchant !== null && itemToEnchant !== 0) {
-      const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant)[0];
+      const foundSlot = this.state.inventoryList.filter((i) => i.item_id === itemToEnchant);
 
-      if (foundSlot.item.item_suffix !== null) {
+      if (foundSlot.length === 0) {
+        return cost;
+      }
 
+      if (foundSlot[0].item.item_suffix !== null) {
         cost += 1000
       }
     }
@@ -464,7 +470,7 @@ export default class EnchantingAction extends React.Component {
         <Row>
           <Col xs={12}>
             <div className="mt-2">
-              <strong>Cost: </strong> {this.state.cost} {this.state.cost > this.state.gold ? <span className="text-danger">You don't have the gold</span> : null}
+              <strong>Cost: </strong> {this.state.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {this.state.cost > this.state.gold ? <span className="text-danger">You don't have the gold</span> : null}
             </div>
           </Col>
         </Row>

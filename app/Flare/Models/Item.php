@@ -49,6 +49,8 @@ class Item extends Model
         'skill_level_trivial',
         'crafting_type',
         'market_sellable',
+        'can_drop',
+        'craft_only',
     ];
 
     /**
@@ -74,7 +76,8 @@ class Item extends Model
         'can_craft'            => 'boolean',
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',
-        'can_craft'            => 'boolean',
+        'craft_only'           => 'boolean',
+        'can_drop'             => 'boolean',
         'market_sellable'      => 'boolean',
         'skill_level_required' => 'integer',
         'skill_level_trivial'  => 'integer',

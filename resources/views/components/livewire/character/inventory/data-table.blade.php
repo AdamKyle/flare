@@ -20,6 +20,11 @@
                             class="btn btn-danger btn-sm ml-2"
                         />
                     @endif
+
+
+                    @if ($allowMassDestroy && ($pageSelected || $selected))
+                        <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
+                    @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />
             </div>
@@ -32,7 +37,7 @@
 
             <x-data-tables.table :collection="$slots">
                 <x-data-tables.header>
-                    @if ($batchSell)
+                    @if ($batchSell || $allowMassDestroy)
                         <x-data-tables.header-row>
                             <input type="checkbox" wire:model="pageSelected" id="select-all" />
                         </x-data-tables.header-row>
@@ -98,6 +103,11 @@
                         <tr>
                             <td colspan="8">
                                 @unless($selectAll)
+                                    @if ($allowMassDestroy)
+                                        <div class="alert alert-info">
+                                            Selecting all items, will <strong>not</strong> destroy currently equipped or quest items. Everything else <strong>will be</strong> destroyed.
+                                        </div>
+                                    @endif
                                     <div>
                                         <span>You have selected <strong>{{$slots->count()}}</strong> items of <strong>{{$slots->total()}}</strong>. Would you like to select all?</span>
                                         <button class="btn btn-link" wire:click="selectAll">Select all</button>
@@ -109,14 +119,20 @@
                         </tr>
                     @endif
 
+                    @if (empty($pageSelected) && !empty($selected))
+                        <div class="alert alert-info">
+                            Selecting all items, will <strong>not</strong> destroy currently equipped or quest items. Everything else <strong>will be</strong> destroyed.
+                        </div>
+                    @endif
+
                     @forelse($slots as $slot)
                         <tr wire:key="slots-table-{{$slot->id}}">
-                            @if ($batchSell)
+                            @if ($batchSell || $allowMassDestroy)
                                 <td>
                                     <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
                                 </td>
                             @endif
-                            <td><a href="{{route('items.item', [
+                            <td><a href="{{route('game.items.item', [
                                     'item' => $slot->item->id
                                 ])}}"><x-item-display-color :item="$slot->item" /></a></td>
                             <td>{{$slot->item->type}}</td>

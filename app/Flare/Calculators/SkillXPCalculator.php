@@ -11,7 +11,7 @@ class SkillXPCalculator {
      * Fetches the total skill exp.
      *
      * Applies equipment, quest item, adventure bonuses and percentage of xp towards, to skill exp which starts at a
-     * a base of 10.
+     * a base of 5.
      *
      * @param Skill $skill
      * @param Adventure|null $adventure | null
@@ -22,7 +22,11 @@ class SkillXPCalculator {
         $xpTowards      = !is_null($skill->xp_towards) ? $skill->xp_towards : 0.0;
         $totalBonus     = $xpTowards + $skill->skill_training_bonus + $adventureBonus;
 
-        return (10 * ($totalBonus > 1 ? $totalBonus : (1 + $totalBonus)));
+        if ($totalBonus >= 1.0) {
+            return 10;
+        } else {
+            return 5 * (1 + $totalBonus);
+        }
     }
 
     /**

@@ -53,9 +53,11 @@ class UnitReturnService {
         foreach ($unitsReturning as $unitInfo) {
             $foundUnits = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
 
-            $foundUnits->update([
-                'amount' => $foundUnits->amount + $unitInfo['amount'],
-            ]);
+            if (!is_null($foundUnits)) {
+                $foundUnits->update([
+                    'amount' => $foundUnits->amount + $unitInfo['amount'],
+                ]);
+            }
         }
 
         $defender = $unitMovement->to_kingdom;

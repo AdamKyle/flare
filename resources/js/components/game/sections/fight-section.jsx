@@ -166,7 +166,7 @@ export default class FightSection extends React.Component {
         }
 
         if (response.status === 429) {
-          location.reload();
+          return this.props.openTimeOutModal();
         }
       }
     })

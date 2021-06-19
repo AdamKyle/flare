@@ -22,6 +22,7 @@
         <th>int_mod</th>
         <th>effect</th>
         <th>can_craft</th>
+        <th>can_drop</th>
         <th>skill_level_required</th>
         <th>skill_level_trivial</th>
         <th>crafting_type</th>
@@ -54,6 +55,40 @@
             <td>{{$item->int_mod}}</td>
             <td>{{$item->effect}}</td>
             <td>{{$item->can_craft}}</td>
+            <td>{{$item->can_drop}}</td>
+            <td>{{$item->skill_level_required}}</td>
+            <td>{{$item->skill_level_trivial}}</td>
+            <td>{{$item->crafting_type}}</td>
+            <td>{{$item->skill_name}}</td>
+            <td>{{$item->skill_bonus}}</td>
+            <td>{{$item->skill_training_bonus}}</td>
+        </tr>
+    @endforeach
+
+    @foreach($itemsWithAffixes as $item)
+        <tr>
+            <td>{{is_null($item->itemSuffix) ? null :$item->itemSuffix->name}}</td>
+            <td>{{is_null($item->itemPrefix) ? null :$item->itemPrefix->name}}</td>
+            <td>{{$item->market_sellable}}</td>
+            <td>{{$item->name}}</td>
+            <td>{{$item->type}}</td>
+            <td>{{$item->description}}</td>
+            <td>{{$item->default_position}}</td>
+            <td>{{$item->base_damage}}</td>
+            <td>{{$item->base_healing}}</td>
+            <td>{{$item->base_ac}}</td>
+            <td>{{$item->cost}}</td>
+            <td>{{$item->base_damage_mod}}</td>
+            <td>{{$item->base_healing_mod}}</td>
+            <td>{{$item->base_ac_mod}}</td>
+            <td>{{$item->str_mod}}</td>
+            <td>{{$item->dur_mod}}</td>
+            <td>{{$item->dex_mod}}</td>
+            <td>{{$item->chr_mod}}</td>
+            <td>{{$item->int_mod}}</td>
+            <td>{{$item->effect}}</td>
+            <td>{{$item->can_craft}}</td>
+            <td>{{$item->can_drop}}</td>
             <td>{{$item->skill_level_required}}</td>
             <td>{{$item->skill_level_trivial}}</td>
             <td>{{$item->crafting_type}}</td>

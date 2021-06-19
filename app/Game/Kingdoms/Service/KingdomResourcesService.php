@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
@@ -77,11 +78,16 @@ class KingdomResourcesService {
         $kingdom = $this->kingdom;
 
         if (UserOnlineValue::isOnline($user)) {
+            broadcast(new UpdateEnemyKingdomsMorale($kingdom));
+
             $kingdom = new Item($kingdom, $this->kingdomTransformer);
             $kingdom = $this->manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($user, $kingdom));
-            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+
+            if ($user->show_kingdom_update_messages) {
+                event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+            }
         } else {
             if (Cache::has('kingdoms-updated-' . $user->id)) {
                 $cache = Cache::get('kingdoms-updated-' . $user->id);
@@ -219,10 +225,10 @@ class KingdomResourcesService {
         }
 
         if ($this->kingdom->current_morale > 0.50) {
-            return $this->updateTreasury(100);
+            return $this->updateTreasury(1000);
         }
 
-        return $this->updateTreasury(50);
+        return $this->updateTreasury(100);
     }
 
 

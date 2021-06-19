@@ -18,6 +18,10 @@ export default class EnemyKingdomModal extends React.Component {
           <dl>
             <dt>Belongs to:</dt>
             <dd>{this.props.kingdom.character_name}</dd>
+            <dt>Kingdom Name:</dt>
+            <dd>{this.props.kingdom.name}</dd>
+            <dt>Kingdom Morale:</dt>
+            <dd>{this.props.kingdom.current_morale * 100}%</dd>
             <dt>X/Y:</dt>
             <dd>{this.props.kingdom.x_position}/{this.props.kingdom.y_position}</dd>
           </dl>

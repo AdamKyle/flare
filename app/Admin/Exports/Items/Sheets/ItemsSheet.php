@@ -15,7 +15,8 @@ class ItemsSheet implements FromView, WithTitle, ShouldAutoSize {
      */
     public function view(): View {
         return view('admin.exports.items.sheets.items', [
-            'items' => Item::all(),
+            'items' => Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->get(),
+            'itemsWithAffixes' => Item::whereNotNull('item_suffix_id')->whereNotNull('item_prefix_id')->get(),
         ]);
     }
 

@@ -7,17 +7,37 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\MarketHistory;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemAffixService {
-    
+
+    /**
+     * @var bool $doNotGiveGold
+     */
+    private $doNotGiveGold = false;
+
+    /**
+     * Sets the do not give gold to true.
+     *
+     * If you call this, the character will not get any gold for the affix.
+     *
+     * @return ItemAffixService
+     */
+    public function doNotGiveGold(): ItemAffixService {
+        $this->doNotGiveGold = true;
+
+        return $this;
+    }
+
     /**
      * Delete the Affix.
-     * 
+     *
      * We also remove the affix from any addition items it might be attached to.
-     * 
+     *
      * Once done, we delete the affix.
-     * 
+     *
      * @param ItemAffix $affix
      * @return void
      */
@@ -25,7 +45,7 @@ class ItemAffixService {
         $column             = 'item_'.$affix->type.'_id';
         $name               = $affix->name;
         $itemsWithThisAffix = Item::where($column, $affix->id)->get();
-        
+
         if ($itemsWithThisAffix->isNotEmpty()) {
             $this->handleItemsWithAffix($itemsWithThisAffix, $affix, $column, $name);
         }
@@ -44,9 +64,9 @@ class ItemAffixService {
                 $this->swapItemForCharacter($item, $slots);
             }
 
-            if ($slots->isNotEmpty()) {
+            if ($slots->isNotEmpty() && !$this->doNotGiveGold) {
                 $this->handleSlots($slots, $affix, $name);
-            }   
+            }
         }
     }
 
@@ -65,15 +85,30 @@ class ItemAffixService {
                 ]);
             }
 
+            $this->deleteFromMarketBoard($item);
+
             $item->delete();
         } else if ($total > 1) {
+
+            $this->deleteFromMarketBoard($item);
+
             $item->delete();
+        }
+    }
+
+    protected function deleteFromMarketBoard(Item $item) {
+        foreach (MarketHistory::where('item_id', $item->id)->get() as $history) {
+            $history->delete();
+        }
+
+        foreach (MarketBoard::where('item_id', $item->id)->get() as $board) {
+            $board->delete();
         }
     }
 
     protected function handleSlots(Collection $slots, ItemAffix $affix, string $name) {
         foreach ($slots as $slot) {
-                        
+
             $character = $slot->inventory->character;
 
             $character->gold += $affix->cost;

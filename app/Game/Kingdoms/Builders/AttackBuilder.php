@@ -51,9 +51,9 @@ class AttackBuilder {
     /**
      * Returns either the defenders kingdom or null.
      *
-     * @return Kingdom
+     * @return mixed
      */
-    public function getDefender(): Kingdom {
+    public function getDefender() {
         return $this->defender;
     }
 }

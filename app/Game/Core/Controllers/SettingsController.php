@@ -31,7 +31,18 @@ class SettingsController extends Controller {
             'unit_recruitment_email'  => $request->has('unit_recruitment_email'),
         ]);
 
-        return redirect()->back()->with('success', 'Updated email prefrences.');
+        return redirect()->back()->with('success', 'Updated email preferences.');
+    }
+
+    public function chatSettings(request $request, User $user) {
+        $user->update([
+            'show_unit_recruitment_messages' => $request->has('show_unit_recruitment_messages'),
+            'show_building_upgrade_messages' => $request->has('show_building_upgrade_messages'),
+            'show_kingdom_update_messages'   => $request->has('show_kingdom_update_messages'),
+            'show_building_rebuilt_messages' => $request->has('show_building_rebuilt_messages'),
+        ]);
+
+        return redirect()->back()->with('success', 'Updated chat preferences.');
     }
 
     public function characterSettings(Request $request, User $user) {

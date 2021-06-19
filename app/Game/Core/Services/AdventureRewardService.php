@@ -108,18 +108,21 @@ class AdventureRewardService {
             foreach ($items as $item) {
                 $item = Item::find($item['id']);
 
-                $character->inventory->slots()->create([
-                    'inventory_id' => $character->inventory->id,
-                    'item_id'      => $item->id,
-                ]);
+                if (!is_null($item)) {
+                    $character->inventory->slots()->create([
+                        'inventory_id' => $character->inventory->id,
+                        'item_id'      => $item->id,
+                    ]);
 
-                $this->messages[] = 'You gained the item: ' . $item->affix_name;
+                    $this->messages[] = 'You gained the item: ' . $item->affix_name;
 
+                    if (!is_null($item->effect)) {
+                        $message = $character->name . ' has found: ' . $item->affix_name;
 
-                if (!is_null($item->effect)) {
-                    $message = $character->name . ' has found: ' . $item->affix_name;
-
-                    broadcast(new GlobalMessageEvent($message));
+                        broadcast(new GlobalMessageEvent($message));
+                    }
+                } else {
+                    $this->messages[] = 'You failed to gain the item: Item no longer exists.';
                 }
             }
         }

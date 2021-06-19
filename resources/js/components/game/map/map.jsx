@@ -32,6 +32,7 @@ export default class Map extends React.Component {
       rightBounds: 0,
       isLoading: true,
       characterId: 0,
+      windowWidth: 0,
       showCharacterInfo: false,
       canMove: true,
       showMessage: false,
@@ -60,6 +61,7 @@ export default class Map extends React.Component {
     this.globalCharacterCount = Echo.join('global-character-count-plane');
     this.globalMapUpdate = Echo.join('global-map-update');
     this.globaNPCKingdomUpdate = Echo.join('npc-kingdoms-update');
+    this.enemyKingdomMoraleUpdate = Echo.join('enemy-kingdom-morale-update');
   }
 
   componentDidMount() {
@@ -124,7 +126,7 @@ export default class Map extends React.Component {
         }
 
         if (response.status === 429) {
-          this.props.openTimeOutModal()
+          return this.props.openTimeOutModal()
         }
       }
     });
@@ -142,6 +144,18 @@ export default class Map extends React.Component {
       if (event.mapName === this.state.characterMapName) {
         this.setState({
           otherKingdoms: event.otherKingdoms.filter((ok) => ok.character_id !== this.state.characterId),
+        });
+      }
+    });
+
+    this.enemyKingdomMoraleUpdate.listen('Game.Kingdoms.Events.UpdateEnemyKingdomsMorale', (event) => {
+      if (this.state.otherKingdoms.length > 0) {
+        let otherKingdoms = this.state.otherKingdoms;
+
+        otherKingdoms.find((ok) => ok.id === event.enemyMorale.id).current_morale = event.enemyMorale.current_morale;
+
+        this.setState({
+          otherKingdoms: otherKingdoms,
         });
       }
     });
@@ -281,6 +295,32 @@ export default class Map extends React.Component {
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
       });
     });
+
+    this.setState({
+      windowWidth: window.innerWidth,
+    });
+
+    window.addEventListener("resize", this.updateWidth.bind(this));
+  }
+
+  updateWidth() {
+    this.setState({
+      windowWidth: window.innerWidth
+    });
+  }
+
+  getMaxLeft() {
+    if (this.state.windowWidth > 1700) {
+      return -100
+    } else if (this.state.windowWidth < 450) {
+      return -150
+    } else if (this.state.windowWidth < 992) {
+      return -100
+    } else if (this.state.windowWidth < 1200) {
+      return 0;
+    }
+
+    return -150;
   }
 
   componentDidUpdate() {
@@ -424,7 +464,7 @@ export default class Map extends React.Component {
         const response = err.response;
 
         if (response.status === 401) {
-          location.reload();
+          return location.reload();
         }
 
         if (response.status === 429) {
@@ -451,7 +491,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
               position={this.state.controlledPosition}
-              bounds={{top: -160, left: -100, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+              bounds={{top: -160, left: this.getMaxLeft(), right: this.state.rightBounds, bottom: this.state.bottomBounds}}
               handle=".handle"
               defaultPosition={{x: 0, y: 0}}
               grid={[16, 16]}
