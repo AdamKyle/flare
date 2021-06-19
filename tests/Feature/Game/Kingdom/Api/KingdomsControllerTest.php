@@ -444,7 +444,7 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-        dd($content);
+
         $this->assertEquals(200, $response->status());
     }
 
