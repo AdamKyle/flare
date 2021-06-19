@@ -177,13 +177,23 @@
                                             </a>
                                         </td>
                                 @else
-                                    <td>
-                                        <a href="{{route('items.item', [
+                                    @if (auth()->user()->hasRole('Admin'))
+                                        <td>
+                                            <a href="{{route('items.item', [
+                                                'item' => $item->id
+                                            ])}}">
+                                                <x-item-display-color :item="$item" />
+                                            </a>
+                                        </td>
+                                    @else
+                                        <td>
+                                            <a href="{{route('game.items.item', [
                                             'item' => $item->id
                                         ])}}">
-                                            <x-item-display-color :item="$item" />
-                                        </a>
-                                    </td>
+                                                <x-item-display-color :item="$item" />
+                                            </a>
+                                        </td>
+                                    @endif
                                 @endif
                             @endguest
 
