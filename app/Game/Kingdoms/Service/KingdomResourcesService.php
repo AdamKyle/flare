@@ -84,7 +84,10 @@ class KingdomResourcesService {
             $kingdom = $this->manager->createData($kingdom)->toArray();
 
             event(new UpdateKingdom($user, $kingdom));
-            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+
+            if ($user->show_kingdom_update_messages) {
+                event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+            }
         } else {
             if (Cache::has('kingdoms-updated-' . $user->id)) {
                 $cache = Cache::get('kingdoms-updated-' . $user->id);
