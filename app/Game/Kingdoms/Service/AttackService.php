@@ -117,7 +117,7 @@ class AttackService {
     public function attack(UnitMovementQueue $unitMovement, Character $character, int $defenderId) {
         $attackingUnits = $unitMovement->units_moving;
         $defender       = $this->attackBuilder->setDefender($unitMovement, $defenderId, $character)->getDefender();
-
+        
         $this->notifyHandler    = $this->notifyHandler->setAttackingKingdom($unitMovement->from_kingdom)
                                                       ->setDefendingKingdom($unitMovement->to_kingdom);
 
