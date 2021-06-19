@@ -430,7 +430,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $gameBuilding->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => 1,
             'level'              => 1,
             'current_defence'    => $gameBuilding->base_defence,
             'current_durability' => $gameBuilding->base_durability,
@@ -444,7 +444,7 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
-
+        dd($content);
         $this->assertEquals(200, $response->status());
     }
 

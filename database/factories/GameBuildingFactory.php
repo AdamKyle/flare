@@ -24,7 +24,7 @@ class GameBuildingFactory extends Factory
         return [
             'name'                        => 'Test Building',
             'description'                 => 'Sample description',
-            'max_level'                   => 1,
+            'max_level'                   => 100,
             'base_durability'             => 100,
             'base_defence'                => 100,
             'required_population'         => 10,
