@@ -1,6 +1,6 @@
 <?php
 
-Route::get('/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
+Route::get('/items/{item}', ['as' => 'game.items.item', 'uses' => 'ItemsController@show']);
 Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
 Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 

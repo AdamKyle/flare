@@ -132,7 +132,7 @@
                                     <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
                                 </td>
                             @endif
-                            <td><a href="{{route('items.item', [
+                            <td><a href="{{route('game.items.item', [
                                     'item' => $slot->item->id
                                 ])}}"><x-item-display-color :item="$slot->item" /></a></td>
                             <td>{{$slot->item->type}}</td>

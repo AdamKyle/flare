@@ -32,7 +32,7 @@ class ItemsControllerTest extends TestCase
     }
 
     public function testCanSeeItemDetails() {
-        $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger');
+        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger');
     }
 
     public function testCanColorForOneAffix() {
@@ -53,7 +53,7 @@ class ItemsControllerTest extends TestCase
 
         $this->item->save();
 
-        $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger')->see('one-enchant');
+        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger')->see('one-enchant');
     }
 
     public function testCanColorForTwoAffix() {
@@ -89,18 +89,18 @@ class ItemsControllerTest extends TestCase
 
         $this->item->save();
 
-        $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger')->see('two-enchant');
+        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger')->see('two-enchant');
     }
 
     public function testColorForQuestItem() {
         $this->item->type = 'quest';
         $this->item->save();
 
-        $this->visitRoute('items.item', ['item' => 1])->see('Rusty Dagger')->see('quest-item');
+        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger')->see('quest-item');
     }
 
     public function testCannotSeeItemDetailsFourOhFour() {
-        $response = $this->get(route('items.item', [
+        $response = $this->get(route('game.items.item', [
             'item' => 100
         ]))->response;
 

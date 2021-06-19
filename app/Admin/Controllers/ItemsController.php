@@ -30,6 +30,12 @@ class ItemsController extends Controller {
         ]);
     }
 
+    public function show(Item $item) {
+        return view('game.items.item', [
+            'item' => $item,
+        ]);
+    }
+
     public function edit(Item $item) {
         return view('admin.items.manage', [
             'item' => $item,
@@ -46,8 +52,6 @@ class ItemsController extends Controller {
     }
 
     public function export() {
-//         (new ItemsExport)->queue('items.xlsx');
-//         return redirect()->back()->with('success', 'Working it, you will be emailed when done.');
         $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
