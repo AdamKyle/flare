@@ -6,6 +6,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
+use App\Game\Core\Requests\CharacterItemsForTypeValidation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use League\Fractal\Manager;
@@ -17,6 +18,8 @@ use App\Flare\Transformers\ItemTransfromer;
 use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use Carbon\Carbon;
+use League\Fractal\Resource\ResourceAbstract;
+use function Ramsey\Uuid\v1;
 
 class MarketBoardController extends Controller {
 
@@ -62,6 +65,31 @@ class MarketBoardController extends Controller {
         return response()->json([
             'items' => $items,
             'gold'  => auth()->user()->character->gold,
+        ], 200);
+    }
+
+    public function fetchCharacterItems(Character $character) {
+
+        $slots = $character->inventory->slots()->join('items', function($join) {
+            $join = $join->on('inventory_slots.item_id', '=', 'items.id');
+
+            $join->where('items.market_sellable', true);
+        })->get();
+
+        return response()->json([
+            'slots' => $slots,
+        ], 200);
+    }
+
+    public function fetchCharacterItemsForType(CharacterItemsForTypeValidation $request, Character $character) {
+        $slots = $character->inventory->slots()->join('items', function($join) use ($request) {
+            $join = $join->on('inventory_slots.item_id', '=', 'items.id');
+
+            $join->where('items.market_sellable', true)->where('items.type', $request->type);
+        })->get();
+
+        return response()->json([
+            'slots' => $slots,
         ], 200);
     }
 

@@ -10,10 +10,7 @@
                 color="primary"
             ></x-core.page-title>
 
-            @livewire('character.inventory.data-table', [
-                'marketBoard' => true,
-                'character' => auth()->user()->character
-            ])
+            <div id="sell-items-on-market">
         </div>
     </div>
 @endsection
