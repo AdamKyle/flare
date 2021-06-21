@@ -60,7 +60,11 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(KingdomResourcesService::class, function($app) {
-            return new KingdomResourcesService($app->make(Manager::class), $app->make(KingdomTransformer::class));
+            return new KingdomResourcesService(
+                $app->make(Manager::class),
+                $app->make(KingdomTransformer::class),
+                $app->make(MovementService::class)
+            );
         });
 
         $this->app->bind(SelectedKingdom::class, function() {

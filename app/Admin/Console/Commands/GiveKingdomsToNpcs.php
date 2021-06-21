@@ -59,8 +59,9 @@ class GiveKingdomsToNpcs extends Command {
     protected function giveNPCKingdoms(Collection $kingdoms, Character $character) {
         foreach ($kingdoms as $kingdom) {
             $kingdom->update([
-                'character_id' => null,
-                'npc_owned'    => true,
+                'character_id'   => null,
+                'npc_owned'      => true,
+                'current_morale' => 0.10
             ]);
 
             broadcast(new UpdateNPCKingdoms($kingdom->gameMap));

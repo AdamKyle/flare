@@ -2,7 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\Character;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use Cache;
+use Illuminate\Support\Collection;
 use Mail;
 use Illuminate\Console\Command;
 use App\Flare\Models\Kingdom;

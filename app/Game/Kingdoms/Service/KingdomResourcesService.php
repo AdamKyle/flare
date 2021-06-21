@@ -2,8 +2,16 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\User;
+use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Services\MovementService;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
@@ -14,6 +22,8 @@ use App\Game\Kingdoms\Events\UpdateKingdom;
 use Cache;
 
 class KingdomResourcesService {
+
+    use KingdomCache;
 
     /**
      * @var Kingdom $kingdom
@@ -30,10 +40,14 @@ class KingdomResourcesService {
      */
     private $kingdomTransformer;
 
+    private $movementService;
+
     /**
      * @var array $kingdomsUpdated
      */
     private $kingdomsUpdated = [];
+
+    private $doNotNotify = false;
 
     /**
      * constructor
@@ -42,9 +56,10 @@ class KingdomResourcesService {
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function __construct(Manager $manager, KingdomTransformer $kingdomTransformer) {
+    public function __construct(Manager $manager, KingdomTransformer $kingdomTransformer, MovementService $movementService) {
         $this->manager            = $manager;
         $this->kingdomTransformer = $kingdomTransformer;
+        $this->movementService    = $movementService;
     }
 
     /**
@@ -69,38 +84,25 @@ class KingdomResourcesService {
      * @return void
      */
     public function updateKingdom(): void {
-        $this->increaseOrDecreaseMorale();
-        $this->updateCurrentPopulation();
-        $this->increaseCurrentResource();
-        $this->increaseTreasury();
-
-        $user  = $this->kingdom->character->user;
-        $kingdom = $this->kingdom;
-
-        if (UserOnlineValue::isOnline($user)) {
-            broadcast(new UpdateEnemyKingdomsMorale($kingdom));
-
-            $kingdom = new Item($kingdom, $this->kingdomTransformer);
-            $kingdom = $this->manager->createData($kingdom)->toArray();
-
-            event(new UpdateKingdom($user, $kingdom));
-
-            if ($user->show_kingdom_update_messages) {
-                event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
-            }
-        } else {
-            if (Cache::has('kingdoms-updated-' . $user->id)) {
-                $cache = Cache::get('kingdoms-updated-' . $user->id);
-
-                $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
-
-                Cache::put('kingdoms-updated-' . $user->id, $cache);
-            } else {
-                $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
-
-                Cache::put('kingdoms-updated-' . $user->id, $cache);
-            }
+        if ($this->kingdom->npc_owned) {
+            return;
         }
+
+        $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
+
+        $this->increaseOrDecreaseMorale($lastTimeWalked);
+
+        if ($lastTimeWalked < 5) {
+            $this->updateCurrentPopulation();
+            $this->increaseCurrentResource();
+            $this->increaseTreasury();
+        }
+
+        if (!$this->doNotNotify) {
+            $this->notifyUser();
+        }
+
+        $this->doNotNotify = false;
     }
 
     /**
@@ -115,10 +117,34 @@ class KingdomResourcesService {
      *
      * This is based on building durability.
      */
-    public function increaseOrDecreaseMorale(): void {
+    public function increaseOrDecreaseMorale(int $lastWalked): void {
         $totalIncrease = 0;
         $totalDecrease = 0;
         $buildings     = $this->kingdom->buildings;
+        $currentMorale = $this->kingdom->current_morale;
+
+        if ($lastWalked > 5) {
+
+            if ($currentMorale <= 0.0) {
+                $this->giveNPCKingdoms();
+
+                $this->doNotNotify = true;
+
+                return;
+            }
+
+            $this->kingdom->update([
+                'current_morale' => $currentMorale - 0.10,
+            ]);
+
+            $message = $this->kingdom->name . ' is loosing morale, due to not being walked for more then 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position;
+
+            $this->notifyUser($message);
+
+            $this->doNotNotify = true;
+
+            return;
+        }
 
         foreach ($buildings as $building) {
             if ($building->current_durability > 0) {
@@ -145,8 +171,35 @@ class KingdomResourcesService {
         $this->adjustMorale($totalIncrease, $totalDecrease);
     }
 
+    protected function giveNPCKingdoms() {
+        $character = $this->kingdom->character;
+
+        $this->kingdom->update([
+            'character_id'   => null,
+            'npc_owned'      => true,
+            'current_morale' => 0.10
+        ]);
+
+        $this->npcTookKingdom($character->user, $this->kingdom);
+
+        broadcast(new UpdateNPCKingdoms($this->kingdom->gameMap));
+        broadcast(new UpdateGlobalMap($character));
+        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+    }
+
     protected function putUpdatedKingdomIntoCache(int $kingdomId, array $cache = []): array {
-        $cache[] = $kingdomId;
+        $isNpcOwned = Kingdom::find($kingdomId)->npc_owned;
+
+        if ($isNpcOwned) {
+            $key = array_search($kingdomId, $cache);
+
+            if ($key !== false) {
+                unset($cache[$key]);
+            }
+        } else {
+            $cache[] = $kingdomId;
+        }
+
 
         return $cache;
     }
@@ -294,5 +347,60 @@ class KingdomResourcesService {
         ]);
 
         $this->kingdom = $this->kingdom->refresh();
+    }
+
+    private function notifyUser(string $message = null) {
+        $user    = $this->kingdom->character->user;
+        $kingdom = $this->kingdom;
+
+        if (UserOnlineValue::isOnline($user)) {
+
+            broadcast(new UpdateEnemyKingdomsMorale($kingdom));
+
+            $kingdom = new Item($kingdom, $this->kingdomTransformer);
+            $kingdom = $this->manager->createData($kingdom)->toArray();
+
+            event(new UpdateKingdom($user, $kingdom));
+
+            if ($user->show_kingdom_update_messages) {
+                $serverMessage = $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position;
+
+                if (!is_null($message)) {
+                    $serverMessage = $message;
+                }
+
+                event(new ServerMessageEvent($user, 'kingdom-resources-update', $serverMessage));
+            }
+        } else {
+            $this->updateKingdomCache($user, $kingdom);
+        }
+
+        broadcast(new UpdateNPCKingdoms($this->kingdom->gameMap));
+        broadcast(new UpdateGlobalMap($user->character));
+    }
+
+    private function npcTookKingdom(User $user, Kingdom $kingdom) {
+        $this->removeKingdomFromCache($user->character, $kingdom);
+
+        if (UserOnlineValue::isOnline($user)) {
+            event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
+            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+        } else {
+            $this->updateKingdomCache($user, $kingdom);
+        }
+    }
+
+    private function updateKingdomCache(User $user, Kingdom $kingdom) {
+        if (Cache::has('kingdoms-updated-' . $user->id)) {
+            $cache = Cache::get('kingdoms-updated-' . $user->id);
+
+            $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
+
+            Cache::put('kingdoms-updated-' . $user->id, $cache);
+        } else {
+            $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
+
+            Cache::put('kingdoms-updated-' . $user->id, $cache);
+        }
     }
 }
