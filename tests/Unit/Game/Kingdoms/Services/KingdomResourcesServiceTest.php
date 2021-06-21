@@ -614,9 +614,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
