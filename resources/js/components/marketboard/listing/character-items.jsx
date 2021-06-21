@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import ReactDatatable from '@ashvin27/react-datatable';
 import Card from '../../game/components/templates/card';
+import ItemName from "../components/item-name";
+import SellItemModal from "./sell-item-modal";
 
 export default class CharacterItems extends Component {
   constructor(props) {
@@ -11,12 +13,25 @@ export default class CharacterItems extends Component {
       {
         key: "name",
         text: "Name",
-        sortable: false
+        sortable: false,
+        cell: row => <div data-tag="allowRowEvents">
+          <div>
+            <ItemName item={this.getItem(row.id)}/>
+          </div>
+        </div>,
       },
       {
         key: "type",
         text: "Item Type",
         sortable: false
+      },
+      {
+        key: "cost",
+        text: "Item Cost",
+        sortable: true,
+        cell: row => <div data-tag="allowRowEvents">
+          <div>{row.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+        </div>,
       },
     ];
 
@@ -38,11 +53,11 @@ export default class CharacterItems extends Component {
 
   componentDidMount() {
     axios.get('/api/market-board/character-items/' + this.props.characterId)
-    .then((result) => {
-      this.setState({
-        records: result.data.slots,
-      });
-    }).catch((error) => {
+      .then((result) => {
+        this.setState({
+          records: result.data.slots,
+        });
+      }).catch((error) => {
       if (error.hasOwnProperty('response')) {
         const response = error.response;
 
@@ -58,13 +73,15 @@ export default class CharacterItems extends Component {
   }
 
   rowClickedHandler(event, data, rowIndex) {
-    console.log(data.item.id);
-
     axios.get('/api/market-board/item', {
       params: {
-        item_id: data.item.id
+        item_id: data.item_id
       }
     }).then((result) => {
+      let resultData = result.data;
+
+      resultData.slot_id = data.id;
+
       this.setState({
         modalData: result.data,
         showModal: true,
@@ -82,10 +99,16 @@ export default class CharacterItems extends Component {
     })
   }
 
-  closeModal() {
+  getItem(id) {
+    return this.state.records.filter((r) => r.id === id)[0].item;
+  }
+
+  closeModal(refresh) {
     this.setState({
       modalData: {},
       showModal: false,
+    }, () => {
+      this.typeChange('reset');
     });
   }
 
@@ -156,6 +179,7 @@ export default class CharacterItems extends Component {
           {type: 'spell-damage', name: 'Spell Damage'},
           {type: 'spell-healing', name: 'Spell Healing'},
           {type: 'ring', name: 'Ring'},
+          {type: 'artifact', name: 'Artifact'},
         ]}
         onChange={this.typeChange.bind(this)}
       >
@@ -164,14 +188,26 @@ export default class CharacterItems extends Component {
             <div className="alert alert-danger mb-2 mt-2">
               Item Not found
             </div>
-          : null
+            : null
         }
+        <div className="alert alert-info mb-3 mt-3">
+          <p><strong>Click on rows, to open the sale window</strong></p>
+          Cost is relative to the cost of the attached affixes, along with base item price. Use this as a guide only when selling items. Opening the individual items
+          will show you a chart, which indicates the latest sales price for the item in question.<br />
+          The chart in the item dialogue, represents the sale price for this item and its associated affixes only.
+        </div>
         <ReactDatatable
           config={this.config}
           records={this.state.records}
           columns={this.columns}
           onRowClicked={this.rowClickedHandler.bind(this)}
         />
+
+        {
+          this.state.showModal ?
+            <SellItemModal showModal={this.state.showModal} closeModal={this.closeModal.bind(this)}
+                           modalData={this.state.modalData} characterId={this.props.characterId} /> : null
+        }
       </Card>
     );
   }

@@ -34,15 +34,15 @@ export default class ItemDetails extends React.Component {
           <dt>Base Healing Modifier:</dt>
           <dd>{item.base_healing_mod !== null ? item.base_healing_mod * 100 : 0}%</dd>
           <dt>Str Modifier:</dt>
-          <dd>{item.str_mod !== null ? item.str_mod * 100 : 0}%</dd>
+          <dd>{item.str_mod !== null ? (item.str_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Dex Modifier:</dt>
-          <dd>{item.dex_mod !== null ? item.dex_mod * 100 : 0}%</dd>
+          <dd>{item.dex_mod !== null ? (item.dex_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Dur Modifier:</dt>
-          <dd>{item.dur_mod !== null ? item.dur_mod * 100 : 0}%</dd>
+          <dd>{item.dur_mod !== null ? (item.dur_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Int Modifier:</dt>
-          <dd>{item.int_mod !== null ? item.int_mod * 100 : 0}%</dd>
+          <dd>{item.int_mod !== null ? (item.int_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Chr Modifier:</dt>
-          <dd>{item.chr_mod !== null ? item.chr_mod * 100 : 0}%</dd>
+          <dd>{item.chr_mod !== null ? (item.chr_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Skill Name:</dt>
           <dd>{item.skill_name === null ? 'N/A' : item.skill_name}</dd>
           <dt>Skill Training Bonus:</dt>
@@ -163,27 +163,27 @@ export default class ItemDetails extends React.Component {
                     <Card.Body>
                       <dl>
                         <dt><strong>Base Damage</strong>:</dt>
-                        <dd className="text-success">{this.props.item.base_damage}</dd>
+                        <dd>{this.props.item.base_damage}</dd>
                         <dt><strong>Base AC</strong>:</dt>
-                        <dd className="text-success">{this.props.item.base_ac}</dd>
+                        <dd>{this.props.item.base_ac}</dd>
                         <dt><strong>Base Healing</strong>:</dt>
-                        <dd className="text-success">{this.props.item.base_healing}</dd>
+                        <dd>{this.props.item.base_healing}</dd>
                         <dt><strong>Base Damage Mod</strong>:</dt>
-                        <dd className="text-success">{this.props.item.base_damage_mod * 100}%</dd>
+                        <dd>{this.props.item.base_damage_mod * 100}%</dd>
                         <dt><strong>Base AC</strong>:</dt>
-                        <dd className="text-success">{this.props.item.base_ac_mod * 100}%</dd>
+                        <dd>{this.props.item.base_ac_mod * 100}%</dd>
                         <dt><strong>Base Healing</strong>:</dt>
-                        <dd className="text-success">{this.props.item.base_healing_mod * 100}%</dd>
+                        <dd>{this.props.item.base_healing_mod * 100}%</dd>
                         <dt><strong>Strength</strong>:</dt>
-                        <dd className="text-success">{this.props.item.str_modifier * 100}%</dd>
+                        <dd>{this.props.item.str_modifier.toFixed(2) * 100}%</dd>
                         <dt><strong>Durability</strong>:</dt>
-                        <dd className="text-success">{this.props.item.dur_modifier * 100}%</dd>
+                        <dd>{this.props.item.dur_modifier.toFixed(2) * 100}%</dd>
                         <dt><strong>Dexterity</strong>:</dt>
-                        <dd className="text-success">{this.props.item.dex_modifier * 100}%</dd>
+                        <dd>{this.props.item.dex_modifier.toFixed(2) * 100}%</dd>
                         <dt><strong>Charisma</strong>:</dt>
-                        <dd className="text-success">{this.props.item.chr_modifier * 100}%</dd>
+                        <dd>{this.props.item.chr_modifier.toFixed(2) * 100}%</dd>
                         <dt><strong>Intelligence</strong>:</dt>
-                        <dd className="text-success">{this.props.item.int_modifier * 100}%</dd>
+                        <dd>{this.props.item.int_modifier.toFixed(2) * 100}%</dd>
                       </dl>
                     </Card.Body>
                   </Card>

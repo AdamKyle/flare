@@ -17,4 +17,24 @@ class SellItemCalculator {
     public function fetchTotalSalePrice(Item $item): int {
         return round(($item->cost - ($item->cost * 0.05)));
     }
+
+    /**
+     * Fetch the cost of the item with it's affixes.
+     *
+     * @param Item $item
+     * @return int
+     */
+    public function fetchSalePriceWithAffixes(Item $item): int {
+        $cost = Item::find($item->id)->cost;
+
+        if (!is_null($item->item_suffix_id)) {
+            $cost += $item->itemSuffix->cost;
+        }
+
+        if (!is_null($item->item_prefix_id)) {
+            $cost += $item->itemPrefix->cost;
+        }
+
+        return $cost;
+    }
 }

@@ -42,28 +42,6 @@ class MarketController extends Controller {
         return view('game.core.market.sell');
     }
 
-    public function list(Request $request, InventorySlot $slot) {
-        if (!$request->has('sell_for')) {
-            return redirect()->to(route('game.market.sell'))->with('error', 'How much are you trying to sell this for? Missing Sell for.');
-        }
-
-        if ($request->sell_for <= 0) {
-            return redirect()->back()->with('error', 'The price cannot be below or equal to 0.');
-        }
-
-        MarketBoard::create([
-            'character_id' => auth()->user()->character->id,
-            'item_id'      => $slot->item->id,
-            'listed_price' => $request->sell_for,
-        ]);
-
-        $slot->delete();
-
-        $this->sendUpdate($this->transformer, $this->manager);
-
-        return redirect()->to(route('game.market.sell'))->with('success', 'Item listed');
-    }
-
     public function currentListings(Character $character) {
         $locked = MarketBoard::where('character_id', $character->id)->where('is_locked', true)->first();
 

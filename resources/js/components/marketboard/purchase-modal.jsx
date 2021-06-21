@@ -64,7 +64,28 @@ export default class PurchaseModal extends React.Component {
     });
   }
 
+  getCostPercentage() {
+    return (this.props.modalData.listed_price / this.state.item.cost) * 100;
+  }
+
   render() {
+    let percentage = 0;
+    let text = '';
+
+    if (!this.state.loading) {
+      percentage = parseInt(this.getCostPercentage().toFixed(0)) || 0;
+    }
+
+    if (percentage > 1.0) {
+      text = 'above';
+    } else {
+      if (percentage === 0.0) {
+        text = 'far below'
+      } else {
+        text = 'below'
+      }
+    }
+
     return (
       <Modal
         show={this.props.showModal}
@@ -75,7 +96,16 @@ export default class PurchaseModal extends React.Component {
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>{this.props.modalData.name}</Modal.Title>
+          <Modal.Title>
+            {this.props.modalData.name}
+            {this.state.loading ?
+              <span className={'ml-2'} style={{fontSize: '16px', position: 'realitive', top: '-10px'}}>calculating ...</span> :
+              <span className={percentage > 1.0 ? 'text-danger' : 'text-success' + " ml-2"} style={{fontSize: '16px', position: 'relative', top: '-2px', left: '5px'}}>
+                {percentage}% {text} base cost
+              </span>
+            }
+
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {
@@ -89,7 +119,13 @@ export default class PurchaseModal extends React.Component {
                 If you would like to delist this item, head over to your My listings section under the market to delist.</div> : null
           }
           <p>Is this the item you would like to purchase? It
-            will <strong>cost</strong>: {this.props.modalData.listed_price * 1.05} Gold (incl. 5% tax)</p>
+            will <strong>cost</strong>: {(this.props.modalData.listed_price * 1.05).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold (incl. 5% tax)</p>
+          {this.state.loading ? 'Loading please wait ...' : <p>
+            <strong> Base cost</strong>: {this.state.item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold
+            <br />
+            Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it your self, or significantly cheaper. Most items will be listed for higher,
+            due to the inherit risk in crafting and enchanting.
+          </p> }
           {this.state.loading ? 'Loading please wait ...' : <ItemDetails item={this.state.item}/>}
         </Modal.Body>
         <Modal.Footer>
