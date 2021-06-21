@@ -12,6 +12,9 @@
             'name' => $user->character->name,
             'user' => $user,
         ])
+        @include('game.core.settings.partials.account-deletion', [
+            'user' => $user,
+        ])
         @include('game.core.settings.partials.email-settings', [
             'user' => $user,
         ])

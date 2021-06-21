@@ -2,17 +2,19 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Game\Core\Traits\UpdateMarketBoard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Item;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\QuestItemSlot;
 use Database\Factories\InventoryFactory;
+use League\Fractal\Manager;
 
-class Inventory extends Model
-{
+class Inventory extends Model {
 
-    use HasFactory;
+    use HasFactory, UpdateMarketBoard;
 
     /**
      * The attributes that are mass assignable.

@@ -10,6 +10,10 @@ use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 
 trait UpdateMarketBoard {
 
+    /**
+     * @param MarketItemsTransfromer $transformer
+     * @param Manager $manager
+     */
     public function sendUpdate(MarketItemsTransfromer $transformer, Manager $manager) {
         $items = MarketBoard::where('is_locked', false)->get();
         $items = new Collection($items, $transformer);

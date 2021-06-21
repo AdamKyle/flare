@@ -3,6 +3,9 @@
 namespace App\Flare\Models;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\GameRace;

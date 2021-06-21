@@ -48,5 +48,7 @@ Route::post('/request-email', ['as' => 'un.ban.request.email', 'uses' => 'UnbanR
 Route::post('/request-security/{user}', ['as' => 'un.ban.request.security', 'uses' => 'UnbanRequestController@securityCheck']);
 Route::post('/request-submit/{user}', ['as' => 'un.ban.request.submit', 'uses' => 'UnbanRequestController@submitRequest']);
 
+Route::post('/delete-account/{user}', ['as' => 'delete.account', 'uses' => 'AccountDeletionController@deleteAccount']);
+
 
 Auth::routes();
