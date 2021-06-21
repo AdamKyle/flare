@@ -41,6 +41,7 @@ class KingdomFactory extends Factory
             'current_morale'     => .50,
             'max_morale'         => 1.0,
             'treasury'           => null,
+            'last_walked'        => now()->subWeeks(6),
         ];
     }
 }

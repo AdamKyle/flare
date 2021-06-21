@@ -14,12 +14,13 @@ class KingdomResourcesServiceTest extends TestCase {
 
     use RefreshDatabase, CreateKingdom, CreateGameBuilding;
 
-    public function testkingdomGetsUpdated() {
+    public function testKingdomGetsUpdated() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
             'game_map_id'        => 1,
             'current_wood'       => 500,
             'current_population' => 0,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -60,7 +61,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $this->assertTrue($kingdom->current_population > 0);
     }
 
-    public function testkingdomGetsUpdatedWhenUserIsOnline() {
+    public function testKingdomGetsUpdatedWhenUserIsOnline() {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         DB::table('sessions')->insert([[
@@ -76,6 +77,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'character_id'       => $characterFactory->getCharacter()->id,
             'game_map_id'        => 1,
             'current_wood'       => 500,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -122,6 +124,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_wood'       => 500,
             'current_population' => 0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -168,6 +171,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_wood'       => 500,
             'current_wood'       => 0,
             'max_wood'           => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -214,6 +218,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0.10,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -259,6 +264,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'game_map_id'        => 1,
             'current_wood'       => 500,
             'current_population' => 0,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -307,6 +313,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_population' => 0,
             'current_morale'     => 1.0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -358,6 +365,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_population' => 0,
             'current_morale'     => 0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -409,6 +417,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_population' => 0,
             'current_morale'     => 0,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -459,6 +468,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_population' => 0,
             'current_morale'     => .50,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -509,6 +519,7 @@ class KingdomResourcesServiceTest extends TestCase {
             'current_population' => 0,
             'current_morale'     => .50,
             'max_population'     => 1,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([
@@ -568,7 +579,8 @@ class KingdomResourcesServiceTest extends TestCase {
             'game_map_id'        => 1,
             'current_wood'       => 500,
             'current_morale'     => 0,
-            'treasury'           => 1000
+            'treasury'           => 1000,
+            'last_walked'        => now(),
         ]);
 
         $kingdom->buildings()->insert([

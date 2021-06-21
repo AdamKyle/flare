@@ -18,6 +18,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Hash;
 use Mail;
 use Str;
 
@@ -68,6 +69,15 @@ class GenerateTestCharacter implements ShouldQueue
      */
     public function handle(AssignSkillService $service) {
         $map = GameMap::where('default', true)->first();
+
+        $token = Str::random(80);
+
+        $user = User::create([
+            'email'            => Str::random(10) . '@email.com',
+            'password'         => Hash::make(Str::random(10)),
+            'game_key'         => hash('sha256', $token),
+            'private_game_key' => $token,
+        ]);
 
         $character = (new CharacterBuilder)->setRace($this->race)
                               ->setClass($this->class)

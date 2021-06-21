@@ -29,6 +29,7 @@ class UpdateKingdomTest extends TestCase
             'current_clay'       => 0,
             'current_iron'       => 0,
             'current_population' => 0,
+            'last_walked'         => now(),
         ]);
 
         $this->createKingdomBuilding([

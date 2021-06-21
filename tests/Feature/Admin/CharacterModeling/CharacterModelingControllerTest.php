@@ -55,7 +55,7 @@ class CharacterModelingControllerTest extends TestCase
 
     public function testCanSeeGenerateButton() {
         $this->actingAs($this->user)->visit(route('admin.character.modeling'))
-                                    ->see('Generate Character Modeling');
+                                    ->see('Character Modeling');
     }
 
     public function testDoNotSeeGenerateButtonWhenThereAreSnapShots() {
@@ -65,7 +65,6 @@ class CharacterModelingControllerTest extends TestCase
         ]);
 
         $this->actingAs($this->user)->visit(route('admin.character.modeling'))
-                                    ->dontSee('Generate Character Modeling')
                                     ->see('Modeling');
     }
 
@@ -222,7 +221,7 @@ class CharacterModelingControllerTest extends TestCase
         $this->createGameMap();
         $this->createItem();
 
-        $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
+        $response = $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
 
         Mail::assertSent(GenericMail::class);
 
