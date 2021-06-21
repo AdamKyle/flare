@@ -20,7 +20,7 @@ class DataTable extends Component
     public $only         = null;
     public $character    = null;
     public $isHelp       = false;
-    public $craftOnly    = true;
+    public $craftOnly    = false;
     public $type         = null;
 
     protected $paginationTheme = 'bootstrap';
@@ -38,7 +38,8 @@ class DataTable extends Component
 
         if (!is_null($this->only)) {
             if ($this->only === 'quest-items-book') {
-                $items = $items->where('name', 'like', '%Book%');
+                $items = $items->where('name', 'like', '%Book%')
+                               ->where('type', 'quest');
             } else {
                 $items = $items->where('type', '!=', 'quest');
             }

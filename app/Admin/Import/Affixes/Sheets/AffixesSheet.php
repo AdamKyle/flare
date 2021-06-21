@@ -34,6 +34,10 @@ class AffixesSheet implements ToCollection {
     protected function returnCleanAffix(array $item) {
         $cleanData = [];
 
+        if (!isset($item['can_drop'])) {
+            $item['can_drop'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'skill_name') {

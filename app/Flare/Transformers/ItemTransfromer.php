@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Item;
 
@@ -17,6 +18,7 @@ class ItemTransfromer extends TransformerAbstract {
 
         return [
             'id'                   => $item->id,
+            'name'                 => $item->affix_name,
             'base_damage'          => $item->getTotalDamage(),
             'base_ac'              => $item->getTotalDefence(),
             'base_healing'         => $item->getTotalHealing(),
@@ -37,6 +39,7 @@ class ItemTransfromer extends TransformerAbstract {
             'crafting_type'        => $item->crafting_type,
             'skill_level_req'      => $item->skill_level_required,
             'skill_level_trivial'  => $item->skill_level_trivial,
+            'cost'                 => SellItemCalculator::fetchSalePriceWithAffixes($item),
         ];
     }
 }
