@@ -90,49 +90,14 @@ export default class Attack {
       defenderDodge = 1 + defenderDodge
     }
 
-    const attackerDexPercentage      = this.calculatePercentage(attacker.dex);
-    const attackerBaseStatPercentage = this.calculatePercentage(attacker.base_stat);
-    const defenderDexPercentage      = this.calculatePercentage(defender.dex);
-    const defenderBaseStatPercentage = this.calculatePercentage(defender.base_stat);
+    const attack = (attacker.base_stat + Math.round(attacker.dex / 2)) * attackerAccuracy;
+    const dodge  = (defender.base_stat + Math.round(defender.dex / 2)) * defenderDodge;
 
-    const baseHitPercentage   = Math.round(100*Math.log(attacker.base_stat)/Math.log(10))/100;
-    const baseDodgePercentage = Math.round(100*Math.log(defender.dex)/Math.log(10))/100;
-
-    const attack = (attackerDexPercentage + attackerBaseStatPercentage) * (attackerAccuracy > 1 ? attackerAccuracy : (1 + attackerAccuracy));
-    const dodge  = (defenderDexPercentage + defenderBaseStatPercentage) * (defenderDodge > 1 ? defenderDodge : (1 + defenderDodge));
-
-    return attack * (1 + (baseHitPercentage / 100)) > dodge * (1 + (baseDodgePercentage / 100));
+    return attack > dodge;
   }
 
   blockedAttack(defender, attacker) {
-    const attackerBaseStatPercentage = this.calculatePercentage(attacker.base_stat);
-
-    return defender.ac > attackerBaseStatPercentage;
-  }
-
-  calculatePercentage(number) {
-    let statThousands = Math.round(100*Math.log(number)/Math.log(10))/100;
-    let stat          = number;
-
-    switch (statThousands) {
-      case 3:
-        stat = Math.round(stat / 100);
-        break;
-      case 4:
-        stat = Math.round(stat / 1000);
-        break;
-      case 5:
-        stat = Math.round(stat / 10000);
-        break;
-      case 6:
-        stat = Math.round(stat / 100000);
-        break;
-      case 7:
-        stat = Math.round(stat / 1000000);
-        break;
-    }
-
-    return stat / 100;
+    return defender.ac > attacker.base_stat;
   }
 
   isMonsterDead() {
