@@ -201,7 +201,7 @@ class FightService {
             'is_monster' => $attacker instanceof Character ? false : true
         ];
 
-        return $this->attack($defender, $attacker);
+        $this->attack($defender, $attacker);
     }
 
     protected function canHit($attacker, $defender): bool {

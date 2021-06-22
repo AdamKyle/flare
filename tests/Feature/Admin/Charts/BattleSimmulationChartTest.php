@@ -62,27 +62,6 @@ class BattleSimmulationChartTest extends TestCase {
         $this->assertEquals(1, $content->datasets[0]->values[0]);
     }
 
-    public function testGetResultsWhereEveryOneDies() {
-        $this->createBattleResults(1, [
-            'str'          => 1000,
-            'dur'          => 1000,
-            'dex'          => 1000,
-            'chr'          => 1000,
-            'int'          => 1000,
-            'ac'           => 1000,
-            'health_range' => '1-8',
-            'attack_range' => '1-6',
-        ]);
-
-        $response = $this->actingAs($this->user)->json('GET', route('charts.battle_simmulation_chart', [
-            'monsterId' => 1,
-        ]))->response;
-
-        $content = json_decode($response->content());
-
-        $this->assertEquals(1, $content->datasets[0]->values[1]);
-    }
-
     public function testGetResultsWhereTookTooLong() {
         $this->createBattleResults(1, [
             'str'          => 10,
@@ -116,7 +95,7 @@ class BattleSimmulationChartTest extends TestCase {
         $this->createGameMap();
         $this->createItem();
 
-        $this->actingAs($this->user)->post(route('admin.character.modeling.generate'));
+        $response = $this->actingAs($this->user)->post(route('admin.character.modeling.generate'))->response;
 
         $this->actingAs($this->user)->visit(route('monsters.list'))->post(route('admin.character.modeling.test'), [
             'model_id' => $this->createMonster($monsterOptions)->id,
