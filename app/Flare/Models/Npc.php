@@ -2,12 +2,15 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\NpceFactory;
+use Database\Factories\NpcFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\Traits\WithSearch;
 
 class Npc extends Model {
 
-    use WithSearch;
+    use WithSearch, HasFactory;
 
     protected $table = 'npcs';
 
@@ -40,5 +43,9 @@ class Npc extends Model {
 
     public function commands() {
         return $this->hasMany(NpcCommand::class, 'npc_id', 'id');
+    }
+
+    protected static function newFactory() {
+        return NpcFactory::new();
     }
 }

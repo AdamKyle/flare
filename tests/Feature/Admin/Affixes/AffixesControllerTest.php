@@ -3,6 +3,8 @@
 namespace Tests\Feature\Admin\Affixes;
 
 use App\Admin\Exports\Affixes\AffixesExport;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\MarketHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -12,16 +14,19 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Location;
 use Event;
 use Queue;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateItemAffix;
+use Tests\Setup\Character\CharacterFactory;
 
 class AffixesControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateUser,
         CreateRole,
-        CreateItemAffix;
+        CreateItemAffix,
+        CreateItem;
 
     private $user;
 
@@ -70,6 +75,24 @@ class AffixesControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
+        $character = (new CharacterFactory())->createBaseCharacter();
+
+        $item = $this->createItem([
+            'item_suffix_id' => $this->affix->id
+        ]);
+
+        MarketBoard::create([
+            'character_id'  => $character->getCharacter()->id,
+            'item_id'       => $item->id,
+            'listed_price'  => 1000,
+            'is_locked'     => false,
+        ]);
+
+        MarketHistory::create([
+            'item_id'   => $item->id,
+            'sold_for'  => 1000,
+        ]);
+
         $response = $this->actingAs($this->user)->post(route('affixes.delete', [
             'affix' => $this->affix->id,
         ]))->response;
@@ -78,15 +101,25 @@ class AffixesControllerTest extends TestCase
         $this->assertNull(ItemAffix::find($this->affix->id));
     }
 
+    public function testCanExportAffixes() {
+        Excel::fake();
+
+        $this->actingAs($this->user)->post(route('affixes.export-data'));
+
+        Excel::assertDownloaded('affixes.xlsx', function(AffixesExport $export) {
+            return true;
+        });
+    }
+
     public function testCanSeeExportAffixes() {
         $this->actingAs($this->user)->visit(route('affixes.export'))->see('Export');
     }
 
-    public function testCanSeeImportPage() {
+    public function testCanSeeAffixImportPage() {
         $this->actingAs($this->user)->visit(route('affixes.import'))->see('Import Affix Data');
     }
 
-    public function testCanImportMonsters() {
+    public function testCanImportAffixes() {
         $this->actingAs($this->user)->post(route('affixes.import-data', [
             'affixes_import' => new UploadedFile(resource_path('data-imports/affixes.xlsx'), 'affixes.xlsx')
         ]));

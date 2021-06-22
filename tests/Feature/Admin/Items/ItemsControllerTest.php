@@ -150,10 +150,12 @@ class ItemsControllerTest extends TestCase
         $response->assertSessionHas('error', 'Invalid input.');
     }
 
+    public function testCanSeeExportPageForItems() {
+        $this->actingAs($this->user)->visit(route('items.export'))->see('Export');
+    }
+
     public function testCanExportItems() {
         Excel::fake();
-
-        $this->actingAs($this->user)->visit(route('items.export'))->see('Export');
 
         $this->actingAs($this->user)->post(route('items.export-data'));
 
@@ -162,11 +164,11 @@ class ItemsControllerTest extends TestCase
         });
     }
 
-    public function testCanSeeImportPage() {
+    public function testCanSeeItemsImportPage() {
         $this->actingAs($this->user)->visit(route('items.import'))->see('Import Item Data');
     }
 
-    public function testCanImportMonsters() {
+    public function testCanImportItems() {
         $this->actingAs($this->user)->post(route('items.import-data', [
             'items_import' => new UploadedFile(resource_path('data-imports/items.xlsx'), 'items.xlsx')
         ]));

@@ -28,32 +28,39 @@
             </dl>
         </x-cards.card-with-title>
 
-        <x-cards.card-with-title title="Available Commands">
-            <p class="mb-2">These are the available commands you can message to the NPC. They're type correlates to the action they will
-                take when you message them.</p>
-            <div class="alert alert-info mb-3">When messaging a NPC their command you would type: <pre class="mt-2">{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</pre>
-            for example.</div>
-            <dl>
-                @php $count = 0; @endphp
-                @foreach($npc->commands as $index => $command)
-                    <dt>Command</dt>
-                    <dd>{{$command->command}}</dd>
-                    <dt>Command Type</dt>
-                    <dd>{{NpcCommandType::statusType($command->command_type)}}</dd>
+        @if($npc->commands->isNotEmpty())
 
-                    @if ($count !== $index)
-                        <hr />
-                        @php $count++; @endphp
+            <x-cards.card-with-title title="Available Commands">
+                <p class="mb-2">These are the available commands you can message to the NPC. They're type correlates to the action they will
+                    take when you message them.</p>
+                <div class="alert alert-info mb-3">When messaging a NPC their command you would type: <pre class="mt-2">{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</pre>
+                for example.</div>
+
+
+                <dl>
+                    @php $count = 0; @endphp
+                    @foreach($npc->commands as $index => $command)
+                        <dt>Command</dt>
+                        <dd>{{$command->command}}</dd>
+                        <dt>Command Type</dt>
+                        <dd>{{NpcCommandType::statusType($command->command_type)}}</dd>
+
+                        @if ($count !== $index)
+                            <hr />
+                            @php $count++; @endphp
+                        @endif
+                    @endforeach
+                </dl>
+
+
+                @auth
+                    @if(auth()->user()->hasRole('Admin'))
+                        <button class="btn btn-primary mt-3">Manage Commands</button>
                     @endif
-                @endforeach
-            </dl>
+                @endauth
+            </x-cards.card-with-title>
 
-            @auth
-                @if(auth()->user()->hasRole('Admin'))
-                    <button class="btn btn-primary mt-3">Manage Commands</button>
-                @endif
-            @endauth
-        </x-cards.card-with-title>
+        @endif
     </div>
 
 @endsection

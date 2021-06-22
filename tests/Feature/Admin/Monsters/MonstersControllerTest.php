@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateMonster;
@@ -80,10 +81,12 @@ class MonstersControllerTest extends TestCase
         $this->assertTrue($monster->refresh()->published);
     }
 
-    public function testCanExportItems() {
-        Excel::fake();
-
+    public function testCanSeeExportPage() {
         $this->actingAs($this->user)->visit(route('monsters.export'))->see('Export');
+    }
+
+    public function testCanExportMonsters() {
+        Excel::fake();
 
         $this->actingAs($this->user)->post(route('monsters.export-data'));
 
@@ -92,7 +95,7 @@ class MonstersControllerTest extends TestCase
         });
     }
 
-    public function testCanSeeImportPage() {
+    public function testCanSeeMonsterImportPage() {
         $this->actingAs($this->user)->visit(route('monsters.import'))->see('Import Monster Data');
     }
 

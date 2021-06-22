@@ -14,24 +14,6 @@ use Illuminate\Database\Eloquent\Collection;
 class ItemAffixService {
 
     /**
-     * @var bool $doNotGiveGold
-     */
-    private $doNotGiveGold = false;
-
-    /**
-     * Sets the do not give gold to true.
-     *
-     * If you call this, the character will not get any gold for the affix.
-     *
-     * @return ItemAffixService
-     */
-    public function doNotGiveGold(): ItemAffixService {
-        $this->doNotGiveGold = true;
-
-        return $this;
-    }
-
-    /**
      * Delete the Affix.
      *
      * We also remove the affix from any addition items it might be attached to.
@@ -64,9 +46,11 @@ class ItemAffixService {
                 $this->swapItemForCharacter($item, $slots);
             }
 
-            if ($slots->isNotEmpty() && !$this->doNotGiveGold) {
+            if ($slots->isNotEmpty()) {
                 $this->handleSlots($slots, $affix, $name);
             }
+
+            $this->deleteFromMarketBoard($item);
         }
     }
 
@@ -84,14 +68,7 @@ class ItemAffixService {
                                         ->first()->id,
                 ]);
             }
-
-            $this->deleteFromMarketBoard($item);
-
-            $item->delete();
         } else if ($total > 1) {
-
-            $this->deleteFromMarketBoard($item);
-
             $item->delete();
         }
     }
