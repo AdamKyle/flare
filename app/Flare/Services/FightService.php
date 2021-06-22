@@ -223,58 +223,29 @@ class FightService {
             $dodgeBonus += 1;
         }
 
-        $attackerDex = $attacker->dex;
-
-        if ($defender instanceof Character) {
-            $baseStat = $this->characterInformation->statMod($attacker->damage_stat);
+        if ($defender instanceof  Character) {
+            $dex = $this->characterInformation->statMod('dex');
+            $baseStat = $this->characterInformation->statMod($defender->damage_stat);
         } else {
+            $dex = $defender->dex;
             $baseStat = $defender->{$defender->damage_stat};
         }
 
-        if ($attacker instanceof Character) {
-            $attackerDex = $this->characterInformation->statMod('dex');
-            $attackerBaseStat = $this->characterInformation->statMod($attacker->damage_stat);
-        } else {
-            $attackerBaseStat = $defender->{$defender->damage_stat};
-        }
+        $attack = $baseStat + round($dex / 2) * $accuracyBonus;
+        $dodge  = $baseStat + round($dex / 2) * $dodgeBonus;
 
-        $baseStat = $baseStat - ($baseStat * 0.5);
-        $attackerBaseStat = $attackerBaseStat - ($attackerBaseStat * 0.5);
-
-        return ($attackerDex + ($attackerBaseStat * $accuracyBonus)) > ($defender->dex + ($baseStat * $dodgeBonus));
+        return $attack > $dodge;
     }
 
     protected function blockedAttack($defender, $attacker): bool {
-        $dexBonus = $defender->dex;
         $baseStat = $defender->{$defender->damage_stat};
         $ac       = $defender->ac;
 
         if ($defender instanceof  Character) {
-            $dexBonus = $this->characterInformation->statMod('dex');
             $baseStat = $this->characterInformation->statMod($defender->damage_stat);
         }
 
-        if ($attacker instanceof Character) {
-            $dexBonus = $this->characterInformation->statMod('dex');
-            $baseStat = $this->characterInformation->statMod($attacker->damage_stat);
-        }
-
-        if ($defender instanceof Character) {
-            $ac = $this->characterInformation->buildDefence();
-        }
-
-        $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
-            $join->on('game_skills.id', 'skills.game_skill_id')
-                 ->where('game_skills.name', 'Accuracy');
-        })->first()->skill_bonus;
-
-        $damageStat = $attacker->{$attacker->damage_stat};
-
-        if ($attacker instanceof Character) {
-            $damageStat = $this->characterInformation->statMod($attacker->damage_stat);
-        }
-
-        return round(($damageStat / 2) + $dexBonus) < ($ac + $baseStat);
+        return $ac > $baseStat;
     }
 
     protected function completeAttack($attacker, $defender): array {

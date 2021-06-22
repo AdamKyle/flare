@@ -89,18 +89,15 @@ export default class Attack {
     if (defenderDodge < 1) {
       defenderDodge = 1 + defenderDodge
     }
+    
+    const attack = (attacker.base_stat + Math.round(attacker.dex / 2)) * attackerAccuracy;
+    const dodge  = (defender.base_stat + Math.round(defender.dex / 2)) * defenderDodge;
 
-    const baseStatBonus      = attacker.base_stat - Math.ceil(attacker.base_stat * .50);
-    const enemyBaseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
-
-    return (attacker.dex + (baseStatBonus * attackerAccuracy)) > (defender.dex + (enemyBaseStatBonus * defenderDodge));
+    return attack > dodge;
   }
 
-  blockedAttack(defender, attacker, type) {
-    let dexBonus      = attacker.dex - Math.ceil(attacker.dex * .50);
-    let baseStatBonus = defender.base_stat - Math.ceil(defender.base_stat * .50);
-
-    return Math.ceil((attacker.base_stat / 2) + dexBonus) < (defender.ac + baseStatBonus);
+  blockedAttack(defender, attacker) {
+    return defender.ac > attacker.base_stat;
   }
 
   isMonsterDead() {
