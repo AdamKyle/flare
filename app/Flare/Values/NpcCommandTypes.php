@@ -14,17 +14,21 @@ class NpcCommandTypes
 
     const TAKE_KINGDOM = 1;
 
+    const CONJURE = 2;
+
     /**
      * @var string[] $values
      */
     protected static $values = [
         self::QUEST => 0,
         self::TAKE_KINGDOM => 1,
+        Self::CONJURE => 2,
     ];
 
     protected static $namedValues = [
         0 => 'Quest',
         1 => 'Take Kingdom',
+        2 => 'Conjure',
     ];
 
     /**
@@ -60,6 +64,14 @@ class NpcCommandTypes
      */
     public function isTakeKingdom(): bool {
         return $this->value = self::TAKE_KINGDOM;
+    }
+
+    /**
+     * Are we a conjure?
+     * @return bool
+     */
+    public function isConjure(): bool {
+        return $this->value = self::CONJURE;
     }
 
     /**

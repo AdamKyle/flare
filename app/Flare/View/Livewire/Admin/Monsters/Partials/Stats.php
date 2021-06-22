@@ -14,21 +14,22 @@ class Stats extends Component
     public $gameMaps;
 
     protected $rules = [
-        'monster.name'         => 'required',
-        'monster.damage_stat'  => 'required',
-        'monster.xp'           => 'required',
-        'monster.str'          => 'required',
-        'monster.dur'          => 'required',
-        'monster.dex'          => 'required',
-        'monster.chr'          => 'required',
-        'monster.int'          => 'required',
-        'monster.ac'           => 'required',
-        'monster.gold'         => 'required',
-        'monster.max_level'    => 'required',
-        'monster.health_range' => 'required',
-        'monster.attack_range' => 'required',
-        'monster.drop_check'   => 'required',
-        'monster.game_map_id'  => 'required',
+        'monster.name'                => 'required',
+        'monster.damage_stat'         => 'required',
+        'monster.xp'                  => 'required',
+        'monster.str'                 => 'required',
+        'monster.dur'                 => 'required',
+        'monster.dex'                 => 'required',
+        'monster.chr'                 => 'required',
+        'monster.int'                 => 'required',
+        'monster.ac'                  => 'required',
+        'monster.gold'                => 'required',
+        'monster.max_level'           => 'required',
+        'monster.health_range'        => 'required',
+        'monster.attack_range'        => 'required',
+        'monster.drop_check'          => 'required',
+        'monster.game_map_id'         => 'required',
+        'monster.is_celestial_entity' => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];
@@ -49,6 +50,10 @@ class Stats extends Component
 
         if (is_null($this->monster->published)) {
             $this->monster->published = false;
+        }
+
+        if (is_null($this->monster->is_celestial_entity)) {
+            $this->monster->is_celestial_entity = false;
         }
 
         $this->monster->save();

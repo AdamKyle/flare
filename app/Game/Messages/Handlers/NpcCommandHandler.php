@@ -2,10 +2,12 @@
 
 namespace App\Game\Messages\Handlers;
 
+use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
 use App\Flare\Values\NpcCommandTypes;
+use App\Flare\Values\NpcComponentsValue;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
@@ -49,15 +51,26 @@ class NpcCommandHandler {
      * @throws Exception
      */
     public function handleForType(int $type, string $npcName, User $user) {
-        $type = new NpcCommandTypes($type);
+        $type        = new NpcCommandTypes($type);
+        $message     = null;
+        $messageType = null;
 
         if ($type->isTakeKingdom()) {
             if ($this->handleTakingKingdom($user, $npcName)) {
-                broadcast(new GlobalMessageEvent($user->character->name . ' Has paid The Old Man for a kingdom on the ' . $user->character->map->gameMap->name . ' plane.'));
-
-                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('took_kingdom', $npcName), true));
+                $message     = $user->character->name . ' Has paid The Old Man for a kingdom on the ' . $user->character->map->gameMap->name . ' plane.';
+                $messageType = 'took_kingdom';
             }
         }
+
+        if ($type->isConjure()) {
+            broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::CONJURE));
+
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('take_a_look', $npcName), true));
+        }
+
+        broadcast(new GlobalMessageEvent($message));
+
+        return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npcName), true));
     }
 
     /**

@@ -37,6 +37,9 @@ class Monster extends Model
         'quest_item_drop_chance',
         'published',
         'game_map_id',
+        'is_celestial_entity',
+        'gold_cost',
+        'gold_dust_cost'
     ];
 
     /**
@@ -57,6 +60,9 @@ class Monster extends Model
         'max_level'              => 'integer',
         'quest_item_drop_chance' => 'float',
         'published'              => 'boolean',
+        'is_celestial_entity'    => 'boolean',
+        'gold_cost'              => 'integer',
+        'gold_dust_cost'         => 'integer',
     ];
 
     public function skills() {
@@ -74,5 +80,5 @@ class Monster extends Model
     protected static function newFactory() {
         return MonsterFactory::new();
     }
-    
+
 }

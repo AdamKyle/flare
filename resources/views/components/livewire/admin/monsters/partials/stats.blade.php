@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <div class="form-group">
                 <label for="name">Name: </label>
-                <input type="text" class="form-control" name="name" value="" wire:model="monster.name"> 
+                <input type="text" class="form-control" name="name" value="" wire:model="monster.name">
                 @error('monster.name') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -13,21 +13,21 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="health_range">Health Range: </label>
-                <input type="text" class="form-control" name="health_range" value="" wire:model="monster.health_range"> 
+                <input type="text" class="form-control" name="health_range" value="" wire:model="monster.health_range">
                 @error('monster.health_range') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label for="max_level">Max Level </label>
-                <input type="number" class="form-control" name="max_level" value="" wire:model="monster.max_level"> 
+                <input type="number" class="form-control" name="max_level" value="" wire:model="monster.max_level">
                 @error('monster.max_level') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label for="attack_range">Attack Range: </label>
-                <input type="text" class="form-control" name="attack_range" value="" wire:model="monster.attack_range"> 
+                <input type="text" class="form-control" name="attack_range" value="" wire:model="monster.attack_range">
                 @error('monster.attack_range') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -59,14 +59,14 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="strength">Strength: </label>
-                <input type="number" class="form-control" name="strength" value="" wire:model="monster.str"> 
+                <input type="number" class="form-control" name="strength" value="" wire:model="monster.str">
                 @error('monster.str') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label for="dexterity">Dexterity: </label>
-                <input type="number" class="form-control" name="dexterity" value="" wire:model="monster.dex"> 
+                <input type="number" class="form-control" name="dexterity" value="" wire:model="monster.dex">
                 @error('monster.dex') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
@@ -75,46 +75,52 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="durability">Durability: </label>
-                <input type="number" class="form-control" name="durability" value="" wire:model="monster.dur"> 
+                <input type="number" class="form-control" name="durability" value="" wire:model="monster.dur">
                 @error('monster.dur') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label for="charisma">Charisma: </label>
-                <input type="number" class="form-control" name="charisma" value="" wire:model="monster.chr"> 
+                <input type="number" class="form-control" name="charisma" value="" wire:model="monster.chr">
                 @error('monster.chr') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
                 <label for="intelligence">Intelligence: </label>
-                <input type="number" class="form-control" name="intelligence" value="" wire:model="monster.int"> 
+                <input type="number" class="form-control" name="intelligence" value="" wire:model="monster.int">
                 @error('monster.int') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="ac">Armour Class: </label>
-                <input type="number" class="form-control" name="ac" value="" wire:model="monster.ac"> 
+                <input type="number" class="form-control" name="ac" value="" wire:model="monster.ac">
                 @error('monster.ac') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="exp">XP Reward: </label>
-                <input type="number" class="form-control" name="exp" value="" wire:model="monster.xp"> 
+                <input type="number" class="form-control" name="exp" value="" wire:model="monster.xp">
                 @error('monster.xp') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gold">Gold Reward: </label>
-                <input type="number" class="form-control" name="gold" value="" wire:model="monster.gold"> 
+                <input type="number" class="form-control" name="gold" value="" wire:model="monster.gold">
                 @error('monster.gold') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="monster-is-celestial" wire:model="monster.is_celestial_entity">
+                <label class="form-check-label" for="monster-is-celestial">Is Monster a Celstial?</label>
             </div>
         </div>
     </div>

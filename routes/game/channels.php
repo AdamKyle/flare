@@ -50,5 +50,10 @@ Broadcast::channel('open-timeout-modal-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When an NPC Wants a components to show.
+Broadcast::channel('component-show-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 

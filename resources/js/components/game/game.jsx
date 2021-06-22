@@ -55,6 +55,7 @@ export default class Game extends React.Component {
     }
 
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
+    this.npcComponent = Echo.private('component-show-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -62,6 +63,10 @@ export default class Game extends React.Component {
       this.setState({
         isDead: event.isDead,
       });
+    });
+
+    this.npcComponent.listen('Flare.Events.NpcComponentShowEvent', (event) => {
+      console.log(event);
     });
   }
 

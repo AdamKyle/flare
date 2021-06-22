@@ -14,18 +14,22 @@ class NpcTypes
 
     const KINGDOM_HOLDER = 0;
 
+    const SUMMONER = 1;
+
     /**
      * @var string[] $values
      */
     protected static $values = [
         self::KINGDOM_HOLDER => 0,
+        self::SUMMONER => 1
     ];
 
     /**
      * @var string[] $namedValues
      */
     protected static $namedValues = [
-      0 => 'Kingdom Holder',
+        0 => 'Kingdom Holder',
+        1 => 'Summoner'
     ];
 
     /**
