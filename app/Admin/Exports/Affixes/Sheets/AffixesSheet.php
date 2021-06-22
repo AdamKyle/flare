@@ -16,7 +16,7 @@ class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
      */
     public function view(): View {
         return view('admin.exports.affixes.sheets.affixes', [
-            'affixes' => ItemAffix::all(),
+            'affixes' => ItemAffix::orderBy('type', 'desc')->orderBy('cost', 'asc')->get(),
         ]);
     }
 

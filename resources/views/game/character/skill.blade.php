@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <p>{{$skill->description}}</p>
+                    <p>{!! nl2br(e($skill->description)) !!}</p>
                     <hr />
                     @if (!$skill->can_train)
                         @if (stristr($skill->name, 'Crafting') !== false)
@@ -25,6 +25,11 @@
                             </div>
                         @endif
                     @endif
+                    <div class="alert alert-info mb-2 mt-2">
+                        Skill bonus applies to skills that affects things in battle, such as accuracy or dodge or even looting.
+                        <br />
+                        If a skill does not have a skill bonus, check the other modifiers.
+                    </div>
                     <dl>
                         <dt>Level:</dt>
                         <dd>{{$skill->level}} / {{$skill->max_level}}</dd>
