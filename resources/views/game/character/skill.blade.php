@@ -25,6 +25,11 @@
                             </div>
                         @endif
                     @endif
+                    <div class="alert alert-info mb-2 mt-2">
+                        Skill bonus applies to skills that affects things in battle, such as accuracy or dodge or even looting.
+                        <br />
+                        If a skill does not have a skill bonus, check the other modifiers.
+                    </div>
                     <dl>
                         <dt>Level:</dt>
                         <dd>{{$skill->level}} / {{$skill->max_level}}</dd>
