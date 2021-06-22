@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <p>{{$skill->description}}</p>
+                    <p>{!! nl2br(e($skill->description)) !!}</p>
                     <hr />
                     @if (!$skill->can_train)
                         @if (stristr($skill->name, 'Crafting') !== false)

@@ -89,7 +89,7 @@ export default class Attack {
     if (defenderDodge < 1) {
       defenderDodge = 1 + defenderDodge
     }
-    
+
     const attack = (attacker.base_stat + Math.round(attacker.dex / 2)) * attackerAccuracy;
     const dodge  = (defender.base_stat + Math.round(defender.dex / 2)) * defenderDodge;
 
