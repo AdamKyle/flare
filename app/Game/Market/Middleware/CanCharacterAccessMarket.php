@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Game\Core\Middleware;
+namespace App\Game\Market\Middleware;
 
 use Closure;
 use App\Flare\Models\Location;
 
-class IsCharacterAtLocationMiddleware
+class CanCharacterAccessMarket
 {
     /**
      * Handle an incoming request.
@@ -21,11 +21,11 @@ class IsCharacterAtLocationMiddleware
         if (auth()->user()->hasRole('Admin')) {
             return $next($request);
         }
-        
+
         $character = auth()->user()->character;
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
-        
+
 
         if ($request->wantsJson()) {
             if (is_null($location)) {
@@ -40,7 +40,7 @@ class IsCharacterAtLocationMiddleware
                 ], 422);
             }
         }
-        
+
         if (is_null($location)) {
             return redirect()->route('game')->with('error', 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.');
         }

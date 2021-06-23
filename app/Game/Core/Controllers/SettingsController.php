@@ -35,6 +35,7 @@ class SettingsController extends Controller {
     }
 
     public function chatSettings(request $request, User $user) {
+
         $user->update([
             'show_unit_recruitment_messages' => $request->has('show_unit_recruitment_messages'),
             'show_building_upgrade_messages' => $request->has('show_building_upgrade_messages'),

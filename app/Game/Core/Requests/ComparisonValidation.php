@@ -24,7 +24,7 @@ class ComparisonValidation extends FormRequest
     public function rules()
     {
         return [
-            'item_to_equip_type' => 'nullable|in:weapon,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell,artifact',
+            'item_to_equip_type' => 'nullable|in:weapon,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-damage,spell-healing,artifact',
             'slot_id'            => 'required',
         ];
     }

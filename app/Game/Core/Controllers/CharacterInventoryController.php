@@ -47,6 +47,7 @@ class CharacterInventoryController extends Controller {
         CharacterInventoryService $characterInventoryService,
         Character $character
     ) {
+
         $itemToEquip = InventorySlot::find($request->slot_id);
 
         if (is_null($itemToEquip)) {
@@ -85,7 +86,7 @@ class CharacterInventoryController extends Controller {
 
     public function compareItem(User $user) {
         if (!Cache::has($user->id . '-compareItemDetails')) {
-            redirect()->route('game.character.sheet')->with('error', 'Item comparison expired.');
+            return redirect()->route('game.character.sheet')->with('error', 'Item comparison expired.');
         }
 
         return view('game.character.equipment', Cache::get($user->id . '-compareItemDetails'));

@@ -165,4 +165,21 @@ class SettingsControllerTest extends TestCase
             'password'     => 'ReallyLongPassword',
         ])->see('Security questions answers need to be unique.');
     }
+
+    public function testCanUpdateChatSettings() {
+        $character = $this->character->getCharacter();
+
+        $this->actingAs($character->user)->visit(route('user.settings', [
+            'user' => $character->user
+        ]))->submitForm('Update Chat Settings', [
+            'show_unit_recruitment_messages' => true
+        ]);
+
+        $user = User::find($this->character->getUser()->id);
+
+        $this->assertTrue($user->show_unit_recruitment_messages);
+        $this->assertFalse($user->show_building_upgrade_messages);
+        $this->assertFalse($user->show_kingdom_update_messages);
+        $this->assertFalse($user->show_building_rebuilt_messages);
+    }
 }

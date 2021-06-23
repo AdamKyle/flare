@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Controllers;
+namespace App\Game\Market\Controllers;
 
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -22,24 +22,12 @@ class MarketController extends Controller {
     private $transformer;
 
     public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
-        $this->middleware('auth');
-
-        $this->middleware('is.character.dead');
-
-        $this->middleware('is.character.adventuring');
-
-        $this->middleware('is.character.at.location');
-
         $this->manager     = $manager;
         $this->transformer = $transformer;
     }
 
     public function index() {
         return view('game.core.market.market');
-    }
-
-    public function sell() {
-        return view('game.core.market.sell');
     }
 
     public function currentListings(Character $character) {

@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Core;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
@@ -14,7 +15,8 @@ class CharacterInventoryControllerTest extends TestCase
     use RefreshDatabase,
         CreateItem,
         CreateItemAffix,
-        CreateUser;
+        CreateUser,
+        CreateRole;
 
     private $character;
 
@@ -68,6 +70,25 @@ class CharacterInventoryControllerTest extends TestCase
 
 
         $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
+            'position'   => 'left-hand',
+            'slot_id'    => '1',
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $character = $this->character->getCharacter();
+
+        $character->inventory->slots->each(function($slot) {
+            $this->assertTrue($slot->equipped);
+        });
+    }
+
+    public function testCanEquipItemAsAdmin() {
+
+        $this->character->inventoryManagement()->unequipAll()->getCharacterFactory()->getUser();
+
+        $adminUser = $this->createAdmin([], $this->createAdminRole());
+
+        $this->actingAs($adminUser)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
             'slot_id'    => '1',
             'equip_type' => 'weapon',
@@ -180,7 +201,7 @@ class CharacterInventoryControllerTest extends TestCase
         $response->assertSessionHas('error', 'Cannot destory equipped item.');
     }
 
-    public function testSeeComparePage() {
+    public function testSeeCompareItemsWithNoCache() {
 
         $user = $this->character->inventoryManagement()
                                 ->giveitem($this->createItem([
@@ -192,11 +213,9 @@ class CharacterInventoryControllerTest extends TestCase
                                 ->getCharacterFactory()
                                 ->getUser();
 
-        $this->actingAs($user)->visitRoute('game.inventory.compare', [
-            'item_to_equip_type' => 'weapon',
-            'slot_id'            => '2',
-            'character'          => $this->character->getCharacter()->id
-        ])->see('Equipped');
+        $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare-items', [
+            'user' => $user
+        ])->see('Item comparison expired.');
     }
 
     public function testSeeComparePageForSpell() {
@@ -207,12 +226,12 @@ class CharacterInventoryControllerTest extends TestCase
                                     'base_damage' => 6,
                                     'type' => 'spell-damage',
                                     'crafting_type' => 'spell',
-                                ]))
+                                ]), true, 'spell-one')
                                 ->getCharacterFactory()
                                 ->getUser();
 
-        $this->actingAs($user)->visitRoute('game.inventory.compare', [
-            'item_to_equip_type' => 'spell',
+        $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare', [
+            'item_to_equip_type' => 'spell-damage',
             'slot_id'            => '2',
             'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('spell');

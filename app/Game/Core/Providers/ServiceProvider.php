@@ -66,6 +66,5 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $router->aliasMiddleware('is.character.adventuring', IsCharacterAdventuringMiddleware::class);
-        $router->aliasMiddleware('is.character.at.location', IsCharacterAtLocationMiddleware::class);
     }
 }
