@@ -33,6 +33,10 @@ class DataTable extends Component
             $users->join('characters', function($join) {
                 $join->on('users.id', 'characters.user_id');
             })->orderBy($this->sortField, $this->sortBy)->select('users.*');
+        } else if ($this->sortField == 'characters.level') {
+            $users->join('characters', function ($join) {
+                $join->on('users.id', 'characters.user_id');
+            })->orderBy($this->sortField, $this->sortBy)->select('users.*');
         } else {
             $users = $users->orderBy('un_ban_request', $this->sortBy)->orderBy($this->sortField, $this->sortBy);
         }

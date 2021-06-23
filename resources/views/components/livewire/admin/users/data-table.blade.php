@@ -25,6 +25,14 @@
                             />
 
                             <x-data-tables.header-row
+                                wire:click.prevent="sortBy('characters.level')"
+                                header-text="Character Level"
+                                sort-by="{{$sortBy}}"
+                                sort-field="{{$sortField}}"
+                                field="characters.level"
+                            />
+
+                            <x-data-tables.header-row
                                 wire:click.prevent="sortBy('is_banned')"
                                 header-text="Is Banned"
                                 sort-by="{{$sortBy}}"
@@ -69,6 +77,7 @@
                                         'user' => $user->id
                                     ])}}">{{$user->character->name}} @if (!is_null($user->un_ban_request)) <i class="fas fa-envelope"></i> @endif</a>
                                 </td>
+                                <td>{{$user->character->level}}</td>
                                 <td>{{$user->is_banned ? 'Yes' : 'No'}}</td>
                                 <td>
                                         @if ($user->is_banned && is_null($user->unbanned_at))
