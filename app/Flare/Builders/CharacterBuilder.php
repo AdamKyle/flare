@@ -127,7 +127,6 @@ class CharacterBuilder {
             'chr'           => $baseStat->chr(),
             'int'           => $baseStat->int(),
             'ac'            => $baseStat->ac(),
-            'is_test'       => true,
         ]);
 
         $this->character->inventory()->create([

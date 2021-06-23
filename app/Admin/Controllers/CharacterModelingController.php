@@ -27,7 +27,7 @@ class CharacterModelingController extends Controller {
 
     public function index() {
 
-        $characters = Character::where('is_test', true)->get();
+        $characters = Character::whereNull('user_id')->get();
 
         return view('admin.character-modeling.index', [
             'cardTitle'    => $characters->isEmpty() ? 'Modeling' : 'Generate',
@@ -153,7 +153,7 @@ class CharacterModelingController extends Controller {
 
     public function generate() {
 
-        if (User::where('is_test', true)->get()->isNotEmpty()) {
+        if (Character::whereNull('user_id')->get()->isNotEmpty()) {
             return redirect()->back()->with('error', 'You already have test characters for every race and class and combination of.');
         }
 
