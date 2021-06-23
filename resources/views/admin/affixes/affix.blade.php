@@ -49,7 +49,7 @@
                 <div class="card-body">
                     <dl>
                         <dt>Base Cost:</dt>
-                        <dd>{{$itemAffix->cost}} gold</dd>
+                        <dd>{{number_format($itemAffix->cost)}} gold</dd>
                         <dt>Intelligence Required:</dt>
                         <dd>{{$itemAffix->int_required}}</dd>
                         <dt>Level Required:</dt>
