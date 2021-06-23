@@ -43,7 +43,7 @@ class AffixDetails extends Component
         $this->validate();
 
         if (is_null($this->itemAffix->can_drop)) {
-            $this->itemAffix->can_drop = true;
+            $this->itemAffix->can_drop = false;
         }
 
         $this->itemAffix->save();
