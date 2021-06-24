@@ -5,7 +5,7 @@
                 <label for="name">Name: </label>
                 <input type="text" class="form-control" name="name" value="" wire:model="npc.name">
                 @error('npc.name') <span class="text-danger">{{ $message }}</span> @enderror
-                <small id="nameHelp" class="form-text text-muted">Name will have all spaces stripped upon saving.</small>
+                <small id="nameHelp" class="form-text text-muted">Name will have all spaces stripped upon saving. We also store this name as their "real name".</small>
             </div>
         </div>
         <div class="col-md-4">

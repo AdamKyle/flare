@@ -21,6 +21,7 @@ class Npc extends Model {
      */
     protected $fillable = [
         'name',
+        'real_name',
         'type',
         'game_map_id',
         'moves_around_map',

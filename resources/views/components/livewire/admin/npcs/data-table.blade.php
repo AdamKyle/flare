@@ -9,11 +9,11 @@
                 <x-data-tables.table :collection="$npcs">
                     <x-data-tables.header>
                         <x-data-tables.header-row
-                            wire:click.prevent="sortBy('name')"
+                            wire:click.prevent="sortBy('real_name')"
                             header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
-                            field="name"
+                            field="real_name"
                         />
                         <x-data-tables.header-row
                             wire:click.prevent="sortBy('game_map_id')"
@@ -60,18 +60,18 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="#">{{$npc->name}}
+                                        <a href="#">{{$npc->real_name}}
                                         </a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
                                             <a href="{{route('npcs.show', [
                                                 'npc' => $npc->id
-                                            ])}}">{{$npc->name}}</a>
+                                            ])}}">{{$npc->real_name}}</a>
                                         @else
                                             @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
-                                                <a href="#">{{$npc->name}}</a>
+                                                <a href="#">{{$npc->real_name}}</a>
                                             @else
-                                                <a href="#">{{$npc->name}}</a>
+                                                <a href="#">{{$npc->real_name}}</a>
                                             @endif
                                         @endif
                                     @endguest

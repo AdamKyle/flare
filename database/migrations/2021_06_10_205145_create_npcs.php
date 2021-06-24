@@ -19,6 +19,7 @@ class CreateNpcs extends Migration
             $table->foreign('game_map_id')
                   ->references('id')->on('game_maps');
             $table->string('name')->unique();
+            $table->string('real_name');
             $table->integer('type');
             $table->boolean('moves_around_map')->default(false);
             $table->boolean('must_be_at_same_location')->default(false);

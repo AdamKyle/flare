@@ -1,34 +1,37 @@
 <?php
 
-namespace App\Flare\Values;
+namespace App\Game\Skills\Values;
 
-class NpcCommandTypes
-{
+class SkillTypeValue {
 
     /**
      * @var string $value
      */
     private $value;
 
-    const QUEST = 0;
+    const TRAINING   = 0;
 
-    const TAKE_KINGDOM = 1;
+    const CRAFTING   = 1;
 
-    const CONJURE = 2;
+    const ENCHANTING = 2;
+
+    const DISENCHANTING = 3;
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::QUEST => 0,
-        self::TAKE_KINGDOM => 1,
-        Self::CONJURE => 2,
+        self::TRAINING      => 0,
+        self::CRAFTING      => 1,
+        self::ENCHANTING    => 2,
+        self::DISENCHANTING => 3,
     ];
 
     protected static $namedValues = [
-        0 => 'Quest',
-        1 => 'Take Kingdom',
-        2 => 'Conjure',
+        0 => 'Training',
+        1 => 'Crafting',
+        2 => 'Enchanting',
+        3 => 'Disenchanting',
     ];
 
     /**
@@ -49,38 +52,39 @@ class NpcCommandTypes
     }
 
     /**
-     * Are we a quest?
+     * is training.
      *
      * @return bool
      */
-    public function isQuest(): bool {
-        return $this->value === self::QUEST;
+    public function isTraining(): bool {
+        return $this->value === self::TRAINING;
     }
 
     /**
-     * Are we a take kingdom?
+     * is crafting
      *
      * @return bool
      */
-    public function isTakeKingdom(): bool {
-        return $this->value === self::TAKE_KINGDOM;
+    public function isCrafting(): bool {
+        return $this->value === self::CRAFTING;
     }
 
     /**
-     * Are we a conjure?
+     * is enchanting
+     *
      * @return bool
      */
-    public function isConjure(): bool {
-        return $this->value === self::CONJURE;
+    public function isEnchanting(): bool {
+        return $this->value === self::ENCHANTING;
     }
 
     /**
-     * Get all the named values.
+     * is  disenchanting
      *
-     * @return string[]
+     * @return bool
      */
-    public static function getNamedValues(): array {
-        return self::$namedValues;
+    public function isDisenchanting(): bool {
+        return $this->value === self::DISENCHANTING;
     }
 
     /**

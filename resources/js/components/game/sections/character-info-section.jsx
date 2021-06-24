@@ -104,6 +104,21 @@ export default class CharacterInfoTopSection extends React.Component {
             </dl>
           </Col>
         </Row>
+        <hr />
+        <Row>
+          <Col md={12} lg={12} xl={6}>
+            <dl>
+              <dt><strong>Gold Dust:</strong></dt>
+              <dd>{sheet.gold_dust}</dd>
+            </dl>
+          </Col>
+          <Col md={12} lg={12} xl={6}>
+            <dl>
+              <dt><strong>Shards:</strong></dt>
+              <dd>{sheet.shards}</dd>
+            </dl>
+          </Col>
+        </Row>
         <hr/>
         <Row>
           <Col md={12} lg={12} xl={2}>

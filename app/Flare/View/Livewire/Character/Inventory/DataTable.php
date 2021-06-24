@@ -35,6 +35,8 @@ class DataTable extends Component
 
     public $allowMassDestroy         = false;
 
+    public $totalGoldDust            = 0;
+
     public $character;
 
     public function getDataQueryProperty() {
@@ -90,14 +92,49 @@ class DataTable extends Component
         return $this->data;
     }
 
-    public function destroyAllItems() {
-        $this->character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped && $slot->item->type !== 'quest') {
-                $slot->delete();
-            }
-        });
+    public function destroyAllItems(string $type = null) {
+        if ($type === 'disenchant') {
+            $this->character->inventory->slots->filter(function($slot) {
+                if (!$slot->equipped && $slot->item->type !== 'quest') {
+                    if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
+                        $goldDust = rand(1, 150);
+
+                        $this->character->update([
+                            'gold_dust' => $this->character->gold_dust + $goldDust,
+                        ]);
+
+                        $this->character = $this->character->refresh();
+                        $this->totalGoldDust += $goldDust;
+                    }
+
+                    $slot->delete();
+                }
+            });
+        } else {
+            $this->character->inventory->slots->filter(function($slot) {
+                if (!$slot->equipped && $slot->item->type !== 'quest') {
+                    if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
+                        $goldDust = rand(1, 25);
+
+
+                        $this->character->update([
+                            'gold_dust' => $this->character->gold_dust + $goldDust,
+                        ]);
+
+                        $this->character = $this->character->refresh();
+                        $this->totalGoldDust += $goldDust;
+                    }
+
+                    $slot->delete();
+                }
+            });
+        }
 
         $this->resetSelect();
+
+        session()->flash('success', 'You gained: '.$this->totalGoldDust.' Gold Dust from all items destroyed.');
+
+        return redirect()->to(route('game.character.sheet'));
     }
 
     public function render()

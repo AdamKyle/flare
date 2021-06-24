@@ -53,6 +53,10 @@
                 <dl>
                     <dt>Total gold:</dt>
                     <dd>{{number_format($character->gold)}}</dd>
+                    <dt>Total gold dust:</dt>
+                    <dd>{{number_format($character->gold_dust)}}</dd>
+                    <dt>Total shards:</dt>
+                    <dd>{{number_format($character->shards)}}</dd>
                     <dt>Used / Max inventory space:</dt>
                     <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
                     <dt>Stat to focus on for max damage:</dt>
@@ -67,9 +71,10 @@
                 <x-tabs.tab-content>
                     <x-tabs.tab-content-section tab="inventory" active="true">
                         <div class="alert alert-info mb-2 mt-2">
-                            You can click on item names to learn more about the item. Quest items are used automatically.
+                            <p>You can click on item names to learn more about the item. Quest items are used automatically.
                             For example, Books give xp bonuses and skill bonuses to specific skill automatically and other items such as Flask of Fresh Air
-                            lets you walk on water. Check the effects section of thequest item to see what it effects if it is not a book.
+                            lets you walk on water. Check the effects section of the quest item to see what it effects if it is not a book.<p>
+                            <p>Destroying enchanted item will yield between 1-25 gold dust per item. Clicking disenchant will yield between 1-150 gold dust per item.</p>
                         </div>
                         @livewire('character.inventory.data-table', [
                             'includeQuestItems'        => true,

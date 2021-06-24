@@ -12,6 +12,7 @@ class Details extends Component {
 
     protected $rules = [
         'npc.name'                     => 'required',
+        'npc.real_name'                => 'required',
         'npc.type'                     => 'required',
         'npc.text_command_to_message'  => 'required',
         'npc.game_map_id'              => 'required',
@@ -41,7 +42,8 @@ class Details extends Component {
     public $coordinates = [];
 
     public function validateInput(string $functionName, int $index) {
-        $this->npc->name = str_replace(' ', '', $this->npc->name);
+        $this->npc->real_name = $this->npc->name;
+        $this->npc->name      = str_replace(' ', '', $this->npc->name);
 
         $this->npc->text_command_to_message = '/m ' . $this->npc->name . ':';
 

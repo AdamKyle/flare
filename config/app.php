@@ -261,6 +261,7 @@ return [
          */
         'KingdomLogStatus' => \App\Flare\Values\Wrappers\KingdomLogStatusHelper::class,
         'NpcCommandType'   => \App\Flare\Values\Wrappers\NpcCommandTypeHelper::class,
+        'ItemEffects'      => \App\Flare\Values\Wrappers\ItemEffectsHelper::class,
         'GameVersion'      => \App\Flare\Values\GameVersionHelper::class,
     ],
 

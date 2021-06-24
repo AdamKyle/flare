@@ -27,6 +27,30 @@
                 </div>
             </div>
         </div>
+        @if ($item->type == 'quest')
+            @if (!is_null($item->effect))
+                @php
+                    $effects = 'N/A';
+
+                    $effect = ItemEffects::effects($item->effect);
+
+                    if ($effect->walkOnWater()) {
+                        $effects = 'Lets you walk on water';
+                    }
+
+                    if ($effect->labyrinth()) {
+                        $effects = 'Lets you use Traverse (beside movement actions) to traverse to Labyrinth plane';
+                    }
+                @endphp
+                <p>This item lets you: {{$effect}}</p>
+            @endif
+            <div class="alert alert-info">
+                <p>
+                    Quest items, like this one are used automatically. For example if the quest item gives bonuses to a crafting skill or enchanting, then the skill bonus and xp
+                    will be applied upon crafting or enchanting. If its an item, like Flask of Fresh Air for example - then it gets used when you attempt to walk on water for the first time.
+                </p>
+            </div>
+        @endif
         @if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix))
             <hr />
             <div class="row">
