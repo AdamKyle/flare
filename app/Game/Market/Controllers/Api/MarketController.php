@@ -39,9 +39,7 @@ class MarketController extends Controller {
         $this->transformer = $transformer;
     }
 
-    public function marketItems(ChangeItemTypeRequest $request,) {
-        $items = null;
-
+    public function marketItems(ChangeItemTypeRequest $request) {
         if ($request->has('item_id')) {
             $items = MarketBoard::join('items', function($join) use($request) {
                 return $join->on('market_board.item_id', '=', 'items.id')
@@ -68,7 +66,7 @@ class MarketController extends Controller {
         ], 200);
     }
 
-    public function fetchItemDetails(Item $item, ItemTransfromer $itemTransfromer) {
+    public function listingDetails(Item $item, ItemTransfromer $itemTransfromer) {
 
         $item = new FractalItem($item, $itemTransfromer);
         $item = $this->manager->createData($item)->toArray();
@@ -119,7 +117,6 @@ class MarketController extends Controller {
     }
 
     public function history(HistoryRequest $request) {
-
         if ($request->has('type')) {
             return response()->json([
                 'labels' => MarketHistory::where('market_history.created_at', '>=', Carbon::today()->subDays(30))->join('items', function($join) use($request) {
@@ -182,7 +179,7 @@ class MarketController extends Controller {
         $totalPrice = ($listing->listed_price * 1.05);
 
         if (!($character->gold > $totalPrice)) {
-            return response()->json(['message' => 'You don\'t have the gold to puchase this item.'], 422);
+            return response()->json(['message' => 'You don\'t have the gold to purchase this item.'], 422);
         }
 
         $character->update([

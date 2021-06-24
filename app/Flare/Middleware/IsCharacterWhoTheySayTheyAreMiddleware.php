@@ -23,6 +23,7 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
                 'game.equip.item',
                 'game.inventory.unequip',
                 'skill.character.info',
+                'api.market.history'
             ];
 
             if (in_array($request->route()->getName(), $letAdminThrough)) {
