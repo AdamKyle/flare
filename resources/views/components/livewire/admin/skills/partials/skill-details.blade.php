@@ -23,10 +23,22 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-6">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="monster-can-have-skill" wire:model="skill.can_monsters_have_skill">
                 <label class="form-check-label" for="monster-can-have-skill">Can monsters have this skill?</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="skill_type">Game Map: </label>
+                <select wire:model="skill.type" class="form-control" id="skill_type">
+                    <option>Please select</option>
+                    @foreach($skillTypes as $type => $name)
+                        <option value="{{$type}}">{{$name}}</option>
+                    @endforeach
+                </select>
+                @error('skill.type') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

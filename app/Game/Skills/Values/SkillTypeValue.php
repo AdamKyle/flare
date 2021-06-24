@@ -45,7 +45,7 @@ class SkillTypeValue {
         self::EFFECTS_UNIT_MOVEMENT_TIMER     => 9
     ];
 
-    protected static $namedValues = [
+    public static $namedValues = [
         0 => 'Training',
         1 => 'Crafting',
         2 => 'Enchanting',

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GameSkill;
 
@@ -33,6 +34,7 @@ class GameSkillFactory extends Factory
             'specifically_assigned'              => false,
             'can_train'                          => true,
             'skill_bonus_per_level'              => 0.01,
+            'type'                               => SkillTypeValue::TRAINING,
         ];
     }
 }

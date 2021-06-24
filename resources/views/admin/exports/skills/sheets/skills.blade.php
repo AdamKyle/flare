@@ -2,6 +2,7 @@
     <thead>
     <tr>
         <th>name</th>
+        <th>type</th>
         <th>description</th>
         <th>max_level</th>
         <th>base_damage_mod_bonus_per_level</th>
@@ -19,6 +20,7 @@
     @foreach($skills as $skill)
         <tr>
             <td>{{$skill->name}}</td>
+            <td>{{$skill->type}}</td>
             <td>{{$skill->description}}</td>
             <td>{{$skill->max_level}}</td>
             <td>{{$skill->base_damage_mod_bonus_per_level}}</td>
