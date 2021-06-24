@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Adventures;
 
+use App\Flare\Models\Character;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\Adventure;
@@ -25,8 +26,8 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function mount() {
-        $this->canTest        = User::where('is_test', true)->get()->isNotEmpty() && !Cache::has('processing-adventure');
-        $this->testCharacters = User::with('character')->where('is_test', true)->get();
+        $this->canTest        = Character::whereNull('character_id')->get()->isNotEmpty() && !Cache::has('processing-adventure');
+        $this->testCharacters = Character::whereNull('character_id')->get();
     }
 
     public function render()

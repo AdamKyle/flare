@@ -12,6 +12,7 @@ import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
+import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -38,6 +39,7 @@ export default class Game extends React.Component {
       openKingdomModal: false,
       openKingdomAttackModal: false,
       openTimeOutModal: false,
+      npcComponentName: null,
       characterId: null,
       canAdventureAgainAt: null,
       canAttack: true,
@@ -66,7 +68,7 @@ export default class Game extends React.Component {
     });
 
     this.npcComponent.listen('Flare.Events.NpcComponentShowEvent', (event) => {
-      console.log(event);
+      this.openNpcComponent(event.componentName);
     });
   }
 
@@ -243,6 +245,18 @@ export default class Game extends React.Component {
     }
   }
 
+  openNpcComponent(component) {
+    this.setState({
+      npcComponentName: component
+    });
+  }
+
+  closeNpcComponent() {
+    this.setState({
+      npcComponentName: null,
+    });
+  }
+
   render() {
     return (
       <>
@@ -311,6 +325,11 @@ export default class Game extends React.Component {
                   characterId={this.state.characterId}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
+                : null
+            }
+            {
+              this.state.npcComponentName !== null ?
+                <NpcComponentWrapper npcComponentName={this.state.npcComponentName} close={this.closeNpcComponent.bind(this)} />
                 : null
             }
           </Col>

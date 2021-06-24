@@ -47,6 +47,8 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'chr_modded'        => number_format(round($characterInformation->statMod('chr'))),
             'int_modded'        => number_format(round($characterInformation->statMod('int'))),
             'gold'              => number_format($character->gold),
+            'gold_dust'         => number_format($character->gold_dust),
+            'shards'            => number_format($character->shards),
             'force_name_change' => $character->force_name_change,
             'timeout_until'     => $character->user->timeout_until,
         ];

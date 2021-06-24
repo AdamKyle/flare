@@ -130,10 +130,12 @@ class InventoryManagement {
      * @param Item $item
      * @return InventoryManagement
      */
-    public function giveItem(Item $item): InventoryManagement {
+    public function giveItem(Item $item, bool $equip = false, string $position = null): InventoryManagement {
         $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
+            'equipped'     => $equip,
+            'position'     => $position,
         ]);
 
         $this->character = $this->character->refresh();

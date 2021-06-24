@@ -39,7 +39,7 @@ class NpcCommandTypes
      * @param string $value
      * @throws \Exception
      */
-    public function __construct(string $value)
+    public function __construct(int $value)
     {
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');
@@ -54,7 +54,7 @@ class NpcCommandTypes
      * @return bool
      */
     public function isQuest(): bool {
-        return $this->value = self::QUEST;
+        return $this->value === self::QUEST;
     }
 
     /**
@@ -63,7 +63,7 @@ class NpcCommandTypes
      * @return bool
      */
     public function isTakeKingdom(): bool {
-        return $this->value = self::TAKE_KINGDOM;
+        return $this->value === self::TAKE_KINGDOM;
     }
 
     /**
@@ -71,7 +71,7 @@ class NpcCommandTypes
      * @return bool
      */
     public function isConjure(): bool {
-        return $this->value = self::CONJURE;
+        return $this->value === self::CONJURE;
     }
 
     /**

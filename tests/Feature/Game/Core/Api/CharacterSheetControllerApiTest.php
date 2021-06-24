@@ -164,4 +164,16 @@ class CharacterSheetControllerApiTest extends TestCase {
         $this->assertEquals($character->y_position, $content->y_position);
         $this->assertEquals($character->gold, $content->gold);
     }
+
+    public function testGlobalTimeOut() {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->json('POST', '/api/character-timeout')
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertNotNull($this->character->getUser()->timeout_until);
+    }
 }
