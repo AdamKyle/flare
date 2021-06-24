@@ -24,6 +24,7 @@ class NpcFactory extends Factory
     {
         return [
             'name'                        => 'SampleNpc',
+            'real_name'                   => 'Sample NPC',
             'type'                        => NpcTypes::KINGDOM_HOLDER,
             'game_map_id'                 => 1,
             'moves_around_map'            => false,
