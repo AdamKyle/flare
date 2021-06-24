@@ -2,7 +2,6 @@
     <li>
         <a href="{{route('game')}}" aria-expanded="false"><i class="fas fa-gamepad"></i><span class="hide-menu ml-2">Game</span></a>
     </li>
-    <li class="nav-devider"></li>
     <li class="nav-small-cap">Character Management</li>
     <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character</span></a>
@@ -10,7 +9,6 @@
             <li><a href="{{route('game.character.sheet')}}">Character Sheet</a></li>
         </ul>
     </li>
-    <li class="nav-devider"></li>
     <li class="nav-small-cap">Manage Kingdoms</li>
     <li>
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-guarded-tower"></i><span class="hide-menu">Kingdoms</span></a>
@@ -19,12 +17,10 @@
             <li><a href="{{route('game.kingdom.unit-movement', ['character' => auth()->user()->character->id])}}">Unit Movement</a></li>
         </ul>
     </li>
-    <li class="nav-devider"></li>
     <li class="nav-small-cap">Manage Adventures</li>
     <li id="adventure-menu">
         {{-- The adventure menu is built via a react component. --}}
     </li>
-    <li class="nav-devider"></li>
     <li class="nav-small-cap">Buy/Sell Items</li>
     <li>
         <a class="has-arrow " href="#" aria-expanded="false"><i class="ra ra-anvil"></i><span class="hide-menu">Shop</span></a>

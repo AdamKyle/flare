@@ -66,6 +66,11 @@
                 </x-tabs.pill-tabs-container>
                 <x-tabs.tab-content>
                     <x-tabs.tab-content-section tab="inventory" active="true">
+                        <div class="alert alert-info mb-2 mt-2">
+                            You can click on item names to learn more about the item. Quest items are used automatically.
+                            For example, Books give xp bonuses and skill bonuses to specific skill automatically and other items such as Flask of Fresh Air
+                            lets you walk on water. Check the effects section of thequest item to see what it effects if it is not a book.
+                        </div>
                         @livewire('character.inventory.data-table', [
                             'includeQuestItems'        => true,
                             'allowInventoryManagement' => true,

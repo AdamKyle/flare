@@ -35,13 +35,13 @@ class AttackTimeOutListener
 
     protected function findTimeReductions(Character $character) {
         $skill = $character->skills->filter(function($skill) {
-            return $skill->currently_training && $skill->reduces_time;
+            return $skill->reduces_time;
         })->first();
 
         if (is_null($skill)) {
             return 0;
         }
-        
+
         return $skill->fight_time_out_mod;
     }
 }

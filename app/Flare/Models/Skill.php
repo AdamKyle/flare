@@ -71,7 +71,28 @@ class Skill extends Model
     }
 
     public function getReducesTimeAttribute() {
-        return !is_null($this->baseSkill->fight_time_out_mod_bonus_per_level);
+        if (is_null($this->baseSkill->fight_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (floatval($this->baseSkill->fight_time_out_mod_bonus_per_level) === 0.0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getReducesMovementTimeAttribute() {
+
+        if (is_null($this->baseSkill->move_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (floatval($this->baseSkill->move_time_out_mod_bonus_per_level) === 0.0) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getBaseDamageModAttribute() {

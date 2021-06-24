@@ -201,7 +201,7 @@ class FightService {
             'is_monster' => $attacker instanceof Character ? false : true
         ];
 
-        return $this->attack($defender, $attacker);
+        $this->attack($defender, $attacker);
     }
 
     protected function canHit($attacker, $defender): bool {
@@ -223,26 +223,38 @@ class FightService {
             $dodgeBonus += 1;
         }
 
+        $defenderDex      = $defender->dex;
+        $defenderBaseStat = $defender->{$defender->damage_stat};
+
+        $attackerDex      = $defender->dex;
+        $attackerBaseStat = $defender->{$defender->damage_stat};
+
         if ($defender instanceof  Character) {
-            $dex = $this->characterInformation->statMod('dex');
-            $baseStat = $this->characterInformation->statMod($defender->damage_stat);
-        } else {
-            $dex = $defender->dex;
-            $baseStat = $defender->{$defender->damage_stat};
+            $defenderDex      = $this->characterInformation->statMod('dex');
+            $defenderBaseStat = $this->characterInformation->statMod($defender->damage_stat);
         }
 
-        $attack = $baseStat + round($dex / 2) * $accuracyBonus;
-        $dodge  = $baseStat + round($dex / 2) * $dodgeBonus;
+        if ($attacker instanceof Character) {
+            $attackerDex      = $this->characterInformation->statMod('dex');
+            $attackerBaseStat = $this->characterInformation->statMod($defender->damage_stat);
+        }
+
+        $attack = $attackerBaseStat + round($attackerDex / 2) * $accuracyBonus;
+        $dodge  = $defenderBaseStat + round($defenderDex / 2) * $dodgeBonus;
 
         return $attack > $dodge;
     }
 
     protected function blockedAttack($defender, $attacker): bool {
-        $baseStat = $defender->{$defender->damage_stat};
+        $baseStat = $attacker->{$defender->damage_stat};
         $ac       = $defender->ac;
 
         if ($defender instanceof  Character) {
-            $baseStat = $this->characterInformation->statMod($defender->damage_stat);
+            $ac = $this->characterInformation->buildDefence();
+        }
+
+        if ($attacker instanceof Character) {
+            $baseStat = $this->characterInformation->statMod($attacker->damage_stat);
         }
 
         return $ac > $baseStat;

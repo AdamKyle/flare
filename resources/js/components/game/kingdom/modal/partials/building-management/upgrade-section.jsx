@@ -22,15 +22,15 @@ export default class UpgradeSection extends React.Component {
         <div className="col-md-6">
           <dl>
             <dt><strong>Wood Gain/hr</strong>:</dt>
-            <dd className="text-success">{this.getIncrease('wood')}</dd>
+            <dd className={this.getIncrease('wood') > 0.0 ? "text-success" : ''}>+{this.getIncrease('wood')}</dd>
             <dt><strong>Clay Gain/hr</strong>:</dt>
-            <dd className="text-success">{this.getIncrease('clay')}</dd>
+            <dd className={this.getIncrease('clay') > 0.0 ? "text-success" : ''}>+{this.getIncrease('clay')}</dd>
             <dt><strong>Stone Gain/hr</strong>:</dt>
-            <dd className="text-success">{this.getIncrease('stone')}</dd>
+            <dd className={this.getIncrease('stone') > 0.0 ? "text-success" : ''}>+{this.getIncrease('stone')}</dd>
             <dt><strong>Iron Gain/hr</strong>:</dt>
-            <dd className="text-success">{this.getIncrease('iron')}</dd>
+            <dd className={this.getIncrease('iron') > 0.0 ? "text-success" : ''}>+{this.getIncrease('iron')}</dd>
             <dt><strong>Population Gain/hr</strong>:</dt>
-            <dd className="text-success">{Math.ceil(this.getIncrease('population') / 2)}</dd>
+            <dd className={this.getIncrease('population') > 0.0 ? "text-success" : ''}>+{Math.ceil(this.getIncrease('population') / 2)}</dd>
             {
               this.props.building.is_farm ?
                 <>

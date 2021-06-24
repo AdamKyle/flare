@@ -68,7 +68,7 @@ class AdventureFightServiceTest extends TestCase
     public function testCantBlock() {
 
         $this->character->adventureLogs()->first()->adventure->monsters()->first()->update([
-            'ac' => 500
+            'ac' => 500,
         ]);
 
         $this->character = $this->character->refresh();

@@ -134,6 +134,20 @@ export default class BuildingManagementModal extends React.Component {
       });
   }
 
+  subTitle() {
+    if (this.props.building.is_farm) {
+      return (
+        <span className="text-muted" style={{fontSize: '16px'}}>(increases population by +100 per level)</span>
+      );
+    }
+
+    if (this.props.building.is_resource_building) {
+      return (
+        <span className="text-muted" style={{fontSize: '16px'}}>(increases resource by specified amount)</span>
+      );
+    }
+  }
+
   render() {
     return (
       <Modal
@@ -146,7 +160,7 @@ export default class BuildingManagementModal extends React.Component {
       >
         <Modal.Header closeButton>
           <Modal.Title id="building-management-modal">
-            {this.props.building.name}
+            {this.props.building.name} {this.subTitle()}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -190,19 +204,15 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          {/*<BuildingCostSection*/}
-          {/*  building={this.props.building}*/}
-          {/*  canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}*/}
-          {/*/>*/}
-
           { this.props.building.level >= this.props.building.max_level ?
             <div className="alert alert-success mt-5">
               This building is already max level and cannot upgrade any further.
             </div>
-          : <BuildingCostSection
-              building={this.props.building}
-              canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
-            />}
+          : <>
+              <h5 className="mt-1">Gain Upon Upgrading</h5>
+              <hr/>
+              <UpgradeSection building={this.props.building}/>
+            </>}
 
           {!this.isCurrentlyInQueue() ?
             <div className="alert alert-warning mb-2 mt-2">
@@ -216,9 +226,16 @@ export default class BuildingManagementModal extends React.Component {
               : !this.buildingNeedsToBeRebuilt() && !(this.props.building.level >= this.props.building.max_level) ?
                 <>
                   <hr/>
-                  <h5 className="mt-1">Gain Upon Upgrading</h5>
+                  <h5 className="mt-1">Cost to upgrade</h5>
                   <hr/>
-                  <UpgradeSection building={this.props.building}/>
+                  <div className="mt-2 mb-2 alert alert-info">
+                    You can click and drag the title to move the modal and make sure you have the resources before
+                    attempting to upgrade.
+                  </div>
+                  <BuildingCostSection
+                    building={this.props.building}
+                    canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
+                  />
                 </>
                   : !(this.props.building.level >= this.props.building.max_level) ?
                 <div className="alert alert-info mt-5">
