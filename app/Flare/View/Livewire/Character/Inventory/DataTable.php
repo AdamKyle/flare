@@ -105,9 +105,9 @@ class DataTable extends Component
 
                         $this->character = $this->character->refresh();
                         $this->totalGoldDust += $goldDust;
-                    }
 
-                    $slot->delete();
+                        $slot->delete();
+                    }
                 }
             });
         } else {
@@ -123,6 +123,9 @@ class DataTable extends Component
 
                         $this->character = $this->character->refresh();
                         $this->totalGoldDust += $goldDust;
+
+
+                        $slot->delete();
                     }
 
                     $slot->delete();

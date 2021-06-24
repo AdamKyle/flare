@@ -24,6 +24,7 @@
 
                     @if ($allowMassDestroy && ($pageSelected || $selected))
                         <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
+                        <button type="button" wire:click="destroyAllItems('disenchant')" class="btn btn-primary btn-sm ml-2">Disenchant</button>
                     @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />
