@@ -29,23 +29,21 @@
                         <dl>
                             <dt>Max Level:</dt>
                             <dd>{{$skill->max_level}}</dd>
-                            <dt>Base Damage Mod:</dt>
-                            <dd>{{$skill->base_damage_mod_bonus_per_level * 100}}%</dd>
-                            <dt>Base Ac Mod:</dt>
-                            <dd>{{$skill->base_ac_mod_bonus_per_level * 100}}%</dd>
-                            <dt>Base Healing Mod:</dt>
-                            <dd>{{$skill->base_healing_mod_bonus_per_level * 100}}%</dd>
-                            <dt>Fight Timeout Mod:</dt>
-                            <dd>{{$skill->fight_time_out_mod_bonus_per_level * 100}}%</dd>
-                            <dt>Move Timeout Mod:</dt>
-                            <dd>{{$skill->move_time_out_mod_bonus_per_level * 100}}%</dd>
-                            <dt>Skill Bonus/lv</dt>
-                            <dd>{{$skill->skill_bonus_per_level * 100}}%</dd>
-                            <dt>Final Bonus At Max Level:</dt>
+                            <dt>Base Damage Mod At Max Level:</dt>
+                            <dd>{{($skill->base_damage_mod_bonus_per_level * 999) * 100}}%</dd>
+                            <dt>Base Ac Mod At Max Level:</dt>
+                            <dd>{{($skill->base_ac_mod_bonus_per_level * 999) * 100}}%</dd>
+                            <dt>Base Healing Mod At Max Level:</dt>
+                            <dd>{{($skill->base_healing_mod_bonus_per_level * 999) * 100}}%</dd>
+                            <dt>Fight Timeout Mod At Max Level:</dt>
+                            <dd>{{($skill->fight_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
+                            <dt>Move Timeout Mod At Max Level:</dt>
+                            <dd>{{($skill->move_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
+                            <dt>Skill Bonus Bonus At Max Level:</dt>
                             @if ($skill->can_train)
-                                <dd>{{($skill->skill_bonus_per_level * 99) * 100}}% (Bonuses from equipment can make this higher)</dd>
+                                <dd>{{($skill->skill_bonus_per_level * 999) * 100}}% (Bonuses from equipment can make this higher)</dd>
                             @else
-                                <dd>{{($skill->skill_bonus_per_level * 399) * 100}}% (Bonuses from equipment can make this higher)</dd>
+                                <dd>{{($skill->skill_bonus_per_level * 400) * 100}}% (Bonuses from equipment can make this higher)</dd>
                             @endif
                         </dl>
                         @guest

@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Admin\Exports\Affixes\Sheets;
-
+namespace App\Admin\Exports\Skills\Sheets;
 
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use App\Flare\Models\ItemAffix;
+use App\Flare\Models\GameSkill;
 
-class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
+class SkillsSheet implements FromView, WithTitle, ShouldAutoSize {
 
     /**
      * @return View
      */
     public function view(): View {
-        return view('admin.exports.affixes.sheets.affixes', [
-            'affixes' => ItemAffix::orderBy('skill_level_required', 'asc')->get(),
+        return view('admin.exports.skills.sheets.skills', [
+            'skills' => GameSkill::all(),
         ]);
     }
 
@@ -24,6 +23,6 @@ class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
      * @return string
      */
     public function title(): string {
-        return 'Affixes';
+        return 'Game Skills';
     }
 }

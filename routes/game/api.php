@@ -10,7 +10,5 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::get('/notifications', ['uses' => 'Api\NotificationsController@index']);
     Route::post('/notifications/clear', ['uses' => 'Api\NotificationsController@clear']);
     Route::post('/notifications/{notification}/clear', ['uses' => 'Api\NotificationsController@clearNotification']);
-
-
     Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);
 });

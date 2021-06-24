@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Admin\Skills;
 
+use App\Flare\Models\GameSkill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateUser;
@@ -56,5 +58,21 @@ class SkillsControllerTest extends TestCase
         $this->actingAs($this->user)->visit(route('skill.edit', [
             'skill' => $this->gameSkill->id,
         ]))->see('Edit skill: ' . $this->gameSkill->name);
+    }
+
+    public function testCanSeeExportSkills() {
+        $this->actingAs($this->user)->visit(route('skills.export'))->see('Export');
+    }
+
+    public function testCanSeeImportPage() {
+        $this->actingAs($this->user)->visit(route('skills.import'))->see('Import Skills Data');
+    }
+
+    public function testCanImportSkills() {
+        $this->actingAs($this->user)->post(route('skills.import-data', [
+            'skills_import' => new UploadedFile(resource_path('data-imports/skills.xlsx'), 'skills.xlsx')
+        ]));
+
+        $this->assertTrue(GameSkill::all()->isNotEmpty());
     }
 }
