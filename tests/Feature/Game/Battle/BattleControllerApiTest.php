@@ -113,7 +113,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
         $this->assertEquals($character->name, $content->character->name);
-        $this->assertEquals(7, $content->character->attack);
+        $this->assertEquals(1, $content->character->attack);
     }
 
     public function testCanGetActionsWithSkills() {
@@ -133,7 +133,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertNotEmpty($content->monsters);
         $this->assertNotEmpty($content->monsters[0]->skills);
         $this->assertEquals($character->name, $content->character->name);
-        $this->assertEquals(7, $content->character->attack);
+        $this->assertEquals(1, $content->character->attack);
     }
 
     public function testWhenNotLoggedInCannotGetActions() {

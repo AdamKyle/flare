@@ -96,34 +96,29 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="ac">Armour Class: </label>
                 <input type="number" class="form-control" name="ac" value="" wire:model="monster.ac">
                 @error('monster.ac') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="exp">XP Reward: </label>
                 <input type="number" class="form-control" name="exp" value="" wire:model="monster.xp">
                 @error('monster.xp') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="gold">Gold Reward: </label>
                 <input type="number" class="form-control" name="gold" value="" wire:model="monster.gold">
                 @error('monster.gold') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="form-group form-check-inline">
-                <input type="checkbox" class="form-check-input" id="monster-is-celestial" wire:model="monster.is_celestial_entity">
-                <label class="form-check-label" for="monster-is-celestial">Is Monster a Celstial?</label>
-            </div>
-        </div>
     </div>
+    <hr />
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
@@ -136,6 +131,81 @@
                 </select>
                 @error('monster.game_map_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="{{$monster->is_celestial_entity ? 'col-md-3' : 'col-md-12'}}">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="monster-is-celestial" wire:model="monster.is_celestial_entity">
+                <label class="form-check-label" for="monster-is-celestial">Is Monster a Celestial?</label>
+            </div>
+        </div>
+        <div class="{{$monster->is_celestial_entity ? 'col-md-3' : 'hide'}}">
+            <div class="form-group">
+                <label for="gold_cost">Gold Cost: </label>
+                <input type="number" class="form-control" name="gold_cost" value="" wire:model="monster.gold_cost">
+                @error('monster.gold_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="{{$monster->is_celestial_entity ? 'col-md-3' : 'hide'}}">
+            <div class="form-group">
+                <label for="gold_dust_cost">Gold Dust Cost: </label>
+                <input type="number" class="form-control" name="gold_dust_cost" value="" wire:model="monster.gold_dust_cost">
+                @error('monster.gold_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="{{$monster->is_celestial_entity ? 'col-md-3' : 'hide'}}">
+            <div class="form-group">
+                <label for="shards">Shard Reward: </label>
+                <input type="number" class="form-control" name="shards" value="" wire:model="monster.shards">
+                @error('monster.gold_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="{{$monster->can_cast ? 'col-md-6' : 'col-md-12'}}">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="can_cast" wire:model="monster.can_cast">
+                <label class="form-check-label" for="can_cast">Can Cast?</label>
+            </div>
+        </div>
+        <div class="{{$monster->can_cast ? 'col-md-6' : 'hide'}}">
+            <div class="form-group">
+                <label for="max_spell_damage">Max Cast Amount: </label>
+                <input type="number" class="form-control" name="max_spell_damage" value="" wire:model="monster.max_spell_damage">
+                @error('monster.gold_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="{{$monster->can_use_artifacts ? 'col-md-6' : 'col-md-12'}}">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="can_use_artifacts" wire:model="monster.can_use_artifacts">
+                <label class="form-check-label" for="can_use_artifacts">Can Use Artifacts?</label>
+            </div>
+        </div>
+        <div class="{{$monster->can_use_artifacts ? 'col-md-6' : 'hide'}}">
+            <div class="form-group">
+                <label for="max_artifact_damage">Max Artifact Damage Amount: </label>
+                <input type="number" class="form-control" name="max_artifact_damage" value="" wire:model="monster.max_artifact_damage">
+                @error('monster.max_artifact_damage') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <label for="spell_evasion">Spell Evasion Percentage: </label>
+            <input type="number" class="form-control" name="spell_evasion" value="" wire:model="monster.spell_evasion">
+            @error('monster.spell_evasion') <span class="text-danger">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-6">
+            <label for="artifact_annulment">Artifact Annulment Percentage: </label>
+            <input type="number" class="form-control" name="artifact_annulment" value="" wire:model="monster.artifact_annulment">
+            @error('monster.artifact_annulment') <span class="text-danger">{{ $message }}</span> @enderror
         </div>
     </div>
 </div>

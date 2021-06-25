@@ -30,6 +30,15 @@ class Stats extends Component
         'monster.drop_check'          => 'required',
         'monster.game_map_id'         => 'required',
         'monster.is_celestial_entity' => 'nullable',
+        'monster.can_cast'            => 'nullable',
+        'monster.gold_cost'           => 'nullable',
+        'monster.gold_dust_cost'      => 'nullable',
+        'monster.can_use_artifacts'   => 'nullable',
+        'monster.max_spell_damage'    => 'nullable',
+        'monster.max_artifact_damage' => 'nullable',
+        'monster.shards'              => 'nullable',
+        'monster.spell_evasion'       => 'nullable',
+        'monster.artifact_annulment'  => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];
@@ -54,6 +63,21 @@ class Stats extends Component
 
         if (is_null($this->monster->is_celestial_entity)) {
             $this->monster->is_celestial_entity = false;
+            $this->monster->gold_cost = 0;
+            $this->monster->gold_dust_cost = 0;
+            $this->monster->shards = 0;
+        }
+
+        if (is_null($this->monster->can_cast)) {
+            $this->monster->can_cast = false;
+
+            $this->monster->max_spell_damage = 0;
+        }
+
+        if (is_null($this->monster->can_use_artifacts)) {
+            $this->monster->can_use_artifacts = false;
+
+            $this->monster->max_artifact_damage = 0;
         }
 
         $this->monster->save();
@@ -62,7 +86,7 @@ class Stats extends Component
             $skills = [];
 
             // Get skills:
-            foreach(GameSkill::where('specifically_assigned', false)->get() as $skill) {
+            foreach(GameSkill::all() as $skill) {
                 if ($skill->can_train && $skill->can_monsters_have_skill) {
                     $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $skill);
                 }
