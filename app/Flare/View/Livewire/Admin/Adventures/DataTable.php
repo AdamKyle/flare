@@ -26,8 +26,8 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function mount() {
-        $this->canTest        = Character::whereNull('character_id')->get()->isNotEmpty() && !Cache::has('processing-adventure');
-        $this->testCharacters = Character::whereNull('character_id')->get();
+        $this->canTest        = Character::whereNull('user_id')->get()->isNotEmpty() && !Cache::has('processing-adventure');
+        $this->testCharacters = Character::whereNull('user_id')->get();
     }
 
     public function render()

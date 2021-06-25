@@ -12,12 +12,12 @@ trait SkillCheck {
      * @param Skill $skill
      * @param int $dcIncrease | 0
      */
-    public function getDCCheck(Skill $skill, int $dcIncrease = 0): int {
+    public function getDCCheck(Skill $skill, int $dcIncrease = 0, int $maxRoll = 400): int {
 
-        $dcCheck = (rand(1, 400) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
+        $dcCheck = (rand(1, $maxRoll) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
 
-        if ($dcCheck > 400) {
-            return 399;
+        if ($dcCheck > $maxRoll) {
+            return $maxRoll;
         } else if ($dcCheck <= 0) {
             return 1;
         }
@@ -31,7 +31,7 @@ trait SkillCheck {
      * @param Skill $skill
      * @return mixed
      */
-    public function characterRoll(Skill $skill) {
-        return (rand(1, 400) * (1 + $skill->skill_bonus));
+    public function characterRoll(Skill $skill, int $maxRoll = 400) {
+        return (rand(1, $maxRoll) * (1 + $skill->skill_bonus));
     }
 }

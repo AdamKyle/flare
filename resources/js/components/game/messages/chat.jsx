@@ -105,6 +105,7 @@ export default class Chat extends React.Component {
         is_npc: event.npc,
         isLink: event.isLink,
         link: event.link,
+        event_id: event.id,
       };
 
       messages.unshift(message);
@@ -194,7 +195,10 @@ export default class Chat extends React.Component {
           if (message.isLink) {
             elements.push(
               <li key={message.id + '_server-message_link'}>
-                <div className="server-message"><a href={message.link} target="_blank">{message.message}</a></div>
+                <div className="server-message">
+                  <a href={message.link} target="_blank">{message.message}</a>
+                  <a href="#" className="ml-1" onClick={() => this.destroy(message.event_id)}>Destroy</a> or <a href="#" onClick={() => this.disenchant(message.event_id)}>Disenchant</a>.
+                </div>
               </li>
             )
           } else {
@@ -344,6 +348,30 @@ export default class Chat extends React.Component {
 
         if (response.status === 401) {
           location.reload();
+        }
+      }
+    });
+  }
+
+  disenchant(itemId) {
+    axios.post('/api/disenchant/' + itemId).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+           return location.reload;
+        }
+      }
+    });
+  }
+
+  destroy(itemId) {
+    axios.post('/api/destroy/' + itemId).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload;
         }
       }
     });

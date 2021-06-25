@@ -25,6 +25,16 @@ class ServerMessageEvent
     public $user;
 
     /**
+     * @var string|null $link
+     */
+    public $link;
+
+    /**
+     * @var int|null $id
+     */
+    public $id;
+
+    /**
      * @var mixed $forMessage
      */
     public $forMessage;
@@ -32,16 +42,18 @@ class ServerMessageEvent
     /**
      * Create a new event instance.
      *
-     * @param  User $user
+     * @param User $user
      * @param string $type
      * @param mixed $forMessage | null
-     * @return void
+     * @param string|null $link
+     * @param int|null $id
      */
-    public function __construct(User $user, string $type, $forMessage = null, $link = null)
+    public function __construct(User $user, string $type, $forMessage = null, string $link = null, int $id = null)
     {
         $this->type        = $type;
         $this->user        = $user;
         $this->forMessage  = $forMessage;
         $this->link        = $link;
+        $this->id          = $id;
     }
 }
