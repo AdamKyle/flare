@@ -40,12 +40,20 @@ class CreateMap extends Command
      */
     public function handle()
     {
+        // Labyrinth:
+        // $land = new Color(99, 70, 8);
+
         // Dungeon:
-        $land  = new Color(99, 70, 8);
+        $land = new Color(94, 74, 73);
 
         // Surface:
-        $water = new Color(66, 129, 178);
         // $land  = new Color(23, 132, 72);
+
+        // Surface & Labyrinth:
+        // $water = new Color(66, 129, 178);
+
+        // Dungeon:
+        $water = new Color(162, 219, 118);
 
         ini_set('memory_limit','3G');
 

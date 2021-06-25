@@ -49,7 +49,7 @@ class MapBuilder {
 
     /**
      * Constructor
-     * 
+     *
      * @param MapSettings $mapSettings
      * @param ImageBuilder $imageBuilder
      * @return void
@@ -61,7 +61,7 @@ class MapBuilder {
 
     /**
      * Sets the land color
-     * 
+     *
      * @param StructColor $land | null
      * @return MapBuilder
      */
@@ -73,7 +73,7 @@ class MapBuilder {
 
     /**
      * Sets the water color
-     * 
+     *
      * @param StructColor $water | null
      * @return MapBuilder
      */
@@ -85,7 +85,7 @@ class MapBuilder {
 
     /**
      * Sets the height of the map.
-     * 
+     *
      * @param int $height | 500
      * @return MapBuilder
      */
@@ -97,7 +97,7 @@ class MapBuilder {
 
     /**
      * Sets the width of the map.
-     * 
+     *
      * @param int $width | 500
      * @return MapBuilder
      */
@@ -109,7 +109,7 @@ class MapBuilder {
 
     /**
      * Sets the map seed
-     * 
+     *
      * @param string $seed | '123'
      * @return MapBuilder
      */
@@ -121,11 +121,11 @@ class MapBuilder {
 
     /**
      * Builds the maps and stores it.
-     * 
+     *
      * Based on the settings this will build the map using the set colors
      * and dimensions, store it as a jpeg image in the public directory using the $mapName
      * as the file name.
-     * 
+     *
      * @param string $mapName
      * @return void
      */
@@ -142,6 +142,6 @@ class MapBuilder {
 
         $image = ImageUtility::createImage($map);
 
-        $this->imageBuilder->buildAndStoreImage($image, 'public', $mapName);
+        $this->imageBuilder->buildAndStoreImage($image, $mapName);
     }
 }
