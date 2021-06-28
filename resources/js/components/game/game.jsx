@@ -29,7 +29,7 @@ export default class Game extends React.Component {
       timeOutFor: 0,
       adventureDetails: [],
       adventureLogs: [],
-      celestial: null,
+      celestial: [],
       position: {},
       teleportLocations: {},
       openPortDetails: false,

@@ -43,6 +43,10 @@ class SkillModifiers extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
+        if (is_null($this->skill->can_train)) {
+            $this->skill->can_train = false;
+        }
+
         if ($this->isMissing()) {
             $this->addError('error', 'You must supply some kind of bonus per level.');
         } else if ($this->isBelowZero()) {
@@ -64,7 +68,7 @@ class SkillModifiers extends Component
                     }
                 }
 
-                
+
             }
 
             $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';
@@ -107,7 +111,7 @@ class SkillModifiers extends Component
         $this->monsters    = Monster::all();
         $this->gameClasses = GameClass::all();
     }
-    
+
 
     public function render()
     {
@@ -116,7 +120,7 @@ class SkillModifiers extends Component
 
     protected function forValue() : string {
         $for = '';
-        
+
         if (is_null($this->skill)) {
             return $for;
         }

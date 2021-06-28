@@ -118,7 +118,9 @@ export default class Map extends React.Component {
           kingdom_to_attack: result.data.kingdom_to_attack,
         });
 
-        this.props.updateCelestial(result.data.celestials[0]);
+        if (result.data.celestials.length > 0) {
+          this.props.updateCelestial(result.data.celestials[0]);
+        }
       });
     }).catch((err) => {
       if (err.hasOwnProperty('response')) {

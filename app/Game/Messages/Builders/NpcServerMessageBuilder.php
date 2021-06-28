@@ -26,7 +26,7 @@ class NpcServerMessageBuilder {
             case 'take_a_look':
                 return '"Why don\'t you take a look, and show me what you can afford my child."';
             case 'location':
-                return '"Child! You must come to me to make the exchange. Come to me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . '. Mess me again when you are here."';
+                return '"Child! You must come to me to make the exchange. Find me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . '. Message me again when you are here."';
             case 'dead':
                 return '"I don\'t deal with dead people. Resurrect child."';
             case 'adventuring':

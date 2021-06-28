@@ -171,7 +171,7 @@ export default class ActionsSection extends React.Component {
                 : null
             }
             {
-              this.props.celestial !== null ?
+              this.props.celestial.length > 0 ?
                 <button disabled={this.state.isDead || this.state.isAdventuring}
                         onClick={this.switchBattleAction.bind(this)}
                         className="btn btn-success btn-sm mb-2">Fight Celestial!</button>

@@ -14,6 +14,18 @@ class SkillsSheet implements ToCollection {
             if ($index !== 0) {
                 $skill = array_combine($rows[0]->toArray(), $row->toArray());
 
+                if (is_null($skill['specifically_assigned'])) {
+                    $skill['specifically_assigned'] = false;
+                }
+
+                if (is_null($skill['can_train'])) {
+                    $skill['can_train'] = false;
+                }
+
+                if (is_null($skill['can_monsters_have_skill'])) {
+                    $skill['can_monsters_have_skill'] = false;
+                }
+
                 $foundSkill = GameSkill::where('name', $skill['name'])->first();
 
                 if (is_null($foundSkill)) {

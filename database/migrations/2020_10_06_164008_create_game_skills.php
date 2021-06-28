@@ -23,10 +23,10 @@ class CreateGameSkills extends Migration
             $table->decimal('base_ac_mod_bonus_per_level', 5, 4)->nullable();
             $table->decimal('fight_time_out_mod_bonus_per_level', 5, 4)->nullable();
             $table->decimal('move_time_out_mod_bonus_per_level', 5, 4)->nullable();
-            $table->boolean('can_train')->nullable()->default(true);
+            $table->boolean('can_train')->default(false);
             $table->decimal('skill_bonus_per_level', 5, 4)->nullable();
-            $table->boolean('specifically_assigned')->nullable()->default(false);
-            $table->boolean('can_monsters_have_skill')->nullable()->default(false);
+            $table->boolean('specifically_assigned')->default(false);
+            $table->boolean('can_monsters_have_skill')->default(false);
             $table->timestamps();
         });
     }

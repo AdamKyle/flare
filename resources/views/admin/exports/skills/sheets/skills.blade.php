@@ -21,7 +21,7 @@
         <tr>
             <td>{{$skill->name}}</td>
             <td>{{$skill->type}}</td>
-            <td>{{$skill->description}}</td>
+            <td>{!! nl2br(e($skill->description)) !!}</td>
             <td>{{$skill->max_level}}</td>
             <td>{{$skill->base_damage_mod_bonus_per_level}}</td>
             <td>{{$skill->base_healing_mod_bonus_per_level}}</td>
