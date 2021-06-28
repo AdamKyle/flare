@@ -2,6 +2,8 @@
 
 namespace App\Game\Battle\Handlers;
 
+use App\Flare\Models\CelestialFight;
+use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\DropsCheckEvent;
@@ -59,6 +61,14 @@ class BattleEventHandler {
         $character->update([
             'is_dead' => false
         ]);
+
+        $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
+
+        if (!is_null($characterInCelestialFight)) {
+            $characterInCelestialFight->update([
+                'character_current_health' => $character->getInformation()->buildHealth(),
+            ]);
+        }
 
         event(new CharacterIsDeadBroadcastEvent($character->user));
         event(new UpdateTopBarEvent($character));

@@ -59,7 +59,6 @@ class SkillModifiers extends Component
             $this->skill->save();
 
             if (!$this->canNotAssignSkill) {
-
                 if (empty($this->selectedMonsters)) {
                     AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), null, $this->selectedClass);
                 } else {
@@ -67,8 +66,6 @@ class SkillModifiers extends Component
                         AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), $monsterId);
                     }
                 }
-
-
             }
 
             $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';

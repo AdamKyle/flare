@@ -29,7 +29,7 @@ export default class Game extends React.Component {
       timeOutFor: 0,
       adventureDetails: [],
       adventureLogs: [],
-      celestial: [],
+      celestial: null,
       position: {},
       teleportLocations: {},
       openPortDetails: false,
@@ -282,6 +282,7 @@ export default class Game extends React.Component {
               openKingdomModal={this.openKingdomModal.bind(this)}
               openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
+              updateCelestial={this.updateCelestial.bind(this)}
               celestial={this.state.celestial}
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}

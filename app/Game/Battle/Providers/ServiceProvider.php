@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Providers;
 
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\CelestialFightService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -40,6 +41,10 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CelestialFightService::class, function($app) {
             return new CelestialFightService($app->make(BattleEventHandler::class));
         });
+
+        $this->commands([
+            ClearCelestials::class,
+        ]);
     }
 
     /**

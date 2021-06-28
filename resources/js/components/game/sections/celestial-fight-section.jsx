@@ -17,6 +17,8 @@ export default class CelestialFightSection extends React.Component {
       loading: true,
       battleIsOver: false,
     }
+
+    this.celestialUpdates = Echo.join('celestial-fight-changes');
   }
 
   componentDidMount() {
@@ -42,17 +44,26 @@ export default class CelestialFightSection extends React.Component {
           return this.props.openTimeOutModal();
         }
       }
-    })
+    });
+
+    this.celestialUpdates.listen('Game.Battle.Events.UpdateCelestialFight', (event) => {
+      if (event.data.close_fight) {
+        return this.props.switchBattleAction('battle-action');
+      }
+
+      this.setState({
+        monsterCurrentHealth: event.data.monster_current_health,
+      });
+    });
   }
 
   attackCelestial() {
     axios.post('/api/attack-celestial/' + this.props.characterId + '/' + this.props.celestialId).then((result) => {
-      console.log(result.data);
       if (result.data.hasOwnProperty('battle_over')) {
         this.setState({
           battleIsOver: true,
           logs: result.data.logs,
-          monsterCurrenthealth: 0,
+          monsterCurrentHealth: 0,
         });
       } else {
         this.setState({
@@ -78,7 +89,7 @@ export default class CelestialFightSection extends React.Component {
 
   revive(data) {
     this.setState({
-      characterCurrenthealth: data.fight.character.current_health,
+      characterCurrentHealth: data.fight.character.current_health,
       monsterCurrentHealth: data.fight.monster.current_health,
     });
   }

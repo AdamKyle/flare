@@ -118,9 +118,13 @@ export default class ActionsSection extends React.Component {
     });
   }
 
-  switchBattleAction() {
+  switchBattleAction(type) {
     this.setState({
-      actionComponent: 'celestial-fight'
+      actionComponent: type
+    }, () => {
+      if (type === 'battle-action') {
+        this.props.updateCelestial(null);
+      }
     });
   }
 
@@ -151,30 +155,38 @@ export default class ActionsSection extends React.Component {
             />
             {
               this.props.kingdomData.can_attack && !_.isEmpty(this.props.kingdomData.my_kingdoms) ?
-                <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring}
-                        onClick={this.props.openKingdomAttackModal}>Attack Kingdom</button>
+                <div className="mb-1">
+                  <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring}
+                          onClick={this.props.openKingdomAttackModal}>Attack Kingdom</button>
+                </div>
                 : null
             }
 
             {
               this.props.kingdomData.can_settle ?
-                <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal}
-                        className="btn btn-success btn-sm mb-2">Settle Kingdom</button>
+                <div className="mb-1">
+                  <button disabled={this.state.isDead || this.state.isAdventuring} onClick={this.props.openKingdomModal}
+                          className="btn btn-success btn-sm mb-2">Settle Kingdom</button>
+                </div>
                 : null
             }
 
             {
               this.props.kingdomData.is_mine ?
+                <div className="mb-1">
                 <button disabled={this.state.isDead || this.state.isAdventuring}
                         onClick={() => this.props.openKingdomManagement(true)}
                         className="btn btn-success btn-sm mb-2">Manage Kingdom</button>
+                </div>
                 : null
             }
             {
-              this.props.celestial.length > 0 ?
-                <button disabled={this.state.isDead || this.state.isAdventuring}
-                        onClick={this.switchBattleAction.bind(this)}
-                        className="btn btn-success btn-sm mb-2">Fight Celestial!</button>
+              this.props.celestial !== null ?
+                <div className="mb-1">
+                  <button disabled={this.state.isDead || this.state.isAdventuring}
+                          onClick={() => this.switchBattleAction('celestial-fight')}
+                          className="btn btn-success btn-sm mb-2">Fight Celestial!</button>
+                </div>
                 : null
             }
           </Col>
@@ -254,6 +266,7 @@ export default class ActionsSection extends React.Component {
                   openTimeOutModal={this.props.openTimeOutModal}
                   characterName={this.state.character.name}
                   monsterName={this.props.celestial.monster.name}
+                  switchBattleAction={this.switchBattleAction.bind(this)}
                 />
             }
 

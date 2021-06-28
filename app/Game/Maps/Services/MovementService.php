@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
@@ -38,6 +39,8 @@ class MovementService {
     private $kingdomData = [];
 
     private $npcKingdoms = [];
+
+    private $celestialEntities = [];
 
     /**
      * @var PortService $portService
@@ -145,7 +148,17 @@ class MovementService {
             $this->processLocation($location, $character);
         }
 
-        $this->npcKingdoms = Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('npc_owned', true)->where('game_map_id', $character->map->game_map_id)->get()->toArray();
+        $this->npcKingdoms       = Kingdom::select('x_position', 'y_position', 'npc_owned')
+                                          ->whereNull('character_id')
+                                          ->where('npc_owned', true)
+                                          ->get()
+                                          ->toArray();
+
+        $this->celestialEntities = CelestialFight::where('x_position', $character->x_position)
+                                                 ->where('y_position', $character->y_position)
+                                                 ->where('game_map_id', $character->map->game_map_id)
+                                                 ->first()
+                                                 ->toArray();
 
         $kingdom = Kingdom::where('x_position', $character->x_position)
                           ->where('y_position', $character->y_position)
@@ -364,6 +377,10 @@ class MovementService {
      */
     public function npcOwnedKingdoms(): array {
         return $this->npcKingdoms;
+    }
+
+    public function celestialEntities(): array {
+        return $this->celestialEntities;
     }
 
     /**

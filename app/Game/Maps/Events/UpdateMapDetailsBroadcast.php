@@ -48,6 +48,8 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public $updatedKingdoms = [];
 
+    public $celestials = [];
+
     /**
      * @var int $charactersOnMap
      */
@@ -81,6 +83,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
         $this->adventureDetails = $service->adventureDetails();
         $this->kingdomDetails   = $service->kingdomDetails();
         $this->npcKingdoms      = $service->npcOwnedKingdoms();
+        $this->celestials       = $service->celestialEntities();
         $this->charactersOnMap  = Character::join('maps', function($query) use ($user) {
             $mapId = $user->character->map->game_map_id;
             $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);

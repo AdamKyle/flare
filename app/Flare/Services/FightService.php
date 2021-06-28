@@ -56,25 +56,27 @@ class FightService {
      * @param Monster $monster
      * @return void
      */
-    public function __construct(Character $character, Monster $monster, int $monsterCurrentHealth = null, int $characterHealth = null) {
+    public function __construct(Character $character, Monster $monster) {
         $this->character = $character;
         $this->monster   = $monster;
 
-        // Set character information
-        if (is_null($characterHealth)) {
-            $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-            $this->currentCharacterHealth = $this->characterInformation->buildHealth();
-        } else {
-            $this->currentCharacterHealth = $characterHealth;
-        }
+        $this->characterInformation   = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $this->currentCharacterHealth = $this->characterInformation->buildHealth();
 
-        // Set monster information
-        if (is_null($monsterCurrentHealth)) {
-            $healthRange = explode('-', $this->monster->health_range);
-            $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
-        } else {
-            $this->currentMonsterHealth = $monsterCurrentHealth;
-        }
+        $healthRange                  = explode('-', $this->monster->health_range);
+        $this->currentMonsterHealth   = rand($healthRange[0], $healthRange[1]) + 10;
+    }
+
+    public function overrideMonsterHealth(int $monsterHealth): FightService {
+        $this->currentMonsterHealth = $monsterHealth;
+
+        return $this;
+    }
+
+    public function overrideCharacterHealth(int $characterHealth): FightService {
+        $this->currentCharacterHealth = $characterHealth;
+
+        return $this;
     }
 
     /**
@@ -165,7 +167,7 @@ class FightService {
                 $this->logInformation[] = [
                     'attacker'   => $defender->name,
                     'defender'   => $attacker->name,
-                    'message'    => $attacker->name . ' has been defeated!',
+                    'messages'   => [[$attacker->name . ' has been defeated!']],
                     'is_monster' => $defender instanceOf Character ? false : true
                 ];
             }
@@ -177,7 +179,7 @@ class FightService {
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
-                'message'    => 'Floor took too long.',
+                'messages'   => [['Floor took too long.']],
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
@@ -209,7 +211,7 @@ class FightService {
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
-                'message'    => $defender->name . ' blocked the attack!',
+                'messages'   => [[$defender->name . ' blocked the attack!']],
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
@@ -392,7 +394,7 @@ class FightService {
 
             if ($totalDamage > 0) {
                 $health = $this->currentMonsterHealth - $totalDamage;
-
+                dump('New health: ' . $health . ' Current Health: ' . $this->currentMonsterHealth . ' Total Damage: ' . $totalDamage);
                 if ($health < 0) {
                     $health = 0;
                 }

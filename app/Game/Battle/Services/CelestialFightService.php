@@ -6,6 +6,7 @@ use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Services\FightService;
+use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -47,11 +48,10 @@ class CelestialFightService {
 
     public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight): array {
         $fightService = resolve(FightService::class, [
-            'character'            => $character,
-            'monster'              => $celestialFight->monster,
-            'monsterCurrentHealth' => $celestialFight->current_health,
-            'characterHealth'      => $characterInCelestialFight->character_current_health
-        ]);
+            'character' => $character,
+            'monster'   => $celestialFight->monster,
+        ])->overrideMonsterHealth($celestialFight->current_health)
+          ->overrideCharacterHealth($characterInCelestialFight->character_current_health);
 
         $fightService->attack($character, $celestialFight->monster);
 
@@ -63,13 +63,15 @@ class CelestialFightService {
             'character_current_health' => $fightService->getRemainingCharacterHealth()
         ]);
 
-        $logInfo                   = $fightService->getLogInformation();
-        dump($logInfo);
+        $logInfo = $fightService->getLogInformation();
+
         if ($fightService->isCharacterDead()) {
             $this->battleEventHandler->processDeadCharacter($character);
 
             $characterInCelestialFight = $characterInCelestialFight->refresh();
             $celestialFight            = $celestialFight->refresh();
+
+            event(new UpdateCelestialFight($celestialFight, false));
 
             return $this->successResult([
                 'fight' => [
@@ -88,22 +90,25 @@ class CelestialFightService {
 
         if ($fightService->isMonsterDead()) {
             $character->update([
-                'shards' => $celestialFight->monster->shards,
+                'shards' => $character->shards + $celestialFight->monster->shards,
             ]);
 
             $this->battleEventHandler->processMonsterDeath($character->refresh(), $celestialFight->monster_id);
 
             event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
 
-            event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards));
+            event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
+
+            $characterInCelestialFight->delete();
+            $celestialFight->delete();
+
+            event(new UpdateCelestialFight(null, true));
 
             return $this->successResult([
                 'battle_over' => true,
                 'logs'        => array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
             ]);
         }
-
-        dump($fightService->getLogInformation(), $fightService->getRemainingMonsterHealth(), $fightService->getRemainingCharacterHealth(), $fightService->isMonsterDead(), $fightService->isCharacterDead());
     }
 
     public function revive(Character $character) {
@@ -113,10 +118,6 @@ class CelestialFightService {
         $celestialFight            = CelestialFight::find($characterInCelestialFight->celestial_fight_id);
 
         if (!is_null($characterInCelestialFight)) {
-            $characterInCelestialFight->update([
-                'character_current_health' => $character->getInformation()->buildHealth(),
-            ]);
-
             return $this->successResult([
                 'fight' => [
                     'character' =>[

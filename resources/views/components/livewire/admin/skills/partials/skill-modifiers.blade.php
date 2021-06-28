@@ -61,7 +61,7 @@
     </div>
     @if ($canNotAssignSkill)
         <div class="alert alert-info">
-            This skill is currently being used and cannot be removed from selected indivuals.
+            This skill is currently being used and cannot be removed from selected individuals.
         </div>
     @else
         <div class="alert alert-warning">
