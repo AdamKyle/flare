@@ -43,6 +43,8 @@ class Character extends Model
         'can_craft_again_at',
         'can_adventure_again_at',
         'force_name_change',
+        'spell_evasion',
+        'artifact_annulment',
         'is_npc',
         'is_test',
         'level',
@@ -90,6 +92,8 @@ class Character extends Model
         'gold'                   => 'integer',
         'gold_dust'              => 'integer',
         'shards'                 => 'integer',
+        'spell_evasion'          => 'decimal:4',
+        'artifact_annulment'     => 'decimal:4',
     ];
 
     public function race() {
@@ -154,6 +158,30 @@ class Character extends Model
 
     public function getXpAttribute($value) {
         return number_format($value, 2);
+    }
+
+    public function getCharacterSpellEvasion() {
+        $skill = $this->skills->filter(function($skill) {
+           return $skill->type()->isSpellEvasion();
+        })->first();
+
+        if (!is_null($skill)) {
+            return $this->spell_evasion + $skill->skill_bonus;
+        }
+
+        return $this->spell_evasion;
+    }
+
+    public function getCharacterArtifactAnnulment() {
+        $skill = $this->skills->filter(function($skill) {
+            return $skill->type()->isArtifactAnnulment();
+        })->first();
+
+        if (!is_null($skill)) {
+            return $this->artifact_annulment + $skill->skill_bonus;
+        }
+
+        return $this->artifact_annulment;
     }
 
     /**

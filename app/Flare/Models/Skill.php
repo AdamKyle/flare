@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\SkillFactory;
@@ -41,6 +42,10 @@ class Skill extends Model
         'xp_max'                => 'integer',
         'xp_towards'            => 'float',
     ];
+
+    public function type(): SkillTypeValue {
+        return $this->baseSkill->skillType();
+    }
 
     public function baseSkill() {
         return $this->belongsTo(GameSkill::class, 'game_skill_id', 'id');

@@ -1,5 +1,5 @@
 import Monster from '../monster/monster';
-import {randomNumber} from '../../helpers/random_number';
+import {random} from 'lodash';
 
 export default class Attack {
 
@@ -37,8 +37,11 @@ export default class Attack {
     }
 
     if (!this.canHit(attacker, defender, type)) {
+      this.castSpells(attacker, defender, type);
+      this.useArtifacts(attacker, defender, type);
+
       this.battleMessages.push({
-        message: this.attackerName + ' missed!'
+        message: this.attackerName + ' (weapon) missed!'
       });
 
       this.missed += 1;
@@ -49,7 +52,7 @@ export default class Attack {
     } else {
       if (this.blockedAttack(defender, attacker, type)) {
         this.battleMessages.push({
-          message: defender.name + ' blocked the attack!'
+          message: defender.name + ' blocked the (weapon) attack!'
         });
 
         this.missed += 1;
@@ -58,6 +61,9 @@ export default class Attack {
           return this.attack(defender, attacker, false, 'monster');
         }
       } else {
+        this.castSpells(attacker, defender, type);
+        this.useArtifacts(attacker, defender, type);
+
         this.doAttack(attacker, type);
 
         if (attackAgain) {
@@ -96,6 +102,136 @@ export default class Attack {
     return attack > dodge;
   }
 
+  castSpells(attacker, defender, type) {
+    if (type == 'player') {
+      if (attacker.has_damage_spells && attacker.spell_damage !== 0) {
+        this.battleMessages.push({
+          message: 'Your spells burst forward towards the enemy!'
+        });
+
+        this.spellDamage(attacker, defender, type);
+      }
+    } else {
+      if (attacker.has_damage_spells && attacker.spell_damage !== 0) {
+        this.battleMessages.push({
+          message: 'The enemy begins to cast their spells!'
+        });
+
+        this.spellDamage(attacker, defender, type);
+      }
+    }
+  }
+
+  useArtifacts(attacker, defender, type) {
+    if (type == 'player') {
+      if (attacker.has_artifacts && attacker.artifact_damage !== 0) {
+        this.battleMessages.push({
+          message: 'Your artifacts flow before the enemy!'
+        });
+
+        this.artifactDamage(attacker, defender, type);
+      }
+    } else {
+      if (attacker.has_artifacts && attacker.artifact_damage !== 0) {
+        this.battleMessages.push({
+          message: 'The enemies artifacts glow brightly!'
+        });
+
+        this.artifactDamage(attacker, defender, type);
+      }
+    }
+  }
+
+  spellDamage(attacker, defender, type) {
+    if (type === 'player') {
+      let totalDamage = Math.round(attacker.spell_damage - (attacker.spell_damage * defender.spell_evasion));
+
+      if (totalDamage < 0) {
+        this.battleMessages.push({
+          message: this.attackerName + '\'s Spells have no effect!'
+        });
+
+        return;
+      }
+
+      this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
+
+      this.battleMessages.push({
+        message: attacker.name + ' spells hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      });
+
+      if (attacker.heal_for > 0) {
+        const healFor = attacker.heal_for + this.characterCurrentHealth;
+
+        if (attacker.health <= (attacker.health * 0.75)) {
+          this.characterCurrentHealth += healFor;
+
+          this.battleMessages.push({
+            message: 'Light floods your eyes as your wounds heal over for: ' + healfor
+          });
+        }
+      }
+    }
+
+    if (type === 'monster') {
+      const damage   = random(1, attacker.spell_damage);
+      let totalDamage = Math.round(damage - (damage * defender.spell_evasion));
+
+      if (totalDamage < 0) {
+        this.battleMessages.push({
+          message: attacker.name + '\'s Spells have no effect!'
+        });
+
+        return;
+      }
+
+      this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
+
+      this.battleMessages.push({
+        message: attacker.name + ' spells hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      });
+    }
+  }
+
+  artifactDamage(attacker, defender, type) {
+    if (type === 'player') {
+      let totalDamage = attacker.artifact_damage - (attacker.artifact_damage * defender.artifact_annulment);
+
+      if (totalDamage < 0) {
+        this.battleMessages.push({
+          message: this.attackerName + '\'s Artifacts are annulled!'
+        });
+
+        return;
+      }
+
+      this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
+
+      this.battleMessages.push({
+        message: attacker.name + ' artifacts hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      });
+    }
+
+    if (type === 'monster') {
+      const damage    = random(1, attacker.artifact_damage);
+      let totalDamage = Math.round(damage - (damage * defender.artifact_damage));
+
+      if (totalDamage < 0) {
+        this.battleMessages.push({
+          message: attacker.name + '\'s Artifacts are annulled!',
+        });
+
+        return;
+      }
+
+      this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
+
+      this.battleMessages.push({
+        message: attacker.name + ' artifacts hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      });
+    }
+  }
+
   blockedAttack(defender, attacker) {
     return defender.ac > attacker.base_stat;
   }
@@ -112,38 +248,14 @@ export default class Attack {
     if (type === 'player') {
       this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.attack;
 
-      if (attacker.has_artifacts) {
-        this.battleMessages.push({
-          message: 'Your artifacts glow before the enemy!'
-        });
-      }
-
       if (attacker.has_affixes) {
         this.battleMessages.push({
           message: 'The enchantments on your equipment lash out at the enemy!'
         });
       }
 
-      if (attacker.has_damage_spells) {
-        this.battleMessages.push({
-          message: 'Your spells burst forward towards the enemy!'
-        });
-      }
-
-      if (attacker.heal_for > 0) {
-        const healFor = attacker.heal_for + this.characterCurrentHealth;
-
-        if (attacker.health <= (attacker.health * 0.75)) {
-          this.characterCurrentHealth += healFor;
-
-          this.battleMessages.push({
-            message: 'Light floods your eyes as your wounds heal over.'
-          });
-        }
-      }
-
       this.battleMessages.push({
-        message: attacker.name + ' hit for ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        message: attacker.name + ' hit for (weapon) ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
 
@@ -154,7 +266,7 @@ export default class Attack {
       this.characterCurrentHealth = this.characterCurrentHealth - attack;
 
       this.battleMessages.push({
-        message: attacker.name + ' hit for ' + attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        message: attacker.name + ' hit for (weapon) ' + attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
   }

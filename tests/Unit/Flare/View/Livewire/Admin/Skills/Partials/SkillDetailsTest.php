@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Flare\View\Livewire\Admin\Skills\Partials;
 
+use App\Game\Skills\Values\SkillTypeValue;
 use Livewire;
 use App\Flare\Models\GameSkill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,6 +29,7 @@ class SkillDetailsTest extends TestCase
             ->set('skill.name', 'sample')
             ->set('skill.description', 'sample')
             ->set('skill.max_level', -5)
+            ->set('skill.type', SkillTypeValue::TRAINING)
             ->call('validateInput', 'nextStep', 2)
             ->assertHasErrors('gameSkill.max_level');
     }
@@ -37,6 +39,7 @@ class SkillDetailsTest extends TestCase
             ->set('skill.name', 'Sample')
             ->set('skill.max_level', 100)
             ->set('skill.description', 'test')
+            ->set('skill.type', SkillTypeValue::TRAINING)
             ->call('validateInput', 'nextStep', 2);
 
         $gameSkill = GameSkill::where('name', 'Sample');
@@ -51,6 +54,7 @@ class SkillDetailsTest extends TestCase
                                         ->set('skill.name', 'Apple Sauce')
                                         ->set('skill.description', $skill->description)
                                         ->set('skill.max_level', $skill->max_level)
+                                        ->set('skill.type', SkillTypeValue::TRAINING)
                                         ->call('validateInput', 'nextStep', 2);
 
         // Assert skill was updated:

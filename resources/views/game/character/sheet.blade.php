@@ -26,6 +26,23 @@
                 <div class="row mt-2">
                     @include('game.character.partials.sheet.core-stats', ['character' => $character])
                 </div>
+                <hr />
+                <h5>Attack Break Down</h5>
+                <hr />
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <dl>
+                            <dt>Attack (includes rings + weapon):</dt>
+                            <dd>{{$character->getInformation()->buildAttack()}}</dd>
+                            <dt>Spell Damage:</dt>
+                            <dd>{{$character->getInformation()->getTotalSpellDamage()}}</dd>
+                            <dt>Artifact Damage:</dt>
+                            <dd>{{$character->getInformation()->getTotalArtifactDamage()}}</dd>
+                            <dt>Heal For:</dt>
+                            <dd>{{$character->getInformation()->buildHealFor()}}</dd>
+                        </dl>
+                    </div>
+                </div>
             </x-cards.card-with-title>
 
             <x-cards.card-with-title

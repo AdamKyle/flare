@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label for="skills">Damage Stat: </label>
+                <label for="skills">Skill: </label>
 
                 @if (!is_null($this->monster))
                     <select wire:model="selectedSkill" class="form-control">
@@ -37,7 +37,7 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label for="base_ac_mod">Level: </label>
-                    <input type="number" step="0.01" class="form-control" name="base_ac_mod" value="" wire:model="monsterSkill.level"> 
+                    <input type="number" step="0.01" class="form-control" name="base_ac_mod" value="" wire:model="monsterSkill.level">
                     @error('monsterSkill.level') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
             </div>

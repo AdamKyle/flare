@@ -8,13 +8,13 @@ class ImageBuilder {
 
     /**
      * Turn the image into a file and store the image in a specified location.
-     * 
+     *
      * @param mixed $image
      * @param string $storageDisk | public
      * @param string $fileName
      * @return void
      */
-    public static function buildAndStoreImage($image, string $storageDisk = 'public', string $fileName): void {
+    public static function buildAndStoreImage($image, string $fileName, string $storageDisk = 'public', ): void {
         ob_start();
 
         imagepng($image);

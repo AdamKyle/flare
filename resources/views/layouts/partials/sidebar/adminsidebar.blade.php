@@ -86,6 +86,8 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('skills.list')}}">Skills</a></li>
             <li><a href="{{route('skills.create')}}">Create Skill</a></li>
+            <li><a href="{{route('skills.export')}}">Export</a></li>
+            <li><a href="{{route('skills.import')}}">Import</a></li>
         </ul>
     </li>
 </ul>

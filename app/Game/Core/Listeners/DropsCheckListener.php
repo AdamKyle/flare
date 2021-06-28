@@ -65,7 +65,7 @@ class DropsCheckListener
 
                 event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name, route('game.items.item', [
                     'item' => $item
-                ])));
+                ]), $item->id));
             }
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameSkillFactory;
@@ -21,6 +22,7 @@ class GameSkill extends Model
         'description',
         'name',
         'max_level',
+        'type',
         'base_damage_mod_bonus_per_level',
         'base_healing_mod_bonus_per_level',
         'base_ac_mod_bonus_per_level',
@@ -47,7 +49,12 @@ class GameSkill extends Model
         'can_monsters_have_skill'            => 'boolean',
         'specifically_assigned'              => 'boolean',
         'can_train'                          => 'boolean',
+        'type'                               => 'integer',
     ];
+
+    public function skillType(): SkillTypeValue {
+        return new SkillTypeValue($this->type);
+    }
 
     protected static function newFactory() {
         return GameSkillFactory::new();

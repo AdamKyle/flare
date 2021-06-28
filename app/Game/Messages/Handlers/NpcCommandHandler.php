@@ -5,6 +5,7 @@ namespace App\Game\Messages\Handlers;
 use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\Npc;
 use App\Flare\Models\User;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
@@ -50,27 +51,43 @@ class NpcCommandHandler {
      * @return PendingBroadcast
      * @throws Exception
      */
-    public function handleForType(int $type, string $npcName, User $user) {
+    public function handleForType(int $type, Npc $npc, User $user) {
         $type        = new NpcCommandTypes($type);
         $message     = null;
         $messageType = null;
 
+        if ($user->character->is_dead) {
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('dead', $npc), true));
+        }
+
+        if (!$user->character->can_adventure) {
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('adventuring', $npc), true));
+        }
+
         if ($type->isTakeKingdom()) {
-            if ($this->handleTakingKingdom($user, $npcName)) {
+            if ($this->handleTakingKingdom($user, $npc->name)) {
                 $message     = $user->character->name . ' Has paid The Old Man for a kingdom on the ' . $user->character->map->gameMap->name . ' plane.';
                 $messageType = 'took_kingdom';
             }
         }
 
         if ($type->isConjure()) {
+            if ($npc->must_be_at_same_location) {
+                $character = $user->character;
+
+                if ($character->x_position !== $npc->x_position && $character->y_position !== $npc->y_position) {
+                    return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('location', $npc), true));
+                }
+            }
+
             broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::CONJURE));
 
-            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('take_a_look', $npcName), true));
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('take_a_look', $npc), true));
         }
 
         broadcast(new GlobalMessageEvent($message));
 
-        return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npcName), true));
+        return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npc), true));
     }
 
     /**

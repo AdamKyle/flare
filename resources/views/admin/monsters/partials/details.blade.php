@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <dl>
                     <dt>str</dt>
                     <dd>{{$monster->str}}</dd>
@@ -17,7 +17,7 @@
                     <dd>{{$monster->damage_stat}}</dd>
                 </dl>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <dl>
                     <dt>Health Range</dt>
                     <dd>{{$monster->health_range}}</dd>
@@ -33,6 +33,14 @@
                     <dd>{{$monster->max_level}}</dd>
                     <dt>Gold</dt>
                     <dd>{{$monster->gold}}</dd>
+                </dl>
+            </div>
+            <div class="col-md-4">
+                <dl>
+                    <dt>Spell Evasion</dt>
+                    <dd>{{$monster->spell_evasion * 100}}%</dd>
+                    <dt>Artifact Annulment</dt>
+                    <dd>{{$monster->artifact_annulment * 100}}%</dd>
                 </dl>
             </div>
             <p class="ml-3 mt-3">

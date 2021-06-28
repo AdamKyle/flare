@@ -29,6 +29,10 @@ class SkillTypeValue {
 
     const EFFECTS_UNIT_MOVEMENT_TIMER     = 9;
 
+    const EFFECTS_SPELL_EVASION           = 10;
+
+    const EFFECTS_ARTIFACT_ANNULMENT      = 11;
+
     /**
      * @var string[] $values
      */
@@ -42,20 +46,24 @@ class SkillTypeValue {
         self::EFFECTS_MINUTE_MOVE_TIMER       => 6,
         self::EFFECTS_KINGDOM_BUILDING_TIMERS => 7,
         self::EFFECTS_UNIT_RECRUITMENT_TIMER  => 8,
-        self::EFFECTS_UNIT_MOVEMENT_TIMER     => 9
+        self::EFFECTS_UNIT_MOVEMENT_TIMER     => 9,
+        self::EFFECTS_SPELL_EVASION           => 10,
+        self::EFFECTS_ARTIFACT_ANNULMENT      => 11,
     ];
 
-    protected static $namedValues = [
-        0 => 'Training',
-        1 => 'Crafting',
-        2 => 'Enchanting',
-        3 => 'Disenchanting',
-        4 => 'Effects Battle Timer',
-        5 => 'Effects Directional Move Timer',
-        6 => 'Effects Minute Based Movement Timer',
-        7 => 'Effects Kingdom Building Timers',
-        8 => 'Effects Unit Recruitment Timers',
-        9 => 'Effects Unit Movement Timers',
+    public static $namedValues = [
+        0  => 'Training',
+        1  => 'Crafting',
+        2  => 'Enchanting',
+        3  => 'Disenchanting',
+        4  => 'Effects Battle Timer',
+        5  => 'Effects Directional Move Timer',
+        6  => 'Effects Minute Based Movement Timer',
+        7  => 'Effects Kingdom Building Timers',
+        8  => 'Effects Unit Recruitment Timers',
+        9  => 'Effects Unit Movement Timers',
+        10 => 'Effects Spell Evasion',
+        11 => 'Effects Artifact Annulment',
     ];
 
     /**
@@ -163,6 +171,24 @@ class SkillTypeValue {
      */
     public function isUnitMovementTimer(): bool {
         return $this->value === self::EFFECTS_UNIT_MOVEMENT_TIMER;
+    }
+
+    /**
+     * Does this effect the spell evasion?
+     *
+     * @return bool
+     */
+    public function isSpellEvasion(): bool {
+        return $this->value === self::EFFECTS_SPELL_EVASION;
+    }
+
+    /**
+     * Does this effect the artifact annulment?
+     *
+     * @return bool
+     */
+    public function isArtifactAnnulment(): bool {
+        return $this->value === self::EFFECTS_ARTIFACT_ANNULMENT;
     }
 
     /**

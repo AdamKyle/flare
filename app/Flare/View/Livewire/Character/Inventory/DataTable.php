@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Character\Inventory;
 
+use App\Game\Skills\Services\DisenchantService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
@@ -92,37 +93,25 @@ class DataTable extends Component
         return $this->data;
     }
 
-    public function destroyAllItems(string $type = null) {
+    public function destroyAllItems(DisenchantService $disenchantService, string $type = null) {
+
         if ($type === 'disenchant') {
-            $this->character->inventory->slots->filter(function($slot) {
+            $this->character->inventory->slots->filter(function($slot) use ($disenchantService) {
                 if (!$slot->equipped && $slot->item->type !== 'quest') {
                     if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
-                        $goldDust = rand(1, 150);
+                        $disenchantService->disenchantWithSkill($this->character, $slot);
 
-                        $this->character->update([
-                            'gold_dust' => $this->character->gold_dust + $goldDust,
-                        ]);
-
-                        $this->character = $this->character->refresh();
-                        $this->totalGoldDust += $goldDust;
+                        $this->totalGoldDust += $disenchantService->getGoldDust();
                     }
-
-                    $slot->delete();
                 }
             });
         } else {
-            $this->character->inventory->slots->filter(function($slot) {
+            $this->character->inventory->slots->filter(function($slot) use ($disenchantService) {
                 if (!$slot->equipped && $slot->item->type !== 'quest') {
                     if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
-                        $goldDust = rand(1, 25);
+                        $disenchantService->disenchantWithOutSkill();
 
-
-                        $this->character->update([
-                            'gold_dust' => $this->character->gold_dust + $goldDust,
-                        ]);
-
-                        $this->character = $this->character->refresh();
-                        $this->totalGoldDust += $goldDust;
+                        $this->totalGoldDust += $disenchantService->getGoldDust();
                     }
 
                     $slot->delete();

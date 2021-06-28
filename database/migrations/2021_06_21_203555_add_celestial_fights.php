@@ -17,8 +17,11 @@ class AddCelestialFights extends Migration
             $table->id();
             $table->bigInteger('monster_id')->unsigned()->nullable();
             $table->foreign('monster_id')
-                ->references('id')->on('monsters');
-            $table->dateTime('started_at')->unique();
+                  ->references('id')->on('monsters');
+            $table->bigInteger('character_id')->unsigned()->nullable();
+            $table->foreign('character_id')
+                ->references('id')->on('characters');
+            $table->date('conjured_at');
             $table->integer('x_position');
             $table->integer('y_position');
             $table->boolean('damaged_kingdom')->default(false);
@@ -26,6 +29,7 @@ class AddCelestialFights extends Migration
             $table->boolean('weakened_morale')->default(false);
             $table->integer('current_health');
             $table->integer('max_health');
+            $table->integer('type');
             $table->timestamps();
         });
     }

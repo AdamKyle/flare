@@ -22,8 +22,9 @@
                     @endif
 
 
-                    @if ($allowMassDestroy && ($pageSelected || $selected))
+                    @if ($allowMassDestroy)
                         <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
+                        <button type="button" wire:click="destroyAllItems('disenchant')" class="btn btn-primary btn-sm ml-2">Disenchant All</button>
                     @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />
@@ -37,7 +38,7 @@
 
             <x-data-tables.table :collection="$slots">
                 <x-data-tables.header>
-                    @if ($batchSell || $allowMassDestroy)
+                    @if ($batchSell)
                         <x-data-tables.header-row>
                             <input type="checkbox" wire:model="pageSelected" id="select-all" />
                         </x-data-tables.header-row>
@@ -103,11 +104,6 @@
                         <tr>
                             <td colspan="8">
                                 @unless($selectAll)
-                                    @if ($allowMassDestroy)
-                                        <div class="alert alert-info">
-                                            Selecting all items, will <strong>not</strong> destroy currently equipped or quest items. Everything else <strong>will be</strong> destroyed.
-                                        </div>
-                                    @endif
                                     <div>
                                         <span>You have selected <strong>{{$slots->count()}}</strong> items of <strong>{{$slots->total()}}</strong>. Would you like to select all?</span>
                                         <button class="btn btn-link" wire:click="selectAll">Select all</button>
@@ -127,7 +123,7 @@
 
                     @forelse($slots as $slot)
                         <tr wire:key="slots-table-{{$slot->id}}">
-                            @if ($batchSell || $allowMassDestroy)
+                            @if ($batchSell)
                                 <td>
                                     <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
                                 </td>

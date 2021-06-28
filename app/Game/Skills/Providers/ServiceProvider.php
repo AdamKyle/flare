@@ -4,6 +4,7 @@ namespace App\Game\Skills\Providers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Game\Skills\Services\CraftingService;
+use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -23,6 +24,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CraftingService::class, function() {
             return new CraftingService;
+        });
+
+        $this->app->bind(DisenchantService::class, function() {
+            return new DisenchantService;
         });
 
         $this->app->bind(EnchantingService::class, function($app) {

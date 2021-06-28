@@ -128,7 +128,7 @@ class MessageController extends Controller {
             $command = $npc->commands->where('command', $request->message)->first();
 
             if (!is_null($command)) {
-                $this->npcCommandHandler->handleForType($command->command_type, $npc->name, auth()->user());
+                $this->npcCommandHandler->handleForType($command->command_type, $npc, auth()->user());
 
                 return response()->json([], 200);
             }

@@ -14,7 +14,8 @@ class CelestialFight extends Model
      */
     protected $fillable = [
         'monster_id',
-        'started_at',
+        'character_id',
+        'conjured_at',
         'x_position',
         'y_position',
         'damaged_kingdom',
@@ -22,6 +23,7 @@ class CelestialFight extends Model
         'weakened_morale',
         'current_health',
         'max_health',
+        'type',
     ];
 
     /**
@@ -30,17 +32,25 @@ class CelestialFight extends Model
      * @var array
      */
     protected $casts = [
-        'started_at'      => 'dateTime',
+        'conjured_at'     => 'date',
         'x_position'      => 'integer',
         'y_position'      => 'integer',
         'damaged_kingdom' => 'boolean',
         'stole_treasury'  => 'boolean',
         'weakened_morale' => 'boolean',
-        'current_health'  => 'boolean',
-        'max_health'      => 'boolean',
+        'current_health'  => 'integer',
+        'max_health'      => 'integer',
     ];
 
     public function monster() {
         return $this->belongsTo(Monster::class);
+    }
+
+    public function character() {
+        return $this->belongsTo(Character::class);
+    }
+
+    public function charactersInFight() {
+        return $this->charactersInFight(CharacterInCelestialFight::class);
     }
 }

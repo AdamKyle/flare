@@ -30,6 +30,10 @@ class MarketController extends Controller {
         return view('game.core.market.market');
     }
 
+    public function sell() {
+        return view('game.core.market.sell');
+    }
+
     public function currentListings(Character $character) {
         $locked = MarketBoard::where('character_id', $character->id)->where('is_locked', true)->first();
 
@@ -48,7 +52,9 @@ class MarketController extends Controller {
     }
 
     public function editCurrentListings(MarketBoard $marketBoard) {
-        if (auth()->user()->character->id !== $marketBoard->character_id) {
+        $character = auth()->user()->character;
+
+        if ($character->id !== $marketBoard->character_id) {
             return redirect()->back()->with('error', 'You are not allowed to do that.');
         }
 
@@ -66,9 +72,15 @@ class MarketController extends Controller {
     }
 
     public function updateCurrentListing(Request $request, MarketBoard $marketBoard) {
+        $character = auth()->user()->character;
+
         $request->validate([
             'listed_price' => 'required|integer'
         ]);
+
+        if ($character->id !== $marketBoard->character_id) {
+            return redirect()->back()->with('error', 'You are not allowed to do that.');
+        }
 
         if ($request->listed_price <= 0) {
             return redirect()->back()->with('error', 'Listed price cannot be below or equal to 0.');

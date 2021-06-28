@@ -3,14 +3,18 @@
 namespace App\Flare\View\Livewire\Admin\Skills\Partials;
 
 use App\Flare\Models\GameSkill;
+use App\Game\Skills\Values\SkillTypeValue;
 use Livewire\Component;
 
 class SkillDetails extends Component
 {
     public $skill;
 
+    public $skillTypes;
+
     protected $rules = [
         'skill.name'                    => 'required',
+        'skill.type'                    => 'required',
         'skill.description'             => 'required',
         'skill.max_level'               => 'required',
         'skill.can_monsters_have_skill' => 'nullable'
@@ -18,6 +22,7 @@ class SkillDetails extends Component
 
     protected $messages =[
         'skill.name.required'        => 'Name required.',
+        'skill.name.type'            => 'Type required.',
         'skill.description.required' => 'Description required.',
         'skill.max_level.required'   => 'Max Level is required.',
     ];
@@ -41,6 +46,8 @@ class SkillDetails extends Component
         if (is_null($this->skill)) {
             $this->skill = new GameSkill;
         }
+
+        $this->skillTypes = SkillTypeValue::$namedValues;
     }
 
     public function render() {

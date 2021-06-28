@@ -79,6 +79,16 @@
   top: -8px;
 }
 
+.celestial-fight-actions {
+  max-width: 155px;
+  margin: 0 auto;
+}
+
+.celestial-dead-actions {
+  max-width: 255px;
+  margin: 0 auto;
+}
+
 @include media-breakpoint-down(lg) {
   .crafting-timeout {
     top: 10px;

@@ -169,6 +169,42 @@ class CharacterInformationBuilder {
         })->isNotEmpty();
     }
 
+    /**
+     * Get the total Spell Damage
+     *
+     * @return int
+     */
+    public function getTotalSpellDamage(): int {
+        return $this->getSpellDamage();
+    }
+
+    /**
+     * Get the total artifact damage.
+     *
+     * @return int
+     */
+    public function getTotalArtifactDamage(): int {
+        return $this->getArtifactDamage();
+    }
+
+    /**
+     * Get total annulment
+     *
+     * @return float
+     */
+    public function getTotalAnnulment(): float {
+        return  $this->character->getCharacterArtifactAnnulment();
+    }
+
+    /**
+     * Get total spell evasion
+     *
+     * @return float
+     */
+    public function getTotalSpellEvasion(): float {
+        return  $this->character->getCharacterSpellEvasion();
+    }
+
     protected function fetchSkillAttackMod(): float {
         $percentageBonus = 0.0;
 
@@ -203,7 +239,33 @@ class CharacterInformationBuilder {
         $damage = 0;
 
         foreach ($this->inventory as $slot) {
-            $damage += $slot->item->getTotalDamage();
+            if ($slot->type === 'weapon' || $slot->type === 'ring') {
+                $damage += $slot->item->getTotalDamage();
+            }
+        }
+
+        return $damage;
+    }
+
+    protected function getSpellDamage(): int {
+        $damage = 0;
+
+        foreach ($this->inventory as $slot) {
+            if ($slot->item->type === 'spell-damage') {
+                $damage += $slot->item->getTotalDamage();
+            }
+        }
+
+        return $damage;
+    }
+
+    protected function getArtifactDamage(): int {
+        $damage = 0;
+
+        foreach ($this->inventory as $slot) {
+            if ($slot->item->type === 'artifact') {
+                $damage += $slot->item->getTotalDamage();
+            }
         }
 
         return $damage;

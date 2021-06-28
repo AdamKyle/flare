@@ -17,4 +17,10 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
         // Enchant Item
         Route::post('/enchant/{character}', ['uses' => 'Api\EnchantingController@enchant']);
     });
+
+    Route::group(['middleware' => 'throttle:25,1'], function() {
+        // Enchant Item
+        Route::post('/disenchant/{item}', ['uses' => 'Api\DisenchantingController@disenchant']);
+        Route::post('/destroy/{item}', ['uses' => 'Api\DisenchantingController@destroy']);
+    });
 });
