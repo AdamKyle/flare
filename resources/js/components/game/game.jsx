@@ -29,6 +29,7 @@ export default class Game extends React.Component {
       timeOutFor: 0,
       adventureDetails: [],
       adventureLogs: [],
+      celestial: null,
       position: {},
       teleportLocations: {},
       openPortDetails: false,
@@ -224,6 +225,12 @@ export default class Game extends React.Component {
     }
   }
 
+  updateCelestial(celestial) {
+    this.setState({
+      celestial: celestial
+    });
+  }
+
   canAdventure() {
     if (this.state.isDead) {
       return false;
@@ -275,6 +282,7 @@ export default class Game extends React.Component {
               openKingdomModal={this.openKingdomModal.bind(this)}
               openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
+              celestial={this.state.celestial}
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}
               character_y={this.state.current_y}
@@ -329,7 +337,13 @@ export default class Game extends React.Component {
             }
             {
               this.state.npcComponentName !== null ?
-                <NpcComponentWrapper npcComponentName={this.state.npcComponentName} close={this.closeNpcComponent.bind(this)} />
+                <NpcComponentWrapper
+                  npcComponentName={this.state.npcComponentName}
+                  close={this.closeNpcComponent.bind(this)}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
+                  characterId={this.state.characterId}
+                  isDead={this.state.isDead}
+                />
                 : null
             }
           </Col>
@@ -349,6 +363,7 @@ export default class Game extends React.Component {
               openTeleportDetails={this.openTeleportDetails.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               updateKingdoms={this.updateKingdoms.bind(this)}
+              updateCelestial={this.updateCelestial.bind(this)}
             />
           </Col>
         </Row>

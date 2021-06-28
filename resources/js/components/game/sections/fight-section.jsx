@@ -2,6 +2,7 @@ import React from 'react';
 import Attack from '../battle/attack/attack';
 import Monster from '../battle/monster/monster';
 import {getServerMessage} from '../helpers/server_message';
+import ReviveSection from "./revive-section";
 
 export default class FightSection extends React.Component {
 
@@ -144,32 +145,14 @@ export default class FightSection extends React.Component {
     }
   }
 
-  revive() {
-    if (!this.state.canAttack) {
-      return getServerMessage('cant_attack');
-    }
-
-    axios.post('/api/battle-revive/' + this.state.character.id).then((result) => {
-      this.setState({
-        character: result.data.character,
-        characterMaxHealth: result.data.character.health,
-        characterCurrentHealth: result.data.character.health,
-      }, () => {
-        this.props.isCharacterDead(result.data.character.is_dead);
-      });
-    }).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
-
-        if (response.status === 401) {
-          location.reload();
-        }
-
-        if (response.status === 429) {
-          return this.props.openTimeOutModal();
-        }
-      }
-    })
+  revive(data) {
+    this.setState({
+      character: data.character,
+      characterMaxHealth: data.character.health,
+      characterCurrentHealth: data.character.health,
+    }, () => {
+      this.props.isCharacterDead(data.character.is_dead);
+    });
   }
 
   healthMeters() {
@@ -220,10 +203,13 @@ export default class FightSection extends React.Component {
           }
           {
             this.state.character.is_dead ?
-              <>
-                <button className="btn btn-primary" onClick={this.revive.bind(this)}>Revive</button>
-                <p className="mt-3">You are dead. Click revive to live again.</p>
-              </>
+              <ReviveSection
+                characterId={this.state.character.id}
+                canAttack={this.state.canAttack}
+                revive={this.revive.bind(this)}
+                openTimeOutModal={this.props.openTimeOutModal}
+                route={'/api/battle-revive/' + this.state.character.id}
+              />
               : null
           }
           {

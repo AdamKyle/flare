@@ -7,6 +7,7 @@ import Card from '../components/templates/card';
 import CraftingAction from '../crafting/crafting-action';
 import EnchantingAction from '../enchanting/enchanting-action';
 import FightSection from './fight-section';
+import CelestialFightSection from "./celestial-fight-section";
 
 export default class ActionsSection extends React.Component {
 
@@ -24,6 +25,7 @@ export default class ActionsSection extends React.Component {
       monsters: null,
       canCraft: true,
       monster: null,
+      actionComponent: 'battle-action',
     };
 
     this.updateActions = Echo.private('update-actions-' + this.props.userId);
@@ -66,6 +68,14 @@ export default class ActionsSection extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.celestial === null && this.state.actionComponent !== 'battle-action') {
+      this.setState({
+        actionComponent: 'battle-action'
+      });
+    }
+  }
+
   characterIsDead(isDead) {
     this.setState({
       isDead: isDead,
@@ -105,6 +115,12 @@ export default class ActionsSection extends React.Component {
   setMonster(monster) {
     this.setState({
       monster: monster,
+    });
+  }
+
+  switchBattleAction() {
+    this.setState({
+      actionComponent: 'celestial-fight'
     });
   }
 
@@ -154,24 +170,39 @@ export default class ActionsSection extends React.Component {
                         className="btn btn-success btn-sm mb-2">Manage Kingdom</button>
                 : null
             }
+            {
+              this.props.celestial !== null ?
+                <button disabled={this.state.isDead || this.state.isAdventuring}
+                        onClick={this.switchBattleAction.bind(this)}
+                        className="btn btn-success btn-sm mb-2">Fight Celestial!</button>
+                : null
+            }
           </Col>
           <Col xs={12} sm={12} md={12} lg={12} xl={10}>
-            <BattleAction
-              userId={this.props.userId}
-              character={this.state.character} x
-              monsters={this.state.monsters}
-              showCrafting={this.state.showCrafting}
-              showEnchanting={this.state.showEnchanting}
-              isDead={this.state.isDead}
-              shouldChangeCraftingType={this.state.changeCraftingType}
-              isCharacterDead={this.characterIsDead.bind(this)}
-              isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
-              changeCraftingType={this.changeCraftingType.bind(this)}
-              updateCanCraft={this.updateCanCraft.bind(this)}
-              setMonster={this.setMonster.bind(this)}
-              canAttack={this.props.canAttack}
-              isAdventuring={this.state.isAdventuring}
-            />
+            {
+              this.state.actionComponent === 'battle-action' ?
+                <BattleAction
+                  userId={this.props.userId}
+                  character={this.state.character} x
+                  monsters={this.state.monsters}
+                  showCrafting={this.state.showCrafting}
+                  showEnchanting={this.state.showEnchanting}
+                  isDead={this.state.isDead}
+                  shouldChangeCraftingType={this.state.changeCraftingType}
+                  isCharacterDead={this.characterIsDead.bind(this)}
+                  isCharacterAdventuring={this.characterIsAdventuring.bind(this)}
+                  changeCraftingType={this.changeCraftingType.bind(this)}
+                  updateCanCraft={this.updateCanCraft.bind(this)}
+                  setMonster={this.setMonster.bind(this)}
+                  canAttack={this.props.canAttack}
+                  isAdventuring={this.state.isAdventuring}
+                />
+                :
+                <div className="text-center mb-2">
+                  <strong>{this.props.celestial.monster.name}</strong>
+                </div>
+            }
+
             <CraftingAction
               isDead={this.state.isDead}
               characterId={this.state.character.id}
@@ -201,16 +232,30 @@ export default class ActionsSection extends React.Component {
               : null
             }
 
-            <FightSection
-              character={this.state.character}
-              monster={this.state.monster}
-              userId={this.props.userId}
-              isCharacterDead={this.characterIsDead.bind(this)}
-              setMonster={this.setMonster.bind(this)}
-              canAttack={this.props.canAttack}
-              isAdventuring={this.state.isAdventuring}
-              openTimeOutModal={this.props.openTimeOutModal}
-            />
+            {
+              this.state.actionComponent === 'battle-action' ?
+                <FightSection
+                  character={this.state.character}
+                  monster={this.state.monster}
+                  userId={this.props.userId}
+                  isCharacterDead={this.characterIsDead.bind(this)}
+                  setMonster={this.setMonster.bind(this)}
+                  canAttack={this.props.canAttack}
+                  isAdventuring={this.state.isAdventuring}
+                  openTimeOutModal={this.props.openTimeOutModal}
+                />
+              :
+                <CelestialFightSection
+                  userId={this.props.userId}
+                  characterId={this.state.character.id}
+                  celestialId={this.props.celestial.id}
+                  isDead={this.state.isDead}
+                  isAdventuring={this.state.isAdventuring}
+                  openTimeOutModal={this.props.openTimeOutModal}
+                  characterName={this.state.character.name}
+                  monsterName={this.props.celestial.monster.name}
+                />
+            }
 
           </Col>
         </Row>

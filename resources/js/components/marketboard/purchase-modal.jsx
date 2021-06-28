@@ -44,23 +44,31 @@ export default class PurchaseModal extends React.Component {
   }
 
   purchase() {
-    axios.post('/api/market-board/purchase/' + this.props.characterId, {
-      market_board_id: this.props.modalData.id
-    }).then((result) => {
-      this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
-      this.props.closeModal();
-    }).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
+    this.setState({
+      loading: false,
+    }, () => {
+      axios.post('/api/market-board/purchase/' + this.props.characterId, {
+        market_board_id: this.props.modalData.id
+      }).then((result) => {
+        this.setState({
+          loading: false
+        }, () => {
+          this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
+          this.props.closeModal();
+        });
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
 
-        if (response.status === 401) {
-          location.reload();
-        }
+          if (response.status === 401) {
+            location.reload();
+          }
 
-        if (response.status === 429) {
-          return window.location = '/game';
+          if (response.status === 429) {
+            return window.location = '/game';
+          }
         }
-      }
+      });
     });
   }
 

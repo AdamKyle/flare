@@ -2,28 +2,20 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
-use App\Flare\Handlers\CheatingCheck;
-use App\Game\Core\Jobs\EndGlobalTimeOut;
-use Cache;
-use App\Game\Core\Events\UpdateAttackStats;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use App\Http\Controllers\Controller;
-use App\Flare\Events\ServerMessageEvent;
+use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
+use App\Flare\Handlers\CheatingCheck;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Game\Core\Events\UpdateCharacterEvent;
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\AttackTimeOutEvent;
-use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Flare\Models\User;
 use App\Flare\Transformers\MonsterTransfromer;
-use League\Fractal\Resource\ResourceAbstract;
 
 class BattleController extends Controller {
 
@@ -33,13 +25,14 @@ class BattleController extends Controller {
 
     private $monster;
 
-    public function __construct(Manager $manager, CharacterAttackTransformer $character, MonsterTransfromer $monster) {
+    public function __construct(Manager $manager, CharacterAttackTransformer $character, MonsterTransfromer $monster, BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
         $this->middleware('is.character.adventuring')->except(['index']);
 
-        $this->manager   = $manager;
-        $this->character = $character;
-        $this->monster   = $monster;
+        $this->manager            = $manager;
+        $this->character          = $character;
+        $this->monster            = $monster;
+        $this->battleEventHandler = $battleEventHandler;
     }
 
     public function index(Request $request) {
@@ -60,17 +53,7 @@ class BattleController extends Controller {
 
         if ($request->is_character_dead) {
 
-            $character->update(['is_dead' => true]);
-
-            $character = $character->refresh();
-
-            event(new ServerMessageEvent($character->user, 'dead_character'));
-            event(new AttackTimeOutEvent($character));
-            event(new CharacterIsDeadBroadcastEvent($character->user, true));
-            event(new UpdateTopBarEvent($character));
-
-            $characterData = new Item($character, $this->character);
-            event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+            $this->battleEventHandler->processDeadCharacter($character);
 
             return response()->json([], 200);
         }
@@ -79,17 +62,7 @@ class BattleController extends Controller {
 
             switch ($request->defender_type) {
                 case 'monster':
-                    $monster = Monster::find($request->monster_id);
-
-                    event(new UpdateCharacterEvent($character, $monster));
-
-                    event(new DropsCheckEvent($character, $monster));
-                    event(new GoldRushCheckEvent($character, $monster));
-
-                    event(new AttackTimeOutEvent($character));
-
-                    $characterData = new Item($character, $this->character);
-                    event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+                    $this->battleEventHandler->processMonsterDeath($character, $request->monster_id);
                     break;
                 default:
                     return response()->json([
@@ -101,13 +74,8 @@ class BattleController extends Controller {
         return response()->json([], 200);
     }
 
-    public function revive(Request $request, Character $character) {
-        $character->update([
-            'is_dead' => false
-        ]);
-
-        event(new CharacterIsDeadBroadcastEvent($character->user));
-        event(new UpdateTopBarEvent($character));
+    public function revive(Character $character) {
+        $character = $this->battleEventHandler->processRevive($character);
 
         $character = new Item($character, $this->character);
 

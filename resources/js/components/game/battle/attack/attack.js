@@ -1,5 +1,4 @@
 import Monster from '../monster/monster';
-import {randomNumber} from '../../helpers/random_number';
 import {random} from 'lodash';
 
 export default class Attack {
@@ -104,7 +103,6 @@ export default class Attack {
   }
 
   castSpells(attacker, defender, type) {
-    console.log('Attacker', attacker);
     if (type == 'player') {
       if (attacker.has_damage_spells && attacker.spell_damage !== 0) {
         this.battleMessages.push({
@@ -176,7 +174,6 @@ export default class Attack {
     }
 
     if (type === 'monster') {
-      console.log('monstr spell damage', attacker.spell_damage, attacker);
       const damage   = random(1, attacker.spell_damage);
       let totalDamage = Math.round(damage - (damage * defender.spell_evasion));
 

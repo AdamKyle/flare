@@ -56,17 +56,25 @@ class FightService {
      * @param Monster $monster
      * @return void
      */
-    public function __construct(Character $character, Monster $monster) {
+    public function __construct(Character $character, Monster $monster, int $monsterCurrentHealth = null, int $characterHealth = null) {
         $this->character = $character;
         $this->monster   = $monster;
 
         // Set character information
-        $this->characterInformation   = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-        $this->currentCharacterHealth = $this->characterInformation->buildHealth();
+        if (is_null($characterHealth)) {
+            $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+            $this->currentCharacterHealth = $this->characterInformation->buildHealth();
+        } else {
+            $this->currentCharacterHealth = $characterHealth;
+        }
 
         // Set monster information
-        $healthRange                = explode('-', $this->monster->health_range);
-        $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+        if (is_null($monsterCurrentHealth)) {
+            $healthRange = explode('-', $this->monster->health_range);
+            $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+        } else {
+            $this->currentMonsterHealth = $monsterCurrentHealth;
+        }
     }
 
     /**
@@ -124,6 +132,24 @@ class FightService {
     }
 
     /**
+     * Get current monster health.
+     *
+     * @return int
+     */
+    public function getRemainingMonsterHealth(): int {
+        return $this->currentMonsterHealth;
+    }
+
+    /**
+     * Get current character health.
+     *
+     * @return int
+     */
+    public function getRemainingCharacterHealth(): int {
+        return $this->currentCharacterHealth;
+    }
+
+    /**
      * Attack the enemy.
      *
      * This attack method mirrors the one on the client side.
@@ -163,10 +189,14 @@ class FightService {
         }
 
         if (!$this->canHit($attacker, $defender)) {
+            $messages   = $this->castSpell($attacker, $defender);
+            $messages   = array_merge($messages, $this->useAtifacts($attacker, $defender));
+            $messages[] = [$attacker->name . '(weapon) Missed!'];
+
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
-                'message'    => $attacker->name . ' Missed!',
+                'messages'   => $messages,
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
@@ -260,6 +290,149 @@ class FightService {
         return $ac > $baseStat;
     }
 
+    protected function castSpell($attacker, $defender) {
+        $messages = [];
+
+        if ($attacker instanceof Character) {
+            if ($this->characterInformation->hasDamageSpells()) {
+                $messages[] = ['Your spells burst forward towards the enemy!'];
+                $messages[] = $this->spellDamage($attacker, $defender);
+            }
+
+            $healFor = $this->characterInformation->buildHealFor();
+
+            if ($healFor > 0) {
+                $this->currentCharacterHealth = $healFor;
+
+                $messages[] = ['Light floods your eyes as your wounds heal over for: ' . $healFor];
+            }
+        }
+
+        if ($attacker->can_cast) {
+            $messages[] = ['The enemy begins to cast their spells!'];
+
+            $messages[] = $this->spellDamage($attacker, $defender);
+        }
+
+        return $messages;
+    }
+
+    protected function useAtifacts($attacker, $defender) {
+        $messages = [];
+
+        if ($attacker instanceOf Character) {
+            if ($this->characterInformation->hasArtifacts()) {
+                $messages[] = ['Your artifacts glow before the enemy!'];
+                $messages[] = $this->artifactDamage($attacker, $defender);
+            }
+        }
+
+        if ($defender instanceOf Character) {
+            if ($defender->can_use_artifacts) {
+                $messages[] = ['The enemies artifacts begin to glow ...'];
+                $messages[] = $this->artifactDamage($attacker, $defender);
+            }
+        }
+
+        return $messages;
+    }
+
+    protected function artifactDamage($attacker, $defender) {
+        if ($attacker instanceof Character) {
+            $artifactDamage = $this->characterInformation->getTotalArtifactDamage();
+            $artifactDamage = $artifactDamage - ($artifactDamage * $defender->artifact_annulment);
+
+            if ($artifactDamage > 0) {
+                $health = ceil($this->currentMonsterHealth - $artifactDamage);
+
+                if ($health < 0) {
+                    $health = 0;
+                }
+
+                $this->currentMonsterHealth = $health;
+
+                return [
+                    'Your artifacts hit the enemy for: ' . $artifactDamage,
+                ];
+            } else {
+                return [
+                    'Your artifacts have no effect ...'
+                ];
+            }
+        }
+
+        if ($defender instanceof Character){
+            $artifactDamage = rand(1, $defender->max_artifact_damage);
+            $artifactDamage = $artifactDamage - ($artifactDamage * $this->characterInformation->getTotalAnnulment());
+
+            if ($artifactDamage > 0) {
+                $health = $this->currentCharacterHealth - $artifactDamage;
+
+                if ($health < 0) {
+                    $health = 0;
+                }
+
+                $this->currentCharacterHealth = $health;
+
+                return [
+                    'The enemies artifacts lash out in intense energy doing: ' . $artifactDamage,
+                ];
+            } else {
+                return [
+                    'The enemies artifacts have no effect ...'
+                ];
+            }
+        }
+    }
+
+    protected function spellDamage($attacker, $defender) {
+        if ($attacker instanceof Character) {
+            $spellDamage = $this->characterInformation->getTotalSpellDamage();
+            $totalDamage = ceil($spellDamage - ($spellDamage * $defender->spell_evasion));
+
+            if ($totalDamage > 0) {
+                $health = $this->currentMonsterHealth - $totalDamage;
+
+                if ($health < 0) {
+                    $health = 0;
+                }
+
+                $this->currentMonsterHealth = $health;
+
+                return [
+                    'Your spells hit the enemy for: ' . $totalDamage,
+                ];
+            } else {
+                return [
+                    'Your spells have no effect ...'
+                ];
+            }
+        }
+
+        if ($defender instanceof Character){
+            $spellDamage = rand(1, $attacker->max_spell_damage);
+            $totalDamage = $spellDamage - ($spellDamage * $this->characterInformation->getTotalSpellEvasion());
+
+            if ($totalDamage > 0) {
+                $health = $this->currentCharacterHealth - $totalDamage;
+
+                if ($health < 0) {
+                    $health = 0;
+                }
+
+                $this->currentCharacterHealth = $health;
+
+                return [
+                    'The enemies spells burst towards you, slamming into you for: ' . $totalDamage,
+                ];
+            } else {
+                return [
+                    'The enemies spells have no effect ...'
+                ];
+            }
+        }
+    }
+
     protected function completeAttack($attacker, $defender): array {
         $messages = [];
 
@@ -269,31 +442,22 @@ class FightService {
 
             $this->currentMonsterHealth -= $characterAttack;
 
-            if ($this->characterInformation->hasArtifacts()) {
-                $messages[] = ['Your artifacts glow before the enemy!'];
-            }
-
             if ($this->characterInformation->hasAffixes()) {
                 $messages[] = ['The enchantments on your equipment lash out at the enemy!'];
             }
 
-            if ($this->characterInformation->hasDamageSpells()) {
-                $messages[] = ['Your spells burst forward towards the enemy!'];
-            }
+            $messages = array_merge($messages, $this->castSpell($attacker, $defender));
+            $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
 
-            $healFor = $this->characterInformation->buildHealFor();
+            $messages[] = [$this->character->name . ' hit for (weapon): ' . number_format($characterAttack)];
 
-            if ($healFor > 0) {
-                $this->currentCharacterHealth = $healFor;
-
-                $messages[] = ['Light floods your eyes as your wounds heal over.'];
-            }
-
-            $messages[] = [$this->character->name . ' hit for ' . number_format($characterAttack)];
         } else {
             $monsterAttack = $this->fetchMonsterAttack($attacker);
 
             $this->currentCharacterHealth -= $monsterAttack;
+
+            $messages = array_merge($messages, $this->castSpell($attacker, $defender));
+            $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
 
             $messages[] =  [$attacker->name . ' hit for ' . number_format($monsterAttack)];
         }

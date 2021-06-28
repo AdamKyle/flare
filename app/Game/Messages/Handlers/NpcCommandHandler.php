@@ -56,6 +56,14 @@ class NpcCommandHandler {
         $message     = null;
         $messageType = null;
 
+        if ($user->character->is_dead) {
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('dead', $npc), true));
+        }
+
+        if (!$user->character->can_adventure) {
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('adventuring', $npc), true));
+        }
+
         if ($type->isTakeKingdom()) {
             if ($this->handleTakingKingdom($user, $npc->name)) {
                 $message     = $user->character->name . ' Has paid The Old Man for a kingdom on the ' . $user->character->map->gameMap->name . ' plane.';

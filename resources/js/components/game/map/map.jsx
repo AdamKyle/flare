@@ -43,6 +43,7 @@ export default class Map extends React.Component {
       adventureLogs: [],
       teleportLocations: [],
       npcKingdoms: [],
+      celestials: [],
       canAdventureAgainAt: null,
       timeRemaining: null,
       isDead: false,
@@ -116,6 +117,8 @@ export default class Map extends React.Component {
           is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
           kingdom_to_attack: result.data.kingdom_to_attack,
         });
+
+        this.props.updateCelestial(result.data.celestials[0]);
       });
     }).catch((err) => {
       if (err.hasOwnProperty('response')) {
@@ -132,7 +135,6 @@ export default class Map extends React.Component {
     });
 
     this.globaNPCKingdomUpdate.listen('Game.Kingdoms.Events.UpdateNPCKingdoms', (event) => {
-      console.log(event);
       if (event.mapName === this.state.characterMapName) {
         this.setState({
           npcKingdoms: event.npcKingdoms,

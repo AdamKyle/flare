@@ -45,6 +45,7 @@ export default class TimeOutBar extends React.Component {
     });
 
     this.echo.listen(this.props.eventClass, (event) => {
+
       let forLength = event.hasOwnProperty('timeout') ? event.timeout : 10;
 
       if (event.hasOwnProperty('forLength')) {
@@ -67,6 +68,10 @@ export default class TimeOutBar extends React.Component {
       this.setState({
         maxTimeOut: event.activatebar ? forLength : 0,
         active: event.activatebar,
+      }, () => {
+        if (this.props.hasOwnProperty('updateCanAttack')) {
+          this.props.updateCanAttack(event.canAttack);
+        }
       });
     });
   }

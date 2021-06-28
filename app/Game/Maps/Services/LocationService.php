@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\CelestialFight;
 use Storage;
 use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
@@ -99,6 +100,7 @@ class LocationService {
             'adventure_completed_at' => $character->can_adventure_again_at,
             'is_dead'                => $character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
+            'celestials'             => CelestialFight::where('x_position', $character->x_position)->where('y_position', $character->y_position)->with('monster')->get()->toArray(),
             'can_settle_kingdom'     => $this->canSettle,
             'can_attack_kingdom'     => $this->canAttack,
             'can_manage_kingdom'     => $this->canManage,
