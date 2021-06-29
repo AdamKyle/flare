@@ -8,6 +8,7 @@ use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Services\FightService;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -34,12 +35,11 @@ class CelestialFightService {
             ]);
         } else {
             if (now()->diffInMinutes($characterInCelestialFight->updated_at) > 5) {
-                $characterInCelestialFight->update([
-                    'character_max_health'    => $character->getInformation()->buildHealth(),
-                    'character_current_health'=> $character->getInformation()->buildHealth(),
-                ]);
+                $characterInCelestialFight = $this->updateCharacterInFight($character, $characterInCelestialFight);
+            }
 
-                $characterInCelestialFight = $characterInCelestialFight->refresh();
+            if ($character->getInformation()->buildHealth() !== $characterInCelestialFight->character_current_health) {
+                $characterInCelestialFight = $this->updateCharacterInFight($character, $characterInCelestialFight);
             }
         }
 
@@ -51,7 +51,8 @@ class CelestialFightService {
             'character' => $character,
             'monster'   => $celestialFight->monster,
         ])->overrideMonsterHealth($celestialFight->current_health)
-          ->overrideCharacterHealth($characterInCelestialFight->character_current_health);
+          ->overrideCharacterHealth($characterInCelestialFight->character_current_health)
+          ->setAttackTimes(1);
 
         $fightService->attack($character, $celestialFight->monster);
 
@@ -110,6 +111,22 @@ class CelestialFightService {
                 'logs'        => $logInfo[0]['messages'],
             ]);
         }
+
+        event(new AttackTimeOutEvent($character));
+
+        return $this->successResult([
+            'fight' => [
+                'character' =>[
+                    'max_health'     => $characterInCelestialFight->character_max_health,
+                    'current_health' => $characterInCelestialFight->character_current_health,
+                ],
+                'monster' => [
+                    'max_health'     => $celestialFight->max_health,
+                    'current_health' => $celestialFight->current_health,
+                ]
+            ],
+            'logs' => array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
+        ]);
     }
 
     public function revive(Character $character) {
@@ -132,5 +149,14 @@ class CelestialFightService {
                 ],
             ]);
         }
+    }
+
+    protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {
+        $characterInCelestialFight->update([
+            'character_max_health'    => $character->getInformation()->buildHealth(),
+            'character_current_health'=> $character->getInformation()->buildHealth(),
+        ]);
+
+        return $characterInCelestialFight->refresh();
     }
 }

@@ -45,6 +45,11 @@ class FightService {
     private $counter = 0;
 
     /**
+     * @var int|null $attackTimes
+     */
+    private int|null $attackTimes;
+
+    /**
      * used to stop adventures from going on too long.
      *
      * @var bool $tookTooLong
@@ -75,6 +80,12 @@ class FightService {
 
     public function overrideCharacterHealth(int $characterHealth): FightService {
         $this->currentCharacterHealth = $characterHealth;
+
+        return $this;
+    }
+
+    public function setAttackTimes(int $times): FightService {
+        $this->attackTimes = $times;
 
         return $this;
     }
@@ -161,6 +172,17 @@ class FightService {
      * @return void
      */
     public function attack($attacker, $defender) {
+
+        if ($attacker instanceof Character) {
+            if (!is_null($this->attackTimes)) {
+                if ($this->attackTimes <= 0) {
+                    return;
+                }
+            }
+
+            $this->attackTimes -= 1;
+        }
+
         if ($this->isCharacterDead() || $this->isMonsterDead()) {
 
             if ($this->isMonsterDead()) {
