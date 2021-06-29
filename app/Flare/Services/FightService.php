@@ -45,9 +45,11 @@ class FightService {
     private $counter = 0;
 
     /**
+     * Used for celestial fights.
+     *
      * @var int|null $attackTimes
      */
-    private int|null $attackTimes;
+    private int|null $attackTimes = null;
 
     /**
      * used to stop adventures from going on too long.
@@ -178,9 +180,9 @@ class FightService {
                 if ($this->attackTimes <= 0) {
                     return;
                 }
-            }
 
-            $this->attackTimes -= 1;
+                $this->attackTimes -= 1;
+            }
         }
 
         if ($this->isCharacterDead() || $this->isMonsterDead()) {

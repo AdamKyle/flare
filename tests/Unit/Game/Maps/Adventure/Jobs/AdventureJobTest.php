@@ -32,16 +32,16 @@ class AdventureJobTest extends TestCase
         $jobName = Str::random(80);
 
         Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, $jobName, now()->addMinutes(5));
-        
+
         for ($i = 1; $i <= $adventure->levels; $i++) {
             AdventureJob::dispatch($character, $adventure, $jobName, $i);
 
-            $character->refresh();
+            $character = $character->refresh();
 
             $this->assertTrue(!empty($character->adventureLogs->first()->logs));
-        
+
         }
-        
+
     }
 
     public function testAdventureJobDoesNotExecuteWhenNameDoesntMatch()

@@ -243,7 +243,7 @@ export default class Map extends React.Component {
         if (_.isEmpty(event.adventureDetails)) {
           this.props.openAdventureDetails(false);
         }
-        
+
         if (event.celestials.length > 0) {
           this.props.updateCelestial(event.celestials[0]);
         } else {

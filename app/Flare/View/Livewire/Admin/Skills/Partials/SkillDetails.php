@@ -30,6 +30,10 @@ class SkillDetails extends Component
     protected $listeners = ['validateInput'];
 
     public function validateInput(string $functionName, int $index) {
+        if (is_null($this->skill->can_monsters_have_skill)) {
+            $this->skill->can_monsters_have_skill = false;
+        }
+
         $this->validate();
 
         if ($this->skill->max_level <= 0) {

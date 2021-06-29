@@ -147,7 +147,6 @@ class AdventureService {
         }
 
         if ($attackService->tooLong()) {
-
             if ($characterModeling) {
                 $this->setCharacterModelingLogs($attackService, false, true);
             }
