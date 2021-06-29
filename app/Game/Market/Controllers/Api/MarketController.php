@@ -84,7 +84,7 @@ class MarketController extends Controller {
             if ($request->has('type')) {
                 $join->where('items.type', $request->type);
             }
-        })->select('inventory_slots.id', 'items.name as item_name', 'items.id as item_id', 'items.type')->get()->transform(function($slot) {
+        })->where('inventory_slots.equipped', false)->select('inventory_slots.id', 'items.name as item_name', 'items.id as item_id', 'items.type')->get()->transform(function($slot) {
             $item = Item::find($slot->item_id);
 
             $slot->name = $item->affix_name;
