@@ -69,9 +69,9 @@ export default class ActionsSection extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.celestial === null && this.state.actionComponent !== 'battle-action') {
+    if (this.props.celestial !== prevProps.celestial && this.state.actionComponent !== 'battle-action') {
       this.setState({
-        actionComponent: 'battle-action'
+        actionComponent: 'battle-action',
       });
     }
   }
@@ -209,10 +209,11 @@ export default class ActionsSection extends React.Component {
                   canAttack={this.props.canAttack}
                   isAdventuring={this.state.isAdventuring}
                 />
-                :
-                <div className="text-center mb-2">
-                  <strong>{this.props.celestial.monster.name}</strong>
-                </div>
+              : this.props.celestial !== null ?
+                  <div className="text-center mb-2">
+                    <strong>{this.props.celestial.monster.name}</strong>
+                  </div>
+              : null
             }
 
             <CraftingAction
@@ -257,17 +258,19 @@ export default class ActionsSection extends React.Component {
                   openTimeOutModal={this.props.openTimeOutModal}
                 />
               :
-                <CelestialFightSection
-                  userId={this.props.userId}
-                  characterId={this.state.character.id}
-                  celestialId={this.props.celestial.id}
-                  isDead={this.state.isDead}
-                  isAdventuring={this.state.isAdventuring}
-                  openTimeOutModal={this.props.openTimeOutModal}
-                  characterName={this.state.character.name}
-                  monsterName={this.props.celestial.monster.name}
-                  switchBattleAction={this.switchBattleAction.bind(this)}
-                />
+                this.props.celestial !== null ?
+                  <CelestialFightSection
+                    userId={this.props.userId}
+                    characterId={this.state.character.id}
+                    celestialId={this.props.celestial.id}
+                    isDead={this.state.isDead}
+                    isAdventuring={this.state.isAdventuring}
+                    openTimeOutModal={this.props.openTimeOutModal}
+                    characterName={this.state.character.name}
+                    monsterName={this.props.celestial.monster.name}
+                    switchBattleAction={this.switchBattleAction.bind(this)}
+                  />
+                : null
             }
 
           </Col>

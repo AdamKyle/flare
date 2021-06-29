@@ -151,14 +151,17 @@ class MovementService {
         $this->npcKingdoms       = Kingdom::select('x_position', 'y_position', 'npc_owned')
                                           ->whereNull('character_id')
                                           ->where('npc_owned', true)
+                                          ->where('game_map_id', $character->map->game_map_id)
                                           ->get()
                                           ->toArray();
 
-        $this->celestialEntities = CelestialFight::where('x_position', $character->x_position)
-                                                 ->where('y_position', $character->y_position)
-                                                 ->where('game_map_id', $character->map->game_map_id)
-                                                 ->first()
-                                                 ->toArray();
+        $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
+                                         ->where('y_position', $character->y_position)
+                                         ->first();
+
+        if (!is_null($celestialEntity)) {
+            $this->celestialEntities[] = $celestialEntity->toArray();
+        }
 
         $kingdom = Kingdom::where('x_position', $character->x_position)
                           ->where('y_position', $character->y_position)
@@ -404,6 +407,7 @@ class MovementService {
             'port_details'      => $this->portDetails(),
             'adventure_details' => $this->adventureDetails(),
             'kingdom_details'   => $this->kingdomDetails(),
+            'celestials'        => $this->celestialEntities(),
             'characters_on_map' => Character::join('maps', function($query) use ($character) {
                 $mapId = $character->map->game_map_id;
                 $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);

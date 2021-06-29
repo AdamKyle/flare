@@ -243,9 +243,11 @@ export default class Map extends React.Component {
         if (_.isEmpty(event.adventureDetails)) {
           this.props.openAdventureDetails(false);
         }
-
+        
         if (event.celestials.length > 0) {
-          this.props.updateCelestial(event.celestial[0]);
+          this.props.updateCelestial(event.celestials[0]);
+        } else {
+          this.props.updateCelestial(null);
         }
       });
     });
@@ -423,6 +425,8 @@ export default class Map extends React.Component {
     const x = coordinates.x;
     const y = coordinates.y;
 
+    this.props.updateCelestial(null)
+
     axios.post('/api/move/' + this.state.characterId, {
       position_x: this.state.controlledPosition.x,
       position_y: this.state.controlledPosition.y,
@@ -466,6 +470,12 @@ export default class Map extends React.Component {
 
         if (_.isEmpty(this.state.adventures)) {
           this.props.openAdventureDetails(false);
+        }
+
+        if (result.data.celestials.length > 0) {
+          this.props.updateCelestial(result.data.celestials[0]);
+        } else {
+          this.props.updateCelestial(null);
         }
       });
     }).catch((err) => {

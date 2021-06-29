@@ -99,14 +99,15 @@ class CelestialFightService {
 
             event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
 
-            $characterInCelestialFight->delete();
+            CharacterInCelestialFight::where('celestial_fight_id', $celestialFight->id)->delete();
+
             $celestialFight->delete();
 
             event(new UpdateCelestialFight(null, true));
 
             return $this->successResult([
                 'battle_over' => true,
-                'logs'        => array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
+                'logs'        => $logInfo[0]['messages'],
             ]);
         }
     }
