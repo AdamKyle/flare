@@ -22,6 +22,7 @@
                                     <a class="dropdown-item" href="#" wire:click="setType('spell-damage')">Spells Damage</a>
                                     <a class="dropdown-item" href="#" wire:click="setType('ring')">Ring</a>
                                     <a class="dropdown-item" href="#" wire:click="setType('artifact')">Artifact</a>
+                                    <a class="dropdown-item" href="#" wire:click="setType('alchemy')">Alchemy</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="#" href="#" wire:click="setType('reset')">Reset</a>
                                 </div>

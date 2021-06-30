@@ -1,5 +1,4 @@
 import React from 'react';
-import {Row, Col} from 'react-bootstrap';
 import Draggable from 'react-draggable';
 import {getServerMessage} from '../helpers/server_message';
 import {
@@ -14,6 +13,7 @@ import Locations from './components/locations';
 import KingdomPin from './components/pins/kingdom-pin';
 import NpcKingdomPin from "./components/pins/npc-kingdom-pin";
 import EnemyKingdomPin from "./components/pins/enemy-kingdom-pin";
+
 export default class Map extends React.Component {
 
   constructor(props) {

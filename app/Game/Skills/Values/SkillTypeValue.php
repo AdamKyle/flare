@@ -17,21 +17,23 @@ class SkillTypeValue {
 
     const DISENCHANTING                   = 3;
 
-    const EFFECTS_BATTLE_TIMER            = 4;
+    const ALCHEMY                         = 4;
 
-    const EFFECTS_DIRECTIONAL_MOVE_TIMER  = 5;
+    const EFFECTS_BATTLE_TIMER            = 5;
 
-    const EFFECTS_MINUTE_MOVE_TIMER       = 6;
+    const EFFECTS_DIRECTIONAL_MOVE_TIMER  = 6;
 
-    const EFFECTS_KINGDOM_BUILDING_TIMERS = 7;
+    const EFFECTS_MINUTE_MOVE_TIMER       = 7;
 
-    const EFFECTS_UNIT_RECRUITMENT_TIMER  = 8;
+    const EFFECTS_KINGDOM_BUILDING_TIMERS = 8;
 
-    const EFFECTS_UNIT_MOVEMENT_TIMER     = 9;
+    const EFFECTS_UNIT_RECRUITMENT_TIMER  = 9;
 
-    const EFFECTS_SPELL_EVASION           = 10;
+    const EFFECTS_UNIT_MOVEMENT_TIMER     = 10;
 
-    const EFFECTS_ARTIFACT_ANNULMENT      = 11;
+    const EFFECTS_SPELL_EVASION           = 11;
+
+    const EFFECTS_ARTIFACT_ANNULMENT      = 12;
 
     /**
      * @var string[] $values
@@ -41,14 +43,16 @@ class SkillTypeValue {
         self::CRAFTING                        => 1,
         self::ENCHANTING                      => 2,
         self::DISENCHANTING                   => 3,
-        self::EFFECTS_BATTLE_TIMER            => 4,
-        self::EFFECTS_DIRECTIONAL_MOVE_TIMER  => 5,
-        self::EFFECTS_MINUTE_MOVE_TIMER       => 6,
-        self::EFFECTS_KINGDOM_BUILDING_TIMERS => 7,
-        self::EFFECTS_UNIT_RECRUITMENT_TIMER  => 8,
-        self::EFFECTS_UNIT_MOVEMENT_TIMER     => 9,
-        self::EFFECTS_SPELL_EVASION           => 10,
-        self::EFFECTS_ARTIFACT_ANNULMENT      => 11,
+        self::ALCHEMY                         => 4,
+        self::EFFECTS_BATTLE_TIMER            => 5,
+        self::EFFECTS_DIRECTIONAL_MOVE_TIMER  => 6,
+        self::EFFECTS_MINUTE_MOVE_TIMER       => 7,
+        self::EFFECTS_KINGDOM_BUILDING_TIMERS => 8,
+        self::EFFECTS_UNIT_RECRUITMENT_TIMER  => 9,
+        self::EFFECTS_UNIT_MOVEMENT_TIMER     => 10,
+        self::EFFECTS_SPELL_EVASION           => 11,
+        self::EFFECTS_ARTIFACT_ANNULMENT      => 12,
+
     ];
 
     public static $namedValues = [
@@ -56,14 +60,16 @@ class SkillTypeValue {
         1  => 'Crafting',
         2  => 'Enchanting',
         3  => 'Disenchanting',
-        4  => 'Effects Battle Timer',
-        5  => 'Effects Directional Move Timer',
-        6  => 'Effects Minute Based Movement Timer',
-        7  => 'Effects Kingdom Building Timers',
-        8  => 'Effects Unit Recruitment Timers',
-        9  => 'Effects Unit Movement Timers',
-        10 => 'Effects Spell Evasion',
-        11 => 'Effects Artifact Annulment',
+        4  => 'Alchemy',
+        5  => 'Effects Battle Timer',
+        6  => 'Effects Directional Move Timer',
+        7  => 'Effects Minute Based Movement Timer',
+        8  => 'Effects Kingdom Building Timers',
+        9  => 'Effects Unit Recruitment Timers',
+        10 => 'Effects Unit Movement Timers',
+        11 => 'Effects Spell Evasion',
+        12 => 'Effects Artifact Annulment',
+
     ];
 
     /**
@@ -111,12 +117,21 @@ class SkillTypeValue {
     }
 
     /**
-     * is  disenchanting
+     * is disenchanting
      *
      * @return bool
      */
     public function isDisenchanting(): bool {
         return $this->value === self::DISENCHANTING;
+    }
+
+    /**
+     * is alchemy
+     *
+     * @return bool
+     */
+    public function isAlchemy(): bool {
+        return $this->value === self::ALCHEMY;
     }
 
     /**

@@ -297,6 +297,7 @@ export default class Game extends React.Component {
                   openPortDetails={this.openPortDetails.bind(this)}
                   updatePlayerPosition={this.updatePlayerPosition.bind(this)}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
+                  updateCelestial={this.updateCelestial.bind(this)}
                 />
                 : null
             }

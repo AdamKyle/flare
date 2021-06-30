@@ -339,10 +339,15 @@ class MovementService {
 
         $character = $character->refresh();
 
+        $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
+            ->where('y_position', $character->y_position)
+            ->first();
+
         return $this->successResult([
             'character_position_details' => $character->map,
             'port_details'               => $this->portService->getPortDetails($character, $location),
             'adventure_details'          => $location->adventures->isNotEmpty() ? $location->adventures : [],
+            'celestial_entities'         => !is_null($celestialEntity) ? [$celestialEntity] : [],
         ]);
     }
 

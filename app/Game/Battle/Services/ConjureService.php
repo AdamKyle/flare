@@ -2,6 +2,8 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Services\MovementService;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Models\CelestialFight;
@@ -41,8 +43,8 @@ class ConjureService {
     }
 
     public function conjure(Monster $monster, Character $character, string $type) {
-        $x = $this->getXPosition();
-        $y = $this->getYPosition();
+        $x = 160; //$this->getXPosition();
+        $y = 80; //$this->getYPosition();
 
         $kingdom = $this->isAtKingdom($x, $y);
         $damagedKingdom = false;
@@ -79,6 +81,8 @@ class ConjureService {
         } else if ($type->isPublic()) {
             event(new GlobalMessageEvent( $monster->name . ' has been conjured to the ' . $plane . ' plane at (x/y): ' . $x . '/' . $y));
         }
+
+        event(new UpdateMapDetailsBroadcast($character->map, $character->user, resolve(MovementService::class)));
 
         if ($damagedKingdom) {
             $this->damageKingdom($kingdom, $character, $this->getDamageAmount());

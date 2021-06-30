@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Game\Skills\Services;
+
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateSkillEvent;
+use Illuminate\Database\Eloquent\Collection;
+use App\Flare\Models\Character;
+use App\Flare\Models\Item;
+use App\Flare\Models\Skill;
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Skills\Services\Traits\SkillCheck;
+use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+
+class AlchemyService {
+    use ResponseBuilder, SkillCheck, UpdateCharacterGold;
+
+    public function fetchAlchemistItems($character) {
+        $skill = $character->skills->filter(function ($skill) {
+            return $skill->type()->isAlchemy();
+        });
+
+        return Item::where('can_craft', true)
+            ->where('crafting_type', 'alchemy')
+            ->where('skill_level_required', '<=', $skill->level)
+            ->where('item_prefix_id', null)
+            ->where('item_suffix_id', null)
+            ->orderBy('cost', 'asc')
+            ->get();
+    }
+
+    public function transmute($character, int $itemId): array {
+        $skill = $character->skills->filter(function ($skill) {
+            return $skill->type()->isAlchemy();
+        });
+
+        $item = Item::find($itemId);
+
+        if (is_null($item)) {
+            return $this->errorResult('Item does not exist.');
+        }
+
+        if ($item->gold_dust_cost > $character->gold_dust) {
+            event(new ServerMessageEvent($character->user, 'not_enough_gold_dust'));
+
+            return $this->successResult([
+                'items' => $this->fetchAlchemistItems($character),
+            ]);
+        }
+
+        if ($item->shard_cost > $character->shards) {
+            event(new ServerMessageEvent($character->user, 'not_enough_shards'));
+
+            return $this->successResult([
+                'items' => $this->fetchAlchemistItems($character),
+            ]);
+        }
+    }
+
+    public function attemptTransmute(Character $character, Skill $skill, Item $item) {
+        if ($skill->level < $item->skill_level_required) {
+            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+
+            return;
+        }
+
+        if ($skill->level >= $item->skill_level_trivial) {
+            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+
+            $this->pickUpItem($character, $item, $skill, true);
+
+            return;
+        }
+
+        $characterRoll = $this->characterRoll($skill);
+        $dcCheck       = $this->getDCCheck($skill);
+
+        if ($dcCheck < $characterRoll) {
+            $this->pickUpItem($character, $item, $skill);
+
+            return;
+        }
+
+        event(new ServerMessageEvent($character->user, 'failed_to_transmute'));
+
+        $this->updateCharacterGold($character, $item->cost, $skill);
+    }
+
+    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
+        if ($this->attemptToPickUpItem($character, $item)) {
+
+            if (!$tooEasy) {
+                event(new UpdateSkillEvent($skill));
+
+                $this->updateAlchemyCost($character, $item);
+            }
+        }
+    }
+
+    private function attemptToPickUpItem(Character $character, Item $item): bool {
+        if ($character->inventory->slots->count() !== $character->inventory_max) {
+
+            $character->inventory->slots()->create([
+                'item_id'      => $item->id,
+                'inventory_id' => $character->inventory->id,
+            ]);
+
+            event(new ServerMessageEvent($character->user, 'transmuted', $item->name));
+
+            return true;
+        }
+
+        event(new ServerMessageEvent($character->user, 'inventory_full'));
+
+        return false;
+    }
+}

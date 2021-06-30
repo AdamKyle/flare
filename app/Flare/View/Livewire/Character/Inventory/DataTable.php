@@ -53,7 +53,7 @@ class DataTable extends Component
             $join = $join->on('inventory_slots.item_id', '=', 'items.id');
 
             if (!$this->includeQuestItems) {
-                $join->where('items.type', '!=', 'quest');
+                $join->whereNotIn('items.type', ['quest', 'alchemy']);
             }
 
             if ($this->batchSell) {

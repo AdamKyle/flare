@@ -37,7 +37,11 @@ class RandomItemDropBuilder {
      * @return Item
      */
     public function generateItem(): Item {
-        $item          = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])->where('type', '!=', 'artifact')->where('type', '!=', 'quest')->where('can_drop', true)->get()->first();
+        $item          = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])
+                                              ->whereNotIn('type', ['artifact', 'quest', 'alchemy'])
+                                              ->where('can_drop', true)
+                                              ->get()
+                                              ->first();
         $duplicateItem = $this->duplicateItem($item);
         $affix         = $this->fetchRandomItemAffix();
 

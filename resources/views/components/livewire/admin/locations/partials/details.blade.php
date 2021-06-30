@@ -36,6 +36,35 @@
                 <label class="form-check-label" for="location-is-port">Is Port Location?</label>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="x-position"> X: <span class="danger">*</span> </label>
+                        <select class="custom-select form-control required" id="x-position" name="x_position" wire:model="location.x">
+                            <option value="">Select X Position</option>
+                            @foreach($coordinates['x'] as $coordinate)
+                                <option value="{{$coordinate}}">{{$coordinate}}</option>
+                            @endforeach
+                        </select>
+                        @error('location.x') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="y-position"> Y: <span class="danger">*</span> </label>
+                        <select class="custom-select form-control required" id="y-position" name="y_position" wire:model="location.y">
+                            <option value="">Select Y Position</option>
+                            @foreach($coordinates['y'] as $coordinate)
+                                <option value="{{$coordinate}}">{{$coordinate}}</option>
+                            @endforeach
+                        </select>
+                        @error('location.y') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
 </div>
 

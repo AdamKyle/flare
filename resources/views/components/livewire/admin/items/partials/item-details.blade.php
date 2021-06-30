@@ -130,23 +130,144 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="item-can-drop" wire:model="item.can_drop">
                 <label class="form-check-label" for="item-can-drop">Can this item drop?</label>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="form-group form-check-inline">
-                <input type="checkbox" class="form-check-input" id="item-can-drop" wire:model="item.craft_only">
-                <label class="form-check-label" for="item-can-drop">Can only craft item?</label>
+                <input type="checkbox" class="form-check-input" id="craft_only" wire:model="item.craft_only">
+                <label class="form-check-label" for="craft_only">Can only craft item?</label>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="market_sellable" wire:model="item.market_sellable">
+                <label class="form-check-label" for="market_sellable">Can this item be sold on the market?</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label for="item-cost">Cost: </label>
                 <input type="number" class="form-control" id="item-cost" name="item-cost" wire:model="item.cost" {{$item->type !== 'quest' ? '' : 'disabled'}}>
                 @error('item.cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="gold_dust_cost">Gold Dust Cost: </label>
+                <input type="number" class="form-control" id="gold_dust_cost" name="gold_dust_cost" wire:model="item.gold_dust_cost" {{$item->type === 'alchemy' ? '' : 'disabled'}}>
+                @error('item.gold_dust_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="shard_cost">Shard Cost: </label>
+                <input type="number" class="form-control" id="shards_cost" name="shards_cost" wire:model="item.shards_cost" {{$item->type === 'alchemy' ? '' : 'disabled'}}>
+                @error('item.shards_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="usable" wire:model="item.usable" {{$item->type === 'alchemy' ? '' : 'disabled'}}>
+                <label class="form-check-label" for="usable">Can this item be used?</label>
+            </div>
+
+            <div class="{{$item->usable ? 'row' : 'hide'}}">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="lasts_for">Lasts For?: </label>
+                        <input type="number" class="form-control" id="lasts_for" name="lasts_for" wire:model="item.lasts_for" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                        <small class="form-text text-muted">Number is in minutes.</small>
+                        @error('item.lasts_for') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+
+            @if ($showUsabillityError)
+                <div class="alert alert-danger mb-2 mt-2">
+                    You must choose an option since this is usable.
+                </div>
+            @endif
+
+            <div class="{{$item->usable ? 'row' : 'hide'}}">
+                <div class="col-md-4">
+                    <div class="form-group form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="stat_increase" wire:model="item.stat_increase" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                        <label class="form-check-label" for="stat_increase">Stat Increase?</label>
+                    </div>
+
+                    <div class="{{$item->stat_increase ? 'row' : 'hide'}}">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="increase_stat_by">Increases Stat By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="increase_stat_by" name="increase_stat_by" wire:model="item.increase_stat_by" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.increase_stat_by') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="affects_skill_type">Affects Skill: </label>
+                        <select class="form-control" name="affects_skill_type" wire:model="item.affects_skill_type" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                            <option value="">Please select</option>
+                            @foreach($skillTypes as $key => $value)
+                                <option value="{{$key}}">{{$value}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @if ($affectsSkillError)
+                        <div class="alert alert-danger mb-2 mt-2">
+                            You must specify how this affects the skill.
+                        </div>
+                    @endif
+                    <div class="{{empty($item->affects_skill_type) && !is_null($item->affects_skill_type) ? 'row' : 'hide'}}">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="increase_skill_bonus_by">Increases Skill Bonus By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="increase_skill_bonus_by" name="increase_skill_bonus_by" wire:model="item.increase_skill_bonus_by" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.increase_skill_bonus_by') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="increase_skill_training_bonus_by">Increases Skill Training By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="increase_skill_training_bonus_by" name="increase_skill_training_bonus_by" wire:model="item.increase_skill_training_bonus_by" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.increase_skill_training_bonus_by') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group form-check-inline">
+                        <label for="damages_kingdoms">Damages Kingdom: </label>
+                        <input type="checkbox" class="form-check-input" id="damages_kingdoms" wire:model="item.damages_kingdoms">
+                    </div>
+
+                    <div class="{{$item->damages_kingdoms ? 'row' : 'hide'}}">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                Any previous information added such as stat increases or skill type bonuses will be voided upon clicking next.<br />
+                                A item that effects a kingdom is a one time use that cannot affect skill progression, stats or last for a period of time.
+                            </div>
+                            <div class="form-group">
+                                <label for="kingdom_damage">Damage %: </label>
+                                <input type="number" steps="0.01" class="form-control" id="kingdom_damage" name="kingdom_damage" wire:model="item.kingdom_damage">
+                                <small id="emailHelp" class="form-text text-muted">Item will damage everything: buildings, units, morale will be affected</small>
+                                @error('item.kingdom_damage') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -37,7 +37,7 @@ class FormWizard extends Component
 
         if ($passed) {
             $this->currentStep = $index;
-            
+
             $this->emitTo($this->views[$index], 'update', $this->model['id']);
         }
     }
@@ -56,7 +56,7 @@ class FormWizard extends Component
             if (!empty($sessionMessage)) {
                 session()->flash($sessionMessage['type'], $sessionMessage['message']);
             }
-            
+
 
             redirect()->route($this->finishRoute);
         }
