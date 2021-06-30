@@ -298,7 +298,7 @@ class FightService {
         $attack = $attackerBaseStat + round($attackerDex / 2) * $accuracyBonus;
         $dodge  = $defenderBaseStat + round($defenderDex / 2) * $dodgeBonus;
 
-        return $attack > $dodge;
+        return $attack >= $dodge;
     }
 
     protected function blockedAttack($defender, $attacker): bool {

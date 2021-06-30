@@ -135,20 +135,18 @@ class CelestialFightService {
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
         $celestialFight            = CelestialFight::find($characterInCelestialFight->celestial_fight_id);
 
-        if (!is_null($characterInCelestialFight)) {
-            return $this->successResult([
-                'fight' => [
-                    'character' =>[
-                        'max_health'     => $characterInCelestialFight->character_max_health,
-                        'current_health' => $characterInCelestialFight->character_current_health,
-                    ],
-                    'monster' => [
-                        'max_health'     => $celestialFight->max_health,
-                        'current_health' => $celestialFight->current_health,
-                    ]
+        return $this->successResult([
+            'fight' => [
+                'character' =>[
+                    'max_health'     => $characterInCelestialFight->character_max_health,
+                    'current_health' => $characterInCelestialFight->character_current_health,
                 ],
-            ]);
-        }
+                'monster' => [
+                    'max_health'     => $celestialFight->max_health,
+                    'current_health' => $celestialFight->current_health,
+                ]
+            ],
+        ]);
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {

@@ -2,10 +2,14 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\CelestialFightFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CelestialFight extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -52,5 +56,9 @@ class CelestialFight extends Model
 
     public function charactersInFight() {
         return $this->charactersInFight(CharacterInCelestialFight::class);
+    }
+
+    protected static function newFactory() {
+        return CelestialFightFactory::new();
     }
 }

@@ -2,10 +2,14 @@
 
 namespace App\Flare\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\CharacterInCelestialFightFactory;
 
 class CharacterInCelestialFight extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -28,4 +32,8 @@ class CharacterInCelestialFight extends Model
         'character_max_health'     => 'integer',
         'character_current_health' => 'integer',
     ];
+
+    protected static function newFactory() {
+        return CharacterInCelestialFightFactory::new();
+    }
 }

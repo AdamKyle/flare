@@ -41,16 +41,14 @@ class ConjureService {
     }
 
     public function conjure(Monster $monster, Character $character, string $type) {
-        $x = CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
-        $y = CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+        $x = $this->getXPosition();
+        $y = $this->getYPosition();
 
         $kingdom = $this->isAtKingdom($x, $y);
         $damagedKingdom = false;
 
         if (!is_null($kingdom)) {
-            if ($this->canDamageKingdom()) {
-                $damagedKingdom = true;
-            }
+            $damagedKingdom = $this->canDamageKingdom();
         }
 
         $healthRange          = explode('-', $monster->health_range);
@@ -77,7 +75,7 @@ class ConjureService {
         if ($type->isPrivate()) {
             event(new GlobalMessageEvent($monster->name . ' has been conjured to the ' . $plane . ' plane.'));
 
-            return broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight), true));
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight), true));
         } else if ($type->isPublic()) {
             event(new GlobalMessageEvent( $monster->name . ' has been conjured to the ' . $plane . ' plane at (x/y): ' . $x . '/' . $y));
         }
@@ -85,6 +83,14 @@ class ConjureService {
         if ($damagedKingdom) {
             $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
         }
+    }
+
+    public function getXPosition(): int {
+        return CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
+    }
+
+    public function getYPosition(): int {
+        return CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
     }
 
     public function canAfford(Monster $monster, Character $character) {
@@ -112,14 +118,14 @@ class ConjureService {
         return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('paid_conjuring', $npc), true));
     }
 
+    public function canDamageKingdom(): bool {
+        return rand(0, self::DAMAGE_KD_CHECK) > (self::DAMAGE_KD_CHECK - 1);
+    }
+
     protected function isAtKingdom(int $x, int $y) {
         return Kingdom::where('x_position', $x)
                       ->where('y_position', $y)
                       ->first();
-    }
-
-    protected function canDamageKingdom(): bool {
-        return rand(0, self::DAMAGE_KD_CHECK) > (self::DAMAGE_KD_CHECK - 1);
     }
 
     protected function getDamageAmount(): float {
@@ -128,11 +134,7 @@ class ConjureService {
 
     protected function damageKingdom(Kingdom $kingdom, Character $character, float $damage) {
         $kingdom->buildings->each(function($building) use($damage) {
-            $durability = $building->current_durability - ($building->current_durability * $damage);
-
-            if ($durability < 0) {
-                $durability = 0;
-            }
+            $durability = floor($building->current_durability - ($building->current_durability * $damage));
 
             $building->update([
                 'current_durability' => $durability
@@ -140,11 +142,7 @@ class ConjureService {
         });
 
         $kingdom->units->each(function($unit) use($damage) {
-            $newAmount = $unit->amount - ($unit->amount * $damage);
-
-            if ($newAmount < 0) {
-                $newAmount = 0;
-            }
+            $newAmount = floor($unit->amount - ($unit->amount * $damage));
 
             $unit->update([
                 'amount' => $newAmount
@@ -154,7 +152,9 @@ class ConjureService {
         $morale   = $kingdom->current_morale - ($kingdom->current_morale * $damage);
         $treasure = $kingdom->treasure - ($kingdom->treasure * $damage);
 
-        if ($morale < 0) {
+        $newMorale = floor($morale * 100);
+
+        if (!($newMorale > 0)) {
             $morale = 0;
         }
 
@@ -168,7 +168,7 @@ class ConjureService {
         $kingdomPlane = $kingdom->gameMap->name;
 
         if (is_null($kingdom->character_id)) {
-            $kingdomOwner = Npc::where('type', NpcTypes::SUMMONER)->first()->real_name;
+            $kingdomOwner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
         } else {
             $kingdomOwner = $kingdom->character->name;
         }

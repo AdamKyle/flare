@@ -57,11 +57,7 @@ class ClearCelestials extends Command
         if ($count > 0) {
             CelestialFight::where('updated_at', '<=', now()->subHour())->chunkById(100, function ($fights) {
                 foreach ($fights as $fight) {
-                    $charactersInFight = CharacterInCelestialFight::where('celestial_fight_id', $fight->id)->get();
-
-                    if ($charactersInFight->isNotEmpty()) {
-                        $charactersInFight->delete();
-                    }
+                    $charactersInFight = CharacterInCelestialFight::where('celestial_fight_id', $fight->id)->delete();
 
                     event(new GlobalMessageEvent($fight->monster->name . ' has vanished from the surface plane (hourly reset).'));
 

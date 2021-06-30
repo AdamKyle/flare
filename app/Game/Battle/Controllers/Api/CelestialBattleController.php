@@ -8,6 +8,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Services\FightService;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\CelestialFightService;
+use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Http\Controllers\Controller;
 use App\Game\Battle\Request\ConjureRequest;
@@ -49,13 +50,13 @@ class CelestialBattleController extends Controller {
         $npc     = Npc::where('type', NpcTypes::SUMMONER)->first();
 
         if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('already_conjured', $npc), true));
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessage->build('already_conjured', $npc), true));
 
             return response()->json([], 200);
         }
 
-        if ($request->type === 'public' && CelestialFight::where('type', 'public')->get()->isNotEmpty()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('public_exists', $npc), true));
+        if ($request->type === 'public' && CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessage->build('public_exists', $npc), true));
 
             return response()->json([], 200);
         }
@@ -67,7 +68,7 @@ class CelestialBattleController extends Controller {
 
             $this->conjureService->conjure($monster, $character, $request->type);
         } else {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('cant_afford_conjuring', $npc), true));
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessage->build('cant_afford_conjuring', $npc), true));
 
             return response()->json([], 200);
         }
@@ -119,7 +120,7 @@ class CelestialBattleController extends Controller {
 
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
 
-        if (is_null($celestialFight)) {
+        if (is_null($characterInCelestialFight)) {
             $characterInCelestialFight = $this->celestialFightService->joinFight($character, $celestialFight);
         }
 
