@@ -43,6 +43,7 @@
             <li><a href="{{route('adventures.list')}}">Adventures</a></li>
             <li><a href="{{route('adventures.create')}}">Create Adventure</a></li>
             <li><a href="{{route('npcs.index')}}">NPC's</a></li>
+            <li><a href="{{route('quests.index')}}">Quests</a></li>
         </ul>
     </li>
     <li>

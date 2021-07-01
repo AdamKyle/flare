@@ -24,6 +24,7 @@ class BaseSkillValue {
             'level'              => 1,
             'xp'                 => 0,
             'xp_max'             => $skill->can_train ? rand(150, 350) : rand(100, 250),
+            'is_locked'          => $skill->is_locked,
         ];
     }
 

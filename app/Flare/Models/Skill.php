@@ -24,6 +24,7 @@ class Skill extends Model
         'monster_id',
         'game_skill_id',
         'currently_training',
+        'is_locked',
         'level',
         'xp',
         'xp_max',
@@ -37,6 +38,7 @@ class Skill extends Model
      */
     protected $casts = [
         'currently_training'    => 'boolean',
+        'is_locked'             => 'boolean',
         'level'                 => 'integer',
         'xp'                    => 'integer',
         'xp_max'                => 'integer',

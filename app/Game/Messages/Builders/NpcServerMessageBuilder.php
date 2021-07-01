@@ -39,6 +39,28 @@ class NpcServerMessageBuilder {
                 return '"No Child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"';
             case 'location_of_conjure':
                 return '"Child, I have conjured the portal, I have opened the gates! Here is the location (X/Y): '.$celestialFight->x_position.'/'.$celestialFight->y_position.'"';
+            case 'taken_item':
+                return '"Child! You have an item I want! I shall take that. In return I shall give you something you always wanted!"';
+            case 'given_item':
+                return '"Here child, take this! It might of use to you!" (Check the help section under quest items to see what this does, or check your inventory and click on the item)';
+            case 'inventory_full':
+                return '"I cannot take the item from you child! Your inventory is to full! Come back when you clean out some space."';
+            case 'gold_capped':
+                return '"Child! You are Gold capped! I cannot take the item from you. Come back when you have less gold!" (check help section under quests for how much gold is to be rewarded with what you have)';
+            case 'gold_dust_capped':
+                return '"Child! You are Gold Dust capped! I cannot take the item from you. Come back when you have less gold dust!" (check help section under quests for how much gold dust is to be rewarded with what you have)';
+            case 'shard_capped':
+                return '"Child! You are shard capped! I cannot take the item from you. Come back when you have less shards!" (check help section under quests for how many shards is to be rewarded with what you have)';
+            case 'currency_given':
+                return '"I have payment for you, here take this!"';
+            case 'quest_complete':
+                return '"Pleasure doing business with you child!"';
+            case 'no_quests':
+                return '"Sorry child, no work for you today!"';
+            case 'no_skill':
+                return '"Sorry child, I do not see a skill that needs unlocking."';
+            case 'dont_own_skill':
+                return  '"Sorry child, you don\'t seem to own the skill to be unlocked!" (Chances are if you are seeing this, it\'s a bug. Head to discord post in the bugs section, link at the top)';
             default:
                 return '';
         }

@@ -46,6 +46,10 @@ class Npc extends Model {
         return $this->hasMany(NpcCommand::class, 'npc_id', 'id');
     }
 
+    public function quests() {
+        return $this->hasMany(Quest::class, 'npc_id', 'id');
+    }
+
     protected static function newFactory() {
         return NpcFactory::new();
     }

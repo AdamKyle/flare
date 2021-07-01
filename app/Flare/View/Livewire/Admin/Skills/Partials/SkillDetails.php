@@ -17,7 +17,8 @@ class SkillDetails extends Component
         'skill.type'                    => 'required',
         'skill.description'             => 'required',
         'skill.max_level'               => 'required',
-        'skill.can_monsters_have_skill' => 'nullable'
+        'skill.can_monsters_have_skill' => 'nullable',
+        'skill.is_locked'               => 'nullable',
     ];
 
     protected $messages =[
@@ -32,6 +33,10 @@ class SkillDetails extends Component
     public function validateInput(string $functionName, int $index) {
         if (is_null($this->skill->can_monsters_have_skill)) {
             $this->skill->can_monsters_have_skill = false;
+        }
+
+        if (is_null($this->skill->is_locked)) {
+            $this->skill->is_locked = false;
         }
 
         $this->validate();

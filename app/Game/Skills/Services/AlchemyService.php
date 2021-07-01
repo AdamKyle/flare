@@ -90,6 +90,8 @@ class AlchemyService {
 
         $this->updateCharacterGold($character, $item->cost, $skill);
 
+        event(new CraftedItemTimeOutEvent($character->refresh()));
+
         return $this->successResult([
             'items' => $this->fetchAlchemistItems($character),
         ]);

@@ -16,12 +16,15 @@ class NpcTypes
 
     const SUMMONER = 1;
 
+    const QUEST_GIVER = 2;
+
     /**
      * @var string[] $values
      */
     protected static $values = [
         self::KINGDOM_HOLDER => 0,
-        self::SUMMONER => 1
+        self::SUMMONER => 1,
+        self::QUEST_GIVER => 2,
     ];
 
     /**
@@ -29,7 +32,8 @@ class NpcTypes
      */
     protected static $namedValues = [
         0 => 'Kingdom Holder',
-        1 => 'Summoner'
+        1 => 'Summoner',
+        2 => 'Quest Giver',
     ];
 
     /**

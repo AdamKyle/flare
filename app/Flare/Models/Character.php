@@ -156,6 +156,14 @@ class Character extends Model
         return $this->hasMany(UnitMovementQueue::class);
     }
 
+    public function boons() {
+        return $this->hasMany(CharacterBoon::class);
+    }
+
+    public function questsCompleted() {
+        return $this->hasMany(QuestsCompleted::class);
+    }
+
     public function getXpAttribute($value) {
         return number_format($value, 2);
     }

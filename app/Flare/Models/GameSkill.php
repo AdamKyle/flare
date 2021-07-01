@@ -32,6 +32,7 @@ class GameSkill extends Model
         'can_train',
         'skill_bonus_per_level',
         'specifically_assigned',
+        'is_locked'
     ];
 
     /**
@@ -49,6 +50,7 @@ class GameSkill extends Model
         'can_monsters_have_skill'            => 'boolean',
         'specifically_assigned'              => 'boolean',
         'can_train'                          => 'boolean',
+        'is_locked'                          => 'integer',
         'type'                               => 'integer',
     ];
 
