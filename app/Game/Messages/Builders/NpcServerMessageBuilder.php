@@ -61,6 +61,10 @@ class NpcServerMessageBuilder {
                 return '"Sorry child, I do not see a skill that needs unlocking."';
             case 'dont_own_skill':
                 return  '"Sorry child, you don\'t seem to own the skill to be unlocked!" (Chances are if you are seeing this, it\'s a bug. Head to discord post in the bugs section, link at the top)';
+            case 'xp_given':
+                return '"Here child, take this for your hard work!"';
+            case 'skill_unlocked':
+                return '"Child, I have done something magical! I have unlocked a skill for you!"';
             default:
                 return '';
         }

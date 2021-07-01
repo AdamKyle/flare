@@ -1,6 +1,8 @@
 <?php
 namespace App\Game\Core\Providers;
 
+use App\Game\Core\Events\CharacterLevelUpEvent;
+use App\Game\Core\Listeners\CharacterLevelUpListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Game\Core\Events\BuyItemEvent;
 use App\Game\Core\Events\SellItemEvent;
@@ -77,6 +79,11 @@ class EventsProvider extends ServiceProvider {
         CreateAdventureNotificationEvent::class => [
             CreateAdventureNotificationListener::class,
         ],
+
+        // When the character levels up:
+        CharacterLevelUpEvent::class => [
+            CharacterLevelUpListener::class,
+        ]
     ];
 
     /**

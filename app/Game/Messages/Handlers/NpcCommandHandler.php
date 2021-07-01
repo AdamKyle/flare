@@ -9,9 +9,12 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Models\User;
+use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
 use App\Game\Battle\Values\MaxCurrenciesValue;
+use App\Game\Battle\Values\MaxLevel;
+use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
@@ -21,6 +24,8 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class NpcCommandHandler {
 
@@ -32,6 +37,16 @@ class NpcCommandHandler {
     private $npcServerMessageBuilder;
 
     /**
+     * @var CharacterAttackTransformer $characterAttackTransformer
+     */
+    private $characterAttackTransformer;
+
+    /**
+     * @var Manager $manager
+     */
+    private $manager;
+
+    /**
      * KINGDOM_COST
      */
     private const KINGDOM_COST = 10000;
@@ -40,16 +55,23 @@ class NpcCommandHandler {
      * NpcCommandHandler constructor.
      *
      * @param NpcServerMessageBuilder $npcServerMessageBuilder
+     * @param CharacterAttackTransformer $characterAttackTransformer
      */
-    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder) {
-        $this->npcServerMessageBuilder = $npcServerMessageBuilder;
+    public function __construct(
+        NpcServerMessageBuilder $npcServerMessageBuilder,
+        CharacterAttackTransformer $characterAttackTransformer,
+        Manager $manager,
+    ) {
+        $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
+        $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->manager                    = $manager;
     }
 
     /**
      * Handle the command.
      *
      * @param int $type
-     * @param string $npcName
+     * @param Npc $npc
      * @param User $user
      * @return PendingBroadcast
      * @throws Exception
@@ -222,6 +244,19 @@ class NpcCommandHandler {
             }
         }
 
+        if (!is_null($quest->reward_xp)) {
+            $xp = (new MaxLevel($character->level, $quest->reward_xp))->fetchXP();
+
+            $character->update([
+                'xp' => $character->xp + $xp,
+            ]);
+
+            event(new CharacterLevelUpEvent($character->refresh()));
+
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('xp_given', $npc->name), true));
+            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->reward_xp . ' XP from: ' . $npc->real_name));
+        }
+
         if (!is_null($quest->reward_gold_dust)) {
             $maxCurrenciesValue = new MaxCurrenciesValue($character->gold_dust, 1);
 
@@ -271,6 +306,12 @@ class NpcCommandHandler {
                 $characterSkill->update([
                     'is_locked' => false
                 ]);
+
+                $characterData = new Item($character->refresh(), $this->characterAttackTransformer);
+                event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
+                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('skill_unlocked', $npc->name), true));
+                broadcast(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
             }
         }
 

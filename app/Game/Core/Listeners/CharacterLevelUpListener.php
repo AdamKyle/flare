@@ -10,7 +10,7 @@ use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Services\CharacterService;
 
-class UpdateCharacterListener
+class CharacterLevelUpListener
 {
 
     /**
@@ -31,19 +31,22 @@ class UpdateCharacterListener
     /**
      * Handle the event.
      *
-     * @param UpdateCharacterEvent $event
+     * @param CharacterLevelUpEvent $event
      * @return void
      */
-    public function handle(UpdateCharacterEvent $event)
+    public function handle(CharacterLevelUpEvent $event)
     {
-        $characterRewardService = resolve(CharacterRewardService::class, [
-            'character' => $event->character,
-        ]);
+        if ($event->character->xp >= $event->character->xp_next) {
+            $this->characterService->levelUpCharacter($event->character);
 
-        $characterRewardService->distributeGoldAndXp($event->monster, $event->adventure);
+            $character = $event->character->refresh();
 
-        $character = $characterRewardService->getCharacter();
+            event(new ServerMessageEvent($character->user, 'level_up'));
+            event(new UpdateTopBarEvent($character));
+            event(new UpdateCharacterAttackEvent($character));
 
-        event(new CharacterLevelUpEvent($character));
+        } else {
+            event(new UpdateTopBarEvent($event->character));
+        }
     }
 }
