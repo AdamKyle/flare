@@ -78,7 +78,8 @@ class ItemDetails extends Component
         'armour',
         'ring',
         'spell',
-        'artifact'
+        'artifact',
+        'alchemy',
     ];
 
     public $skills;
@@ -151,7 +152,7 @@ class ItemDetails extends Component
                 $this->item->stat_increase      = null;
                 $this->item->affects_skill_type = '';
                 $this->item->gold_dust_cost     = 0;
-                $this->item->shards             = 0;
+                $this->item->shards_cost        = 0;
             }
 
             if (is_null($this->item->damages_kingdoms)) {

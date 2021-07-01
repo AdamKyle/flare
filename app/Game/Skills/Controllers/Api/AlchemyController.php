@@ -2,9 +2,10 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Flare\Models\Character;
 use App\Game\Skills\Requests\AlchemyValidation;
 use App\Game\Skills\Services\AlchemyService;
-use App\Http\Controllers\Controller;
 
 class AlchemyController extends Controller {
 
@@ -20,8 +21,8 @@ class AlchemyController extends Controller {
         ]);
     }
 
-    public function transform(AlchemyValidation $request, Character $character) {
-        $response = $this->alchemyService->transmute($character, $request->item_id);
+    public function transmute(AlchemyValidation $request, Character $character) {
+        $response = $this->alchemyService->transmute($character, $request->item_to_craft);
 
         $status = $response['status'];
 

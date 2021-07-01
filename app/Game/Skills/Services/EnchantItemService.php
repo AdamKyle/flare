@@ -68,8 +68,10 @@ class EnchantItemService {
         }
     }
 
-    public function setDcIncrease(int $increaseBy) {
+    public function setDcIncrease(int $increaseBy): EnchantItemService {
         $this->dcIncrease = $increaseBy;
+
+        return $this;
     }
 
     public function getItem() {

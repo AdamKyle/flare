@@ -43,8 +43,8 @@ class ConjureService {
     }
 
     public function conjure(Monster $monster, Character $character, string $type) {
-        $x = 160; //$this->getXPosition();
-        $y = 80; //$this->getYPosition();
+        $x = $this->getXPosition();
+        $y = $this->getYPosition();
 
         $kingdom = $this->isAtKingdom($x, $y);
         $damagedKingdom = false;

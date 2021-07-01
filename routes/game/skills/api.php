@@ -8,7 +8,7 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
     Route::get('/enchanting/{character}', ['uses' => 'Api\EnchantingController@fetchAffixes']);
 
     // Fetch Alchemy Items
-    Route::get('/alchemy/{character}', ['uses' => 'Api\AlchmeyController@alchemyItems']);
+    Route::get('/alchemy/{character}', ['uses' => 'Api\AlchemyController@alchemyItems']);
 
     Route::group(['middleware' => 'throttle:crafting'], function() {
         // Craft Item
@@ -28,6 +28,6 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
 
     Route::group(['middleware' => 'throttle:25,1'], function() {
         // Alchemy
-        Route::post('/transmute/{Character}', ['uses' => 'Api\AlchemyController@transmute']);
+        Route::post('/transmute/{character}', ['uses' => 'Api\AlchemyController@transmute']);
     });
 });
