@@ -22,16 +22,16 @@ class CreateQuests extends Migration
             $table->bigInteger('item_id')->unsigned()->nullable();
             $table->foreign('item_id')
                 ->references('id')->on('items');
-            $table->bigIneteger('gold_dust_cost')->nullable()->default(0);
-            $table->bigIneteger('shard_cost')->nullable()->default(0);
-            $table->bigIneteger('gold_cost')->nullable()->default(0);
+            $table->bigInteger('gold_dust_cost')->nullable()->default(0);
+            $table->bigInteger('shard_cost')->nullable()->default(0);
+            $table->bigInteger('gold_cost')->nullable()->default(0);
             $table->bigInteger('reward_item')->unsigned()->nullable();
             $table->foreign('reward_item')
                 ->references('id')->on('items');
-            $table->bigIneteger('reward_gold_dust')->nullable()->default(0);
-            $table->bigIneteger('reward_shards')->nullable()->default(0);
-            $table->bigIneteger('reward_gold')->nullable()->default(0);
-            $table->bigIneteger('reward_xp')->nullable()->default(0);
+            $table->bigInteger('reward_gold_dust')->nullable()->default(0);
+            $table->bigInteger('reward_shards')->nullable()->default(0);
+            $table->bigInteger('reward_gold')->nullable()->default(0);
+            $table->bigInteger('reward_xp')->nullable()->default(0);
             $table->boolean('unlocks_skill')->default(false);
             $table->integer('unlocks_skill_type')->nullable();
             $table->timestamps();

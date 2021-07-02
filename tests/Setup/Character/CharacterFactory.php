@@ -300,13 +300,14 @@ class CharacterFactory {
      * @param int $level | 1
      * @return characterFactory
      */
-    public function assignSkill(GameSkill $skill, int $level = 1): CharacterFactory {
+    public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false): CharacterFactory {
         $this->character->skills()->create([
             'game_skill_id' => $skill->id,
             'character_id'  => $this->character->id,
             'level'         => $level,
             'xp'            => 0,
             'xp_max'        => 100,
+            'is_locked'     => $locked,
         ]);
 
         return $this;

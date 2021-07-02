@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Battle\Values;
+namespace App\Flare\Values;
 
 class MaxCurrenciesValue {
 

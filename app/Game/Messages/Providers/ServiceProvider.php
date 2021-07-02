@@ -3,10 +3,12 @@
 namespace App\Game\Messages\Providers;
 
 
+use App\Flare\Transformers\CharacterAttackTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Messages\Console\Commands\CleanChat;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Handlers\NpcCommandHandler;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -18,8 +20,8 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register() {
         $this->commands([CleanChat::class]);
 
-        $this->app->bind(NpcCommandHandler::class, function() {
-            return new NpcCommandHandler(new NpcServerMessageBuilder);
+        $this->app->bind(NpcCommandHandler::class, function($app) {
+            return new NpcCommandHandler($app->make(NpcServerMessageBuilder::class), $app->make(CharacterAttackTransformer::class), $app->make(Manager::class));
         });
     }
 
