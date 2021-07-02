@@ -10,6 +10,7 @@ export default class PurchaseModal extends React.Component {
     this.state = {
       item: null,
       loading: true,
+      posting: false,
     }
   }
 
@@ -44,23 +45,27 @@ export default class PurchaseModal extends React.Component {
   }
 
   purchase() {
-    axios.post('/api/market-board/purchase/' + this.props.characterId, {
-      market_board_id: this.props.modalData.id
-    }).then((result) => {
-      this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
-      this.props.closeModal();
-    }).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
+    this.setState({
+      purchasing: true
+    }, () => {
+      axios.post('/api/market-board/purchase/' + this.props.characterId, {
+        market_board_id: this.props.modalData.id
+      }).then((result) => {
+        this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
+        this.props.closeModal();
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
 
-        if (response.status === 401) {
-          location.reload();
-        }
+          if (response.status === 401) {
+            location.reload();
+          }
 
-        if (response.status === 429) {
-          return window.location = '/game';
+          if (response.status === 429) {
+            return window.location = '/game';
+          }
         }
-      }
+      });
     });
   }
 
@@ -127,6 +132,14 @@ export default class PurchaseModal extends React.Component {
             due to the inherit risk in crafting and enchanting.
           </p> }
           {this.state.loading ? 'Loading please wait ...' : <ItemDetails item={this.state.item}/>}
+          {
+            this.state.purchasing ?
+              <div className="progress loading-progress mt-3" style={{position: 'relative'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+              : null
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={this.props.closeModal}>
