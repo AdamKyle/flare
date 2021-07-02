@@ -13,6 +13,7 @@ export default class SellItemModal extends React.Component {
       error: false,
       posting: false,
       error_message: null,
+      loading: false,
     }
   }
 
@@ -88,14 +89,6 @@ export default class SellItemModal extends React.Component {
           <Modal.Title>{this.props.modalData.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {
-            this.state.posting ?
-              <div className="progress mb-2 mt-2" style={{position: 'relative', height: '5px'}}>
-                <div className="progress-bar progress-bar-striped indeterminate">
-                </div>
-              </div>
-              : null
-          }
           { this.state.error ?
             <div className="alert alert-danger mb-2 mt-2">
               {this.state.error_message}
@@ -112,6 +105,14 @@ export default class SellItemModal extends React.Component {
           </div>
           <MarketHistory type={this.props.modalData.type}/>
           <ItemDetails item={this.props.modalData} />
+          {
+            this.state.posting ?
+              <div className="progress mb-2 mt-2" style={{position: 'relative', height: '5px'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+              : null
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={this.props.closeModal}>
