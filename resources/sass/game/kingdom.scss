@@ -13,6 +13,10 @@
   top: 38px;
 }
 
+.kingdom-loading {
+  margin: 20px 0 0 0 !important;
+  width: 100% !important;
+}
 
 @include media-breakpoint-down(sm) {
   .treasury-btn {

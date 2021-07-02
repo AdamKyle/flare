@@ -1,5 +1,5 @@
 import React from 'react';
-import RangeSlider from 'react-bootstrap-range-slider';
+import {Popover, OverlayTrigger} from 'react-bootstrap';
 
 export default class Recruit extends React.Component {
 
@@ -7,16 +7,17 @@ export default class Recruit extends React.Component {
     super(props);
 
     this.state = {
-      max: Math.round(this.props.currentPopulation / this.props.unit.required_population),
+      max: this.props.currentPopulation,
       value: "",
       canRecruit: false,
+      loading: false,
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.max !== this.state.max) {
       this.setState({
-        max: Math.round(this.props.currentPopulation / this.props.unit.required_population),
+        max: this.props.currentPopulation,
         value: 0,
       });
     }
@@ -40,31 +41,35 @@ export default class Recruit extends React.Component {
   }
 
   recruitUnits() {
-    axios.post('/api/kingdoms/' + this.props.kingdom.id + '/recruit-units/' + this.props.unit.id, {
-      amount: this.state.value,
-    }).then((result) => {
-      const amount = this.state.value;
+    this.setState({
+      canRecruit: false,
+      loading: true,
+    }, () => {
+      axios.post('/api/kingdoms/' + this.props.kingdom.id + '/recruit-units/' + this.props.unit.id, {
+        amount: this.state.value,
+      }).then((result) => {
+        const amount = this.state.value;
 
-      this.setState({
-        value: 0,
-        canRecruit: false,
-      }, () => {
-        this.props.updateKingdomData(result.data);
-        this.props.showUnitRecruitmentSuccess('Recruiting ' + amount + ' ' + this.props.unit.name + '. You can see this in the Unit Queue tab.')
-        this.props.close();
+        this.setState({
+          value: 0,
+        }, () => {
+          this.props.updateKingdomData(result.data);
+          this.props.showUnitRecruitmentSuccess('Recruiting ' + amount + ' ' + this.props.unit.name + '. You can see this in the Unit Queue tab.')
+          this.props.close();
+        });
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            location.reload();
+          }
+
+          if (response.status === 429) {
+            return this.props.openTimeOutModal();
+          }
+        }
       });
-    }).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
-
-        if (response.status === 401) {
-          location.reload();
-        }
-
-        if (response.status === 429) {
-          return this.props.openTimeOutModal();
-        }
-      }
     });
   }
 
@@ -128,7 +133,27 @@ export default class Recruit extends React.Component {
         }
         <div className="row">
           <div className="col-md-6">
-            <p><strong>Current Population</strong>: {this.state.max}</p>
+            <p><strong>Current Population</strong>: {this.state.max}
+              <OverlayTrigger
+                trigger="hover"
+                key='right'
+                placement='right'
+                overlay={
+                  <Popover id={`popover-positioned-right`}>
+                    <Popover.Title as="h3">Current Population</Popover.Title>
+                    <Popover.Content>
+                      <p>
+                        Pay attention to <strong>required population</strong> in the <strong>unit cost</strong> section.
+                        The current population here is a total amount of all remaining people in your kingdom. Just because you have X
+                        number of people does not mean you can recruit all of those people. Some units have different population requirements.
+                      </p>
+                    </Popover.Content>
+                  </Popover>
+                }
+              >
+                <i className="fas fa-question-circle ml-2"></i>
+              </OverlayTrigger>
+            </p>
             <input className="form-control" type="number" min={0} max={this.state.max} value={this.state.value} onChange={this.amountChange.bind(this)} />
           </div>
           <div className="col-md-6">
@@ -137,6 +162,14 @@ export default class Recruit extends React.Component {
             </button>
           </div>
         </div>
+        {
+          this.state.loading ?
+            <div className="progress loading-progress mt-3" style={{position: 'relative', width: '100%'}}>
+              <div className="progress-bar progress-bar-striped indeterminate">
+              </div>
+            </div>
+            : null
+        }
         <hr/>
       </div>
     );

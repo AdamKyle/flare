@@ -86,7 +86,7 @@ export default class UnitData extends React.Component {
               <dd><strong>Healing Percentage</strong>:</dd>
               <dd>{this.props.unit.heal_percentage * 100}%
                 <OverlayTrigger
-                  trigger="click"
+                  trigger="hover"
                   key='right'
                   placement='right'
                   overlay={
@@ -127,7 +127,24 @@ export default class UnitData extends React.Component {
                 className={this.getClass('iron_cost', this.props.amount)}>{this.calculateAmount('iron_cost', this.props.amount)}</dd>
               <dd><strong>Required population</strong>:</dd>
               <dd
-                className={this.getClass('required_population', this.props.amount)}>{this.calculateAmount('required_population', this.props.amount)}</dd>
+                className={this.getClass('required_population', this.props.amount)}>{this.calculateAmount('required_population', this.props.amount)}
+                <OverlayTrigger
+                  trigger="hover"
+                  key='right'
+                  placement='right'
+                  overlay={
+                    <Popover id={`popover-positioned-right`}>
+                      <Popover.Title as="h3">Required Population</Popover.Title>
+                      <Popover.Content>
+                        <p>This number will increase as you recruit more and more units. This represents how many people are needed for one unit and is then, much like resources,
+                        multiplied by amount of people.</p>
+                      </Popover.Content>
+                    </Popover>
+                  }
+                >
+                  <i className="fas fa-question-circle ml-2"></i>
+                </OverlayTrigger>
+              </dd>
             </dl>
           </div>
         </div>
