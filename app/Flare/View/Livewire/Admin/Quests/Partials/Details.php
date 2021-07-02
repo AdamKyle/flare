@@ -12,18 +12,19 @@ use Livewire\Component;
 class Details extends Component
 {
     protected $rules = [
-        'name'               => 'required',
-        'item_id'            => 'required',
-        'gold_dust_cost'     => 'nullable',
-        'shard_cost'         => 'nullable',
-        'gold_cost'          => 'nullable',
-        'reward_item'        => 'nullable',
-        'reward_gold_dust'   => 'nullable',
-        'reward_shards'      => 'nullable',
-        'reward_gold'        => 'nullable',
-        'reward_xp'          => 'nullable',
-        'unlocks_skill'      => 'nullable',
-        'unlocks_skill_type' => 'nullable',
+        'quest.name'               => 'required',
+        'quest.npc_id'             => 'required',
+        'quest.item_id'            => 'nullable',
+        'quest.gold_dust_cost'     => 'nullable',
+        'quest.shard_cost'         => 'nullable',
+        'quest.gold_cost'          => 'nullable',
+        'quest.reward_item'        => 'nullable',
+        'quest.reward_gold_dust'   => 'nullable',
+        'quest.reward_shards'      => 'nullable',
+        'quest.reward_gold'        => 'nullable',
+        'quest.reward_xp'          => 'nullable',
+        'quest.unlocks_skill'      => 'nullable',
+        'quest.unlocks_skill_type' => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];
@@ -49,7 +50,7 @@ class Details extends Component
 
         $this->quest->save();
 
-        $this->emitTo('core.form-wizard', 'storeModel', $this->npc);
+        $this->emitTo('core.form-wizard', 'storeModel', $this->quest);
         $this->emitTo('core.form-wizard', $functionName, $index, true);
     }
 

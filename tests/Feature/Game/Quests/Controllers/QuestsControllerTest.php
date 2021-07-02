@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Skills\Controllers\Api;
+namespace Tests\Feature\Game\Quests\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\NpcTypes;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Admin\Models;
+namespace Tests\Unit\Admin\Console;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;

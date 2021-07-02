@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Quest;
 
 class QuestsController extends Controller {
@@ -12,8 +13,14 @@ class QuestsController extends Controller {
     }
 
     public function show(Quest $quest) {
+        $skill = null;
+
+        if ($quest->unlocks_skill) {
+            $skill = GameSkill::where('type', $quest->unlocks_skill_type)->where('is_locked', true)->first();
+        }
         return view('admin.quests.show', [
-            'quest' => $quest,
+            'quest'       => $quest,
+            'lockedSkill' => $skill,
         ]);
     }
 

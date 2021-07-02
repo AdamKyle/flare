@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Messages\Events;
+namespace Tests\Unit\Game\Messages\Handlers;
 
 use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Models\QuestsCompleted;

@@ -37,7 +37,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="skill_type">Game Map: </label>
+                <label for="skill_type">Type: </label>
                 <select wire:model="skill.type" class="form-control" id="skill_type">
                     <option>Please select</option>
                     @foreach($skillTypes as $type => $name)

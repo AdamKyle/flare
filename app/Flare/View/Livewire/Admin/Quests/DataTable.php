@@ -2,13 +2,12 @@
 
 namespace App\Flare\View\Livewire\Admin\Quests;
 
-use App\Flare\Models\Npc;
-use App\Flare\Values\NpcTypes;
+use App\Flare\Models\Quest;
 use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class Datatable extends Component
+class DataTable extends Component
 {
     use WithPagination, WithSorting;
 
@@ -16,8 +15,8 @@ class Datatable extends Component
     public $sortField   = 'name';
     public $perPage     = 10;
 
-    public function fetchNpcs() {
-        $quests = Quests::dataTableSearch($this->search)->get();
+    public function fetchQuests() {
+        $quests = Quest::dataTableSearch($this->search)->get();
 
         $quests = $quests->transform(function($quest) {
             $quest->npc_name = $quest->npc->real_name;
@@ -31,8 +30,11 @@ class Datatable extends Component
 
         return $quests->sortByDesc($this->sortBy)->paginate(10);
     }
+
     public function render()
     {
-        return view('components.livewire.admin.quests.datatable');
+        return view('components.livewire.admin.quests.data-table', [
+            'quests' => $this->fetchQuests()
+        ]);
     }
 }

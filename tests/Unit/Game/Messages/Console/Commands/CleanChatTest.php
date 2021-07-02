@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Battle\Console\Commands;
+namespace Tests\Unit\Game\Messages\Console\Commands;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
