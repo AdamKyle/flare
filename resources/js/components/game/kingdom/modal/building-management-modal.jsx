@@ -21,7 +21,10 @@ export default class BuildingManagementModal extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = {}
+    this.state = {
+      disabledButtons: false,
+      loading: false,
+    }
   }
 
   canUpgrade() {
@@ -91,47 +94,58 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   upgradeBuilding() {
-    axios.post('/api/kingdoms/' + this.props.characterId + '/upgrade-building/' + this.props.building.id)
-      .then((result) => {
-        this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being upgraded). You can see this in the Building Queue tab.');
-        this.props.close();
-      })
-      .catch((err) => {
-        this.props.close();
+    this.setState({
+      disabledButtons: true,
+      loading: true,
+    }, () => {
+      axios.post('/api/kingdoms/' + this.props.characterId + '/upgrade-building/' + this.props.building.id)
+        .then((result) => {
+          this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being upgraded). You can see this in the Building Queue tab.');
+          this.props.close();
+        })
+        .catch((err) => {
+          this.props.close();
 
-        if (err.hasOwnProperty('response')) {
-          const response = err.response;
+          if (err.hasOwnProperty('response')) {
+            const response = err.response;
 
-          if (response.status === 401) {
-            location.reload();
+            if (response.status === 401) {
+              location.reload();
+            }
+
+            if (response.status === 429) {
+              return this.props.openTimeOutModal();
+            }
           }
+        });
+    });
 
-          if (response.status === 429) {
-            return this.props.openTimeOutModal();
-          }
-        }
-      });
   }
 
   rebuildBuilding() {
-    axios.post('/api/kingdoms/' + this.props.characterId + '/rebuild-building/' + this.props.building.id)
-      .then((result) => {
-        this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being rebuilt). You can see this in the Building Queue tab.');
-        this.props.close();
-      })
-      .catch((err) => {
-        if (err.hasOwnProperty('response')) {
-          const response = err.response;
+    this.setState({
+      disabledButtons: true,
+      loading: true,
+    }, () => {
+      axios.post('/api/kingdoms/' + this.props.characterId + '/rebuild-building/' + this.props.building.id)
+        .then((result) => {
+          this.props.showBuildingSuccess(this.props.building.name + ' is in queue (being rebuilt). You can see this in the Building Queue tab.');
+          this.props.close();
+        })
+        .catch((err) => {
+          if (err.hasOwnProperty('response')) {
+            const response = err.response;
 
-          if (response.status === 401) {
-            return location.reload();
-          }
+            if (response.status === 401) {
+              return location.reload();
+            }
 
-          if (response.status === 429) {
-            return this.props.openTimeOutModal();
+            if (response.status === 429) {
+              return this.props.openTimeOutModal();
+            }
           }
-        }
-      });
+        });
+    });
   }
 
   subTitle() {
@@ -243,17 +257,25 @@ export default class BuildingManagementModal extends React.Component {
                   You can see this in the Cost section above.
                 </div> : null
           }
+          {
+            this.state.loading ?
+              <div className="progress loading-progress kingdom-loading " style={{position: 'relative'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+              : null
+          }
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-danger" onClick={this.props.close}>Cancel</button>
           {
             this.buildingNeedsToBeRebuilt() ?
               <button className="btn btn-primary"
-                      disabled={!this.canRebuild() || !this.isCurrentlyInQueue()}
+                      disabled={!this.canRebuild() || !this.isCurrentlyInQueue() || this.state.disabledButtons}
                       onClick={this.rebuildBuilding.bind(this)}>Rebuild</button>
               :
               <button className="btn btn-success"
-                      disabled={!this.canUpgrade() || !this.isCurrentlyInQueue()}
+                      disabled={!this.canUpgrade() || !this.isCurrentlyInQueue() || this.state.disabledButtons}
                       onClick={this.upgradeBuilding.bind(this)}
               >
                 Upgrade
