@@ -58,32 +58,36 @@ export default class CelestialFightSection extends React.Component {
   }
 
   attackCelestial() {
-    axios.post('/api/attack-celestial/' + this.props.characterId + '/' + this.props.celestialId).then((result) => {
-      if (result.data.hasOwnProperty('battle_over')) {
-        this.setState({
-          battleIsOver: true,
-          logs: result.data.logs,
-          monsterCurrentHealth: 0,
-        });
-      } else {
-        this.setState({
-          characterCurrentHealth: result.data.fight.character.current_health,
-          monsterCurrentHealth: result.data.fight.monster.current_health,
-          logs: result.data.logs,
-        })
-      }
-    }).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
-
-        if (response.status === 401) {
-          return location.reload();
+    this.setState({
+      canAttack: false,
+    }, () => {
+      axios.post('/api/attack-celestial/' + this.props.characterId + '/' + this.props.celestialId).then((result) => {
+        if (result.data.hasOwnProperty('battle_over')) {
+          this.setState({
+            battleIsOver: true,
+            logs: result.data.logs,
+            monsterCurrentHealth: 0,
+          });
+        } else {
+          this.setState({
+            characterCurrentHealth: result.data.fight.character.current_health,
+            monsterCurrentHealth: result.data.fight.monster.current_health,
+            logs: result.data.logs,
+          })
         }
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
 
-        if (response.status === 429) {
-          return this.props.openTimeOutModal();
+          if (response.status === 401) {
+            return location.reload();
+          }
+
+          if (response.status === 429) {
+            return this.props.openTimeOutModal();
+          }
         }
-      }
+      });
     });
   }
 

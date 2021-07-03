@@ -13,7 +13,7 @@ class ItemEffectsHelper {
      * @return ItemEffectsValue
      * @throws \Exception
      */
-    public static function effect(string $effect): ItemEffectsValue {
+    public static function effects(string $effect): ItemEffectsValue {
         return new ItemEffectsValue($effect);
     }
 }

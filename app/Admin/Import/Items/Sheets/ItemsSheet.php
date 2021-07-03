@@ -49,6 +49,30 @@ class ItemsSheet implements ToCollection {
             $item['can_drop'] = false;
         }
 
+        if (!isset($item['market_sellable'])) {
+            $item['market_sellable'] = false;
+        }
+
+        if (!isset($item['usable'])) {
+            $item['usable'] = false;
+        }
+
+        if (!isset($item['damages_kingdoms'])) {
+            $item['damages_kingdoms'] = false;
+        }
+
+        if (!isset($item['stat_increase'])) {
+            $item['stat_increase'] = false;
+        }
+
+        if (!isset($item['can_craft'])) {
+            $item['can_craft'] = false;
+        }
+
+        if (!isset($item['craft_only'])) {
+            $item['craft_only'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
 

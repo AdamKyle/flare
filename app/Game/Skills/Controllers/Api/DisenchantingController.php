@@ -27,7 +27,7 @@ class DisenchantingController extends Controller {
         $character = auth()->user()->character->refresh();
 
         $foundItem = $character->inventory->slots->filter(function($slot) use ($item) {
-            if (!$slot->equipped && $slot->type !== 'quest' && $slot->item_id === $item->id) {
+            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item_id === $item->id) {
                 return $slot;
             }
         })->first();
@@ -45,7 +45,7 @@ class DisenchantingController extends Controller {
         $character = auth()->user()->character->refresh();
 
         $foundItem = $character->inventory->slots->filter(function($slot) use ($item) {
-            if (!$slot->equipped && $slot->type !== 'quest' && $slot->item_id === $item->id) {
+            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item_id === $item->id) {
                 return $slot;
             }
         })->first();

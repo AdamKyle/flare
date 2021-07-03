@@ -36,7 +36,7 @@ class DropsCheckListener
         }
 
         if (!is_null($event->monster->quest_item_id)) {
-            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $event->adventure);
+            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $event->adventure, true);
 
             if ($canGetQuestItem) {
                 $this->attemptToPickUpItem($event, $event->monster->questItem);
@@ -57,7 +57,7 @@ class DropsCheckListener
                     'inventory_id' => $event->character->inventory->id,
                 ]);
 
-                if (!is_null($item->effect)) {
+                if ($item->type === 'quest') {
                     $message = $event->character->name . ' has found: ' . $item->affix_name;
 
                     broadcast(new GlobalMessageEvent($message));

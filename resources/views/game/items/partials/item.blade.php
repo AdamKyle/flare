@@ -24,20 +24,7 @@
                 <div class="col-md-6">
                     <x-cards.card-with-title title="Quest Item Details">
                         @if (!is_null($item->effect))
-                            @php
-                                $effects = 'N/A';
-
-                                $effect = ItemEffects::effects($item->effect);
-
-                                if ($effect->walkOnWater()) {
-                                    $effects = 'Lets you walk on water';
-                                }
-
-                                if ($effect->labyrinth()) {
-                                    $effects = 'Lets you use Traverse (beside movement actions) to traverse to Labyrinth plane';
-                                }
-                            @endphp
-                            <p>This item lets you: {{$effect}}</p>
+                            <p>This item lets you: {{$effects}}</p>
                         @endif
                         <div class="alert alert-info mb-3 mt-2">
                             <p>

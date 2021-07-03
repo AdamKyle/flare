@@ -12,6 +12,8 @@
         <th>base_healing</th>
         <th>base_ac</th>
         <th>cost</th>
+        <th>gold_dust_cost</th>
+        <th>shards_cost</th>
         <th>base_damage_mod</th>
         <th>base_healing_mod</th>
         <th>base_ac_mod</th>
@@ -29,6 +31,16 @@
         <th>skill_name</th>
         <th>skill_bonus</th>
         <th>skill_training_bonus</th>
+        <th>craft_only</th>
+        <th>usable</th>
+        <th>damages_kingdoms</th>
+        <th>kingdom_damage</th>
+        <th>lasts_for</th>
+        <th>stat_increase</th>
+        <th>increase_stat_by</th>
+        <th>affects_skill_type</th>
+        <th>increase_skill_bonus_by</th>
+        <th>increase_skill_training_bonus_by</th>
     </tr>
     </thead>
     <tbody>
@@ -45,6 +57,8 @@
             <td>{{$item->base_healing}}</td>
             <td>{{$item->base_ac}}</td>
             <td>{{$item->cost}}</td>
+            <td>{{$item->gold_dust_cost}}</td>
+            <td>{{$item->shards_cost}}</td>
             <td>{{$item->base_damage_mod}}</td>
             <td>{{$item->base_healing_mod}}</td>
             <td>{{$item->base_ac_mod}}</td>
@@ -62,6 +76,16 @@
             <td>{{$item->skill_name}}</td>
             <td>{{$item->skill_bonus}}</td>
             <td>{{$item->skill_training_bonus}}</td>
+            <td>{{$item->craft_only}}</td>
+            <td>{{$item->usable}}</td>
+            <td>{{$item->damages_kingdoms}}</td>
+            <td>{{$item->kingdom_damage}}</td>
+            <td>{{$item->lasts_for}}</td>
+            <td>{{$item->stat_increase}}</td>
+            <td>{{$item->increase_stat_by}}</td>
+            <td>{{$item->affects_skill_type}}</td>
+            <td>{{$item->increase_skill_bonus_by}}</td>
+            <td>{{$item->increase_skill_training_bonus_by}}</td>
         </tr>
     @endforeach
 
@@ -78,6 +102,8 @@
             <td>{{$item->base_healing}}</td>
             <td>{{$item->base_ac}}</td>
             <td>{{$item->cost}}</td>
+            <td>{{$item->gold_dust_cost}}</td>
+            <td>{{$item->shards_cost}}</td>
             <td>{{$item->base_damage_mod}}</td>
             <td>{{$item->base_healing_mod}}</td>
             <td>{{$item->base_ac_mod}}</td>
@@ -95,6 +121,16 @@
             <td>{{$item->skill_name}}</td>
             <td>{{$item->skill_bonus}}</td>
             <td>{{$item->skill_training_bonus}}</td>
+            <td>{{$item->craft_only}}</td>
+            <td>{{$item->usable}}</td>
+            <td>{{$item->damages_kingdoms}}</td>
+            <td>{{$item->kingdom_damage}}</td>
+            <td>{{$item->lasts_for}}</td>
+            <td>{{$item->stat_increase}}</td>
+            <td>{{$item->increase_stat_by}}</td>
+            <td>{{$item->affects_skill_type}}</td>
+            <td>{{$item->increase_skill_bonus_by}}</td>
+            <td>{{$item->increase_skill_training_bonus_by}}</td>
         </tr>
     @endforeach
     </tbody>

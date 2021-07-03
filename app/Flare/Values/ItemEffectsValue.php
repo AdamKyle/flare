@@ -9,14 +9,14 @@ class ItemEffectsValue {
      */
     private $value;
 
-    const WALKONWATER      = 'walk-on-water';
-    const LABYRINTH        = 'labyrinth';
+    const WALK_ON_WATER  = 'walk-on-water';
+    const LABYRINTH      = 'labyrinth';
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::WALKONWATER => 'walk-on-water',
+        self::WALK_ON_WATER => 'walk-on-water',
         self::LABYRINTH   => 'labyrinth',
     ];
 
@@ -29,6 +29,7 @@ class ItemEffectsValue {
      * @throws \Exception
      */
     public function __construct(string $value) {
+
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');
         }
@@ -42,7 +43,7 @@ class ItemEffectsValue {
      * @return bool
      */
     public function walkOnWater(): bool {
-        return $this->value === self::WALKONWATER;
+        return $this->value === self::WALK_ON_WATER;
     }
 
     /**
