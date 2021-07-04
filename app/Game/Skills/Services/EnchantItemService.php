@@ -30,7 +30,7 @@ class EnchantItemService {
         if ($tooEasy) {
             $this->enchantItem($item, $affix);
         } else {
-            $dcCheck       = $this->getDCCheck($enchantingSkill, $this->dcIncrease);
+            $dcCheck       = $this->getDCCheck($enchantingSkill, $this->dcIncrease, $enchantingSkill->max_level);
             $characterRoll = $this->characterRoll($enchantingSkill);
 
             if ($dcCheck > $characterRoll) {

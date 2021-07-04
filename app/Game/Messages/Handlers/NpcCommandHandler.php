@@ -206,21 +206,24 @@ class NpcCommandHandler {
                     continue;
                 }
 
-                if ($this->handleReward($character, $quest, $npc)) {
-                    $foundItem->delete();
-
-                    broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('taken_item', $npc), true));
-
-                    return true;
+                if (!$this->canHaveReward($character, $npc)) {
+                    return false;
                 }
+
+                $foundItem->delete();
+
+                broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('taken_item', $npc), true));
+
+                $this->handleReward($character, $quest, $npc);
+
+                return true;
             }
         }
 
         return false;
     }
 
-    private function handleReward(Character $character, Quest $quest, Npc $npc) {
-
+    private function canHaveReward(Character $character, Npc $npc) {
         if ($character->inventory_max === 0 || !($character->inventory_max > $character->inventory->slots()->count())) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
             return false;
@@ -245,6 +248,10 @@ class NpcCommandHandler {
             return false;
         }
 
+        return true;
+    }
+
+    private function handleReward(Character $character, Quest $quest, Npc $npc) {
         if (!is_null($quest->reward_item)) {
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
@@ -286,7 +293,7 @@ class NpcCommandHandler {
             ]);
 
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('currency_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->reward_gold . ' gold from: ' . $npc->real_name));
+            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold) . ' gold from: ' . $npc->real_name));
         }
 
         if (!is_null($quest->reward_xp)) {
@@ -299,7 +306,7 @@ class NpcCommandHandler {
             event(new CharacterLevelUpEvent($character->refresh()));
 
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('xp_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->reward_xp . ' XP from: ' . $npc->real_name));
+            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_xp) . ' XP from: ' . $npc->real_name));
         }
 
         if (!is_null($quest->reward_gold_dust)) {
@@ -308,7 +315,7 @@ class NpcCommandHandler {
             ]);
 
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('currency_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->reward_gold_dust . ' gold dust from: ' . $npc->real_name));
+            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold_dust) . ' gold dust from: ' . $npc->real_name));
         }
 
         if (!is_null($quest->reward_shards)) {
@@ -317,7 +324,7 @@ class NpcCommandHandler {
             ]);
 
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('currency_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->reward_shards . ' shards from: ' . $npc->real_name));
+            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_shards) . ' shards from: ' . $npc->real_name));
         }
 
         $character->questsCompleted()->create([

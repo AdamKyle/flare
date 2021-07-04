@@ -1,6 +1,12 @@
 <dl>
     <dt>
-        <a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:
+        <a href="{{route('skill.character.info', ['skill' => $skill->id])}}" class="{{$skill->is_locked ? 'text-danger' : ''}}">
+            {{$skill->name}}
+
+            @if ($skill->is_locked)
+                <i class="fas fa-lock"></i>
+            @endif
+        </a>:
     </dt>
     <dd>
         <div class="row">

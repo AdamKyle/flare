@@ -4,6 +4,7 @@ namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Values\ItemUsabilityType;
 
 class CharacterInformationBuilder {
 
@@ -54,12 +55,26 @@ class CharacterInformationBuilder {
         foreach ($equipped as $slot) {
             $percentageIncrease = $this->fetchModdedStat($stat, $slot->item);
 
-            if ($percentageIncrease < 1) {
+            if ($percentageIncrease < 1.0) {
                 $percentageIncrease = 1 + $percentageIncrease;
             }
 
             if ($percentageIncrease !== 0.0) {
                 $base *= $percentageIncrease;
+            }
+        }
+
+        if (!$this->character->boons->isEmpty()) {
+            $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
+
+            if ($boons->isNotEmpty()) {
+                $sum = $boons->sum('stat_bonus');
+
+                if ($sum < 1.0) {
+                    $sum += 1;
+                }
+
+                $base *= $sum;
             }
         }
 
@@ -78,7 +93,18 @@ class CharacterInformationBuilder {
         $characterDamageStat = $this->statMod($this->character->damage_stat);
         $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
 
-        return round($characterDamageStat + $this->getWeaponDamage());
+        $totalAttack = $this->getWeaponDamage();
+
+        return round($characterDamageStat + $totalAttack);
+    }
+
+    public function buildTotalAttack(): int {
+        $characterDamageStat = $this->statMod($this->character->damage_stat);
+        $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
+
+        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage();
+
+        return round($characterDamageStat + $totalAttack);
     }
 
     /**

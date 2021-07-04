@@ -12,7 +12,7 @@ class ItemModifiers extends Component
     public $item;
 
     public $effects = [
-        ItemEffectsValue::WALKONWATER,
+        ItemEffectsValue::WALK_ON_WATER,
         ItemEffectsValue::LABYRINTH,
     ];
 

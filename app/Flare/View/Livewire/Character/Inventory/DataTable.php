@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Character\Inventory;
 
+use App\Flare\Models\GameSkill;
 use App\Game\Skills\Services\DisenchantService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -59,6 +60,7 @@ class DataTable extends Component
             if ($this->batchSell) {
                 $join->whereNull('items.item_prefix_id')->whereNull('items.item_suffix_id');
                 $join->where('items.craft_only', $this->craftOnly);
+                $join->where('items.usable', false);
             }
 
             if ($this->marketBoard) {
@@ -79,6 +81,18 @@ class DataTable extends Component
 
     public function getDataProperty() {
         $slots = $this->dataQuery->get();
+
+        $slots->transform(function($slot) {
+            $skills = [];
+
+            if ($slot->item->usable && !is_null($slot->item->affects_skill_type)) {
+                $skills = GameSkill::where('type', $slot->item->affects_skill_type)->pluck('name')->toArray();
+            }
+
+            $slot->affects_skills = $skills;
+
+            return $slot;
+        });
 
         if ($this->search !== '') {
             return collect($slots->filter(function ($slot) {

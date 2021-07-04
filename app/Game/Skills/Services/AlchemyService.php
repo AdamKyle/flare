@@ -27,6 +27,7 @@ class AlchemyService {
             ->where('item_prefix_id', null)
             ->where('item_suffix_id', null)
             ->orderBy('gold_dust_cost', 'asc')
+            ->select('id', 'name', 'gold_dust_cost', 'shards_cost')
             ->get();
     }
 
@@ -63,6 +64,7 @@ class AlchemyService {
     public function attemptTransmute(Character $character, Skill $skill, Item $item): array {
         if ($skill->level < $item->skill_level_required) {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+            event(new CraftedItemTimeOutEvent($character->refresh()));
 
             return $this->successResult([
                 'items' => $this->fetchAlchemistItems($character),
@@ -71,6 +73,7 @@ class AlchemyService {
 
         if ($skill->level >= $item->skill_level_trivial) {
             event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+            event(new CraftedItemTimeOutEvent($character->refresh()));
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -80,10 +83,16 @@ class AlchemyService {
         }
 
         $characterRoll = $this->characterRoll($skill);
-        $dcCheck       = $this->getDCCheck($skill);
+        $dcCheck       = $this->getDCCheck($skill, 0, $skill->baseSkill->max_level);
 
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
+
+            event(new CraftedItemTimeOutEvent($character->refresh()));
+
+            return $this->successResult([
+                'items' => $this->fetchAlchemistItems($character),
+            ]);
         }
 
         event(new ServerMessageEvent($character->user, 'failed_to_transmute'));

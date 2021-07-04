@@ -43,9 +43,11 @@ class ItemValidator {
 
         if ($item->usable) {
             if (is_null($item->lasts_for)) {
-                $component->addError('item.lasts_for', 'How long does the effect last?');
+                if (!$item->damages_kingdoms) {
+                    $component->addError('item.lasts_for', 'How long does the effect last?');
 
-                $isValid = false;
+                    $isValid = false;
+                }
             }
 
             if (is_null($item->damages_kingdoms) && empty($item->stat_increase) && empty(affects_skill_type)) {
@@ -55,9 +57,11 @@ class ItemValidator {
             }
 
             if (!is_null($item->damages_kingdoms) && is_null($item->kingdom_damage)) {
-                $component->addError('item.kingdom_damage', 'How much damage does this do to kingdoms?');
+                if ($item->damages_kingdoms) {
+                    $component->addError('item.kingdom_damage', 'How much damage does this do to kingdoms?');
 
-                $isValid = false;
+                    $isValid = false;
+                }
             }
 
             if (!empty($item->stat_increase) && is_null($item->increase_stat_by)) {

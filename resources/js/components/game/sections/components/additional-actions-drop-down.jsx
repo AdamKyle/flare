@@ -9,7 +9,8 @@ export default class AdditionalActionsDropDown extends React.Component {
 
     this.state = {
       showCrafting: false,
-      ahowEnchanting: false,
+      showEnchanting: false,
+      showAlchemy: false,
     }
   }
 
@@ -21,9 +22,11 @@ export default class AdditionalActionsDropDown extends React.Component {
     this.setState({
       showCrafting: !this.state.showCrafting,
       showEnchanting: false,
+      showAlchemy: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
+      this.props.updateShowAlchemy(this.state.showAlchemy);
     });
   }
 
@@ -35,9 +38,27 @@ export default class AdditionalActionsDropDown extends React.Component {
     this.setState({
       showEnchanting: !this.state.showEnchanting,
       showCrafting: false,
+      showAlchemy: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
+      this.props.updateShowAlchemy(this.state.showAlchemy);
+    });
+  }
+
+  addAlchemySection() {
+    if (!this.props.canCraft) {
+      return getServerMessage('cant_enchant');
+    }
+
+    this.setState({
+      showEnchanting: false,
+      showCrafting: false,
+      showAlchemy: !this.state.showAlchemy,
+    }, () => {
+      this.props.updateShowCrafting(this.state.showCrafting);
+      this.props.updateShowEnchanting(this.state.showEnchanting);
+      this.props.updateShowAlchemy(this.state.showAlchemy);
     });
   }
 
@@ -63,6 +84,13 @@ export default class AdditionalActionsDropDown extends React.Component {
               onClick={this.addCraftingAction.bind(this)}>{this.state.showCrafting ? 'Remove Crafting' : 'Craft'}</Dropdown.Item>
             <Dropdown.Item
               onClick={this.addEnchantingAction.bind(this)}>{this.state.showEnchanting ? 'Remove Enchanting' : 'Enchant'}</Dropdown.Item>
+            {
+              !this.props.isAlchemyLocked ?
+                <Dropdown.Item
+                  onClick={this.addAlchemySection.bind(this)}>{this.state.showAlchemy ? 'Remove Alchemy' : 'Alchemy'}</Dropdown.Item>
+              : null
+            }
+
             {this.state.showCrafting
               ?
               <Dropdown.Item onClick={this.changeType.bind(this)}>Change Type</Dropdown.Item>

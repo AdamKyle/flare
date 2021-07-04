@@ -161,7 +161,6 @@ class ItemDetails extends Component
             } else if ($this->item->damages_kingdoms) {
                 // A item that damages kingdoms cannot affect skills or stats.
                 $this->item->lasts_for          = null;
-                $this->item->damages_kingdoms   = null;
                 $this->item->stat_increase      = null;
                 $this->item->affects_skill_type = '';
             }
@@ -171,7 +170,7 @@ class ItemDetails extends Component
                 $this->item->increase_stat_by = null;
             }
 
-            if (empty($this->item->affects_skill_type)) {
+            if (is_null($this->item->affects_skill_type) || $this->item->affects_skill_type === '') {
                 $this->item->affects_skill_type               = null;
                 $this->item->increase_skill_bonus_by          = null;
                 $this->item->increase_skill_training_bonus_by = null;

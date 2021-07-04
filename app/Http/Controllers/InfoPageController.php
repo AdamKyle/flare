@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Storage;
+use Illuminate\Http\Request;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameClass;
@@ -12,12 +14,12 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use Cache;
-use Illuminate\Http\Request;
-use Storage;
+use App\Flare\Traits\Controllers\ItemsShowInformation;
 
 class InfoPageController extends Controller
 {
+
+    use ItemsShowInformation;
 
     /**
      * Show the application dashboard.
@@ -125,9 +127,7 @@ class InfoPageController extends Controller
     }
 
     public function viewItem(Request $request, Item $item) {
-        return view('information.items.item', [
-            'item' => $item
-        ]);
+        return $this->renderItemShow('information.items.item', $item);
     }
 
     public function viewAffix(Request $request, ItemAffix $affix) {

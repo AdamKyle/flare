@@ -19,5 +19,6 @@
         'quest'     => $quest,
         'location'  => $location,
         'adventure' => $adventure,
+        'skills'    => $skills,
     ])
 @endsection

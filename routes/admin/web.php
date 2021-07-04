@@ -2,8 +2,11 @@
 
 Route::get('/affixes/{affix}', ['as' => 'game.affixes.affix', 'uses' => 'AffixesController@show']);
 Route::get('/game/adventures/{adventure}', ['as' => 'game.adventures.adventure', 'uses' => 'AdventuresController@show']);
+Route::get('/game/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'Location@show']);
 Route::get('/game/kingdoms/units/{gameUnit}', ['as' => 'game.units.unit', 'uses' => 'UnitsController@show']);
 Route::get('/game/kingdoms/buildings/{building}', ['as' => 'game.buildings.building', 'uses' => 'BuildingsController@show']);
+Route::get('/game/quests/{quest}', ['as' => 'game.quests.show', 'uses' => 'QuestsController@show']);
+Route::get('/game/npcs/{npc}', ['as' => 'game.npcs.show', 'uses' => 'NpcsController@show']);
 
 Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);

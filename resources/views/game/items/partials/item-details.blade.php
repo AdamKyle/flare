@@ -33,16 +33,22 @@
 </dl>
 
 @if ($item->can_craft)
-<h4 class="mt-3">Crafting Info</h4>
-<hr />
-<dl>
-    <dt>Crafting Type</dt>
-    <dd>{{$item->crafting_type}}</dd>
-    <dt>Skill Level Required</dt>
-    <dd>{{$item->skill_level_required}}</dd>
-    <dt>Skill Level Trivial</dt>
-    <dd>{{$item->skill_level_trivial}}</dd>
-</dl>
+    <h4 class="mt-3">Crafting Info</h4>
+    <hr />
+    <dl>
+        <dt>Crafting Type</dt>
+        <dd>{{$item->crafting_type}}</dd>
+        <dt>Skill Level Required</dt>
+        <dd>{{$item->skill_level_required}}</dd>
+        <dt>Skill Level Trivial</dt>
+        <dd>{{$item->skill_level_trivial}}</dd>
+        <dt>Gold Cost:</dt>
+        <dd>{{$item->cost}}</dd>
+        <dt>God Dust Cost:</dt>
+        <dd>{{$item->gold_dust_cost}}</dd>
+        <dt>Shards Cost</dt>
+        <dd>{{$item->shards_cost}}</dd>
+    </dl>
 @endif
 
 @if (!empty($item->getItemSkills()))

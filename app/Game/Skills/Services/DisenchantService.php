@@ -32,7 +32,7 @@ class DisenchantService {
         if (!is_null($disenchantSkill)) {
 
             $characterRoll = $this->characterRoll($disenchantSkill, 999);
-            $dcCheck       = $this->getDCCheck($disenchantSkill, 0, 999);
+            $dcCheck       = $this->getDCCheck($disenchantSkill, 0, $disenchantSkill->baseSkill->max_level);
 
             if ($characterRoll > $dcCheck) {
                 $goldDust = $this->updateGoldDust($character);

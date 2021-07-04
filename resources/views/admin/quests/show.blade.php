@@ -21,17 +21,34 @@
                         <dt>Quest Name:</dt>
                         <dd>{{$quest->name}}</dd>
                         <dt>Npc Name:</dt>
-                        <dd><a href="{{route('npcs.show', [
-                            'npc' => $quest->npc_id
-                        ])}}">{{$quest->npc->real_name}}</a></dd>
+                        <dd>
+                            @if (auth()->user()->hasRole('Admin'))
+                            <a href="{{route('npcs.show', [
+                                'npc' => $quest->npc_id
+                            ])}}">{{$quest->npc->real_name}}</a>
+                            @else
+                                <a href="{{route('game.npcs.show', [
+                                'npc' => $quest->npc_id
+                            ])}}">{{$quest->npc->real_name}}</a>;
+                            @endif
+                        </dd>
                         @if ($quest->npc->must_be_at_same_location)
                             <dt>Npc X/Y:</dt>
                             <dd>{{$quest->npc->x_position}}/{{$quest->npc->y_position}} (You must be here to interact with the npc)</dd>
                         @endif
                         <dt>Required Item:</dt>
-                        <dd><a href="{{route('items.item', [
-                            'item' => $quest->item_id
-                        ])}}">{{$quest->item->name}}</a></dd>
+                        <dd>
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a href="{{route('items.item', [
+                                    'item' => $quest->item_id
+                                ])}}">{{$quest->item->name}}</a>
+                            @else
+                                <a href="{{route('game.items.item', [
+                                    'item' => $quest->item_id
+                                ])}}">{{$quest->item->name}}</a>
+
+                            @endif
+                        </dd>
 
                         @if (!is_null($quest->gold_cost))
                             <dt>Required Gold:</dt>
@@ -57,36 +74,56 @@
 
                         @if (!is_null($quest->reward_item))
                             <dt>Reward Item:</dt>
-                            <dd><a href="{{route('items.item', [
-                                'item' => $quest->reward_item
-                            ])}}">{{$quest->rewardItem->name}}</a></dd>
+                            <dd>
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <a href="{{route('items.item', [
+                                        'item' => $quest->reward_item
+                                    ])}}">
+                                        {{$quest->rewardItem->name}}
+                                    </a>
+                                @else
+                                    <a href="{{route('game.items.item', [
+                                    'item' => $quest->reward_item
+                                    ])}}">
+                                        {{$quest->rewardItem->name}}
+                                    </a>
+                                @endif
+                            </dd>
                         @endif
 
                         @if (!is_null($quest->reward_gold))
                             <dt>Reward Gold:</dt>
-                            <dd>{{$quest->reward_gold}}</dd>
+                            <dd>{{number_format($quest->reward_gold)}}</dd>
                         @endif
 
                         @if (!is_null($quest->reward_gold_dust))
                             <dt>Reward Gold Dust:</dt>
-                            <dd>{{$quest->reward_gold_dust}}</dd>
+                            <dd>{{number_format($quest->reward_gold_dust)}}</dd>
                         @endif
 
                         @if (!is_null($quest->reward_shards))
                             <dt>Reward Shards:</dt>
-                            <dd>{{$quest->reward_shards}}</dd>
+                            <dd>{{number_format($quest->reward_shards)}}</dd>
                         @endif
 
                         @if (!is_null($quest->reward_xp))
                             <dt>Reward XP:</dt>
-                            <dd>{{$quest->reward_xp}}</dd>
+                            <dd>{{number_format($quest->reward_xp)}}</dd>
                         @endif
 
                         @if ($quest->unlocks_skill)
                             <dt>Unlocks Skill:</dt>
-                            <dd><a href="{{route('skills.skill', [
-                                'skill' => $lockedSkill->id,
-                            ])}}">{{$lockedSkill->name}}</a></dd>
+                            <dd>
+                                @if (auth()->user()->hasRole('Admin'))
+                                    <a href="{{route('skills.skill', [
+                                        'skill' => $lockedSkill->id,
+                                    ])}}">{{$lockedSkill->name}}</a>
+                                @else
+                                    <a href="{{route('skill.character.info', [
+                                        'skill' => $lockedSkill->id,
+                                    ])}}">{{$lockedSkill->name}}</a>
+                                @endif
+                            </dd>
                         @endif
                     </dl>
                 </div>

@@ -45,7 +45,20 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'can_adventure'       => $character->can_adventure,
             'show_message'        => $character->can_attack ? false : true,
             'is_dead'             => $character->is_dead,
+            'is_alchemy_locked'   => $this->isAlchemyLocked($character),
             'gold'                => $character->gold,
         ];
+    }
+
+    private function isAlchemyLocked(Character $character) {
+        $skill = $character->skills->filter(function($skill) {
+            return $skill->type()->isAlchemy();
+        })->first();
+
+        if (!is_null($skill)) {
+            return $skill->is_locked;
+        }
+
+        return true;
     }
 }

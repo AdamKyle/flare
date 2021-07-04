@@ -146,7 +146,12 @@
                                     ])
 
                                     @include('game.character.partials.equipment.modals.destroy-modal', [
-                                        'slot' => $slot,
+                                        'slot'      => $slot,
+                                        'character' => $character
+                                    ])
+
+                                    @include('game.character.partials.equipment.modals.use-modal', [
+                                        'slot'      => $slot,
                                         'character' => $character
                                     ])
                                 @elseif ($marketBoard)

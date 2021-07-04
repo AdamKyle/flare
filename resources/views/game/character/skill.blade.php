@@ -19,9 +19,13 @@
                             <div class="alert alert-info">
                                 This skill can only be trained by crafting.
                             </div>
-                        @else
+                        @elseif ($skill->type()->isEnchanting())
                             <div class="alert alert-info">
                                 This skill can only be trained by enchanting.
+                            </div>
+                        @elseif($skill->type()->isAlchemy())
+                            <div class="alert alert-info">
+                                This skill can only be trained by using alchemy, which is found in the same menu as Crafting/Enchanting..
                             </div>
                         @endif
                     @endif
@@ -54,4 +58,25 @@
             </div>
         </div>
     </div>
+    @if ($skill->is_locked)
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <x-cards.card-with-title title="Locked">
+                    <p>This skill is locked and cannot be trained until you complete a quest.</p>
+                    <dl>
+                        <dt>
+                            Quest Name:
+                        </dt>
+                        <dd>
+                            <a href="{{route('game.quests.show', [
+                                'quest' => $quest->id
+                            ])}}">{{$quest->name}}</a>
+                        </dd>
+                    </dl>
+                    <p class="mt-3">Upon completing the quest, the skill will be unlocked, there will be a new action called: Alchemy under Crafting/Enchanting
+                    to allow you to craft new items.</p>
+                </x-cards.card-with-title>
+            </div>
+        </div>
+    @endif
 @endsection

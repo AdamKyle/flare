@@ -8,6 +8,7 @@ import CraftingAction from '../crafting/crafting-action';
 import EnchantingAction from '../enchanting/enchanting-action';
 import FightSection from './fight-section';
 import CelestialFightSection from "./celestial-fight-section";
+import AlchemyAction from "../alchemy/alchemy-action";
 
 export default class ActionsSection extends React.Component {
 
@@ -19,6 +20,8 @@ export default class ActionsSection extends React.Component {
       isAdventuring: false,
       changeCraftingType: false,
       showCrafting: false,
+      showEnchanting: false,
+      showAlchemy: false,
       characterId: null,
       isLoading: true,
       character: null,
@@ -106,6 +109,12 @@ export default class ActionsSection extends React.Component {
     });
   }
 
+  updateShowAlchemy(show) {
+    this.setState({
+      showAlchemy: show,
+    });
+  }
+
   updateCanCraft(can) {
     this.setState({
       canCraft: can,
@@ -148,9 +157,11 @@ export default class ActionsSection extends React.Component {
             <AdditionaActionsDropDown
               isDead={this.state.isDead}
               isAdventuring={this.state.isAdventuring}
+              isAlchemyLocked={this.state.character.is_alchemy_locked}
               changeCraftingType={this.changeCraftingType.bind(this)}
               updateShowCrafting={this.updateShowCrafting.bind(this)}
               updateShowEnchanting={this.updateShowEnchanting.bind(this)}
+              updateShowAlchemy={this.updateShowAlchemy.bind(this)}
               canCraft={this.state.canCraft}
             />
             {
@@ -229,6 +240,22 @@ export default class ActionsSection extends React.Component {
               isAdventuring={this.state.isAdventuring}
               openTimeOutModal={this.props.openTimeOutModal}
             />
+            {
+              this.state.showAlchemy ?
+                <AlchemyAction
+                  isDead={this.state.isDead}
+                  characterId={this.state.character.id}
+                  showAlchemy={this.state.showAlchemy}
+                  userId={this.props.userId}
+                  characterGoldDust={this.state.character.gold_dust}
+                  characterShards={this.state.character.shards}
+                  timeRemaining={this.state.character.can_craft_again_at}
+                  updateCanCraft={this.updateCanCraft.bind(this)}
+                  isAdventuring={this.state.isAdventuring}
+                  openTimeOutModal={this.props.openTimeOutModal}
+                />
+              : null
+            }
             {this.state.showEnchanting ?
               <EnchantingAction
                 isDead={this.state.isDead}

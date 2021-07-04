@@ -131,6 +131,15 @@ class Skill extends Model
         $bonus = ($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level;
         $bonus += $this->getItemBonuses($this->baseSkill->name);
 
+
+        if ($this->character->boons->isNotEmpty()) {
+            $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
+
+            if ($boons->isNotEmpty()) {
+                $bonus += $boons->sum('increase_skill_bonus_by');
+            }
+        }
+
         $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
         $looting  = $this->getCharacterSkillBonus($this->character, 'Looting');
         $dodge    = $this->getCharacterSkillBonus($this->character, 'Dodge');
@@ -161,6 +170,14 @@ class Skill extends Model
 
             if ($slot->item->type ==='quest') {
                 $bonus += $this->calculateTrainingBonus($slot->item, $this->baseSkill->name);
+            }
+        }
+
+        if ($this->character->boons->isNotEmpty()) {
+            $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
+
+            if ($boons->isNotEmpty()) {
+                $bonus += $boons->sum('increase_skill_training_bonus_by');
             }
         }
 
