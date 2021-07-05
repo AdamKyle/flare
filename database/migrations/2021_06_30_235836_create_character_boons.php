@@ -28,8 +28,8 @@ class CreateCharacterBoons extends Migration
             $table->decimal('affected_skill_base_ac_mod_bonus', 8, 4)->nullable()->default(0.0);
             $table->decimal('affected_skill_fight_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
             $table->decimal('affected_skill_move_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
-            $table->date('started');
-            $table->date('complete');
+            $table->dateTime('started');
+            $table->dateTime('complete');
             $table->timestamps();
         });
     }

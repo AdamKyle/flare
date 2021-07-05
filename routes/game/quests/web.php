@@ -6,6 +6,6 @@ Route::group(['middleware' => [
     'is.character.dead',
     'is.character.adventuring',
 ]], function() {
-    Route::get('/game/completed-quests/{character}', ['as' => 'completed.quests', 'uses' => 'QuestsController@index']);
+    Route::get('/game/completed-quests/{user}', ['as' => 'completed.quests', 'uses' => 'QuestsController@index']);
     Route::get('/game/completed-quest/{character}/{questsCompleted}', ['as' => 'completed.quest', 'uses' => 'QuestsController@show']);
 });

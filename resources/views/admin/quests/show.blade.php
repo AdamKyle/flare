@@ -7,7 +7,11 @@
                 <h4 class="mt-2">{{$quest->name}}</h4>
             </div>
             <div class="col-md-6 align-self-right">
-                <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
+                @if (auth()->user()->hasRole('isAdmin'))
+                    <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
+                @else
+                    <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+                @endif
             </div>
         </div>
         <hr />

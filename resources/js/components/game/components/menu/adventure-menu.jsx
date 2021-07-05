@@ -97,6 +97,7 @@ export default class AdventureMenu extends React.Component {
           <ul id="adventure-links">
             <li>{this.renderCurrentAdventureLink()}</li>
             <li><a href="/current-adventures/">Completed Adventures</a></li>
+            <li><a href={"/game/completed-quests/" + this.props.userId}>Completed Quests</a></li>
           </ul>
         </Collapse>
       </>

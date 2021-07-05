@@ -50,8 +50,8 @@ class CharacterBoon extends Model
         'affected_skill_base_ac_mod_bonus'        => 'float',
         'affected_skill_fight_time_out_mod_bonus' => 'float',
         'affected_skill_move_time_out_mod_bonus'  => 'float',
-        'started'                                 => 'date',
-        'complete'                                => 'date',
+        'started'                                 => 'datetime',
+        'complete'                                => 'datetime',
     ];
 
     public function character() {

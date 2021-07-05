@@ -11,7 +11,9 @@
 
         <div class="card">
             <div class="card-body">
-
+                @livewire('character.completed-quests.data-table', [
+                    'character' => $character,
+                ])
             </div>
         </div>
     </div>

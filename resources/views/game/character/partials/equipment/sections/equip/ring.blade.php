@@ -6,8 +6,8 @@
     <div class="col-sm-10">
     <div class="form-check">
         <label class="form-check-label">
-            <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring-one">
-            Ring One (Left Finger)
+            <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring-one">
+            Ring One (Right Finger)
 
             @if (!empty($details))
                 @if (isset($details['ring-one']))
@@ -18,8 +18,8 @@
     </div>
     <div class="form-check">
         <label class="form-check-label">
-            <input class="form-check-input radio-inline" type="radio" name="position" id="position-right" value="ring-two">
-            Ring Two (Right Finger)
+            <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="ring-two">
+            Ring Two (Left Finger)
 
             @if (!empty($details))
                 @if (isset($details['ring-two']))

@@ -3,7 +3,9 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
+use App\Flare\Values\ItemUsabilityType;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Http\Controllers\Controller;
@@ -70,6 +72,23 @@ class CharacterSheetController extends Controller {
 
         return response()->json([
             'timeout_until' => $timeout,
+        ]);
+    }
+
+    public function activeBoons(Character $character) {
+        $boons = $character->boons->toArray();
+
+        foreach ($boons as $key => $boon) {
+            $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
+
+            $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
+            $boon['affected_skills'] = implode(',', $skills);
+
+            $boons[$key] = $boon;
+        }
+
+        return response()->json([
+            'active_boons' => $boons,
         ]);
     }
 }

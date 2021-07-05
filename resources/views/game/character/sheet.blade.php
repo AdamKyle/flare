@@ -10,40 +10,52 @@
     <hr />
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
-            <x-cards.card-with-title
-                title="Character Info"
-            >
-                <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
-                        @include('game.character.partials.sheet.basic-information', ['character' => $character, 'maxLevel' => $maxLevel])
-                    </div>
+            <x-tabs.pill-tabs-container>
+                <x-tabs.tab tab="info" title="Information" selected="true" active="true" />
+                <x-tabs.tab tab="active-boons" title="Active Boons" selected="false" active="false" />
+            </x-tabs.pill-tabs-container>
+            <x-tabs.tab-content>
+                <x-tabs.tab-content-section tab="info" active="true">
+                    <x-cards.card>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                @include('game.character.partials.sheet.basic-information', ['character' => $character, 'maxLevel' => $maxLevel])
+                            </div>
 
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
-                        @include('game.character.partials.sheet.attack-stats', ['character' => $character])
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
+                                @include('game.character.partials.sheet.attack-stats', ['character' => $character])
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row mt-2">
+                            @include('game.character.partials.sheet.core-stats', ['character' => $character])
+                        </div>
+                        <hr />
+                        <h5>Attack Break Down</h5>
+                        <hr />
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <dl>
+                                    <dt>Attack (includes rings + weapon):</dt>
+                                    <dd>{{$character->getInformation()->buildAttack()}}</dd>
+                                    <dt>Spell Damage:</dt>
+                                    <dd>{{$character->getInformation()->getTotalSpellDamage()}}</dd>
+                                    <dt>Artifact Damage:</dt>
+                                    <dd>{{$character->getInformation()->getTotalArtifactDamage()}}</dd>
+                                    <dt>Heal For:</dt>
+                                    <dd>{{$character->getInformation()->buildHealFor()}}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </x-cards.card>
+                </x-tabs.tab-content-section>
+                <x-tabs.tab-content-section tab="active-boons" active="false">
+                    <div class="alert alert-info mt-2 mb-3">
+                        Clicking on a row will allow you to see more details as well as cancel a boon.
                     </div>
-                </div>
-                <hr />
-                <div class="row mt-2">
-                    @include('game.character.partials.sheet.core-stats', ['character' => $character])
-                </div>
-                <hr />
-                <h5>Attack Break Down</h5>
-                <hr />
-                <div class="row mt-2">
-                    <div class="col-md-12">
-                        <dl>
-                            <dt>Attack (includes rings + weapon):</dt>
-                            <dd>{{$character->getInformation()->buildAttack()}}</dd>
-                            <dt>Spell Damage:</dt>
-                            <dd>{{$character->getInformation()->getTotalSpellDamage()}}</dd>
-                            <dt>Artifact Damage:</dt>
-                            <dd>{{$character->getInformation()->getTotalArtifactDamage()}}</dd>
-                            <dt>Heal For:</dt>
-                            <dd>{{$character->getInformation()->buildHealFor()}}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </x-cards.card-with-title>
+                    <div id="active-boons" data-user="{{$character->user->id}}" data-character="{{$character->id}}"></div>
+                </x-tabs.tab-content-section>
+            </x-tabs.tab-content>
 
             <x-cards.card-with-title
                 title="Skills"
@@ -113,3 +125,9 @@
         </div>
     </div>
 @endSection
+
+@push('scripts')
+    <script>
+        characterBoons('active-boons');
+    </script>
+@endpush

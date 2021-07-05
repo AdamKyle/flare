@@ -67,9 +67,9 @@ class ItemsController extends Controller {
         if ($item->damages_kingdoms) {
             $type = ItemUsabilityType::KINGDOM_DAMAGE;
         }
-
+        dump($item->lasts_for);
         $completedAt = now()->addMinutes($item->lasts_for);
-
+        dump(now()->toDateTime(), $completedAt->toDateTime());
         $boon = $character->boons()->create([
             'character_id'                             => $character->id,
             'type'                                     => $type,
