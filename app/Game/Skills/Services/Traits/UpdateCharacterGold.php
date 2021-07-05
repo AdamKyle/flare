@@ -27,8 +27,8 @@ trait UpdateCharacterGold {
 
     public function updateAlchemyCost(Character $character, Item $item): void {
         $character->update([
-            'gold_dust'  => $character->gold_dust - $item->gold_dust_cost,
-            'shard_cost' => $character->shards - $item->shard_cost,
+            'gold_dust'  => ($character->gold_dust - $item->gold_dust_cost),
+            'shards'     => ($character->shards - $item->shards_cost),
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));

@@ -90,6 +90,8 @@ class AlchemyService {
 
             event(new CraftedItemTimeOutEvent($character->refresh()));
 
+            $this->updateAlchemyCost($character, $item);
+
             return $this->successResult([
                 'items' => $this->fetchAlchemistItems($character),
             ]);
@@ -97,7 +99,7 @@ class AlchemyService {
 
         event(new ServerMessageEvent($character->user, 'failed_to_transmute'));
 
-        $this->updateCharacterGold($character, $item->cost, $skill);
+        $this->updateAlchemyCost($character, $item);
 
         event(new CraftedItemTimeOutEvent($character->refresh()));
 
@@ -111,8 +113,6 @@ class AlchemyService {
 
             if (!$tooEasy) {
                 event(new UpdateSkillEvent($skill));
-
-                $this->updateAlchemyCost($character, $item);
             }
         }
     }

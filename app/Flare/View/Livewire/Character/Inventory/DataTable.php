@@ -3,6 +3,7 @@
 namespace App\Flare\View\Livewire\Character\Inventory;
 
 use App\Flare\Models\GameSkill;
+use App\Game\Core\Services\UseItemService;
 use App\Game\Skills\Services\DisenchantService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -136,6 +137,18 @@ class DataTable extends Component
         $this->resetSelect();
 
         session()->flash('success', 'You gained: '.$this->totalGoldDust.' Gold Dust from all items destroyed.');
+
+        return redirect()->to(route('game.character.sheet'));
+    }
+
+    public function useAllItems(UseItemService $useItemService) {
+        $this->character->inventory->slots->filter(function($slot) use ($useItemService) {
+            if ($slot->item->usable) {
+                $useItemService->useItem($slot, $this->character, $slot->item);
+            }
+        });
+
+        session()->flash('success', 'Used every single item in your inventory. Check: Active Boons tab');
 
         return redirect()->to(route('game.character.sheet'));
     }

@@ -7,6 +7,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\Core\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Services\UseItemService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,9 +33,9 @@ class CharacterBoonJob implements ShouldQueue
      *
      * @param CharacterBoon $characterBoon
      */
-    public function __construct(CharacterBoon $characterBoon)
+    public function __construct(int $characterBoonId)
     {
-        $this->characterBoon = $characterBoon;
+        $this->characterBoon = $characterBoonId;
     }
 
     /**
@@ -42,32 +43,18 @@ class CharacterBoonJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(CharacterAttackTransformer $characterAttackTransformer, Manager $manager)
+    public function handle(UseItemService $useItemService)
     {
-        $character = $this->characterBoon->character;
+        $boon = CharacterBoon::find($this->characterBoon);
 
-        $this->characterBoon->delete();
-
-        $character = $character->refresh();
-
-        $characterAttack = new Item($character, $characterAttackTransformer);
-
-        event(new UpdateAttackStats($manager->createData($characterAttack)->toArray(), $character->user));
-        event(new UpdateTopBarEvent($character));
-
-        $boons = $character->boons->toArray();
-
-        foreach ($boons as $key => $boon) {
-            $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
-
-            $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
-            $boon['affected_skills'] = implode(',', $skills);
-
-            $boons[$key] = $boon;
+        if (is_null($boon)) {
+            return;
         }
 
-        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $boons));
+        $character = $boon->character;
 
-        event(new ServerMessageEvent($character->user, 'A boon has worn off. Your stats have been updated.'));
+        $boon->delete();
+
+        $useItemService->updateChaacter($character->refresh());
     }
 }

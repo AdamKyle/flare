@@ -25,6 +25,7 @@
                     @if ($allowMassDestroy)
                         <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
                         <button type="button" wire:click="destroyAllItems('disenchant')" class="btn btn-primary btn-sm ml-2">Disenchant All</button>
+                        <button type="button" wire:click="useAllItems" class="btn btn-primary btn-sm ml-2">Use All</button>
                     @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />

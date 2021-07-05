@@ -3,6 +3,7 @@ import ReactDatatable from '@ashvin27/react-datatable';
 import moment from 'moment';
 import {CountdownCircleTimer} from 'react-countdown-circle-timer';
 import Card from '../components/templates/card';
+import BoonModal from "./modals/boon-modal";
 
 export default class Boons extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export default class Boons extends React.Component {
     this.state = {
       characterBoons: [],
       boonToCancel: null,
+      showBoonModal: false,
       loading: true,
     }
 
@@ -50,7 +52,7 @@ export default class Boons extends React.Component {
   }
 
   componentDidMount() {
-    axios.get('/api/character-sheet/'+this.props.characterId+'/active-boons').then((result) => {
+    axios.get('/api/character-sheet/' + this.props.characterId + '/active-boons').then((result) => {
       this.setState({
         characterBoons: result.data.active_boons,
         loading: false,
@@ -124,13 +126,16 @@ export default class Boons extends React.Component {
   }
 
   cancelBoon(event, data, rowIndex) {
-
+    this.setState({
+      boonToCancel: data,
+      showBoonModal: true,
+    })
   }
 
   closeCancelBoon() {
     this.setState({
-      unitsToRecall: null,
-      showUnitRecallModal: false,
+      boonToCancel: null,
+      showBoonModal: false,
     })
   }
 
@@ -165,6 +170,16 @@ export default class Boons extends React.Component {
                 onRowClicked={this.cancelBoon.bind(this)}
               />
             </>
+        }
+        {
+          this.state.showBoonModal ?
+            <BoonModal
+              show={this.state.showBoonModal}
+              close={this.closeCancelBoon.bind(this)}
+              boon={this.state.boonToCancel}
+              characterBoons={this.state.characterBoons}
+            />
+            : null
         }
       </Card>
     )

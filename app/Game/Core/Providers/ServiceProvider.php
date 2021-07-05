@@ -4,6 +4,7 @@ namespace App\Game\Core\Providers;
 
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
+use App\Game\Core\Services\UseItemService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
@@ -53,6 +54,13 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ShopService::class, function($app) {
             return new ShopService();
+        });
+
+        $this->app->bind(UseItemService::class, function($app) {
+            return new UseItemService(
+                $app->make(Manager::class),
+                $app->make(CharacterAttackTransformer::class),
+            );
         });
     }
 
