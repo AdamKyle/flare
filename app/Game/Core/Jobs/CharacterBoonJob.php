@@ -3,6 +3,9 @@
 namespace App\Game\Core\Jobs;
 
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\GameSkill;
+use App\Flare\Values\ItemUsabilityType;
+use App\Game\Core\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
@@ -51,6 +54,19 @@ class CharacterBoonJob implements ShouldQueue
 
         event(new UpdateAttackStats($manager->createData($characterAttack)->toArray(), $character->user));
         event(new UpdateTopBarEvent($character));
+
+        $boons = $character->boons->toArray();
+
+        foreach ($boons as $key => $boon) {
+            $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
+
+            $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
+            $boon['affected_skills'] = implode(',', $skills);
+
+            $boons[$key] = $boon;
+        }
+
+        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $boons));
 
         event(new ServerMessageEvent($character->user, 'A boon has worn off. Your stats have been updated.'));
     }

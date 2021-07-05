@@ -55,5 +55,10 @@ Broadcast::channel('component-show-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When a characters boons update.
+Broadcast::channel('update-boons-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 

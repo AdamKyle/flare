@@ -46,7 +46,7 @@ export default class Boons extends React.Component {
       },
     ];
 
-    //this.updateUnitMovements = Echo.private('update-boons-' + this.props.userId);
+    this.updateUnitMovements = Echo.private('update-boons-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -67,6 +67,12 @@ export default class Boons extends React.Component {
           return window.location.replace('/game');
         }
       }
+    });
+
+    this.updateUnitMovements.listen('Game.Core.Events.CharacterBoonsUpdateBroadcastEvent', (event) => {
+      this.setState({
+        characterBoons: event.boons,
+      });
     });
   }
 
