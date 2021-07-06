@@ -85,7 +85,7 @@ class ConjureService {
         event(new GlobalMessageEvent($character->name . ' ' . $types[$randomIndex] . ': ' . $monster->name . ' on the ' . $plane . ' plane at (X/Y): ' . $x . '/' . $y));
 
         if ($damagedKingdom) {
-            $this->damageKingdom($kingdom, $this->getDamageAmount());
+            $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
         }
     }
 
@@ -132,7 +132,7 @@ class ConjureService {
         event(new UpdateMapDetailsBroadcast($character->map, $character->user, resolve(MovementService::class)));
 
         if ($damagedKingdom) {
-            $this->damageKingdom($kingdom, $this->getDamageAmount());
+            $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
         }
     }
 
@@ -183,7 +183,7 @@ class ConjureService {
         return rand(1, 45) / 100;
     }
 
-    protected function damageKingdom(Kingdom $kingdom, float $damage) {
+    protected function damageKingdom(Kingdom $kingdom, Character $character, float $damage) {
         $kingdom->buildings->each(function($building) use($damage) {
             $durability = floor($building->current_durability - ($building->current_durability * $damage));
 
@@ -224,10 +224,12 @@ class ConjureService {
             $kingdomOwner = $kingdom->character->name;
         }
 
-        $kingdom = new Item($kingdom, $this->kingdomTransformer);
-        $kingdom = $this->manager->createData($kingdom)->toArray();
+        $kingdomData = new Item($kingdom, $this->kingdomTransformer);
+        $kingdomData = $this->manager->createData($kingdomData)->toArray();
 
-        event(new UpdateKingdom($kingdom->character->user, $kingdom));
+        if (!is_null($kingdom->character_id)) {
+            event(new UpdateKingdom($character->user, $kingdomData));
+        }
 
         event(new GlobalMessageEvent($kingdomOwner . '\'s Kingdom on the ' . $kingdomPlane . ' plane was attacked by the Celestial Entity for: ' . ($damage * 100) . '%'));
     }

@@ -49,7 +49,7 @@ class QuestsControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $this->actingAs($character->user)->visitRoute('completed.quests', [
-            'character' => $character->id,
+            'user' => $character->user->id,
         ])->see('Completed Quests');
     }
 
