@@ -55,6 +55,6 @@ class CharacterBoonJob implements ShouldQueue
 
         $boon->delete();
 
-        $useItemService->updateChaacter($character->refresh());
+        $useItemService->updateCharacter($character->refresh());
     }
 }

@@ -42,6 +42,53 @@ class ConjureService {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
+    public function movementConjure(Character $character) {
+
+        if (CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
+            return;
+        }
+
+        $x = $this->getXPosition();
+        $y = $this->getYPosition();
+
+        $kingdom = $this->isAtKingdom($x, $y);
+        $damagedKingdom = false;
+
+        if (!is_null($kingdom)) {
+            $damagedKingdom = $this->canDamageKingdom();
+        }
+
+        $monster = Monster::where('is_celestial_entity', true)->inRandomOrder()->first();
+
+        $healthRange          = explode('-', $monster->health_range);
+        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+
+        CelestialFight::create([
+            'monster_id'      => $monster->id,
+            'character_id'    => null,
+            'conjured_at'     => now(),
+            'x_position'      => $x,
+            'y_position'      => $y,
+            'damaged_kingdom' => $damagedKingdom,
+            'stole_treasury'  => $damagedKingdom,
+            'weakened_morale' => $damagedKingdom,
+            'current_health'  => $currentMonsterHealth,
+            'max_health'      => $currentMonsterHealth,
+            'type'            => CelestialConjureType::PUBLIC,
+        ]);
+
+        $plane = $monster->gameMap->name;
+
+        $types = ['has awoken', 'has angered', 'has enraged', 'has set free', 'has set loose'];
+        $randomIndex = rand(0, count($types));
+
+        event(new GlobalMessageEvent($character->name . ' ' . $types[$randomIndex] . ': ' . $monster->name . ' on the ' . $plane . ' plane at (X/Y): ' . $x . '/' . $y));
+
+        if ($damagedKingdom) {
+            $this->damageKingdom($kingdom, $this->getDamageAmount());
+        }
+    }
+
     public function conjure(Monster $monster, Character $character, string $type) {
         $x = $this->getXPosition();
         $y = $this->getYPosition();
@@ -85,7 +132,7 @@ class ConjureService {
         event(new UpdateMapDetailsBroadcast($character->map, $character->user, resolve(MovementService::class)));
 
         if ($damagedKingdom) {
-            $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
+            $this->damageKingdom($kingdom, $this->getDamageAmount());
         }
     }
 
@@ -136,7 +183,7 @@ class ConjureService {
         return rand(1, 45) / 100;
     }
 
-    protected function damageKingdom(Kingdom $kingdom, Character $character, float $damage) {
+    protected function damageKingdom(Kingdom $kingdom, float $damage) {
         $kingdom->buildings->each(function($building) use($damage) {
             $durability = floor($building->current_durability - ($building->current_durability * $damage));
 
@@ -180,7 +227,7 @@ class ConjureService {
         $kingdom = new Item($kingdom, $this->kingdomTransformer);
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
-        event(new UpdateKingdom($character->user, $kingdom));
+        event(new UpdateKingdom($kingdom->character->user, $kingdom));
 
         event(new GlobalMessageEvent($kingdomOwner . '\'s Kingdom on the ' . $kingdomPlane . ' plane was attacked by the Celestial Entity for: ' . ($damage * 100) . '%'));
     }

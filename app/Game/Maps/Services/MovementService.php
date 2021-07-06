@@ -12,6 +12,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcTypes;
+use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
@@ -68,6 +69,13 @@ class MovementService {
     private $traverseService;
 
     /**
+     * @var ConjureService $conjureService
+     */
+    private $conjureService;
+
+    private const CHANCE_FOR_CELESTIAL_TO_SPAWN = 1000000;
+
+    /**
      * Constructor
      *
      * @param PortService $portService
@@ -77,13 +85,15 @@ class MovementService {
                                 MapTileValue $mapTile,
                                 CoordinatesCache $coordinatesCache,
                                 MapPositionValue $mapPositionValue,
-                                TraverseService $traverseService)
+                                TraverseService $traverseService,
+                                ConjureService $conjureService)
     {
         $this->portService      = $portService;
         $this->mapTile          = $mapTile;
         $this->coordinatesCache = $coordinatesCache;
         $this->mapPositionValue = $mapPositionValue;
         $this->traverseService  = $traverseService;
+        $this->conjureService   = $conjureService;
     }
 
     /**
@@ -292,6 +302,8 @@ class MovementService {
             return $this->errorResult('Invalid coordinates');
         }
 
+        $this->attemptConjure($character);
+
         $character->map->update([
             'character_position_x' => $x,
             'character_position_y' => $y,
@@ -339,9 +351,12 @@ class MovementService {
 
         $character = $character->refresh();
 
+        $this->attemptConjure($character);
+
         $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
             ->where('y_position', $character->y_position)
             ->first();
+
 
         return $this->successResult([
             'character_position_details' => $character->map,
@@ -387,8 +402,22 @@ class MovementService {
         return $this->npcKingdoms;
     }
 
+    /**
+     * Get celestials
+     *
+     * @return array
+     */
     public function celestialEntities(): array {
         return $this->celestialEntities;
+    }
+
+    /**
+     * Can conjure Celestials?
+     *
+     * @return bool
+     */
+    public function canConjure() {
+        return rand(1, self::CHANCE_FOR_CELESTIAL_TO_SPAWN) > (self::CHANCE_FOR_CELESTIAL_TO_SPAWN - 1);
     }
 
     /**
@@ -404,6 +433,8 @@ class MovementService {
 
         $character = $character->refresh();
 
+        $this->attemptConjure($character);
+
         $this->processArea($character);
 
         $this->updateCharacterMovementTimeOut($character);
@@ -418,6 +449,18 @@ class MovementService {
                 $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
             })->count()
         ]);
+    }
+
+
+    /**
+     * Attempt to conjure Celestial to any plane on Movement, Teleport or Set Sail
+     *
+     * @param Character $character
+     */
+    protected function attemptConjure(Character $character) {
+        if ($this->canConjure()) {
+            $this->conjureService->movementConjure($character);
+        }
     }
 
     /**

@@ -50,12 +50,12 @@ class UseItemService {
 
         $character = $character->refresh();
 
-        $this->updateChaacter($character, $item);
+        $this->updateCharacter($character, $item);
 
         $slot->delete();
     }
 
-    public function updateChaacter(Character $character, Item $item = null) {
+    public function updateCharacter(Character $character, Item $item = null) {
         $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
 
         event(new UpdateAttackStats($this->manager->createData($characterAttack)->toArray(), $character->user));

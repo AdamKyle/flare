@@ -4,6 +4,7 @@ namespace App\Game\Maps\Providers;
 
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
+use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Services\TraverseService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Cache\CoordinatesCache;
@@ -57,6 +58,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(MapPositionValue::class),
                 $app->make(TraverseService::class),
+                $app->make(ConjureService::class),
             );
         });
 
