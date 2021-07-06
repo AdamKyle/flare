@@ -22,6 +22,7 @@ class DataTable extends Component
     public $isHelp       = false;
     public $craftOnly    = false;
     public $type         = null;
+    public $showAlchemy  = true;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -71,7 +72,7 @@ class DataTable extends Component
             $items = $items->where('type', $this->type);
         }
 
-
+        $this->showAlchemy = false;
 
         return $items->orderBy($this->sortField, $this->sortBy);
     }

@@ -143,7 +143,7 @@ class DataTable extends Component
 
     public function useAllItems(UseItemService $useItemService) {
         $this->character->inventory->slots->filter(function($slot) use ($useItemService) {
-            if ($slot->item->usable) {
+            if ($slot->item->usable && !$slot->item->damages_kingdoms) {
                 $useItemService->useItem($slot, $this->character, $slot->item);
             }
         });

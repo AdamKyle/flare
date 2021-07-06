@@ -140,7 +140,7 @@
                                 <td>{{is_null($slot->item->cost) ? 'N/A' : number_format($slot->item->cost)}}</td>
                             @endif
                             <td>
-                                @if ($allowInventoryManagement && $slot->item->type !== 'quest')
+                                @if ($allowInventoryManagement && $slot->item->type !== 'quest' && !$slot->item->damages_kingdoms)
                                     @include('game.character.partials.equipment.drop-downs.equip-dropdown', [
                                         'slot' => $slot,
                                         'character' => $character
@@ -155,16 +155,10 @@
                                         'slot'      => $slot,
                                         'character' => $character
                                     ])
-                                @elseif ($marketBoard)
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#slot-id-{{$slot->id}}">
-                                        Sell On Market
-                                    </button>
-
-                                    @include('components.livewire.character.inventory.partials.market-sell-modal', [
-                                        'slot' => $slot
-                                    ])
                                 @else
-                                    @if ($slot->item->type !== 'quest')
+                                    @if ($slot->item->damages_kingdoms)
+                                        Damages Kingdoms.
+                                    @elseif ($slot->item->type !== 'quest')
                                         @include('game.character.partials.equipment.drop-downs.sell-item', [
                                             'slot' => $slot,
                                             'character' => $character

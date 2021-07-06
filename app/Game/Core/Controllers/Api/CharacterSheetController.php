@@ -82,7 +82,7 @@ class CharacterSheetController extends Controller {
             $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
 
             $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
-            $boon['affected_skills'] = implode(',', $skills);
+            $boon['affected_skills'] = implode(', ', $skills);
 
             $boons[$key] = $boon;
         }

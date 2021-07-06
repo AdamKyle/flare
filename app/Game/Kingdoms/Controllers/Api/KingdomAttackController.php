@@ -31,7 +31,14 @@ class KingdomAttackController extends Controller {
                                 ->groupBy('kingdoms.id')
                                 ->get();
 
-        return response()->json($kingdoms, 200);
+        $usableItems = $character->inventory->slots->filter(function($slot) {
+           return $slot->item->usable && $slot->item->damages_kingdoms;
+        })->all();
+
+        return response()->json([
+            'kingdoms' => $kingdoms->toArray(),
+            'items'    => array_values($usableItems),
+        ], 200);
     }
 
     public function selectKingdoms(SelectedKingdomsRequest $request, Character $character) {

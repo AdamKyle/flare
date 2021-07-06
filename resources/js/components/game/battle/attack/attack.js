@@ -66,6 +66,22 @@ export default class Attack {
 
         this.doAttack(attacker, type);
 
+        if (type === 'monster') {
+          if (defender.heal_for > 0) {
+            if (this.characterCurrentHealth <= (defender.health * 0.75)) {
+              if (this.characterCurrentHealth < 0) {
+                this.characterCurrentHealth = defender.health;
+              } else {
+                this.characterCurrentHealth += defender.heal_for;
+              }
+
+              this.battleMessages.push({
+                message: 'Light floods your eyes as your wounds heal over for: ' + defender.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              });
+            }
+          }
+        }
+
         if (attackAgain) {
           return this.attack(defender, attacker, false, 'monster');
         }
@@ -159,18 +175,6 @@ export default class Attack {
       this.battleMessages.push({
         message: attacker.name + ' spells hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
-
-      if (attacker.heal_for > 0) {
-        const healFor = attacker.heal_for + this.characterCurrentHealth;
-
-        if (attacker.health <= (attacker.health * 0.75)) {
-          this.characterCurrentHealth += healFor;
-
-          this.battleMessages.push({
-            message: 'Light floods your eyes as your wounds heal over for: ' + healfor
-          });
-        }
-      }
     }
 
     if (type === 'monster') {

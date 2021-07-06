@@ -71,7 +71,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.affected_skill_base_damage_mod_bonus !== null ?
                       <>
-                        <dt>Skill Base AC Mod</dt>
+                        <dt>Skill Base Damge Mod</dt>
                         <dd className="text-success">+{this.props.boon.affected_skill_base_damage_mod_bonus * 100} %</dd>
                       </>
                       : null
@@ -79,7 +79,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.affected_skill_base_healing_mod_bonus !== null ?
                       <>
-                        <dt>Skill Base AC Mod</dt>
+                        <dt>Skill Base Healing Mod</dt>
                         <dd className="text-success">+{this.props.boon.affected_skill_base_healing_mod_bonus * 100} %</dd>
                       </>
                       : null
@@ -87,7 +87,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.affected_skill_bonus !== null ?
                       <>
-                        <dt>Skill Base AC Mod</dt>
+                        <dt>Skill Bonus</dt>
                         <dd className="text-success">+{this.props.boon.affected_skill_bonus * 100} %</dd>
                       </>
                       : null
@@ -95,7 +95,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.affected_skill_fight_time_out_mod_bonus !== null ?
                       <>
-                        <dt>Skill Base AC Mod</dt>
+                        <dt>Skill Fight Time Out Bonus</dt>
                         <dd className="text-success">+{this.props.boon.affected_skill_fight_time_out_mod_bonus * 100} %</dd>
                       </>
                       : null
@@ -103,7 +103,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.affected_skill_move_time_out_mod_bonus !== null ?
                       <>
-                        <dt>Skill Base AC Mod</dt>
+                        <dt>Skill Move Time Out Bonus</dt>
                         <dd className="text-success">+{this.props.boon.affected_skill_move_time_out_mod_bonus * 100} %</dd>
                       </>
                       : null
@@ -111,7 +111,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.affected_skill_training_bonus !== null ?
                       <>
-                        <dt>Skill Base AC Mod</dt>
+                        <dt>Skill XP Bonus</dt>
                         <dd className="text-success">+{this.props.boon.affected_skill_training_bonus * 100} %</dd>
                       </>
                       : null
