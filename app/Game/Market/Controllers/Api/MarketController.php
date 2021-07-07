@@ -117,15 +117,33 @@ class MarketController extends Controller {
     }
 
     public function history(HistoryRequest $request) {
+        $when = Carbon::today();
+
+        if ($request->has('when')) {
+            switch($request->when) {
+                case '24 hours':
+                    $when = Carbon::today();
+                    break;
+                case '1 week':
+                    $when = Carbon::today()->subWeek();
+                    break;
+                case '1 month':
+                    $when = Carbon::today()->subMonth();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         if ($request->has('type')) {
             return response()->json([
-                'labels' => MarketHistory::where('market_history.created_at', '>=', Carbon::today()->subDays(30))->join('items', function($join) use($request) {
+                'labels' => MarketHistory::where('market_history.created_at', '>=', $when)->join('items', function($join) use($request) {
                     return $join->on('market_history.item_id', '=', 'items.id')
                         ->where('items.type', $request->type);
                 })->select('market_history.*')->get()->map(function($mh) {
                     return $mh->created_at->format('y-m-d');
                 }),
-                'data'   => MarketHistory::where('market_history.created_at', '>=', Carbon::today()->subDays(30))->join('items', function($join) use($request) {
+                'data'   => MarketHistory::where('market_history.created_at', '>=', $when)->join('items', function($join) use($request) {
                     return $join->on('market_history.item_id', '=', 'items.id')
                         ->where('items.type', $request->type);
                 })->select('market_history.*')->get()->pluck('sold_for'),
@@ -133,10 +151,10 @@ class MarketController extends Controller {
         }
 
         return response()->json([
-            'labels' => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->map(function($mh) {
+            'labels' => MarketHistory::where('created_at', '>=', $when)->get()->map(function($mh) {
                 return $mh->item->affix_name;
             }),
-            'data'   => MarketHistory::where('created_at', '>=', Carbon::today()->subDays(30))->get()->pluck('sold_for'),
+            'data'   => MarketHistory::where('created_at', '>=', $when)->get()->pluck('sold_for'),
         ]);
     }
 

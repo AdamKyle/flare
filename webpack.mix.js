@@ -18,7 +18,7 @@ mix.react('resources/js/app.js', 'public/js')
    .react('resources/js/helpers/admin-site-stats-components.js', 'public/js')
    .react('resources/js/helpers/character-boons.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
-   //.extract(['lodash', 'react', 'jquery', 'bootstrap'])
+   .sourceMaps()
    .version()
    .sourceMaps()
    .browserSync('127.0.0.1:8000');
