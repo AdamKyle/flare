@@ -18,6 +18,12 @@ return [
     'traverse'          => [],
     'teleport'          => [],
     'planes'            => [],
+    'celestials'        => [],
+    'disenchanting'     => [],
+    'npc-kingdoms'      => [],
+    'npcs'              => [],
+    'currencies'        => [],
+    'quests'            => [],
     'kingdoms'          => [
         [
             'livewire'            => true,

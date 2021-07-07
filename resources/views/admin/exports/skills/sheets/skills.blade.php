@@ -14,6 +14,7 @@
         <th>can_train</th>
         <th>skill_bonus_per_level</th>
         <th>specifically_assigned</th>
+        <th>is_locked</th>
     </tr>
     </thead>
     <tbody>
@@ -32,6 +33,7 @@
             <td>{{$skill->can_train}}</td>
             <td>{{$skill->skill_bonus_per_level}}</td>
             <td>{{$skill->specifically_assigned}}</td>
+            <td>{{$skill->is_locked}}</td>
         </tr>
     @endforeach
     </tbody>

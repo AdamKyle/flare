@@ -22,6 +22,10 @@ class SkillsSheet implements ToCollection {
                     $skill['can_train'] = false;
                 }
 
+                if (is_null($skill['is_locked'])) {
+                    $skill['is_locked'] = false;
+                }
+
                 if (is_null($skill['can_monsters_have_skill'])) {
                     $skill['can_monsters_have_skill'] = false;
                 }

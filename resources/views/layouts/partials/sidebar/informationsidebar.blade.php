@@ -23,6 +23,7 @@
           <li><a href="{{route('info.page', ['pageName' => 'character-stats'])}}">Stats</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'skill-information'])}}">Skills</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'equipment'])}}">Equipment</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'currencies'])}}">Currencies</a></li>
       </ul>
     </li>
     <li>
@@ -46,7 +47,15 @@
       <ul aria-expanded="false" class="collapse">
           <li><a href="{{route('info.page', ['pageName' => 'kingdoms'])}}">Kingdoms</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'attacking-kingdoms'])}}">Attacking A Kingdom</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'npc-kingdoms'])}}">NPC Kingdom</a></li>
       </ul>
+    </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-pawn"></i><span class="hide-menu">NPC's & Quests</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('info.page', ['pageName' => 'npcs'])}}">NPCs</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'quests'])}}">Quests</a></li>
+        </ul>
     </li>
     <li>
         <a href="{{route('info.page', [
@@ -72,11 +81,20 @@
             <li>
                 <a href="{{route('info.page', ['pageName' => 'enchanting'])}}">Enchanting</a>
             </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'disenchanting'])}}">Disenchanting</a>
+            </li>
         </ul>
     </li>
     <li>
-        <a href="{{route('info.page', [
-            'pageName' => 'monsters'
-          ])}}"><i class="ra ra-eye-monster"></i> Monsters List</a>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-eye-monster"></i><span class="hide-menu">Monsters</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'celestials'])}}">Celestials</a>
+            </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'monsters'])}}">Monsters List</a>
+            </li>
+        </ul>
     </li>
 </ul>
