@@ -3,6 +3,7 @@ import {Modal, Button} from 'react-bootstrap';
 import KingdomSelection from './partials/attack-sections/kingdom-selection';
 import UnitSelection from './partials/attack-sections/unit-selection';
 import LoadingModal from "../../components/loading/loading-modal";
+import ItemSelection from "./partials/attack-sections/item-selection";
 
 export default class KingdomAttackModal extends React.Component {
 
@@ -43,7 +44,8 @@ export default class KingdomAttackModal extends React.Component {
 
         this.setState({
           steps: steps,
-          currentStep: steps.length === 3 ? 0 : 1
+          currentStep: 0,
+          finalStep: steps.length === 3 ? 2 : 1,
         });
       });
     }).catch((err) => {
@@ -103,11 +105,15 @@ export default class KingdomAttackModal extends React.Component {
   }
 
   next() {
-    if (this.state.currentStep === 1) {
+    if (this.state.currentStep !== (this.state.steps.length === 3 ? 2 : 1)) {
       this.setState({
-        loading: true,
+        currentStep: this.state.currentStep + 1,
       }, () => {
-        this.getKingdomsUnits();
+        if (this.state.steps.length === 3 && this.state.currentStep === 2) {
+          this.getKingdomsUnits();
+        } else if (this.state.steps.length === 2 && this.state.currentStep === 1) {
+          this.getKingdomsUnits();
+        }
       });
     }
   }
@@ -163,13 +169,32 @@ export default class KingdomAttackModal extends React.Component {
     });
   }
 
+  updateItems(items) {
+    this.setState({
+      items: items,
+    }, () => {
+      const steps = this.state.steps;
+
+      if (items.length === 0) {
+        steps.shift()
+
+        this.setState({
+          steps: steps,
+          currentStep: 0,
+          finalStep: 1,
+        });
+      }
+    });
+  }
+
   getKingdomsUnits() {
+    this.setState({loading: true});
+
     axios.post('/api/kingdoms/' + this.props.characterId + '/attack/selection', {
       selected_kingdoms: this.state.selectedKingdomData
     }).then((result) => {
       this.setState({
         loading: false,
-        currentStep: this.state.currentStep + 1,
         attackingKingdoms: result.data,
       })
     }).catch((err) => {
@@ -227,14 +252,22 @@ export default class KingdomAttackModal extends React.Component {
               </div>
               : null
           }
-          { this.state.currentStep === 0 ?
+          { this.state.steps.length === 3 && this.state.currentStep === 0 ?
               this.state.items.length > 0 ?
-                <>Hello</>
-              : null
+                <ItemSelection
+                  items={this.state.items}
+                  enableNext={this.enableNext.bind(this)}
+                  openTimeOutModal={this.props.openTimeOutModal}
+                  close={this.props.close}
+                  characterId={this.props.characterId}
+                  defenderId={this.props.kingdomToAttack.id}
+                  updateItems={this.updateItems.bind(this)}
+                />
+              : <>Test</>
             : null
           }
           {
-            this.state.currentStep === 1 ?
+            this.state.steps.length === 3 && this.state.currentStep === 1 || this.state.steps.length === 2 && this.state.currentStep === 0 ?
               <KingdomSelection
                 kingdoms={this.state.kingdoms}
                 enableNext={this.enableNext.bind(this)}
@@ -243,7 +276,7 @@ export default class KingdomAttackModal extends React.Component {
               : null
           }
           {
-            this.state.currentStep === 2 ?
+            (this.state.steps.length === 3 && this.state.currentStep === 2 || this.state.steps.length === 2 && this.state.currentStep === 1) && this.state.attackingKingdoms.length > 0 ?
               <UnitSelection
                 attackingKingdoms={this.state.attackingKingdoms}
                 defendingKingdom={this.props.kingdomToAttack}

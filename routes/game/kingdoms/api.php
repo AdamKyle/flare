@@ -20,5 +20,6 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:120,1
 
     Route::post('/kingdoms/{character}/attack/selection', ['as' => 'kingdom.attack.selection', 'uses' => 'Api\KingdomAttackController@selectKingdoms']);
     Route::post('/kingdoms/{character}/attack', ['as' => 'kingdom.atack', 'uses' => 'Api\KingdomAttackController@attack']);
+    Route::post('/use-items-on-kingdom/{character}', ['uses' => 'Api\KingdomAttackController@useItems']);
     Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\KingdomUnitMovementController@recallUnits']);
 });

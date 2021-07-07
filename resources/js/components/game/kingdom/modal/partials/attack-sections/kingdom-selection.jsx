@@ -11,6 +11,10 @@ export default class KingdomSelection extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.props.enableNext(false);
+  }
+
   renderSelectOptions() {
     return this.props.kingdoms.map((kingdom) => {
       return (

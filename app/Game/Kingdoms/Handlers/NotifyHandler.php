@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Events\KingdomServerMessageEvent;
+use App\Flare\Jobs\SendOffEmail;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
@@ -275,12 +276,14 @@ class NotifyHandler {
      * @param string $message
      * @return array|void|null
      */
-    protected function sendMessage(User $user, $type, string $message) {
+    public function sendMessage(User $user, $type, string $message) {
         if (!UserOnlineValue::isOnline($user)) {
             $subjectParts = explode('-', $type);
             $subject      = ucfirst($subjectParts[0]) . ' ' . ucfirst($subjectParts[1]) . '!';
 
-            return \Mail::to($user->email)->send((new GenericMail($user, $message, $subject)));
+            SendOffEmail::dispatch($user, (new GenericMail($user, $message, $subject)))->delay(now()->addMinute());
+
+            return;
         }
 
         return event(new KingdomServerMessageEvent($user, $type, $message));
