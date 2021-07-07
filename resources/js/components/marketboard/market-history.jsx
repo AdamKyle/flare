@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Line} from 'react-chartjs-2';
+import {Dropdown} from "react-bootstrap";
 
 export default class MarketHistory extends React.Component {
   constructor(props) {
@@ -31,7 +32,13 @@ export default class MarketHistory extends React.Component {
             pointHitRadius: 10,
           }
         ]
-      }
+      },
+      dropDown: [
+        {type: 'reset', name: 'Reset Filter'},
+        {type: '24 hours', name: '24 Hours'},
+        {type: '1 week', name: 'Week'},
+        {type: '1 month', name: 'Month'},
+      ]
     }
 
     this.update = Echo.join('update-market');
@@ -56,10 +63,11 @@ export default class MarketHistory extends React.Component {
     }
   }
 
-  fetchMarketHistory() {
+  fetchMarketHistory(when) {
     axios.get('/api/market-board/history', {
       params: {
         type: this.props.type,
+        when: typeof when !== 'undefined' ? when : null,
       }
     }).then((result) => {
 
@@ -88,6 +96,17 @@ export default class MarketHistory extends React.Component {
     });
   }
 
+  changeWhen(event) {
+    this.fetchMarketHistory(event.target.dataset.when);
+  }
+
+  buildDropDownOptions() {
+    return this.state.dropDown.map((button) => {
+      return <Dropdown.Item onClick={this.changeWhen.bind(this)} data-when={button.type}
+                            key={"button-" + button.type}>{button.name}</Dropdown.Item>
+    })
+  }
+
   render() {
 
     if (this.state.loading) {
@@ -95,8 +114,17 @@ export default class MarketHistory extends React.Component {
     }
 
     return (
-      <div className="mb-4">
-        <h6>Market History</h6>
+      <div className="mb-4 clearfix">
+        <h6 className="float-left">Market History</h6>
+        <Dropdown size="sm" className="float-right">
+          <Dropdown.Toggle variant="primary" id="dropdown-basic">
+            Show history for last?
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu>
+            {this.buildDropDownOptions()}
+          </Dropdown.Menu>
+        </Dropdown>
         <Line
           data={this.state.data}
           width={300}
