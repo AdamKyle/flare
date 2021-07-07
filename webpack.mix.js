@@ -17,6 +17,6 @@ mix.react('resources/js/app.js', 'public/js')
    .react('resources/js/helpers/admin-chat-messages.js', 'public/js')
    .react('resources/js/helpers/admin-site-stats-components.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
-   //.extract(['lodash', 'react', 'jquery', 'bootstrap'])
+   .sourceMaps()
    .version()
    .browserSync('127.0.0.1:8000');
