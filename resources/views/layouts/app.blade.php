@@ -27,18 +27,16 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
 
     @livewireStyles
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
-    <script src="{{ asset('js/vendor.js') }}"></script>
-    <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src={{asset('js/market-board.js')}} type="text/javascript"></script>
-    <script src={{asset('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
-    <script src={{asset('js/character-boons.js')}} type="text/javascript"></script>
+    <script src={{mix('js/market-board.js')}} type="text/javascript"></script>
+    <script src={{mix('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
+    <script src={{mix('js/character-boons.js')}} type="text/javascript"></script>
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
 
@@ -156,8 +154,7 @@
 
     @livewireScripts
 
-    <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ mix('js/app.js') }}"></script>
 
     @stack('scripts')
 </body>
