@@ -267,7 +267,7 @@ class Item extends Model
             $baseStat += !is_null($statBonus) ? $statBonus : 0.0;
         }
 
-        return number_format($baseStat);
+        return number_format($baseStat, 2);
     }
 
     /**

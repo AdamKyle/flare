@@ -19,12 +19,31 @@
                         <p>{!! nl2br(e($skill->description)) !!}</p>
                         <hr />
                         @if (!$skill->can_train)
-                            <p>
-                                This skill cannot be trained by fighting alone. Instead,
-                                by crafting weapons of this type you'll gain some xp towards its level.
-                                Certain quest items can help increase
-                                the amount of xp you get from training this skill.
-                            </p>
+                            <div class="alert alert-info mb-3 mt-2">
+                                @if ($skill->skillType()->isCrafting())
+                                    <p>
+                                        This skill cannot be trained by fighting alone. Instead,
+                                        by crafting weapons of this type you'll gain some xp towards its level.
+                                        Certain quest items can help increase
+                                        the amount of xp you get from training this skill.
+                                    </p>
+                                @endif
+
+                                @if ($skill->skillType()->isEnchanting())
+                                    <p>
+                                        This skill requires you to enchant items. You can do this by clicking Craft/Enchant
+                                        and selecting enchant. Specific quest items can help increase the amount of XP
+                                        you get per successful attempt.
+                                    </p>
+                                @endif
+
+                                @if ($skill->skillType()->isAlchemy())
+                                    <p>
+                                        This skill requires you to use Alchemy, which you can find under Craft/Enchant
+                                        Assuming you have done the appropriate quest.
+                                    </p>
+                                @endif
+                            </div>
                         @endif
                         <dl>
                             <dt>Max Level:</dt>

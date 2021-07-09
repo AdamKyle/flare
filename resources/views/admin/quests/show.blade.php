@@ -33,7 +33,7 @@
                             @else
                                 <a href="{{route('game.npcs.show', [
                                 'npc' => $quest->npc_id
-                            ])}}">{{$quest->npc->real_name}}</a>;
+                            ])}}">{{$quest->npc->real_name}}</a>
                             @endif
                         </dd>
                         @if ($quest->npc->must_be_at_same_location)
@@ -44,11 +44,11 @@
                         <dd>
                             @if (auth()->user()->hasRole('Admin'))
                                 <a href="{{route('items.item', [
-                                    'item' => $quest->item_id
+                                    'item' => $quest->item->id
                                 ])}}">{{$quest->item->name}}</a>
                             @else
                                 <a href="{{route('game.items.item', [
-                                    'item' => $quest->item_id
+                                    'item' => $quest->item->id
                                 ])}}">{{$quest->item->name}}</a>
 
                             @endif

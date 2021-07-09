@@ -8,9 +8,11 @@ use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Npc;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Models\User;
 use App\Flare\Values\KingdomLogStatusValue;
+use App\Flare\Values\NpcTypes;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Flare\Values\UserOnlineValue;
 
@@ -78,10 +80,10 @@ class NotifyHandler {
     /**
      * Sets the defending character.
      *
-     * @param Character $character
+     * @param Character|null $character
      * @return $this
      */
-    public function setDefendingCharacter(Character $character): NotifyHandler {
+    public function setDefendingCharacter(Character $character = null): NotifyHandler {
         $this->defendingCharacter = $character;
 
         return $this;
@@ -147,6 +149,9 @@ class NotifyHandler {
      * @throws \Exception
      */
     public function notifyDefender(string $status, Kingdom $defender) {
+        if (is_null($defender->character_id)) {
+            return;
+        }
 
         $value = new KingdomLogStatusValue($status);
 
@@ -221,7 +226,7 @@ class NotifyHandler {
         }
 
         if ($logStatus->lostAttack()) {
-            $message = 'You lost all your units when attacking kingdom at: (X/Y) ' .
+            $message = 'You lost all your units when attacking '.$defender->name.' at: (X/Y) ' .
                 $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane. Check the kingdom attack logs for more info.';
 
@@ -238,13 +243,20 @@ class NotifyHandler {
         }
 
         if ($logStatus->unitsReturning()) {
-            $characterName = $defender->character->name;
+            if (is_null($defender->character_id)) {
+                $characterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+            } else {
+                $characterName = $defender->character->name;
+            }
+
 
             $message = 'Your units are retuning from ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane. When they are back a log will be generated with details';
 
-            if ($defender->character->id === $character->id) {
-                $message = 'Your units are returning from: (X\Y) ' . $defender->x_position . '/' . $defender->y_position . '. You own this kingdom.';
+            if (!is_null($defender->character_id)) {
+                if ($defender->character->id === $character->id) {
+                    $message = 'Your units are returning from: (X\Y) ' . $defender->x_position . '/' . $defender->y_position . '. You own this kingdom.';
+                }
             }
 
             $type = 'units-returning';

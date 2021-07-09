@@ -24,6 +24,8 @@ return [
     'npcs'              => [],
     'currencies'        => [],
     'quests'            => [],
+    'usable-items'      => [],
+    'combat'            => [],
     'kingdoms'          => [
         [
             'livewire'            => true,

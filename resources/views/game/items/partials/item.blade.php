@@ -34,6 +34,7 @@
                     @include('game.items.partials.item-usable-section', [
                         'item'   => $item,
                         'skills' => $skills,
+                        'skill'  => $skill,
                     ])
                 </div>
             @else

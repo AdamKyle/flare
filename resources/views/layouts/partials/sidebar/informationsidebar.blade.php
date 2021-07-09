@@ -24,6 +24,7 @@
           <li><a href="{{route('info.page', ['pageName' => 'skill-information'])}}">Skills</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'equipment'])}}">Equipment</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'currencies'])}}">Currencies</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'combat'])}}">Combat</a></li>
       </ul>
     </li>
     <li>
@@ -83,6 +84,9 @@
             </li>
             <li>
                 <a href="{{route('info.page', ['pageName' => 'disenchanting'])}}">Disenchanting</a>
+            </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'usable-items'])}}">Usable Items</a>
             </li>
         </ul>
     </li>

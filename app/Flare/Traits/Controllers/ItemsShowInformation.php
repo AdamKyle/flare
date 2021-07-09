@@ -9,12 +9,14 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Skills\Values\SkillTypeValue;
 
 trait ItemsShowInformation {
 
     public function renderItemShow(string $viewName, Item $item) {
         $effects = 'N/A';
         $skills  = [];
+        $skill   = null;
 
         if (!is_null($item->effects)) {
             $effect = new ItemEffectsValue($item->effect);
@@ -32,6 +34,20 @@ trait ItemsShowInformation {
             $skills = GameSkill::where('type', $item->affects_skill_type)->pluck('name')->toArray();
         }
 
+
+
+        if ($item->usable) {
+            if (auth()->user()->hasRole('admin')) {
+                $skill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+            }
+
+            if (auth()->user()) {
+                $skill = auth()->user()->character->skills->filter(function($skill) {
+                    return $skill->type()->isAlchemy();
+                })->first();
+            }
+        }
+
         return view('game.items.item', [
             'item'      => $item,
             'monster'   => Monster::where('quest_item_id', $item->id)->first(),
@@ -40,6 +56,7 @@ trait ItemsShowInformation {
             'adventure' => Adventure::where('reward_item_id', $item->id)->first(),
             'effects'   => $effects,
             'skills'    => $skills,
+            'skill'     => $skill,
         ]);
     }
 }

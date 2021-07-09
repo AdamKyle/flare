@@ -8,7 +8,15 @@
             by clicking on the tab beside "Character Info" called "Boons". You can cancel a boon at any time by clicking it and canceling it.
         </p>
         <p>
-            These items cannot be sold via the market bord and cannot be sold via the shop. They can only be crafted via <a href="#">Alchemy</a>.
+            These items cannot be sold via the market bord and cannot be sold via the shop. They can only be crafted via
+
+            @if (isset($skill))
+                @if (auth()->user()->hasRole('Admin'))
+                    <a href="{{route('skills.skill', ['skill' => $skill->id])}}">Alchemy</a>.
+                @elseif (auth()->user())
+                    <a href="{{route('skill.character.info', ['skill' => $skill->id])}}">Alchemy</a>.
+                @endif
+            @endif
         </p>
     </div>
 

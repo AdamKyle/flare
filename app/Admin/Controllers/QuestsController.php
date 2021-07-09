@@ -18,6 +18,7 @@ class QuestsController extends Controller {
         if ($quest->unlocks_skill) {
             $skill = GameSkill::where('type', $quest->unlocks_skill_type)->where('is_locked', true)->first();
         }
+
         return view('admin.quests.show', [
             'quest'       => $quest,
             'lockedSkill' => $skill,

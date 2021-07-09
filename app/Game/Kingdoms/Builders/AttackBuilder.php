@@ -26,15 +26,20 @@ class AttackBuilder {
      * @return $this
      */
     public function setDefender(UnitMovementQueue $unitMovement, int $defenderId, Character $character = null): AttackBuilder {
+
         $query = Kingdom::where('id', $defenderId)
                         ->where('x_position', $unitMovement->moving_to_x)
                         ->where('y_position', $unitMovement->moving_to_y);
 
-        if (!is_null($character)) {
-            $query = $query->where('character_id', '!=', $character->id);
+        $kingdom = $query->first();
+
+        if (!is_null($character) && !is_null($kingdom->character_id)) {
+            if ($kingdom->character_id === $character->id) {
+                return $this;
+            }
         }
 
-        $this->defender = $query->first();
+        $this->defender = $kingdom;
 
         return $this;
     }
@@ -42,9 +47,13 @@ class AttackBuilder {
     /**
      * Returns the defending character or null.
      *
-     * @return Character
+     * @return Mixed
      */
-    public function getDefendingCharacter(): Character {
+    public function getDefendingCharacter() {
+        if (is_null($this->getDefender()->character_id)) {
+            return null;
+        }
+
         return $this->getDefender()->character;
     }
 

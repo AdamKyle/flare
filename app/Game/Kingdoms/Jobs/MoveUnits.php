@@ -40,8 +40,6 @@ class MoveUnits implements ShouldQueue
             return;
         }
 
-
-
         switch ($this->type) {
             case 'attack':
                 $unitMovement->update([

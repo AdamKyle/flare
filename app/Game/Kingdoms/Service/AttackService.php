@@ -7,6 +7,7 @@ use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
+use Exception;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
@@ -113,11 +114,12 @@ class AttackService {
      * @param UnitMovementQueue $unitMovement
      * @param Character $character
      * @param int $defenderId
+     * @throws Exception
      */
     public function attack(UnitMovementQueue $unitMovement, Character $character, int $defenderId) {
         $attackingUnits = $unitMovement->units_moving;
         $defender       = $this->attackBuilder->setDefender($unitMovement, $defenderId, $character)->getDefender();
-        
+
         $this->notifyHandler    = $this->notifyHandler->setAttackingKingdom($unitMovement->from_kingdom)
                                                       ->setDefendingKingdom($unitMovement->to_kingdom);
 
