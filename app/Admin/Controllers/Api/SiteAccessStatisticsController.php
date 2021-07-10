@@ -13,4 +13,12 @@ class SiteAccessStatisticsController extends Controller {
             'signed_in'  => SiteAccessStatisticValue::getSignedIn(),
         ], 200);
     }
+
+    public function fetchLoggedInAllTime() {
+        return response()->json(['stats' => SiteAccessStatisticValue::getAllTimeSignedIn()], 200);
+    }
+
+    public function fetchRegisteredAllTime() {
+        return response()->json(['stats' => SiteAccessStatisticValue::getAllTimeRegistered()], 200);
+    }
 }
