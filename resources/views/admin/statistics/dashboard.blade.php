@@ -46,7 +46,7 @@
     </div>
     <hr />
     <x-cards.card-with-title title="Characters Gold (Not Live)">
-        <div id="chart" style="height: 400px;"></div>
+        <div id="character-gold"></div>
     </x-cards.card-with-title>
 @endsection
 
@@ -58,11 +58,6 @@
     <script>
         renderStatsAllTime('site-accessed', 'Logged In (All Time)', 'Login (All Time)', '/api/admin/site-statistics/all-time-sign-in');
         renderStatsAllTime('registered-users', 'Registered (All Time)', 'Registered (All Time)', '/api/admin/site-statistics/all-time-register');
-
-        const chart = new Chartisan({
-            el: '#chart',
-            url: "@chart('all_character_gold')",
-            hooks: new ChartisanHooks().datasets('line').tooltip().legend(),
-        });
+        renderStatsAllTime('character-gold', 'Gold', 'Gold', '/api/admin/site-statistics/all-characters-gold');
     </script>
 @endpush

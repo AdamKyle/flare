@@ -13,8 +13,8 @@ class StatisticsController extends Controller {
             'averageCharacterLevel'     => number_format(Character::avg('level'), 2),
             'averageCharacterGold'      => number_format(Character::avg('gold')),
             'kingdomCount'              => number_format(Kingdom::count()),
-            'richestCharacter'          => Character::orderBy('gold', 'asc')->first(),
-            'highestLevelCharacter'     => Character::orderBy('gold', 'asc')->first(),
+            'richestCharacter'          => Character::orderBy('gold', 'desc')->first(),
+            'highestLevelCharacter'     => Character::orderBy('gold', 'desc')->first(),
         ]);
     }
 }
