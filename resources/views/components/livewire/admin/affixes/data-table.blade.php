@@ -55,18 +55,27 @@
                             field="int_required"
                         />
                         <x-data-tables.header-row
+                            wire:click.prevent="sortBy('cost')"
+                            header-text="Cost"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="cost"
+                        />
+
+                        <x-data-tables.header-row
                             wire:click.prevent="sortBy('skill_level_required')"
                             header-text="Skill Level Required"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="skill_level_required"
                         />
+
                         <x-data-tables.header-row
-                            wire:click.prevent="sortBy('cost')"
-                            header-text="Cost"
+                            wire:click.prevent="sortBy('skill_level_trivial')"
+                            header-text="Skill Level Trivial"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
-                            field="cost"
+                            field="skill_level_trivial"
                         />
 
                         <x-data-tables.header-row
@@ -102,8 +111,9 @@
                                 <td>{{is_null($itemAffix->base_ac_mod) ? 'N/A' : ($itemAffix->base_ac_mod * 100) . '%'}}</td>
                                 <td>{{is_null($itemAffix->base_healing_mod) ? 'N/A' : ($itemAffix->base_healing_mod * 100) . '%'}}</td>
                                 <td>{{is_null($itemAffix->int_required) ? 'N/A' : $itemAffix->int_required}}</td>
-                                <td>{{is_null($itemAffix->skill_level_required) ? 'N/A' : $itemAffix->skill_level_required}}</td>
                                 <td>{{is_null($itemAffix->cost) ? 'N/A' : number_format($itemAffix->cost)}}</td>
+                                <td>{{is_null($itemAffix->skill_level_required) ? 'N/A' : $itemAffix->skill_level_required}}</td>
+                                <td>{{is_null($itemAffix->skill_level_trivial) ? 'N/A' : $itemAffix->skill_level_trivial}}</td>
                                 <td>
                                     @guest
                                     @else

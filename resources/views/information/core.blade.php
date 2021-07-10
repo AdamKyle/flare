@@ -21,7 +21,9 @@
 
                 <div class="mb-3 mt-3">
                     @livewire($section['view'], [
-                        'only'   => $section['only']
+                        'only'          => $section['only'],
+                        'showSkillInfo' => $section['showSkillInfo'],
+                        'showDropDown'  => $section['showDropDown'],
                     ])
                 </div>
                 @else

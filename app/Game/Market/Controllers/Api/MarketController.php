@@ -123,8 +123,11 @@ class MarketController extends Controller {
 
         if ($request->has('when')) {
             switch($request->when) {
-                case '24 hours':
+                case 'today':
                     $when = Carbon::today();
+                    break;
+                case 'yesterday':
+                    $when = Carbon::yesterday();
                     break;
                 case '1 week':
                     $when = Carbon::today()->subWeek();
