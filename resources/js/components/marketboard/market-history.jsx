@@ -35,7 +35,8 @@ export default class MarketHistory extends React.Component {
       },
       dropDown: [
         {type: 'reset', name: 'Reset Filter'},
-        {type: '24 hours', name: '24 Hours'},
+        {type: 'today', name: 'Today'},
+        {type: 'last 24 hours', name: 'Yesterday'},
         {type: '1 week', name: 'Week'},
         {type: '1 month', name: 'Month'},
       ]

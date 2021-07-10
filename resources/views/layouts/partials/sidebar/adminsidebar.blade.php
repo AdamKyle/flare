@@ -91,4 +91,10 @@
             <li><a href="{{route('skills.import')}}">Import</a></li>
         </ul>
     </li>
+    <li>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="fas fa-chart-bar"></i><span class="hide-menu">Statistics</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{{route('admin.statistics')}}">Dashboard</a></li>
+        </ul>
+    </li>
 </ul>

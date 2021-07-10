@@ -10,5 +10,7 @@
             <a href="{{route('items.create')}}" class="btn btn-primary float-right ml-2">Create</a>
         </div>
     </div>
-    @livewire('admin.items.data-table')
+    @livewire('admin.items.data-table', [
+      'showSkillInfo' => true
+    ])
 @endsection

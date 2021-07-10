@@ -240,8 +240,11 @@
                             <td>{{is_null($item->cost) ? 0 : number_format($item->cost)}}</td>
                             <td>{{is_null($item->gold_dust_cost) ? 0 : number_format($item->gold_dust_cost)}}</td>
                             <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
-                            <td>{{is_null($item->skill_level_required) ? 'can\'t craft' : $item->skill_level_required}}</td>
-                            <td>{{is_null($item->skill_level_trivial) ? 'can\'t craft' : $item->skill_level_trivial}}</td>
+                            @if ($showSkillInfo)
+                                <td>{{$item->skill_level_required}}</td>
+                                <td>{{$item->skill_level_trivial}}</td>
+                            @endif
+
                             @guest
                             @else
                                 <td>

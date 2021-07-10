@@ -93,12 +93,16 @@ return [
             'view'                => 'admin.items.data-table',
             'only'                => null,
             'insert_before_table' => 'information.partials.crafting-section-one',
+            'showSkillInfo'       => true,
+            'showDropDown'        => true,
         ],
         [
             'livewire'            => true,
             'view'                => 'admin.items.data-table',
             'only'                => 'quest-items-book',
             'insert_before_table' => null,
+            'showSkillInfo'       => false,
+            'showDropDown'        => false,
         ]
     ],
     'enchanting' => [

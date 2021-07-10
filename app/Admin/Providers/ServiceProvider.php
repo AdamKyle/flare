@@ -2,6 +2,7 @@
 
 namespace App\Admin\Providers;
 
+use App\Charts\AllCharacterGoldChart;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use ConsoleTVs\Charts\Registrar as Charts;
 use App\Admin\Console\Commands\CreateAdminAccount;
@@ -53,6 +54,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $charts->register([
             BattleSimulationChart::class,
+            AllCharacterGoldChart::class,
         ]);
 
         $router->aliasMiddleware('is.admin', IsAdminMiddleware::class);

@@ -23,13 +23,6 @@
             @endswitch
         </dd>
     @endif
-
-    <dt>Skill Name:</dt>
-    <dd>{{is_null($item->skill_name) ? 'N/A' : $item->skill_name}}</dd>
-    <dt>Skill XP Bonus (When Training):</dt>
-    <dd>{{is_null($item->skill_name) ? 0 : $item->skill_training_bonus * 100}}%</dd>
-    <dt>Skill Bonus (When using)</dt>
-    <dd>{{is_null($item->skill_training_bonus) ? 0 : $item->skill_bonus * 100}}%</dd>
 </dl>
 
 @if ($item->can_craft)

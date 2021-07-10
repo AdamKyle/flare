@@ -1,6 +1,4 @@
-@extends('layouts.information', [
-    'pageTitle' => 'Class'
-])
+@extends('layouts.information')
 
 @section('content')
     <div class="row page-titles mt-3">
@@ -51,7 +49,7 @@
                 <div class="card-body">
                     <dl>
                         <dt>Base Cost:</dt>
-                        <dd>{{$itemAffix->cost}} gold</dd>
+                        <dd>{{number_format($itemAffix->cost)}} gold</dd>
                         <dt>Intelligence Required:</dt>
                         <dd>{{$itemAffix->int_required}}</dd>
                         <dt>Level Required:</dt>

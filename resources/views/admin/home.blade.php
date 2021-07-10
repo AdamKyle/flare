@@ -44,8 +44,8 @@
 @endsection
 
 @push('head')
-    <script src={{asset('js/admin-chat-messages.js')}} type="text/javascript"></script>
-    <script src={{asset('js/admin-site-stats-components.js')}} type="text/javascript"></script>
+    <script src={{mix('js/admin-chat-messages.js')}} type="text/javascript"></script>
+    <script src={{mix('js/admin-site-stats-components.js')}} type="text/javascript"></script>
 @endpush
 
 @push('scripts')

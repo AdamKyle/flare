@@ -44,25 +44,37 @@ class InfoPageController extends Controller
 
         for ($i = 0; $i < count($files); $i++) {
             if (explode('.', $files[$i])[1] === 'md') {
-                $view     = null;
-                $livewire = false;
-                $only     = null;
-                $index    = $i === 0 ? 0 : $i;
-                $before   = null;
+                $view          = null;
+                $livewire      = false;
+                $only          = null;
+                $index         = $i === 0 ? 0 : $i;
+                $before        = null;
+                $showSkillInfo = false;
+                $showDropDown  = false;
 
                 if (isset(config('info.' . $pageName)[$index])) {
                     $view     = config('info.' . $pageName)[$index]['view'];
                     $livewire = config('info.' . $pageName)[$index]['livewire'];
                     $only     = config('info.' . $pageName)[$index]['only'];
                     $before   = config('info.' . $pageName)[$index]['insert_before_table'];
+
+                    if (isset(config('info.' . $pageName)[$index]['showSkillInfo'])) {
+                        $showSkillInfo = config('info.' . $pageName)[$index]['showSkillInfo'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['showDropDown'])) {
+                        $showDropDown = config('info.' . $pageName)[$index]['showDropDown'];
+                    }
                 }
 
                 $sections[] = [
-                    'content'  => Storage::disk('info')->get($files[$i]),
-                    'view'     => $view,
-                    'livewire' => $livewire,
-                    'only'     => $only,
-                    'before'   => $before,
+                    'content'       => Storage::disk('info')->get($files[$i]),
+                    'view'          => $view,
+                    'livewire'      => $livewire,
+                    'only'          => $only,
+                    'before'        => $before,
+                    'showSkillInfo' => $showSkillInfo,
+                    'showDropDown'  => $showDropDown,
                 ];
             }
         }
