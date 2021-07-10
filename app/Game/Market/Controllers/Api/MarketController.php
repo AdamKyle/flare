@@ -126,7 +126,7 @@ class MarketController extends Controller {
                 case 'today':
                     $when = Carbon::today();
                     break;
-                case 'yesterday':
+                case 'last 24 hours':
                     $when = Carbon::yesterday();
                     break;
                 case '1 week':
