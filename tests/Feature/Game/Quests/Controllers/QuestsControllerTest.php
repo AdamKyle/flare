@@ -4,17 +4,19 @@ namespace Tests\Feature\Game\Quests\Controllers;
 
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcCommandTypes;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\NpcTypes;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
 
 class QuestsControllerTest extends TestCase
 {
-    use RefreshDatabase, CreateQuest, CreateNpc, CreateItem;
+    use RefreshDatabase, CreateQuest, CreateNpc, CreateItem, CreateGameSkill;
 
     private $character;
 
@@ -23,7 +25,15 @@ class QuestsControllerTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $gameSkill = $this->createGameSkill([
+            'type'      => SkillTypeValue::ALCHEMY,
+            'is_locked' => true,
+        ]);
+
+        $this->character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($gameSkill, 1, false);
 
         $this->completedQuest = $this->createCompletedQuest([
             'character_id' => $this->character->getCharacter()->id,
@@ -34,7 +44,8 @@ class QuestsControllerTest extends TestCase
                     'type'        => NpcTypes::QUEST_GIVER,
                     'game_map_id' => $this->character->getCharacter()->map->game_map_id,
                 ])->id,
-                'unlocks_skill'   => false,
+                'unlocks_skill'   => true,
+                'unlocks_skill_type' => SkillTypeValue::ALCHEMY
             ])->id,
         ]);
 

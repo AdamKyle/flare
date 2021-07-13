@@ -3,7 +3,9 @@
 namespace Tests\Feature\Game\Market\Controllers\Api;
 
 use App\Flare\Models\MarketBoard;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -251,6 +253,178 @@ class MarketBoardApiControllerTest extends TestCase {
 
         $response = $this->actingAs($this->character->getUser())->json('GET', '/api/market-board/history', [
             'type' => $item->crafting_type,
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(1, $content->labels);
+        $this->assertCount(1, $content->data);
+    }
+
+    public function testCanFetchMarketHistoryForToday() {
+        $this->createLocation([
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+            'game_map_id' => 1,
+            'name' => Str::random(10),
+            'description' => Str::random(40),
+        ]);
+
+        $item = $this->createItem([
+            'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
+            'market_sellable' => true,
+            'type'            => 'weapon',
+        ]);
+
+        $this->createMarketHistory([
+            'item_id' => $item->id,
+            'sold_for' => 200,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('GET', '/api/market-board/history', [
+            'when' => 'today'
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(1, $content->labels);
+        $this->assertCount(1, $content->data);
+    }
+
+    public function testCanFetchMarketHistoryForYesterday() {
+        $this->createLocation([
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+            'game_map_id' => 1,
+            'name' => Str::random(10),
+            'description' => Str::random(40),
+        ]);
+
+        $item = $this->createItem([
+            'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
+            'market_sellable' => true,
+            'type'            => 'weapon',
+        ]);
+
+        $this->createMarketHistory([
+            'item_id' => $item->id,
+            'sold_for' => 200,
+        ]);
+
+        DB::table('market_history')->update([
+            'created_at' => Carbon::yesterday()
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('GET', '/api/market-board/history', [
+            'when' => 'last 24 hours'
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(1, $content->labels);
+        $this->assertCount(1, $content->data);
+    }
+
+    public function testCanFetchMarketHistoryForOneWeek() {
+        $this->createLocation([
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+            'game_map_id' => 1,
+            'name' => Str::random(10),
+            'description' => Str::random(40),
+        ]);
+
+        $item = $this->createItem([
+            'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
+            'market_sellable' => true,
+            'type'            => 'weapon',
+        ]);
+
+        $this->createMarketHistory([
+            'item_id' => $item->id,
+            'sold_for' => 200,
+        ]);
+
+        DB::table('market_history')->update([
+            'created_at' => Carbon::today()->subWeek()
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('GET', '/api/market-board/history', [
+            'when' => '1 week'
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(1, $content->labels);
+        $this->assertCount(1, $content->data);
+    }
+
+    public function testCanFetchMarketHistoryForOneMonth() {
+        $this->createLocation([
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+            'game_map_id' => 1,
+            'name' => Str::random(10),
+            'description' => Str::random(40),
+        ]);
+
+        $item = $this->createItem([
+            'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
+            'market_sellable' => true,
+            'type'            => 'weapon',
+        ]);
+
+        $this->createMarketHistory([
+            'item_id' => $item->id,
+            'sold_for' => 200,
+        ]);
+
+        DB::table('market_history')->update([
+            'created_at' => Carbon::today()->subMonth()
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('GET', '/api/market-board/history', [
+            'when' => '1 month'
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(1, $content->labels);
+        $this->assertCount(1, $content->data);
+    }
+
+    public function testCanFetchMarketHistoryForWhenDoesntExistDefaultToToday() {
+        $this->createLocation([
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+            'game_map_id' => 1,
+            'name' => Str::random(10),
+            'description' => Str::random(40),
+        ]);
+
+        $item = $this->createItem([
+            'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
+            'market_sellable' => true,
+            'type'            => 'weapon',
+        ]);
+
+        $this->createMarketHistory([
+            'item_id' => $item->id,
+            'sold_for' => 200,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('GET', '/api/market-board/history', [
+            'when' => '1 year' // does not exist, should hit default and still use today.
         ])->response;
 
         $content = json_decode($response->content());
