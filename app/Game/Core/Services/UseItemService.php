@@ -90,10 +90,6 @@ class UseItemService {
             $type = ItemUsabilityType::EFFECTS_SKILL;
         }
 
-        if ($item->damages_kingdoms) {
-            $type = ItemUsabilityType::KINGDOM_DAMAGE;
-        }
-
         return $type;
     }
 }

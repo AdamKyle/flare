@@ -3,9 +3,11 @@
 namespace Tests\Feature\Game\Core\Api;
 
 use App\Flare\Models\ItemAffix;
+use App\Flare\Values\ItemUsabilityType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
@@ -15,7 +17,8 @@ class CharacterSheetControllerApiTest extends TestCase {
     use RefreshDatabase,
         CreateUser,
         CreateRole,
-        CreateItem;
+        CreateItem,
+        CreateCharacterBoon;
 
     private $character;
 
@@ -175,5 +178,29 @@ class CharacterSheetControllerApiTest extends TestCase {
         $this->assertEquals(200, $response->status());
 
         $this->assertNotNull($this->character->getUser()->timeout_until);
+    }
+
+    public function testGetBoons() {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'stat_bonus'   => 0.08,
+            'started'      => now(),
+            'complete'     => now()->addMinutes(100),
+            'type'         => ItemUsabilityType::STAT_INCREASE
+        ]);
+
+        $character = $character->refresh();
+
+        $response = $this->actingAs($character->user)
+            ->json('GET', '/api/character-sheet/'.$character->id.'/active-boons')
+            ->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertCount(1, $content->active_boons);
     }
 }

@@ -2,16 +2,21 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Values\ItemUsabilityType;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Setup\Character\CharacterFactory;
 
 class ItemsControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateItem,
-        CreateItemAffix;
+        CreateItemAffix,
+        CreateCharacterBoon;
 
     private $item;
 
@@ -105,5 +110,77 @@ class ItemsControllerTest extends TestCase
         ]))->response;
 
         $this->assertEquals($response->status(), 404);
+    }
+
+    public function testUseItem() {
+        $this->item->update([
+            'usable' => true,
+            'stat_increase' => true,
+            'increase_stat_by' => 0.08,
+            'lasts_for' => 10
+        ]);
+
+        $item = $this->item->refresh();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'stat_bonus'   => 0.08,
+            'started'      => now(),
+            'complete'     => now()->subHour(10),
+            'type'         => ItemUsabilityType::STAT_INCREASE
+        ]);
+
+        $character = $character->refresh();
+
+        $response = $this->actingAs($character->user)->post(route('game.item.use', [
+            'character' => $character->id,
+            'item'      => $item->id,
+        ]))->response;
+
+        $response->assertSessionHas('success', 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.');
+    }
+
+    public function testUseItemAffectsSkills() {
+        $this->item->update([
+            'usable' => true,
+            'affects_skill_type' => SkillTypeValue::ALCHEMY,
+            'increase_skill_bonus_by' => 0.18,
+            'lasts_for' => 10
+        ]);
+
+        $item = $this->item->refresh();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character = $character->refresh();
+
+        $response = $this->actingAs($character->user)->post(route('game.item.use', [
+            'character' => $character->id,
+            'item'      => $item->id,
+        ]))->response;
+
+        $response->assertSessionHas('success', 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.');
+    }
+
+    public function testUseItemThatDoesntExist() {
+        $this->item->update([
+            'usable' => true,
+            'stat_increase' => true,
+            'increase_stat_by' => 0.08,
+            'lasts_for' => 10
+        ]);
+
+        $item = $this->item->refresh();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->inventoryManagement()->getCharacter();
+
+        $response = $this->actingAs($character->user)->post(route('game.item.use', [
+            'character' => $character->id,
+            'item'      => $item->id,
+        ]))->response;
+
+        $response->assertSessionHas('error', 'You don\'t have this item.');
     }
 }

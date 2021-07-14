@@ -3,6 +3,7 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\GameMap;
+use App\Game\Skills\Values\SkillTypeValue;
 use Str;
 use Hash;
 use Illuminate\Database\Eloquent\Collection;

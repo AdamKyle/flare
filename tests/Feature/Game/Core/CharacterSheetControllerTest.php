@@ -35,6 +35,7 @@ class CharacterSheetControllerTest extends TestCase
 
         $this->character = null;
     }
+
     public function testCanSeeCharacterSheet() {
         $user      = $this->character->getUser();
         $character = $this->character->getCharacter();
