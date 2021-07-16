@@ -1,0 +1,33 @@
+import:
+  - recipe/laravel.php
+  - contrib/yarn.php
+
+config:
+  application: 'app name'
+  repository: 'https://github.com/someone/project.git'
+  release_path: '/var/www/somewhere'
+
+hosts:
+  production:
+    remote_user: user
+    hostname: 'userssite.com'
+    deploy_path: '{{release_path}}'
+
+tasks:
+  deploy:
+    - deploy:prepare
+    - deploy:vendors
+    - artisan:storage:link
+    - artisan:view:cache
+    - artisan:config:cache
+    - artisan:migrate
+    - yarn:install
+    - yarn:run:prod
+    - artisan:fetch:tag-data
+    - deploy:publish
+  yarn:run:prod:
+    script:
+      - 'cd {{release_path}} && yarn run prod'
+
+after:
+  deploy:failed: deploy:unlock
