@@ -11,7 +11,7 @@ use phpDocumentor\Reflection\Types\Boolean;
 
 class ItemsSheet implements FromView, WithTitle, ShouldAutoSize {
 
-    private Boolean $affixesOnly = false;
+    private bool $affixesOnly = false;
 
     public function __construct(bool $affixesOnly) {
         $this->affixesOnly = $affixesOnly;

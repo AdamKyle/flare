@@ -51,8 +51,8 @@ class ItemsController extends Controller {
         return view('admin.items.import');
     }
 
-    public function export() {
-        $response = Excel::download(new ItemsExport, 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    public function export(Request $request) {
+        $response = Excel::download(new ItemsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;

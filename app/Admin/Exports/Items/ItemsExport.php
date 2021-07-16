@@ -10,10 +10,10 @@ class ItemsExport implements WithMultipleSheets {
 
     use Exportable;
 
-    private Boolean $affixesOnly = false;
+    private bool $affixesOnly = false;
 
-    public function affixesOnly() {
-        $this->affixesOnly = true;
+    public function __construct(bool $affixesOnly) {
+        $this->affixesOnly = $affixesOnly;
     }
 
     /**
