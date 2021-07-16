@@ -12,7 +12,7 @@ class ItemsExportTest extends TestCase {
     use RefreshDatabase;
 
     public function testExport() {
-        Excel::store(new ItemsExport, 'test.xlsx');
+        Excel::store(new ItemsExport(false), 'test.xlsx');
 
         Storage::disk('local')->assertExists('test.xlsx');
 
