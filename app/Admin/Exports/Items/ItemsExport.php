@@ -10,13 +10,19 @@ class ItemsExport implements WithMultipleSheets {
 
     use Exportable;
 
+    private bool $affixesOnly = false;
+
+    public function __construct(bool $affixesOnly) {
+        $this->affixesOnly = $affixesOnly;
+    }
+
     /**
      * @return array
      */
     public function sheets(): array {
         $sheets   = [];
 
-        $sheets[] = new ItemsSheet();
+        $sheets[] = new ItemsSheet($this->affixesOnly);
 
         return $sheets;
     }

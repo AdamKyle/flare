@@ -85,7 +85,7 @@ class CraftingService {
         }
 
         $characterRoll = $this->characterRoll($skill);
-        $dcCheck       = $this->getDCCheck($skill, 0, $skill->baseSkill->max_level);
+        $dcCheck       = $this->getDCCheck($skill, 0);
 
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
