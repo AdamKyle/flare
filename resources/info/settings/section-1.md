@@ -25,6 +25,18 @@ Character names can also be forced changed by The Creator if they are deemed ina
 
 Under that, you can see some email settings – you can turn these on and off to your leisure.
 
+## Chat Settings
+
+There are some chat settings that are disabled by default for you. Feel free to enable these:
+
+<div class="mb-4">
+    <a href="/storage/info/settings/images/chat-settings.png" class="glightbox">
+        <img src="/storage/info/settings/images/chat-settings.png" class="img-fluid" />
+    </a>
+</div>
+
+These mostly relate to those with large amounts of kingdoms.s
+
 Finally, we come to the security questions section at the bottom of the page:
 
 <div class="mb-4">
@@ -36,3 +48,5 @@ Finally, we come to the security questions section at the bottom of the page:
 Security questions are used to verify that you are who you say you are. These are used when you reset your password or submit an unban request.
 
 Security questions must be unique and so must their answers.
+
+

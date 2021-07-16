@@ -24,6 +24,7 @@ class HistoryRequest extends FormRequest {
     public function rules() {
         return [
             'type' => 'string|nullable',
+            'when' => 'string|nullable',
         ];
     }
 }
