@@ -14,6 +14,7 @@ use App\Flare\Models\MarketHistory;
 use App\Flare\Models\Skill;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ChangeItems extends Command
 {
@@ -59,25 +60,38 @@ class ChangeItems extends Command
             foreach ($items as $item) {
                 $foundBaseItem = Item::where('name', $item->name)
                                      ->where('cost', '!=', $item->cost)
-                                     ->whereIsNull('item_suffix_id')
-                                     ->whereisNull('item_affix_id')
-                                     ->first();
+                                     ->whereNull('item_suffix_id')
+                                     ->whereNull('item_prefix_id')->first();
 
                 if (!is_null($foundBaseItem)) {
+
+                    $oldCost = $item->cost;
+
                     $item->update([
                         'cost' => $foundBaseItem->cost,
                     ]);
 
+                    $item = $item->refresh();
+                    $this->newLine(1);
+                    $this->line($item->name . ' Previous Base Cost: ' . $oldCost . ' New Cost: ' . $item->cost);
+
                 } else {
-                    $this->newLine($item->name . ' does not have a base item.');
+                    $this->newLine(1);
+                    $this->line($item->name . ' Base cost is the same');
                 }
 
                 $bar->advance();
             }
 
             $bar->finish();
+            $this->newLine(2);
+            $this->line('Updating items and item affixes that can drop.');
 
-            $this->newLine('All done.');
+            DB::table('items')->where('cost', '<=', 5000)->update(['can_drop' => true]);
+            DB::table('item_affixes')->where('cost', '<=', 5000)->update(['can_drop' => true]);
+
+            $this->newLine(2);
+            $this->line('All done.');
         } else {
             $this->error('How are their not items with affixes?');
         }
