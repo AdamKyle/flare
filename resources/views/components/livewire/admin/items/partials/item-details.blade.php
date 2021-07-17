@@ -229,7 +229,7 @@
                             You must specify how this affects the skill.
                         </div>
                     @endif
-                    <div class="{{empty($item->affects_skill_type) && !is_null($item->affects_skill_type) ? 'row' : 'hide'}}">
+                    <div class="{{!is_null($item->affects_skill_type) ? 'row' : 'hide'}}">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="increase_skill_bonus_by">Increases Skill Bonus By: </label>

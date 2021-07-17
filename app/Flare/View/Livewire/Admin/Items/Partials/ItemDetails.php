@@ -150,7 +150,7 @@ class ItemDetails extends Component
                 $this->item->lasts_for          = null;
                 $this->item->damages_kingdoms   = null;
                 $this->item->stat_increase      = null;
-                $this->item->affects_skill_type = '';
+                $this->item->affects_skill_type = null;
                 $this->item->gold_dust_cost     = 0;
                 $this->item->shards_cost        = 0;
             }
@@ -170,7 +170,7 @@ class ItemDetails extends Component
                 $this->item->increase_stat_by = null;
             }
 
-            if (is_null($this->item->affects_skill_type) || $this->item->affects_skill_type === '') {
+            if (is_null($this->item->affects_skill_type)) {
                 $this->item->affects_skill_type               = null;
                 $this->item->increase_skill_bonus_by          = null;
                 $this->item->increase_skill_training_bonus_by = null;

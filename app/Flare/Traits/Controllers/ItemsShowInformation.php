@@ -37,11 +37,9 @@ trait ItemsShowInformation {
 
 
         if ($item->usable) {
-            if (auth()->user()->hasRole('admin')) {
+            if (auth()->user()->hasRole('Admin')) {
                 $skill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
-            }
-
-            if (auth()->user()) {
+            } else if (auth()->user()) {
                 $skill = auth()->user()->character->skills->filter(function($skill) {
                     return $skill->type()->isAlchemy();
                 })->first();
