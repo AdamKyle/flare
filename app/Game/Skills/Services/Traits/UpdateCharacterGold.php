@@ -9,9 +9,9 @@ trait UpdateCharacterGold {
 
     /**
      * Update the characters gold when enchanting.
-     * 
+     *
      * Subtract cost from gold.
-     * 
+     *
      * @param Character $character
      * @param int $cost
      * @return void
@@ -19,6 +19,20 @@ trait UpdateCharacterGold {
     public function updateCharacterGold(Character $character, int $cost): void {
         $character->update([
             'gold' => $character->gold - $cost,
+        ]);
+
+        event(new UpdateTopBarEvent($character->refresh()));
+    }
+
+    /**
+     * Only really called if something goes wrong.
+     *
+     * @param Character $character
+     * @param int $cost
+     */
+    public function giveGoldBack(Character $character, int $cost): void {
+        $character->update([
+            'gold' => $character->gold + $cost,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));

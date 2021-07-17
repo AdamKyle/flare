@@ -105,6 +105,8 @@ class EnchantingService {
 
         $timeOut = $this->timeForEnchanting($slot->item);
 
+        $this->updateCharacterGold($character, $params['cost']);
+
         try {
             $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character, $params['cost']);
 
@@ -112,12 +114,14 @@ class EnchantingService {
 
             event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
 
-
             return $this->successResult([
                 'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
                 'character_inventory' => array_values($this->fetchCharacterInventory($character)),
             ]);
         } catch (Exception $e) {
+            // Something went wrong, give their gold back
+            $this->giveGoldBack($character->refresh(), $params['cost']);
+
             return $this->errorResult($e->getMessage());
         }
     }
@@ -160,7 +164,8 @@ class EnchantingService {
         return null;
     }
 
-    protected function attachAffixes(array $affixes, InventorySlot $slot, Skill $enchantingSkill, Character $character, int $cost) {
+    protected function attachAffixes
+    (array $affixes, InventorySlot $slot, Skill $enchantingSkill, Character $character) {
         foreach ($affixes as $affixId) {
             $affix = ItemAffix::find($affixId);
 
@@ -183,7 +188,7 @@ class EnchantingService {
                     $this->sentToEasyMessage = true;
                 }
 
-                $this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost, true);
+                $this->processedEnchant($slot, $affix, $character, $enchantingSkill, true);
 
                 $this->wasTooEasy = true;
 
@@ -196,17 +201,15 @@ class EnchantingService {
              * If we fail to do this then we retrun from the loop.
              */
             if (!$this->wasTooEasy) {
-                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill, $cost)) {
+                if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
                     return;
                 }
             }
         }
     }
 
-    protected function processedEnchant(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, int $cost, bool $tooEasy = false) {
+    protected function processedEnchant(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
         $enchanted = $this->enchantItemService->attachAffix($slot->item, $affix, $enchantingSkill, $tooEasy);
-
-        $this->updateCharacterGold($character, $cost);
 
         if ($enchanted) {
             $this->appliedEnchantment($slot, $affix, $character, $enchantingSkill, $tooEasy);
