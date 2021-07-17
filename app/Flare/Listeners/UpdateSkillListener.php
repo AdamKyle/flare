@@ -22,7 +22,7 @@ class UpdateSkillListener
         }
 
         $event->skill->update([
-            'xp' => $event->skill->xp + SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure),
+            'xp' => $event->skill->xp + SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure, $event->monster),
         ]);
 
         $skill = $event->skill->refresh();

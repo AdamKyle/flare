@@ -3,6 +3,7 @@
 namespace App\Flare\Calculators;
 
 use App\Flare\Models\Adventure;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 
 class SkillXPCalculator {
@@ -15,18 +16,35 @@ class SkillXPCalculator {
      *
      * @param Skill $skill
      * @param Adventure|null $adventure | null
+     * @param Monster|null $monster
      * @return float|int
      */
-    public function fetchSkillXP(Skill $skill, Adventure $adventure = null) {
+    public function fetchSkillXP(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
         $adventureBonus = $this->fetchAdventureBonus($adventure);
-        $xpTowards      = !is_null($skill->xp_towards) ? $skill->xp_towards : 0.0;
-        $totalBonus     = $xpTowards + $skill->skill_training_bonus + $adventureBonus;
+        $xpTowards      = $this->getXpTowards($skill, $monster);
+        $totalBonus     = 1 + ($skill->skill_training_bonus + $adventureBonus);
 
-        if ($totalBonus < 1.0) {
-            $totalBonus += 1;
+        return (5 + $xpTowards) * $totalBonus;
+    }
+
+    protected function getXpTowards(Skill $skill, Monster $monster = null) {
+        if (is_null($monster)) {
+             return 0;
         }
 
-        return 5 * $totalBonus;
+        $totalTowards = 0;
+
+        $monsterXP = $monster->xp;
+
+        if (!is_null($skill->xp_towards)) {
+            $totalTowards = (int) number_format($monsterXP - ($monsterXP * $skill->xp_towards));
+
+            if ($totalTowards === 0) {
+                $totalTowards = $monster->xp;
+            }
+        }
+
+        return $totalTowards;
     }
 
     /**
