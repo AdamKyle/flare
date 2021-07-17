@@ -439,6 +439,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                                     ]))
                                      ->getCharacterFactory()
                                      ->getCharacter();
+
         $user      = $this->character->getUser();
 
         $currentGold = $character->refresh()->gold;
@@ -453,7 +454,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         $item = $this->character->getCharacter()->inventory->slots->first()->item;
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue($currentGold === $character->refresh()->gold);
+        $this->assertTrue($currentGold !== $character->refresh()->gold);
         $this->assertNull($item->item_suffix_id);
     }
 
