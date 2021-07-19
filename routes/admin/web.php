@@ -72,8 +72,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/users/{user}/ingore-unban-request', ['as' => 'user.ignore.unban.request', 'uses' => 'UsersController@ignoreUnBanRequest']);
     Route::post('/admin/users/{user}/force-name-change', ['as' => 'user.force.name.change', 'uses' => 'UsersController@forceNameChange']);
 
-    Route::get('/admin/skills/export-monsters', ['as' => 'skills.export', 'uses' => 'SkillsController@exportSkills']);
-    Route::get('/admin/skills/import-monsters', ['as' => 'skills.import', 'uses' => 'SkillsController@importSkills']);
+    Route::get('/admin/skills/export-skills', ['as' => 'skills.export', 'uses' => 'SkillsController@exportSkills']);
+    Route::get('/admin/skills/import-skills', ['as' => 'skills.import', 'uses' => 'SkillsController@importSkills']);
     Route::post('/admin/skills/export-data', ['as' => 'skills.export-data', 'uses' => 'SkillsController@export']);
     Route::post('/admin/skills/import-data', ['as' => 'skills.import-data', 'uses' => 'SkillsController@importData']);
 

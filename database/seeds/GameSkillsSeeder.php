@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Flare\Models\GameSkill;
 use Illuminate\Database\Seeder;
+use App\Flare\Models\GameSkill;
+use App\Game\Skills\Values\SkillTypeValue;
 
 class GameSkillsSeeder extends Seeder
 {
@@ -27,6 +28,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 100,
                 'skill_bonus_per_level' => 0.01,
                 'can_monsters_have_skill' => true,
+                'type' => SkillTypeValue::TRAINING,
             ],
             [
                 'name' => 'Dodge',
@@ -40,6 +42,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 100,
                 'skill_bonus_per_level' => 0.01,
                 'can_monsters_have_skill' => true,
+                'type' => SkillTypeValue::TRAINING,
             ],
             [
                 'name' => 'Looting',
@@ -53,6 +56,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 100,
                 'skill_bonus_per_level' => 0.01,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::TRAINING,
             ],
             [
                 'name' => 'Weapon Crafting',
@@ -66,6 +70,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::CRAFTING,
             ],
             [
                 'name' => 'Armour Crafting',
@@ -79,6 +84,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::CRAFTING,
             ],
             [
                 'name' => 'Spell Crafting',
@@ -92,6 +98,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::CRAFTING,
             ],
             [
                 'name' => 'Ring Crafting',
@@ -105,6 +112,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::CRAFTING,
             ],
             [
                 'name' => 'Artifact Crafting',
@@ -118,6 +126,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::CRAFTING,
             ],
             [
                 'name' => 'Enchanting',
@@ -131,6 +140,7 @@ class GameSkillsSeeder extends Seeder
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
                 'can_monsters_have_skill' => false,
+                'type' => SkillTypeValue::ENCHANTING,
             ],
         ]);
     }

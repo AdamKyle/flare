@@ -9,7 +9,7 @@
         </div>
         <div class="modal-body">
           <p>
-              You can only train one skill at a time. 
+              You can only train one skill at a time.
               If you would like to procede, please choose how much xp per fight is awarded to the training of the skill.
           </p>
           <div class="alert alert-warning">
@@ -25,16 +25,16 @@
               <div class="form-group">
                 <label for="xp_percentage">Example select</label>
                 <select class="form-control" id="xp_percentage" name="xp_percentage">
-                  <option value="0.10">10%</option>
-                  <option value="0.20">20%</option>
-                  <option value="0.30">30%</option>
-                  <option value="0.40">40%</option>
-                  <option value="0.50">50%</option>
-                  <option value="0.60">60%</option>
-                  <option value="0.70">70%</option>
-                  <option value="0.80">80%</option>
-                  <option value="0.90">90%</option>
-                  <option value="1">100%</option>
+                  <option value="0.10" {{$skill->xp_towards === 0.10 ? 'selected' : ''}}>10%</option>
+                  <option value="0.20" {{$skill->xp_towards === 0.20 ? 'selected' : ''}}>20%</option>
+                  <option value="0.30" {{$skill->xp_towards === 0.30 ? 'selected' : ''}}>30%</option>
+                  <option value="0.40" {{$skill->xp_towards === 0.40 ? 'selected' : ''}}>40%</option>
+                  <option value="0.50" {{$skill->xp_towards === 0.50 ? 'selected' : ''}}>50%</option>
+                  <option value="0.60" {{$skill->xp_towards === 0.60 ? 'selected' : ''}}>60%</option>
+                  <option value="0.70" {{$skill->xp_towards === 0.70 ? 'selected' : ''}}>70%</option>
+                  <option value="0.80" {{$skill->xp_towards === 0.80 ? 'selected' : ''}}>80%</option>
+                  <option value="0.90" {{$skill->xp_towards === 0.90 ? 'selected' : ''}}>90%</option>
+                  <option value="1" {{$skill->xp_towards === 1.0 ? 'selected' : ''}}>100%</option>
                 </select>
               </div>
           </form>

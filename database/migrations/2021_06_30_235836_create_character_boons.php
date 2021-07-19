@@ -21,13 +21,8 @@ class CreateCharacterBoons extends Migration
             $table->integer('type');
             $table->decimal('stat_bonus', 8, 4)->nullable()->default(0.0);
             $table->integer('affect_skill_type')->nullable();
-            $table->decimal('affected_skill_bonus', 8, 4)->nullable()->default(0.0);
-            $table->decimal('affected_skill_training_bonus', 8 ,4)->nullable()->default(0.0);
-            $table->decimal('affected_skill_base_damage_mod_bonus', 8, 4)->nullable()->default(0.0);
-            $table->decimal('affected_skill_base_healing_mod_bonus', 8, 4)->nullable()->default(0.0);
-            $table->decimal('affected_skill_base_ac_mod_bonus', 8, 4)->nullable()->default(0.0);
-            $table->decimal('affected_skill_fight_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
-            $table->decimal('affected_skill_move_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('skill_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('skill_training_bonus', 8 ,4)->nullable()->default(0.0);
             $table->dateTime('started');
             $table->dateTime('complete');
             $table->timestamps();

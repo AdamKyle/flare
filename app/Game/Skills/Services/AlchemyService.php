@@ -62,8 +62,9 @@ class AlchemyService {
     }
 
     public function attemptTransmute(Character $character, Skill $skill, Item $item): array {
+        $this->updateAlchemyCost($character, $item);
+
         if ($skill->level < $item->skill_level_required) {
-            $this->updateAlchemyCost($character, $item);
 
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
             event(new CraftedItemTimeOutEvent($character->refresh()));
@@ -74,7 +75,6 @@ class AlchemyService {
         }
 
         if ($skill->level >= $item->skill_level_trivial) {
-            $this->updateAlchemyCost($character, $item);
 
             event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
             event(new CraftedItemTimeOutEvent($character->refresh()));
@@ -94,16 +94,12 @@ class AlchemyService {
 
             event(new CraftedItemTimeOutEvent($character->refresh()));
 
-            $this->updateAlchemyCost($character, $item);
-
             return $this->successResult([
                 'items' => $this->fetchAlchemistItems($character),
             ]);
         }
 
         event(new ServerMessageEvent($character->user, 'failed_to_transmute'));
-
-        $this->updateAlchemyCost($character, $item);
 
         event(new CraftedItemTimeOutEvent($character->refresh()));
 
