@@ -1,4 +1,4 @@
-<div class="modal fade" id="are-you-sure-"{{$character->user->id}} tabindex="-1" role="dialog" aria-labelledby="are-you-sure-"{{$character->user->id}} aria-hidden="true">
+<div class="modal" id="are-you-sure-"{{$character->user->id}} tabindex="-1" role="dialog" aria-labelledby="are-you-sure-"{{$character->user->id}} aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header">
@@ -12,11 +12,11 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-            <x-forms.button-with-form 
+            <x-forms.button-with-form
                 form-route="{{route('user.ignore.unban.request', [
                     'user' => $character->user->id
-                ])}}" 
-                form-id="{{$character->user->id}}-character-user" 
+                ])}}"
+                form-id="{{$character->user->id}}-character-user"
                 button-title="Continue"
                 class="btn btn-primary"
             />

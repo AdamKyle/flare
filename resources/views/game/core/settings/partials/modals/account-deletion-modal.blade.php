@@ -1,4 +1,4 @@
-<div class="modal fade" id="account-deletion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal" id="account-deletion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -22,6 +22,10 @@
                 <p>
                     Are you sure you want to do this? There is no going back, accept to create a new account.
                 </p>
+                <div class="alert alert-info">
+                    <p>Deleting your account to start over? That's ok too. Just please wait for the email of confirmation to come through first.</p>
+                    <p><strong>Remember</strong>: One account per player.</p>
+                </div>
                 <form action="{{route('delete.account', [
                     'user' => $user
                 ])}}" id="character-deletion" method="POST">

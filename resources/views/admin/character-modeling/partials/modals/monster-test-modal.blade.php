@@ -1,4 +1,4 @@
-<div class="modal fade" id="monster-test-{{$monster->id}}" tabindex="-1" role="dialog" aria-labelledby="monster-test-label" aria-hidden="true">
+<div class="modal" id="monster-test-{{$monster->id}}" tabindex="-1" role="dialog" aria-labelledby="monster-test-label" aria-hidden="true">
     <div class="modal-dialog large-modal" role="document">
         <div class="modal-content">
         <div class="modal-header">

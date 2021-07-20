@@ -1,4 +1,4 @@
-<div class="modal fade" id="adventure-test-{{$adventure->id}}" tabindex="-1" role="dialog" aria-labelledby="adventure-test-label" aria-hidden="true">
+<div class="modal" id="adventure-test-{{$adventure->id}}" tabindex="-1" role="dialog" aria-labelledby="adventure-test-label" aria-hidden="true">
     <div class="modal-dialog large-modal" role="document">
         <div class="modal-content">
         <div class="modal-header">
@@ -16,7 +16,7 @@
             <hr />
             <div class="alert alert-info pb-2">
                 <p>
-                    When the adventure test is over you will be able to 
+                    When the adventure test is over you will be able to
                     come back here and see the results of that adventure.
                 <p>
                 <p>
