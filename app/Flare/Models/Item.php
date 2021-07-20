@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
+use App\Flare\Models\Traits\CalculateTimeReduction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Bkwld\Cloner\Cloneable;

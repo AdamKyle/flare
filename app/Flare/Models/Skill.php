@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
+use App\Flare\Models\Traits\CalculateTimeReduction;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 class Skill extends Model
 {
 
-    use HasFactory, CalculateSkillBonus;
+    use HasFactory, CalculateSkillBonus, CalculateTimeReduction;
 
     /**
      * The attributes that are mass assignable.
@@ -115,7 +116,7 @@ class Skill extends Model
     }
 
     public function getFightTimeOutModAttribute() {
-        return ($this->baseSkill->fight_time_out_mod_bonus_per_level * $this->level) - $this->baseSkill->fight_time_out_mod_bonus_per_level;
+        return $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
     }
 
     public function getMoveTimeOutModAttribute() {

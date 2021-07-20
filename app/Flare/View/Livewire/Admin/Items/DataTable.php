@@ -14,17 +14,18 @@ class DataTable extends Component
 
     public $affixId = null;
 
-    public $search        = '';
-    public $sortField     = 'type';
-    public $perPage       = 10;
-    public $only          = null;
-    public $character     = null;
-    public $isHelp        = false;
-    public $craftOnly     = false;
-    public $type          = null;
-    public $showSkillInfo = false;
-    public $showDropDown  = false;
-    public $showAlchemy   = true;
+    public $search                = '';
+    public $sortField             = 'cost';
+    public $perPage               = 10;
+    public $only                  = null;
+    public $character             = null;
+    public $isHelp                = false;
+    public $craftOnly             = false;
+    public $type                  = null;
+    public $showSkillInfo         = false;
+    public $showDropDown          = false;
+    public $showAlchemy           = true;
+    public $showOtherCurrencyCost = true;
 
 
     protected $paginationTheme = 'bootstrap';

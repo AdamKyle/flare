@@ -39,8 +39,10 @@
 
                 <h4 class="mb-2">Items</h4>
                 @livewire('admin.items.data-table', [
-                    'character' => $character,
-                    'craftOnly' => false
+                    'character'             => $character,
+                    'craftOnly'             => false,
+                    'showSkillInfo'         => false,
+                    'showOtherCurrencyCost' => false
                 ])
             </div>
         </div>

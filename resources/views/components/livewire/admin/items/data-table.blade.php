@@ -132,40 +132,44 @@
                         field="cost"
                     />
 
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('gold_dust_cost')"
-                        header-text="Gold Dust Cost"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="gold_dust_cost"
-                    />
+                    @if ($showOtherCurrencyCost)
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('gold_dust_cost')"
+                            header-text="Gold Dust Cost"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="gold_dust_cost"
+                        />
 
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('shards_cost')"
-                        header-text="Shards Cost"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="shards_cost"
-                    />
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('shards_cost')"
+                            header-text="Shards Cost"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="shards_cost"
+                        />
+                    @endif
 
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('skill_level_required')"
-                        header-text="Skill Level Required"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="skill_level_required"
-                    />
+                    @if ($showSkillInfo)
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('skill_level_required')"
+                            header-text="Skill Level Required"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="skill_level_required"
+                        />
 
-                    <x-data-tables.header-row
-                        wire:click.prevent="sortBy('skill_level_trivial')"
-                        header-text="Skill Level Trivial"
-                        sort-by="{{$sortBy}}"
-                        sort-field="{{$sortField}}"
-                        field="skill_level_trivial"
-                    />
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('skill_level_trivial')"
+                            header-text="Skill Level Trivial"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="skill_level_trivial"
+                        />
+                    @endif
 
                     @guest
-                    @elseif (!is_null($character))
+                    @elseif (auth()->user()->hasRole('Admin'))
                         <x-data-tables.header-row>
                             Actions
                         </x-data-tables.header-row>
@@ -238,8 +242,12 @@
                             <td>{{is_null($item->base_ac) ? 0 : $item->base_ac}}</td>
                             <td>{{is_null($item->base_healing) ? 0 : $item->base_healing}}</td>
                             <td>{{is_null($item->cost) ? 0 : number_format($item->cost)}}</td>
-                            <td>{{is_null($item->gold_dust_cost) ? 0 : number_format($item->gold_dust_cost)}}</td>
-                            <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
+
+                            @if ($showOtherCurrencyCost)
+                                <td>{{is_null($item->gold_dust_cost) ? 0 : number_format($item->gold_dust_cost)}}</td>
+                                <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
+                            @endif
+
                             @if ($showSkillInfo)
                                 <td>{{$item->skill_level_required}}</td>
                                 <td>{{$item->skill_level_trivial}}</td>

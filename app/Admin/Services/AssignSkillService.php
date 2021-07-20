@@ -82,6 +82,7 @@ class AssignSkillService {
                     'currently_training' => false,
                     'level' => 1,
                     'xp_max' => $skill->can_train ? rand(100, 150) : rand(100, 200),
+                    'is_locked' => $skill->is_locked,
                 ]);
 
                 $this->alertUser($character, $skill);

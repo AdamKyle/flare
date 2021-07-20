@@ -2,13 +2,20 @@
 
 namespace App\Flare\Models\Traits;
 
-use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
 
 trait CalculateTimeReduction {
 
-    public function calculateTotalBonus(GameSkill $gameSkill, Skill $skill, string $modifier) {
-        $currentValue = ($gameSkill->{$modifier} * $skill) - $gameSkill->{$modifier};
+    /**
+     * Calculates the total bonus including boons.
+     *
+     * @param Skill $skill
+     * @param string $modifier
+     * @return float|int|mixed
+     */
+    public function calculateTotalTimeBonus(Skill $skill, string $modifier) {
+        $gameSkill    = $skill->baseSkill;
+        $currentValue = ($gameSkill->{$modifier} * $skill->level) - $gameSkill->{$modifier};
 
         $character = $skill->character;
 
