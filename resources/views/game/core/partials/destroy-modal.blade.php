@@ -1,4 +1,4 @@
-<div class="modal fade" id="slot-{{$slot->id}}" tabindex="-1" role="dialog" aria-labelledby="DestroyLabel" aria-hidden="true">
+<div class="modal" id="slot-{{$slot->id}}" tabindex="-1" role="dialog" aria-labelledby="DestroyLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
