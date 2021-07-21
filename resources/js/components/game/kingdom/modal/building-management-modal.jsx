@@ -218,11 +218,11 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          { this.props.building.level >= this.props.building.max_level ?
+          {this.props.building.level >= this.props.building.max_level ?
             <div className="alert alert-success mt-5">
               This building is already max level and cannot upgrade any further.
             </div>
-          : <>
+            : <>
               <h5 className="mt-1">Gain Upon Upgrading</h5>
               <hr/>
               <UpgradeSection building={this.props.building}/>
@@ -233,10 +233,16 @@ export default class BuildingManagementModal extends React.Component {
               Cannot upgrade building. Currently in queue. Please wait till it's finished.
             </div>
             : !this.canUpgrade() && !(this.props.building.level >= this.props.building.max_level) ?
-              <div className="alert alert-warning mb-2 mt-2">
-                You don't seem to have the resources to upgrade this building. You can move this modal
-                by clicking and dragging on the title, to compare the required resources with what you currently have.
-              </div>
+              <>
+                <div className="alert alert-warning mb-2 mt-2">
+                  You don't seem to have the resources to upgrade this building. You can move this modal
+                  by clicking and dragging on the title, to compare the required resources with what you currently have.
+                </div>
+                <BuildingCostSection
+                  building={this.props.building}
+                  canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
+                />
+              </>
               : !this.buildingNeedsToBeRebuilt() && !(this.props.building.level >= this.props.building.max_level) ?
                 <>
                   <hr/>
@@ -251,11 +257,11 @@ export default class BuildingManagementModal extends React.Component {
                     canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
                   />
                 </>
-                  : !(this.props.building.level >= this.props.building.max_level) ?
-                <div className="alert alert-info mt-5">
-                  Rebuilding the building will require the amount of resources to upgrade to the current level.
-                  You can see this in the Cost section above.
-                </div> : null
+                : !(this.props.building.level >= this.props.building.max_level) ?
+                  <div className="alert alert-info mt-5">
+                    Rebuilding the building will require the amount of resources to upgrade to the current level.
+                    You can see this in the Cost section above.
+                  </div> : null
           }
           {
             this.state.loading ?
