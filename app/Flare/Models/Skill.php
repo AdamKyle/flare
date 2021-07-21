@@ -137,7 +137,7 @@ class Skill extends Model
             $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
 
             if ($boons->isNotEmpty()) {
-                $bonus += $boons->sum('increase_skill_bonus_by');
+                $bonus += $boons->sum('skill_bonus');
             }
         }
 
@@ -178,7 +178,7 @@ class Skill extends Model
             $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
 
             if ($boons->isNotEmpty()) {
-                $bonus += $boons->sum('increase_skill_training_bonus_by');
+                $bonus += $boons->sum('skill_training_bonus');
             }
         }
 

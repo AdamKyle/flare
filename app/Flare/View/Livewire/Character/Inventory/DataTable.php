@@ -38,6 +38,8 @@ class DataTable extends Component
 
     public $allowMassDestroy         = false;
 
+    public $itemBeingUsed            = false;
+
     public $totalGoldDust            = 0;
 
     public $character;
@@ -142,6 +144,8 @@ class DataTable extends Component
     }
 
     public function useAllItems(UseItemService $useItemService) {
+        $this->itemBeingUsed = true;
+
         $this->character->inventory->slots->filter(function($slot) use ($useItemService) {
             if ($slot->item->usable && !$slot->item->damages_kingdoms) {
                 $useItemService->useItem($slot, $this->character, $slot->item);

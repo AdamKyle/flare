@@ -2,22 +2,14 @@
 
 namespace App\Game\Core\Jobs;
 
-use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\GameSkill;
-use App\Flare\Values\ItemUsabilityType;
-use App\Game\Core\Events\CharacterBoonsUpdateBroadcastEvent;
-use App\Game\Core\Events\UpdateAttackStats;
-use App\Game\Core\Services\UseItemService;
-use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
+use App\Game\Core\Services\UseItemService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\CharacterBoon;
-use App\Flare\Transformers\CharacterAttackTransformer;
 
 class CharacterBoonJob implements ShouldQueue
 {
@@ -56,5 +48,7 @@ class CharacterBoonJob implements ShouldQueue
         $boon->delete();
 
         $useItemService->updateCharacter($character->refresh());
+
+        event(new ServerMessageEvent($character->user, 'A boon has worn off your stats (skills) have been adjusted accordingly.'));
     }
 }

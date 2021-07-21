@@ -27,7 +27,7 @@ trait UpdateCharacterGold {
 
     /**
      * Update the alchemy currencies
-     * 
+     *
      * @param Character $character
      * @param Item $item
      */
@@ -36,6 +36,8 @@ trait UpdateCharacterGold {
             'gold_dust'  => ($character->gold_dust - $item->gold_dust_cost),
             'shards'     => ($character->shards - $item->shards_cost),
         ]);
+
+        event(new UpdateTopBarEvent($character->refresh()));
     }
 
     /**
