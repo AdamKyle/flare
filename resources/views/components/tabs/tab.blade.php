@@ -1,6 +1,7 @@
 @props([
     'tab'      => '',
     'title'    => '',
+    'icon'     => '',
     'selected' => 'false',
     'active'   => 'false',
 ])
@@ -15,5 +16,9 @@
        aria-selected="{{$selected}}"
     >
         {{$title}}
+
+        @if ($icon !== '')
+            <i class="fas fa-exclamation-triangle inventory-set-error"></i>
+        @endif
     </a>
 </li>

@@ -96,6 +96,10 @@
                 <x-tabs.pill-tabs-container>
                     <x-tabs.tab tab="inventory" title="Inventory" selected="true" active="true" />
                     <x-tabs.tab tab="equipped" title="Equipped" selected="false" active="false" />
+                    <x-tabs.tab tab="sets" title="Sets" selected="false" active="false" />
+                    <x-tabs.tab tab="usable" title="Usable Items" selected="false" active="false" />
+                    <x-tabs.tab tab="quest" title="Quest Items" selected="false" active="false" />
+
                 </x-tabs.pill-tabs-container>
                 <x-tabs.tab-content>
                     <x-tabs.tab-content-section tab="inventory" active="true">
@@ -119,6 +123,17 @@
                             'allowInventoryManagement' => true,
                             'character'                => $character,
                         ])
+                    </x-tabs.tab-content-section>
+                    <x-tabs.tab-content-section tab="sets">
+                        @include('game.character.partials.equipment-sets.sets', [
+                            'character' => $character
+                        ])
+                    </x-tabs.tab-content-section>
+                    <x-tabs.tab-content-section tab="usable">
+                        Usable Items here
+                    </x-tabs.tab-content-section>
+                    <x-tabs.tab-content-section tab="quest">
+                        Quest Items here
                     </x-tabs.tab-content-section>
                 </x-tabs.tab-content>
             </div>
