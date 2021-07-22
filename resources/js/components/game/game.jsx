@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col, Container} from 'react-bootstrap';
 import Chat from './messages/chat';
 import Map from './map/map';
 import Teleport from './sections/components/teleport';
@@ -52,9 +52,14 @@ export default class Game extends React.Component {
       },
       kingdom: null,
       isDead: false,
+      windowWidth: window.innerWidth,
     }
 
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
+  }
+
+  updateDimensions() {
+    this.setState({ windowWidth: window.innerWidth});
   }
 
   componentDidMount() {
@@ -63,6 +68,12 @@ export default class Game extends React.Component {
         isDead: event.isDead,
       });
     });
+
+    window.addEventListener('resize', this.updateDimensions.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimensions.bind(this));
   }
 
   updatePort(portDetails) {
@@ -239,10 +250,11 @@ export default class Game extends React.Component {
   }
 
   render() {
+    console.log(this.state.windowWidth);
     return (
       <>
-        <Row>
-          <Col xs={12} sm={12} md={12} lg={6} xl={9}>
+        <div className="row">
+          <div className="col-12 col-lg-6 col-xl-9 col-xxl-12 col-xxxl-9">
             <CharacterInfoTopSection
               characterId={this.props.characterId}
               userId={this.props.userId}
@@ -308,8 +320,14 @@ export default class Game extends React.Component {
                 />
                 : null
             }
-          </Col>
-          <Col xs={12} sm={8} md={8} lg={6} xl={3}>
+          </div>
+          <div
+            className={
+              this.state.windowWidth === 1366 ?
+                'col-12 col-sm-8 col-lg-6 col-xl-3 col-xxl-5 col-xxxl-3 center-element'
+              : 'col-12 col-sm-8 col-lg-6 col-xl-3 col-xxl-5 col-xxxl-3'
+            }
+          >
             <Map
               apiUrl={this.apiUrl}
               userId={this.props.userId}
@@ -326,8 +344,8 @@ export default class Game extends React.Component {
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               updateKingdoms={this.updateKingdoms.bind(this)}
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
         <Row>
           <Col xs={12}>
             <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
@@ -379,7 +397,7 @@ export default class Game extends React.Component {
           this.state.openTimeOutModal ?
             <TimeoutDialogue userId={this.props.userId} show={this.state.openTimeOutModal} timeOutFor={this.state.timeOutFor}/> : null
         }
-      </>
+        </>
     )
   }
 }
