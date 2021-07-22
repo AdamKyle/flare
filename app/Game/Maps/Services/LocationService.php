@@ -150,6 +150,7 @@ class LocationService {
     protected function kingdomManagement(Character $character): void {
         $kingdom   = Kingdom::where('x_position', $character->x_position)
                             ->where('y_position', $character->y_position)
+                            ->where('game_map_id', $character->map->game_map_id)
                             ->first();
 
         // See if the characters kingdoms
