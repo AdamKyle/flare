@@ -3,9 +3,13 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
+<<<<<<< HEAD
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcTypes;
+=======
+use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
+>>>>>>> master
 use App\Game\Messages\Events\GlobalMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -56,7 +60,7 @@ class KingdomsAttackService {
     }
 
     public function attackKingdom(Character $character, int $defenderId, array $params) {
-        $defender = Kingdom::find($defenderId);
+        $defender = Kingdom::where('id', $defenderId)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (is_null($defender)) {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
@@ -104,6 +108,8 @@ class KingdomsAttackService {
                 $kingdom = $this->manager->createData($kingdom)->toArray();
 
                 event(new UpdateKingdom($character->user, $kingdom));
+
+                event(new UpdateUnitMovementLogs($character));
             }
         }
 

@@ -48,6 +48,8 @@
 // React Data Tables Components:
 @import 'game/components/react-data-tables/data-table';
 
+
+
 body {
   font-family: "Roboto", sans-serif;
 }
@@ -163,6 +165,10 @@ dd {
 
 .cursor {
   cursor: pointer;
+}
+
+.center-element {
+  margin: 0 auto;
 }
 
 .keep-down {
