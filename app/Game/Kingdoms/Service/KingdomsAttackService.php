@@ -3,13 +3,10 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
-<<<<<<< HEAD
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcTypes;
-=======
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
->>>>>>> master
 use App\Game\Messages\Events\GlobalMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -181,7 +178,7 @@ class KingdomsAttackService {
         $defenderCharacterName = null;
 
         if (is_null($defender->character_id)) {
-            $defenderCharacterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+            $defenderCharacterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name . ' (NPC)';
         } else {
             $defenderCharacterName = $defender->character->name;
         }

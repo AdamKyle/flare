@@ -88,6 +88,15 @@ class KingdomResourcesService {
             return;
         }
 
+        // If the kingdom has never been walked, take it.
+        if (is_null($this->kingdom->last_walked)) {
+            $this->giveNPCKingdoms();
+
+            $this->doNotNotify = true;
+
+            return;
+        }
+
         $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
 
         $this->increaseOrDecreaseMorale($lastTimeWalked);
@@ -382,8 +391,9 @@ class KingdomResourcesService {
     private function npcTookKingdom(User $user, Kingdom $kingdom) {
         $this->removeKingdomFromCache($user->character, $kingdom);
 
+        event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
+
         if (UserOnlineValue::isOnline($user)) {
-            event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
         } else {
             $this->updateKingdomCache($user, $kingdom);
