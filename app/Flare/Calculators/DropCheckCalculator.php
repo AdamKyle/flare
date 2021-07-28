@@ -16,22 +16,24 @@ class DropCheckCalculator {
      *
      * @param Monster $monster
      * @param float $lootingChance | 0.0
+     * @param float $gameMapBonus
      * @param Adventure|null $adventure | null
-     * @param bool $isQuestCheck
      * @return bool
      */
-    public function fetchDropCheckChance(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null, bool $isQuestCheck = false): bool {
+    public function fetchDropCheckChance(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0, Adventure $adventure = null): bool {
         $adventureBonus = $this->getAdventureBonus($adventure);
 
         if ($adventureBonus >= 1.0) {
             return true;
         }
 
-        $bonus = $lootingChance + $adventureBonus;
+        $bonus = $lootingChance + $adventureBonus + $gameMapBonus;
 
-        if ($bonus < 1) {
-            $bonus += 1;
+        if ($bonus >= 1) {
+            return true;
         }
+
+        $bonus += 1;
 
         return (rand(1, 1000) * $bonus)  > (1000 - (1000 * $monster->drop_check));
     }
@@ -45,17 +47,17 @@ class DropCheckCalculator {
      * @param Adventure|null $adventure
      * @return bool
      */
-    public function fetchQuestItemDropCheck(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null): bool {
+    public function fetchQuestItemDropCheck(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0, Adventure $adventure = null): bool {
         $adventureBonus = $this->getAdventureBonus($adventure);
-        $totalBonus     = $adventureBonus + $lootingChance;
+        $totalBonus     = $adventureBonus + $lootingChance + $gameMapBonus;
 
-        if ($totalBonus < 1) {
-            $totalBonus = 1 + $totalBonus;
-        } else if ($totalBonus >= 1.0) {
+        if ($monster->quest_item_drop_chance >= 1) {
             return true;
         }
 
-        if ($monster->quest_item_drop_chance >= 1.0) {
+        if ($totalBonus < 1) {
+            $totalBonus = 1 + $totalBonus;
+        } else if ($totalBonus >= 1) {
             return true;
         }
 

@@ -20,11 +20,17 @@ class GoldRushCheckListener
     public function handle(GoldRushCheckEvent $event)
     {
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-        
-        $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($event->monster, $lootingChance, $event->adventure);
+        $gameMap        = $event->character->map->gameMap;
+        $gameMapBonus   = 0.0;
+
+        if (!is_null($gameMap->drop_chance_bonus)) {
+            $gameMapBonus = $gameMap->drop_chance_bonus;
+        }
+
+        $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
 
         if ($hasGoldRush) {
-            $goldRush = rand(0, 1000) + 1000;
+            $goldRush = rand(0, 10000) + 10000;
 
             $event->character->gold += $goldRush;
             $event->character->save();
@@ -36,7 +42,7 @@ class GoldRushCheckListener
         }
     }
 
-    
+
 
 
 }
