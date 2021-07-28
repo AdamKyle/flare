@@ -22,8 +22,14 @@ class DropsCheckListener
     public function handle(DropsCheckEvent $event)
     {
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $gameMap        = $event->character->map->gameMap;
+        $gameMapBonus   = 0.0;
 
-        $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $event->adventure);
+        if (!is_null($gameMap->drop_chance_bonus)) {
+            $gameMapBonus = $gameMap->drop_chance_bonus;
+        }
+
+        $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
 
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
@@ -36,7 +42,7 @@ class DropsCheckListener
         }
 
         if (!is_null($event->monster->quest_item_id)) {
-            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $event->adventure);
+            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $event->adventure, $gameMapBonus);
 
             if ($canGetQuestItem) {
                 $this->attemptToPickUpItem($event, $event->monster->questItem);

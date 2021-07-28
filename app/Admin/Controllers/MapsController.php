@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use Illuminate\Http\Request;
 use Storage;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameMap;
@@ -30,5 +31,19 @@ class MapsController extends Controller {
         ]);
 
         return redirect()->route('maps')->with('success', $request->name . ' uploaded successsfully.');
+    }
+
+    public function createBonuses(GameMap $gameMap) {
+        return view('admin.maps.create-bonuses', ['gameMap' => $gameMap]);
+    }
+
+    public function viewBonuses(GameMap $gameMap) {
+        return view('admin.maps.view-bonuses', ['gameMap' => $gameMap]);
+    }
+
+    public function postBonuses(Request $request, GameMap $gameMap) {
+        $gameMap->update($request->all());
+
+        return redirect()->route('maps')->with('success', $gameMap->name . ' now has bonuses.');
     }
 }

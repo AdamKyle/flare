@@ -21,8 +21,16 @@ class UpdateSkillListener
             return;
         }
 
+        $gameMap = $event->skill->character->map->gameMap;
+
+        $skillXP = SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure, $event->monster);
+
+        if (!is_null($gameMap->skill_training_bonus)) {
+            $skillXP = $skillXP * (1 + $gameMap->skill_training_bonus);
+        }
+
         $event->skill->update([
-            'xp' => $event->skill->xp + SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure, $event->monster),
+            'xp' => $event->skill->xp + $skillXP,
         ]);
 
         $skill = $event->skill->refresh();

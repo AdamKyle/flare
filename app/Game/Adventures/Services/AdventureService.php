@@ -252,14 +252,26 @@ class AdventureService {
 
         $xpBonus = $this->adventure->exp_bonus;
 
-        $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction) * ($xpBonus > 1 ? $xpBonus : (1 + $xpBonus));
+        $gameMap = $this->character->map->gameMap;
+
+        if (is_null($gameMap->xp_bonus)) {
+            $xpBonus += $gameMap->xp_bonus;
+        }
+
+        $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction) * ($xpBonus > 2 ? $xpBonus : (1 + $xpBonus));
 
         $drop      = null;
         $questDrop = null;
         $gold      = 0;
 
-        $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure);
-        $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards);
+        $dropChanceBonus   = 0.0;
+
+        if (!is_null($gameMap->drop_chance_bonus)) {
+            $dropChanceBonus = $gameMap->drop_chance_bonus;
+        }
+
+        $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure, $dropChanceBonus);
+        $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards, $dropChanceBonus);
         $gold      = $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
 
         if (!is_null($drop)) {

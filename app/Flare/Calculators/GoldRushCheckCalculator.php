@@ -10,7 +10,7 @@ class GoldRushCheckCalculator {
     /**
      * Fetches the gold rush check chance.
      *
-     * Fecthes the adventure bonus if applies and applies it to the looting bonus agains the monsters drop check.
+     * Fetches the adventure bonus if applies and applies it to the looting bonus agains the monsters drop check.
      *
      * If true, the check passed and the character should be rewarded.
      *
@@ -19,14 +19,18 @@ class GoldRushCheckCalculator {
      * @param Adaventure $adventure | null
      * @return bool
      */
-    public function fetchGoldRushChance(Monster $monster, float $lootingChance = 0.0, Adventure $adventure = null) {
+    public function fetchGoldRushChance(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0, Adventure $adventure = null) {
         $adventureBonus = $this->getAdventureGoldrushChance($adventure);
 
         if ($adventureBonus >= 1) {
             return true;
         }
 
-        $bonus = $lootingChance + $adventureBonus;
+        $bonus = $lootingChance + $adventureBonus + $gameMapBonus;
+
+        if ($bonus >= 1) {
+            return true;
+        }
 
         if ($bonus < 1) {
             $bonus += 1;

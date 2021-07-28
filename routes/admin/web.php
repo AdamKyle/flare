@@ -8,8 +8,11 @@ Route::get('/game/kingdoms/buildings/{building}', ['as' => 'game.buildings.build
 Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
     Route::get('/admin/maps', ['as' => 'maps', 'uses' => 'MapsController@index']);
+    Route::get('/admin/maps/{gameMap}/add-bonuses', ['as' => 'map.bonuses', 'uses' => 'MapsController@createBonuses']);
+    Route::get('/admin/maps/{gameMap}/view-bonuses', ['as' => 'view.map.bonuses', 'uses' => 'MapsController@viewBonuses']);
     Route::get('/admin/maps/upload', ['as' => 'maps.upload', 'uses' => 'MapsController@uploadMap']);
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
+    Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 
     Route::get('/admin/locations', ['as' => 'locations.list', 'uses' => 'LocationsController@index']);
     Route::get('/admin/locations/create', ['as' => 'locations.create', 'uses' => 'LocationsController@create']);
