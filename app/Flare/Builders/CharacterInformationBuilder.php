@@ -4,9 +4,13 @@ namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Traits\ClassBasedBonuses;
+use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemUsabilityType;
 
 class CharacterInformationBuilder {
+
+    use ClassBasedBonuses;
 
     /**
      * @var Character $character
@@ -91,18 +95,14 @@ class CharacterInformationBuilder {
     public function buildAttack(): int {
 
         $characterDamageStat = $this->statMod($this->character->damage_stat);
-        $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
+        $classBonuses        = $this->getFightersDamageBonus($this->character) +
+            $this->prophetDamageBonus($this->character) +
+            $this->getThievesDamageBonus($this->character) +
+            $this->getVampiresDamageBonus($this->character) +
+            $this->getRangersDamageBonus($this->character);
+        $characterDamageStat *= 1 + ($this->fetchSkillAttackMod() + $classBonuses);
 
         $totalAttack = $this->getWeaponDamage();
-
-        return round($characterDamageStat + $totalAttack);
-    }
-
-    public function buildTotalAttack(): int {
-        $characterDamageStat = $this->statMod($this->character->damage_stat);
-        $characterDamageStat *= 1 + $this->fetchSkillAttackMod();
-
-        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage();
 
         return round($characterDamageStat + $totalAttack);
     }
@@ -116,7 +116,7 @@ class CharacterInformationBuilder {
      * @return int
      */
     public function buildDefence(): int {
-        return round((10 + $this->getDefence()) * (1 + $this->fetchSkillACMod()));
+        return round((10 + $this->getDefence()) * (1 + $this->fetchSkillACMod() + $this->getFightersDefence($this->character)));
     }
 
     /**
@@ -125,9 +125,12 @@ class CharacterInformationBuilder {
      * Fetches the total healing amount based on skills and equipment.
      *
      * @return int
+     * @throws \Exception
      */
     public function buildHealFor(): int {
-        return round($this->fetchHealingAmount() * (1 + $this->fetchSkillHealingMod()));
+        $classBonus = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
+
+        return round($this->fetchHealingAmount() * (1 + ($this->fetchSkillHealingMod() + $classBonus)));
     }
 
     /**
@@ -144,14 +147,13 @@ class CharacterInformationBuilder {
             return 0;
         }
 
-        $totalPercentage = 1.0;
-        $baseHealth      = $this->character->dur + 10;
+        $baseHealth = $this->character->dur + 10;
 
         foreach ($this->character->inventory->slots as $slot) {
             if ($slot->equipped) {
                 $percentage = $slot->item->getTotalPercentageForStat('dur');
 
-                if ($percentage < 1) {
+                if ($percentage < 2) {
                     $percentage = 1 + $percentage;
                 }
 
@@ -234,8 +236,12 @@ class CharacterInformationBuilder {
     protected function fetchSkillAttackMod(): float {
         $percentageBonus = 0.0;
 
-        foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_damage_mod + ($skill->level / 100);
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
+        foreach ($skills as $skill) {
+            $percentageBonus += $skill->base_damage_mod;
         }
 
         return $percentageBonus;
@@ -244,8 +250,12 @@ class CharacterInformationBuilder {
     protected function fetchSkillHealingMod(): float {
         $percentageBonus = 0.0;
 
-        foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_healing_mod + ($skill->level / 100);
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
+        foreach ($skills as $skill) {
+            $percentageBonus += $skill->base_healing_mod;
         }
 
         return $percentageBonus;
@@ -254,8 +264,12 @@ class CharacterInformationBuilder {
     protected function fetchSkillACMod(): float {
         $percentageBonus = 0.0;
 
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
         foreach ($this->character->skills as $skill) {
-            $percentageBonus += $skill->base_ac_mod + ($skill->level / 100);
+            $percentageBonus += $skill->base_ac_mod;
         }
 
         return $percentageBonus;
@@ -282,7 +296,13 @@ class CharacterInformationBuilder {
             }
         }
 
-        return $damage;
+        $bonus = $this->hereticSpellDamageBonus($this->character);
+
+        if ($bonus < 2) {
+            $bonus += 1;
+        }
+
+        return $damage * $bonus;
     }
 
     protected function getArtifactDamage(): int {

@@ -4,6 +4,7 @@ namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
 use App\Flare\Models\Traits\CalculateTimeReduction;
+use App\Flare\Models\Traits\ClassBasedBonuses;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -104,15 +105,40 @@ class Skill extends Model
     }
 
     public function getBaseDamageModAttribute() {
-        return ($this->baseSkill->base_damage_mod_bonus_per_level * $this->level) - $this->baseSkill->base_damage_mod_bonus_per_level;
+
+        $itemBonus = $this->getItemBonuses($this->baseSkill->name);
+
+        $baseBonus = (
+                $this->baseSkill->base_damage_mod_bonus_per_level * $this->level
+            ) - $this->baseSkill->base_damage_mod_bonus_per_level;
+
+        $baseBonus = $this->getCharacterBoonsBonus($baseBonus);
+
+        return $itemBonus + $baseBonus;
     }
 
     public function getBaseHealingModAttribute() {
-        return ($this->baseSkill->base_healing_mod_bonus_per_level * $this->level) - $this->baseSkill->base_healing_mod_bonus_per_level;
+        $itemBonus = $this->getItemBonuses($this->baseSkill->name);
+
+        $baseBonus = (
+            $this->baseSkill->base_healing_mod_bonus_per_level * $this->level
+        ) - $this->baseSkill->base_healing_mod_bonus_per_level;
+
+        $baseBonus = $this->getCharacterBoonsBonus($baseBonus);
+
+        return $itemBonus + $baseBonus;
     }
 
     public function getBaseACModAttribute() {
-        return ($this->baseSkill->base_ac_mod_bonus_per_level * $this->level) - $this->baseSkill->base_ac_mod_bonus_per_level;
+        $itemBonus = $this->getItemBonuses($this->baseSkill->name);
+
+        $baseBonus = (
+            $this->baseSkill->base_ac_mod_bonus_per_level * $this->level
+        ) - $this->baseSkill->base_ac_mod_bonus_per_level;
+
+        $baseBonus = $this->getCharacterBoonsBonus($baseBonus);
+
+        return $itemBonus + $baseBonus;
     }
 
     public function getFightTimeOutModAttribute() {
@@ -133,13 +159,7 @@ class Skill extends Model
         $bonus += $this->getItemBonuses($this->baseSkill->name);
 
 
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
-
-            if ($boons->isNotEmpty()) {
-                $bonus += $boons->sum('skill_bonus');
-            }
-        }
+        $bonus = $this->getCharacterBoonsBonus($bonus);
 
         $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
         $looting  = $this->getCharacterSkillBonus($this->character, 'Looting');
@@ -202,6 +222,18 @@ class Skill extends Model
 
             if ($slot->item->type ==='quest') {
                 $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name);
+            }
+        }
+
+        return $bonus;
+    }
+
+    protected function getCharacterBoonsBonus(float $bonus) {
+        if ($this->character->boons->isNotEmpty()) {
+            $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
+
+            if ($boons->isNotEmpty()) {
+                $bonus += $boons->sum('skill_bonus');
             }
         }
 

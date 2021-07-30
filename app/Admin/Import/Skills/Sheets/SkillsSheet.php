@@ -2,6 +2,7 @@
 
 namespace App\Admin\Import\Skills\Sheets;
 
+use App\Flare\Models\GameClass;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Flare\Models\GameSkill;
@@ -14,10 +15,6 @@ class SkillsSheet implements ToCollection {
             if ($index !== 0) {
                 $skill = array_combine($rows[0]->toArray(), $row->toArray());
 
-                if (is_null($skill['specifically_assigned'])) {
-                    $skill['specifically_assigned'] = false;
-                }
-
                 if (is_null($skill['can_train'])) {
                     $skill['can_train'] = false;
                 }
@@ -28,6 +25,10 @@ class SkillsSheet implements ToCollection {
 
                 if (is_null($skill['can_monsters_have_skill'])) {
                     $skill['can_monsters_have_skill'] = false;
+                }
+
+                if (!is_null($skill['game_class_id'])) {
+                    $skill['game_class_id'] = GameClass::where('name', $skill['game_class_id'])->first()->id;
                 }
 
                 $foundSkill = GameSkill::where('name', $skill['name'])->first();

@@ -29,9 +29,10 @@ class GameSkill extends Model
         'fight_time_out_mod_bonus_per_level',
         'move_time_out_mod_bonus_per_level',
         'can_monsters_have_skill',
+        'required_equipment_type',
         'can_train',
         'skill_bonus_per_level',
-        'specifically_assigned',
+        'game_class_id',
         'is_locked'
     ];
 
@@ -48,7 +49,6 @@ class GameSkill extends Model
         'move_time_out_mod_bonus_per_level'  => 'decimal:4',
         'skill_bonus_per_level'              => 'decimal:4',
         'can_monsters_have_skill'            => 'boolean',
-        'specifically_assigned'              => 'boolean',
         'can_train'                          => 'boolean',
         'is_locked'                          => 'integer',
         'type'                               => 'integer',
@@ -56,6 +56,10 @@ class GameSkill extends Model
 
     public function skillType(): SkillTypeValue {
         return new SkillTypeValue($this->type);
+    }
+
+    public function gameClass() {
+        return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
     }
 
     protected static function newFactory() {

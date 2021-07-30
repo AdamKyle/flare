@@ -28,6 +28,8 @@ class SkillModifiers extends Component
 
     public $editing = false;
 
+    public $disabledSelection = false;
+
     protected $rules = [
         'skill.base_damage_mod_bonus_per_level'    => 'nullable',
         'skill.base_healing_mod_bonus_per_level'   => 'nullable',
@@ -36,6 +38,7 @@ class SkillModifiers extends Component
         'skill.move_time_out_mod_bonus_per_level'  => 'nullable',
         'skill.can_train'                          => 'nullable',
         'skill.skill_bonus_per_level'              => 'nullable',
+        'skill.game_class_id'                      => 'nullable'
     ];
 
     protected $listeners = ['validateInput', 'update'];
@@ -53,13 +56,15 @@ class SkillModifiers extends Component
             $this->addError('error', 'No bonus may be below  or equal to: 0.');
         } else if ($this->for === 'select-monsters' && empty($this->selectedMonsters)) {
             $this->addError('monster', 'At least one or more monsters must be selected.');
-        } else if ($this->for === 'select-class' && (is_null($this->selectedClass) || $this->selectedClass === '')) {
-            $this->addError('class', 'Class must be selected.');
+        } else if ($this->for === 'select-class' && (is_null($this->skill->game_class_id))) {
+            $this->addError('game_class_id', 'Class must be selected.');
         } else {
             $this->skill->save();
 
-            if (!$this->canNotAssignSkill) {
+            if (!$this->disabledSelection) {
                 if (empty($this->selectedMonsters)) {
+                    $this->skill->game_class_id = $this->selectedClass;
+
                     AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), null, $this->selectedClass);
                 } else {
                     foreach ($this->selectedMonsters as $monsterId) {
@@ -71,7 +76,7 @@ class SkillModifiers extends Component
             $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';
 
             if ($this->editing) {
-                $message = 'Skill: ' . $this->skill->name . ' Updated. Applying to selected entities!';
+                $message = 'Skill: ' . $this->skill->name . ' Updated';
             }
 
             $this->emitTo('core.form-wizard', 'finish', $index, true, [
@@ -122,36 +127,19 @@ class SkillModifiers extends Component
             return $for;
         }
 
+        if (!is_null($this->skill->gameClass)) {
+            $this->disabledSelection = true;
+        }
+
         $monstersWithSkill = Monster::join('skills', function($join) {
             $join->on('skills.monster_id', 'monsters.id')
                  ->where('skills.game_skill_id', $this->skill->id);
         })->select('monsters.*')->get();
 
-        $charactersWithSkill = Character::join('skills', function($join) {
-            $join->on('skills.character_id', 'characters.id')
-                 ->where('skills.game_skill_id', $this->skill->id);
-        })->select('characters.*')->get();
-
-        if ($monstersWithSkill->isNotEmpty() && $charactersWithSkill->isNotEmpty()) {
+        if ($monstersWithSkill->isNotEmpty()) {
             $for = 'all';
 
-            $this->canNotAssignSkill = true;
-        }
-
-        if ($monstersWithSkill->isNotEmpty() && $charactersWithSkill->isEmpty()) {
-            $for = 'select-monsters';
-
-            $this->selectedMonsters = $monstersWithSkill->pluck('id')->toArray();
-
-            $this->canNotAssignSkill = true;
-        }
-
-        if ($charactersWithSkill->isNotEmpty()) {
-            $for = 'selected-class';
-
-            $this->selectedClass = $charactersWithSkill->first()->class->id;
-
-            $this->canNotAssignSkill = true;
+            $this->disabledSelection = true;
         }
 
         return $for;

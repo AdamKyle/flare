@@ -13,7 +13,7 @@
         <th>can_monsters_have_skill</th>
         <th>can_train</th>
         <th>skill_bonus_per_level</th>
-        <th>specifically_assigned</th>
+        <th>game_class_id</th>
         <th>is_locked</th>
     </tr>
     </thead>
@@ -32,7 +32,7 @@
             <td>{{$skill->can_monsters_have_skill}}</td>
             <td>{{$skill->can_train}}</td>
             <td>{{$skill->skill_bonus_per_level}}</td>
-            <td>{{$skill->specifically_assigned}}</td>
+            <td>{{!is_null($skill->gameClass) ? $skill->gameClass->name : null}}</td>
             <td>{{$skill->is_locked}}</td>
         </tr>
     @endforeach

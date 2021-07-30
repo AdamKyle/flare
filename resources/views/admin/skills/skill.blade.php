@@ -45,6 +45,13 @@
                                 @endif
                             </div>
                         @endif
+                        @php
+                            $fightTimeOutMod = $skill->fight_time_out_mod_bonus_per_level * 999;
+
+                            if ($fightTimeOutMod < 1.0) {
+                                $fightTimeOutMod * 100;
+                            }
+                        @endphp
                         <dl>
                             <dt>Max Level:</dt>
                             <dd>{{$skill->max_level}}</dd>
@@ -55,7 +62,7 @@
                             <dt>Base Healing Mod At Max Level:</dt>
                             <dd>{{($skill->base_healing_mod_bonus_per_level * 999) * 100}}%</dd>
                             <dt>Fight Timeout Mod At Max Level:</dt>
-                            <dd>{{($skill->fight_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
+                            <dd>{{$fightTimeOutMod}}%</dd>
                             <dt>Move Timeout Mod At Max Level:</dt>
                             <dd>{{($skill->move_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
                             <dt>Skill Bonus Bonus At Max Level:</dt>

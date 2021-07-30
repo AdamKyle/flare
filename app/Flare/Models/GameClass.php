@@ -48,6 +48,10 @@ class GameClass extends Model
         'looting_mod'  => 'float',
     ];
 
+    public function gameSkills() {
+        return $this->hasMany(GameSkill::class, 'game_class_id', 'id');
+    }
+
     protected static function newFactory() {
         return GameClassFactory::new();
     }

@@ -156,7 +156,16 @@ class CharacterBuilder {
      * @return CharacterBuilder
      */
     public function assignSkills(): CharacterBuilder {
-        foreach (GameSkill::where('specifically_assigned', false)->get() as $skill) {
+        foreach (GameSkill::whereNull('game_class_id')->get() as $skill) {
+            $this->character->skills()->create(
+                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
+            );
+        }
+
+        /**
+         * Assign the skills assigned to this character's class.
+         */
+        foreach ($this->character->class->gameSkills as $skill) {
             $this->character->skills()->create(
                 resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
             );
