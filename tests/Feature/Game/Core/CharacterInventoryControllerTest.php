@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateRole;
@@ -38,10 +42,10 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $this->actingAs($user)->post(route('game.inventory.unequip', ['character' => $this->character->getCharacter()->id]), [
-            'item_to_remove' => 1
+            'item_to_remove' => InventorySlot::where('equipped', true)->first()->id,
         ]);
 
-        $character = $this->character->getCharacter();
+        $character = Character::first();
 
         $character->inventory->slots->each(function($slot) {
             $this->assertFalse($slot->equipped);
@@ -52,7 +56,7 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->post(route('game.inventory.unequip', ['character' => $this->character->getCharacter()->id]) , [
-            'item_to_remove' => 2
+            'item_to_remove' => rand(900,9560)
         ])->response;
 
         $response->assertSessionHas('error', 'No item found to be equipped.');
@@ -71,26 +75,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
-            'slot_id'    => '1',
-            'equip_type' => 'weapon',
-        ])->response;
-
-        $character = $this->character->getCharacter();
-
-        $character->inventory->slots->each(function($slot) {
-            $this->assertTrue($slot->equipped);
-        });
-    }
-
-    public function testCanEquipItemAsAdmin() {
-
-        $this->character->inventoryManagement()->unequipAll()->getCharacterFactory()->getUser();
-
-        $adminUser = $this->createAdmin([], $this->createAdminRole());
-
-        $this->actingAs($adminUser)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
-            'position'   => 'left-hand',
-            'slot_id'    => '1',
+            'slot_id'    => InventorySlot::first()->id,
             'equip_type' => 'weapon',
         ])->response;
 
@@ -111,7 +96,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $response = $this->actingAs($user)->visitRoute('game')->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
-            'slot_id'    => '1',
+            'slot_id'    => InventorySlot::first()->id,
             'equip_type' => 'weapon',
         ])->response;
 
@@ -144,23 +129,17 @@ class CharacterInventoryControllerTest extends TestCase
         ]);
 
         $user = $this->character->inventoryManagement()
-                                ->giveItem($this->createItem([
-                                    'name' => 'Spear',
-                                    'base_damage' => 6,
-                                    'type' => 'weapon',
-                                ]))
+                                ->giveItem($item)
                                 ->getCharacterFactory()
                                 ->getUser();
 
         $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter()->id]), [
             'position'   => 'left-hand',
-            'slot_id'    => '2',
+            'slot_id'    => InventorySlot::where('item_id', $item->id)->first()->id,
             'equip_type' => 'weapon',
         ])->response;
 
-        $character = $this->character->getCharacter();
-
-        $slot = $character->inventory->slots->where('id', 2)->where('equipped', true)->first();
+        $slot = InventorySlot::where('item_id', $item->id)->first();
 
         $this->assertNotNull($slot);
         $this->assertEquals($slot->item->name, 'Spear');
@@ -173,7 +152,7 @@ class CharacterInventoryControllerTest extends TestCase
 
 
         $response = $this->actingAs($user)->post(route('game.destroy.item', ['character' => $this->character->getCharacter()->id]), [
-            'slot_id' => '1'
+            'slot_id' => InventorySlot::first()->id
         ])->response;
 
         $response->assertSessionHas('success', 'Destroyed Rusty Dagger.');
@@ -195,7 +174,7 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->post(route('game.destroy.item', ['character' => $this->character->getCharacter()->id]), [
-            'slot_id' => '1'
+            'slot_id' => InventorySlot::first()->id,
         ])->response;
 
         $response->assertSessionHas('error', 'Cannot destory equipped item.');
@@ -238,73 +217,79 @@ class CharacterInventoryControllerTest extends TestCase
     }
 
     public function testSeeComparePageForArmour() {
+        $item = $this->createItem([
+            'name'             => 'Armour',
+            'base_damage'      => 6,
+            'base_ac'          => 6,
+            'type'             => 'gloves',
+            'default_position' => 'hands',
+            'crafting_type'    => 'armour',
+        ]);
+
         $user = $this->character->inventoryManagement()
-                                ->giveitem($this->createItem([
-                                    'name'             => 'Armour',
-                                    'base_damage'      => 6,
-                                    'base_ac'          => 6,
-                                    'type'             => 'gloves',
-                                    'default_position' => 'hands',
-                                    'crafting_type'    => 'armour',
-                                ]))
+                                ->giveitem($item)
                                 ->getCharacterFactory()
                                 ->getUser();
 
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
-            'slot_id'   => '2',
+            'slot_id'   => InventorySlot::where('item_id', $item->id)->first()->id,
             'character' => $this->character->getCharacter()->id
         ])->see('Equipped')->see('Armour');
     }
 
     public function testSeeComparePageForItemWithPrefixAndSuffix() {
+        $item = $this->createItem([
+            'name' => 'Armour',
+            'base_damage'      => 6,
+            'base_ac'          => 6,
+            'type'             => 'gloves',
+            'default_position' => 'hands',
+            'item_suffix_id'   => $this->createItemAffix([
+                'name' => 'Sample',
+                'base_healing_mod' => 0.10,
+                'str_mod' => 0.10,
+                'type' => 'suffix',
+                'cost' => 500,
+            ])->id,
+            'item_prefix_id'   => $this->createItemAffix([
+                'name' => 'Sample',
+                'base_healing_mod' => 0.10,
+                'dex_mod' => 0.10,
+                'type' => 'prefix',
+                'cost' => 500,
+            ])->id
+        ]);
+
         $user = $this->character->inventoryManagement()
-                                ->giveitem($this->createItem([
-                                    'name' => 'Armour',
-                                    'base_damage'      => 6,
-                                    'base_ac'          => 6,
-                                    'type'             => 'gloves',
-                                    'default_position' => 'hands',
-                                    'item_suffix_id'   => $this->createItemAffix([
-                                        'name' => 'Sample',
-                                        'base_healing_mod' => 0.10,
-                                        'str_mod' => 0.10,
-                                        'type' => 'suffix',
-                                        'cost' => 500,
-                                    ])->id,
-                                    'item_prefix_id'   => $this->createItemAffix([
-                                        'name' => 'Sample',
-                                        'base_healing_mod' => 0.10,
-                                        'dex_mod' => 0.10,
-                                        'type' => 'prefix',
-                                        'cost' => 500,
-                                    ])->id,
-                                ]))
+                                ->giveitem($item)
                                 ->getCharacterFactory()
                                 ->getUser();
 
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'gloves',
-            'slot_id'            => '2',
+            'slot_id'            => InventorySlot::where('item_id', $item->id)->first()->id,
             'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('*Sample* Armour *Sample*');
     }
 
     public function testCannotSeeComparePage() {
+        $item = $this->createItem([
+            'name'             => 'Armour',
+            'base_damage'      => 6,
+            'base_ac'          => 6,
+            'type'             => 'gloves',
+            'default_position' => 'hands',
+            'crafting_type'    => 'armour',
+        ]);
+
         $user = $this->character->inventoryManagement()
-                                ->giveitem($this->createItem([
-                                    'name'             => 'Armour',
-                                    'base_damage'      => 6,
-                                    'base_ac'          => 6,
-                                    'type'             => 'gloves',
-                                    'default_position' => 'hands',
-                                    'crafting_type'    => 'armour',
-                                ]))
+                                ->giveitem($item)
                                 ->getCharacterFactory()
                                 ->getUser();
 
         $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'apple-sauce',
-            'slot_id'            => '2',
+            'slot_id'            => InventorySlot::where('item_id', $item->id)->first()->id,
             'character'          => $this->character->getCharacter()->id
         ])->see('Error. Invalid Input.');
     }
@@ -318,7 +303,7 @@ class CharacterInventoryControllerTest extends TestCase
 
         $this->actingAs($user)->visitRoute('game.inventory.compare', [
             'item_to_equip_type' => 'weapon',
-            'slot_id'            => '1',
+            'slot_id'            => InventorySlot::first()->id,
             'character'          => $this->character->getCharacter()->id
         ])->see('Equipped')->see('You have nothing equipped for this item type. Anything is better then nothing.');
     }
@@ -344,7 +329,7 @@ class CharacterInventoryControllerTest extends TestCase
                                     'default_position' => 'hands',
                                     'crafting_type'    => 'armour',
                                 ]))
-                                ->equipItem('hands', 2)
+                                ->equipItem('hands', 'Armour')
                                 ->getCharacterFactory()
                                 ->getUser();
 

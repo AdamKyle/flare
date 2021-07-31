@@ -183,11 +183,18 @@ class CelestialBattleControllerApiTest extends TestCase {
 
         $monster = $this->createMonster([
             'is_celestial_entity' => true,
-            'gold_cost'           => 10000000000,
-            'gold_dust_cost'      => 1000,
+            'gold_cost'           => 1000000,
+            'gold_dust_cost'      => 1000000,
         ]);
 
         $character = $this->character->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+            'gold_dust' => 0,
+        ]);
+
+        $character = $character->refresh();
 
         $response = $this->actingAs($character->user)
             ->json('POST', '/api/conjure/' . $character->id, [
@@ -197,7 +204,7 @@ class CelestialBattleControllerApiTest extends TestCase {
             ->response;
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse(CelestialFight::all()->isNotEmpty());
+        $this->assertTrue(CelestialFight::all()->isEmpty());
     }
 
     public function testGetCelestialFight() {

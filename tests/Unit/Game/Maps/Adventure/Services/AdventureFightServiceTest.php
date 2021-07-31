@@ -156,8 +156,8 @@ class AdventureFightServiceTest extends TestCase
                                         ->giveItem($healingSpell)
                                         ->giveItem($damageSpell)
                                         ->giveItem($artifact)
-                                        ->equipSpellSlot('spell-one', 1)
-                                        ->equipSpellSlot('spell-two', 2)
+                                        ->equipSpellSlot($healingSpell->name, 'spell-one')
+                                        ->equipSpellSlot($damageSpell->name, 'spell-two', )
                                         ->getCharacterFactory()
                                         ->updateSkill('Accuracy', [
                                             'skill_bonus_per_level' => 10,

@@ -31,7 +31,7 @@ class GameSkillFactory extends Factory
             'base_ac_mod_bonus_per_level'        => 0,
             'fight_time_out_mod_bonus_per_level' => 0,
             'move_time_out_mod_bonus_per_level'  => 0,
-            'specifically_assigned'              => false,
+            'game_class_id'                      => null,
             'can_train'                          => true,
             'skill_bonus_per_level'              => 0.01,
             'type'                               => SkillTypeValue::TRAINING,

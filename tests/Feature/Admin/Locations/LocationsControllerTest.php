@@ -76,13 +76,13 @@ class LocationsControllerTest extends TestCase
 
     public function testCanSeeShowPage() {
         $this->actingAs($this->user)->visit(route('locations.location', [
-            'location' => 1
+            'location' => Location::first()->id
         ]))->see(Location::first()->name);
     }
 
     public function testCanSeeEditPage() {
         $this->actingAs($this->user)->visit(route('location.edit', [
-            'location' => 1
+            'location' => Location::first()->id
         ]))->see(Location::first()->name);
     }
 }

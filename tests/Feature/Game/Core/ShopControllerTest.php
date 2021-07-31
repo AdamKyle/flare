@@ -53,7 +53,7 @@ class ShopControllerTest extends TestCase
                                 ->givePlayerLocation()
                                 ->inventoryManagement()
                                 ->giveItem($this->item)
-                                ->equipLeftHand()
+                                ->equipLeftHand($this->item->name)
                                 ->getCharacterFactory();
     }
 

@@ -49,13 +49,13 @@ class BuildingsControllerTest extends TestCase
 
     public function testCanSeeEdit() {
         $this->actingAs($this->user)->visitRoute('buildings.edit', [
-            'building' => 1
+            'building' => GameBuilding::first()->id,
         ])->see('Edit Building: Test Building')->see('Building Details');
     }
 
     public function testCanSeeShow() {
         $this->actingAs($this->user)->visitRoute('buildings.building', [
-            'building' => 1
+            'building' => GameBuilding::first()->id,
         ])->see('Test Building')->see('Base Details');
     }
 

@@ -19,7 +19,6 @@ class SkillDetails extends Component
         'skill.max_level'               => 'required',
         'skill.can_monsters_have_skill' => 'nullable',
         'skill.is_locked'               => 'nullable',
-        'skill.required_equipment_type' => 'nullable',
     ];
 
     protected $messages =[

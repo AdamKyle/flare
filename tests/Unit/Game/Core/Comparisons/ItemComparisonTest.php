@@ -54,7 +54,7 @@ class ItemComparisonTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                ->inventoryManagement()
                                                ->giveItem($itemForCharacter)
-                                               ->equipLeftHand()
+                                               ->equipLeftHand($itemForCharacter->name)
                                                ->getCharacterFactory();
     }
 

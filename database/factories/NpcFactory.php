@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcTypes;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -26,7 +27,7 @@ class NpcFactory extends Factory
             'name'                        => 'SampleNpc',
             'real_name'                   => 'Sample NPC',
             'type'                        => NpcTypes::KINGDOM_HOLDER,
-            'game_map_id'                 => 1,
+            'game_map_id'                 => GameMap::first()->id,
             'moves_around_map'            => false,
             'must_be_at_same_location'    => false,
             'text_command_to_message'     => 'Take Kingdom',

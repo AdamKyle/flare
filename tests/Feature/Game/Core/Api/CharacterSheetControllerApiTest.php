@@ -123,7 +123,7 @@ class CharacterSheetControllerApiTest extends TestCase {
                                             'cost'                 => 100,
                                         ])->id,
                                     ]))
-                                    ->equipLefthand(3)
+                                    ->equipLeftHand('sword')
                                     ->getCharacterFactory()
                                     ->getCharacter();
 

@@ -27,6 +27,8 @@ class AdventuresControllerTest extends TestCase
 
     private $user;
 
+    private $item;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -52,7 +54,7 @@ class AdventuresControllerTest extends TestCase
             'y'                    => 1,
         ]);
 
-        $this->createItem([
+        $this->item = $this->createItem([
             'name'          => 'Sample',
             'type'          => 'quest',
             'base_damage'   => null,
@@ -88,7 +90,7 @@ class AdventuresControllerTest extends TestCase
             'description'      => 'sample',
             'location_ids'     => [Location::first()->id],
             'monster_ids'      => [Monster::first()->id],
-            'reward_item_id'   => 1,
+            'reward_item_id'   => $this->item->id,
             'levels'           => 1,
             'time_per_level'   => 1,
             'gold_rush_chance' => 0.01,

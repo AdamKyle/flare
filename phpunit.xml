@@ -27,8 +27,8 @@
       <env name="MAIL_DRIVER" value="array"/>
       <env name="MAIL_USERNAME" value="test@example.ca" />
       <env name="QUEUE_CONNECTION" value="sync"/>
-      <env name="DB_CONNECTION" value="sqlite"/>
-      <env name="DB_DATABASE" value=":memory:"/>
+      <env name="DB_CONNECTION" value="mysql"/>
+      <env name="DB_DATABASE" value="flare_testing"/>
       <env name="SESSION_DRIVER" value="array"/>
       <env name="BROADCAST_DRIVER" value="log"/>
       <env name="TIME_ZONE" value="America/Edmonton"/>

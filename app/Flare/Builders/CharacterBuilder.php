@@ -11,6 +11,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
+use Illuminate\Support\Facades\DB;
 
 class CharacterBuilder {
 
@@ -156,6 +157,7 @@ class CharacterBuilder {
      * @return CharacterBuilder
      */
     public function assignSkills(): CharacterBuilder {
+        //dd('Stop');
         foreach (GameSkill::whereNull('game_class_id')->get() as $skill) {
             $this->character->skills()->create(
                 resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)

@@ -7,7 +7,9 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\User;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
@@ -22,7 +24,8 @@ class RegistrationTest extends TestCase
         CreateClass,
         CreateUser,
         CreateItem,
-        CreateCharacter;
+        CreateCharacter,
+        CreateGameSkill;
 
     public function setUp(): void {
         parent::setUp();

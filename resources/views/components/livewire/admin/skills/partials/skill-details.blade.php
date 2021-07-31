@@ -23,31 +23,19 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="monster-can-have-skill" wire:model="skill.can_monsters_have_skill">
                 <label class="form-check-label" for="monster-can-have-skill">Can monsters have this skill?</label>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="is_locked" wire:model="skill.is_locked">
                 <label class="form-check-label" for="is_locked">Is this skill locked?</label>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label for="item-required-equipment-type">Required Equipment Type: </label>
-                <select class="form-control required" name="item-required-equipment-type" wire:model="skill.required_equipment_type">
-                    <option value="">Please select</option>
-                    @foreach($types as $type)
-                        <option value={{$type}}>{{$type}}</option>
-                    @endforeach
-                </select>
-                @error('skill.required_equipment_type') <span class="text-danger">{{ $message }}</span> @enderror
-            </div>
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="skill_type">Type: </label>
                 <select wire:model="skill.type" class="form-control" id="skill_type">

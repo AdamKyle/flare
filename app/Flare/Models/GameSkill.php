@@ -23,6 +23,7 @@ class GameSkill extends Model
         'name',
         'max_level',
         'type',
+        'game_class_id',
         'base_damage_mod_bonus_per_level',
         'base_healing_mod_bonus_per_level',
         'base_ac_mod_bonus_per_level',

@@ -129,9 +129,5 @@ class AssignSkillService {
             'currently_training' => false,
             'level' => 0,
         ]);
-
-        $skill->update([
-            'specifically_assigned' => true,
-        ]);
     }
 }

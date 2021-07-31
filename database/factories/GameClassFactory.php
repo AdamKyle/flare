@@ -22,7 +22,7 @@ class GameClassFactory extends Factory
     public function definition()
     {
         return [
-            'name'        => 'Sample Class',
+            'name'        => 'Fighter',
             'damage_stat' => 'str',
             'str_mod'     => 0,
         ];

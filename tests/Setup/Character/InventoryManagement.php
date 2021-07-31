@@ -28,8 +28,8 @@ class InventoryManagement {
      * @param int $slotId | 1
      * @return InventoryManagement
      */
-    public function equipLeftHand(int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipLeftHand(string $itemName): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -47,8 +47,8 @@ class InventoryManagement {
      * @param int $slotId | 1
      * @return InventoryManagement
      */
-    public function equipRightHand(int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipRightHand(string $itemName): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -69,8 +69,8 @@ class InventoryManagement {
      * @param string $position | spell-one, spell-two
      * @return InventoryManagement
      */
-    public function equipSpellSlot(string $position = 'spell-one', int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipSpellSlot(string $itemName, string $position = 'spell-one'): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -89,8 +89,8 @@ class InventoryManagement {
      * @param string $position | artifact-one, artifact-two
      * @return InventoryManagement
      */
-    public function equipArtifact(string $position = 'artifact-one', int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipArtifact(string $itemName, string $position = 'artifact-one'): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -109,8 +109,8 @@ class InventoryManagement {
      * @param string $position
      * @return InventoryManagement
      */
-    public function equipItem(string $position, int $slotId = 1): InventoryManagement {
-        $slot = $this->fetchSlot($slotId);
+    public function equipItem(string $position, string $itemName): InventoryManagement {
+        $slot = $this->fetchSlot($itemName);
 
         $slot->update([
             'equipped' => true,
@@ -179,21 +179,15 @@ class InventoryManagement {
         return $this->character->refresh();
     }
 
-    protected function fetchSlot(int $slotId): InventorySlot {
-        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($slotId) {
-            return $slot->id === $slotId && !$slot->equipped;
+    protected function fetchSlot(string $itemName): InventorySlot {
+        $foundMatching = $this->character->inventory->slots->filter(function($slot) use($itemName) {
+            return $slot->item->name === $itemName;
          })->first();
 
          if (is_null($foundMatching)) {
              throw new \Exception('Item is not in inventory or is already equipped');
          }
 
-         $slot = $this->character->inventory->slots->find($slotId);
-
-         if (is_null($slot)) {
-             throw new \Exception('Slot is not found, did you give the item to the player?');
-         }
-
-         return $slot;
+         return $foundMatching;
     }
 }

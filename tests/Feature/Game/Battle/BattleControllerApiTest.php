@@ -392,6 +392,7 @@ class BattleControllerApiTest extends TestCase
             ])
             ->response;
 
+
         $character = $character->refresh();
 
         $found = $character->inventory->slots->filter(function($slot) use ($itemId) {

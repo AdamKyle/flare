@@ -43,14 +43,14 @@ trait CreateMonster {
     }
 
     protected function fetchSkills(): Collection {
-        $skills = GameSkill::where('specifically_assigned', false)->get();
+        $skills = GameSkill::whereNull('game_class_id')->get();
 
         if ($skills->isEmpty()) {
             $this->createGameSkill(['name' => 'Accuracy']);
             $this->createGameSkill(['name' => 'Dodge']);
             $this->createGameSkill(['name' => 'Looting']);
 
-            return GameSkill::where('specifically_assigned', false)->get();
+            return GameSkill::whereNull('game_class_id')->get();
         }
 
         return $skills;

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core\Api;
 
+use App\Flare\Models\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -120,8 +121,10 @@ class NotificationsControllerTest extends TestCase {
             'url'          => 'somthing.com',
         ], 2);
 
+        $notificationId = Notification::first()->id;
+
         $response = $this->actingAs($user)
-                         ->json('POST', '/api/notifications/1/clear')
+                         ->json('POST', '/api/notifications/'.$notificationId.'/clear')
                          ->response;
 
         $this->assertEquals(200, $response->status());
@@ -145,8 +148,10 @@ class NotificationsControllerTest extends TestCase {
 
         $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
+        $notificationId = Notification::first()->id;
+
         $response = $this->actingAs($user)
-                         ->json('POST', '/api/notifications/1/clear')
+                         ->json('POST', '/api/notifications/'.$notificationId.'/clear')
                          ->response;
 
         $this->assertEquals(422, $response->status());

@@ -169,9 +169,8 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => 1,
+                 'adventureLog' => AdventureLog::first()->id,
              ]))->response;
-
 
         $response->assertSessionHas('success', [
            'You gained a level! Now level: 2',
@@ -185,7 +184,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => 1,
+                 'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
 
@@ -209,7 +208,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => 1,
+                 'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
         $response->assertSessionHas('success', ['You are a ready for your next adventure!']);
@@ -222,7 +221,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => 1,
+                 'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
 
@@ -236,7 +235,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => 1,
+                 'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
 
@@ -250,7 +249,7 @@ class CharacterAdventureControllerTest extends TestCase
 
         $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => 1,
+                 'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
 
@@ -259,7 +258,7 @@ class CharacterAdventureControllerTest extends TestCase
 
     public function testDeleteAdventureLog() {
         $this->actingAs($this->character->getUser())->post(route('game.adventures.delete', [
-            'adventureLog' => 1
+            'adventureLog' => AdventureLog::first()->id
         ]));
 
         $this->assertTrue(AdventureLog::all()->isEmpty());
@@ -267,7 +266,7 @@ class CharacterAdventureControllerTest extends TestCase
 
     public function testBatchDeleteAdventureLog() {
         $this->actingAs($this->character->getUser())->post(route('game.adventures.batch-delete'), [
-            'logs' => [1]
+            'logs' => [AdventureLog::first()->id]
         ]);
 
         $this->assertTrue(AdventureLog::all()->isEmpty());

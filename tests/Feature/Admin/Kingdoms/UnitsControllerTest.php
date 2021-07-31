@@ -58,7 +58,7 @@ class UnitsControllerTest extends TestCase
 
     public function testCanSeeEdit() {
         $this->actingAs($this->user)->visitRoute('units.edit', [
-            'gameUnit' => 1
+            'gameUnit' => GameUnit::first()->id
         ])->see('Edit Unit: Sample Unit')->see('Unit Details');
     }
 
@@ -67,12 +67,12 @@ class UnitsControllerTest extends TestCase
 
         $building->units()->create([
             'game_building_id' => $building->id,
-            'game_unit_id'     => 1,
+            'game_unit_id'     => GameUnit::first()->id,
             'required_level'   => 1,
         ]);
 
         $this->actingAs($this->user)->visitRoute('units.unit', [
-            'gameUnit' => 1
+            'gameUnit' => GameUnit::first()->id
         ])->see('Sample Unit')->see('Attributes');
     }
 
@@ -81,12 +81,12 @@ class UnitsControllerTest extends TestCase
 
         $building->units()->create([
             'game_building_id' => $building->id,
-            'game_unit_id'     => 1,
+            'game_unit_id'     => GameUnit::first()->id,
             'required_level'   => 1,
         ]);
 
         $this->actingAs($this->user)->visitRoute('units.unit', [
-            'gameUnit' => 1
+            'gameUnit' => GameUnit::first()->id
         ])->see('Sample Unit')->see('Attributes')->see($building->name);
     }
 }

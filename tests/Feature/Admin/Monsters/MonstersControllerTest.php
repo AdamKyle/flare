@@ -63,13 +63,13 @@ class MonstersControllerTest extends TestCase
 
     public function testCanSeeShowPage() {
         $this->actingAs($this->user)->visit(route('monsters.monster', [
-            'monster' => 1
+            'monster' => Monster::first()->id
         ]))->see(Monster::first()->name);
     }
 
     public function testCanSeeEditPage() {
         $this->actingAs($this->user)->visit(route('monster.edit', [
-            'monster' => 1
+            'monster' => Monster::first()->id
         ]))->see(Monster::first()->name);
     }
 

@@ -85,7 +85,7 @@ class ItemsControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()
                                            ->inventoryManagement()
                                            ->giveItem($this->item)
-                                           ->equipLeftHand()
+                                           ->equipLeftHand($this->item->name)
                                            ->getCharacterFactory();
 
         $this->actingAs($this->user)->post(route('items.delete', [
@@ -110,7 +110,7 @@ class ItemsControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()
                                            ->inventoryManagement()
                                            ->giveItem($this->item)
-                                           ->equipLeftHand()
+                                           ->equipLeftHand($this->item->name)
                                            ->getCharacterFactory();
 
         $this->actingAs($this->user)->post(route('items.delete.all', [

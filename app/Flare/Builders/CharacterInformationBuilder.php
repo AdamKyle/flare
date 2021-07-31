@@ -108,6 +108,26 @@ class CharacterInformationBuilder {
     }
 
     /**
+     * Builds Total Attack.
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function buildTotalAttack(): int {
+        $characterDamageStat = $this->statMod($this->character->damage_stat);
+        $classBonuses        = $this->getFightersDamageBonus($this->character) +
+            $this->prophetDamageBonus($this->character) +
+            $this->getThievesDamageBonus($this->character) +
+            $this->getVampiresDamageBonus($this->character) +
+            $this->getRangersDamageBonus($this->character);
+        $characterDamageStat *= 1 + ($this->fetchSkillAttackMod() + $classBonuses);
+
+        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage();
+
+        return round($characterDamageStat + $totalAttack);
+    }
+
+    /**
      * Build the defence
      *
      * Fetches the defence based off a base of ten plus the equipment, skills and other
