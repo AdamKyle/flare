@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\Item;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,7 +38,7 @@ class ItemsControllerTest extends TestCase
     }
 
     public function testCanSeeItemDetails() {
-        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger');
+        $this->visitRoute('game.items.item', ['item' => Item::first()->id])->see('Rusty Dagger');
     }
 
     public function testCanColorForOneAffix() {
@@ -58,7 +59,7 @@ class ItemsControllerTest extends TestCase
 
         $this->item->save();
 
-        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger')->see('one-enchant');
+        $this->visitRoute('game.items.item', ['item' => Item::first()->id])->see('Rusty Dagger')->see('one-enchant');
     }
 
     public function testCanColorForTwoAffix() {
@@ -94,19 +95,19 @@ class ItemsControllerTest extends TestCase
 
         $this->item->save();
 
-        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger')->see('two-enchant');
+        $this->visitRoute('game.items.item', ['item' => Item::first()->id])->see('Rusty Dagger')->see('two-enchant');
     }
 
     public function testColorForQuestItem() {
         $this->item->type = 'quest';
         $this->item->save();
 
-        $this->visitRoute('game.items.item', ['item' => 1])->see('Rusty Dagger')->see('quest-item');
+        $this->visitRoute('game.items.item', ['item' => Item::first()->id])->see('Rusty Dagger')->see('quest-item');
     }
 
     public function testCannotSeeItemDetailsFourOhFour() {
         $response = $this->get(route('game.items.item', [
-            'item' => 100
+            'item' => rand(768,9804),
         ]))->response;
 
         $this->assertEquals($response->status(), 404);

@@ -81,10 +81,6 @@ class RegistrationTest extends TestCase
                  'name'                  => 'bobtest',
                  'race'                  => $race->id,
                  'class'                 => $class->id,
-                 'question_one'          => 'Whats your favourite movie?',
-                 'question_two'          => 'Whats the name of the town you grew up in?',
-                 'answer_one'            => 'test',
-                 'answer_two'            => 'test2',
              ])->dontSee('The name has already been taken.');
 
       $user = User::first();
@@ -94,57 +90,6 @@ class RegistrationTest extends TestCase
       $this->assertEquals($class->name, $user->character->class->name);
     }
 
-    public function testSecurityQuestionsMustBeUnique() {
-        $race  = $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $class = $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $this->visit('/login')
-             ->click('Register')
-             ->submitForm('Register', [
-                 'email'                 => 'a@example.net',
-                 'password'              => 'TestExamplePassword',
-                 'password_confirmation' => 'TestExamplePassword',
-                 'name'                  => 'bobtest',
-                 'race'                  => $race->id,
-                 'class'                 => $class->id,
-                 'question_one'          => 'Whats your favourite movie?',
-                 'question_two'          => 'Whats your favourite movie?',
-                 'answer_one'            => 'test',
-                 'answer_two'            => 'test2',
-             ])->see('Security questions need to be unique.');
-    }
-
-    public function testSecurityAnswersMustBeUnique() {
-        $race  = $this->createRace([
-            'dex_mod' => 2,
-        ]);
-
-        $class = $this->createClass([
-            'str_mod' => 2,
-            'damage_stat' => 'str',
-        ]);
-
-        $this->visit('/login')
-             ->click('Register')
-             ->submitForm('Register', [
-                 'email'                 => 'a@example.net',
-                 'password'              => 'TestExamplePassword',
-                 'password_confirmation' => 'TestExamplePassword',
-                 'name'                  => 'bobtest',
-                 'race'                  => $race->id,
-                 'class'                 => $class->id,
-                 'question_one'          => 'Whats your favourite movie?',
-                 'question_two'          => 'Whats the name of the town you grew up in?',
-                 'answer_one'            => 'test',
-                 'answer_two'            => 'test',
-             ])->see('Security questions answers need to be unique.');
-    }
 
     public function testCannotRegisterWhenNoMap() {
 
@@ -207,10 +152,6 @@ class RegistrationTest extends TestCase
                 'name'                  => 'bobtest',
                 'race'                  => GameRace::first()->id,
                 'class'                 => GameClass::first()->id,
-                'question_one'          => 'Whats your favourite movie?',
-                'question_two'          => 'Whats the name of the town you grew up in?',
-                'answer_one'            => 'test',
-                'answer_two'            => 'test2',
             ])->see('You cannot register anymore characters.');
     }
 

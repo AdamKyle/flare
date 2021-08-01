@@ -9,6 +9,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
+use App\Flare\Models\Character;
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Mail\RecruitedUnits;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
@@ -43,12 +49,12 @@ class KingdomsControllerTest extends TestCase
 
     public function testGetKingdomData() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('GET', route('kingdoms.location', [
-            'kingdom' => 1,
+            'kingdom' => Kingdom::first()->id,
             'character' => $this->character->getCharacter()->id,
         ]))->response;
 
@@ -63,7 +69,7 @@ class KingdomsControllerTest extends TestCase
         $this->createGameBuilding();
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
-            'character' => 1
+            'character' => Character::first()->id
         ]), [
             'x_position'     => 16,
             'y_position'     => 16,
@@ -89,7 +95,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.settle', [
-            'character' => 1
+            'character' => Character::first()->id
         ]), [
             'x_position'     => 26,
             'y_position'     => 26,
@@ -108,7 +114,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdom.rename', [
-            'kingdom' => 1
+            'kingdom' => Kingdom::first()->id
         ]), [
             'name' => 'Test Kingdom 456'
         ])->response;
@@ -123,7 +129,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->kingdomManagement()->assignKingdom()->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdom.rename', [
-            'kingdom' => 1
+            'kingdom' => Kingdom::first()->id
         ]))->response;
 
         $content = json_decode($response->content());
@@ -138,7 +144,7 @@ class KingdomsControllerTest extends TestCase
         $this->createGameBuilding();
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
-            'character' => 1
+            'character' => Character::first()->id
         ]), [
             'x_position'     => 16,
             'y_position'     => 16,
@@ -160,7 +166,7 @@ class KingdomsControllerTest extends TestCase
 
     public function testFailToSettleKingdomMissingData() {
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
-            'character' => 1
+            'character' => Character::first()->id
         ]))->response;
 
         $content = json_decode($response->content());
@@ -174,12 +180,12 @@ class KingdomsControllerTest extends TestCase
 
     public function testFailToSettleKingdomKingdomAlreadyExists() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
-            'character' => 1
+            'character' => Character::first()->id
         ]), [
             'x_position'     => 16,
             'y_position'     => 16,
@@ -198,7 +204,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createLocation([
             'name'                 => 'Kingdom',
-            'game_map_id'          => 1,
+            'game_map_id'          => GameMap::first()->id,
             'quest_reward_item_id' => null,
             'description'          => 'null',
             'is_port'              => false,
@@ -207,7 +213,7 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
-            'character' => 1
+            'character' => Character::first()->id
         ]), [
             'x_position'      => 16,
             'y_position'      => 16,
@@ -234,15 +240,15 @@ class KingdomsControllerTest extends TestCase
         ]]);
 
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $this->createGameBuilding();
 
         $this->createKingdomBuilding([
-            'game_building_id'   => 1,
-            'kingdom_id'         => 1,
+            'game_building_id'   => GameBuilding::first()->id,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 0,
@@ -251,8 +257,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.rebuild', [
-            'character'  => 1,
-            'building'   => 1,
+            'character'  => Character::first()->id,
+            'building'   => KingdomBuilding::first()->id,
         ]))->response;
 
         $this->assertEquals(200, $response->status());
@@ -266,15 +272,15 @@ class KingdomsControllerTest extends TestCase
     public function testRebuildKingdomBuildingOffLine() {
 
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $this->createGameBuilding();
 
         $this->createKingdomBuilding([
-            'game_building_id'   => 1,
-            'kingdom_id'         => 1,
+            'game_building_id'   => GameBuilding::first()->id,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 0,
@@ -283,8 +289,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.rebuild', [
-            'character'  => 1,
-            'building'   => 1,
+            'character'  => Character::first()->id,
+            'building'   => KingdomBuilding::first()->id,
         ]))->response;
 
         $this->assertEquals(200, $response->status());
@@ -297,8 +303,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testCannotRebuildKingdomBuildingNotEnoughResources() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1,
             'current_wood'       => 1,
             'current_clay'       => 1,
@@ -309,8 +315,8 @@ class KingdomsControllerTest extends TestCase
         $this->createGameBuilding();
 
         $this->createKingdomBuilding([
-            'game_building_id'   => 1,
-            'kingdom_id'         => 1,
+            'game_building_id'   => GameBuilding::first()->id,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 0,
@@ -319,8 +325,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.rebuild', [
-            'character'  => 1,
-            'building'   => 1,
+            'character'  => Character::first()->id,
+            'building'   => KingdomBuilding::first()->id,
         ]))->response;
 
         $this->assertEquals(422, $response->status());
@@ -336,13 +342,13 @@ class KingdomsControllerTest extends TestCase
 
     public function testCanEmbezzel() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
             'treasury'     => 2000,
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
-            'kingdom' => 1
+            'kingdom' => Kingdom::first()->id
         ]), [
             'embezzel_amount' => 2000
         ])->response;
@@ -354,13 +360,13 @@ class KingdomsControllerTest extends TestCase
 
     public function testCannotEmbezzelMissingParam() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
             'treasury'     => 2000,
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
-            'kingdom' => 1
+            'kingdom' => Kingdom::first()->id
         ]))->response;
 
         $this->assertEquals(422, $response->status());
@@ -372,13 +378,13 @@ class KingdomsControllerTest extends TestCase
 
     public function testCannotEmbezzelHaveNoTreasury() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
             'treasury'     => 0,
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
-            'kingdom' => 1
+            'kingdom' => Kingdom::first()->id
         ]), [
             'embezzel_amount' => 2000
         ])->response;
@@ -392,14 +398,14 @@ class KingdomsControllerTest extends TestCase
 
     public function testCannotEmbezzelMoraleTooLow() {
         $this->createKingdom([
-            'character_id'   => 1,
-            'game_map_id'    => 1,
+            'character_id'   => Character::first()->id,
+            'game_map_id'    => GameMap::first()->id,
             'current_morale' => 0.07,
             'treasury'       => 2000,
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
-            'kingdom' => 1
+            'kingdom' => Kingdom::first()->id
         ]), [
             'embezzel_amount' => 2000
         ])->response;
@@ -413,8 +419,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testUpgradeKingdomBuildingWhileOnline() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $gameBuilding = $this->createGameBuilding();
@@ -430,7 +436,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $gameBuilding->id,
-            'kingdom_id'         => 1,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => $gameBuilding->base_defence,
             'current_durability' => $gameBuilding->base_durability,
@@ -439,8 +445,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
-            'character' => 1,
-            'building'  => 1,
+            'character' => Character::first()->id,
+            'building'  => KingdomBuilding::first()->id,
         ]))->response;
 
         $content = json_decode($response->content());
@@ -450,15 +456,15 @@ class KingdomsControllerTest extends TestCase
 
     public function testUpgradeKingdomBuildingWithEmail() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $gameBuilding = $this->createGameBuilding();
 
         $this->createKingdomBuilding([
             'game_building_id'   => $gameBuilding->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => $gameBuilding->base_defence,
             'current_durability' => $gameBuilding->base_durability,
@@ -467,8 +473,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
-            'character' => 1,
-            'building'  => 1,
+            'character' => Character::first()->id,
+            'building'  => KingdomBuilding::first()->id,
         ]))->response;
 
         $content = json_decode($response->content());
@@ -478,8 +484,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testUpgradeKingdomBuildingThatIsResource() {
         $this->createKingdom([
-            'character_id' => 1,
-            'game_map_id'  => 1,
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
         ]);
 
         $gameBuilding = $this->createGameBuilding([
@@ -488,7 +494,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $gameBuilding->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => $gameBuilding->base_defence,
             'current_durability' => $gameBuilding->base_durability,
@@ -497,8 +503,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
-            'character' => 1,
-            'building'  => 1,
+            'character' => Character::first()->id,
+            'building'  => KingdomBuilding::first()->id,
         ]))->response;
 
         $content = json_decode($response->content());
@@ -508,8 +514,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testFailToUpgradeNotEnoughResources() {
         $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -523,7 +529,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $gameBuilding->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => $gameBuilding->base_defence,
             'current_durability' => $gameBuilding->base_durability,
@@ -532,8 +538,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
-            'character' => 1,
-            'building'  => 1,
+            'character' => Character::first()->id,
+            'building'  => KingdomBuilding::first()->id,
         ]))->response;
 
         $content = json_decode($response->content());
@@ -544,8 +550,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testRecruitUnit() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1000,
             'current_wood'       => 1000,
             'current_clay'       => 1000,
@@ -558,8 +564,8 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
-            'gameUnit' => 1,
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
         ]), [
             'amount' => 5
         ])->response;
@@ -574,8 +580,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testRecruitUnitWhenOnline() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1000,
             'current_wood'       => 1000,
             'current_clay'       => 1000,
@@ -597,8 +603,8 @@ class KingdomsControllerTest extends TestCase
         ]]);
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
-            'gameUnit' => 1,
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
         ]), [
             'amount' => 5
         ])->response;
@@ -615,8 +621,8 @@ class KingdomsControllerTest extends TestCase
         Mail::fake();
 
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1000,
             'current_wood'       => 1000,
             'current_clay'       => 1000,
@@ -633,8 +639,8 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
-            'gameUnit' => 1,
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
         ]), [
             'amount' => 5
         ])->response;
@@ -650,8 +656,8 @@ class KingdomsControllerTest extends TestCase
     }
     public function testRecruitAdditionalUnits() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1000,
             'current_wood'       => 1000,
             'current_clay'       => 1000,
@@ -662,16 +668,16 @@ class KingdomsControllerTest extends TestCase
         $this->createGameUnit();
 
         $kingdom->units()->create([
-            'game_unit_id' => 1,
-            'kingdom_id'   => 1,
+            'game_unit_id' => GameUnit::first()->id,
+            'kingdom_id'   => Kingdom::first()->id,
             'amount'       => 5,
         ]);
 
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
-            'gameUnit' => 1,
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
         ]), [
             'amount' => 5
         ])->response;
@@ -686,8 +692,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testRecruitUnitsForKingdomWithUnits() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1000,
             'current_wood'       => 1000,
             'current_clay'       => 1000,
@@ -698,15 +704,15 @@ class KingdomsControllerTest extends TestCase
         $this->createGameUnit();
 
         $kingdom->units()->create([
-            'game_unit_id' => 1,
-            'kingdom_id'   => 1,
+            'game_unit_id' => GameUnit::first()->id,
+            'kingdom_id'   => Kingdom::first()->id,
             'amount'       => 5,
         ]);
 
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
+            'kingdom'  => Kingdom::first()->id,
             'gameUnit' => $this->createGameUnit(['name' => 'Axemen']),
         ]), [
             'amount' => 5
@@ -717,13 +723,13 @@ class KingdomsControllerTest extends TestCase
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->units->isNotEmpty());
-        $this->assertEquals(5, $kingdom->units->where('game_unit_id', 2)->first()->amount);
+        $this->assertEquals(5, $kingdom->units->where('game_unit_id', GameUnit::first()->id)->first()->amount);
     }
 
     public function testFailToRecruitUnitsWhenAmountIsZero() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 1000,
             'current_wood'       => 1000,
             'current_clay'       => 1000,
@@ -736,8 +742,8 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
-            'gameUnit' => 1,
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
         ]), [
             'amount' => 0
         ])->response;
@@ -753,8 +759,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testNotEnoughResourcesToRecruit() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -767,8 +773,8 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
-            'kingdom'  => 1,
-            'gameUnit' => 1,
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
         ]), [
             'amount' => 150
         ])->response;
@@ -786,8 +792,8 @@ class KingdomsControllerTest extends TestCase
         $this->createGameUnit();
 
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -796,9 +802,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $this->createUnitQueue([
-            'character_id' => 1,
+            'character_id' => Character::first()->id,
             'kingdom_id'   => $kingdom->id,
-            'game_unit_id' => 1,
+            'game_unit_id' => GameUnit::first()->id,
             'amount'       => 150,
             'completed_at' => now()->addMinutes(150)
         ]);
@@ -806,7 +812,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units.cancel'), [
-            'queue_id' => 1
+            'queue_id' => UnitInQueue::first()->id
         ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -820,7 +826,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertTrue($kingdom->current_iron > 0);
     }
 
-    public function testCannotCancelRecruitOrderForNonExistantQueue() {
+    public function testCannotCancelRecruitOrderForNonExistentQueue() {
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units.cancel'), [
@@ -838,8 +844,8 @@ class KingdomsControllerTest extends TestCase
         $this->createGameUnit();
 
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -848,9 +854,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $this->createUnitQueue([
-            'character_id' => 1,
+            'character_id' => Character::first()->id,
             'kingdom_id'   => $kingdom->id,
-            'game_unit_id' => 1,
+            'game_unit_id' => GameUnit::first()->id,
             'amount'       => 150,
             'completed_at' => now()->subMinute(10)
         ]);
@@ -858,7 +864,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units.cancel'), [
-            'queue_id' => 1
+            'queue_id' => UnitInQueue::first()->id
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -870,8 +876,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testCanCancelKingdomBuildingOrder() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -881,7 +887,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -890,9 +896,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $this->createKingdomBuildingQueue([
-            'character_id' => 1,
+            'character_id' => Character::first()->id,
             'kingdom_id'   => $kingdom->id,
-            'building_id'  => 1,
+            'building_id'  => KingdomBuilding::first()->id,
             'to_level'     => 2,
             'completed_at' => now()->addMinutes(150)
         ]);
@@ -900,7 +906,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.building.queue.delete'), [
-            'queue_id' => 1
+            'queue_id' => BuildingInQueue::first()->id
         ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -918,7 +924,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.building.queue.delete'), [
-            'queue_id' => 1
+            'queue_id' => 8747654
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -930,8 +936,8 @@ class KingdomsControllerTest extends TestCase
 
     public function testCannotCancelKingdomBuildingOrderToLittleTimeLeft() {
         $kingdom = $this->createKingdom([
-            'character_id'       => 1,
-            'game_map_id'        => 1,
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -941,7 +947,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->createKingdomBuilding([
             'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdom_id'         => 1,
+            'kingdom_id'         => Kingdom::first()->id,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -950,9 +956,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $this->createKingdomBuildingQueue([
-            'character_id' => 1,
+            'character_id' => Character::first()->id,
             'kingdom_id'   => $kingdom->id,
-            'building_id'  => 1,
+            'building_id'  => KingdomBuilding::first()->id,
             'to_level'     => 2,
             'completed_at' => now()->subDays(1),
             'started_at'   => now()
@@ -961,7 +967,7 @@ class KingdomsControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdoms.building.queue.delete'), [
-            'queue_id' => 1
+            'queue_id' => BuildingInQueue::first()->id,
         ])->response;
 
         $this->assertEquals(422, $response->status());

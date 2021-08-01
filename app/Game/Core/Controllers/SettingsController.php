@@ -6,6 +6,8 @@ use Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SettingsController extends Controller {
 
@@ -58,35 +60,8 @@ class SettingsController extends Controller {
         return redirect()->back()->with('success', 'Updated character name.');
     }
 
-    public function securityQuestions(Request $request, User $user) {
-        $request->validate([
-            'password'     => 'required',
-            'question_one' => 'required',
-            'question_two' => 'required',
-            'answer_one'   => 'required|min:4',
-            'answer_two'   => 'required|min:4',
-        ]);
-
-        if (!Hash::check($request->password, $user->password)) {
-            return redirect()->back()->with('error', 'Invalid password.');
-        }
-
-        $user->securityQuestions()->truncate();
-
-        if ($request->question_one === $request->question_two) {
-            return redirect()->back()->with('error', 'Security questions need to be unique.');
-        }
-
-        if ($request->answer_one === $request->answer_two) {
-            return redirect()->back()->with('error', 'Security questions answers need to be unique.');
-        }
-
-        $this->createSecurityQuestions($request, $user);
-
-        return redirect()->back()->with('success', 'Security Question supdated. Do not forget these answers. We cannot reset them for you.');
-    }
-
     protected function createSecurityQuestions(Request $request, User $user): User {
+
         $user->securityQuestions()->insert([
             [
                 'user_id'    => $user->id,

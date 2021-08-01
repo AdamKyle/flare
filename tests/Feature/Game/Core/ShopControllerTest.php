@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\InventorySlot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Tests\TestCase;
@@ -137,37 +138,12 @@ class ShopControllerTest extends TestCase
                                 ->getUser();
 
         $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter()->id]), [
-            'slot_id' => 1,
+            'slot_id' => InventorySlot::first()->id,
         ])->response;
 
         $sellFor = SellItemCalculator::fetchTotalSalePrice($this->item);
 
         $response->assertSessionHas('success', 'Sold: Rusty Dagger for: '.$sellFor.' gold.');
-
-        $this->assertTrue($this->character->getCharacter()->gold > 0);
-    }
-
-    public function testCanSellItemWithArtifactAndAfixes() {
-        $user = $this->character->inventoryManagement()
-                                ->unequipAll()
-                                ->getCharacterFactory()
-                                ->updateCharacter([
-                                    'gold' => 0
-                                ])
-                                ->getUser();
-
-
-        $this->item->update([
-            'item_suffix_id' => $this->itemAffix->id,
-        ]);
-
-        $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter()->id]), [
-            'slot_id' => 1,
-        ])->response;
-
-        $sellFor = SellItemCalculator::fetchTotalSalePrice($this->item);
-
-        $response->assertSessionHas('success', 'Sold: Rusty Dagger *'.$this->itemAffix->name.'* for: '.$sellFor.' gold.');
 
         $this->assertTrue($this->character->getCharacter()->gold > 0);
     }

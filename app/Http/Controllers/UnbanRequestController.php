@@ -37,39 +37,9 @@ class UnbanRequestController extends Controller
 
         Cache::put('user-temp-' . $user->id, 'temp', now()->addMinutes(60));
 
-        return redirect()->to(route('un.ban.security.check', $user));
-    }
-
-    public function securityForm(User $user) {
-        if (!Cache::has('user-temp-' . $user->id)) {
-            return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
-        }
-
-        return view('request.unban-security-check', [
+        return view('request.request-unban-form', [
             'user' => $user
         ]);
-    }
-
-    public function securityCheck(Request $request, User $user) {
-        if (!Cache::has('user-temp-' . $user->id)) {
-            return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
-        }
-
-        $request->validate([
-            'answer_one' => 'required',
-            'answer_two' => 'required',
-        ]);
-
-        $firstAnswer  = $user->securityQuestions()->where('question', $request->question_one)->first()->answer;
-        $secondAnswer = $user->securityQuestions()->where('question', $request->question_two)->first()->answer;
-
-        if (!Hash::check($request->answer_one, $firstAnswer) && !Hash::check($request->answer_two, $secondAnswer)) {
-            return redirect()->back()->with('error', 'The answer to one or more security questions does not match our records.');
-        }
-
-        return redirect()->to(route('un.ban.request.form', [
-            'user' => $user
-        ]));
     }
 
     public function requestForm(User $user) {

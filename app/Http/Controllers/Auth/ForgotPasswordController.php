@@ -47,40 +47,9 @@ class ForgotPasswordController extends Controller
                         : redirect()->to('/')->with('error', 'Failed to send link.');
         }
 
-        Cache::put($user->id . '-email', $request->email, now()->addMinutes(5));
-
-        return redirect()->to(route('user.security.questions', [
-            'user' => $user->id
-        ]));
-    }
-
-    public function answerSecurityQuestions(Request $request, User $user) {
-        if (!Cache::has($user->id . '-email')) {
-            return redirect()->to('/')->with('error', 'Your time expired. Please try again.');
-        }
-
-        return view('auth.passwords.answer-security-questions', [
-            'user' => $user,
-        ]);
-    }
-
-    public function securityQuestionsAnswers(Request $request, User $user) {
-        if (!Cache::has($user->id . '-email')) {
-            return redirect()->to('/')->with('error', 'Your time expired. Please try again.');
-        }
-
-        $firstAnswer = $user->securityQuestions()->where('question', $request->question_one)->first()->answer;
-        $secondAnswer = $user->securityQuestions()->where('question', $request->question_two)->first()->answer;
-
-        if (!Hash::check($request->answer_one, $firstAnswer) && !Hash::check($request->answer_two, $secondAnswer)) {
-            return redirect()->back()->with('error', 'The answer to one or more security questions does not match our records.');
-        }
-
         $token = app('Password')::getRepository()->create($user);
 
         Mail::to($user->email)->send((new ResetPassword($user, $token)));
-
-        Cache::delete($user->id . '-email');
 
         return redirect()->to('/')->with('success', 'Sent you an email to begin the reset process.');
     }

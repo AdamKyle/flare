@@ -58,7 +58,7 @@ class KingdomControllerTest extends TestCase {
 
         $this->actingAs($this->character->getUser())->visit(route('game.kingdom.attack-log', [
             'character'  => $this->character->getCharacter()->id,
-            'kingdomLog' => 1,
+            'kingdomLog' => KingdomLog::first()->id,
         ]))->see('Attack Log (' . KingdomLogStatusValue::KINGDOM_ATTACKED . ')');
     }
 
@@ -77,7 +77,7 @@ class KingdomControllerTest extends TestCase {
 
         $this->actingAs($this->character->getUser())->visit(route('game.kingdom.attack-log', [
             'character'  => $this->character->getCharacter()->id,
-            'kingdomLog' => 1,
+            'kingdomLog' => KingdomLog::first()->id,
         ]))->see('Attack Log (' . KingdomLogStatusValue::ATTACKED . ')');
     }
 
@@ -96,7 +96,7 @@ class KingdomControllerTest extends TestCase {
 
         $this->actingAs($this->character->getUser())->visit(route('game.kingdom.attack-log', [
             'character'  => $this->character->getCharacter()->id,
-            'kingdomLog' => 1,
+            'kingdomLog' => KingdomLog::first()->id,
         ]))->see('Attack Log (' . KingdomLogStatusValue::LOST . ')');
     }
 
@@ -115,7 +115,7 @@ class KingdomControllerTest extends TestCase {
 
         $this->actingAs($this->character->getUser())->visit(route('game.kingdom.attack-log', [
             'character'  => $this->character->getCharacter()->id,
-            'kingdomLog' => 1,
+            'kingdomLog' => KingdomLog::first()->id,
         ]))->see('Attack Log (' . KingdomLogStatusValue::TAKEN . ')');
     }
 
@@ -143,7 +143,7 @@ class KingdomControllerTest extends TestCase {
 
         $this->actingAs($this->character->getUser())->visit(route('game.kingdom.attack-log', [
             'character'  => $this->character->getCharacter()->id,
-            'kingdomLog' => 1,
+            'kingdomLog' => KingdomLog::first()->id,
         ]))->see('Attack Log (' . KingdomLogStatusValue::KINGDOM_ATTACKED . ')');
     }
 
@@ -162,7 +162,7 @@ class KingdomControllerTest extends TestCase {
 
         $this->actingAs($this->character->getUser())->post(route('game.kingdom.delete-log', [
             'character'  => $this->character->getCharacter()->id,
-            'kingdomLog' => 1,
+            'kingdomLog' => KingdomLog::first()->id,
         ]));
 
         $this->assertTrue(KingdomLog::all()->isEmpty());
@@ -184,7 +184,7 @@ class KingdomControllerTest extends TestCase {
         $this->actingAs($this->character->getUser())->post(route('game.kingdom.batch-delete-logs', [
             'character'  => $this->character->getCharacter()->id,
         ]), [
-            'logs' => [1]
+            'logs' => [KingdomLog::first()->id]
         ]);
 
         $this->assertTrue(KingdomLog::all()->isEmpty());

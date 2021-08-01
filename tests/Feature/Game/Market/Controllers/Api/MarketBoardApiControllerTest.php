@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Market\Controllers\Api;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\MarketBoard;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,7 +59,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => false,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -78,7 +79,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -104,7 +105,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -132,7 +133,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -158,7 +159,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -175,7 +176,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -205,7 +206,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -235,7 +236,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -267,7 +268,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -299,7 +300,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -335,7 +336,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -371,7 +372,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -407,7 +408,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -439,7 +440,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -470,7 +471,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -503,7 +504,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -536,7 +537,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -560,7 +561,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -588,7 +589,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -613,7 +614,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -644,7 +645,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -664,7 +665,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -706,7 +707,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);

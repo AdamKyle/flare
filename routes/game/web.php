@@ -43,7 +43,6 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::post('/settings/{user}/chat-settings', ['as' => 'user.settings.chat', 'uses' => 'SettingsController@chatSettings']);
     Route::post('/settings/{user}/email-settings', ['as' => 'user.settings.email', 'uses' => 'SettingsController@emailSettings']);
     Route::post('/settings/{user}/character-name', ['as' => 'user.settings.character', 'uses' => 'SettingsController@characterSettings']);
-    Route::post('/settings/{user}/security', ['as' => 'user.settings.security', 'uses' => 'SettingsController@securityQuestions']);
 
     Route::post('/items/use/{character}/{item}', ['as' => 'game.item.use', 'uses' => 'ItemsController@useItem']);
 });

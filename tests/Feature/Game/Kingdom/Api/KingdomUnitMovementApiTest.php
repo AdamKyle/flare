@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Kingdom\Api;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,6 +63,7 @@ class KingdomUnitMovementApiTest extends TestCase
         ]);
 
         $this->createUnitMovementQueue([
+            'character_id'        => Character::first()->id,
             'from_kingdom_id'    => $attacker->getKingdom()->id,
             'to_kingdom_id'      => $this->character->getKingdom()->id,
             'units_moving'       => [
@@ -152,6 +154,7 @@ class KingdomUnitMovementApiTest extends TestCase
 
     protected function createUnitMovement(Kingdom $defenderKingdom, Kingdom $attackingKingdom, $completeInMinutes = 100, $startedAtMinutes = 0): UnitMovementQueue {
         return $this->createUnitMovementQueue([
+            'character_id'       => Character::first()->id,
             'from_kingdom_id'    => $attackingKingdom->id,
             'to_kingdom_id'      => $defenderKingdom->id,
             'units_moving'       => $this->getUnitsInMovement($attackingKingdom),

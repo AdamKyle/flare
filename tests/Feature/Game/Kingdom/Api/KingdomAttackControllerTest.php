@@ -36,7 +36,7 @@ class KingdomAttackControllerTest extends TestCase
         $response = $this->actingAs($user)->json('POST', route('kingdom.attack.selection', [
             'character' => $this->character->getCharacter()->id
         ]),[
-            'selected_kingdoms' => [1]
+            'selected_kingdoms' => [Kingdom::first()->id]
         ])->response;
 
         $content = json_decode($response->content());

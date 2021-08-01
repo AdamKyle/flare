@@ -21,8 +21,5 @@
         @include('game.core.settings.partials.chat-settings', [
             'user' => $user,
         ])
-        @include('game.core.settings.partials.security-questions', [
-            'user' => $user,
-        ])
     </div>
 @endsection

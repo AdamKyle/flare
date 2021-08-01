@@ -578,7 +578,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->getCharacter();
         $user      = $this->character->getUser();
 
-        $this->createLocation([
+        $port = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,

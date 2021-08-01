@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Flare\Models\Character;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\UnitMovementQueue;
 
@@ -21,8 +22,10 @@ class UnitMoveQueueFactory extends Factory
      */
     public function definition()
     {
+        $character = Character::first();
+
         return [
-            'character_id'    => 1,
+            'character_id'    => is_null($character) ? $character : null,
             'from_kingdom_id' => 1,
             'to_kingdom_id'   => 1,
             'units_moving'    => [],

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Market\Controllers;
 
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\Setup\Character\CharacterFactory;
@@ -37,7 +38,7 @@ class MarketBoardControllerTest extends TestCase {
         $this->createLocation([
             'x' => 16,
             'y' => 16,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -50,7 +51,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -63,7 +64,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -86,7 +87,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -99,7 +100,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -125,7 +126,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -149,7 +150,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -175,7 +176,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -201,7 +202,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -230,7 +231,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -260,7 +261,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -292,7 +293,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -318,7 +319,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
@@ -352,7 +353,7 @@ class MarketBoardControllerTest extends TestCase {
             'x' => 16,
             'y' => 16,
             'is_port' => true,
-            'game_map_id' => 1,
+            'game_map_id' => GameMap::first()->id,
             'name' => Str::random(10),
             'description' => Str::random(40),
         ]);
