@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Maps;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Values\ItemEffectsValue;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -587,7 +588,7 @@ class MapControllerApiTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
+            ->json('POST', '/api/map/set-sail/'.$port->id.'/' . $character->id, [
                 'current_port_id' => 3,
                 'time_out_value'  => 1,
                 'cost'            => 3000,
@@ -601,7 +602,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCannotSetSailNotEnoughGold() {
-        $this->createLocation([
+        $secondPort = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -609,7 +610,7 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
-        $this->createLocation([
+        $port = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -621,8 +622,8 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
-                'current_port_id' => 2,
+            ->json('POST', '/api/map/set-sail/'.$port->id.'/' . $character->id, [
+                'current_port_id' => $secondPort->id,
                 'time_out_value'  => 1,
                 'cost'            => 3000,
             ])
@@ -647,7 +648,7 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/1/' . $character->id, [])
+            ->json('POST', '/api/map/set-sail/'.Location::first()->id.'/' . $character->id, [])
             ->response;
 
         $content = json_decode($response->content());
@@ -660,7 +661,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCannotSetSailInValidData() {
-        $this->createLocation([
+        $portOne = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -669,7 +670,7 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
-        $this->createLocation([
+        $portTwo = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -682,8 +683,8 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
-                'current_port_id' => 2,
+            ->json('POST', '/api/map/set-sail/'.$portOne->id.'/' . $character->id, [
+                'current_port_id' => $portTwo->id,
                 'time_out_value'  => 0,
                 'cost'            => 0,
             ])
@@ -697,7 +698,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCanSetSail() {
-        $this->createLocation([
+        $portOne = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -706,7 +707,7 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter()->map->game_map_id,
         ]);
 
-        $this->createLocation([
+        $portTwo = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -719,8 +720,8 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/1/' . $character->id, [
-                'current_port_id' => 2,
+            ->json('POST', '/api/map/set-sail/'.$portOne->id.'/' . $character->id, [
+                'current_port_id' => $portTwo->id,
                 'time_out_value'  => 1,
                 'cost'            => 100,
             ])
@@ -740,7 +741,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCanSetSailAndGetReward() {
-        $this->createLocation([
+        $port = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -773,8 +774,8 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/2/' . $character->id, [
-                'current_port_id' => 1,
+            ->json('POST', '/api/map/set-sail/'.$location->id.'/' . $character->id, [
+                'current_port_id' => $port->id,
                 'time_out_value'  => 1,
                 'cost'            => 100,
             ])
@@ -864,7 +865,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCanSetSailAndNotGetReward() {
-        $this->createLocation([
+        $port = $this->createLocation([
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -899,8 +900,8 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
-            ->json('POST', '/api/map/set-sail/2/' . $character->id, [
-                'current_port_id' => 1,
+            ->json('POST', '/api/map/set-sail/'.$location->id.'/' . $character->id, [
+                'current_port_id' => $port->id,
                 'time_out_value'  => 1,
                 'cost'            => 100,
             ])

@@ -82,8 +82,8 @@ class InfoPageControllerTest extends TestCase
         $this->createRace(['name' => 'Human']);
 
         $this->visitRoute('info.page.race', [
-            'race' => 1,
-        ])->see(GameRace::find(1)->name);
+            'race' => GameRace::first()->id,
+        ])->see(GameRace::first()->name);
     }
 
     public function testViewClass() {
@@ -92,8 +92,8 @@ class InfoPageControllerTest extends TestCase
         $this->createClass(['name' => 'Fighter']);
 
         $this->visitRoute('info.page.class', [
-            'class' => 1,
-        ])->see(GameClass::find(1)->name);
+            'class' => GameClass::first()->id,
+        ])->see(GameClass::first()->name);
     }
 
     public function testViewSkill() {
@@ -104,8 +104,8 @@ class InfoPageControllerTest extends TestCase
         ]);
 
         $this->visitRoute('info.page.skill', [
-            'skill' => 1,
-        ])->see(GameSkill::find(1)->name);
+            'skill' => GameSkill::first()->id,
+        ])->see(GameSkill::first()->name);
     }
 
     public function testViewAdventure() {

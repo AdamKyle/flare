@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Market\Controllers\Api;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -576,7 +577,7 @@ class MarketBoardApiControllerTest extends TestCase {
 
         $response = $this->actingAs($this->character->getUser())->json('POST', '/api/market-board/sell-item/' . $character->id, [
             'list_for' => 2000,
-            'slot_id'  => 1,
+            'slot_id'  => InventorySlot::first()->id,
         ])->response;
 
         $this->assertEquals(200, $response->status());
