@@ -11,7 +11,7 @@ trait CreateUser {
         return User::factory()->create($options);
     }
 
-    public function createAdmin(array $options = [], Role $role): User {
+    public function createAdmin(Role $role, array $options = []): User {
         $user =  $this->createUser(array_merge($options, ['is_test' => false]));
 
         $user->assignRole($role->name);

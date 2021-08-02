@@ -17,7 +17,7 @@ class UpdateSilencedUserJobTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->createAdmin([], $role);
+        $this->createAdmin($role, []);
 
         $user = $this->createUser(
             [

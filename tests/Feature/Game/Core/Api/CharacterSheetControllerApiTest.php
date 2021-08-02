@@ -27,7 +27,7 @@ class CharacterSheetControllerApiTest extends TestCase {
 
         $role = $this->createAdminRole();
 
-        $this->createAdmin([], $role);
+        $this->createAdmin($role, []);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->equipStartingEquipment()

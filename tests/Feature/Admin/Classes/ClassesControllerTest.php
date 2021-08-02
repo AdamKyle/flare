@@ -25,7 +25,7 @@ class ClassesControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->class = $this->createClass();
     }

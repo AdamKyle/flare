@@ -28,7 +28,7 @@ class LocationsControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->createLocation([
             'name'                 => 'Apples',

@@ -32,7 +32,7 @@ class NpcsControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->npc = $this->createNpc([
             'game_map_id' => $this->createGameMap()->id,

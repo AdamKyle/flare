@@ -28,7 +28,7 @@ class UsersControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
     }
@@ -84,7 +84,7 @@ class UsersControllerTest extends TestCase
         Event::fake();
 
         $user = $this->character->getUser();
-        
+
         $response = $this->actingAs($this->user)->post(route('user.silence', [
             'user' => $user->id
         ]), [
@@ -119,7 +119,7 @@ class UsersControllerTest extends TestCase
         Mail::Fake();
 
         $user = $this->character->getUser();
-        
+
         $this->actingAs($this->user)->post(route('ban.user.with.reason', [
             'user' => $user->id
         ]), [
@@ -138,7 +138,7 @@ class UsersControllerTest extends TestCase
         Event::fake();
 
         $user = $this->character->getUser();
-        
+
         $this->actingAs($this->user)->post(route('ban.user.with.reason', [
             'user' => $user->id
         ]), [
@@ -157,7 +157,7 @@ class UsersControllerTest extends TestCase
         Mail::fake();
 
         $user = $this->character->getUser();
-        
+
         $response = $this->actingAs($this->user)->post(route('ban.user.with.reason', [
             'user' => $this->character->getUser()->id
         ]), [
@@ -176,7 +176,7 @@ class UsersControllerTest extends TestCase
     public function testCannotBanUserUnknownLength() {
         Queue::fake();
         Event::fake();
-        
+
         $response = $this->actingAs($this->user)->post(route('ban.user', [
             'user' => $this->character->getUser()->id
         ]), [])->response;
@@ -193,7 +193,7 @@ class UsersControllerTest extends TestCase
 
         $character = $this->character->banCharacter();
         $user      = $character->getUser();
-        
+
         $response = $this->actingAs($this->user)->post(route('unban.user', [
             'user' => $user->id
         ]))->response;

@@ -23,7 +23,7 @@ class MessageControllerApiTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->createAdmin([], $role);
+        $this->createAdmin($role, []);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 

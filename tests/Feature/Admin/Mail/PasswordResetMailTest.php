@@ -23,7 +23,7 @@ class PasswordResetMailTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         Mail::fake();
     }
@@ -43,5 +43,5 @@ class PasswordResetMailTest extends TestCase
         ]));
 
         Mail::assertSent(ResetPasswordEmail::class);
-    } 
+    }
 }

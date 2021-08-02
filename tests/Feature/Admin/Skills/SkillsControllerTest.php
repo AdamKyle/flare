@@ -27,7 +27,7 @@ class SkillsControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->gameSkill = $this->createGameSkill();
     }

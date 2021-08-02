@@ -38,7 +38,7 @@ class AffixesControllerTest extends TestCase
 
         $role = $this->createAdminRole();
 
-        $this->user = $this->createAdmin([], $role);
+        $this->user = $this->createAdmin($role, []);
 
         $this->affix = $this->createItemAffix();
     }
