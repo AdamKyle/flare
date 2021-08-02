@@ -3,6 +3,7 @@
 namespace Tests\Unit\Flare\Models;
 
 use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
@@ -20,7 +21,7 @@ class BuildingInQueueTest extends TestCase
     public function testGetCharacter() {
 
         $this->createBuildingQueue();
-        
+
         $buildingInQueue = BuildingInQueue::first();
 
         $this->assertNotNull($buildingInQueue->character);
@@ -29,7 +30,7 @@ class BuildingInQueueTest extends TestCase
     public function testGetKingdom() {
 
         $this->createBuildingQueue();
-        
+
         $buildingInQueue = BuildingInQueue::first();
 
         $this->assertNotNull($buildingInQueue->kingdom);
@@ -42,7 +43,7 @@ class BuildingInQueueTest extends TestCase
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -50,9 +51,9 @@ class BuildingInQueueTest extends TestCase
             'current_population' => 0,
         ]);
 
-        $this->createKingdomBuilding([
+        $building = $this->createKingdomBuilding([
             'game_building_id'   => $this->createGameBuilding()->id,
-            'kingdom_id'        => 1,
+            'kingdom_id'         => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -61,9 +62,9 @@ class BuildingInQueueTest extends TestCase
         ]);
 
         $this->createKingdomBuildingQueue([
-            'character_id' => 1,
+            'character_id' => $character->id,
             'kingdom_id'   => $kingdom->id,
-            'building_id'  => 1,
+            'building_id'  => $building->id,
             'to_level'     => 2,
             'completed_at' => now()->addMinutes(150)
         ]);

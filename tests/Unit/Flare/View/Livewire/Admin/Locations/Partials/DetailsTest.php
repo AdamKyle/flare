@@ -26,7 +26,7 @@ class DetailsTest extends TestCase
     }
 
     public function testCreateValidLocation() {
-        $this->createGameMap([
+        $map = $this->createGameMap([
             'name' => 'Apples',
             'path' => 'test',
             'default' => true
@@ -36,7 +36,7 @@ class DetailsTest extends TestCase
                                     ->set('location.description', 'something')
                                     ->set('location.x', 10)
                                     ->set('location.y', 10)
-                                    ->set('location.game_map_id', 1)
+                                    ->set('location.game_map_id', $map->id)
                                     ->call('validateInput', 'nextStep', 2);
 
         // Assert Location was created:
@@ -84,7 +84,7 @@ class DetailsTest extends TestCase
             'x'                    => 1,
             'y'                    => 1,
         ]);
-        
+
         Livewire::test(Details::class, ['location' => $location->toArray()])->assertSet('location.name', $location->name);
     }
 }

@@ -17,11 +17,10 @@ class ItemTest extends TestCase
 
     public function testGetInventorySlot() {
 
-        (new CharacterFactory)->createBaseCharacter()->equipStartingEquipment();
+        $character = (new CharacterFactory)->createBaseCharacter()->equipStartingEquipment()->getCharacter();
 
-        $item = Item::first();
 
-        $this->assertNotNull($item->slot);
+        $this->assertNotNull($character->inventory->slots()->where('equipped', true)->first());
     }
 
     public function getSuffixItemBaseACMod() {

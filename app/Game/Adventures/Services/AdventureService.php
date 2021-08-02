@@ -271,7 +271,7 @@ class AdventureService {
 
         $drop      = $this->rewardBuilder->fetchDrops($monster, $this->character, $this->adventure, $dropChanceBonus);
         $questDrop = $this->rewardBuilder->fetchQuestItemFromMonster($monster, $this->character, $this->adventure, $this->rewards, $dropChanceBonus);
-        $gold      = $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure);
+        $gold      = $this->rewardBuilder->fetchGoldRush($monster, $this->character, $this->adventure, $dropChanceBonus);
 
         if (!is_null($drop)) {
             $this->rewards['items'][] = [

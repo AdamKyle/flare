@@ -20,12 +20,12 @@ class DataTableTest extends TestCase
 
     public function testTheComponentLoads()
     {
-        $this->createGameUnit();
-        $this->createGameBuilding();
+        $unit = $this->createGameUnit();
+        $building = $this->createGameBuilding();
 
         GameBuildingUnit::create([
-            'game_unit_id' => 1,
-            'game_building_id' => 1,
+            'game_unit_id' => $unit->id,
+            'game_building_id' => $building->id,
             'required_level' => 1,
         ]);
 

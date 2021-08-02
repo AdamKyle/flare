@@ -15,12 +15,10 @@ class MonsterTest extends TestCase
 
     public function testGetGameMap() {
 
-        $this->createGameMap();
-
         $monster = $this->createMonster([
-            'game_map_id' => 1
+            'game_map_id' => $this->createGameMap()->id,
         ]);
-        
+
         $this->assertNotNull($monster->gameMap);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use App\Flare\Models\GameMap;
 use DB;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +18,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomGetsUpdated() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'last_walked'        => now(),
@@ -75,7 +76,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $this->createKingdom([
             'character_id'       => $characterFactory->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'last_walked'        => now(),
         ]);
@@ -120,7 +121,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomMaxPopulationGetsSetAsCurrentPopulation() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'max_population'     => 1,
@@ -167,7 +168,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomMaxResourceGetsSetAsCurrentResourse() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_wood'       => 0,
             'max_wood'           => 1,
@@ -214,7 +215,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDecreasesMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0.10,
@@ -261,7 +262,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomAdjustMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'last_walked'        => now(),
@@ -308,7 +309,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotAddMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 1.0,
@@ -360,7 +361,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomSetMoraleToOne() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0,
@@ -412,7 +413,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotReduceMorale() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => 0,
@@ -463,7 +464,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotReduceMoraleBelowZero() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => .50,
@@ -514,7 +515,7 @@ class KingdomResourcesServiceTest extends TestCase {
     public function testKingdomDoNotAdjustMoraleBelowZero() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
             'current_morale'     => .50,
@@ -576,7 +577,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $this->createKingdom([
             'character_id'       => $characterFactory->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_morale'     => 0,
             'treasury'           => 1000,

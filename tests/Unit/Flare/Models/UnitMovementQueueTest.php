@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Flare\Models;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
@@ -19,7 +21,22 @@ class UnitMovementQueueTest extends TestCase
     public function testGetKingdom() {
         $this->createTestKingdom();
 
-        $this->createUnitMovementQueue();
+        $this->createUnitMovementQueue([
+            'character_id'    => Character::first()->id,
+            'from_kingdom_id' => Kingdom::first()->id,
+            'to_kingdom_id'   => Kingdom::first()->id,
+            'units_moving'    => [],
+            'completed_at'    => now()->addDays(250),
+            'started_at'      => now(),
+            'moving_to_x'     => 1,
+            'moving_to_y'     => 0,
+            'from_x'          => 0,
+            'from_y'          => 1,
+            'is_attacking'    => true,
+            'is_recalled'     => false,
+            'is_returning'    => false,
+            'is_moving'       => false,
+        ]);
 
         $this->assertNotNull(UnitMovementQueue::first()->from_kingdom);
         $this->assertNotNull(UnitMovementQueue::first()->to_kingdom);
@@ -28,12 +45,27 @@ class UnitMovementQueueTest extends TestCase
     public function testSetUnitsInMovement() {
         $this->createTestKingdom();
 
-        $unit = $this->createUnitMovementQueue();
+        $unit = $this->createUnitMovementQueue([
+            'character_id'    => Character::first()->id,
+            'from_kingdom_id' => Kingdom::first()->id,
+            'to_kingdom_id'   => Kingdom::first()->id,
+            'units_moving'    => [],
+            'completed_at'    => now()->addDays(250),
+            'started_at'      => now(),
+            'moving_to_x'     => 1,
+            'moving_to_y'     => 0,
+            'from_x'          => 0,
+            'from_y'          => 1,
+            'is_attacking'    => true,
+            'is_recalled'     => false,
+            'is_returning'    => false,
+            'is_moving'       => false,
+        ]);
 
         $unit->update([
             'units_moving' => [
                 [
-                    'unit_id' => 1,
+                    'unit_id' => $unit->id,
                     'amount'  => 200,
                 ]
             ]
@@ -49,7 +81,7 @@ class UnitMovementQueueTest extends TestCase
 
         return $this->createKingdom([
             'character_id'       => $character->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,

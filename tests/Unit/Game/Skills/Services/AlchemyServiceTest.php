@@ -26,7 +26,7 @@ class AlchemyServiceTest extends TestCase
         ]))->updateCharacter([
             'gold_dust' => 10000,
             'shards'    => 100,
-        ]);
+        ])->givePlayerLocation();
 
         $this->item = $this->createItem([
             'can_craft' => true,

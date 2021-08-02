@@ -30,6 +30,7 @@ class AdventureJobTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                          ->createAdventureLog($adventure)
+                                         ->givePlayerLocation()
                                          ->getCharacter();
 
         Event::fake();

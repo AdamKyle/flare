@@ -29,7 +29,7 @@ class UpdateCharacterAttackEventTest extends TestCase
                                          ])
                                          ->inventoryManagement()
                                          ->giveItem($item)
-                                         ->equipLeftHand($itemName)
+                                         ->equipLeftHand($item->name)
                                          ->getCharacterFactory()
                                          ->getCharacter();
 

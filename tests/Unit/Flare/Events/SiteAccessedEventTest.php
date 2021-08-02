@@ -15,7 +15,7 @@ use App\Flare\Models\UserSiteAccessStatistics;
 
 class SiteAccessedEventTest extends TestCase {
 
-    use RefreshDatabase, CreateUser, CreateRole, CreateUserSiteAccessStatistics;
+    use CreateUser, CreateRole, CreateUserSiteAccessStatistics;
 
 
     public function setUp(): void {
@@ -51,7 +51,8 @@ class SiteAccessedEventTest extends TestCase {
     }
 
     public function testSetsRecordWithOutAdmin() {
-        User::first()->delete();
+
+        User::doesntHave('character')->first()->delete();
 
         event(new Login('auth', User::first(), false));
 
@@ -59,7 +60,7 @@ class SiteAccessedEventTest extends TestCase {
     }
 
     public function testSetsRecordWhenOneExistsWithOutAdmin() {
-        User::first()->delete();
+        User::doesntHave('character')->first()->delete();
 
         $this->createUserSiteAccessStatistics();
 
@@ -69,7 +70,7 @@ class SiteAccessedEventTest extends TestCase {
     }
 
     public function testSetsRecordWhenJustSigningInWithOutAdmin() {
-        User::first()->delete();
+        User::doesntHave('character')->first()->delete();
 
         $this->createUserSiteAccessStatistics();
 

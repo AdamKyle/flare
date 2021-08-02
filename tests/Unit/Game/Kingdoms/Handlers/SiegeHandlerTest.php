@@ -116,7 +116,7 @@ class SiegeHandlerTest extends TestCase {
         }
     }
 
-    public function testAttackKingdomWhereDefenderHasSeiegeUnits() {
+    public function testAttackKingdomWhereDefenderHasSiegeUnits() {
         $unitsToAttack = $this->createAtackingUnits();
         $defender      = $this->createEnemyKingdom()->assignUnits([
             'siege_weapon' => true,
@@ -127,7 +127,7 @@ class SiegeHandlerTest extends TestCase {
 
         $siegeHandler  = resolve(SiegeHandler::class);
 
-        $defender->buildings->find(4)->update([
+        $defender->buildings->where('is_farm', false)->where('is_walls', false)->first()->update([
             'current_durability' => 20000,
             'current_defence'    => 20000
         ]);
@@ -143,7 +143,7 @@ class SiegeHandlerTest extends TestCase {
         $this->assertEquals(0, $farm->current_durability);
         $this->assertEquals(0, $walls->current_durability);
 
-        $buildingThatHasntFallen = $defender->buildings->find(4);
+        $buildingThatHasntFallen = $defender->buildings->where('current_durability', '>', 0)->first();
 
         $this->assertNotEquals(0, $buildingThatHasntFallen->current_durability);
     }

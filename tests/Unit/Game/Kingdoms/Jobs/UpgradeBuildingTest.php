@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
@@ -19,7 +21,7 @@ class UpgradeBuildingTest extends TestCase
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
         ]);
 
         $kingdom->buildings()->create([
@@ -41,12 +43,12 @@ class UpgradeBuildingTest extends TestCase
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
         ]);
 
         $kingdom->buildings()->create([
             'game_building_id'   => $this->createGameBuilding(['is_farm' => true])->id,
-            'kingdom_id'        => $kingdom->id,
+            'kingdom_id'          => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 300,
             'current_durability' => 300,
@@ -54,15 +56,15 @@ class UpgradeBuildingTest extends TestCase
             'max_durability'     => 300,
         ]);
 
-        $this->createKingdomBuildingQueue([
-            'character_id' => 1,
-            'kingdom_id'   => 1,
-            'building_id'  => 1,
+        $queue = $this->createKingdomBuildingQueue([
+            'character_id' => Character::first()->id,
+            'kingdom_id'   => $kingdom->id,
+            'building_id'  => $kingdom->buildings->first()->id,
             'to_level'     => 2,
         ]);
 
-        UpgradeBuilding::dispatch(KingdomBuilding::first(), User::first(), 1);
-        
+        UpgradeBuilding::dispatch($kingdom->buildings->first(), User::first(), $queue->id);
+
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->buildings->first()->level === 2);
@@ -73,7 +75,7 @@ class UpgradeBuildingTest extends TestCase
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
         ]);
 
         $kingdom->buildings()->create([
@@ -93,14 +95,14 @@ class UpgradeBuildingTest extends TestCase
         ]);
 
         $this->createKingdomBuildingQueue([
-            'character_id' => 1,
-            'kingdom_id'   => 1,
-            'building_id'  => 1,
+            'character_id' => Character::first()->id,
+            'kingdom_id'   => $kingdom->id,
+            'building_id'  => $kingdom->buildings->first()->id,
             'to_level'     => 2,
         ]);
 
         UpgradeBuilding::dispatch(KingdomBuilding::first(), User::first(), 1);
-        
+
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->buildings->first()->level === 1);

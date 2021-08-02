@@ -48,6 +48,7 @@ class AdventureServiceTest extends TestCase
         $item      = $this->createItem(['name' => 'Item Name']);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->updateCharacter(['can_move' => false])
                                         ->levelCharacterUp(100)
                                         ->inventoryManagement()
@@ -87,6 +88,7 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -133,6 +135,7 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure($monster, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
             ->levelCharacterUp(10)
             ->updateCharacter(['can_move' => false])
             ->createAdventureLog($adventure)
@@ -195,6 +198,7 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure($monster, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
             ->levelCharacterUp(10)
             ->updateCharacter(['can_move' => false])
             ->createAdventureLog($adventure)
@@ -247,6 +251,7 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -289,6 +294,7 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -322,6 +328,7 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -375,6 +382,7 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [
@@ -437,6 +445,7 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [
@@ -485,6 +494,7 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [
@@ -540,6 +550,7 @@ class AdventureServiceTest extends TestCase
 
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -589,6 +600,7 @@ class AdventureServiceTest extends TestCase
 
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -636,6 +648,7 @@ class AdventureServiceTest extends TestCase
 
 
         $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)

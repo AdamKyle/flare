@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Flare\Models;
 
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
@@ -16,15 +17,17 @@ class UnitInQueueTest extends TestCase
         CreateKingdom,
         CreateGameUnit;
 
-    public function testGetCharacter() {
-        $this->createTestKingdom();
+    private $charactr;
 
-        $this->createGameUnit();
+    public function testGetCharacter() {
+        $kingdom = $this->createTestKingdom();
+
+        $gameUnit = $this->createGameUnit();
 
         $this->createUnitQueue([
-            'character_id' => 1,
-            'kingdom_id'   => 1,
-            'game_unit_id' => 1,
+            'character_id' => $this->character->id,
+            'kingdom_id'   => $kingdom->id,
+            'game_unit_id' => $gameUnit->id,
             'amount'       => 100,
         ]);
 
@@ -32,13 +35,13 @@ class UnitInQueueTest extends TestCase
     }
 
     protected function createTestKingdom(): Kingdom {
-        $character = (new CharacterFactory)->createBaseCharacter()
+        $this->character = (new CharacterFactory)->createBaseCharacter()
                                            ->givePlayerLocation()
                                            ->getCharacter();
 
         return $this->createKingdom([
-            'character_id'       => $character->id,
-            'game_map_id'        => 1,
+            'character_id'       => $this->character->id,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,

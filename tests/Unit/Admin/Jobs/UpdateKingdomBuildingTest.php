@@ -7,17 +7,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateKingdom;
 
 class UpdateKingdomBuildingTest extends TestCase
 {
-    use RefreshDatabase, CreateKingdom, CreateGameBuilding;
+    use RefreshDatabase, CreateKingdom, CreateGameBuilding, CreateGameMap;
 
     public function testKingdomBuildingGetsUpdated()
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => $this->createGameMap()->id,
             'current_wood'       => 500,
             'current_population' => 0,
         ]);

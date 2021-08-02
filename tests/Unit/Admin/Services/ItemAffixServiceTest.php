@@ -12,7 +12,7 @@ use Tests\Setup\Character\CharacterFactory;
 
 class ItemAffixServiceTest extends TestCase
 {
-    use RefreshDatabase, CreateItem, CreateItemAffix;
+    use CreateItem, CreateItemAffix;
 
     private $character;
 

@@ -25,6 +25,7 @@ class DisenchantingControllerTest extends TestCase
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->assignSkill($this->createGameSkill([
                                                      'type' => SkillTypeValue::DISENCHANTING,
                                                  ]))
@@ -37,7 +38,7 @@ class DisenchantingControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $response = $this->actingAs($character->user)->json('POST', '/api/disenchant/' . $this->item->id)->response;
-
+        //dd(json_decode($response->content()));
         $this->assertEquals(200, $response->status());
 
         $foundItem = $character->refresh()->inventory->slots->filter(function($slot) {

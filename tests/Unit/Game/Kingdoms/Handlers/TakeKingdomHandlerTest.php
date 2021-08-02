@@ -97,6 +97,7 @@ class TakeKingdomHandlerTest extends TestCase {
 
     protected function createUnitMovement(Kingdom $defenderKingdom, Kingdom $attackingKingdom): UnitMovementQueue {
         return $this->createUnitMovementQueue([
+            'character_id'       => $attackingKingdom->character->id,
             'from_kingdom_id'    => $attackingKingdom->id,
             'to_kingdom_id'      => $defenderKingdom->id,
             'units_moving'       => $this->getUnitsInMovement($attackingKingdom),

@@ -63,9 +63,7 @@ class SkillModifiers extends Component
 
             if (!$this->disabledSelection) {
                 if (empty($this->selectedMonsters)) {
-                    $this->skill->game_class_id = $this->selectedClass;
-
-                    AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), null, $this->selectedClass);
+                    AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), null);
                 } else {
                     foreach ($this->selectedMonsters as $monsterId) {
                         AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), $monsterId);

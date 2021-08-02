@@ -29,10 +29,10 @@ class ItemModifiersTest extends TestCase
         Livewire::test(ItemModifiers::class, [
             'item' => $this->createItem(),
         ])->call('validateInput', 'nextStep', 2);
-          
+
 
         // Assert Item modifier was not created:
-        $this->assertNull(Item::where('effects', 'walk-on-water')->first());
+        $this->assertNull(Item::where('effect', 'walk-on-water')->first());
     }
 
     public function TestAddModifier() {
@@ -40,15 +40,15 @@ class ItemModifiersTest extends TestCase
             'item' => $this->createItem(),
         ])->set('item.effects', 'walk-on-water')
           ->call('validateInput', 'nextStep', 2);
-          
+
 
         // Assert Item modifier was created:
-        $this->assertNotNull(Item::where('effects', 'walk-on-water')->first());
+        $this->assertNotNull(Item::where('effect', 'walk-on-water')->first());
     }
 
     public function testInitialAffixIsArray() {
         $item = $this->createItem();
-        
+
         Livewire::test(ItemModifiers::class, ['item' => $item->toArray()])->assertSet('item.name', $item->name);
     }
 }

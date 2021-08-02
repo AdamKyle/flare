@@ -19,7 +19,7 @@ class AssignSkillsJob implements ShouldQueue
 
     /**
      * Who is the skill for?
-     * 
+     *
      * @var String $for
      */
     public $for;
@@ -35,11 +35,6 @@ class AssignSkillsJob implements ShouldQueue
     public $monsterId;
 
     /**
-     * @var int $classId | null
-     */
-    public $classId;
-
-    /**
      * @var User $adminUser
      */
     public $adminUser;
@@ -49,18 +44,17 @@ class AssignSkillsJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $for, GameSkill $skill, User $adminUser, int $monsterId = null, int $classId = null)
+    public function __construct(string $for, GameSkill $skill, User $adminUser, int $monsterId = null)
     {
         $this->for       = $for;
         $this->skill     = $skill;
         $this->monsterId = $monsterId;
-        $this->classId   = $classId;
         $this->adminUser = $adminUser;
     }
 
     /**
      * Attempt to assign the skill.
-     * 
+     *
      * If the skill should fail to be asigned to the intended target for any reason, we email
      * the administrator with the error message.
      *
@@ -70,10 +64,10 @@ class AssignSkillsJob implements ShouldQueue
     public function handle(AssignSkillService $service)
     {
         try {
-            $service->assignSkill($this->for, $this->skill, $this->monsterId, $this->classId);
+            $service->assignSkill($this->for, $this->skill, $this->monsterId);
         } catch (\Exception $e) {
             $message = 'Something went wrong trying to assign the skills: ' . $e->getMessage();
-            
+
             Mail::to($this->adminUser->email)->send(new GenericMail($this->adminUser, $message, 'Failed to assign skill'));
         }
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Admin\Jobs;
 
+use App\Flare\Models\GameMap;
 use Mail;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +25,7 @@ class UpdateKingdomBuildingsTest extends TestCase
 
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
         ]);
@@ -57,7 +58,7 @@ class UpdateKingdomBuildingsTest extends TestCase
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
         ]);
@@ -90,7 +91,7 @@ class UpdateKingdomBuildingsTest extends TestCase
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
         ]);
@@ -117,7 +118,7 @@ class UpdateKingdomBuildingsTest extends TestCase
             'max_durability' => 300,
         ]);
 
-        UpdateKingdomBuildings::dispatch($building->refresh(), [1], 5);
+        UpdateKingdomBuildings::dispatch($building->refresh(), [$unit->id], 5);
 
         $kingdom  = $kingdom->refresh();
         $building = $kingdom->buildings->first();

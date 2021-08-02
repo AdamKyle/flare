@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\GameMap;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
 use Tests\Setup\Character\CharacterFactory;
@@ -17,7 +18,7 @@ class RecruitUnitsTest extends TestCase
     {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
         ]);
 
         $unit = $this->createGameUnit();

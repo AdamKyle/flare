@@ -7,6 +7,12 @@ use App\Flare\Models\Role;
 trait CreateRole {
 
     public function createAdminRole(): Role {
-        return Role::create(['name' => 'Admin']);
+        $role = Role::where('name', 'Admin')->first();
+
+        if (is_null($role)) {
+            return Role::create(['name' => 'Admin']);
+        }
+
+        return $role;
     }
 }

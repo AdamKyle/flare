@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Kingdom;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Jobs\MoveUnits;
@@ -46,7 +48,7 @@ class MoveUnitsTest extends TestCase {
 
         $this->createKingdom([
             'character_id'       => $character->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
@@ -54,7 +56,20 @@ class MoveUnitsTest extends TestCase {
             'current_population' => 0,
         ]);
 
-        $unit = $this->createUnitMovementQueue();
+        $unit = $this->createUnitMovementQueue([
+            'character_id'    => $character->id,
+            'from_kingdom_id' => Kingdom::first()->id,
+            'to_kingdom_id'   => Kingdom::first()->id,
+            'units_moving'    => [],
+            'completed_at'    => now()->addMinutes(45),
+            'started_at'      => now(),
+            'moving_to_x'     => 16,
+            'moving_to_y'     => 16,
+            'from_x'          => 0,
+            'from_y'          => 0,
+            'is_recalled'     => false,
+            'is_returning'    => false,
+        ]);
 
         $unit->update([
             'units_moving' => [

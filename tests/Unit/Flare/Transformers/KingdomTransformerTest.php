@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Flare\Transformers;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,9 +18,9 @@ use Tests\Traits\CreateKingdomBuilding;
 
 class KingdomTransformerTest extends TestCase
 {
-    use RefreshDatabase, 
-        CreateKingdom, 
-        CreateKingdomBuilding, 
+    use RefreshDatabase,
+        CreateKingdom,
+        CreateKingdomBuilding,
         CreateGameBuilding,
         CreateGameUnit,
         CreateGameBuildingUnit;
@@ -32,7 +33,7 @@ class KingdomTransformerTest extends TestCase
 
         $kingdom = new Item($kingdom, $kingdomTransfromer);
         $kingdom = $manager->createData($kingdom)->toArray();
-        
+
         $this->assertNotEmpty($kingdom['data']['recruitable_units']);
     }
 
@@ -43,7 +44,7 @@ class KingdomTransformerTest extends TestCase
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,

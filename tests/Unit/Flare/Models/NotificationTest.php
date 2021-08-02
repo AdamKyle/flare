@@ -13,9 +13,9 @@ use Tests\Traits\CreateUser;
 
 class NotificationTest extends TestCase
 {
-    use RefreshDatabase, 
-        CreateUser, 
-        CreateCharacter, 
+    use RefreshDatabase,
+        CreateUser,
+        CreateCharacter,
         CreateRace,
         CreateClass,
         CreateNotification,
@@ -32,7 +32,7 @@ class NotificationTest extends TestCase
             'message' => 'Sample',
             'status' => 'test',
             'type' => 'test',
-            'read' => 'test',
+            'read' => 0,
             'url' => 'test',
             'adventure_id' => $this->createNewAdventure()->id
         ]);
