@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Game\Core;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 
 class SettingsControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     private $character;
 
