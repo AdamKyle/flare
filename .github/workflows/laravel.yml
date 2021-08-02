@@ -44,6 +44,7 @@ jobs:
         DB_PORT: 33306
         DB_USER: root
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        TIME_ZONE: America/Edmonton
       run: |
         php artisan migrate
     - name: Execute tests (Unit and Feature tests) via PHPUnit
