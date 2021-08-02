@@ -22,7 +22,7 @@ class UserAccessSiteStatisticsControllerApiTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->admin = $this->createAdmin([], $this->createAdminRole());
+        $this->admin = $this->createAdmin($this->createAdminRole(), []);
     }
 
     public function tearDown(): void {

@@ -21,7 +21,7 @@ class SiteAccessedEventTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->createAdmin([], $this->createAdminRole());
+        $this->createAdmin($this->createAdminRole(), []);
     }
 
     public function tearDown(): void {

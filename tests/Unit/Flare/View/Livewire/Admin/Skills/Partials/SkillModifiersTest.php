@@ -90,7 +90,7 @@ class SkillModifiersTest extends TestCase
     public function testFailToSaveModifierWhenMofiersAreEmpty() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -118,7 +118,7 @@ class SkillModifiersTest extends TestCase
     public function testFailToSaveModifierWhenMofiersAreBelowZero() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -146,7 +146,7 @@ class SkillModifiersTest extends TestCase
     public function testFailToSaveModifierWhenNoMonsterSelected() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -168,7 +168,7 @@ class SkillModifiersTest extends TestCase
     public function testAssignToAll() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
@@ -187,7 +187,7 @@ class SkillModifiersTest extends TestCase
     public function testDontAssignToAllWhenBothHaveTheSkill() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $skill = $this->createGameSkill();
 
@@ -213,7 +213,7 @@ class SkillModifiersTest extends TestCase
 
     public function testAssignToClasses() {
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
@@ -230,7 +230,7 @@ class SkillModifiersTest extends TestCase
 
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $skill = $this->createGameSkill();
@@ -259,7 +259,7 @@ class SkillModifiersTest extends TestCase
 
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
@@ -280,7 +280,7 @@ class SkillModifiersTest extends TestCase
     public function testDontAssignToMonsterWhenMonsterHasSkill() {
         $monster = $this->createMonster();
 
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $skill = $this->createGameSkill();
 
@@ -302,7 +302,7 @@ class SkillModifiersTest extends TestCase
     }
 
     public function testFailToAssignToUnknownMonster() {
-        $this->actingAs($this->createAdmin([], $this->createAdminRole()));
+        $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
         $skill = $this->createGameSkill();
 
