@@ -223,7 +223,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'sold_for' => 200,
         ]);
 
-        $response = $this->actingAs($this->createAdmin([], $this->createAdminRole()))->json('GET', '/api/market-board/history')->response;
+        $response = $this->actingAs($this->createAdmin($this->createAdminRole(), []))->json('GET', '/api/market-board/history')->response;
 
         $content = json_decode($response->content());
 
