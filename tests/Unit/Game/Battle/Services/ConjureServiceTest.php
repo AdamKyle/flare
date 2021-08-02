@@ -228,4 +228,96 @@ class ConjureServiceTest extends TestCase
 
         $this->assertTrue(CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty());
     }
+
+    public function testMovementConjuresCelestialEntity() {
+        $conjureService = resolve(ConjureService::class);
+
+        $this->createNpc([
+            'type' => NpcTypes::SUMMONER
+        ]);
+
+        $this->createMonster([
+            'is_celestial_entity' => true,
+            'gold_cost'           => 1000,
+            'gold_dust_cost'      => 1000,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $conjureService->movementConjure($character);
+
+        $this->assertTrue(CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty());
+    }
+
+    public function testMovementConjuresCelestialEntityThatDamagesKingdom() {
+        $this->createNpc([
+            'type' => NpcTypes::SUMMONER
+        ]);
+
+        $this->createMonster([
+            'is_celestial_entity' => true,
+            'gold_cost'           => 1000,
+            'gold_dust_cost'      => 1000,
+        ]);
+
+        $character = $this->character->kingdomManagement()->assignKingdom([
+            'x_position' => 16,
+            'y_position' => 16,
+            'current_morale' => 100,
+        ])->assignBuilding()->assignUnits()->getCharacter();
+
+        $conjure = \Mockery::mock(ConjureService::class, [
+            resolve(Manager::class),
+            resolve(KingdomTransformer::class),
+            resolve(CharacterSheetTransformer::class),
+            resolve(NpcServerMessageBuilder::class),
+        ])->makePartial();
+
+        $this->app->instance(ConjureService::class, $conjure);
+
+        $conjure->shouldReceive('canDamageKingdom')->once()->andReturn(true);
+        $conjure->shouldReceive('getXPosition')->once()->andReturn(16);
+        $conjure->shouldReceive('getYPosition')->once()->andReturn(16);
+
+        $conjureService = resolve(ConjureService::class);
+
+        $conjureService->movementConjure($character);
+
+        $this->assertTrue(CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty());
+        $this->assertTrue($character->refresh()->kingdoms->first()->current_morale < 100);
+    }
+
+    public function testMovementDoesNotConjuresCelestialEntity() {
+        $this->createNpc([
+            'type' => NpcTypes::SUMMONER
+        ]);
+
+        $monster = $this->createMonster([
+            'is_celestial_entity' => true,
+            'gold_cost'           => 1000,
+            'gold_dust_cost'      => 1000,
+        ]);
+
+        $this->createCelestialFight([
+            'monster_id'      => $monster->id,
+            'character_id'    => null,
+            'conjured_at'     => now(),
+            'x_position'      => 126,
+            'y_position'      => 176,
+            'current_health'  => 100,
+            'max_health'      => 100,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'type'            => CelestialConjureType::PUBLIC,
+        ]);
+
+        $conjureService = resolve(ConjureService::class);
+
+        $character = $this->character->getCharacter();
+
+        $conjureService->movementConjure($character);
+
+        $this->assertCount(1, CelestialFight::all());
+    }
 }

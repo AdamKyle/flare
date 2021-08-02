@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
-use App\Game\Skills\Values\SkillTypeValue;
+use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Values\SkillTypeValue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -37,8 +39,14 @@ class DisenchantingControllerTest extends TestCase
     public function testCanDisenchantItem() {
         $character = $this->character->getCharacter();
 
+        $disenchantingService = Mockery::mock(DisenchantService::class)->makePartial();
+
+        $this->app->instance(DisenchantService::class, $disenchantingService);
+
+        $disenchantingService->shouldReceive('characterRoll')->once()->andReturn(1000);
+
         $response = $this->actingAs($character->user)->json('POST', '/api/disenchant/' . $this->item->id)->response;
-        //dd(json_decode($response->content()));
+
         $this->assertEquals(200, $response->status());
 
         $foundItem = $character->refresh()->inventory->slots->filter(function($slot) {

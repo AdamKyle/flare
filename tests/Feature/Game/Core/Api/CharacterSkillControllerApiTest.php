@@ -61,7 +61,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                 'type' => 'weapon',
             ])
             ->response;
-        dump(json_decode($response->content()));
+
         $this->assertEquals(200, $response->status());
         $this->assertFalse($currentGold === $this->character->getCharacter()->gold);
     }

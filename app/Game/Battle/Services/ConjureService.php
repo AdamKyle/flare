@@ -80,7 +80,7 @@ class ConjureService {
         $plane = $monster->gameMap->name;
 
         $types = ['has awoken', 'has angered', 'has enraged', 'has set free', 'has set loose'];
-        $randomIndex = rand(0, count($types));
+        $randomIndex = rand(0, count($types) - 1);
 
         event(new GlobalMessageEvent($character->name . ' ' . $types[$randomIndex] . ': ' . $monster->name . ' on the ' . $plane . ' plane at (X/Y): ' . $x . '/' . $y));
 
