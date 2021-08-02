@@ -47,5 +47,5 @@ jobs:
         DB_PASSWORD: password
         TIME_ZONE: America/Edmonton
       run: |
-      php artisan migrate
-      vendor/bin/phpunit --stop-on-failure
+        php artisan migrate
+        vendor/bin/phpunit --stop-on-failure
