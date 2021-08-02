@@ -9,15 +9,15 @@
     </exclude>
   </coverage>
   <testsuites>
-    <testsuite name="Feature">
-      <directory suffix="Test.php">./tests/Console</directory>
-    </testsuite>
+<!--    <testsuite name="Feature">-->
+<!--      <directory suffix="Test.php">./tests/Console</directory>-->
+<!--    </testsuite>-->
     <testsuite name="Feature">
       <directory suffix="Test.php">./tests/Feature</directory>
     </testsuite>
-    <testsuite name="Unit">
-      <directory suffix="Test.php">./tests/Unit</directory>
-    </testsuite>
+<!--    <testsuite name="Unit">-->
+<!--      <directory suffix="Test.php">./tests/Unit</directory>-->
+<!--    </testsuite>-->
   </testsuites>
   <php>
       <ini name="memory_limit" value="-1" />
