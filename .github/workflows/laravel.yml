@@ -5,37 +5,76 @@ on: [push]
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
-    services:
-      mysql-service:
-        image: mysql:8.0.25
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: flare_test
-        ports:
-          - 33306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 8.0
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
-    - name: Install Dependencies (composer)
-      run: |
-        rm -rf vendor
-        composer install
-        yarn install
-    - name: Generate key
-      run: php artisan key:generate
-    - name: Link Storage
-      run: php artisan storage:link
-    - name: Install dependencies (laravel mix)
-      run: yarn run prod
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      run: vendor/bin/phpunit
+      - uses: actions/checkout@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Install Dependencies
+        run: |
+          rm -rf vendor
+          composer install
+          yarn install
+      - name: Generate key
+        run: php artisan key:generate
+      - name: Link Storage
+        run: php artisan storage:link
+      - name: Create Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+      - name: Install dependencies (laravel mix)
+        run: yarn run prod
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: |
+          cp phpunit.xml.ci phpunit.xml
+          vendor/bin/phpunit
+
+
+#name: Laravel
+#
+#on: [push]
+#
+#jobs:
+#  laravel-tests:
+#    runs-on: ubuntu-latest
+#    services:
+#      mysql-service:
+#        image: mysql:8.0.25
+#        env:
+#          MYSQL_ROOT_PASSWORD: password
+#          MYSQL_DATABASE: flare_test
+#        ports:
+#          - 33306:3306
+#        options: >-
+#          --health-cmd="mysqladmin ping"
+#          --health-interval=10s
+#          --health-timeout=5s
+#          --health-retries=3
+#    steps:
+#    - uses: actions/checkout@v1
+#    - name: Setup PHP
+#      uses: shivammathur/setup-php@v2
+#      with:
+#        php-version: 8.0
+#    - name: Copy .env
+#      run: php -r "file_exists('.env') || copy('.env.ci', '.env');"
+#    - name: Install Dependencies (composer)
+#      run: |
+#        rm -rf vendor
+#        composer install
+#        yarn install
+#    - name: Generate key
+#      run: php artisan key:generate
+#    - name: Link Storage
+#      run: php artisan storage:link
+#    - name: Install dependencies (laravel mix)
+#      run: yarn run prod
+#    - name: Execute tests (Unit and Feature tests) via PHPUnit
+#      run: vendor/bin/phpunit

@@ -23,14 +23,13 @@ class SettingsController extends Controller {
 
     public function emailSettings(Request $request, User $user) {
         $user->update([
-            'adventure_email'         => $request->has('adventure_email'),
-            'new_building_email'      => $request->has('new_building_email'),
-            'kingdoms_update_email'   => $request->has('kingdoms_update_email'),
-            'new_building_email'      => $request->has('new_building_email'),
-            'upgraded_building_email' => $request->has('upgraded_building_email'),
-            'rebuilt_building_email'  => $request->has('rebuilt_building_email'),
-            'kingdom_attack_email'    => $request->has('kingdom_attack_email'),
-            'unit_recruitment_email'  => $request->has('unit_recruitment_email'),
+            'adventure_email'         => $request->has('adventure_email') ? $request->adventure_email : false,
+            'new_building_email'      => $request->has('new_building_email') ? $request->new_building_email : false,
+            'kingdoms_update_email'   => $request->has('kingdoms_update_email') ? $request->new_building_email : false,
+            'upgraded_building_email' => $request->has('upgraded_building_email') ? $request->upgraded_building_email : false,
+            'rebuilt_building_email'  => $request->has('rebuilt_building_email') ? $request->rebuilt_building_email : false,
+            'kingdom_attack_email'    => $request->has('kingdom_attack_email') ? $request->kingdom_attack_email : false,
+            'unit_recruitment_email'  => $request->has('unit_recruitment_email') ? $request->unit_recruitment_email : false,
         ]);
 
         return redirect()->back()->with('success', 'Updated email preferences.');
@@ -39,10 +38,10 @@ class SettingsController extends Controller {
     public function chatSettings(request $request, User $user) {
 
         $user->update([
-            'show_unit_recruitment_messages' => $request->has('show_unit_recruitment_messages'),
-            'show_building_upgrade_messages' => $request->has('show_building_upgrade_messages'),
-            'show_kingdom_update_messages'   => $request->has('show_kingdom_update_messages'),
-            'show_building_rebuilt_messages' => $request->has('show_building_rebuilt_messages'),
+            'show_unit_recruitment_messages' => $request->has('show_unit_recruitment_messages') ? $request->show_unit_recruitment_messages : false,
+            'show_building_upgrade_messages' => $request->has('show_building_upgrade_messages') ? $request->show_building_upgrade_messages : false,
+            'show_kingdom_update_messages'   => $request->has('show_kingdom_update_messages') ? $request->show_kingdom_update_messages : false,
+            'show_building_rebuilt_messages' => $request->has('show_building_rebuilt_messages') ? $request->show_building_rebuilt_messages : false,
         ]);
 
         return redirect()->back()->with('success', 'Updated chat preferences.');
@@ -58,27 +57,5 @@ class SettingsController extends Controller {
         ]);
 
         return redirect()->back()->with('success', 'Updated character name.');
-    }
-
-    protected function createSecurityQuestions(Request $request, User $user): User {
-
-        $user->securityQuestions()->insert([
-            [
-                'user_id'    => $user->id,
-                'question'   => $request->question_one,
-                'answer'     => Hash::make($request->answer_one),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'user_id'    => $user->id,
-                'question'   => $request->question_two,
-                'answer'     => Hash::make($request->answer_two),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        ]);
-
-        return $user->refresh();
     }
 }

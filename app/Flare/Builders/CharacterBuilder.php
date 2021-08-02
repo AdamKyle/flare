@@ -157,7 +157,6 @@ class CharacterBuilder {
      * @return CharacterBuilder
      */
     public function assignSkills(): CharacterBuilder {
-        //dd('Stop');
         foreach (GameSkill::whereNull('game_class_id')->get() as $skill) {
             $this->character->skills()->create(
                 resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
