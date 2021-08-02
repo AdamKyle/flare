@@ -42,4 +42,4 @@ jobs:
         php artisan migrate
         vendor/bin/phpunit
       env:
-        DB_PORT: $[{ job.services.mysql.ports[306] }]
+        DB_PORT: $[{ job.services.mysql.ports[3306] }]

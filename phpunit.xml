@@ -27,7 +27,6 @@
       <env name="MAIL_DRIVER" value="array"/>
       <env name="MAIL_USERNAME" value="test@example.ca" />
       <env name="QUEUE_CONNECTION" value="sync"/>
-      <env name="DB_CONNECTION" value="mysql"/>
       <env name="DB_DATABASE" value="flare_test"/>
       <env name="SESSION_DRIVER" value="array"/>
       <env name="BROADCAST_DRIVER" value="log"/>
