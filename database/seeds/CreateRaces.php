@@ -24,7 +24,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 1,
                 'accuracy_mod' => 0.03,
                 'dodge_mod'    => 0.02,
-                'deffense_mod' => 0.01,
+                'defense_mod' => 0.01,
                 'looting_mod'  => 0,
             ],
             [
@@ -36,7 +36,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 3,
                 'accuracy_mod' => 0.10,
                 'dodge_mod'    => 0.05,
-                'deffense_mod' => 0,
+                'defense_mod' => 0,
                 'looting_mod'  => 0,
             ],
             [
@@ -48,7 +48,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 0.05,
+                'defense_mod' => 0.05,
                 'looting_mod'  => 0,
             ],
             [
@@ -60,7 +60,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0.07,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 0.02,
+                'defense_mod' => 0.02,
                 'looting_mod'  => 0,
             ],
             [
@@ -72,7 +72,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 3,
                 'accuracy_mod' => 0.5,
                 'dodge_mod'    => 0.5,
-                'deffense_mod' => 0,
+                'defense_mod' => 0,
                 'looting_mod'  => 0,
             ],
             [
@@ -84,7 +84,7 @@ class CreateRaces extends Seeder
                 'int_mod'      => 0,
                 'accuracy_mod' => 0,
                 'dodge_mod'    => 0,
-                'deffense_mod' => 0,
+                'defense_mod' => 0,
                 'looting_mod'  => 0.02,
             ]
         ]);

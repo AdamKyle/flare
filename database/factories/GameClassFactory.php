@@ -24,6 +24,7 @@ class GameClassFactory extends Factory
         return [
             'name'        => 'Fighter',
             'damage_stat' => 'str',
+            'to_hit_stat' => 'dex',
             'str_mod'     => 0,
         ];
     }

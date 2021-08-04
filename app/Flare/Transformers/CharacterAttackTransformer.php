@@ -64,14 +64,6 @@ class CharacterAttackTransformer extends TransformerAbstract {
     }
 
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation) {
-        $toHitBase = $character->{$character->class->to_hit_stat};
-        $toHitMod  = (int) number_format($characterInformation->statMod($character->class->to_hit_stat), 0);
-        dump($toHitBase, $toHitMod);
-        return $toHitMod;
-//        if ($toHitBase === $toHitMod) {
-//            return $toHitMod;
-//        } else {
-//            return $character->{$character->class->to_hit_stat} / $characterInformation->statMod($character->class->to_hit_stat);
-//        }
+        return (int) number_format($characterInformation->statMod($character->class->to_hit_stat), 0);
     }
 }

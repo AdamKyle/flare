@@ -418,7 +418,7 @@ class FightService {
 
             if ($totalDamage > 0) {
                 $health = $this->currentMonsterHealth - $totalDamage;
-                dump('New health: ' . $health . ' Current Health: ' . $this->currentMonsterHealth . ' Total Damage: ' . $totalDamage);
+
                 if ($health < 0) {
                     $health = 0;
                 }

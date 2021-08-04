@@ -22,7 +22,7 @@ class GameClass extends Component
         'gameClass.int_mod'      => 'nullable',
         'gameClass.accuracy_mod' => 'nullable',
         'gameClass.dodge_mod'    => 'nullable',
-        'gameClass.deffense_mod' => 'nullable',
+        'gameClass.defense_mod'  => 'nullable',
         'gameClass.looting_mod'  => 'nullable',
     ];
 

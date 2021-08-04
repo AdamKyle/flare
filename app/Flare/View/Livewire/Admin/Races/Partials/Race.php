@@ -21,7 +21,7 @@ class Race extends Component
         'race.int_mod'      => 'nullable',
         'race.accuracy_mod' => 'nullable',
         'race.dodge_mod'    => 'nullable',
-        'race.deffense_mod' => 'nullable',
+        'race.defense_mod'  => 'nullable',
         'race.looting_mod'  => 'nullable',
     ];
 
@@ -50,7 +50,7 @@ class Race extends Component
             $message = 'Race: ' . $this->race->name . ' Updated. Applying to all characters who are this race.';
 
             Cache::put('updating-characters', true);
-            
+
             (new UpdateCharacterStatsService())->updateRacialStats($oldRace, $this->race->refresh());
         } else {
             $message = 'Race: ' . $this->race->name . ' Created!';

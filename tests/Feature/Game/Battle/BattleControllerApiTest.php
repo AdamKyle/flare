@@ -370,13 +370,14 @@ class BattleControllerApiTest extends TestCase
         $user        = $this->character->getUser();
         $monster     = $this->monster->getMonster();
 
-        $itemId = $this->createItem([
+        $item = $this->createItem([
             'name' => 'quest item',
             'type' => 'quest',
-        ])->id;
+        ]);
+
 
         $monster->update([
-            'quest_item_id' => $itemId,
+            'quest_item_id' => $item->id,
             'quest_item_drop_chance' => 1.00,
         ]);
 
@@ -395,8 +396,8 @@ class BattleControllerApiTest extends TestCase
 
         $character = $character->refresh();
 
-        $found = $character->inventory->slots->filter(function($slot) use ($itemId) {
-            return $slot->item_id === $itemId;
+        $found = $character->inventory->slots->filter(function($slot) use ($item) {
+            return $slot->item->name === $item->name;
         })->all();
 
         $this->assertEquals(200, $response->status());
@@ -419,13 +420,14 @@ class BattleControllerApiTest extends TestCase
         $user        = $this->character->getUser();
         $monster     = $this->monster->getMonster();
 
-        $itemId = $this->createItem([
+
+        $item = $this->createItem([
             'name' => 'quest item',
             'type' => 'quest',
-        ])->id;
+        ]);
 
         $monster->update([
-            'quest_item_id' => $itemId,
+            'quest_item_id' => $item->id,
             'quest_item_drop_chance' => 0,
         ]);
 
@@ -443,8 +445,8 @@ class BattleControllerApiTest extends TestCase
 
         $character = $character->refresh();
 
-        $found = $character->inventory->slots->filter(function($slot) use ($itemId) {
-            return $slot->item_id === $itemId;
+        $found = $character->inventory->slots->filter(function($slot) use ($item) {
+            return $slot->item->name === $item->name;
         })->all();
 
         $this->assertEquals(200, $response->status());

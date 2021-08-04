@@ -34,6 +34,8 @@ class CharacterFactory extends Factory
             'dex'           => 1,
             'chr'           => 1,
             'int'           => 1,
+            'agi'           => 1,
+            'focus'         => 1,
             'ac'            => 1,
             'gold'          => 0,
             'can_attack'    => true,

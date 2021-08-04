@@ -76,7 +76,6 @@ class KingdomService {
      * @return bool
      */
     public function canSettle(int $x, int $y, Character $character): bool {
-        dump($x, $y, $character->map->game_map_id);
         $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {

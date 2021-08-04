@@ -129,6 +129,8 @@ class CharacterBuilder {
             'dex'           => $baseStat->dex(),
             'chr'           => $baseStat->chr(),
             'int'           => $baseStat->int(),
+            'agi'           => $baseStat->agi(),
+            'focus'         => $baseStat->focus(),
             'ac'            => $baseStat->ac(),
         ]);
 
