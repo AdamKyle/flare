@@ -42,6 +42,10 @@
                         <dd class="{{$details['slot']->item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
                         <dd class="{{$details['slot']->item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->int_mod * 100}}%</dd>
+                        <dt>Agi mod:</dt>
+                        <dd class="{{$details['slot']->item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->agi_mod * 100}}%</dd>
+                        <dt>Focus mod:</dt>
+                        <dd class="{{$details['slot']->item->itemPrefix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->focus_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>
@@ -78,6 +82,10 @@
                         <dd class="{{$details['slot']->item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->int_mod * 100}}%</dd>
+                        <dt>Agi mod:</dt>
+                        <dd class="{{$details['slot']->item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->agi_mod * 100}}%</dd>
+                        <dt>Focus mod:</dt>
+                        <dd class="{{$details['slot']->item->itemPrefix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->focus_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>

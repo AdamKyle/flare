@@ -41,11 +41,15 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'dex'               => number_format($character->dex),
             'chr'               => number_format($character->chr),
             'int'               => number_format($character->int),
+            'agi'               => number_format($character->agi),
+            'focus'             => number_format($character->focus),
             'str_modded'        => number_format(round($characterInformation->statMod('str'))),
             'dur_modded'        => number_format(round($characterInformation->statMod('dur'))),
             'dex_modded'        => number_format(round($characterInformation->statMod('dex'))),
             'chr_modded'        => number_format(round($characterInformation->statMod('chr'))),
             'int_modded'        => number_format(round($characterInformation->statMod('int'))),
+            'agi_modded'        => number_format(round($characterInformation->statMod('agi'))),
+            'focus_modded'      => number_format(round($characterInformation->statMod('focus'))),
             'gold'              => number_format($character->gold),
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
@@ -53,6 +57,4 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'timeout_until'     => $character->user->timeout_until,
         ];
     }
-
-
 }

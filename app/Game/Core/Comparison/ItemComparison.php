@@ -178,6 +178,8 @@ class ItemComparison {
                 'dex_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'dex'),
                 'chr_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'chr'),
                 'int_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'int'),
+                'agi_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'agi'),
+                'focus_adjustment'        => $this->getStatIncrease($toCompare, $foundPosition->item, 'focus'),
             ];
         } else {
             $baseDamageAdjustment  = $toCompare->base_damage_mod < $foundPosition->item->base_damage_mod ? $toCompare->base_damage_mod - $foundPosition->item->base_damage_mod : 0;
@@ -197,6 +199,8 @@ class ItemComparison {
                 'dex_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'dex'),
                 'chr_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'chr'),
                 'int_adjustment'          => $this->getStatDecrease($toCompare, $foundPosition->item, 'int'),
+                'agi_adjustment'          => $this->getStatIncrease($toCompare, $foundPosition->item, 'agi'),
+                'focus_adjustment'        => $this->getStatIncrease($toCompare, $foundPosition->item, 'focus'),
                 'base_damage_adjustment'  => $baseDamageAdjustment,
                 'base_healing_adjustment' => $baseHealingAdjustment,
                 'base_ac_adjustment'      => $baseAcAdjustment,

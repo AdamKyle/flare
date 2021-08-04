@@ -15,4 +15,8 @@
     <dd><span class={{$value['chr_adjustment'] >= 0 ? 'text-success' : 'text-danger'}}>{{$value['chr_adjustment'] >= 0 ? '+' : ''}}{{$value['chr_adjustment'] * 100}}%</span></dd>
     <dt>Int:</dt>
     <dd><span class={{$value['int_adjustment'] >= 0 ? 'text-success' : 'text-danger'}}>{{$value['int_adjustment'] >= 0 ? '+' : ''}}{{$value['int_adjustment'] * 100}}%</span></dd>
+    <dt>Agi:</dt>
+    <dd><span class={{$value['agi_adjustment'] >= 0 ? 'text-success' : 'text-danger'}}>{{$value['agi_adjustment'] >= 0 ? '+' : ''}}{{$value['agi_adjustment'] * 100}}%</span></dd>
+    <dt>Focus:</dt>
+    <dd><span class={{$value['focus_adjustment'] >= 0 ? 'text-success' : 'text-danger'}}>{{$value['focus_adjustment'] >= 0 ? '+' : ''}}{{$value['focus_adjustment'] * 100}}%</span></dd>
 </dl>

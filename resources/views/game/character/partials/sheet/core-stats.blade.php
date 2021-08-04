@@ -11,6 +11,10 @@
         <dd>{{$character->chr}}</dd>
         <dt>Intelligence:</dt>
         <dd>{{$character->int}}</dd>
+        <dt>Agility:</dt>
+        <dd>{{$character->agi}}</dd>
+        <dt>Focus:</dt>
+        <dd>{{$character->focus}}</dd>
     </dl>
 </div>
 <div class="col-md-4">
@@ -25,6 +29,10 @@
         <dd>{{$characterInfo['chr']}}</dd>
         <dt>Intelligence Modded:</dt>
         <dd>{{$characterInfo['int']}}</dd>
+        <dt>Agility Modded:</dt>
+        <dd>{{$characterInfo['agi']}}</dd>
+        <dt>Focus Modded:</dt>
+        <dd>{{$characterInfo['focus']}}</dd>
     </dl>
 </div>
 <div class="col-md-4">

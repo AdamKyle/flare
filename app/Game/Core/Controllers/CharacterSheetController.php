@@ -31,6 +31,8 @@ class CharacterSheetController extends Controller {
                 'dex'       => number_format($characterInfo->statMod('dex')),
                 'chr'       => number_format($characterInfo->statMod('chr')),
                 'int'       => number_format($characterInfo->statMod('int')),
+                'agi'       => number_format($characterInfo->statMod('agi')),
+                'focus'     => number_format($characterInfo->statMod('focus')),
             ],
         ]);
     }

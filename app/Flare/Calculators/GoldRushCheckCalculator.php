@@ -22,21 +22,20 @@ class GoldRushCheckCalculator {
     public function fetchGoldRushChance(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0, Adventure $adventure = null) {
         $adventureBonus = $this->getAdventureGoldrushChance($adventure);
 
-        if ($adventureBonus >= 1) {
+        if ($adventureBonus >= 1.0) {
             return true;
         }
 
         $bonus = $lootingChance + $adventureBonus + $gameMapBonus;
 
-        if ($bonus >= 1) {
+        if ($bonus >= 1.0) {
             return true;
         }
 
-        if ($bonus < 1) {
-            $bonus += 1;
-        }
+        $roll = rand(1, 1000);
+        $roll += $roll * $bonus;
 
-        return (rand(1, 1000) * $bonus) > (1000 - (1000 * $monster->drop_check));
+        return $roll > (1000 - (1000 * $monster->drop_check));
     }
 
     protected function getAdventureGoldrushChance(Adventure $adventure = null): float {

@@ -36,6 +36,9 @@ trait SkillCheck {
             return 101; // instant success.
         }
 
-        return (rand(1, 100) * (1 + $skill->skill_bonus));
+        $roll = rand(1, 1000);
+        $roll += $roll * $skill->skill_bonus;
+
+        return $roll;
     }
 }

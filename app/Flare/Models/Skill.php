@@ -155,7 +155,7 @@ class Skill extends Model
             return ($this->baseSkill->skill_bonus_per_level * $this->level);
         }
 
-        $bonus = ($this->baseSkill->skill_bonus_per_level * $this->level) - $this->baseSkill->skill_bonus_per_level;
+        $bonus = ($this->baseSkill->skill_bonus_per_level * $this->level);
         $bonus += $this->getItemBonuses($this->baseSkill->name);
 
 

@@ -8,9 +8,9 @@ class LevelUpValue {
 
     /**
      * Create the level up value object.
-     * 
+     *
      * Increases core stats.
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -23,17 +23,19 @@ class LevelUpValue {
             'dex'   => $this->addValue($character, 'dex'),
             'chr'   => $this->addValue($character, 'chr'),
             'int'   => $this->addvalue($character, 'int'),
+            'agi'   => $this->addvalue($character, 'agi'),
+            'focus' => $this->addvalue($character, 'focus'),
         ];
     }
 
     /**
      * Add the new value to the character stat.
-     * 
+     *
      * Regular stats get +1 and the damage stat gets a +2
-     * 
+     *
      * @param Character $character
      * @param string $currentStat
-     * @return int 
+     * @return int
      */
     private function addValue(Character $character, string $currenStat): int {
         if ($character->damage_stat === $currenStat) {

@@ -22,6 +22,8 @@
         <th>dex_mod</th>
         <th>chr_mod</th>
         <th>int_mod</th>
+        <th>agi_mod</th>
+        <th>focus_mod</th>
         <th>effect</th>
         <th>can_craft</th>
         <th>can_drop</th>
@@ -67,6 +69,8 @@
             <td>{{$item->dex_mod}}</td>
             <td>{{$item->chr_mod}}</td>
             <td>{{$item->int_mod}}</td>
+            <td>{{$item->agi_mod}}</td>
+            <td>{{$item->focus_mod}}</td>
             <td>{{$item->effect}}</td>
             <td>{{$item->can_craft}}</td>
             <td>{{$item->can_drop}}</td>

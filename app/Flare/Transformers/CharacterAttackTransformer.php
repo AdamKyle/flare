@@ -26,6 +26,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'ac'                  => $characterInformation->buildDefence(),
             'name'                => $character->name,
             'dex'                 => $characterInformation->statMod('dex'),
+            'to_hit_base'         => $this->getToHitBase($character, $characterInformation),
             'base_stat'           => $characterInformation->statMod($character->class->damage_stat),
             'attack'              => $characterInformation->buildAttack(),
             'spell_damage'        => $characterInformation->getTotalSpellDamage(),
@@ -60,5 +61,17 @@ class CharacterAttackTransformer extends TransformerAbstract {
         }
 
         return true;
+    }
+
+    private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation) {
+        $toHitBase = $character->{$character->class->to_hit_stat};
+        $toHitMod  = (int) number_format($characterInformation->statMod($character->class->to_hit_stat), 0);
+        dump($toHitBase, $toHitMod);
+        return $toHitMod;
+//        if ($toHitBase === $toHitMod) {
+//            return $toHitMod;
+//        } else {
+//            return $character->{$character->class->to_hit_stat} / $characterInformation->statMod($character->class->to_hit_stat);
+//        }
     }
 }

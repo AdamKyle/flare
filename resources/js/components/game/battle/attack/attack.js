@@ -103,19 +103,24 @@ export default class Attack {
   canHit(attacker, defender) {
     let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
 
-    if (attackerAccuracy < 1) {
-      attackerAccuracy = 1 + attackerAccuracy
+    if (Math.sign(toHitBase) === - 1) {
+      toHitBase = Math.abs(toHitBase);
     }
 
-    if (defenderDodge < 1) {
-      defenderDodge = 1 + defenderDodge
+    if (toHitBase > 1.0) {
+      return true;
     }
+    const percentage = Math.floor((100 - toHitBase));
 
-    const attack = (attacker.base_stat + Math.round(attacker.dex / 2)) * attackerAccuracy;
-    const dodge  = (defender.base_stat + Math.round(defender.dex / 2)) * defenderDodge;
+    const needToHit = 100 - percentage;
 
-    return attack > dodge;
+    return (Math.random() * (100 - 1) + 1) > needToHit;
+  }
+
+  toHitCalculation(toHit, dex, accuracy, dodge) {
+    return ((toHit + toHit * accuracy) / 10000) - ((dex / 10000) * dodge);
   }
 
   castSpells(attacker, defender, type) {

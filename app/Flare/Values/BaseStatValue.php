@@ -19,7 +19,7 @@ class BaseStatValue {
 
     /**
      * Set the race
-     * 
+     *
      * @param GameRace $race
      * @return BaseStatValue
      */
@@ -31,7 +31,7 @@ class BaseStatValue {
 
     /**
      * Set the class
-     * 
+     *
      * @param GameClass $class
      * @return BaseStatValue
      */
@@ -43,7 +43,7 @@ class BaseStatValue {
 
     /**
      * Get strength based on race and class modifiers.
-     * 
+     *
      * @return int
      */
     public function str(): int {
@@ -54,7 +54,7 @@ class BaseStatValue {
 
     /**
      * Get dexterity based on race and class modifiers.
-     * 
+     *
      * @return int
      */
     public function dex(): int {
@@ -65,7 +65,7 @@ class BaseStatValue {
 
     /**
      * Get durabillity based on race and class modifiers.
-     * 
+     *
      * @return int
      */
     public function dur(): int {
@@ -76,18 +76,18 @@ class BaseStatValue {
 
     /**
      * Get durabillity based on race and class modifiers.
-     * 
+     *
      * @return int
      */
     public function chr(): int {
         $modifier = $this->race->chr_mod + $this->class->chr_mod;
-        
+
         return round(10 + $modifier);
     }
 
     /**
      * Get intelligence based on race and class modifiers.
-     * 
+     *
      * @return int
      */
     public function int(): int {
@@ -97,10 +97,32 @@ class BaseStatValue {
     }
 
     /**
+     * Get Agility based on race and class modifiers.
+     *
+     * @return int
+     */
+    public function agi(): int {
+        $modifier = $this->race->agi_mod + $this->class->agi_mod;
+
+        return round(10 + $modifier);
+    }
+
+    /**
+     * Get Focus based on race and class modifiers.
+     *
+     * @return int
+     */
+    public function focus(): int {
+        $modifier = $this->race->agi_mod + $this->class->agi_mod;
+
+        return round(10 + $modifier);
+    }
+
+    /**
      * Get ac based on race and class modifiers.
-     * 
+     *
      * This is done by taking 10 * modifier%
-     * 
+     *
      * @return int
      */
     public function ac(): int {

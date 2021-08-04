@@ -8,54 +8,68 @@
                 </div>
                 <x-data-tables.table :collection="$gameClasses">
                     <x-data-tables.header>
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('name')" 
-                            header-text="Name" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('name')"
+                            header-text="Name"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="name"
                         />
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('damage_stat')" 
-                            header-text="Damage Stat" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('damage_stat')"
+                            header-text="Damage Stat"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="damage_stat"
                         />
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('str_mod')" 
-                            header-text="Strength Modifier" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('str_mod')"
+                            header-text="Strength Modifier"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="str_mod"
                         />
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('dur_mod')" 
-                            header-text="Durabillity Modifier" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('dur_mod')"
+                            header-text="Durabillity Modifier"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="dur_mod"
                         />
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('dex_mod')" 
-                            header-text="Dexterity Modifier" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('dex_mod')"
+                            header-text="Dexterity Modifier"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="dex_mod"
                         />
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('chr_mod')" 
-                            header-text="Charisma Modifier" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('chr_mod')"
+                            header-text="Charisma Modifier"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="chr_mod"
                         />
-                        <x-data-tables.header-row 
-                            wire:click.prevent="sortBy('int_mod')" 
-                            header-text="Intelligence Modifier" 
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('int_mod')"
+                            header-text="Intelligence Modifier"
                             sort-by="{{$sortBy}}"
                             sort-field="{{$sortField}}"
                             field="int_mod"
+                        />
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('agi_mod')"
+                            header-text="Agility Modifier"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="agi_mod"
+                        />
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('focus_mod')"
+                            header-text="Focus Modifier"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="focus_mod"
                         />
                         @guest
                         @else
@@ -82,14 +96,14 @@
                                                 'class' => $class
                                             ])}}">
                                                 {{$class->name}}
-                                            </a> 
+                                            </a>
                                         @endif
                                     @else
                                         <a href="{{route('info.page.class', [
                                             'class' => $class
                                         ])}}">
                                             {{$class->name}}
-                                        </a> 
+                                        </a>
                                     @endif
                                 </td>
                                 <td>{{$class->damage_stat}}</td>
@@ -98,6 +112,8 @@
                                 <td>{{$class->dex_mod}} pts. </td>
                                 <td>{{$class->chr_mod}} pts. </td>
                                 <td>{{$class->int_mod}} pts. </td>
+                                <td>{{$class->agi_mod}} pts. </td>
+                                <td>{{$class->focus_mod}} pts. </td>
                                 @guest
                                 @else
                                     @if (auth()->user()->hasRole('Admin'))

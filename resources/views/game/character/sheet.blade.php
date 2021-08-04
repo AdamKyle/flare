@@ -90,6 +90,8 @@
                     <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
                     <dt>Stat to focus on for max damage:</dt>
                     <dd>{{$character->class->damage_stat}}</dd>
+                    <dt>To focus on for Hit%:</dt>
+                    <dd>Accuracy (skill) and {{$character->class->to_hit_stat}}</dd>
                 </dl>
             </x-cards.card-with-title>
             <div class="mt-3">

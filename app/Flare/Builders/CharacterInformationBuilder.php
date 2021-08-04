@@ -57,15 +57,7 @@ class CharacterInformationBuilder {
         }
 
         foreach ($equipped as $slot) {
-            $percentageIncrease = $this->fetchModdedStat($stat, $slot->item);
-
-            if ($percentageIncrease < 2) {
-                $percentageIncrease = 1 + $percentageIncrease;
-            }
-
-            if ($percentageIncrease !== 0.0) {
-                $base *= $percentageIncrease;
-            }
+            $base += $base * $this->fetchModdedStat($stat, $slot->item);
         }
 
         if (!$this->character->boons->isEmpty()) {
@@ -74,15 +66,11 @@ class CharacterInformationBuilder {
             if ($boons->isNotEmpty()) {
                 $sum = $boons->sum('stat_bonus');
 
-                if ($sum < 1.0) {
-                    $sum += 1;
-                }
-
-                $base *= $sum;
+                $base += $base * $sum;
             }
         }
 
-        return round($base);
+        return $base;
     }
 
     /**

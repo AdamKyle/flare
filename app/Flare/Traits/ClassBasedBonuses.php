@@ -218,7 +218,7 @@ trait ClassBasedBonuses {
         $classType  = new CharacterClassValue($character->class->name);
         $classBonus = 0.0;
 
-        if ($classType->isThief()) {
+        if ($classType->isRanger()) {
             $class = $character->class;
 
             $hasBow = $character->inventory->slots->filter(function($slot) {
@@ -246,7 +246,7 @@ trait ClassBasedBonuses {
         $classType  = new CharacterClassValue($character->class->name);
         $classBonus = 0.0;
 
-        if ($classType->isThief()) {
+        if ($classType->isRanger()) {
             $class = $character->class;
 
             $hasBow = $character->inventory->slots->filter(function($slot) {

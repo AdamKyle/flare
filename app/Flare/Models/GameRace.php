@@ -24,9 +24,11 @@ class GameRace extends Model
         'dex_mod',
         'chr_mod',
         'int_mod',
+        'agi_mod',
+        'focus_mod',
         'accuracy_mod',
         'dodge_mod',
-        'deffense_mod',
+        'defense_mod',
         'looting_mod',
     ];
 
@@ -41,14 +43,16 @@ class GameRace extends Model
         'dex_mod'      => 'integer',
         'chr_mod'      => 'integer',
         'int_mod'      => 'integer',
+        'agi_mod'      => 'integer',
+        'focus_mod'    => 'integer',
         'accuracy_mod' => 'float',
         'dodge_mod'    => 'float',
-        'deffense_mod' => 'float',
+        'defense_mod'  => 'float',
         'looting_mod'  => 'float',
     ];
 
     protected static function newFactory() {
         return GameRaceFactory::new();
     }
-    
+
 }

@@ -34,6 +34,10 @@
                         <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
                         <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->int_mod * 100}}%</dd>
+                        <dt>Agi mod:</dt>
+                        <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->agi_mod * 100}}%</dd>
+                        <dt>Focus mod:</dt>
+                        <dd class="{{$item->itemPrefix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->focus_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>
@@ -70,6 +74,10 @@
                         <dd class="{{$item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->chr_mod * 100}}%</dd>
                         <dt>Int mod:</dt>
                         <dd class="{{$item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->int_mod * 100}}%</dd>
+                        <dt>Agi mod:</dt>
+                        <dd class="{{$item->itemSuffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->agi_mod * 100}}%</dd>
+                        <dt>Focus mod:</dt>
+                        <dd class="{{$item->itemSuffix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>

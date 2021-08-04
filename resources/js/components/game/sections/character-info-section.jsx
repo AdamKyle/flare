@@ -194,6 +194,20 @@ export default class CharacterInfoTopSection extends React.Component {
             </dl>
           </Col>
         </Row>
+        <Row>
+          <Col md={12} lg={12} xl={2}>
+            <dl>
+              <dt><strong>Agi</strong>:</dt>
+              <dd>{sheet.agi_modded}</dd>
+            </dl>
+          </Col>
+          <Col md={12} lg={12} xl={2}>
+            <dl>
+              <dt><strong>Focus</strong>:</dt>
+              <dd>{sheet.focus_modded}</dd>
+            </dl>
+          </Col>
+        </Row>
 
         {
           this.state.forceNameChange ?
