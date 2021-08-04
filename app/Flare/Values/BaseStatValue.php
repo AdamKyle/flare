@@ -126,7 +126,7 @@ class BaseStatValue {
      * @return int
      */
     public function ac(): int {
-        $modifier = $this->race->deffense_mod + $this->class->deffense_mod;
+        $modifier = $this->race->defense_mod + $this->class->defense_mod;
 
         return round(10 * ($modifier < 1 ? (1 + $modifier) : $modifier ));
     }
