@@ -30,7 +30,7 @@ class DropsCheckListener
         }
 
         $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
-
+        //dd($canGetDrop);
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::where('can_drop', true)->get())

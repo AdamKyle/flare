@@ -18,14 +18,14 @@ class GiveCharactersSkill extends Command
      *
      * @var string
      */
-    protected $signature = 'give:skill {skillId}';
+    protected $signature = 'give:skills';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Assigns skill to missing players';
+    protected $description = 'Assigns skills to missing players';
 
     /**
      * Create a new command instance.
@@ -42,26 +42,40 @@ class GiveCharactersSkill extends Command
      * @return mixed
      */
     public function handle() {
-        $foundSkill = GameSkill::find($this->argument('skillId'));
+        $gameSkills = GameSkill::all();
 
-        if (is_null($foundSkill)) {
-            $this->error('No skill found for that id.');
+        if ($gameSkills->isEmpty()) {
+            $this->error('No skills in the system.');
 
             return;
         }
 
-        foreach (Character::all() as $character) {
-            $hasSkill = $character->skills()->where('game_skill_id', $foundSkill->id)->first();
+        forEach($gameSkills as $skill) {
+            foreach (Character::all() as $character) {
+                $hasSkill = $character->skills()->where('game_skill_id', $skill->id)->first();
 
-            if (is_null($hasSkill)) {
-                $character->skills()->create(
-                    resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($character, $foundSkill)
-                );
+                if (is_null($hasSkill)) {
+                    if (!is_null($skill->gameClass)) {
+                        if ($character->class->id === $skill->game_class_id) {
+                            $character->skills()->create(
+                                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($character, $skill)
+                            );
 
-                $this->line('Gave Character id: ' . $character->id . ' skill.');
-            } else {
-                $this->line('Character id: ' . $character->id . ' Already has said skill.');
+                            $this->line('Gave Character id: ' . $character->name . ' class skill: ' . $skill->name);
+                        }
+                    } else {
+                        $character->skills()->create(
+                            resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($character, $skill)
+                        );
+
+                        $this->line('Gave Character id: ' . $character->name . ' skill: ' . $skill->name);
+                    }
+
+                } else {
+                    $this->line('Character id: ' . $character->name . ' Already has skill: ' . $skill->name);
+                }
             }
         }
+
     }
 }

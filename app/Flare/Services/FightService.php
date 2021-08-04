@@ -271,34 +271,27 @@ class FightService {
                      ->where('game_skills.name', 'Dodge');
         })->first()->skill_bonus;
 
-        if ($accuracyBonus < 1) {
-            $accuracyBonus += 1;
-        }
-
-        if ($dodgeBonus < 1) {
-            $dodgeBonus += 1;
-        }
-
-        $defenderDex      = $defender->dex;
-        $defenderBaseStat = $defender->{$defender->damage_stat};
-
-        $attackerDex      = $defender->dex;
-        $attackerBaseStat = $defender->{$defender->damage_stat};
 
         if ($defender instanceof  Character) {
-            $defenderDex      = $this->characterInformation->statMod('dex');
-            $defenderBaseStat = $this->characterInformation->statMod($defender->damage_stat);
+            $toHit = $this->toHitCalculation($attacker->dex, $this->characterInformation->statMod('dex'), $accuracyBonus, $dodgeBonus);
         }
 
         if ($attacker instanceof Character) {
-            $attackerDex      = $this->characterInformation->statMod('dex');
-            $attackerBaseStat = $this->characterInformation->statMod($defender->damage_stat);
+            $toHit = $this->toHitCalculation($this->characterInformation->statMod($attacker->class->to_hit_stat), $defender->dex, $accuracyBonus, $dodgeBonus);
         }
 
-        $attack = $attackerBaseStat + round($attackerDex / 2) * $accuracyBonus;
-        $dodge  = $defenderBaseStat + round($defenderDex / 2) * $dodgeBonus;
+        if ($toHit > 1.0) {
+            return true;
+        }
 
-        return $attack >= $dodge;
+        $percent = floor((100 - $toHit));
+        $needToHit = 100 - $percent;
+
+        return rand(1, 100) > $needToHit;
+    }
+
+    protected function toHitCalculation(int $toHit, int $dex, float $accuracy, float $dodge) {
+        return abs((($toHit + $toHit * $accuracy) / 10000) - (($dex / 10000) * $dodge));
     }
 
     protected function blockedAttack($defender, $attacker): bool {

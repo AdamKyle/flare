@@ -58,7 +58,7 @@ trait ClassBasedBonuses {
             })->isNotEmpty();
 
             if ($healingSpellsEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'skill_bonus');
+                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
             }
         }
 
@@ -86,7 +86,7 @@ trait ClassBasedBonuses {
             })->isNotEmpty();
 
             if ($damageSpellsEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'skill_bonus');
+                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
             }
         }
 

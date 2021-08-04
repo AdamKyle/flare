@@ -19,6 +19,8 @@ class Race extends Component
         'race.dex_mod'      => 'nullable',
         'race.chr_mod'      => 'nullable',
         'race.int_mod'      => 'nullable',
+        'race.agi_mod'      => 'nullable',
+        'race.focus_mod'    => 'nullable',
         'race.accuracy_mod' => 'nullable',
         'race.dodge_mod'    => 'nullable',
         'race.defense_mod'  => 'nullable',

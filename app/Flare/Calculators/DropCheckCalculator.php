@@ -23,7 +23,11 @@ class DropCheckCalculator {
     public function fetchDropCheckChance(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0, Adventure $adventure = null): bool {
         $adventureBonus = $this->getAdventureBonus($adventure);
 
-        if ($adventureBonus >= 1.0) {
+        if ($monster->drop_check <= 0.0 && is_null($adventure)) {
+            return false;
+        }
+
+        if ($adventureBonus >= 1.0 || $monster->drop_check > 1.0) {
             return true;
         }
 
@@ -52,7 +56,11 @@ class DropCheckCalculator {
         $adventureBonus = $this->getAdventureBonus($adventure);
         $totalBonus     = $adventureBonus + $lootingChance + $gameMapBonus;
 
-        if ($monster->quest_item_drop_chance >= 1) {
+        if ($monster->quest_item_drop_chance <= 0.0 && is_null($adventure)) {
+            return false;
+        }
+
+        if ($monster->quest_item_drop_chance >= 1.0 || $monster->quest_item_drop_chance >= 1.0) {
             return true;
         }
 

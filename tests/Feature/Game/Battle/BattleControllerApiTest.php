@@ -426,9 +426,11 @@ class BattleControllerApiTest extends TestCase
             'type' => 'quest',
         ]);
 
+
         $monster->update([
             'quest_item_id' => $item->id,
-            'quest_item_drop_chance' => 0,
+            'quest_item_drop_chance' => 0.0,
+            'drop_check' => 0.0,
         ]);
 
         $monster = $monster->refresh();

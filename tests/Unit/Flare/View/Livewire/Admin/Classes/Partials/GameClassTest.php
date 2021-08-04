@@ -30,6 +30,7 @@ class GameClassTest extends TestCase
             ->call('validateInput', 'nextStep', 2)
             ->set('gameClass.name', 'Sample')
             ->set('gameClass.damage_stat', 'str')
+            ->set('gameClass.to_hit_stat', 'str')
             ->call('validateInput', 'nextStep', 2);
 
         $this->assertTrue(!is_null(GameClass::where('name', 'Sample')->first()));

@@ -46,6 +46,7 @@ class BattleEventHandler {
     public function processMonsterDeath(Character $character, int $monsterId) {
         $monster = Monster::find($monsterId);
 
+
         event(new UpdateCharacterEvent($character, $monster));
 
         event(new DropsCheckEvent($character, $monster));
