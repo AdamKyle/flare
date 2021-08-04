@@ -245,6 +245,45 @@
                             </div>
                         </div>
                     </div>
+                    <div class="{{!is_null($item->affects_skill_type) ? 'row' : 'hide'}}">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="base_damage_mod_bonus">Increases Skill Base Damage By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="base_damage_mod_bonus" name="base_damage_mod_bonus" wire:model="item.base_damage_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.base_damage_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="base_healing_mod_bonus">Increases Skill Base Healing By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="base_healing_mod_bonus" name="base_healing_mod_bonus" wire:model="item.base_healing_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.base_healing_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="base_ac_mod_bonus">Increase Skill Base AC By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="base_ac_mod_bonus" name="base_ac_mod_bonus" wire:model="item.base_ac_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.base_ac_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="{{!is_null($item->affects_skill_type) ? 'row' : 'hide'}}">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fight_time_out_mod_bonus">Increases Skill Fight Time Out By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="fight_time_out_mod_bonus" name="fight_time_out_mod_bonus" wire:model="item.fight_time_out_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.fight_time_out_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="move_time_out_mod_bonus">Increases Move Time Out By: </label>
+                                <input type="number" steps="0.01" class="form-control" id="move_time_out_mod_bonus" name="move_time_out_mod_bonus" wire:model="item.move_time_out_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
+                                @error('item.move_time_out_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-4">

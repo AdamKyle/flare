@@ -25,6 +25,11 @@ class AddAlchemyCostsToItems extends Migration
             $table->integer('affects_skill_type')->nullable();
             $table->decimal('increase_skill_bonus_by', 8, 4)->nullable()->default(0.0);
             $table->decimal('increase_skill_training_bonus_by', 8, 4)->nullable()->default(0.0);
+            $table->decimal('base_damage_mod_bonus', 8, 4)->nullable();
+            $table->decimal('base_healing_mod_bonus', 8, 4)->nullable();
+            $table->decimal('base_ac_mod_bonus', 8, 4)->nullable();
+            $table->decimal('fight_time_out_mod_bonus', 8, 4)->nullable();
+            $table->decimal('move_time_out_mod_bonus', 8, 4)->nullable();
         });
     }
 
@@ -42,13 +47,18 @@ class AddAlchemyCostsToItems extends Migration
             $table->dropColumn('shards_cost');
             $table->dropColumn('usable');
             $table->dropColumn('damages_kingdoms');
-            $table->dropColumn('kingdom_damage', 8, 4);
+            $table->dropColumn('kingdom_damage');
             $table->dropColumn('lasts_for');
             $table->dropColumn('stat_increase');
-            $table->dropColumn('increase_stat_by', 8, 4);
+            $table->dropColumn('increase_stat_by');
             $table->dropColumn('affects_skill_type');
-            $table->dropColumn('increase_skill_bonus_by', 8, 4);
-            $table->dropColumn('increase_skill_training_bonus_by', 8, 4);
+            $table->dropColumn('increase_skill_bonus_by');
+            $table->dropColumn('increase_skill_training_bonus_by');
+            $table->dropColumn('base_damage_mod_bonus');
+            $table->dropColumn('base_healing_mod_bonus');
+            $table->dropColumn('base_ac_mod_bonus');
+            $table->dropColumn('fight_time_out_mod_bonus');
+            $table->dropColumn('move_time_out_mod_bonus');
         });
     }
 }

@@ -23,6 +23,6 @@ trait CalculateTimeReduction {
 
         $character = $skill->character;
 
-        return $currentValue + $character->boons()->where('affect_skill_type', $skill->baseSkill->type)->sum('skill_bonus');
+        return $currentValue + $character->boons()->where('affect_skill_type', $skill->baseSkill->type)->sum('fight_time_out_mod_bonus');
     }
 }

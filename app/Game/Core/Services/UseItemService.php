@@ -31,14 +31,19 @@ class UseItemService {
         $completedAt = now()->addMinutes($item->lasts_for);
 
         $boon = $character->boons()->create([
-            'character_id'                             => $character->id,
-            'type'                                     => $this->getType($item),
-            'stat_bonus'                               => $item->increase_stat_by,
-            'affect_skill_type'                        => $item->affects_skill_type,
-            'skill_bonus'                              => $item->increase_skill_bonus_by,
-            'skill_training_bonus'                     => $item->increase_skill_training_bonus_by,
-            'started'                                  => now(),
-            'complete'                                 => $completedAt,
+            'character_id'             => $character->id,
+            'type'                     => $this->getType($item),
+            'stat_bonus'               => $item->increase_stat_by,
+            'affect_skill_type'        => $item->affects_skill_type,
+            'skill_bonus'              => $item->increase_skill_bonus_by,
+            'skill_training_bonus'     => $item->increase_skill_training_bonus_by,
+            'base_damage_mod_bonus'    => $item->base_damage_mod_bonus,
+            'base_healing_mod_bonus'   => $item->base_healing_mod_bonus,
+            'base_ac_mod_bonus'        => $item->base_ac_mod_bonus,
+            'fight_time_out_mod_bonus' => $item->fight_time_out_mod_bonus,
+            'move_time_out_mod_bonus'  => $item->move_time_out_mod_bonus,
+            'started'                  => now(),
+            'complete'                 => $completedAt,
         ]);
 
         CharacterBoonJob::dispatch($boon->id)->delay($completedAt);

@@ -32,6 +32,11 @@
         <th>crafting_type</th>
         <th>skill_name</th>
         <th>skill_bonus</th>
+        <th>base_damage_mod_bonus</th>
+        <th>base_healing_mod_bonus</th>
+        <th>base_ac_mod_bonus</th>
+        <th>fight_time_out_mod_bonus</th>
+        <th>move_time_out_mod_bonus</th>
         <th>skill_training_bonus</th>
         <th>craft_only</th>
         <th>usable</th>
@@ -79,6 +84,11 @@
             <td>{{$item->crafting_type}}</td>
             <td>{{$item->skill_name}}</td>
             <td>{{$item->skill_bonus}}</td>
+            <td>{{$item->base_damage_mod_bonus}}</td>
+            <td>{{$item->base_healing_mod_bonus}}</td>
+            <td>{{$item->base_ac_mod_bonus}}</td>
+            <td>{{$item->fight_time_out_mod_bonus}}</td>
+            <td>{{$item->move_time_out_mod_bonus}}</td>
             <td>{{$item->skill_training_bonus}}</td>
             <td>{{$item->craft_only}}</td>
             <td>{{$item->usable}}</td>

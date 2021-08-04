@@ -104,8 +104,8 @@ class CreateCharacterTest extends TestCase
                                                      ->character();
 
 
-        $this->assertEquals('2.01', $this->fetchSkill('Accuracy', $character)->skill_bonus);
-        $this->assertEquals('3.01', $this->fetchSkill('Dodge', $character)->skill_bonus);
+        $this->assertGreaterThan(0, number_format($this->fetchSkill('Accuracy', $character)->skill_bonus));
+        $this->assertGreaterThan(0, number_format($this->fetchSkill('Dodge', $character)->skill_bonus));
     }
 
     public function testCreateCharacterWithSkillsAndClassSkills() {
@@ -168,8 +168,8 @@ class CreateCharacterTest extends TestCase
             ->assignSkills()
             ->character();
 
-        $this->assertEquals('2.01', $this->fetchSkill('Accuracy', $character)->skill_bonus);
-        $this->assertEquals('3.01', $this->fetchSkill('Dodge', $character)->skill_bonus);
+        $this->assertGreaterThan(0, number_format($this->fetchSkill('Accuracy', $character)->skill_bonus));
+        $this->assertGreaterThan(0, number_format($this->fetchSkill('Dodge', $character)->skill_bonus));
         $this->assertNull($character->user);
     }
 
