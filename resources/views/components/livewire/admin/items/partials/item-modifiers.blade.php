@@ -28,7 +28,7 @@
                     id="item-fight-time-out-mod-bonus"
                     name="item-fight-time-out-mod-bonus"
                     wire:model="item.fight_time_out_mod_bonus"
-                    {{$item->usable ? 'disabled' : ''}}
+                    {{is_null($item) ? '' : ($item->usable ? 'disabled' : '')}}
                 >
             </div>
         </div>
