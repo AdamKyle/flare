@@ -14,6 +14,10 @@
                 @if ($slot->item->crafting_type === 'armour')
                     <input type="hidden" name="item_to_equip_type" value={{$slot->item->type}} />
                 @endif
+
+                @if ($slot->item->type === 'bow')
+                    <input type="hidden" name="item_to_equip_type" value="weapon" />
+                @endif
             </form>
 
             <a class="dropdown-item" href="{{route('game.inventory.compare', ['character' => $character])}}"

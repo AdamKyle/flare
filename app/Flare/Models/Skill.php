@@ -118,7 +118,7 @@ class Skill extends Model
     }
 
     public function getBaseHealingModAttribute() {
-        $itemBonus = $this->getItemBonuses($this->baseSkill->name);
+        $itemBonus = $this->getItemBonuses($this->baseSkill->name, 'base_damage_mod_bonus');
 
         $baseBonus = (
             $this->baseSkill->base_healing_mod_bonus_per_level * $this->level
@@ -130,7 +130,7 @@ class Skill extends Model
     }
 
     public function getBaseACModAttribute() {
-        $itemBonus = $this->getItemBonuses($this->baseSkill->name);
+        $itemBonus = $this->getItemBonuses($this->baseSkill->name, 'base_ac_mod_bonus');
 
         $baseBonus = (
             $this->baseSkill->base_ac_mod_bonus_per_level * $this->level
@@ -142,7 +142,10 @@ class Skill extends Model
     }
 
     public function getFightTimeOutModAttribute() {
-        return $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
+        $baseBonus = $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
+        $itemBonus = $this->getItemBonuses($this->baseSkill->name, 'fight_time_out_mod_bonus');
+
+        return $baseBonus + $itemBonus;
     }
 
     public function getMoveTimeOutModAttribute() {
@@ -220,16 +223,16 @@ class Skill extends Model
         return $raceSkillBonusValue + $classSkillBonusValue;
     }
 
-    protected function getItemBonuses($skillName): float {
+    protected function getItemBonuses(string $skillName, string $skillAttribute = 'skill_bonus'): float {
         $bonus = 0.0;
 
         foreach($this->character->inventory->slots as $slot) {
             if ($slot->equipped) {
-                $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name);
+                $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name, $skillAttribute);
             }
 
             if ($slot->item->type ==='quest') {
-                $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name);
+                $bonus += $this->calculateBonus($slot->item, $this->baseSkill->name, $skillAttribute);
             }
         }
 
@@ -237,15 +240,17 @@ class Skill extends Model
     }
 
     protected function getCharacterBoonsBonus(float $bonus, string $skillBonusAttribute) {
+        $newBonus = 0.0;
+
         if ($this->character->boons->isNotEmpty()) {
             $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
 
             if ($boons->isNotEmpty()) {
-                $bonus += $boons->sum($skillBonusAttribute);
+                $newBonus += $boons->sum($skillBonusAttribute);
             }
         }
 
-        return $bonus;
+        return $newBonus > $bonus ? $newBonus : 0.0;
     }
 
     protected static function newFactory() {

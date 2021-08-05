@@ -7,7 +7,7 @@
     <div class="form-check">
         <label class="form-check-label">
             <input class="form-check-input radio-inline" type="radio" name="position" id="position-left" value="left-hand">
-            Left Hand 
+            Left Hand
 
             @if (!empty($details))
                 @if (isset($details['left-hand']))

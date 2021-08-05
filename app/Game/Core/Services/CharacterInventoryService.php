@@ -105,6 +105,10 @@ class CharacterInventoryService {
             return $this->fetchType($request->item_to_equip_type);
         }
 
+        if ($item->type === 'bow') {
+            return $item->type;
+        }
+
         return $item->crafting_type;
     }
 

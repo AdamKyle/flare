@@ -43,7 +43,7 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-damage">Base Damage: </label>
-                <input type="number" class="form-control" id="item-base-damage" name="item-base-damage" wire:model="item.base_damage" {{($item->type !== 'quest' && $item->type !== 'shield' && $item->type !== 'spell-healing' && in_array($item->type, $itemsWithOutDefaultPosition)) ? '' : 'disabled'}}>
+                <input type="number" class="form-control" id="item-base-damage" name="item-base-damage" wire:model="item.base_damage" {{($item->type !== 'quest' && $item->type !== 'shield' && $item->type !== 'spell-healing' && in_array($item->type, $itemsWithOutDefaultPosition)) || $item->type === 'bow' ? '' : 'disabled'}}>
             </div>
         </div>
         <div class="col-md-3">

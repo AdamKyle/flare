@@ -250,7 +250,7 @@ class Item extends Model
                 $healFor = 1;
             }
 
-            $healFor = ($healFor * (1 + $this->itemPrefix->base_healing_mod));
+            $healFor += ($healFor * $this->itemPrefix->base_healing_mod);
         }
 
         if (!is_null($this->itemSuffix)) {
@@ -258,10 +258,17 @@ class Item extends Model
                 $healFor = 1;
             }
 
-            $healFor = ($healFor * (1 + $this->itemSuffix->base_healing_mod));
+            $healFor += ($healFor * $this->itemSuffix->base_healing_mod);
         }
 
         return ceil($healFor);
+    }
+
+    /**
+     * @return int
+     */
+    public function scopeGetTotalFightTimeOutMod(): int {
+        return is_null($this->fight_time_out_mod_bonus) ? 0 : $this->fight_time_out_mod_bonus;
     }
 
     /**

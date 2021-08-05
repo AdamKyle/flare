@@ -88,12 +88,25 @@ class EquipItemService {
             throw new EquipItemException('Could not equip item because you either do not have it, or it is equipped already.');
         }
 
-        $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->position === $this->request->position && $slot->equipped;
-        })->first();
+        if ($characterSlot->item->type === 'bow') {
+            $this->unequipBothHands();
+        } else {
+            $hasBowEquipped = $this->character->inventory->slots->filter(function($slot) {
+                return $slot->item->type === 'bow' && $slot->equipped;
+            })->isNotEmpty();
 
-        if (!is_null($itemForPosition)) {
-            $itemForPosition->update(['equipped' => false]);
+
+            if ($hasBowEquipped) {
+                $this->unequipBothHands();
+            } else {
+                $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
+                    return $slot->position === $this->request->position && $slot->equipped;
+                })->first();
+
+                if (!is_null($itemForPosition)) {
+                    $itemForPosition->update(['equipped' => false]);
+                }
+            }
         }
 
         $characterSlot->update([
@@ -120,5 +133,38 @@ class EquipItemService {
      */
     public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array {
        return resolve(ItemComparison::class)->fetchDetails($toCompare, $inventorySlots, $character);
+    }
+
+    /**
+     * Do we have a bow equipped?
+     *
+     * @param Item $itemToEquip
+     * @param Collection $inventorySlots
+     * @return bool
+     */
+    public function isBowEquipped(Item $itemToEquip, Collection $inventorySlots): bool {
+        $validTypes = ['weapon', 'shield', 'bow'];
+
+        if (!in_array($itemToEquip->type, $validTypes)) {
+             return false;
+        }
+
+        return $inventorySlots->filter(function($slot) {
+            return $slot->item->type === 'bow' && $slot->equipped;
+        })->isNotEmpty();
+    }
+
+    public function unequipBothHands() {
+        $slots = $this->character->inventory->slots->filter(function($slot) {
+            return $slot->equipped;
+        });
+
+        foreach ($slots as $slot) {
+            if ($slot->position === 'right-hand' || $slot->position === 'left-hand') {
+                $slot->update(['equipped' => false]);
+            }
+        }
+
+        $this->character = $this->character->refresh();
     }
 }

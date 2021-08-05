@@ -1,6 +1,13 @@
 <input type="hidden" name="slot_id" value={{$slotId}} />
 <input type="hidden" name="equip_type" value={{$type}} />
 
+@if ($item->type === 'bow')
+    <div class="alert alert-info mt-2 mb-3">
+        You can choose what ever hand to hold the bow in, however you fire the bow with both hands. You cannot dual wield bows or bows with other weapons.
+        Any other weapons you have equipped, including shields, will be replaced by this bow.
+    </div>
+@endif
+
 <fieldset class="form-group row">
     <legend class="col-sm-2">Which Position</legend>
     <div class="col-sm-10">

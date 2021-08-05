@@ -15,25 +15,29 @@ trait CalculateSkillBonus {
      * @param string $skillName
      * @return float|mixed
      */
-    public function calculateBonus(Item $item, string $skillName) {
+    public function calculateBonus(Item $item, string $skillName, string $skillAttribute = 'skill_bonus') {
         $baseSkillTraining = 0.0;
 
         if (!is_null($item->itemPrefix)) {
             if ($item->itemPrefix->skill_name === $skillName) {
-                $baseSkillTraining += !is_null($item->itemPrefix->skill_bonus) ? $item->itemPrefix->skill_bonus : 0;
+                $baseSkillTraining += !is_null($item->itemPrefix->{$skillAttribute}) ? $item->itemPrefix->{$skillAttribute} : 0;
             }
         }
 
         if (!is_null($item->itemSuffix)) {
             if ($item->itemSuffix->skill_name === $skillName) {
-                $baseSkillTraining += !is_null($item->itemSuffix->skill_bonus) ? $item->itemSuffix->skill_bonus : 0;
+                $baseSkillTraining += !is_null($item->itemSuffix->{$skillAttribute}) ? $item->itemSuffix->{$skillAttribute} : 0;
             }
         }
 
         if (!is_null($item->skill_name)) {
             if ($item->skill_name === $skillName) {
-                $baseSkillTraining += $item->skill_bonus;
+                $baseSkillTraining += $item->{$skillAttribute};
             }
+        }
+
+        if (!is_null($item->{$skillAttribute})) {
+            $baseSkillTraining += $item->{$skillAttribute};
         }
 
         return $baseSkillTraining;

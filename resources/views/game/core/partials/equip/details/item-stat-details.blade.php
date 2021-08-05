@@ -11,6 +11,8 @@
     <dd class={{$item->base_ac_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_ac_mod * 100}}%</dd>
     <dt>Healing Modifier:</dt>
     <dd class={{$item->base_ac_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_healing_mod * 100}}%</dd>
+    <dt>Fight Time Out Modifier:</dt>
+    <dd class={{$item->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}>{{$item->fight_time_out_mod_bonus * 100}}%</dd>
     <dt>Str Modifier:</dt>
     <dd><span class={{$item->getTotalPercentageForStat('str') > 0.0 ? 'text-success' : ''}}>{{number_format($item->getTotalPercentageForStat('str') * 100)}}% </span></dd>
     <dt>Dur Modifier:</dt>

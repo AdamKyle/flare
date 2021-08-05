@@ -21,6 +21,7 @@ class ItemDetails extends Component
 
     public $types = [
         'weapon',
+        'bow',
         'body',
         'shield',
         'leggings',
@@ -37,6 +38,7 @@ class ItemDetails extends Component
     ];
 
     public $defaultPositions = [
+        'bow',
         'body',
         'leggings',
         'feet',

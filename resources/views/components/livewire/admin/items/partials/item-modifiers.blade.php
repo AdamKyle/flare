@@ -1,21 +1,35 @@
 <div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-damage-mod">Base Damage Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-base-damage-mod" name="item-base-damage-mod" wire:model="item.base_damage_mod">
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-ac-mod">Base AC Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-base-ac-mod" name="item-base-ac-mod" wire:model="item.base_ac_mod">
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-healing-mod">Base Healing Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-base-healing-mod" name="item-base-healing-mod" wire:model="item.base_healing_mod">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item-fight-time-out-mod-bonus">Base Fight Time Out Mod: </label>
+                <input
+                    type="number"
+                    steps="0.01"
+                    class="form-control"
+                    id="item-fight-time-out-mod-bonus"
+                    name="item-fight-time-out-mod-bonus"
+                    wire:model="item.fight_time_out_mod_bonus"
+                    {{$item->usable ? 'disabled' : ''}}
+                >
             </div>
         </div>
     </div>
@@ -50,6 +64,18 @@
             <div class="form-group">
                 <label for="item-chr-mod">Chr Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-chr-mod" name="item-chr-mod" wire:model="item.chr_mod">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item-agi-mod">Agi Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-agi-mod" name="item-agi-mod" wire:model="item.agi_mod">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item-focus-mod">Focus Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-focus-mod" name="item-focus-mod" wire:model="item.focus_mod">
             </div>
         </div>
     </div>

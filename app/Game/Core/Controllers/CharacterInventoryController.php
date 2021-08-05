@@ -65,6 +65,7 @@ class CharacterInventoryController extends Controller {
             'type'        => $service->getType($request, $itemToEquip->item),
             'slotId'      => $itemToEquip->id,
             'characterId' => $character->id,
+            'bowEquipped' => false,
         ];
 
         if ($service->inventory()->isNotEmpty()) {
@@ -75,6 +76,7 @@ class CharacterInventoryController extends Controller {
                 'slotId'       => $itemToEquip->id,
                 'slotPosition' => $itemToEquip->position,
                 'characterId'  => $character->id,
+                'bowEquipped'  => $this->equipItemService->isBowEquipped($itemToEquip->item, $service->inventory()),
             ];
         }
 

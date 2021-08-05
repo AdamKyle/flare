@@ -19,15 +19,18 @@ class ItemModifiers extends Component
     public $editing = false;
 
     protected $rules = [
-        'item.base_damage_mod'  => 'nullable',
-        'item.base_healing_mod' => 'nullable',
-        'item.base_ac_mod'      => 'nullable',
-        'item.str_mod'          => 'nullable',
-        'item.dur_mod'          => 'nullable',
-        'item.dex_mod'          => 'nullable',
-        'item.chr_mod'          => 'nullable',
-        'item.int_mod'          => 'nullable',
-        'item.effect'           => 'nullable',
+        'item.base_damage_mod'          => 'nullable',
+        'item.base_healing_mod'         => 'nullable',
+        'item.base_ac_mod'              => 'nullable',
+        'item.str_mod'                  => 'nullable',
+        'item.dur_mod'                  => 'nullable',
+        'item.dex_mod'                  => 'nullable',
+        'item.chr_mod'                  => 'nullable',
+        'item.int_mod'                  => 'nullable',
+        'item.agi_mod'                  => 'nullable',
+        'item.focus_mod'                => 'nullable',
+        'item.effect'                   => 'nullable',
+        'item.fight_time_out_mod_bonus' => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];
