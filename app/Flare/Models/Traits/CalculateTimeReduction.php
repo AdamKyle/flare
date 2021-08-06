@@ -15,6 +15,7 @@ trait CalculateTimeReduction {
      */
     public function calculateTotalTimeBonus(Skill $skill, string $modifier) {
         $gameSkill    = $skill->baseSkill;
+
         $currentValue = ($gameSkill->{$modifier} * $skill->level);
 
         $character = $skill->character;
