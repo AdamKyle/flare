@@ -15,6 +15,7 @@ class CreateInventorySets extends Migration
     {
         Schema::create('inventory_sets', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');
             $table->bigInteger('inventory_id')->unsigned();
             $table->foreign('inventory_id')
                 ->references('id')->on('inventories');

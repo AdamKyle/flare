@@ -23,9 +23,12 @@
                 <p>Sets may be incomplete, in that case we will just replace the appropriate gear.</p>
                 <p>You may also treat sets as a stash tab, which seems to be what you are doing here - they just cant be equipped automatically.</p>
             </div>
-            First Set
+            <button class="btn btn-primary btn-sm">re-name set</button>
+            <hr />
         </x-tabs.tab-content-section>
         <x-tabs.tab-content-section tab="set-2" active="false">
+            <button class="btn btn-primary btn-sm">re-name set</button>
+            <hr />
             Second Set
         </x-tabs.tab-content-section>
         <x-tabs.tab-content-section tab="set-3" active="false">

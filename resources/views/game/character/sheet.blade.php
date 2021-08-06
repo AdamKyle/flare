@@ -127,6 +127,15 @@
                         ])
                     </x-tabs.tab-content-section>
                     <x-tabs.tab-content-section tab="sets">
+                        <div class="alert alert-info mt-2 mb-3">
+                            <p>
+                                Items placed in sets cannot be usable items, they can only be equipment you wish to use later by quickly equipping or to store for later usage as
+                                a stash tab. Items placed in a set can be removed, but will not be destroyed or disenchanted when clicking "Destroy All" or "Disenchant all"
+                            </p>
+                            <p>
+                                Sets also do not count towards your max inventory space.
+                            </p>
+                        </div>
                         @include('game.character.partials.equipment-sets.sets', [
                             'character' => $character
                         ])
