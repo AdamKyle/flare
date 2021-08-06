@@ -31,6 +31,7 @@ class ItemModifiers extends Component
         'item.focus_mod'                => 'nullable',
         'item.effect'                   => 'nullable',
         'item.fight_time_out_mod_bonus' => 'nullable',
+        'item.base_damage_mod_bonus'    => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];

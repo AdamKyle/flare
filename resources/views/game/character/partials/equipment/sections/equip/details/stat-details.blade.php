@@ -14,11 +14,11 @@
             <dt>Healing:</dt>
             <dd><span class={{$value['healing_adjustment'] === 0 ? '' : ($value['healing_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['healing_adjustment'] >= 0 ? '+' : ''}}{{$value['healing_adjustment']}}</span></dd>
             <dt>Base Attack Mod:</dt>
-            <dd><span class={{$value['base_damage_adjustment'] === 0 ? '' : ($value['base_damage_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_damage_adjustment'] >= 0 ? '+' : ''}}{{$value['base_damage_adjustment'] * 100}}%</span></dd>
-            <dt>Base AC Mod:</dt>
-            <dd><span class={{$value['base_ac_adjustment'] === 0 ? '' : ($value['base_ac_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_ac_adjustment'] >= 0 ? '+' : ''}}{{$value['base_ac_adjustment'] * 100}}%</span></dd>
-            <dt>Base Healing Mod:</dt>
-            <dd><span class={{$value['base_healing_adjustment'] === 0 ? '' : ($value['base_healing_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_healing_adjustment'] >= 0 ? '+' : ''}}{{$value['base_healing_adjustment']}}</span></dd>
+            <dd><span class={{$value['base_damage_adjustment'] === 0.0 ? '' : ($value['base_damage_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_damage_adjustment'] >= 0 ? '+' : ''}}{{$value['base_damage_adjustment'] * 100}}%</span></dd>
+            <dt>Fight Time Out Mod:</dt>
+            <dd><span class={{$value['fight_timeout_mod_adjustment'] === 0.0 ? '' : ($value['fight_timeout_mod_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['fight_timeout_mod_adjustment'] >= 0 ? '+' : ''}}{{$value['fight_timeout_mod_adjustment'] * 100}}%</span></dd>
+            <dt>Base Damage Mod:</dt>
+            <dd><span class={{$value['base_damage_mod_adjustment'] === 0.0 ? '' : ($value['base_damage_mod_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_damage_mod_adjustment'] >= 0 ? '+' : ''}}{{$value['base_damage_mod_adjustment'] * 100}}%</span></dd>
             <dt>Str:</dt>
             <dd><span class={{$value['str_adjustment'] === 0.0 ? '' : ($value['str_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['str_adjustment'] >= 0 ? '+' : ''}}{{$value['str_adjustment'] * 100}}%</span></dd>
             <dt>Dur:</dt>
@@ -30,9 +30,9 @@
             <dt>Int:</dt>
             <dd><span class={{$value['int_adjustment'] === 0.0 ? '' : ($value['int_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['int_adjustment'] >= 0 ? '+' : ''}}{{$value['int_adjustment'] * 100}}%</span></dd>
             <dt>Agi:</dt>
-            <dd><span class={{$value['agi_adjustment'] >= 0 ? 'text-success' : 'text-danger'}}>{{$value['agi_adjustment'] >= 0 ? '+' : ''}}{{$value['agi_adjustment'] * 100}}%</span></dd>
+            <dd><span class={{$value['agi_adjustment'] === 0.0 ? '' : ($value['agi_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['agi_adjustment'] >= 0 ? '+' : ''}}{{$value['agi_adjustment'] * 100}}%</span></dd>
             <dt>Focus:</dt>
-            <dd><span class={{$value['focus_adjustment'] >= 0 ? 'text-success' : 'text-danger'}}>{{$value['focus_adjustment'] >= 0 ? '+' : ''}}{{$value['focus_adjustment'] * 100}}%</span></dd>
+            <dd><span class={{$value['focus_adjustment'] === 0.0 ? '' : ($value['focus_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['focus_adjustment'] >= 0 ? '+' : ''}}{{$value['focus_adjustment'] * 100}}%</span></dd>
         </dl>
     </div>
 @endforeach

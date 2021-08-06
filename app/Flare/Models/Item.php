@@ -176,7 +176,7 @@ class Item extends Model
                 $damage = 1;
             }
 
-            $damage = ($damage * (1 + $this->itemPrefix->base_damage_mod));
+            $damage += ($damage * $this->itemPrefix->base_damage_mod);
         }
 
         if (!is_null($this->itemSuffix)) {
@@ -184,10 +184,14 @@ class Item extends Model
                 $damage = 1;
             }
 
-            $damage = ($damage * (1 + $this->itemSuffix->base_damage_mod));
+            $damage += ($damage * $this->itemSuffix->base_damage_mod);
         }
 
-        return ceil($damage);
+        if (!is_null($this->base_damage_mod)) {
+            $damage += ($damage * $this->base_damage_mod);
+        }
+
+        return round($damage);
     }
 
     /**
@@ -265,10 +269,19 @@ class Item extends Model
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function scopeGetTotalFightTimeOutMod(): int {
-        return is_null($this->fight_time_out_mod_bonus) ? 0 : $this->fight_time_out_mod_bonus;
+    public function scopeGetTotalFightTimeOutMod(): float {
+        return is_null($this->fight_time_out_mod_bonus) ? 0.0 : $this->fight_time_out_mod_bonus;
+    }
+
+    /**
+     * Get the total Base Damage Mode
+     *
+     * @return float
+     */
+    public function scopeGetTotalBaseDamageMod(): float {
+        return is_null($this->base_damage_mod_bonus) ? 0.0 : $this->base_damage_mod_bonus;
     }
 
     /**

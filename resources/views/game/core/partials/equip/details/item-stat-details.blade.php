@@ -1,18 +1,20 @@
 <dl class="mt-2">
-    <dt>Attack:</dt>
+    <dt>Attack <sup>*</sup></sup>:</dt>
     <dd><span class={{$item->getTotalDamage() > 0 ? 'text-success' : ''}}>{{$item->getTotalDamage()}}</span></dd>
     <dt>AC:</dt>
     <dd><span class={{$item->getTotalDefence() > 0 ? 'text-success' : ''}}>{{$item->getTotalDefence()}}</span></dd>
     <dt>Healing:</dt>
     <dd><span class={{$item->getTotalHealing() > 0 ? 'text-success' : ''}}>{{$item->getTotalHealing()}}</span></dd>
-    <dt>Damage Modifier:</dt>
+    <dt>Base Attack Modifier:</dt>
     <dd class={{$item->base_damage_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_damage_mod * 100}}%</dd>
+    <dt>Fight Time Out Modifier <sup>**</sup>:</dt>
+    <dd class={{$item->getTotalFightTimeOutMod() > 0.0 ? 'text-success' : ''}}>{{$item->getTotalFightTimeOutMod() * 100}}%</dd>
+    <dt>Base Damage Modifier<sup>**</sup>:</dt>
+    <dd class={{$item->getTotalBaseDamageMod() > 0.0 ? 'text-success' : ''}}>{{$item->getTotalBaseDamageMod() * 100}}%</dd>
     <dt>AC Modifier:</dt>
     <dd class={{$item->base_ac_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_ac_mod * 100}}%</dd>
     <dt>Healing Modifier:</dt>
     <dd class={{$item->base_ac_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_healing_mod * 100}}%</dd>
-    <dt>Fight Time Out Modifier:</dt>
-    <dd class={{$item->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}>{{$item->fight_time_out_mod_bonus * 100}}%</dd>
     <dt>Str Modifier:</dt>
     <dd><span class={{$item->getTotalPercentageForStat('str') > 0.0 ? 'text-success' : ''}}>{{number_format($item->getTotalPercentageForStat('str') * 100)}}% </span></dd>
     <dt>Dur Modifier:</dt>
@@ -28,3 +30,11 @@
     <dt>Focus Modifier:</dt>
     <dd><span class={{$item->getTotalPercentageForStat('focus') > 0.0 ? 'text-success' : ''}}>{{number_format($item->getTotalPercentageForStat('focus') * 100)}}% </span></dd>
 </dl>
+
+<p class="mt-3 mb-3">
+    <sup>*</sup> Attack includes Base Attack Modifier applied automatically, rounded to the nearest whole number.
+</p>
+<p>
+    <sup>**</sup> Applies to all skills that increase this modifier.
+</p>
+

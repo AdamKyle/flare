@@ -25,11 +25,11 @@ class AddAlchemyCostsToItems extends Migration
             $table->integer('affects_skill_type')->nullable();
             $table->decimal('increase_skill_bonus_by', 8, 4)->nullable()->default(0.0);
             $table->decimal('increase_skill_training_bonus_by', 8, 4)->nullable()->default(0.0);
-            $table->decimal('base_damage_mod_bonus', 8, 4)->nullable();
-            $table->decimal('base_healing_mod_bonus', 8, 4)->nullable();
-            $table->decimal('base_ac_mod_bonus', 8, 4)->nullable();
-            $table->decimal('fight_time_out_mod_bonus', 8, 4)->nullable();
-            $table->decimal('move_time_out_mod_bonus', 8, 4)->nullable();
+            $table->decimal('base_damage_mod_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('base_healing_mod_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('base_ac_mod_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('fight_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('move_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
         });
     }
 
