@@ -7,7 +7,7 @@
     <dd><span class={{$item->getTotalHealing() > 0 ? 'text-success' : ''}}>{{$item->getTotalHealing()}}</span></dd>
     <dt>Base Attack Modifier:</dt>
     <dd class={{$item->base_damage_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_damage_mod * 100}}%</dd>
-    <dt>Fight Time Out Modifier <sup>**</sup>:</dt>
+    <dt>Fight Timeout Modifier <sup>**</sup>:</dt>
     <dd class={{$item->getTotalFightTimeOutMod() > 0.0 ? 'text-success' : ''}}>{{$item->getTotalFightTimeOutMod() * 100}}%</dd>
     <dt>Base Damage Modifier<sup>**</sup>:</dt>
     <dd class={{$item->getTotalBaseDamageMod() > 0.0 ? 'text-success' : ''}}>{{$item->getTotalBaseDamageMod() * 100}}%</dd>

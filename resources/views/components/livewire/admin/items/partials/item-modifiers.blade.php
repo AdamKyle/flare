@@ -36,7 +36,7 @@
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label for="item-fight-time-out-mod-bonus">Base Fight Time Out Mod (Skills): </label>
+                <label for="item-fight-time-out-mod-bonus">Base Fight Timeout Mod (Skills): </label>
                 <input
                     type="number"
                     steps="0.01"

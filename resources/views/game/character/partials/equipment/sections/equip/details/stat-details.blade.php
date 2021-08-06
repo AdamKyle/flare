@@ -7,7 +7,7 @@
         @endif
 
         <dl>
-            <dt>Attack:</dt>
+            <dt>Attack <sup>*</sup>:</dt>
             <dd><span class={{$value['damage_adjustment'] === 0 ? '' : ($value['damage_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['damage_adjustment'] >= 0 ? '+' : ''}}{{$value['damage_adjustment']}}</span></dd>
             <dt>AC:</dt>
             <dd><span class={{$value['ac_adjustment'] === 0 ? '' : ($value['ac_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['ac_adjustment'] >= 0 ? '+' : ''}}{{$value['ac_adjustment']}}</span></dd>
@@ -15,9 +15,9 @@
             <dd><span class={{$value['healing_adjustment'] === 0 ? '' : ($value['healing_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['healing_adjustment'] >= 0 ? '+' : ''}}{{$value['healing_adjustment']}}</span></dd>
             <dt>Base Attack Mod:</dt>
             <dd><span class={{$value['base_damage_adjustment'] === 0.0 ? '' : ($value['base_damage_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_damage_adjustment'] >= 0 ? '+' : ''}}{{$value['base_damage_adjustment'] * 100}}%</span></dd>
-            <dt>Fight Time Out Mod:</dt>
+            <dt>Fight Timeout Mod <sup>**</sup>:</dt>
             <dd><span class={{$value['fight_timeout_mod_adjustment'] === 0.0 ? '' : ($value['fight_timeout_mod_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['fight_timeout_mod_adjustment'] >= 0 ? '+' : ''}}{{$value['fight_timeout_mod_adjustment'] * 100}}%</span></dd>
-            <dt>Base Damage Mod:</dt>
+            <dt>Base Damage Mod <sup>**</sup>:</dt>
             <dd><span class={{$value['base_damage_mod_adjustment'] === 0.0 ? '' : ($value['base_damage_mod_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_damage_mod_adjustment'] >= 0 ? '+' : ''}}{{$value['base_damage_mod_adjustment'] * 100}}%</span></dd>
             <dt>Str:</dt>
             <dd><span class={{$value['str_adjustment'] === 0.0 ? '' : ($value['str_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['str_adjustment'] >= 0 ? '+' : ''}}{{$value['str_adjustment'] * 100}}%</span></dd>

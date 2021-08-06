@@ -8,5 +8,12 @@
             <h6 class="mb-4">Stat Details:</h6>
             @include('game.character.partials.equipment.sections.item-stat-details', ['item' => $equipment['slot']->item])
         @endif
+
+        <p class="mt-3 mb-3">
+            <sup>*</sup> Attack includes Base Attack Modifier applied automatically, rounded to the nearest whole number.
+        </p>
+        <p>
+            <sup>**</sup> Applies to all skills that increase this modifier.
+        </p>
     </div>
 </div>

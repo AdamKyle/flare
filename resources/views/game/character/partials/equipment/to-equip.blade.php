@@ -7,6 +7,13 @@
             'details'      => $details,
         ])
 
+        <p class="mt-3 mb-3">
+            <sup>*</sup> Attack includes Base Attack Modifier applied automatically, rounded to the nearest whole number.
+        </p>
+        <p>
+            <sup>**</sup> Applies to all skills that increase this modifier.
+        </p>
+
         <form class="mt-4" action="{{route('game.equip.item', ['character' => $characterId])}}" method="POST">
             @csrf
 

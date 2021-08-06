@@ -1,5 +1,5 @@
 <dl class="mt-2">
-    <dt>Attack:</dt>
+    <dt>Attack <sup>*</sup>:</dt>
     <dd><span class='{{$item->getTotalDamage() > 0 ? 'text-success' : ''}}'>+{{$item->getTotalDamage()}} </span></dd>
     <dt>AC:</dt>
     <dd><span class='{{$item->getTotalDefence() > 0 ? 'text-success' : ''}}'>+{{$item->getTotalDefence()}} </span></dd>
@@ -7,9 +7,9 @@
     <dd><span class='{{$item->getTotalHealing() > 0 ? 'text-success' : ''}}'>+{{$item->getTotalHealing()}} </span></dd>
     <dt>Base Attack Mod:</dt>
     <dd><span class='{{$item->getTotalBaseDamageMod() > 0.0 ? 'text-success' : ''}}'>+{{$item->getTotalBaseDamageMod() * 100}}% </span></dd>
-    <dt>Fight Time Out Mod:</dt>
+    <dt>Fight Timeout Mod <sup>**</sup>:</dt>
     <dd><span class='{{$item->getTotalFightTimeOutMod() > 0.0 ? 'text-success' : ''}}'>+{{$item->getTotalFightTimeOutMod() * 100}}% </span></dd>
-    <dt>Base Damage Mod:</dt>
+    <dt>Base Damage Mod <sup>**</sup>:</dt>
     <dd><span class='{{$item->getTotalBaseDamageMod() > 0.0 ? 'text-success' : ''}}'>+{{$item->getTotalBaseDamageMod() * 100}}% </span></dd>
     <dt>Str:</dt>
     <dd><span class='{{$item->getTotalPercentageForStat('str') > 0 ? 'text-success' : ''}}'>+{{$item->getTotalPercentageForStat('str') * 100}}% </span></dd>
