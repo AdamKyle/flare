@@ -99,6 +99,12 @@ class CharacterBuilder {
             'position'     => 'left-hand',
         ]);
 
+        for ($i = 1; $i <= 10; $i++) {
+            $this->character->inventorySets()->create([
+                'character_id' => $this->character->id,
+            ]);
+        }
+
         $this->character->map()->create([
             'character_id' => $this->character->id,
             'game_map_id'  => $map->id,

@@ -120,6 +120,10 @@ class Character extends Model
         return $this->hasOne(Inventory::class, 'character_id', 'id');
     }
 
+    public function inventorySets() {
+        return $this->hasMany(InventorySet::class, 'character_id', 'id');
+    }
+
     public function map() {
         return $this->hasOne(Map::class);
     }

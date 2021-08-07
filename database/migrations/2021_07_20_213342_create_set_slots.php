@@ -21,6 +21,7 @@ class CreateSetSlots extends Migration
             $table->bigInteger('inventory_set_id')->unsigned();
             $table->foreign('inventory_set_id', 'set_id')
                 ->references('id')->on('inventory_sets');
+            $table->boolean('equipped')->default(false);
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ class UpdateKingdomTest extends TestCase
                         ->givePlayerLocation()
                         ->getCharacter();
 
-        $this->createKingdom([
+        $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
             'game_map_id'        => 1,
             'current_stone'      => 0,
@@ -37,7 +37,7 @@ class UpdateKingdomTest extends TestCase
                 'is_resource_building' => true,
                 'increase_wood_amount' => 150,
             ])->id,
-            'kingdom_id'         => 1,
+            'kingdom_id'         => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,
@@ -49,7 +49,19 @@ class UpdateKingdomTest extends TestCase
             'game_building_id'   => $this->createGameBuilding([
                 'is_farm' => true,
             ])->id,
-            'kingdom_id'         => 1,
+            'kingdom_id'         => $kingdom->id,
+            'level'              => 1,
+            'current_defence'    => 100,
+            'current_durability' => 100,
+            'max_defence'        => 100,
+            'max_durability'     => 100,
+        ]);
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => $this->createGameBuilding([
+                'name' => 'Keep',
+            ])->id,
+            'kingdom_id'         => $kingdom->id,
             'level'              => 1,
             'current_defence'    => 100,
             'current_durability' => 100,

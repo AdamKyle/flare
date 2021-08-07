@@ -46,6 +46,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 100,
                 'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -103,6 +114,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 100,
                 'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -143,6 +165,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'game_building_id'     => $this->createGameBuilding([
                     'is_resource_building' => true,
                     'increase_wood_amount' => 100
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
@@ -198,6 +231,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'current_durability' => 100,
                 'current_defence'    => 100,
             ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
+            ]
         ]);
 
         $kingdom = $kingdom->refresh();
@@ -239,6 +283,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 ])->id,
                 'kingdom_id'          => $kingdom->id,
                 'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 0,
+                'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'               => 1,
                 'max_defence'        => 100,
                 'max_durability'     => 100,
                 'current_durability' => 0,
@@ -290,6 +345,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'     => 100,
                 'current_durability' => 0,
                 'current_defence'    => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 0,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -301,7 +367,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $this->assertEquals($kingdom->current_morale, .50);
+        $this->assertEquals($kingdom->current_morale, .45);
         $this->assertEquals($kingdom->current_wood, 700);
         $this->assertTrue($kingdom->current_population > 0);
     }
@@ -343,6 +409,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -395,7 +472,19 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 100,
                 'current_defence'        => 100,
-            ]
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name'                   => 'Keep',
+                    'increase_morale_amount' => 2.0,
+                ])->id,
+                'kingdom_id'            => $kingdom->id,
+                'level'                  => 1,
+                'max_defence'            => 100,
+                'max_durability'         => 100,
+                'current_durability'     => 100,
+                'current_defence'        => 100,
+            ],
         ]);
 
         $kingdom = $kingdom->refresh();
@@ -447,6 +536,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -498,6 +598,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -549,6 +660,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 100,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 
@@ -610,6 +732,17 @@ class KingdomResourcesServiceTest extends TestCase {
                 'max_durability'         => 100,
                 'current_durability'     => 0,
                 'current_defence'        => 100,
+            ],
+            [
+                'game_building_id'     => $this->createGameBuilding([
+                    'name' => 'Keep',
+                ])->id,
+                'kingdom_id'          => $kingdom->id,
+                'level'                => 1,
+                'max_defence'        => 100,
+                'max_durability'     => 100,
+                'current_durability' => 100,
+                'current_defence'    => 100,
             ]
         ]);
 

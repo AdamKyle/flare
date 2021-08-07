@@ -50,7 +50,7 @@ class CharacterSkillControllerTest extends TestCase
         $response = $this->actingAs($user)->post(route('train.skill', [
             'character' => $character->id
         ]), [
-            'skill_id'      => 6,
+            'skill_id'      => 69702,
             'xp_percentage' => 0.10,
         ])->response;
 

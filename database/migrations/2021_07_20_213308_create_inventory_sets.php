@@ -15,11 +15,11 @@ class CreateInventorySets extends Migration
     {
         Schema::create('inventory_sets', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
-            $table->bigInteger('inventory_id')->unsigned();
-            $table->foreign('inventory_id')
-                ->references('id')->on('inventories');
+            $table->bigInteger('character_id')->unsigned();
+            $table->foreign('character_id')
+                ->references('id')->on('characters');
             $table->boolean('is_equipped')->default(false);
+            $table->boolean('can_be_equipped')->default(true);
             $table->timestamps();
         });
     }

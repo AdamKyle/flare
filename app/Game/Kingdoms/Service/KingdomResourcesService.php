@@ -3,12 +3,14 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -286,11 +288,21 @@ class KingdomResourcesService {
             return;
         }
 
-        if ($this->kingdom->current_morale > 0.50) {
-            return $this->updateTreasury(1000);
+        if (KingdomMaxValue::isTreasuryAtMax($this->kingdom)) {
+             return;
         }
 
-        return $this->updateTreasury(100);
+        if ($this->kingdom->current_morale > 0.50) {
+            $keep = $this->kingdom->buildings()
+                                  ->where('game_building_id', GameBuilding::where('name', 'Keep')->first()->id)
+                                  ->first();
+
+            $total = 10000 + (10000 * ($keep->level / 100));
+
+            return $this->updateTreasury($total);
+        }
+
+        return $this->updateTreasury(1000);
     }
 
 
