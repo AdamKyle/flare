@@ -4,6 +4,7 @@ namespace App\Game\Core\Providers;
 
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
+use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\UseItemService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -61,6 +62,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Manager::class),
                 $app->make(CharacterAttackTransformer::class),
             );
+        });
+
+        $this->app->bind(InventorySetService::class, function($app) {
+            return new InventorySetService();
         });
     }
 

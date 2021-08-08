@@ -1,0 +1,253 @@
+<?php
+
+namespace App\Game\Core\Services;
+
+use App\Flare\Models\Character;
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\Item;
+use App\Game\Core\Traits\ResponseBuilder;
+
+class InventorySetService {
+
+    use ResponseBuilder;
+
+    /**
+     * Allows us to add an item to an inventory set.
+     *
+     * @param InventorySet $inventorySet
+     * @param Item $item
+     */
+    public function assignItemToSet(InventorySet $inventorySet, Item $item) {
+        $inventorySet->slots()->create([
+            'inventory_set_id' => $inventorySet->id,
+            'item_id'          => $item->id,
+        ]);
+
+        $inventorySet = $inventorySet->efresh();
+
+        // Is the inventory set still considered equipable?
+        $inventorySet->update([
+            'can_be_equipped' => $this->isSetEquippable($inventorySet),
+        ]);
+    }
+
+    /**
+     * Allows us to remove an item from the set.
+     *
+     * Returns a response object.
+     *
+     * @param InventorySet $inventorySet
+     * @param Item $item
+     * @return array
+     */
+    public function removeItemFromInventorySet(InventorySet $inventorySet, Item $item): array {
+        $slotWithItem = $inventorySet->slots->filter(function($slot) use ($item) {
+            return $slot->item_id === $item->id;
+        })->first();
+
+        if (is_null($slotWithItem)) {
+            return $this->errorResult('No such item found in this inventory set.');
+        }
+
+        $character = $inventorySet->character;
+
+        if ($character->inventory_max === $character->inventory->slots->count()) {
+            return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
+        }
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $slotWithItem->item_id,
+        ]);
+
+        $slotWithItem->delete();
+
+        $inventorySet = $inventorySet->refresh();
+
+        $inventorySet->update([
+            'can_be_equipped' => $this->isSetEquippable($inventorySet),
+        ]);
+
+        return $this->successResult(['message' => 'Removed item from inventory set and placed back into inventory.']);
+    }
+
+    /**
+     * Equips an inventory set.
+     *
+     * Removes the existing equipped items.
+     *
+     * Return s a refreshed character.
+     *
+     * @param Character $character
+     * @param InventorySet $inventorySet
+     * @return Character
+     */
+    public function equipInventorySet(Character $character, InventorySet $inventorySet): Character {
+        $character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
+        $inventorySet->slots()->update(['equipped' => true]);
+        $inventorySet->update(['equipped', true]);
+
+        return $character->refresh();
+    }
+
+    /**
+     * Can un equip a set.
+     *
+     * @param InventorySet $inventorySet
+     */
+    public function unEquipInventorySet(InventorySet $inventorySet): void {
+        $inventorySet->slots()->update(['equipped' => false]);
+        $inventorySet->update(['equipped', false]);
+    }
+
+    /**
+     * Checks to see if the set is equipable.
+     *
+     * When new items are added or items are removed from the set, the set will call this
+     * function to then update it's euippable status.
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
+    public function isSetEquippable(InventorySet $inventorySet): bool {
+        // Bail early as our weapons are invalid.
+        if (!$this->hasWeapon($inventorySet)) {
+            return false;
+        }
+
+        $validArmour = ['body','leggings','feet','sleeves','helmet','gloves'];
+
+        foreach ($validArmour as $armourType) {
+            // If any of the armour we have in the set doesn't match the count of 1.
+            if (!$this->hasArmour($inventorySet, $armourType)) {
+                return false;
+            }
+        }
+
+        // Bail if we have more then two rings.
+        if (!$this->hasRings($inventorySet)) {
+            return false;
+        }
+
+        // Bail if we have more then two spells of either type.
+        if (!$this->hasSpells($inventorySet)) {
+            return false;
+        }
+
+        // Assume that this set is equippable.
+        return true;
+    }
+
+    /**
+     * Do we have at least one weapon?
+     *
+     * If you have more then two weapons, its a no.
+     *
+     * If you have a bow and a weapon or a shield, its a no.
+     *
+     * If you have multiple weapons and a shield/bow its a no.
+     *
+     * Valid: 2 weapons (neither are bow) or 1 weapons (bow) or 1 weapon (non bow) and shield.
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
+    protected function hasWeapon(InventorySet $inventorySet) {
+        $weapons = collect($inventorySet->slots->filter(function($slot) {
+           return $slot->item->type === 'weapon';
+        })->all());
+
+        if ($weapons->count() > 2) {
+            return false;
+        }
+
+        $hasBow = $inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'bow';
+        })->isNotEmpty();
+
+        if ($hasBow && $weapons->count() > 1) {
+            return false;
+        }
+
+        $hasShield = $inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'shield';
+        })->isNotEmpty();
+
+        if ($hasShield && $weapons->count() > 1) {
+            return false;
+        }
+
+        if ($hasShield && $hasBow) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Is the type of armour being passed in a count of 1?
+     *
+     * If you have more then one piece of armour its a no.
+     *
+     * @param InventorySet $inventorySet
+     * @param string $type
+     * @return bool
+     */
+    protected function hasArmour(InventorySet $inventorySet, string $type) : bool {
+        $items = collect($inventorySet->slots->filter(function($slot) use ($type) {
+            return $slot->item->type === $type;
+        })->all());
+
+        if ($items->count() > 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Do you only have a max of 2 rings or less?
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
+    protected function hasRings(InventorySet $inventorySet): bool {
+        $rings = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'ring';
+        }));
+
+        if ($rings->count > 2) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Do you have spells?
+     *
+     * Valid: 1 Heal, 1 Damage or 2 Heal no Damage or 2 Damage no Heal.
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
+    protected function hasSpells(InventorySet $inventorySet) {
+        $healingSpells = collection($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'spell-healing';
+        }));
+
+        $damageSpells = collection($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'spell-damage';
+        }));
+
+        if ($healingSpells >= 2 && $damageSpells > 0) {
+            return false;
+        }
+
+        if ($healingSpells > 0 && $damageSpells >= 2) {
+            return false;
+        }
+
+        return true;
+    }
+}

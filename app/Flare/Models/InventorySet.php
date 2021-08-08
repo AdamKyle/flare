@@ -31,4 +31,8 @@ class InventorySet extends Model {
     public function character() {
         return $this->belongsTo(Character::class);
     }
+
+    public function slots() {
+        return $this->hasMany(SetSlot::class);
+    }
 }
