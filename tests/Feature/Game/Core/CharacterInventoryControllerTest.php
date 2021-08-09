@@ -42,7 +42,8 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $this->actingAs($user)->post(route('game.inventory.unequip', ['character' => $this->character->getCharacter()->id]), [
-            'item_to_remove' => InventorySlot::where('equipped', true)->first()->id,
+            'item_to_remove'         => InventorySlot::where('equipped', true)->first()->id,
+            'inventory_set_equipped' => false,
         ]);
 
         $character = Character::first();
@@ -56,7 +57,8 @@ class CharacterInventoryControllerTest extends TestCase
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->post(route('game.inventory.unequip', ['character' => $this->character->getCharacter()->id]) , [
-            'item_to_remove' => rand(900,9560)
+            'item_to_remove' => rand(900,9560),
+            'inventory_set_equipped' => false,
         ])->response;
 
         $response->assertSessionHas('error', 'No item found to be equipped.');

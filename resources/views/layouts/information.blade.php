@@ -86,7 +86,7 @@
               </div>
           </aside>
 
-          <div class="page-wrapper page">
+          <div class="page-wrapper page p-5">
             <div class="container mb-5 info-text">
                 @yield('content')
             </div>

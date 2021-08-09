@@ -143,14 +143,10 @@ class CharacterInventoryController extends Controller {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
             if (is_null($inventorySet)) {
-                $foundItem = null;
+                return redirect()->back()->with('error', 'No item found to be equipped.');
             } else {
                 $foundItem = $inventorySet->slots->find($request->item_to_remove);
             }
-        }
-
-        if (!is_null($foundItem)) {
-            return redirect()->back()->with('error', 'No item found to be equipped.');
         }
 
         $foundItem->update([
