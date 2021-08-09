@@ -34,6 +34,7 @@
                 @csrf
 
                 <input type="hidden" name="item_to_remove" value={{$slot->id}} />
+                <input type="hidden" name="inventory_set_equipped" value="{{$inventorySetEquipped}}" />
             </form>
             <a class="dropdown-item" href="{{route('game.inventory.unequip', ['character' => $character])}}"
                onclick="event.preventDefault();

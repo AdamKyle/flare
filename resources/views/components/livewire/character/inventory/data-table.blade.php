@@ -177,7 +177,8 @@
                                 @if ($allowInventoryManagement && $slot->item->type !== 'quest' && !$slot->item->damages_kingdoms)
                                     @include('game.character.partials.equipment.drop-downs.equip-dropdown', [
                                         'slot' => $slot,
-                                        'character' => $character
+                                        'character' => $character,
+                                        'inventorySetEquipped' => $inventorySetEquipped,
                                     ])
 
                                     @include('game.character.partials.equipment.modals.destroy-modal', [

@@ -126,7 +126,15 @@ class CharacterInventoryController extends Controller {
         }
     }
 
-    public function unequipItem(Request $request, Character $character) {
+    public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService) {
+        if ($request->inventory_set_equipped) {
+            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
+            $inventoryIndex = $character->inventorySets->search(function($set) { return $set->is_equipped; });
+
+            $inventorySetService->unEquipInventorySet($inventorySet);
+
+            return redirect()->back()->with('success', 'Unequipped Set ' . $inventoryIndex + 1 . '.');
+        }
 
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
 
@@ -293,8 +301,10 @@ class CharacterInventoryController extends Controller {
 
         $inventorySetService->equipInventorySet($character, $inventorySet);
 
-        $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
-            return $set->id === $inventorySet->id;
+        $character->refresh();
+
+        $setIndex = $character->inventorySets->search(function($set) {
+            return $set->is_equipped;
         });
 
         $character = $character->refresh();
@@ -305,5 +315,26 @@ class CharacterInventoryController extends Controller {
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         return redirect()->back()->with('success', 'Set ' . $setIndex + 1 . ' is now equipped');
+    }
+
+    public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
+        $currentInventoryAmount    = $character->inventory_max - $inventorySet->slots->count();
+        $originalCount             = $currentInventoryAmount;
+        $originalInventorySetCount = $inventorySet->slots->count();
+
+        foreach ($inventorySet->slots as $slot) {
+
+            if ($currentInventoryAmount !== 0) {
+                $inventorySetService->removeItemFromInventorySet($inventorySet, $slot->item);
+
+                $currentInventoryAmount -= 1;
+            }
+        }
+
+        $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
+            return $set->id === $inventorySet;
+        });
+
+        return redirect()->back()->with('success', 'Removed ' . $originalCount . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1);
     }
 }

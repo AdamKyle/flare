@@ -20,10 +20,17 @@
                         @if ($inventorySet->can_be_equipped && !$inventorySet->is_equipped && $inventorySet->slots->isNotEmpty())
                             <x-forms.button-with-form
                                 form-route="{{route('game.equip.set', ['character' => $character->id, 'inventorySet' => $inventorySet->id])}}"
-                                form-id='equip.set'
+                                form-id="{{'equip.set.' . $inventorySet->id}}"
                                 button-title="Equip Set"
                                 class="btn btn-primary btn-sm ml-2"
                             />
+                        @endif
+                        @if ($inventorySet->slots->isNotEmpty() && !$inventorySet->is_equipped)
+                            <a href="#" class="btn btn-sm btn-danger ml-2" data-toggle="modal" data-target="#character-inventory-set-{{$inventorySet->id}}">Empty Set</a>
+
+                            @include('game.character.partials.equipment.modals.empty-set-modal', [
+                                'inventorySet' => $inventorySet,
+                            ])
                         @endif
                     </x-data-tables.per-page>
 
