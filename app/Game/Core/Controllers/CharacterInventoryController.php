@@ -319,8 +319,8 @@ class CharacterInventoryController extends Controller {
 
     public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
         $currentInventoryAmount    = $character->inventory_max - $inventorySet->slots->count();
-        $originalCount             = $currentInventoryAmount;
         $originalInventorySetCount = $inventorySet->slots->count();
+        $itemsRemoved              = 0;
 
         foreach ($inventorySet->slots as $slot) {
 
@@ -328,13 +328,14 @@ class CharacterInventoryController extends Controller {
                 $inventorySetService->removeItemFromInventorySet($inventorySet, $slot->item);
 
                 $currentInventoryAmount -= 1;
+                $itemsRemoved           += 1;
             }
         }
 
         $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
-            return $set->id === $inventorySet;
+            return $set->id === $inventorySet->id;
         });
 
-        return redirect()->back()->with('success', 'Removed ' . $originalCount . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1);
+        return redirect()->back()->with('success', 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1);
     }
 }
