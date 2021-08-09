@@ -22,9 +22,12 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::get('/game/character/inventory/compare/{character}', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
     Route::get('/game/character/inventory/compare-items/{user}', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
     Route::post('/game/equip/item/{character}', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
+    Route::post('/game/equip/set/{character}/{inventorySet}', ['as' => 'game.equip.set', 'uses' => 'CharacterInventoryController@equipSet']);
     Route::post('/game/unequip/all/{character}', ['as' => 'game.unequip.all', 'uses' => 'CharacterInventoryController@unequipAll']);
     Route::post('/game/unequip/item/{character}', ['as' => 'game.inventory.unequip', 'uses' => 'CharacterInventoryController@unequipItem']);
     Route::post('/game/destroy/item/{character}', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
+    Route::post('/game/character/{character}/inventory/move-to-set', ['as' => 'game.inventory.move.to.set', 'uses' => 'CharacterInventoryController@moveToSet']);
+    Route::post('/game/character/{character}/inventory/remove-from-set', ['as' => 'game.remove.from.set', 'uses' => 'CharacterInventoryController@removeFromSet']);
 
     Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);
     Route::post('/skill/train/{character}', ['as' => 'train.skill', 'uses' => 'CharacterSkillController@train']);

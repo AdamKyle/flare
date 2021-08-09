@@ -101,7 +101,8 @@ class CharacterBuilder {
 
         for ($i = 1; $i <= 10; $i++) {
             $this->character->inventorySets()->create([
-                'character_id' => $this->character->id,
+                'character_id'    => $this->character->id,
+                'can_be_equipped' => true,
             ]);
         }
 
@@ -150,6 +151,13 @@ class CharacterBuilder {
             'equipped'     => true,
             'position'     => 'left-hand',
         ]);
+
+        for ($i = 1; $i <= 10; $i++) {
+            $this->character->inventorySets()->create([
+                'character_id'    => $this->character->id,
+                'can_be_equipped' => true,
+            ]);
+        }
 
         $this->character->map()->create([
             'character_id' => $this->character->id,

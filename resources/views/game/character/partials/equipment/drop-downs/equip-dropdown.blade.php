@@ -28,15 +28,7 @@
 
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#slot-{{$slot->id}}">Destroy</a>
 
-            @foreach ($character->inventorySets as $index => $inventorySet)
-                @php
-                    $numberAsWord = new \NumberFormatter("en", NumberFormatter::SPELLOUT);
-                    $active = ($index === 0 ? true : false);
-                @endphp
-
-                <a class="dropdown-item" href="#">{{'Add To Set: ' . $numberAsWord->format($index + 1)}}</a>
-            @endforeach
-
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#character-inventory-move-{{$slot->id}}">Assign To Set</a>
         @else
             <form id="item-unequip-{{$slot->id}}" action="{{route('game.inventory.unequip', ['character' => $character])}}" method="POST" style="display: none">
                 @csrf

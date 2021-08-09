@@ -22,6 +22,7 @@ class CreateSetSlots extends Migration
             $table->foreign('inventory_set_id', 'set_id')
                 ->references('id')->on('inventory_sets');
             $table->boolean('equipped')->default(false);
+            $table->string('position')->nullable();
             $table->timestamps();
         });
     }

@@ -4,7 +4,9 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\SetSlot;
 use App\Game\Core\Traits\ResponseBuilder;
 
 class InventorySetService {
@@ -17,18 +19,20 @@ class InventorySetService {
      * @param InventorySet $inventorySet
      * @param Item $item
      */
-    public function assignItemToSet(InventorySet $inventorySet, Item $item) {
+    public function assignItemToSet(InventorySet $inventorySet, InventorySlot $slot) {
         $inventorySet->slots()->create([
             'inventory_set_id' => $inventorySet->id,
-            'item_id'          => $item->id,
+            'item_id'          => $slot->item_id,
         ]);
 
-        $inventorySet = $inventorySet->efresh();
+        $inventorySet = $inventorySet->refresh();
 
         // Is the inventory set still considered equipable?
         $inventorySet->update([
             'can_be_equipped' => $this->isSetEquippable($inventorySet),
         ]);
+
+        $slot->delete();
     }
 
     /**
@@ -84,8 +88,50 @@ class InventorySetService {
      */
     public function equipInventorySet(Character $character, InventorySet $inventorySet): Character {
         $character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
-        $inventorySet->slots()->update(['equipped' => true]);
-        $inventorySet->update(['equipped', true]);
+
+        $data = [];
+
+        $armourPositions = ['body','leggings','feet','sleeves','sleeves','helmet','gloves'];
+
+        foreach ($inventorySet->slots as $slot) {
+            if ($slot->item->type === 'weapon') {
+                $data = $this->setPositionEquipData($slot, $data, 'left-hand', 'right-hand');
+            }
+
+            if ($slot->item->type === 'shield') {
+                $data = $this->setPositionEquipData($slot, $data, 'left-hand', 'right-hand');
+            }
+
+            if ($slot->item->type === 'bow') {
+                $data[$slot->id] = [
+                    'item_id' => $slot->item->id,
+                    'equipped' => true,
+                    'position' => 'left-hand',
+                ];
+            }
+
+            if ($slot->item->type === 'ring') {
+                $data = $this->setPositionEquipData($slot, $data, 'ring-one', 'ring-two');
+            }
+
+            if ($slot->item->type === 'spell') {
+                $data = $this->setPositionEquipData($slot, $data, 'spell-one', 'spell-two');
+            }
+
+            if ($slot->item->type === 'artifact') {
+                $data = $this->setPositionEquipData($slot, $data, 'artifact-one', 'artifact-two');
+            }
+
+            if (array_has($armourPositions, $slot->item->default_position)) {
+                $data = $this->setArmourEquipData($slot, $data, $slot->item->default_position);
+            }
+        }
+
+        foreach ($data as $slotId => $data) {
+            $inventorySet->slots()->find($slotId)->update($data);
+        }
+
+        $inventorySet->update(['is_equipped' => true]);
 
         return $character->refresh();
     }
@@ -131,6 +177,11 @@ class InventorySetService {
 
         // Bail if we have more then two spells of either type.
         if (!$this->hasSpells($inventorySet)) {
+            return false;
+        }
+
+        // Bail if we have more then two artifacts.
+        if (!$this->hasArtifacts($inventorySet)) {
             return false;
         }
 
@@ -216,7 +267,25 @@ class InventorySetService {
             return $slot->item->type === 'ring';
         }));
 
-        if ($rings->count > 2) {
+        if ($rings->count() > 2) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Do you only have a max of 2 artifacts.
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
+    public function hasArtifacts(InventorySet $inventorySet): bool {
+        $artifacts = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'artifact';
+        }));
+
+        if ($artifacts->count() > 2) {
             return false;
         }
 
@@ -232,22 +301,71 @@ class InventorySetService {
      * @return bool
      */
     protected function hasSpells(InventorySet $inventorySet) {
-        $healingSpells = collection($inventorySet->slots->filter(function($slot) {
+        $healingSpells = collect($inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'spell-healing';
         }));
 
-        $damageSpells = collection($inventorySet->slots->filter(function($slot) {
+        $damageSpells = collect($inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'spell-damage';
         }));
 
-        if ($healingSpells >= 2 && $damageSpells > 0) {
+        if ($healingSpells->count() >= 2 && $damageSpells->count() > 0) {
             return false;
         }
 
-        if ($healingSpells > 0 && $damageSpells >= 2) {
+        if ($healingSpells->count() > 0 && $damageSpells->count() >= 2) {
             return false;
         }
 
         return true;
+    }
+
+
+
+    /**
+     * Set the position of equipment, except armour.
+     *
+     * @param SetSlot $slot
+     * @param array $data
+     * @param string $defaultPosition
+     * @param string $oppositePosition
+     * @return array
+     */
+    protected function setPositionEquipData(SetSlot $slot, array $data, string $defaultPosition, string $oppositePosition): array {
+        $hasHand = collect($data)->search(function($item) use ($defaultPosition) {
+            return $item['position'] === $defaultPosition;
+        });
+
+        if ($hasHand === false) {
+            $data[$slot->id] = [
+                'item_id'  => $slot->item->id,
+                'equipped' => true,
+                'position' => $defaultPosition,
+            ];
+        } else {
+            $data[$slot->id] = [
+                'item_id'  => $slot->item->id,
+                'equipped' => true,
+                'position' => $oppositePosition,
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Set the position of the armour.
+     *
+     * @param SetSlot $slot
+     * @param array $data
+     * @param string $position
+     * @return array
+     */
+    protected function setArmourEquipData(SetSlot $slot, array $data, string $position): array {
+        return $data[$slot->id] = [
+            'item_id'  => $slot->item->id,
+            'equipped' => true,
+            'position' => $position,
+        ];
     }
 }

@@ -75,15 +75,22 @@ class DataTable extends Component
             }
 
             return $join;
-        });
+        })->select('inventory_slots.*');
 
-        return $slots->select('inventory_slots.*')
+        if ($slots->where('equipped', $this->includeEquipped)->get()->isEmpty() && $this->includeEquipped) {
+            $slots = $character->inventorySets->where('is_equipped', true)->first()->slots()->join('items', function($join) {
+                return $join->on('set_slots.item_id', '=', 'items.id');
+            })->select('set_slots.*');
+        }
+
+        return $slots
               ->where('equipped', $this->includeEquipped)
               ->orderBy($this->sortField, $this->sortBy);
     }
 
     public function getDataProperty() {
         $slots = $this->dataQuery->get();
+
 
         $slots->transform(function($slot) {
             $skills = [];
@@ -107,6 +114,7 @@ class DataTable extends Component
     }
 
     public function fetchSlots() {
+
         return $this->data;
     }
 

@@ -18,6 +18,7 @@ class SetSlot extends Model {
         'item_id',
         'inventory_set_id',
         'equipped',
+        'position',
     ];
 
     /**

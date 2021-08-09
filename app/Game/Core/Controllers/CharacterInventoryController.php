@@ -2,8 +2,12 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Models\InventorySet;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Requests\MoveItemRequest;
+use App\Game\Core\Requests\RemoveItemRequest;
+use App\Game\Core\Services\InventorySetService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -116,6 +120,17 @@ class CharacterInventoryController extends Controller {
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
 
         if (is_null($foundItem)) {
+            // If there is no item, maybe it's apart of the inventory set?
+            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
+
+            if (is_null($inventorySet)) {
+                $foundItem = null;
+            } else {
+                $foundItem = $inventorySet->slots->find($request->item_to_remove);
+            }
+        }
+
+        if (!is_null($foundItem)) {
             return redirect()->back()->with('error', 'No item found to be equipped.');
         }
 
@@ -169,5 +184,69 @@ class CharacterInventoryController extends Controller {
         $character->refresh();
 
         return redirect()->back()->with('success', 'Destroyed ' . $name . '.');
+    }
+
+    public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
+        $slot         = $character->inventory->slots()->find($request->slot_id);
+        $inventorySet = $character->inventorySets()->find($request->move_to_set);
+
+        if (is_null($slot) || is_null($inventorySet)) {
+            return redirect()->back()->with('error', 'Either the slot or the inventory set does not exist.');
+        }
+
+        $itemName = $slot->item->affix_name;
+
+        $inventorySetService->assignItemToSet($inventorySet, $slot);
+
+        $character = $character->refresh();
+
+        $index     = $character->inventorySets->search(function($set) use ($request) {
+            return $set->id === $request->move_to_set;
+        });
+
+        return redirect()->back()->with('success', $itemName . ' Has been moved to: Set ' . $index + 1);
+    }
+
+    public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
+        $slot          = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
+        $itemAffixName = $slot->item->affix_name;
+
+        if (is_null($slot)) {
+            return redirect()->back()->with('error', 'Either the slot or the inventory set does not exist.');
+        }
+
+        if ($slot->inventorySet->is_equipped) {
+            return redirect()->back()->with('error', 'You cannot move an equipped item into your inventory from this set. Unequip it first.');
+        }
+
+        $itemName = $slot->item->affix_name;
+
+        $result = $inventorySetService->removeItemFromInventorySet($slot->inventorySet, $slot->item);
+
+        if ($result['status'] !== 200) {
+            return redirect()->back()->with('error', $result['message']);
+        }
+
+        $character = $character->refresh();
+
+        $index     = $character->inventorySets->search(function($set) use ($request) {
+            return $set->id === $request->inventory_set_id;
+        });
+
+        return redirect()->back()->with('success', $itemName . ' Has been removed from Set ' . $index + 1 . ' and placed back into your inventory.');
+    }
+
+    public function equipSet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
+        if ($character->id !== $inventorySet->character->id) {
+            return redirect()->back()->with('error', 'Invalid input.');
+        }
+
+        $inventorySetService->equipInventorySet($character, $inventorySet);
+
+        $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
+            return $set->id === $inventorySet->id;
+        });
+
+        return redirect()->back()->with('success', 'Set ' . $setIndex + 1 . ' is now equipped');
     }
 }

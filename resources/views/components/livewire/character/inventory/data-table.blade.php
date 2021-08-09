@@ -161,6 +161,11 @@
                                         'slot'      => $slot,
                                         'character' => $character
                                     ])
+
+                                    @include('game.character.partials.equipment.modals.move-to-set-modal', [
+                                        'slot'      => $slot,
+                                        'character' => $character
+                                    ])
                                 @else
                                     @if ($slot->item->damages_kingdoms)
                                         Damages Kingdoms.
