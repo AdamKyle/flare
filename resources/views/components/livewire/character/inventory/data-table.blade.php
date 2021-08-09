@@ -1,5 +1,16 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
+        @if (!$hasEmptyInventorySets && $allowUnequipAll)
+            <div class="alert alert-warning mt-2 mb-3">
+                You do not have any empty sets to save this set into.
+            </div>
+        @endif
+        @if ($inventorySetEquipped)
+            <div class="alert alert-info">
+                You currently have a set equipped. Equipping any other item, or set will replace this set completely.
+                You <strong>cannot</strong> mix and match sets or sets with non set items. <strong>It's one or the other.</strong>
+            </div>
+        @endif
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage">
@@ -18,20 +29,24 @@
                             form-id='unequip-all'
                             button-title="Unequip All"
                             class="btn btn-danger btn-sm ml-2"
-                        />
+                        >
+                            <input type="hidden" name="is_set_equipped" value="{{$inventorySetEquipped}}">
+                        </x-forms.button-with-form>
+
+                        @if (!$inventorySetEquipped && $hasEmptyInventorySets)
+                            <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#character-{{$character->id}}">Save as set</a>
+
+                            @include('game.character.partials.equipment.modals.save-as-set-modal', [
+                                'character' => $character
+                            ])
+                        @endif
                     @endif
 
 
                     @if ($allowMassDestroy)
                         <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2">Destroy All</button>
                         <button type="button" wire:click="destroyAllItems('disenchant')" class="btn btn-primary btn-sm ml-2">Disenchant All</button>
-                        <button type="button" wire:click="useAllItems" class="btn btn-primary btn-sm ml-2" {{$itemBeingUsed ? 'disabled' : ''}}>
-                            Use All
-
-                            @if ($itemBeingUsed)
-                                <i class="fas fa-spinner fa-spin"></i>
-                            @endif
-                        </button>
+                        <button type="button" wire:click="useAllItems" class="btn btn-primary btn-sm ml-2">Use All</button>
                     @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />
@@ -91,6 +106,16 @@
                         field="items.base_healing"
                     />
 
+                    @if ($allowUnequipAll)
+                        <x-data-tables.header-row
+                            wire:click.prevent="sortBy('position')"
+                            header-text="Position"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="position"
+                        />
+                    @endif
+
                     @if (!$marketBoard && $batchSell)
                         <x-data-tables.header-row
                             wire:click.prevent="sortBy('items.cost')"
@@ -142,6 +167,9 @@
                             <td>{{is_null($slot->item->base_damage) ? 'N/A' : $slot->item->base_damage}}</td>
                             <td>{{is_null($slot->item->base_ac) ? 'N/A' : $slot->item->base_ac}}</td>
                             <td>{{is_null($slot->item->base_healing) ? 'N/A' : $slot->item->base_healing}}</td>
+                            @if ($allowUnequipAll)
+                                <td>{{ucfirst(implode(' ', explode('-', $slot->position)))}}</td>
+                            @endif
                             @if (!$marketBoard && $batchSell)
                                 <td>{{is_null($slot->item->cost) ? 'N/A' : number_format($slot->item->cost)}}</td>
                             @endif

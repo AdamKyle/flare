@@ -89,6 +89,13 @@ class InventorySetService {
     public function equipInventorySet(Character $character, InventorySet $inventorySet): Character {
         $character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
 
+        $equippedInventorySet = $character->inventorySets()->where('is_equipped', true)->first();
+
+        if (!is_null($equippedInventorySet)) {
+            $equippedInventorySet->slots()->update(['equipped' => false]);
+            $equippedInventorySet->update(['is_equipped' => false]);
+        }
+
         $data = [];
 
         $armourPositions = ['body','leggings','feet','sleeves','sleeves','helmet','gloves'];
@@ -122,7 +129,7 @@ class InventorySetService {
                 $data = $this->setPositionEquipData($slot, $data, 'artifact-one', 'artifact-two');
             }
 
-            if (array_has($armourPositions, $slot->item->default_position)) {
+            if (in_array($slot->item->default_position, $armourPositions)) {
                 $data = $this->setArmourEquipData($slot, $data, $slot->item->default_position);
             }
         }
@@ -143,7 +150,7 @@ class InventorySetService {
      */
     public function unEquipInventorySet(InventorySet $inventorySet): void {
         $inventorySet->slots()->update(['equipped' => false]);
-        $inventorySet->update(['equipped', false]);
+        $inventorySet->update(['is_equipped' => false]);
     }
 
     /**
@@ -362,10 +369,12 @@ class InventorySetService {
      * @return array
      */
     protected function setArmourEquipData(SetSlot $slot, array $data, string $position): array {
-        return $data[$slot->id] = [
+        $data[$slot->id] = [
             'item_id'  => $slot->item->id,
             'equipped' => true,
             'position' => $position,
         ];
+
+        return $data;
     }
 }

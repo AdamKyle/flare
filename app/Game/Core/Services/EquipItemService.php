@@ -29,6 +29,11 @@ class EquipItemService {
     private $characterTransformer;
 
     /**
+     * @var InventorySetService $inventorySetService
+     */
+    private $inventorySetService;
+
+    /**
      * @var Request $request
      */
     private $request;
@@ -43,10 +48,12 @@ class EquipItemService {
      *
      * @param Manager $manager
      * @param CharacterAttackTransformer $characterTransformer
+     * @param InventorySetService $inventorySetService
      */
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer) {
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService) {
         $this->manager              = $manager;
         $this->characterTransformer = $characterTransformer;
+        $this->inventorySetService  = $inventorySetService;
     }
 
     /**
@@ -86,6 +93,12 @@ class EquipItemService {
 
         if (is_null($characterSlot)) {
             throw new EquipItemException('Could not equip item because you either do not have it, or it is equipped already.');
+        }
+
+        $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
+
+        if (!is_null($equippedSet)) {
+            $this->inventorySetService->unEquipInventorySet($equippedSet);
         }
 
         if ($characterSlot->item->type === 'bow') {

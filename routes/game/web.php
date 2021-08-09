@@ -28,6 +28,7 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::post('/game/destroy/item/{character}', ['as' => 'game.destroy.item', 'uses' => 'CharacterInventoryController@destroy']);
     Route::post('/game/character/{character}/inventory/move-to-set', ['as' => 'game.inventory.move.to.set', 'uses' => 'CharacterInventoryController@moveToSet']);
     Route::post('/game/character/{character}/inventory/remove-from-set', ['as' => 'game.remove.from.set', 'uses' => 'CharacterInventoryController@removeFromSet']);
+    Route::post('/game/character/{character}/inventory/equipped/save-as-set', ['as' => 'game.inventory.save.as.set', 'uses' => 'CharacterInventoryController@saveEquippedAsSet']);
 
     Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);
     Route::post('/skill/train/{character}', ['as' => 'train.skill', 'uses' => 'CharacterSkillController@train']);

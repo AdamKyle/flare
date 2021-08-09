@@ -38,7 +38,9 @@ class DataTable extends Component
 
     public $allowMassDestroy         = false;
 
-    public $itemBeingUsed            = false;
+    public $inventorySetEquipped     = false;
+
+    public $hasEmptyInventorySets    = false;
 
     public $totalGoldDust            = 0;
 
@@ -78,10 +80,18 @@ class DataTable extends Component
         })->select('inventory_slots.*');
 
         if ($slots->where('equipped', $this->includeEquipped)->get()->isEmpty() && $this->includeEquipped) {
-            $slots = $character->inventorySets->where('is_equipped', true)->first()->slots()->join('items', function($join) {
-                return $join->on('set_slots.item_id', '=', 'items.id');
-            })->select('set_slots.*');
+            $equippedInventorySet = $character->inventorySets->where('is_equipped', true)->first();
+
+            if (!is_null($equippedInventorySet)) {
+                $slots = $character->inventorySets->where('is_equipped', true)->first()->slots()->join('items', function($join) {
+                    return $join->on('set_slots.item_id', '=', 'items.id');
+                })->select('set_slots.*');
+
+                $this->inventorySetEquipped  = true;
+            }
         }
+
+        $this->hasEmptyInventorySets = $character->inventorySets()->doesntHave('slots')->get()->isNotEmpty();
 
         return $slots
               ->where('equipped', $this->includeEquipped)
@@ -152,8 +162,6 @@ class DataTable extends Component
     }
 
     public function useAllItems(UseItemService $useItemService) {
-        $this->itemBeingUsed = true;
-
         $this->character->inventory->slots->filter(function($slot) use ($useItemService) {
             if ($slot->item->usable && !$slot->item->damages_kingdoms) {
                 $useItemService->useItem($slot, $this->character, $slot->item);

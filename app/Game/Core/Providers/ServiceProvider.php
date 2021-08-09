@@ -37,8 +37,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return $manager;
         });
 
+        $this->app->bind(InventorySetService::class, function($app) {
+            return new InventorySetService();
+        });
+
         $this->app->bind(EquipItemService::class, function($app) {
-            return new EquipItemService($app->make(Manager::class), $app->make(CharacterAttackTransformer::class));
+            return new EquipItemService($app->make(Manager::class), $app->make(CharacterAttackTransformer::class), $app->make(InventorySetService::class));
         });
 
         $this->app->bind(ItemComparison::class, function($app) {
@@ -62,10 +66,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Manager::class),
                 $app->make(CharacterAttackTransformer::class),
             );
-        });
-
-        $this->app->bind(InventorySetService::class, function($app) {
-            return new InventorySetService();
         });
     }
 

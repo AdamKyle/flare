@@ -15,7 +15,7 @@
                         <li>
                             1 Weapon, 1 Shield or 2 Weapons or 1 Bow
                         </li>
-                        <li>1 Of each armour (Body, Leggings, Sleeves, Feet, Gloves)</li>
+                        <li>1 Of each armour (Body, Leggings, Sleeves, Feet, Gloves and Helmet)</li>
                         <li>2 Rings</li>
                         <li>2 Spells (1 Healing, 1 Damage or 2 Healing or 2 Damage)</li>
                         <li>2 Artifacts</li>
@@ -23,6 +23,16 @@
                     <p>Sets may be incomplete, but if they do not confirm to the above they will be treated as stash tabs (not equipable).</p>
                     <p>Equipping a set (regardless of if it's incomplete) will replace all currently equipped items.</p>
                 </div>
+                @php
+                    $index = $character->inventorySets->search(function($set) {
+                        return $set->is_equipped;
+                    })
+                @endphp
+                @if ($index !== false)
+                    <div class="alert alert-warning mb-3">
+                        You cannot move items into Set {{$index + 1}} as that set is already equipped.
+                    </div>
+                @endif
                <form method="POST" action="{{route('game.inventory.move.to.set', ['character' => $character])}}">
                    @csrf
 
@@ -34,7 +44,9 @@
                            <select name="move_to_set" id="move-to-set" class="form-control">
                                <option value="">Please select</option>
                                @foreach ($character->inventorySets as $index => $set)
-                                   <option value="{{$set->id}}">Set {{$index + 1}}</option>
+                                   @if (!$set->is_equipped)
+                                    <option value="{{$set->id}}">Set {{$index + 1}}</option>
+                                   @endif
                                @endforeach
                            </select>
                        </div>

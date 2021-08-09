@@ -5,8 +5,8 @@ namespace App\Flare\Builders;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\ClassBasedBonuses;
-use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemUsabilityType;
+use Illuminate\Support\Collection;
 
 class CharacterInformationBuilder {
 
@@ -48,7 +48,7 @@ class CharacterInformationBuilder {
     public function statMod(string $stat): float {
         $base = $this->character->{$stat};
 
-        $equipped = $this->inventory->filter(function($slot) {
+        $equipped = $this->fetchInventory()->filter(function($slot) {
             return $slot->equipped;
         });
 
@@ -348,6 +348,31 @@ class CharacterInformationBuilder {
         }
 
         return $healFor;
+    }
+
+    /**
+     * Fetch the appropriate inventory.
+     *
+     * Either return the current inventory, by default, if not empty or
+     * return the inventory set that is currently equipped.
+     *
+     * Players cannot have both equipped at the same time.
+     *
+     * @return Collection
+     */
+    protected function fetchInventory(): Collection
+    {
+        if ($this->inventory->isNotEmpty()) {
+            return $this->inventory;
+        }
+
+        $inventorySet = $this->character->inventorySets()->where('is_equipped', true)->first();
+
+        if (!is_null($inventorySet)) {
+            return $inventorySet->slots;
+        }
+
+        return $this->inventory;
     }
 
     protected function fetchModdedStat(string $stat, Item $item): float {

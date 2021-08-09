@@ -70,18 +70,40 @@ class CharacterInventoryService {
     public function setInventory(Request $request): CharacterInventoryService {
 
         if (empty($this->positions)) {
-            $this->inventory = $this->character->inventory->slots->filter(function($slot) use($request) {
-                return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
-            });
+            $this->inventory =  $this->getInventory($request);
 
             return $this;
         }
 
-        $this->inventory = $this->character->inventory->slots->filter(function ($slot) {
-            return in_array($slot->position, $this->positions) && $slot->equipped;
-        });
+        $this->inventory = $this->getInventory($request, true);
 
         return $this;
+    }
+
+    protected function getInventory(Request $request, bool $useArray = false) {
+        $inventory = $this->character->inventory->slots->filter(function($slot) use($request, $useArray) {
+            if ($useArray) {
+                return in_array($slot->position, $this->positions) && $slot->equipped;
+            }
+
+            return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
+        });
+
+        if ($inventory->isEmpty()) {
+            $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
+
+            if (!is_null($equippedSet)) {
+                $inventory = $equippedSet->slots->filter(function($slot) use($request, $useArray) {
+                    if ($useArray) {
+                        return in_array($slot->position, $this->positions) && $slot->equipped;
+                    }
+
+                    return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
+                });
+            }
+        }
+
+        return $inventory;
     }
 
     /**

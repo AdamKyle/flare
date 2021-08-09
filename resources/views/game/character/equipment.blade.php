@@ -8,6 +8,12 @@
         color="success"
     ></x-core.page-title>
     <hr />
+    @if ($setEquipped)
+        <div class="alert alert-warning mt-2 mb-3">
+            Equipping this item while <strong>Set {{$setIndex}}</strong> is equipped will remove the set and equip this item.
+            You <strong>cannot</strong> mix and match sets nor sets with other equipment.
+        </div>
+    @endif
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
             @if (empty($details))

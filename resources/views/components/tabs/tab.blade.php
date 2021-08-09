@@ -1,13 +1,15 @@
 @props([
-    'tab'      => '',
-    'title'    => '',
-    'icon'     => '',
-    'selected' => 'false',
-    'active'   => 'false',
+    'tab'          => '',
+    'title'        => '',
+    'icon'         => '',
+    'selected'     => 'false',
+    'active'       => 'false',
+    'navLinkClass' => 'nav-link',
+    'iconClass'    => '',
 ])
 
 <li class="nav-item">
-    <a class="nav-link {{$active === 'true' ? 'active' : ''}}"
+    <a class="nav-link {{$navLinkClass . ' ' . ($active === 'true' ? 'active' : '')}}"
        id="pills-{{$tab}}-tab"
        data-toggle="pill"
        href="#pills-{{$tab}}"
@@ -18,7 +20,7 @@
         {{$title}}
 
         @if ($icon !== '')
-            <i class="fas fa-exclamation-triangle inventory-set-error"></i>
+            <i class="{{$icon}} {{$iconClass}}"></i>
         @endif
     </a>
 </li>

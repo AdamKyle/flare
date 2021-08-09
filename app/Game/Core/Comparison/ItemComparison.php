@@ -161,10 +161,6 @@ class ItemComparison {
             return $slot->position === $hand;
         })->first();
 
-        dump('To Compare: ' . $toCompare->base_damage_mod);
-
-        dump($foundPosition);
-
         if ($this->isItemBetter($toCompare, $foundPosition->item)) {
             return [
                 'is_better'                    => true,

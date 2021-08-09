@@ -7,6 +7,7 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Requests\MoveItemRequest;
 use App\Game\Core\Requests\RemoveItemRequest;
+use App\Game\Core\Requests\SaveEquipmentAsSet;
 use App\Game\Core\Services\InventorySetService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -70,9 +71,17 @@ class CharacterInventoryController extends Controller {
             'slotId'      => $itemToEquip->id,
             'characterId' => $character->id,
             'bowEquipped' => false,
+            'setEquipped' => false,
+            'setIndex'    => 0,
         ];
 
         if ($service->inventory()->isNotEmpty()) {
+            $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
+
+
+            $hasSet   = !is_null($setEquipped);
+            $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
+
             $viewData = [
                 'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory(), $character),
                 'itemToEquip'  => $itemToEquip->item,
@@ -81,6 +90,8 @@ class CharacterInventoryController extends Controller {
                 'slotPosition' => $itemToEquip->position,
                 'characterId'  => $character->id,
                 'bowEquipped'  => $this->equipItemService->isBowEquipped($itemToEquip->item, $service->inventory()),
+                'setEquipped'  => $hasSet,
+                'setIndex'     => $setIndex,
             ];
         }
 
@@ -147,17 +158,25 @@ class CharacterInventoryController extends Controller {
         return redirect()->back()->with('success', 'Unequipped item.');
     }
 
-    public function unequipAll(Request $request, Character $character) {
-        $character->inventory->slots->each(function($slot) {
-            $slot->update([
-                'equipped' => false,
-                'position' => null,
-            ]);
-        });
+    public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService) {
+        if ($request->is_set_equipped) {
+            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
-        event(new UpdateTopBarEvent($character->refresh()));
+            $inventorySetService->unEquipInventorySet($inventorySet);
+        } else {
+            $character->inventory->slots->each(function($slot) {
+                $slot->update([
+                    'equipped' => false,
+                    'position' => null,
+                ]);
+            });
+        }
 
-        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character, $this->characterTransformer);
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         return redirect()->back()->with('success', 'All items have been removed.');
@@ -207,6 +226,37 @@ class CharacterInventoryController extends Controller {
         return redirect()->back()->with('success', $itemName . ' Has been moved to: Set ' . $index + 1);
     }
 
+    public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character, InventorySetService $inventorySetService) {
+        $currentlyEquipped = $character->inventory->slots->filter(function($slot) {
+            return $slot->equipped;
+        });
+
+        $inventorySet = $character->inventorySets()->find($request->move_to_set);
+
+        foreach ($currentlyEquipped as $equipped) {
+            $inventorySet->slots()->create(array_merge(['inventory_set_id' => $inventorySet->id], $equipped->getAttributes()));
+
+            $equipped->delete();
+        }
+
+        $inventorySet->update([
+            'is_equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
+            return $set->equipped;
+        });
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character, $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
+        return redirect()->back()->with('success', 'Set ' . $setIndex + 1 . ' is now equipped (equipment has been moved to the set)');
+    }
+
     public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
         $slot          = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
         $itemAffixName = $slot->item->affix_name;
@@ -246,6 +296,13 @@ class CharacterInventoryController extends Controller {
         $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
             return $set->id === $inventorySet->id;
         });
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character, $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         return redirect()->back()->with('success', 'Set ' . $setIndex + 1 . ' is now equipped');
     }
