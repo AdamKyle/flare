@@ -70,6 +70,9 @@ class Item extends Model
         'affects_skill_type',
         'increase_skill_bonus_by',
         'increase_skill_training_bonus_by',
+        'can_resurrect',
+        'resurrection_chance',
+
     ];
 
     /**
@@ -102,6 +105,7 @@ class Item extends Model
         'fight_time_out_mod_bonus'         => 'float',
         'move_time_out_mod_bonus'          => 'float',
         'can_craft'                        => 'boolean',
+        'can_resurrect'                    => 'boolean',
         'skill_level_required'             => 'integer',
         'skill_level_trivial'              => 'integer',
         'craft_only'                       => 'boolean',
@@ -118,6 +122,7 @@ class Item extends Model
         'affects_skill_type'               => 'integer',
         'increase_skill_bonus_by'          => 'float',
         'increase_skill_training_bonus_by' => 'float',
+        'resurrection_chance'              => 'float',
     ];
 
     protected $appends = [

@@ -37,6 +37,12 @@ trait ClassBasedBonuses {
         return $classBonus;
     }
 
+    public function prophetHasHealingSpells(Character $character): bool {
+        return $healingSpellsEquipped = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'spell-healing' && $slot->equipped;
+        })->isNotEmpty();
+    }
+
     /**
      * Get the prophet damage bonus.
      *

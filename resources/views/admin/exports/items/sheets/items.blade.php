@@ -48,6 +48,8 @@
         <th>affects_skill_type</th>
         <th>increase_skill_bonus_by</th>
         <th>increase_skill_training_bonus_by</th>
+        <th>can_resurrect</th>
+        <th>resurrect_chance</th>
     </tr>
     </thead>
     <tbody>
@@ -100,6 +102,8 @@
             <td>{{$item->affects_skill_type}}</td>
             <td>{{$item->increase_skill_bonus_by}}</td>
             <td>{{$item->increase_skill_training_bonus_by}}</td>
+            <td>{{$item->can_resurrect}}</td>
+            <td>{{$item->resurrect_chance}}</td>
         </tr>
     @endforeach
     </tbody>

@@ -123,6 +123,8 @@ class ItemDetails extends Component
         'item.affects_skill_type'               => 'nullable',
         'item.increase_skill_bonus_by'          => 'nullable',
         'item.increase_skill_training_bonus_by' => 'nullable',
+        'item.can_resurrect'                    => 'nullable',
+        'item.resurrection_chance'              => 'nullable',
     ];
 
     protected $messages = [
@@ -150,6 +152,10 @@ class ItemDetails extends Component
 
             if (is_null($this->item->market_sellable)) {
                 $this->item->market_sellable = false;
+            }
+
+            if (is_null($this->item->can_resurrect)) {
+                $this->item->can_resurrect = false;
             }
 
             if (is_null($this->item->usable)) {

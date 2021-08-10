@@ -73,6 +73,10 @@ class ItemsSheet implements ToCollection {
             $item['craft_only'] = false;
         }
 
+        if (!isset($item['can_resurrect'])) {
+            $item['can_resurrect'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
 

@@ -5,6 +5,7 @@ namespace App\Flare\Builders;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\ClassBasedBonuses;
+use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemUsabilityType;
 use Illuminate\Support\Collection;
 
@@ -136,9 +137,53 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildHealFor(): int {
-        $classBonus = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
+        $classBonus    = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
 
-        return round($this->fetchHealingAmount() * (1 + ($this->fetchSkillHealingMod() + $classBonus)));
+        $classType     = new CharacterClassValue($this->character->class->name);
+
+        $healingAmount = $this->fetchHealingAmount();
+        $dmgStat       = $this->character->class->damage_stat;
+
+        if ($classType->isVampire()) {
+            $healingAmount += $this->character->{$dmgStat} - $this->character->{$dmgStat} * .025;
+        }
+
+        if ($classType->isProphet()) {
+            $hasHealingSpells = $this->prophetHasHealingSpells();
+
+            if ($hasHealingSpells) {
+                $healingAmount += $this->character->{$dmgStat} * .025;
+            }
+        }
+
+        return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+    }
+
+    /**
+     * Fetch the resurrection chance;
+     *
+     * @return float
+     * @throws \Exception
+     */
+    public function fetchResurrectionChance(): float {
+        $resurrectionItems = $this->fetchInventory()->filter(function($slot) {
+            return $slot->item->can_resurrect;
+        });
+
+        $chance    = 0.0;
+        $classType = new CharacterClassValue($this->character->class->name);
+
+        if ($classType->isVampire() || $classType->isProphet()) {
+            $chance += 0.05;
+        }
+
+        if ($resurrectionItems->isEmpty()) {
+             return $chance;
+        }
+
+        $chance += $resurrectionItems->sum('item.resurrection_chance');
+
+        return $chance;
     }
 
     /**
@@ -161,11 +206,7 @@ class CharacterInformationBuilder {
             if ($slot->equipped) {
                 $percentage = $slot->item->getTotalPercentageForStat('dur');
 
-                if ($percentage < 2) {
-                    $percentage = 1 + $percentage;
-                }
-
-                $baseHealth *= $percentage;
+                $baseHealth += $baseHealth * $percentage;
             }
         }
 

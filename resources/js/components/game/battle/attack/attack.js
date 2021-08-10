@@ -3,11 +3,12 @@ import {random} from 'lodash';
 
 export default class Attack {
 
-  constructor(attacker, defender, characterCurrenthealth, monsterCurrenthealth) {
+  constructor(attacker, defender, characterCurrentHealth, monsterCurrentHealth) {
     this.attacker = attacker;
     this.defender = defender;
-    this.characterCurrentHealth = characterCurrenthealth;
-    this.monsterCurrentHealth = monsterCurrenthealth;
+    this.characterCurrentHealth = characterCurrentHealth;
+    this.characterMaxHealth = characterCurrentHealth;
+    this.monsterCurrentHealth = monsterCurrentHealth;
     this.battleMessages = [];
     this.attackerName = '';
     this.missed       = 0;
@@ -67,19 +68,7 @@ export default class Attack {
         this.doAttack(attacker, type);
 
         if (type === 'monster') {
-          if (defender.heal_for > 0) {
-            if (this.characterCurrentHealth <= (defender.health * 0.75)) {
-              if (this.characterCurrentHealth < 0) {
-                this.characterCurrentHealth = defender.health;
-              } else {
-                this.characterCurrentHealth += defender.heal_for;
-              }
-
-              this.battleMessages.push({
-                message: 'Light floods your eyes as your wounds heal over for: ' + defender.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              });
-            }
-          }
+          this.healSelf(defender);
         }
 
         if (attackAgain) {
@@ -139,6 +128,31 @@ export default class Attack {
         });
 
         this.spellDamage(attacker, defender, type);
+      }
+    }
+  }
+
+  healSelf(defender) {
+    if (defender.heal_for > 0 && (this.characterCurrentHealth > 0 && this.characterCurrentHealth !== this.characterMaxHealth)) {
+      this.characterCurrentHealth += defender.heal_for;
+
+      this.battleMessages.push({
+        message: 'Light floods your eyes as your wounds heal over for: ' + defender.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      });
+    }
+
+    if (this.characterCurrentHealth <= 0 && defender.resurrection_chance !== 0.0) {
+      let dc = 100 - (100 * defender.resurrection_chance);
+
+      const characterRoll = (Math.random() * (100 - 1) + 1) > dc;
+
+      if (characterRoll) {
+        this.characterCurrentHealth = 0;
+        this.characterCurrentHealth += defender.heal_for;
+
+        this.battleMessages.push({
+          message: 'Breath enters your lungs and you come back to life, healing for: ' + defender.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        });
       }
     }
   }

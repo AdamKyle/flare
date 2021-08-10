@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Values\CharacterClassValue;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -36,6 +37,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'has_affixes'         => $characterInformation->hasAffixes(),
             'has_damage_spells'   => $characterInformation->hasDamageSpells(),
             'heal_for'            => $characterInformation->buildHealFor(),
+            'resurrection_chance' => $characterInformation->fetchResurrectionChance(),
             'artifact_annulment'  => $characterInformation->getTotalAnnulment(),
             'spell_evasion'       => $characterInformation->getTotalSpellEvasion(),
             'skills'              => $this->fetchSkills($character->skills),

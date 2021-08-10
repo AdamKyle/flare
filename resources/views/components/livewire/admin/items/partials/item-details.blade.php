@@ -63,6 +63,20 @@
         </div>
     </div>
     <div class="row">
+        <div class="{{$item->can_resurrect ? 'col-md-2' : 'col-md-12'}}">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="item-can-resurrect" wire:model="item.can_resurrect" {{$item->type === 'spell-healing' ? '' : 'disabled'}}>
+                <label class="form-check-label" for="item-can-resurrect">Can Resurrect</label>
+            </div>
+        </div>
+        <div class="{{$item->can_resurrect ? 'col-md-10' : 'hide'}}">
+            <div class="form-group">
+                <label class="form-check-label" for="item-resurrect-chance">Resurrect Chance</label>
+                <input type="number" steps="0.01" class="form-control" id="item-base-healing" name="item-resurrect-chance" wire:model="item.resurrection_chance">
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="item-can-craft" wire:model="item.can_craft" {{$item->type !== 'quest' ? '' : 'disabled'}}>
