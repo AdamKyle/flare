@@ -58,6 +58,10 @@ class CelestialFight extends Model
         return $this->charactersInFight(CharacterInCelestialFight::class);
     }
 
+    public function gameMapName(): string {
+        return $this->monster->gameMap->name;
+    }
+
     protected static function newFactory() {
         return CelestialFightFactory::new();
     }

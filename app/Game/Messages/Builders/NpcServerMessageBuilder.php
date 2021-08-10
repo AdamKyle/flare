@@ -26,7 +26,7 @@ class NpcServerMessageBuilder {
             case 'take_a_look':
                 return '"Why don\'t you take a look, and show me what you can afford my child."';
             case 'location':
-                return '"Child! You must come to me to make the exchange. Find me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . '. Message me again when you are here."';
+                return '"Child! You must come to me to make the exchange. Find me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . ' ('.$npc->gameMapName().' Plane). Message me again when you are here."';
             case 'dead':
                 return '"I don\'t deal with dead people. Resurrect child."';
             case 'adventuring':
@@ -38,7 +38,7 @@ class NpcServerMessageBuilder {
             case 'public_exists':
                 return '"No Child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"';
             case 'location_of_conjure':
-                return '"Child, I have conjured the portal, I have opened the gates! Here is the location (X/Y): '.$celestialFight->x_position.'/'.$celestialFight->y_position.'"';
+                return '"Child, I have conjured the portal, I have opened the gates! Here is the location (X/Y): '.$celestialFight->x_position.'/'.$celestialFight->y_position.' ('.$celestialFight->gameMapName().' Plane)"';
             case 'taken_item':
                 return '"Child! You have an item I want! I shall take that. In return I shall give you something you always wanted!"';
             case 'given_item':

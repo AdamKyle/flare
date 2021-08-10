@@ -42,6 +42,10 @@ class Npc extends Model {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 
+    public function gameMapName(): string {
+        return $this->gameMap->name;
+    }
+
     public function commands() {
         return $this->hasMany(NpcCommand::class, 'npc_id', 'id');
     }
