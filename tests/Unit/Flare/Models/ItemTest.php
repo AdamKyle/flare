@@ -2,10 +2,11 @@
 
 namespace Tests\Unit\Flare\Models;
 
+use App\Flare\Models\GameSkill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Models\Item;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
@@ -13,7 +14,8 @@ class ItemTest extends TestCase
 {
     use RefreshDatabase,
         CreateItem,
-        CreateItemAffix;
+        CreateItemAffix,
+        CreateGameSkill;
 
     public function testGetInventorySlot() {
 
@@ -60,7 +62,7 @@ class ItemTest extends TestCase
             'item_prefix_id' => $itemSuffix->id
         ]);
 
-        $this->assertNotEquals(0, $item->getSkillTrainingBonus('test'));
+        $this->assertNotEquals(0, $item->getSkillTrainingBonus($this->createGameSkill(['name' => 'test'])));
     }
 
     public function testGetSkillBonusForSuffix() {
@@ -73,7 +75,7 @@ class ItemTest extends TestCase
             'item_suffix_id' => $itemSuffix->id
         ]);
 
-        $this->assertNotEquals(0, $item->getSkillTrainingBonus('test'));
+        $this->assertNotEquals(0, $item->getSkillTrainingBonus($this->createGameSkill(['name' => 'test'])));
     }
 
     public function testGetSkillBonusForItem() {
@@ -96,6 +98,6 @@ class ItemTest extends TestCase
             'item_prefix_id' => $itemPrefix->id,
         ]);
 
-        $this->assertNotEquals(0, $item->getSkillBonus('Sample'));
+        $this->assertNotEquals(0, $item->getSkillBonus($this->createGameSkill(['name' => 'Sample'])));
     }
 }

@@ -6,11 +6,15 @@ use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\UserSiteAccessStatistics;
 use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Support\Collection;
 use League\Fractal\Manager;
 use Mail;
 use Illuminate\Bus\Queueable;
@@ -44,12 +48,18 @@ class AccountDeletionJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle() {
+    public function handle(KingdomResourcesService $kingdomResourcesService) {
         $user = $this->user;
+        $characterName = $user->character->name;
 
         $this->emptyCharacterInventory($user->character->inventory);
+        $this->emptyCharacterInventorysets($user->character->inventorySets);
+
+        foreach ($user->character->kingdoms as $kingdom) {
+            $kingdomResourcesService->setKingdom($kingdom)->giveNPCKingdoms(false);
+        }
+
         $this->deleteCharacter($user->character);
-        $this->removeSecurityQuestions($user);
 
         $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
@@ -65,6 +75,8 @@ class AccountDeletionJob implements ShouldQueue
         Mail::to($user)->send(new GenericMail($user, 'Your account has been deleted', 'Account Deletion', true));
 
         $user->delete();
+
+        event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
     }
 
     protected function emptyCharacterInventory(Inventory $inventory) {
@@ -81,6 +93,16 @@ class AccountDeletionJob implements ShouldQueue
         }
 
         $inventory->delete();
+    }
+
+    protected function emptyCharacterInventorySets(Collection $inventorySets) {
+        foreach ($inventorySets as $set) {
+            foreach ($set->slots as $slot) {
+                $slot->delete();
+            }
+
+            $inventorySets->delete();
+        }
     }
 
     protected function deleteCharacter(Character $character) {
@@ -114,9 +136,5 @@ class AccountDeletionJob implements ShouldQueue
         }
 
         $character->delete();
-    }
-
-    protected function removeSecurityQuestions(User $user) {
-        $user->securityQuestions()->delete();
     }
 }

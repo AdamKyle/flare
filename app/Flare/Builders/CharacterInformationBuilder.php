@@ -91,7 +91,7 @@ class CharacterInformationBuilder {
             $this->getRangersDamageBonus($this->character);
         $characterDamageStat *= 1 + ($this->fetchSkillAttackMod() + $classBonuses);
 
-        $totalAttack = $this->getWeaponDamage();
+        $totalAttack = $this->getWeaponDamage() + $this->getTotalRingDamage();
 
         return round($characterDamageStat + $totalAttack);
     }
@@ -111,7 +111,7 @@ class CharacterInformationBuilder {
             $this->getRangersDamageBonus($this->character);
         $characterDamageStat *= 1 + ($this->fetchSkillAttackMod() + $classBonuses);
 
-        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage();
+        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
 
         return round($characterDamageStat + $totalAttack);
     }
@@ -202,7 +202,7 @@ class CharacterInformationBuilder {
 
         $baseHealth = $this->character->dur + 10;
 
-        foreach ($this->character->inventory->slots as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             if ($slot->equipped) {
                 $percentage = $slot->item->getTotalPercentageForStat('dur');
 
@@ -219,7 +219,7 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function hasArtifacts(): bool {
-        return $this->inventory->filter(function ($slot) {
+        return $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'artifact' && $slot->equipped;
         })->isNotEmpty();
     }
@@ -230,7 +230,7 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function hasAffixes(): bool {
-        return $this->inventory->filter(function ($slot) {
+        return $this->fetchInventory()->filter(function ($slot) {
             return ((!is_null($slot->item->itemPrefix)) || (!is_null($slot->item->itemSuffix))) && $slot->equipped;
         })->isNotEmpty();
     }
@@ -241,7 +241,7 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function hasDamageSpells(): bool {
-        return $this->inventory->filter(function ($slot) {
+        return $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'spell-damage' && $slot->equipped;
         })->isNotEmpty();
     }
@@ -262,6 +262,10 @@ class CharacterInformationBuilder {
      */
     public function getTotalArtifactDamage(): int {
         return $this->getArtifactDamage();
+    }
+
+    public function getTotalRingDamage(): int {
+        return $this->getRingDamage();
     }
 
     /**
@@ -327,7 +331,7 @@ class CharacterInformationBuilder {
     protected function getWeaponDamage(): int {
         $damage = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             if ($slot->type === 'weapon' || $slot->type === 'ring') {
                 $damage += $slot->item->getTotalDamage();
             }
@@ -339,7 +343,7 @@ class CharacterInformationBuilder {
     protected function getSpellDamage(): int {
         $damage = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'spell-damage') {
                 $damage += $slot->item->getTotalDamage();
             }
@@ -357,8 +361,20 @@ class CharacterInformationBuilder {
     protected function getArtifactDamage(): int {
         $damage = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'artifact') {
+                $damage += $slot->item->getTotalDamage();
+            }
+        }
+
+        return $damage;
+    }
+
+    protected function getRingDamage(): int {
+        $damage = 0;
+
+        foreach ($this->fetchInventory() as $slot) {
+            if ($slot->item->type === 'ring') {
                 $damage += $slot->item->getTotalDamage();
             }
         }
@@ -369,7 +385,7 @@ class CharacterInformationBuilder {
     protected function getDefence(): int {
         $defence = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
 
             $defence += $slot->item->getTotalDefence();
         }
@@ -384,7 +400,7 @@ class CharacterInformationBuilder {
     protected function fetchHealingAmount(): int {
         $healFor = 0;
 
-        foreach ($this->inventory as $slot) {
+        foreach ($this->fetchInventory() as $slot) {
             $healFor += $slot->item->getTotalHealing();
         }
 

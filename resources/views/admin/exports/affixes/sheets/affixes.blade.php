@@ -15,8 +15,14 @@
             <th>skill_level_required</th>
             <th>skill_level_trivial</th>
             <th>skill_name</th>
+            <th>affects_skill_type</th>
             <th>skill_bonus</th>
             <th>skill_training_bonus</th>
+            <td>base_damage_mod_bonus</td>
+            <td>base_healing_mod_bonus</td>
+            <td>base_ac_mod_bonus</td>
+            <td>fight_time_out_mod_bonus</td>
+            <td>move_time_out_mod_bonus</td>
             <th>can_drop</th>
             <th>cost</th>
             <th>type</th>
@@ -39,8 +45,14 @@
             <td>{{$affix->skill_level_required}}</td>
             <td>{{$affix->skill_level_trivial}}</td>
             <td>{{$affix->skill_name}}</td>
+            <td>{{$affix->affects_skill_type}}</td>
             <td>{{$affix->skill_bonus}}</td>
             <td>{{$affix->skill_training_bonus}}</td>
+            <td>{{$affix->base_damage_mod_bonus}}</td>
+            <td>{{$affix->base_healing_mod_bonus}}</td>
+            <td>{{$affix->base_ac_mod_bonus}}</td>
+            <td>{{$affix->fight_time_out_mod_bonus}}</td>
+            <td>{{$affix->move_time_out_mod_bonus}}</td>
             <td>{{$affix->can_drop}}</td>
             <td>{{$affix->cost}}</td>
             <td>{{$affix->type}}</td>

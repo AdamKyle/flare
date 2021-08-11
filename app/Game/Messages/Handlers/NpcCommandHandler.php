@@ -118,6 +118,7 @@ class NpcCommandHandler {
                 $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' And has been rewarded with a godly gift!';
                 $messageType = 'quest_complete';
             } else {
+
                 $messageType = 'no_quests';
             };
         }
@@ -125,6 +126,8 @@ class NpcCommandHandler {
         if (!is_null($message) && !is_null($messageType)) {
             broadcast(new GlobalMessageEvent($message));
 
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npc), true));
+        } else if (!is_null($messageType)) {
             return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npc), true));
         }
     }
@@ -188,7 +191,7 @@ class NpcCommandHandler {
 
     protected function handleQuest($user, $npc) {
         $character         = $user->character;
-        $completedQuestIds = $character->questsCompleted->pluck('id')->toArray();
+        $completedQuestIds = $character->questsCompleted->pluck('quest_id')->toArray();
 
         $quests = $npc->quests()->whereNotIn('id', $completedQuestIds)->get();
 
@@ -259,6 +262,8 @@ class NpcCommandHandler {
             ]);
 
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('given_item', $npc), true));
+
+            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, false));
         }
 
         if ($quest->unlocks_skill) {

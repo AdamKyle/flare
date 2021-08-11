@@ -182,7 +182,7 @@ class KingdomResourcesService {
         $this->adjustMorale($totalIncrease, $totalDecrease);
     }
 
-    protected function giveNPCKingdoms() {
+    public function giveNPCKingdoms(bool $notify = true) {
         $character = $this->kingdom->character;
 
         $this->kingdom->update([
@@ -191,7 +191,11 @@ class KingdomResourcesService {
             'current_morale' => 0.10
         ]);
 
-        $this->npcTookKingdom($character->user, $this->kingdom);
+        if (!$notify) {
+            $this->removeKingdomFromCache($character->user, $this->kingdom->refresh());
+        } else {
+            $this->npcTookKingdom($character->user, $this->kingdom);
+        }
 
         broadcast(new UpdateNPCKingdoms($this->kingdom->gameMap));
         broadcast(new UpdateGlobalMap($character));

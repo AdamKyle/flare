@@ -42,7 +42,7 @@ class NpcServerMessageBuilder {
             case 'taken_item':
                 return '"Child! You have an item I want! I shall take that. In return I shall give you something you always wanted!"';
             case 'given_item':
-                return '"Here child, take this! It might of use to you!" (Check the help section under quest items to see what this does, or check your inventory and click on the item)';
+                return '"Here child, take this! It might be of use to you!" (Check the help section under quest items to see what this does, or check your inventory and click on the item)';
             case 'inventory_full':
                 return '"I cannot take the item from you child! Your inventory is to full! Come back when you clean out some space."';
             case 'gold_capped':

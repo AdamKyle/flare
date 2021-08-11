@@ -18,17 +18,22 @@ class AffixModifier extends Component
     protected $listeners = ['validateInput' , 'update'];
 
     protected $rules = [
-        'itemAffix.base_damage_mod'      => 'nullable',
-        'itemAffix.base_ac_mod'          => 'nullable',
-        'itemAffix.base_healing_mod'     => 'nullable',
-        'itemAffix.str_mod'              => 'nullable',
-        'itemAffix.dur_mod'              => 'nullable',
-        'itemAffix.dex_mod'              => 'nullable',
-        'itemAffix.chr_mod'              => 'nullable',
-        'itemAffix.int_mod'              => 'nullable',
-        'itemAffix.skill_name'           => 'nullable',
-        'itemAffix.skill_bonus'          => 'nullable',
-        'itemAffix.skill_training_bonus' => 'nullable',
+        'itemAffix.base_damage_mod'          => 'nullable',
+        'itemAffix.base_ac_mod'              => 'nullable',
+        'itemAffix.base_healing_mod'         => 'nullable',
+        'itemAffix.str_mod'                  => 'nullable',
+        'itemAffix.dur_mod'                  => 'nullable',
+        'itemAffix.dex_mod'                  => 'nullable',
+        'itemAffix.chr_mod'                  => 'nullable',
+        'itemAffix.int_mod'                  => 'nullable',
+        'itemAffix.skill_name'               => 'nullable',
+        'itemAffix.skill_bonus'              => 'nullable',
+        'itemAffix.skill_training_bonus'     => 'nullable',
+        'itemAffix.base_damage_mod_bonus'    => 'nullable',
+        'itemAffix.base_healing_mod_bonus'   => 'nullable',
+        'itemAffix.base_ac_mod_bonus'        => 'nullable',
+        'itemAffix.fight_time_out_mod_bonus' => 'nullable',
+        'itemAffix.move_time_out_mod_bonus'  => 'nullable',
     ];
 
     public function update($id) {

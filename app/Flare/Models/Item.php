@@ -313,12 +313,11 @@ class Item extends Model
     /**
      * Gets the total skill training bonus (XP bonus)
      *
-     * @param $query
      * @param string $skillName
      * @return float
      */
-    public function scopeGetSkillTrainingBonus($query, string $skillName): float {
-        return $this->calculateTrainingBonus($this, $skillName);
+    public function getSkillTrainingBonus(GameSkill $gameSkill): float {
+        return $this->calculateTrainingBonus($this, $gameSkill);
     }
 
     public function scopeGetItemSkills($query): array {
@@ -358,12 +357,11 @@ class Item extends Model
     /**
      * Gets the total skill training bonus (Bonus when using)
      *
-     * @param $query
      * @param string $skillName
      * @return float
      */
-    public function scopeGetSkillBonus($query, string $skillName): float {
-        return $this->calculateBonus($this, $skillName);
+    public function getSkillBonus(GameSkill $gameSkill): float {
+        return $this->calculateBonus($this, $gameSkill);
     }
 
     protected static function newFactory() {

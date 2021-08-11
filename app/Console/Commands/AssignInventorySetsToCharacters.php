@@ -11,21 +11,21 @@ use App\Flare\Values\CharacterClassValue;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class AssignCharactersNewStats extends Command
+class AssignInventorySetsToCharacters extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'characters:assign-new-stats';
+    protected $signature = 'characters:assign-inventory-sets';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Assigns new stats to characters';
+    protected $description = 'Assigns inventory sets to characters that don\'t have inventory sets.';
 
     /**
      * Create a new command instance.
@@ -46,14 +46,14 @@ class AssignCharactersNewStats extends Command
     {
         Character::chunkById(100, function($characters) {
             $characters->each(function($character) {
-                $baseStatValue = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
-                $agi   = $baseStatValue->agi() + $character->level;
-                $focus = $baseStatValue->focus() + $character->level;
-
-                $character->update([
-                    'agi'   => $agi,
-                    'focus' => $focus,
-                ]);
+                if ($character->inventorySets->isEmpty()) {
+                    for ($i = 1; $i <= 10; $i++) {
+                        $character->inventorySets()->create([
+                            'character_id'    => $character->id,
+                            'can_be_equipped' => true,
+                        ]);
+                    }
+                }
             });
         });
     }
