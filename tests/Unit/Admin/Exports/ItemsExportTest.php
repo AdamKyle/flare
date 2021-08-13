@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Admin\Exports;
 
+use App\Admin\Exports\Items\ItemsExport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -12,7 +13,7 @@ class ItemsExportTest extends TestCase {
     use RefreshDatabase;
 
     public function testExport() {
-        Excel::store(new NpcsExport(false), 'test.xlsx');
+        Excel::store(new ItemsExport(false), 'test.xlsx');
 
         Storage::disk('local')->assertExists('test.xlsx');
 

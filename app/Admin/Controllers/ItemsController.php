@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Import\Items\ItemsImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -52,14 +54,14 @@ class ItemsController extends Controller {
     }
 
     public function export(Request $request) {
-        $response = Excel::download(new QuestsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new ItemsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
     }
 
     public function importData(ItemsImportRequest $request) {
-        Excel::import(new QuestsImport, $request->items_import);
+        Excel::import(new ItemsImport, $request->items_import);
 
         return redirect()->back()->with('success', 'imported item data.');
     }

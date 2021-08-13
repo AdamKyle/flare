@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Admin\Imports;
 
+use App\Admin\Import\Items\ItemsImport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
@@ -11,7 +12,7 @@ class ItemsImportTest extends TestCase {
     use RefreshDatabase;
 
     public function testImport() {
-        Excel::import(new QuestsImport(), resource_path('data-imports/items.xlsx'));
+        Excel::import(new ItemsImport(), resource_path('data-imports/items.xlsx'));
 
         $this->assertTrue(true);
     }
