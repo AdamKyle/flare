@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Admin\Import\Items;
+namespace App\Admin\Import\Quests;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Import\Items\Sheets\QuestsSheet;
+use App\Admin\Import\Quests\Sheets\QuestsSheet;
 
-class ItemsImport implements WithMultipleSheets
+class QuestsImport implements WithMultipleSheets
 {
 
     public function sheets(): array

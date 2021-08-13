@@ -133,6 +133,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/npcs/edit/{npc}', ['as' => 'npcs.edit', 'uses' => 'NpcsController@edit']);
     Route::get('/admin/npcs/{npc}', ['as' => 'npcs.show', 'uses' => 'NpcsController@show']);
 
+    Route::get('/admin/quests/export-quests', ['as' => 'quests.export', 'uses' => 'QuestsController@exportQuests']);
+    Route::get('/admin/quests/import-quests', ['as' => 'quests.import', 'uses' => 'QuestsController@importQuests']);
+    Route::post('/admin/quests/export-data', ['as' => 'quests.export-data', 'uses' => 'QuestsController@export']);
+    Route::post('/admin/quests/import-data', ['as' => 'quests.import-data', 'uses' => 'QuestsController@import']);
+
     Route::get('/admin/quests/index', ['as' => 'quests.index', 'uses' => 'QuestsController@index']);
     Route::get('/admin/quests/create', ['as' => 'quests.create', 'uses' => 'QuestsController@create']);
     Route::get('/admin/quests/edit/{quest}', ['as' => 'quests.edit', 'uses' => 'QuestsController@edit']);

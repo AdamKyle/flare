@@ -2,7 +2,11 @@
 
 namespace App\Admin\Controllers;
 
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
+use App\Admin\Exports\Quests\QuestsExport;
+use App\Admin\Import\Quests\QuestsImport;
+use App\Admin\Requests\QuestsImportRequest;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Quest;
 
@@ -37,5 +41,26 @@ class QuestsController extends Controller {
             'quest'   => $quest,
             'editing' => true,
         ]);
+    }
+
+    public function exportQuests() {
+        return view('admin.quests.export');
+    }
+
+    public function importQuests() {
+        return view('admin.quests.import');
+    }
+
+    public function export() {
+        $response = Excel::download(new QuestsExport, 'quests.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
+    }
+
+    public function import(QuestsImportRequest $request) {
+        Excel::import(new QuestsImport, $request->quests_import);
+
+        return redirect()->back()->with('success', 'imported quest data.');
     }
 }
