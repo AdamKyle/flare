@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Admin\Requests\ItemsImport as ItemsImportRequest;
-use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Exports\Items\NpcsExport;
 use App\Admin\Import\Items\ItemsImport;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -52,7 +52,7 @@ class ItemsController extends Controller {
     }
 
     public function export(Request $request) {
-        $response = Excel::download(new ItemsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new NpcsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;

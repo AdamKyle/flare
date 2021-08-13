@@ -2,10 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-
-use App\Flare\Values\NpcTypes;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Admin\Requests\NpcsImportRequest;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Npc;
+use App\Flare\Values\NpcTypes;
+use App\Admin\Exports\Npcs\NpcsExport;
+use App\Admin\Import\Npcs\NpcsImport;
 
 class NpcsController extends Controller {
 
@@ -35,5 +38,26 @@ class NpcsController extends Controller {
             'npc'     => $npc,
             'editing' => true,
         ]);
+    }
+
+    public function exportNpcs() {
+        return view('admin.npcs.export');
+    }
+
+    public function importNpcs() {
+        return view('admin.npcs.import');
+    }
+
+    public function export() {
+        $response = Excel::download(new NpcsExport(), 'npcs.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
+    }
+
+    public function import(NpcsImportRequest $request) {
+        Excel::import(new NpcsImport, $request->npcs_import);
+
+        return redirect()->back()->with('success', 'imported npc data.');
     }
 }

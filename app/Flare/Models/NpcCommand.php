@@ -20,4 +20,8 @@ class NpcCommand extends Model {
     protected $casts = [
         'command_type' => 'integer',
     ];
+
+    public function npc() {
+        return $this->belongsTo(Npc::class);
+    }
 }

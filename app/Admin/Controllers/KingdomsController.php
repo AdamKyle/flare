@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Exports\Kingdoms\KingdomsExport;
-use App\Admin\Import\Kingdoms\KingdomsImport;
+use App\Admin\Import\Kingdoms\NpcsImport;
 use App\Admin\Requests\KingdomImport;
 use App\Flare\Models\GameBuilding;
 use App\Http\Controllers\Controller;
@@ -32,7 +32,7 @@ class KingdomsController extends Controller {
             return redirect()->back()->with('error', 'You already have data in the system. Import aborted.');
         }
 
-        Excel::import(new KingdomsImport(), $request->kingdom_import);
+        Excel::import(new NpcsImport(), $request->kingdom_import);
 
         return redirect()->back()->with('success', 'imported kingdom data.');
     }

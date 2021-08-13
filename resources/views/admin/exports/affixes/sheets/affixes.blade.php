@@ -11,6 +11,8 @@
             <th>dex_mod</th>
             <th>chr_mod</th>
             <th>int_mod</th>
+            <th>agi_mod</th>
+            <th>focus_mod</th>
             <th>int_required</th>
             <th>skill_level_required</th>
             <th>skill_level_trivial</th>
@@ -41,6 +43,8 @@
             <td>{{$affix->dex_mod}}</td>
             <td>{{$affix->chr_mod}}</td>
             <td>{{$affix->int_mod}}</td>
+            <td>{{$affix->agi_mod}}</td>
+            <td>{{$affix->focus_mod}}</td>
             <td>{{$affix->int_required}}</td>
             <td>{{$affix->skill_level_required}}</td>
             <td>{{$affix->skill_level_trivial}}</td>

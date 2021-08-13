@@ -54,6 +54,20 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item-affix-int-mod">Agi Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-int-mod" name="item-affix-int-mod" wire:model="itemAffix.agi_mod">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item-affix-chr-mod">Focus Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-chr-mod" name="item-affix-chr-mod" wire:model="itemAffix.focus_mod">
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label for="item-affix-skill-name">Affects Skill: </label>

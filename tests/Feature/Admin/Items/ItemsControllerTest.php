@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Items;
 
-use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Exports\Items\NpcsExport;
 use Event;
 use Illuminate\Http\UploadedFile;
 use Maatwebsite\Excel\Facades\Excel;
@@ -159,7 +159,7 @@ class ItemsControllerTest extends TestCase
 
         $this->actingAs($this->user)->post(route('items.export-data'));
 
-        Excel::assertDownloaded('items.xlsx', function(ItemsExport $export) {
+        Excel::assertDownloaded('items.xlsx', function(NpcsExport $export) {
             return true;
         });
     }

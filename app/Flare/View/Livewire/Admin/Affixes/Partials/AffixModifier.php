@@ -26,6 +26,8 @@ class AffixModifier extends Component
         'itemAffix.dex_mod'                  => 'nullable',
         'itemAffix.chr_mod'                  => 'nullable',
         'itemAffix.int_mod'                  => 'nullable',
+        'itemAffix.agi_mod'                  => 'nullable',
+        'itemAffix.focus_mod'                => 'nullable',
         'itemAffix.skill_name'               => 'nullable',
         'itemAffix.skill_bonus'              => 'nullable',
         'itemAffix.skill_training_bonus'     => 'nullable',

@@ -3,7 +3,7 @@
 namespace App\Admin\Import\Kingdoms;
 
 use App\Admin\Import\Kingdoms\Sheets\BuildingsSheet;
-use App\Admin\Import\Kingdoms\Sheets\BuildingsUnitsSheet;
+use App\Admin\Import\Kingdoms\Sheets\NpcCommandsSheet;
 use App\Admin\Import\Kingdoms\Sheets\UnitsSheet;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -15,7 +15,7 @@ class KingdomsImport implements WithMultipleSheets
         return [
             0 => new BuildingsSheet,
             1 => new UnitsSheet,
-            2 => new BuildingsUnitsSheet
+            2 => new NpcCommandsSheet
         ];
     }
 }
