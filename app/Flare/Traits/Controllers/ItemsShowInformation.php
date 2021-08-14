@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
+use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Values\SkillTypeValue;
 
@@ -31,7 +32,15 @@ trait ItemsShowInformation {
         }
 
         if ($item->usable) {
-            $skills = GameSkill::where('type', $item->affects_skill_type)->pluck('name')->toArray();
+            $type = new SkillTypeValue($item->affects_skill_type);
+
+            $query = GameSkill::where('type', $item->affects_skill_type);
+
+            if ($type->isTraining()) {
+                $query = $query->where('can_train', true);
+            }
+
+            $skills = $query->pluck('name')->toArray();
         }
 
 

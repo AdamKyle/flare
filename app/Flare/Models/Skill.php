@@ -115,7 +115,6 @@ class Skill extends Model
         );
 
         $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'base_damage_mod_bonus');
-        $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'skill_bonus');
 
         return $itemBonus + $baseBonus;
     }
@@ -139,7 +138,7 @@ class Skill extends Model
             $this->baseSkill->base_ac_mod_bonus_per_level * $this->level
         );
 
-        $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'base_ac_mod_bonus', true);
+        $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'base_ac_mod_bonus');
 
         return $itemBonus + $baseBonus;
     }
@@ -154,11 +153,8 @@ class Skill extends Model
     public function getMoveTimeOutModAttribute() {
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'move_time_out_mod_bonus', true);
 
-        $baseBonus = (
-            $this->baseSkill->move_time_out_mod_bonus_per_level * $this->level
-        );
+        $baseBonus = $this->calculateTotalTimeBonus($this, 'move_time_out_mod_bonus_per_level');
 
-        $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'base_ac_mod_bonus');
 
         return $itemBonus + $baseBonus;
     }
@@ -255,7 +251,7 @@ class Skill extends Model
             }
         }
 
-        return $newBonus > $bonus ? $newBonus : 0.0;
+        return $newBonus;
     }
 
     private function fetchSlotsWithEquipment(): Collection  {

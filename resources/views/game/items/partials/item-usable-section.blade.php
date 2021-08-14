@@ -1,14 +1,15 @@
 <x-cards.card-with-title title="Usable Item">
     <div class="alert alert-info mb-3 mt-2">
-        <p>This item is usable, what that means is either via chat or via the inventory (action drop down)
-            You can "use" the item.</p>
-
         <p>
-            Upon using this item, the effects below will take place for the allotted time (in minutes). You can see what affects are applied
-            by clicking on the tab beside "Character Info" called "Boons". You can cancel a boon at any time by clicking it and canceling it.
+            When using this item, it's effects will be applied for a specified amount of time in minutes. Usable items, accept those that are used
+            to attack kingdoms, are used from the character inventory section. These items can only be crafted and <strong>can be sold on the market</strong>.
         </p>
         <p>
-            These items cannot be sold via the market bord and cannot be sold via the shop. They can only be crafted via
+            Upon being used, you can see the "applied boons" under the Active Boons tab on the character sheet where you can see the boon
+            and even cancel its effects early if you so desire.
+        </p>
+        <p>
+            These items can crafted via
 
             @if (isset($skill))
                 @if (auth()->user()->hasRole('Admin'))
@@ -52,10 +53,20 @@
             @if (!is_null($item->affects_skill_type))
                 <dt>Skills Affected: </dt>
                 <dd>{{empty($skills) ? 'None' : implode(', ', $skills)}}</dd>
-                <dt>Skills Bonus: </dt>
+                <dt>Skill Bonus: </dt>
                 <dd>{{$item->increase_skill_bonus_by * 100}}%</dd>
-                <dt>Skills Affected: </dt>
+                <dt>Skill Training Bonus: </dt>
                 <dd>{{$item->increase_skill_training_bonus_by * 100}}%</dd>
+                <dt>Base Damage Mod Bonus:</dt>
+                <dd>{{$item->base_damage_mod_bonus * 100}}%</dd>
+                <dt>Base Healing Mod Bonus:</dt>
+                <dd>{{$item->base_healing_mod_bonus * 100}}%</dd>
+                <dt>Base AC Mod Bonus:</dt>
+                <dd>{{$item->base_ac_mod_bonus * 100}}%</dd>
+                <dt>Fight Timeout Mod Bonus:</dt>
+                <dd>{{$item->fight_time_out_mod_bonus * 100}}%</dd>
+                <dt>Move Timeout Mod Bonus:</dt>
+                <dd>{{$item->move_time_out_mod_bonus * 100}}%</dd>
             @endif
         </dl>
     @endif
