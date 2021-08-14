@@ -149,7 +149,7 @@ class CharacterInformationBuilder {
         }
 
         if ($classType->isProphet()) {
-            $hasHealingSpells = $this->prophetHasHealingSpells();
+            $hasHealingSpells = $this->prophetHasHealingSpells($this->character);
 
             if ($hasHealingSpells) {
                 $healingAmount += $this->character->{$dmgStat} * .025;

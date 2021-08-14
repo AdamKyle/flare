@@ -32,7 +32,7 @@ class KingdomsController extends Controller {
             return redirect()->back()->with('error', 'You already have data in the system. Import aborted.');
         }
 
-        Excel::import(new NpcsImport(), $request->kingdom_import);
+        Excel::import(new KingdomImport(), $request->kingdom_import);
 
         return redirect()->back()->with('success', 'imported kingdom data.');
     }
