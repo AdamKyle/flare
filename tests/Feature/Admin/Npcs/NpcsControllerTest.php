@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Npcs;
 
+use App\Flare\Values\NpcCommandTypes;
 use Event;
 use Mail;
 use Queue;
@@ -37,6 +38,12 @@ class NpcsControllerTest extends TestCase
         $this->npc = $this->createNpc([
             'game_map_id' => $this->createGameMap()->id,
         ]);
+
+        $this->npc->commands()->create([
+            'npc_id' => $this->npc->id,
+            'command' => 'Test',
+            'command_type' => NpcCommandTypes::QUEST,
+        ]);
     }
 
     public function tearDown(): void
@@ -54,7 +61,7 @@ class NpcsControllerTest extends TestCase
     public function testCanSeeShow() {
         $this->actingAs($this->user)->visit(route('npcs.show', [
             'npc' => $this->npc,
-        ]))->see($this->npc->name);
+        ]))->see($this->npc->real_name);
     }
 
     public function testCanSeeCreatePage() {
