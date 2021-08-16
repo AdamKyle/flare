@@ -125,6 +125,8 @@ class ItemDetails extends Component
         'item.increase_skill_training_bonus_by' => 'nullable',
         'item.can_resurrect'                    => 'nullable',
         'item.resurrection_chance'              => 'nullable',
+        'item.spell_evasion'                    => 'nullable',
+        'item.artifact_annulment'               => 'nullable',
     ];
 
     protected $messages = [

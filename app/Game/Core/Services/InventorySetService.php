@@ -121,7 +121,7 @@ class InventorySetService {
                 $data = $this->setPositionEquipData($slot, $data, 'ring-one', 'ring-two');
             }
 
-            if ($slot->item->type === 'spell') {
+            if ($slot->item->type === 'spell-damage' || $slot->item->type === 'spell-healing') {
                 $data = $this->setPositionEquipData($slot, $data, 'spell-one', 'spell-two');
             }
 

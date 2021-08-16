@@ -30,6 +30,8 @@ class AddAlchemyCostsToItems extends Migration
             $table->decimal('base_ac_mod_bonus', 8, 4)->nullable()->default(0.0);
             $table->decimal('fight_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
             $table->decimal('move_time_out_mod_bonus', 8, 4)->nullable()->default(0.0);
+            $table->decimal('spell_evasion', 8, 4)->nullable()->default(0.0);
+            $table->decimal('artifact_annulment', 8, 4)->nullable()->default(0.0);
         });
     }
 
@@ -59,6 +61,8 @@ class AddAlchemyCostsToItems extends Migration
             $table->dropColumn('base_ac_mod_bonus');
             $table->dropColumn('fight_time_out_mod_bonus');
             $table->dropColumn('move_time_out_mod_bonus');
+            $table->dropColumn('spell_evasion');
+            $table->dropColumn('artifact_annulment');
         });
     }
 }

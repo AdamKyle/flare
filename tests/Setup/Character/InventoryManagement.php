@@ -16,6 +16,7 @@ class InventoryManagement {
      * Constructor
      *
      * @param Character $character
+     * @param CharacterFactory|null $characterFactory
      */
     public function __construct(Character $character, CharacterFactory $characterFactory = null) {
         $this->character        = $character;
@@ -25,8 +26,9 @@ class InventoryManagement {
     /**
      * Equip the left hand with an item that isn't already equipped.
      *
-     * @param int $slotId | 1
+     * @param string $itemName
      * @return InventoryManagement
+     * @throws \Exception
      */
     public function equipLeftHand(string $itemName): InventoryManagement {
         $slot = $this->fetchSlot($itemName);
@@ -44,8 +46,9 @@ class InventoryManagement {
     /**
      * Equip the right hand.
      *
-     * @param int $slotId | 1
+     * @param string $itemName
      * @return InventoryManagement
+     * @throws \Exception
      */
     public function equipRightHand(string $itemName): InventoryManagement {
         $slot = $this->fetchSlot($itemName);
@@ -65,9 +68,10 @@ class InventoryManagement {
      *
      * Accepted: spell-one, spell-two
      *
-     * @param int $slotId | 1
+     * @param string $itemName
      * @param string $position | spell-one, spell-two
      * @return InventoryManagement
+     * @throws \Exception
      */
     public function equipSpellSlot(string $itemName, string $position = 'spell-one'): InventoryManagement {
         $slot = $this->fetchSlot($itemName);
@@ -85,9 +89,10 @@ class InventoryManagement {
     /**
      * Equip an artifact.
      *
-     * @param int $slotId
+     * @param string $itemName
      * @param string $position | artifact-one, artifact-two
      * @return InventoryManagement
+     * @throws \Exception
      */
     public function equipArtifact(string $itemName, string $position = 'artifact-one'): InventoryManagement {
         $slot = $this->fetchSlot($itemName);
@@ -105,9 +110,10 @@ class InventoryManagement {
     /**
      * Equip an item.
      *
-     * @param int $slotId | 1
      * @param string $position
+     * @param string $itemName
      * @return InventoryManagement
+     * @throws \Exception
      */
     public function equipItem(string $position, string $itemName): InventoryManagement {
         $slot = $this->fetchSlot($itemName);
@@ -128,6 +134,8 @@ class InventoryManagement {
      * Ignores the inventory max limit.
      *
      * @param Item $item
+     * @param bool $equip
+     * @param string|null $position
      * @return InventoryManagement
      */
     public function giveItem(Item $item, bool $equip = false, string $position = null): InventoryManagement {

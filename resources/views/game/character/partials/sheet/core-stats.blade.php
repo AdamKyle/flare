@@ -38,8 +38,11 @@
 <div class="col-md-4">
     <dl>
         <dt>Spell Evasion:</dt>
-        <dd>{{$character->spell_evasion * 100}}%</dd>
+        <dd>{{$character->getInformation()->getTotalSpellEvasion() * 100}}%</dd>
         <dt>Artifact Annulment:</dt>
-        <dd>{{$character->artifact_annulment * 100}}%</dd>
+        <dd>{{$character->getInformation()->getTotalAnnulment() * 100}}%</dd>
+        <dt>Resurrection Chance<sup>*</sup>:</dt>
+        <dd>{{$character->getInformation()->fetchResurrectionChance() * 100}}%</dd>
     </dl>
+    <p class="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
 </div>

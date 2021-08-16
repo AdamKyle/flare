@@ -89,11 +89,12 @@ class CharacterInformationBuilder {
             $this->getThievesDamageBonus($this->character) +
             $this->getVampiresDamageBonus($this->character) +
             $this->getRangersDamageBonus($this->character);
-        $characterDamageStat *= 1 + ($this->fetchSkillAttackMod() + $classBonuses);
 
-        $totalAttack = $this->getWeaponDamage() + $this->getTotalRingDamage();
+        $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
 
-        return round($characterDamageStat + $totalAttack);
+        $totalAttack = $this->getWeaponDamage();
+
+        return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
     }
 
     /**
@@ -103,17 +104,19 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildTotalAttack(): int {
+
         $characterDamageStat = $this->statMod($this->character->damage_stat);
         $classBonuses        = $this->getFightersDamageBonus($this->character) +
             $this->prophetDamageBonus($this->character) +
             $this->getThievesDamageBonus($this->character) +
             $this->getVampiresDamageBonus($this->character) +
             $this->getRangersDamageBonus($this->character);
-        $characterDamageStat *= 1 + ($this->fetchSkillAttackMod() + $classBonuses);
+
+        $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
 
         $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
 
-        return round($characterDamageStat + $totalAttack);
+        return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
     }
 
     /**
@@ -264,6 +267,11 @@ class CharacterInformationBuilder {
         return $this->getArtifactDamage();
     }
 
+    /**
+     * Gets the total ring damage.
+     *
+     * @return int
+     */
     public function getTotalRingDamage(): int {
         return $this->getRingDamage();
     }
@@ -274,7 +282,7 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function getTotalAnnulment(): float {
-        return  $this->character->getCharacterArtifactAnnulment();
+        return $this->getArtifactAnnulment();
     }
 
     /**
@@ -283,7 +291,43 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function getTotalSpellEvasion(): float {
-        return  $this->character->getCharacterSpellEvasion();
+        return  $this->getSpellEvasion();
+    }
+
+    protected function getSpellEvasion(): float {
+        $skillSpellEvasion = 0.0;
+
+        $skill = $this->character->skills->filter(function($skill) {
+            return $skill->type()->isSpellEvasion();
+        })->first();
+
+        if (!is_null($skill)) {
+            $skillSpellEvasion = $skill->skill_bonus;
+        }
+
+        $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'ring' && $slot->equipped;
+        })->sum('spell_evasion');
+
+        return $itemsEvasion + $skillSpellEvasion;
+    }
+
+    protected function getArtifactAnnulment(): float {
+        $skillArtifactAnnulment = 0.0;
+
+        $skill = $this->character->skills->filter(function($skill) {
+            return $skill->type()->isArtifactAnnulment();
+        })->first();
+
+        if (!is_null($skill)) {
+            $skillArtifactAnnulment = $skill->skill_bonus;
+        }
+
+        $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'ring' && $slot->equipped;
+        })->sum('artifact_annulment');
+
+        return $itemsEvasion + $skillArtifactAnnulment;
     }
 
     protected function fetchSkillAttackMod(): float {
@@ -321,7 +365,7 @@ class CharacterInformationBuilder {
             return is_null($skill->baseSkill->game_class_id);
         })->all();
 
-        foreach ($this->character->skills as $skill) {
+        foreach ($skills as $skill) {
             $percentageBonus += $skill->base_ac_mod;
         }
 
@@ -332,7 +376,7 @@ class CharacterInformationBuilder {
         $damage = 0;
 
         foreach ($this->fetchInventory() as $slot) {
-            if ($slot->type === 'weapon' || $slot->type === 'ring') {
+            if ($slot->item->type === 'weapon') {
                 $damage += $slot->item->getTotalDamage();
             }
         }
@@ -391,7 +435,7 @@ class CharacterInformationBuilder {
         }
 
         if ($defence !== 10) {
-            return $defence / 8;
+            return $defence / 6;
         }
 
         return $defence;

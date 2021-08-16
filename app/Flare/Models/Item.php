@@ -72,6 +72,8 @@ class Item extends Model
         'increase_skill_training_bonus_by',
         'can_resurrect',
         'resurrection_chance',
+        'spell_evasion',
+        'artifact_annulment',
 
     ];
 
@@ -111,8 +113,6 @@ class Item extends Model
         'craft_only'                       => 'boolean',
         'can_drop'                         => 'boolean',
         'market_sellable'                  => 'boolean',
-        'skill_level_required'             => 'integer',
-        'skill_level_trivial'              => 'integer',
         'usable'                           => 'boolean',
         'damages_kingdoms'                 => 'boolean',
         'kingdom_damage'                   => 'float',
@@ -123,6 +123,8 @@ class Item extends Model
         'increase_skill_bonus_by'          => 'float',
         'increase_skill_training_bonus_by' => 'float',
         'resurrection_chance'              => 'float',
+        'spell_evasion'                    => 'float',
+        'artifact_annulment'               => 'float',
     ];
 
     protected $appends = [

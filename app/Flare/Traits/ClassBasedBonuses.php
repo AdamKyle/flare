@@ -4,7 +4,11 @@ namespace App\Flare\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySet;
 use App\Flare\Values\CharacterClassValue;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 trait ClassBasedBonuses {
 
@@ -25,12 +29,12 @@ trait ClassBasedBonuses {
         if ($classType->isProphet()) {
             $class = $character->class;
 
-            $healingSpellsEquipped = $character->inventory->slots->filter(function($slot) {
+            $healingSpellsEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'spell-healing' && $slot->equipped;
             })->isNotEmpty();
 
             if ($healingSpellsEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_healing_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_healing_mod');
             }
         }
 
@@ -38,7 +42,7 @@ trait ClassBasedBonuses {
     }
 
     public function prophetHasHealingSpells(Character $character): bool {
-        return $healingSpellsEquipped = $character->inventory->slots->filter(function($slot) {
+        return $this->getEquippedInventory($character)->slots->filter(function($slot) {
             return $slot->item->type === 'spell-healing' && $slot->equipped;
         })->isNotEmpty();
     }
@@ -59,12 +63,12 @@ trait ClassBasedBonuses {
         if ($classType->isProphet()) {
             $class = $character->class;
 
-            $healingSpellsEquipped = $character->inventory->slots->filter(function($slot) {
+            $healingSpellsEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'spell-healing' && $slot->equipped;
             })->isNotEmpty();
 
             if ($healingSpellsEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
             }
         }
 
@@ -87,12 +91,12 @@ trait ClassBasedBonuses {
         if ($classType->isHeretic()) {
             $class = $character->class;
 
-            $damageSpellsEquipped = $character->inventory->slots->filter(function($slot) {
+            $damageSpellsEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'spell-damage' && $slot->equipped;
             })->isNotEmpty();
 
             if ($damageSpellsEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
             }
         }
 
@@ -115,12 +119,12 @@ trait ClassBasedBonuses {
         if ($classType->isFighter()) {
             $class = $character->class;
 
-            $weaponEquipped = $character->inventory->slots->filter(function($slot) {
+            $weaponEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'weapon' && $slot->equipped;
             })->isNotEmpty();
 
             if ($weaponEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
             }
         }
 
@@ -143,12 +147,12 @@ trait ClassBasedBonuses {
         if ($classType->isFighter()) {
             $class = $character->class;
 
-            $shieldEquipped = $character->inventory->slots->filter(function($slot) {
+            $shieldEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'shield' && $slot->equipped;
             })->isNotEmpty();
 
             if ($shieldEquipped) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_ac_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_ac_mod');
             }
         }
 
@@ -171,12 +175,12 @@ trait ClassBasedBonuses {
         if ($classType->isThief()) {
             $class = $character->class;
 
-            $dualWielding = $character->inventory->slots->filter(function($slot) {
+            $dualWielding = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'weapon' && $slot->equipped;
             })->count();
 
             if ($dualWielding === 2) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
             }
         }
 
@@ -199,12 +203,12 @@ trait ClassBasedBonuses {
         if ($classType->isThief()) {
             $class = $character->class;
 
-            $dualWielding = $character->inventory->slots->filter(function($slot) {
+            $dualWielding = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'weapon' && $slot->equipped;
             })->count();
 
             if ($dualWielding === 2) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'fight_time_out_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'fight_time_out_mod');
             }
         }
 
@@ -227,12 +231,12 @@ trait ClassBasedBonuses {
         if ($classType->isRanger()) {
             $class = $character->class;
 
-            $hasBow = $character->inventory->slots->filter(function($slot) {
+            $hasBow = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'bow' && $slot->equipped;
             })->isNotEmpty();
 
             if ($hasBow) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
             }
         }
 
@@ -255,12 +259,12 @@ trait ClassBasedBonuses {
         if ($classType->isRanger()) {
             $class = $character->class;
 
-            $hasBow = $character->inventory->slots->filter(function($slot) {
+            $hasBow = $this->getEquippedInventory($character)->slots->filter(function($slot) {
                 return $slot->item->type === 'bow' && $slot->equipped;
             })->isNotEmpty();
 
             if ($hasBow) {
-                $classBonus = $this->getClassBonus($class, $classBonus, 'fight_time_out_mod');
+                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'fight_time_out_mod');
             }
         }
 
@@ -281,7 +285,7 @@ trait ClassBasedBonuses {
         if ($classType->isVampire()) {
             $class = $character->class;
 
-            $classBonus = $this->getClassBonus($class, $classBonus, 'base_damage_mod');
+            $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
         }
 
         return $classBonus;
@@ -301,7 +305,7 @@ trait ClassBasedBonuses {
         if ($classType->isVampire()) {
             $class = $character->class;
 
-            $classBonus = $this->getClassBonus($class, $classBonus, 'base_healing_mod');
+            $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_healing_mod');
         }
 
         return $classBonus;
@@ -315,15 +319,31 @@ trait ClassBasedBonuses {
      * @param string $type
      * @return float
      */
-    private function getClassBonus(GameClass $class, float $classBonus, string $type): float {
+    private function getClassBonus(Character $character, GameClass $class, float $classBonus, string $type): float {
         $classSkillIds = $class->gameSkills()->pluck('id')->toArray();
-        $skills        = $this->character->skills()->whereIn('game_skill_id', $classSkillIds)->get();
+        $skills        = $character->skills()->whereIn('game_skill_id', $classSkillIds)->get();
 
         foreach ($skills as $skill) {
             $classBonus += $skill->{$type};
         }
 
         return $classBonus;
+    }
+
+    /**
+     * Gets the correct inventory for the calculations.
+     *
+     * @param Character $character
+     * @return Inventory|InventorySet
+     */
+    private function getEquippedInventory(Character $character): Inventory|InventorySet {
+        $equippedSet = $character->inventorySets->where('is_equipped', true)->first();
+
+        if (is_null($equippedSet)){
+            return $character->inventory;
+        }
+
+        return $equippedSet;
     }
 
 }

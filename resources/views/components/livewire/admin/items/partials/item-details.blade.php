@@ -58,7 +58,21 @@
         <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-healing">Base Healing: </label>
-                <input type="number" class="form-control" id="item-base-healing" name="item-base-healing" wire:model="item.base_healing">
+                <input type="number" step="0.01" class="form-control" id="item-base-healing" name="item-base-healing" wire:model="item.base_healing">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item-base-spell-evasion">Spell Evasion: </label>
+                <input type="number" step="0.01" class="form-control" id="item-base-spell-evasion" name="item-base-spell-evasion" wire:model="item.spell_evasion" {{$item->type !== 'ring' ? 'disabled' : null}}>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item-base-artifact-annulment">Artifact Annulment: </label>
+                <input type="number" class="form-control" id="item-base-artifact-annulment" name="item-base-artifact-annulment" wire:model="item.artifact_annulment" {{$item->type !== 'ring' ? 'disabled' : null}}>
             </div>
         </div>
     </div>

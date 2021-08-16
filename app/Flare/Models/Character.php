@@ -96,8 +96,6 @@ class Character extends Model
         'gold'                   => 'integer',
         'gold_dust'              => 'integer',
         'shards'                 => 'integer',
-        'spell_evasion'          => 'decimal:4',
-        'artifact_annulment'     => 'decimal:4',
     ];
 
     public function race() {

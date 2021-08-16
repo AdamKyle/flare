@@ -36,7 +36,9 @@ class CharacterFactory {
         CreateSkill,
         CreateSecurityQuestion;
 
-    private $character;
+    private Character $character;
+
+    private ?InventorySetManagement $inventorySetManagement;
 
     /**
      * Creates a base character associated with a user.
@@ -102,6 +104,22 @@ class CharacterFactory {
      */
     public function kingdomManagement(): KingdomManagement {
         return new KingdomManagement($this->character, $this);
+    }
+
+    /**
+     * Fetches inventory management.
+     *
+     * Use existing instantiation if it exists.
+     *
+     * @return InventorySetManagement
+     */
+    public function InventorySetManagement(): InventorySetManagement {
+
+        if (!is_null($this->inventorySetManagement)) {
+            $this->inventorySetManagement = new InventorySetManagement($this->character, $this);
+        }
+
+        return $this->inventorySetManagement;
     }
 
     /**

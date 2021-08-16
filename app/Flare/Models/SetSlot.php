@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\SetSlotFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -34,5 +35,9 @@ class SetSlot extends Model {
 
     public function item() {
         return $this->hasOne(Item::class, 'id', 'item_id');
+    }
+
+    protected static function newFactory() {
+        return SetSlotFactory::new();
     }
 }

@@ -49,7 +49,9 @@
         <th>increase_skill_bonus_by</th>
         <th>increase_skill_training_bonus_by</th>
         <th>can_resurrect</th>
-        <th>resurrect_chance</th>
+        <th>resurrection_chance</th>
+        <th>spell_evasion</th>
+        <th>artifact_annulment</th>
     </tr>
     </thead>
     <tbody>
@@ -103,7 +105,9 @@
             <td>{{$item->increase_skill_bonus_by}}</td>
             <td>{{$item->increase_skill_training_bonus_by}}</td>
             <td>{{$item->can_resurrect}}</td>
-            <td>{{$item->resurrect_chance}}</td>
+            <td>{{$item->resurrection_chance}}</td>
+            <td>{{$item->spell_evasion}}</td>
+            <td>{{$item->asrtifact_annulment}}</td>
         </tr>
     @endforeach
     </tbody>

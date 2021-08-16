@@ -32,12 +32,17 @@
                         </div>
                         <hr />
                         <h5>Attack Break Down</h5>
+                        <p class="mt-2">
+                            These include any attached affixes and skill bonuses:
+                        </p>
                         <hr />
                         <div class="row mt-2">
                             <div class="col-md-12">
                                 <dl>
-                                    <dt>Attack (includes rings + weapon):</dt>
+                                    <dt>Weapon Attack:</dt>
                                     <dd>{{$character->getInformation()->buildAttack()}}</dd>
+                                    <dt>Rings Attack:</dt>
+                                    <dd>{{$character->getInformation()->getTotalRingDamage()}}</dd>
                                     <dt>Spell Damage:</dt>
                                     <dd>{{$character->getInformation()->getTotalSpellDamage()}}</dd>
                                     <dt>Artifact Damage:</dt>

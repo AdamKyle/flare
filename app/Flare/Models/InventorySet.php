@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\InventorySetFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\QuestItemSlot;
@@ -34,5 +35,9 @@ class InventorySet extends Model {
 
     public function slots() {
         return $this->hasMany(SetSlot::class);
+    }
+
+    protected static function newFactory() {
+        return InventorySetFactory::new();
     }
 }

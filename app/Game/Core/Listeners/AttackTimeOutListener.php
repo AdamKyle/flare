@@ -46,8 +46,8 @@ class AttackTimeOutListener
             return 0;
         }
 
-        $thiefAttackTimeOutBonus = $this->getThievesFightTimeout($character) + $this->getRangersFightTimeout($character);
+        $classBonus = $this->getThievesFightTimeout($character) + $this->getRangersFightTimeout($character);
 
-        return $skill->fight_time_out_mod + $thiefAttackTimeOutBonus;
+        return $skill->fight_time_out_mod + $classBonus;
     }
 }
