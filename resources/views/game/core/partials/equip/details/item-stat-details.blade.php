@@ -13,8 +13,14 @@
     <dd class={{$item->getTotalBaseDamageMod() > 0.0 ? 'text-success' : ''}}>{{$item->getTotalBaseDamageMod() * 100}}%</dd>
     <dt>AC Modifier:</dt>
     <dd class={{$item->base_ac_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_ac_mod * 100}}%</dd>
-    <dt>Healing Modifier:</dt>
-    <dd class={{$item->base_ac_mod > 0.0 ? 'text-success' : ''}}>{{$item->base_healing_mod * 100}}%</dd>
+    <dt>Spell Evasion Modifier:</dt>
+    <dd class={{$item->spell_evasion > 0.0 ? 'text-success' : ''}}>{{$item->spell_evasion * 100}}%</dd>
+    <dt>Artifact Annulment Modifier:</dt>
+    <dd class={{$item->artifact_annulment > 0.0 ? 'text-success' : ''}}>{{$item->artifact_annulment * 100}}%</dd>
+    @if ($item->can_resurrect)
+        <dt>Resurrection Chance <sup>rc</sup>:</dt>
+        <dd class={{$item->resurrection_chance > 0.0 ? 'text-success' : ''}}>{{$item->resurrection_chance * 100}}%</dd>
+    @endif
     <dt>Str Modifier:</dt>
     <dd><span class={{$item->getTotalPercentageForStat('str') > 0.0 ? 'text-success' : ''}}>{{number_format($item->getTotalPercentageForStat('str') * 100)}}% </span></dd>
     <dt>Dur Modifier:</dt>
@@ -37,4 +43,9 @@
 <p>
     <sup>**</sup> Applies to all skills that increase this modifier.
 </p>
+@if ($item->can_resurrect)
+    <p>
+        <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.
+    </p>
+@endif
 

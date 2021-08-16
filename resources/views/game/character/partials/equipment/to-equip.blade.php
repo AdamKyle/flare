@@ -13,6 +13,12 @@
         <p>
             <sup>**</sup> Applies to all skills that increase this modifier.
         </p>
+        @if ($itemToEquip->can_resurrect)
+            <p>
+                <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.
+            </p>
+        @endif
+
 
         <form class="mt-4" action="{{route('game.equip.item', ['character' => $characterId])}}" method="POST">
             @csrf

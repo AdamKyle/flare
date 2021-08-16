@@ -15,5 +15,11 @@
         <p>
             <sup>**</sup> Applies to all skills that increase this modifier.
         </p>
+        @if ($equipment['slot']->item->can_resurrect)
+            <p>
+                <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.
+            </p>
+        @endif
+
     </div>
 </div>

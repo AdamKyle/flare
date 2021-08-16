@@ -11,6 +11,14 @@
     <dd><span class='{{$item->getTotalFightTimeOutMod() > 0.0 ? 'text-success' : ''}}'>{{$item->getTotalFightTimeOutMod() * 100}}% </span></dd>
     <dt>Base Damage Mod <sup>**</sup>:</dt>
     <dd><span class='{{$item->getTotalBaseDamageMod() > 0.0 ? 'text-success' : ''}}'>{{$item->getTotalBaseDamageMod() * 100}}% </span></dd>
+    <dt>Spell Evasion Modifier:</dt>
+    <dd class={{$item->spell_evasion > 0.0 ? 'text-success' : ''}}>{{$item->spell_evasion * 100}}%</dd>
+    <dt>Artifact Annulment Modifier:</dt>
+    <dd class={{$item->artifact_annulment > 0.0 ? 'text-success' : ''}}>{{$item->artifact_annulment * 100}}%</dd>
+    @if ($item->can_resurrect)
+        <dt>Resurrection Chance <sup>rc</sup>:</dt>
+        <dd class={{$item->resurrection_chance > 0.0 ? 'text-success' : ''}}>{{$item->resurrection_chance * 100}}%</dd>
+    @endif
     <dt>Str:</dt>
     <dd><span class={{$item->getTotalPercentageForStat('str') > 0.0 ? 'text-success' : ''}}>{{$item->getTotalPercentageForStat('str') * 100}}% </span></dd>
     <dt>Dur:</dt>

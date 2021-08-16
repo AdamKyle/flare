@@ -107,7 +107,7 @@
             <td>{{$item->can_resurrect}}</td>
             <td>{{$item->resurrection_chance}}</td>
             <td>{{$item->spell_evasion}}</td>
-            <td>{{$item->asrtifact_annulment}}</td>
+            <td>{{$item->artifact_annulment}}</td>
         </tr>
     @endforeach
     </tbody>

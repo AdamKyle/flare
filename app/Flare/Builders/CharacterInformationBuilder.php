@@ -307,7 +307,7 @@ class CharacterInformationBuilder {
 
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
-        })->sum('spell_evasion');
+        })->sum('item.spell_evasion');
 
         return $itemsEvasion + $skillSpellEvasion;
     }
@@ -325,7 +325,7 @@ class CharacterInformationBuilder {
 
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
-        })->sum('artifact_annulment');
+        })->sum('item.artifact_annulment');
 
         return $itemsEvasion + $skillArtifactAnnulment;
     }

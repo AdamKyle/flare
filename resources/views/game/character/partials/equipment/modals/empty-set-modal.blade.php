@@ -1,6 +1,6 @@
 @php
     $characterInventoryCount = $inventorySet->character->inventory->slots()->count();
-    $characterInventoryMax   = $inventorySet->character->inventory_max - $characterInventoryCount;
+    $characterInventoryMax   = $inventorySet->character->inventory_max;
     $icon                    = 'text-warning fas fa-exclamation-triangle';
     $getAll                  = false;
     $disabled                = false;
@@ -10,7 +10,7 @@
         $getAll = true;
     }
 
-    if ($characterInventoryCount === 0) {
+    if ($characterInventoryCount === 75) {
         $icon     = 'text-danger fas fa-exclamation-circle';
         $disabled = true;
     }

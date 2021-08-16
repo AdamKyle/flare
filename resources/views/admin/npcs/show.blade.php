@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row page-titles">
             <div class="col-md-6 align-self-right">
-                <h4 class="mt-2">{{$npc->name}}</h4>
+                <h4 class="mt-2">{{$npc->real_name}}</h4>
             </div>
             <div class="col-md-6 align-self-right">
                 <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
@@ -18,13 +18,13 @@
                 <dt>Plane</dt>
                 <dd>{{$npc->game_map_name}}</dd>
                 <dt>Coordinates (X/Y)</dt>
-                <dd>{{$npc->x_position}}/{{$npc->y_position}}</dd>
+                <dd>{{$npc->x_position}}/{{$npc->y_position}} {{$npc->gameMap->name}}</dd>
                 <dt>Has to be at same location to interact?</dt>
                 <dd>{{$npc->must_be_at_same_location ? 'Yes' : 'No'}}</dd>
                 <dt>Moves around the map? (once per hour)</dt>
                 <dd>{{$npc->moves_around_map ? 'Yes' : 'No'}}</dd>
                 <dt>How to message</dt>
-                <dd>{{$npc->text_command_to_message}} command here</dd>
+                <dd>{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</dd>
             </dl>
         </x-cards.card-with-title>
 
@@ -33,8 +33,11 @@
             <x-cards.card-with-title title="Available Commands">
                 <p class="mb-2">These are the available commands you can message to the NPC. They're type correlates to the action they will
                     take when you message them.</p>
-                <div class="alert alert-info mb-3">When messaging a NPC their command you would type: <pre class="mt-2">{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</pre>
-                for example.</div>
+                <div class="alert alert-info mb-3">
+                    When messaging a NPC their command you would type:
+                    <pre class="mt-2">{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</pre>
+                    <p class="mt-3"><strong>Commands must be typed exactly, or they will not work. Copy and paste is your friend.</strong></p>
+                </div>
 
 
                 <dl>

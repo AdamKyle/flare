@@ -38,7 +38,7 @@
                         </dd>
                         @if ($quest->npc->must_be_at_same_location)
                             <dt>Npc X/Y:</dt>
-                            <dd>{{$quest->npc->x_position}}/{{$quest->npc->y_position}} (You must be here to interact with the npc)</dd>
+                            <dd>{{$quest->npc->x_position}}/{{$quest->npc->y_position}} <strong>{{$quest->npc->gameMap->name}}</strong> (You must be here to interact with the npc)</dd>
                         @endif
                         <dt>Required Item:</dt>
                         <dd>

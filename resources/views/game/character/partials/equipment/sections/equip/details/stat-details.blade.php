@@ -19,6 +19,15 @@
             <dd><span class={{$value['fight_timeout_mod_adjustment'] === 0.0 ? '' : ($value['fight_timeout_mod_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['fight_timeout_mod_adjustment'] >= 0 ? '+' : ''}}{{$value['fight_timeout_mod_adjustment'] * 100}}%</span></dd>
             <dt>Base Damage Mod <sup>**</sup>:</dt>
             <dd><span class={{$value['base_damage_mod_adjustment'] === 0.0 ? '' : ($value['base_damage_mod_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['base_damage_mod_adjustment'] >= 0 ? '+' : ''}}{{$value['base_damage_mod_adjustment'] * 100}}%</span></dd>
+            <dt>Spell Evasion Modifier:</dt>
+            <dd><span class={{$value['spell_evasion_adjustment'] === 0.0 ? '' : ($value['spell_evasion_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['spell_evasion_adjustment'] >= 0 ? '+' : ''}}{{$value['spell_evasion_adjustment'] * 100}}%</span></dd>
+            <dt>Artifact Annulment Modifier:</dt>
+            <dd><span class={{$value['artifact_annulment_adjustment'] === 0.0 ? '' : ($value['artifact_annulment_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['artifact_annulment_adjustment'] >= 0 ? '+' : ''}}{{$value['artifact_annulment_adjustment'] * 100}}%</span></dd>
+            @if ($item->can_resurrect)
+                <dt>Resurrection Chance <sup>rc</sup>:</dt>
+                <dd><span class={{$value['res_chance_adjustment'] === 0.0 ? '' : ($value['res_chance_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['res_chance_adjustment'] >= 0 ? '+' : ''}}{{$value['res_chance_adjustment'] * 100}}%</span></dd>
+            @endif
+
             <dt>Str:</dt>
             <dd><span class={{$value['str_adjustment'] === 0.0 ? '' : ($value['str_adjustment'] >= 0.0 ? 'text-success' : 'text-danger')}}>{{$value['str_adjustment'] >= 0 ? '+' : ''}}{{$value['str_adjustment'] * 100}}%</span></dd>
             <dt>Dur:</dt>

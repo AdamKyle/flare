@@ -38,9 +38,9 @@
         <dt>Gold Cost:</dt>
         <dd>{{$item->cost}}</dd>
         <dt>God Dust Cost:</dt>
-        <dd>{{$item->gold_dust_cost}}</dd>
-        <dt>Shards Cost</dt>
-        <dd>{{$item->shards_cost}}</dd>
+        <dd>{{!is_null($item->gold_dust_cost) ? $item->gold_dust_cost : 0}}</dd>
+        <dt>Shards Cost:</dt>
+        <dd>{{!is_null($item->shards_cost) ? $item->shards_cost : 0}}</dd>
     </dl>
 @endif
 
