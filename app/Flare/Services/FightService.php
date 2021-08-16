@@ -175,6 +175,8 @@ class FightService {
      */
     public function attack($attacker, $defender) {
 
+        $messages = [];
+
         if ($attacker instanceof Character) {
             if (!is_null($this->attackTimes)) {
                 if ($this->attackTimes <= 0) {
@@ -215,8 +217,9 @@ class FightService {
         }
 
         if (!$this->canHit($attacker, $defender)) {
-            $messages   = $this->castSpell($attacker, $defender);
+            $messages   = array_merge($messages, $this->castSpell($attacker, $defender));
             $messages   = array_merge($messages, $this->useAtifacts($attacker, $defender));
+            $messages   = array_merge($messages, $this->useRings($attacker));
             $messages[] = [$attacker->name . '(weapon) Missed!'];
 
             $this->logInformation[] = [
@@ -336,6 +339,23 @@ class FightService {
         return $messages;
     }
 
+    protected function useRings($attacker): array {
+        $messages = [];
+
+        if ($attacker instanceof Character) {
+            $ringDamage = $this->characterInformation->getTotalRingDamage();
+            if ($ringDamage > 0) {
+                $messages[]  = ['Your rings begin to shimmer in the presence of the enemy'];
+
+                $this->currentMonsterHealth -= $ringDamage;
+
+                $messages[] = ['Your rings lash out at the enemy for: ' . $ringDamage];
+            }
+        }
+
+        return $messages;
+    }
+
     protected function useAtifacts($attacker, $defender) {
         $messages = [];
 
@@ -358,8 +378,8 @@ class FightService {
 
     protected function artifactDamage($attacker, $defender) {
         if ($attacker instanceof Character) {
-            $artifactDamage = $this->characterInformation->getTotalArtifactDamage();
-            $artifactDamage = $artifactDamage - ($artifactDamage * $defender->artifact_annulment);
+            $baseArtifactDamage = $this->characterInformation->getTotalArtifactDamage();
+            $artifactDamage = $baseArtifactDamage - ($baseArtifactDamage * $defender->artifact_annulment);
 
             if ($artifactDamage > 0) {
                 $health = ceil($this->currentMonsterHealth - $artifactDamage);
@@ -370,19 +390,25 @@ class FightService {
 
                 $this->currentMonsterHealth = $health;
 
+                if ($baseArtifactDamage !== $artifactDamage) {
+                    return [
+                        'Your artifacts hit the enemy for: ' . $artifactDamage . ' (Partially annulled)',
+                    ];
+                }
+
                 return [
                     'Your artifacts hit the enemy for: ' . $artifactDamage,
                 ];
             } else {
                 return [
-                    'Your artifacts have no effect ...'
+                    'Your artifacts were annulled ...'
                 ];
             }
         }
 
         if ($defender instanceof Character){
-            $artifactDamage = rand(1, $defender->max_artifact_damage);
-            $artifactDamage = $artifactDamage - ($artifactDamage * $this->characterInformation->getTotalAnnulment());
+            $baseArtifactDamage = rand(1, $defender->max_artifact_damage);
+            $artifactDamage = $baseArtifactDamage - ($baseArtifactDamage * $this->characterInformation->getTotalAnnulment());
 
             if ($artifactDamage > 0) {
                 $health = $this->currentCharacterHealth - $artifactDamage;
@@ -393,12 +419,18 @@ class FightService {
 
                 $this->currentCharacterHealth = $health;
 
+                if ($baseArtifactDamage !== $artifactDamage) {
+                    return [
+                        'The enemies artifacts lash out in intense energy doing: ' . $artifactDamage . ' (Partially annulled)',
+                    ];
+                }
+
                 return [
                     'The enemies artifacts lash out in intense energy doing: ' . $artifactDamage,
                 ];
-            } else {
+            }else {
                 return [
-                    'The enemies artifacts have no effect ...'
+                    'The enemies artifacts were annulled ...'
                 ];
             }
         }
@@ -417,6 +449,12 @@ class FightService {
                 }
 
                 $this->currentMonsterHealth = $health;
+
+                if ($spellDamage !== $totalDamage) {
+                    return [
+                        'Your spells hit the enemy for: ' . $totalDamage . ' (Partially Annulled)',
+                    ];
+                }
 
                 return [
                     'Your spells hit the enemy for: ' . $totalDamage,
@@ -440,6 +478,12 @@ class FightService {
                 }
 
                 $this->currentCharacterHealth = $health;
+
+                if ($spellDamage !== $totalDamage) {
+                    return [
+                            'The enemies spells burst towards you, slamming into you for: ' . $totalDamage . ' (Partially Annulled)',
+                    ];
+                }
 
                 return [
                     'The enemies spells burst towards you, slamming into you for: ' . $totalDamage,
@@ -467,6 +511,7 @@ class FightService {
 
             $messages = array_merge($messages, $this->castSpell($attacker, $defender));
             $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
+            $messages = array_merge($messages, $this->useRings($attacker));
 
             $messages[] = [$this->character->name . ' hit for (weapon): ' . number_format($characterAttack)];
 

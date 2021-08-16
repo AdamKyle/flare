@@ -40,6 +40,7 @@ export default class Attack {
     if (!this.canHit(attacker, defender, type)) {
       this.castSpells(attacker, defender, type);
       this.useArtifacts(attacker, defender, type);
+      this.useRings(attacker, defender, type);
 
       this.battleMessages.push({
         message: this.attackerName + ' (weapon) missed!'
@@ -64,6 +65,7 @@ export default class Attack {
       } else {
         this.castSpells(attacker, defender, type);
         this.useArtifacts(attacker, defender, type);
+        this.useRings(attacker, defender, type);
 
         this.doAttack(attacker, type);
 
@@ -161,7 +163,7 @@ export default class Attack {
     if (type == 'player') {
       if (attacker.has_artifacts && attacker.artifact_damage !== 0) {
         this.battleMessages.push({
-          message: 'Your artifacts flow before the enemy!'
+          message: 'Your artifacts glow before the enemy!'
         });
 
         this.artifactDamage(attacker, defender, type);
@@ -173,6 +175,18 @@ export default class Attack {
         });
 
         this.artifactDamage(attacker, defender, type);
+      }
+    }
+  }
+
+  useRings(attacker, defender, type) {
+    if (type === 'player') {
+      if (attacker.ring_damage !== 0) {
+        this.battleMessages.push({
+          message: 'Your rings shimmer in the presence of this foe ...'
+        });
+
+        this.ringDamage(attacker, defender, type);
       }
     }
   }
@@ -200,12 +214,16 @@ export default class Attack {
       const damage   = random(1, attacker.spell_damage);
       let totalDamage = Math.round(damage - (damage * defender.spell_evasion));
 
-      if (totalDamage < 0) {
+      if (totalDamage <= 0) {
         this.battleMessages.push({
           message: attacker.name + '\'s Spells have no effect!'
         });
 
         return;
+      } else if ($totalDamage !== attacker.artifact_damage) {
+        this.battleMessages.push({
+          message: this.attackerName + '\'s Artifacts have their potency reduced by the enemies artifact annulment'
+        });
       }
 
       this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
@@ -218,14 +236,18 @@ export default class Attack {
 
   artifactDamage(attacker, defender, type) {
     if (type === 'player') {
-      let totalDamage = attacker.artifact_damage - (attacker.artifact_damage * defender.artifact_annulment);
+      let totalDamage = Math.round(attacker.artifact_damage - (attacker.artifact_damage * defender.artifact_annulment));
 
-      if (totalDamage < 0) {
+      if (totalDamage <= 0) {
         this.battleMessages.push({
           message: this.attackerName + '\'s Artifacts are annulled!'
         });
 
         return;
+      } else if (totalDamage !== attacker.artifact_damage) {
+        this.battleMessages.push({
+          message: this.attackerName + '\'s Artifacts have their potency reduced by the enemies artifact annulment'
+        });
       }
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
@@ -251,6 +273,16 @@ export default class Attack {
 
       this.battleMessages.push({
         message: attacker.name + ' artifacts hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      });
+    }
+  }
+
+  ringDamage(attacker, defender, type) {
+    if (type === 'player') {
+      this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.ring_damage;
+
+      this.battleMessages.push({
+        message: attacker.name + ' rings hit for: ' + attacker.ring_damage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
   }

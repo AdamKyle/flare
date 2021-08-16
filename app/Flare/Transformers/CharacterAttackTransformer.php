@@ -32,6 +32,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'attack'              => $characterInformation->buildAttack(),
             'spell_damage'        => $characterInformation->getTotalSpellDamage(),
             'artifact_damage'     => $characterInformation->getTotalArtifactDamage(),
+            'ring_damage'         => $characterInformation->getTotalRingDamage(),
             'health'              => $characterInformation->buildHealth(),
             'has_artifacts'       => $characterInformation->hasArtifacts(),
             'has_affixes'         => $characterInformation->hasAffixes(),
