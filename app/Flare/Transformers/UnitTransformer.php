@@ -10,7 +10,7 @@ class UnitTransformer extends TransformerAbstract {
 
     /**
      * Gets the response data for the character sheet
-     * 
+     *
      * @param Character $character
      * @return mixed
      */
@@ -36,6 +36,8 @@ class UnitTransformer extends TransformerAbstract {
             'time_to_recruit'      => $unit->time_to_recruit,
             'current_amount'       => $unit->kingdom_current_amount,
             'max_amount'           => $unit->kingdom_max_amount,
+            'kd_max'               => $unit->max_recruitable,
+            'can_recruit_more'     => $unit->can_recruit_more,
             'recruited_from'       => GameBuildingUnit::where('game_unit_id', $unit->id)->first()->gameBuilding,
         ];
     }

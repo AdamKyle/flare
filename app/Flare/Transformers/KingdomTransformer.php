@@ -5,6 +5,7 @@ namespace App\Flare\Transformers;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Kingdom;
 use Illuminate\Support\Collection;
@@ -79,6 +80,8 @@ class KingdomTransformer extends TransformerAbstract {
 
             $unit->kingdom_current_amount = !is_null($kingdomUnitInfo) ? $kingdomUnitInfo->amount : 0;
             $unit->kingdom_max_amount     = $kingdom->max_population;
+            $unit->max_recruitable        = number_format(KingdomMaxValue::MAX_UNIT);
+            $unit->can_recruit_more       = is_null($kingdomUnitInfo) || $kingdomUnitInfo->amount < KingdomMaxValue::MAX_UNIT;
 
             return $unit;
         });

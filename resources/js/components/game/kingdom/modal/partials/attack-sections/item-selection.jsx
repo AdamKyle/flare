@@ -107,7 +107,7 @@ export default class ItemSelection extends React.Component {
         <hr />
         <dl>
           <dt>Total Damage:</dt>
-          <dd>{this.getTotalDamageToBeDone() * 100}%</dd>
+          <dd>{Math.round(this.getTotalDamageToBeDone() * 100)}%</dd>
         </dl>
         <hr />
         <button className="btn btn-primary mt-3" disabled={this.state.slots_selected.length > 0 ? false : true} onClick={this.useItems.bind(this)}>Use Items</button>

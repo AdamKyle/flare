@@ -289,7 +289,7 @@ class NotifyHandler {
      * @return array|void|null
      */
     public function sendMessage(User $user, $type, string $message) {
-        if (!UserOnlineValue::isOnline($user)) {
+        if (!UserOnlineValue::isOnline($user) && $user->kingdom_attack_email) {
             $subjectParts = explode('-', $type);
             $subject      = ucfirst($subjectParts[0]) . ' ' . ucfirst($subjectParts[1]) . '!';
 

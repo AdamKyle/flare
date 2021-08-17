@@ -131,33 +131,64 @@ export default class Recruit extends React.Component {
             <div className="alert alert-danger mt-2 mb-2">You have no population. You cannot recruit</div>
             : null
         }
+
+        {
+          !this.props.unit.can_recruit_more ?
+            <div className="alert alert-danger mt-2 mb-2">You have recruited as many as you are allowed.</div>
+            : null
+        }
         <div className="row">
           <div className="col-md-6">
-            <p><strong>Current Population</strong>: {this.state.max}
-              <OverlayTrigger
-                trigger="hover"
-                key='right'
-                placement='right'
-                overlay={
-                  <Popover id={`popover-positioned-right`}>
-                    <Popover.Title as="h3">Current Population</Popover.Title>
-                    <Popover.Content>
-                      <p>
-                        Pay attention to <strong>required population</strong> in the <strong>unit cost</strong> section.
-                        The current population here is a total amount of all remaining people in your kingdom. Just because you have X
-                        number of people does not mean you can recruit all of those people. Some units have different population requirements.
-                      </p>
-                    </Popover.Content>
-                  </Popover>
-                }
-              >
-                <i className="fas fa-question-circle ml-2"></i>
-              </OverlayTrigger>
-            </p>
+            <dl className="mb-3">
+              <dt><strong>Current Population</strong>:</dt>
+              <dd>
+                {this.state.max}
+                <OverlayTrigger
+                  trigger="hover"
+                  key='right'
+                  placement='right'
+                  overlay={
+                    <Popover id={`popover-positioned-right`}>
+                      <Popover.Title as="h3">Current Population</Popover.Title>
+                      <Popover.Content>
+                        <p>
+                          Pay attention to <strong>required population</strong> in the <strong>unit cost</strong> section.
+                          The current population here is a total amount of all remaining people in your kingdom. Just because you have X
+                          number of people does not mean you can recruit all of those people. Some units have different population requirements.
+                        </p>
+                      </Popover.Content>
+                    </Popover>
+                  }
+                >
+                  <i className="fas fa-question-circle ml-2"></i>
+                </OverlayTrigger>
+              </dd>
+              <dt><strong>Maximum Allowed:</strong>: </dt>
+              <dd>
+                {this.props.unit.kd_max}
+                <OverlayTrigger
+                  trigger="hover"
+                  key='right'
+                  placement='right'
+                  overlay={
+                    <Popover id={`popover-positioned-right`}>
+                      <Popover.Title as="h3">Maximum Allowed</Popover.Title>
+                      <Popover.Content>
+                        <p>
+                          This is the maximum allowed amount for this unit, for this kingdom.
+                        </p>
+                      </Popover.Content>
+                    </Popover>
+                  }
+                >
+                  <i className="fas fa-question-circle ml-2"></i>
+                </OverlayTrigger>
+              </dd>
+            </dl>
             <input className="form-control" type="number" min={0} max={this.state.max} value={this.state.value} onChange={this.amountChange.bind(this)} />
           </div>
           <div className="col-md-6">
-            <button className="btn btn-primary unit-recruit-button" disabled={this.state.canRecruit ? false : true}
+            <button className="btn btn-primary unit-recruit-button" disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more}
                     onClick={this.recruitUnits.bind(this)}>Recruit Selected Amount
             </button>
           </div>

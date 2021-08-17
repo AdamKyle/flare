@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -142,6 +143,20 @@ class KingdomsController extends Controller {
         $request->validate([
             'amount' => 'required|integer',
         ]);
+
+        if ($request->amount > KingdomMaxValue::MAX_UNIT) {
+            return response()->json([
+                'message' => 'Too many units'
+            ], 422);
+        }
+
+        $currentAmount = $kingdom->units()->where('game_unit_id', $gameUnit->id)->sum('amount');
+
+        if ($currentAmount >= KingdomMaxValue::MAX_UNIT) {
+            return response()->json([
+                'message' => 'Too many units'
+            ], 422);
+        }
 
         if ($request->amount <= 0) {
             return response()->json([

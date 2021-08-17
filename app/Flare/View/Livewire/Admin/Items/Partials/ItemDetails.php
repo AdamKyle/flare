@@ -177,7 +177,7 @@ class ItemDetails extends Component
                 // A item that damages kingdoms cannot affect skills or stats.
                 $this->item->lasts_for          = null;
                 $this->item->stat_increase      = null;
-                $this->item->affects_skill_type = '';
+                $this->item->affects_skill_type = null;
             }
 
             if (empty($this->item->stat_increase)) {

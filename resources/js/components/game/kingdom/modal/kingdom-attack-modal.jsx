@@ -291,7 +291,7 @@ export default class KingdomAttackModal extends React.Component {
             Close
           </Button>
           {
-            this.state.currentStep !== (this.state.steps.length === 3 ? 0 : 1) ?
+            this.state.currentStep !== 0 ?
               <Button variant="primary" onClick={this.previous.bind(this)}>
                 Previous
               </Button>

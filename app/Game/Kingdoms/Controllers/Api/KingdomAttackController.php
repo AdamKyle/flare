@@ -112,13 +112,13 @@ class KingdomAttackController extends Controller {
         if (!is_null($kingdom->character_id)) {
             $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position .
                 '/' . $kingdom->y_position . ' on the ' .
-                $kingdom->gameMap->name . ' plane, has had an item dropped on it doing: ' . ($damageToKingdom * 100) . '% to Buildings and Units';
+                $kingdom->gameMap->name . ' plane, has had an item dropped on it doing: ' . ($damageToKingdom * 100) . '% to Buildings and Units.';
 
             $notifyHandler->sendMessage($kingdom->character->user, 'kingdom-attacked', $message);
         }
 
         $message = $character->name . ' Has caused the earth to shake, the buildings to crumble and the units to slaughtered at: ' .
-            $kingdom->name . ' (kingdom) on the ' . $kingdom->gameMap->name . ' plane. Even The Creator trembles in fear.';
+            $kingdom->name . ' (kingdom) doing: '.($damageToKingdom * 100).'% damage to units and buildings, on the ' . $kingdom->gameMap->name . ' plane. Even The Creator trembles in fear.';
 
         broadcast(new GlobalMessageEvent($message));
 
