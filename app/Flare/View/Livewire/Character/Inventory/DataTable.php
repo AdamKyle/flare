@@ -42,6 +42,10 @@ class DataTable extends Component
 
     public $hasEmptyInventorySets    = false;
 
+    public $onlyQuestItems           = false;
+
+    public $onlyUsable               = false;
+
     public $totalGoldDust            = 0;
 
     public $character;
@@ -58,7 +62,7 @@ class DataTable extends Component
         $slots = $character->inventory->slots()->join('items', function($join) {
             $join = $join->on('inventory_slots.item_id', '=', 'items.id');
 
-            if (!$this->includeQuestItems) {
+            if (!$this->includeQuestItems && !$this->onlyQuestItems && !$this->onlyUsable) {
                 $join->whereNotIn('items.type', ['quest', 'alchemy']);
             }
 
@@ -66,6 +70,14 @@ class DataTable extends Component
                 $join->whereNull('items.item_prefix_id')->whereNull('items.item_suffix_id');
                 $join->where('items.craft_only', $this->craftOnly);
                 $join->where('items.usable', false);
+            }
+
+            if ($this->onlyQuestItems) {
+                $join->where('items.type', 'quest');
+            }
+
+            if ($this->onlyUsable) {
+                $join->where('items.usable', true)->where('items.type', 'alchemy');
             }
 
             if ($this->marketBoard) {
@@ -78,6 +90,10 @@ class DataTable extends Component
 
             return $join;
         })->select('inventory_slots.*');
+
+        if ($this->onlyQuestItems) {
+            return $slots->orderBy($this->sortField, $this->sortBy);
+        }
 
         if ($slots->where('equipped', $this->includeEquipped)->get()->isEmpty() && $this->includeEquipped) {
             $equippedInventorySet = $character->inventorySets->where('is_equipped', true)->first();
@@ -100,7 +116,6 @@ class DataTable extends Component
 
     public function getDataProperty() {
         $slots = $this->dataQuery->get();
-
 
         $slots->transform(function($slot) {
             $skills = [];
@@ -126,6 +141,30 @@ class DataTable extends Component
     public function fetchSlots() {
 
         return $this->data;
+    }
+
+    public function useAllSelectedItems(UseItemService $useItemService) {
+        if ($this->character->boons->count() === 10) {
+            session()->flash('error', 'You can only have a max of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.');
+
+            return redirect()->route('game.character.sheet');
+        }
+
+        $slots = $this->character->inventory->slots()->findMany($this->selected);
+
+        if ($slots->isEmpty()) {
+            session()->flash('error', 'No slots found with these items.');
+
+            return redirect()->route('game.character.sheet');
+        }
+
+        foreach ($slots as $slot) {
+            $useItemService->useItem($slot, $this->character, $slot->item);
+        }
+
+        session()->flash('success', 'Used selected items. Check your Active Boons section.');
+
+        return redirect()->route('game.character.sheet');
     }
 
     public function destroyAllItems(DisenchantService $disenchantService, string $type = null) {

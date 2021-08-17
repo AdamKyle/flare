@@ -14,8 +14,6 @@ class NpcCommandsSheet implements ToCollection {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
 
-                dump($row[0], Npc::where('real_name', $row[0])->first());
-
                 $npc = Npc::where('real_name', $row[0])->first();
 
                 if (!is_null($npc)) {

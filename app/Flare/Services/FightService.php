@@ -312,6 +312,22 @@ class FightService {
         return $ac > $baseStat;
     }
 
+    protected function castHealingSpell($defender) {
+        $messages = [];
+
+        if ($defender instanceof Character) {
+            $healFor = $this->characterInformation->buildHealFor();
+
+            if ($healFor > 0 && $this->currentCharacterHealth !== $this->characterInformation->buildHealth()) {
+                $this->currentCharacterHealth = $healFor;
+
+                $messages[] = ['Light floods your eyes as your wounds heal over for: ' . $healFor];
+            }
+        }
+
+        return $messages;
+    }
+
     protected function castSpell($attacker, $defender) {
         $messages = [];
 
@@ -319,14 +335,6 @@ class FightService {
             if ($this->characterInformation->hasDamageSpells()) {
                 $messages[] = ['Your spells burst forward towards the enemy!'];
                 $messages[] = $this->spellDamage($attacker, $defender);
-            }
-
-            $healFor = $this->characterInformation->buildHealFor();
-
-            if ($healFor > 0) {
-                $this->currentCharacterHealth = $healFor;
-
-                $messages[] = ['Light floods your eyes as your wounds heal over for: ' . $healFor];
             }
         }
 
@@ -524,6 +532,20 @@ class FightService {
             $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
 
             $messages[] =  [$attacker->name . ' hit for ' . number_format($monsterAttack)];
+
+            if ($this->currentCharacterHealth > 0 && $this->currentCharacterHealth < $this->characterInformation->buildHealth()) {
+                $messages = array_merge($messages, $this->castHealingSpell($defender));
+            } else if ($this->currentCharacterHealth <= 0) {
+                $resChance = $this->characterInformation->fetchResurrectionChance();
+                $dc        = 100 - 100 * $resChance;
+                $chRoll    = rand(1, 100);
+
+                if ($chRoll > $dc) {
+                    $this->currentCharacterHealth = 0;
+
+                    $messages = array_merge($messages, $this->castHealingSpell($defender));
+                }
+            }
         }
 
         return $messages;

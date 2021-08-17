@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
+use App\Game\Core\Requests\UseMultipleItemsRequest;
 use App\Game\Core\Services\UseItemService;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Http\Controllers\Controller;
@@ -36,6 +37,10 @@ class ItemsController extends Controller {
     }
 
     public function useItem(Character $character, Item $item) {
+        if ($character->boons->count() === 10) {
+            return redirect()->back()->with('error', 'You can only have a max of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.');
+        }
+
         $slot = $character->inventory->slots->filter(function($slot) use($item) {
            return $slot->item_id === $item->id;
         })->first();

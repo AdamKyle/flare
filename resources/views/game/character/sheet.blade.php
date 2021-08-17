@@ -117,7 +117,7 @@
                             <p>Destroying enchanted item will yield between 1-25 gold dust per item. Clicking disenchant will yield between 1-150 gold dust per item.</p>
                         </div>
                         @livewire('character.inventory.data-table', [
-                            'includeQuestItems'        => true,
+                            'includeQuestItems'        => false,
                             'allowInventoryManagement' => true,
                             'character'                => $character,
                             'allowMassDestroy'         => true,
@@ -146,10 +146,29 @@
                         ])
                     </x-tabs.tab-content-section>
                     <x-tabs.tab-content-section tab="usable">
-                        Usable Items here
+                        <div class="alert alert-info mt-2 mb-3">
+                            <p>
+                                Usable items take up space in your inventory, how ever are seperated so you can better manage them.
+                            </p>
+                            <p>
+                                You may use up to a <strong>max of ten</strong> items at a time on your self. These give you what are called <a href="#">Character Boons</a>
+                                that last for a specific amount of time.
+                            </p>
+                            <p>
+                                Kingdom damaging usable items can only be used from the Kingdom Attack modal. You will be asked if you want to use items on the kingdom
+                                before moving ahead to select which kingdoms you want to attack from and what units to send.
+                            </p>
+                        </div>
+                        @livewire('character.inventory.data-table', [
+                            'onlyUsable' => true,
+                            'character'  => $character,
+                        ])
                     </x-tabs.tab-content-section>
                     <x-tabs.tab-content-section tab="quest">
-                        Quest Items here
+                        @livewire('character.inventory.data-table', [
+                            'onlyQuestItems' => true,
+                            'character'      => $character,
+                        ])
                     </x-tabs.tab-content-section>
                 </x-tabs.tab-content>
             </div>

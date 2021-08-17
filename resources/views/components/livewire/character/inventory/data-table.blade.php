@@ -35,7 +35,6 @@
 
                         @if (!$inventorySetEquipped && $hasEmptyInventorySets)
                             <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#character-{{$character->id}}">Save as set</a>
-
                             @include('game.character.partials.equipment.modals.save-as-set-modal', [
                                 'character' => $character
                             ])
@@ -60,9 +59,11 @@
 
             <x-data-tables.table :collection="$slots">
                 <x-data-tables.header>
-                    @if ($batchSell)
+                    @if ($batchSell || $onlyUsable)
                         <x-data-tables.header-row>
-                            <input type="checkbox" wire:model="pageSelected" id="select-all" />
+                            @if (!$onlyUsable)
+                                <input type="checkbox" wire:model="pageSelected" id="select-all" />
+                            @endif
                         </x-data-tables.header-row>
                     @endif
 
@@ -147,15 +148,29 @@
                         </tr>
                     @endif
 
-                    @if (empty($pageSelected) && !empty($selected))
+                    @if (empty($pageSelected) && !empty($selected) && !$onlyUsable)
                         <div class="alert alert-info">
                             Selecting all items, will <strong>not</strong> destroy currently equipped or quest items. Everything else <strong>will be</strong> destroyed.
                         </div>
                     @endif
 
+                    @if ($onlyUsable)
+                        <button
+                            class="btn btn-primary btn-sm mb-3"
+                            data-toggle="modal"
+                            data-target="#use-multiple-items"
+                            {{count($selected) > 10 || count($selected) === 0 ? 'disabled' : ''}}
+                        >Use Selected Items</button>
+
+                        @include('game.character.partials.equipment.modals.use-multiple-modal', [
+                            'selected'  => $selected,
+                            'character' => $character,
+                        ])
+                    @endif
+
                     @forelse($slots as $slot)
                         <tr wire:key="slots-table-{{$slot->id}}">
-                            @if ($batchSell)
+                            @if ($batchSell || $onlyUsable)
                                 <td>
                                     <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
                                 </td>
@@ -198,9 +213,15 @@
                                 @else
                                     @if ($slot->item->damages_kingdoms)
                                         Damages Kingdoms.
-                                    @elseif ($slot->item->type !== 'quest')
+                                    @elseif ($slot->item->type !== 'quest' && !$onlyUsable )
                                         @include('game.character.partials.equipment.drop-downs.sell-item', [
                                             'slot' => $slot,
+                                            'character' => $character
+                                        ])
+                                    @elseif ($onlyUsable)
+                                        <button class="btn btn-primary" data-toggle="modal" data-target="#slot-use-{{$slot->id}}">Use</button>
+                                        @include('game.character.partials.equipment.modals.use-modal', [
+                                            'slot'      => $slot,
                                             'character' => $character
                                         ])
                                     @else

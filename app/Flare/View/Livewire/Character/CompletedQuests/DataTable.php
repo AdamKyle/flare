@@ -40,7 +40,6 @@ class DataTable extends Component
 
         if ($this->search !== '') {
             $data = $data->filter(function($item) {
-                dump($item, $this->search);
                 return str_contains($item->name, $this->search);
             })->all();
 

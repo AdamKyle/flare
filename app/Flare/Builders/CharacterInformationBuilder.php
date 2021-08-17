@@ -61,13 +61,13 @@ class CharacterInformationBuilder {
             $base += $base * $this->fetchModdedStat($stat, $slot->item);
         }
 
-        if (!$this->character->boons->isEmpty()) {
+        if ($this->character->boons->isNotEmpty()) {
             $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
 
             if ($boons->isNotEmpty()) {
                 $sum = $boons->sum('stat_bonus');
 
-                $base += $base * $sum;
+                $base += $base + $base * $sum;
             }
         }
 
