@@ -92,7 +92,7 @@
                     <dt>Total shards:</dt>
                     <dd>{{number_format($character->shards)}}</dd>
                     <dt>Used / Max inventory space:</dt>
-                    <dd>{{$character->inventory->slots->count()}} / {{$character->inventory_max}}</dd>
+                    <dd>{{$character->getInventoryCount()}} / {{$character->inventory_max}}</dd>
                     <dt>Stat to focus on for max damage:</dt>
                     <dd>{{$character->class->damage_stat}}</dd>
                     <dt>To focus on for Hit%:</dt>

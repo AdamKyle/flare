@@ -51,7 +51,7 @@ class DropsCheckListener
     }
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
-        if ($event->character->inventory->slots->count() !== $event->character->inventory_max) {
+        if (!$event->character->isInventoryFull()) {
 
             $alreadyHas = $event->character->inventory->slots->filter(function ($slot) use ($item) {
                 return $slot->item_id === $item->id && $item->type === 'quest';

@@ -174,30 +174,6 @@ class Character extends Model
         return number_format($value, 2);
     }
 
-    public function getCharacterSpellEvasion() {
-        $skill = $this->skills->filter(function($skill) {
-           return $skill->type()->isSpellEvasion();
-        })->first();
-
-        if (!is_null($skill)) {
-            return $this->spell_evasion + $skill->skill_bonus;
-        }
-
-        return $this->spell_evasion;
-    }
-
-    public function getCharacterArtifactAnnulment() {
-        $skill = $this->skills->filter(function($skill) {
-            return $skill->type()->isArtifactAnnulment();
-        })->first();
-
-        if (!is_null($skill)) {
-            return $this->artifact_annulment + $skill->skill_bonus;
-        }
-
-        return $this->artifact_annulment;
-    }
-
     /**
      * Allows one to get specific information from a character.
      *
@@ -210,6 +186,28 @@ class Character extends Model
         $info = resolve(CharacterInformationBuilder::class);
 
         return $info->setCharacter($this);
+    }
+
+    /**
+     * Gets the inventory count.
+     *
+     * Excludes quest and equipped items.
+     *
+     * @return int
+     */
+    public function getInventoryCount(): int {
+        return $this->inventory->slots->filter(function($slot) {
+            return $slot->item->type !== 'quest' && !$slot->equipped;
+        })->count();
+    }
+
+    /**
+     * Is the inventory full?
+     *
+     * @return bool
+     */
+    public function isInventoryFull(): bool {
+        return $this->getInventoryCount() === $this->inventory_max;
     }
 
     protected static function newFactory() {

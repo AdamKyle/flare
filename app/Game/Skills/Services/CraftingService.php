@@ -123,7 +123,7 @@ class CraftingService {
     }
 
     private function attemptToPickUpItem(Character $character, Item $item): bool {
-        if ($character->inventory->slots->count() !== $character->inventory_max) {
+        if (!$character->isInventoryFull()) {
 
             $character->inventory->slots()->create([
                 'item_id'      => $item->id,

@@ -499,7 +499,7 @@ class MovementService {
             })->first();
 
             if (is_null($item)) {
-                if (!($character->inventory->slots()->count() < $character->inventory_max)) {
+                if ($character->isInventoryFull()) {
                     event(new ServerMessageEvent($character->user, 'inventory_full'));
                 } else {
                     $character->inventory->slots()->create([

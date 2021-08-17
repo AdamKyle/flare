@@ -515,7 +515,7 @@ class BattleControllerApiTest extends TestCase
         ]);
 
         $character   = $this->character->updateSkill('Looting', ['level' => 100])
-                                       ->updateCharacter(['inventory_max' => 1])
+                                       ->updateCharacter(['inventory_max' => 0])
                                        ->getCharacter();
         $user        = $this->character->getUser();
         $monster     = $this->monster->getMonster();

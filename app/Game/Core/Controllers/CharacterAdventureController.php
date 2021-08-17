@@ -87,11 +87,28 @@ class CharacterAdventureController extends Controller {
             return redirect()->to(route('game'))->with('error', 'You cannot collect already collected rewards.');
         }
 
-        $messages  = $adventureRewardService->distributeRewards($rewards, $character)->getMessages();
+        $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character);
+        $messages               = $adventureRewardService->getMessages();
 
-        $adventureLog->update([
-            'rewards' => null,
-        ]);
+        if (array_key_exists('error', $messages)) {
+            $rewards['xp'] = 0;
+
+            if (isset($rewards['skill'])) {
+                $rewards['skill']['exp'] = 0;
+            }
+
+            $rewards['items'] = $adventureRewardService->getItemsLeft();
+
+            $adventureLog->update([
+                'rewards' => $rewards,
+            ]);
+
+            return redirect()->back()->with('error', $messages['error']);
+        } else {
+            $adventureLog->update([
+                'rewards' => null,
+            ]);
+        }
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 

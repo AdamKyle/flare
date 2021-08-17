@@ -227,7 +227,7 @@ class NpcCommandHandler {
     }
 
     private function canHaveReward(Character $character, Npc $npc) {
-        if ($character->inventory_max === 0 || !($character->inventory_max > $character->inventory->slots()->count())) {
+        if ($character->isInventoryFull()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
             return false;
         }

@@ -21,6 +21,11 @@ class AdventureRewardService {
     private $messages = [];
 
     /**
+     * @var array $itemsLeft
+     */
+    private $itemsLeft = [];
+
+    /**
      * @param CharacterService $characterService
      * @return void
      */
@@ -54,6 +59,10 @@ class AdventureRewardService {
      */
     public function getMessages(): array {
         return $this->messages;
+    }
+
+    public function getItemsLeft(): array {
+        return $this->itemsLeft;
     }
 
     protected function handleXp(int $xp, Character $character): void {
@@ -104,11 +113,22 @@ class AdventureRewardService {
     }
 
     protected function handleItems(array $items, Character $character): void {
+        $character = $character->refresh();
+        $newItemList = $items;
+
         if (!empty($items)) {
-            foreach ($items as $item) {
+            foreach ($items as $index => $item) {
                 $item = Item::find($item['id']);
 
                 if (!is_null($item)) {
+                    if ($character->isInventoryFull()) {
+                        $this->messages['error'] = 'Your inventory is full. You must clear some space, come back and finish collecting the remaining items.';
+
+                        $this->itemsLeft = $newItemList;
+
+                        return;
+                    }
+
                     $character->inventory->slots()->create([
                         'inventory_id' => $character->inventory->id,
                         'item_id'      => $item->id,
@@ -121,9 +141,14 @@ class AdventureRewardService {
 
                         broadcast(new GlobalMessageEvent($message));
                     }
+
+                    // Remove the item.
+                    unset($newItemList[$index]);
                 } else {
                     $this->messages[] = 'You failed to gain the item: Item no longer exists.';
                 }
+
+                $character = $character->refresh();
             }
         }
     }
