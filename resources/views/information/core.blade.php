@@ -7,7 +7,9 @@
         @foreach($sections as $section)
             <div class="row justify-content-center mb-2 mt-3 text-lg">
                 <div class="col-xl-12">
+                    <x-cards.card>
                     @markdown($section['content'])
+                    </x-cards.card>
                 </div>
             </div>
 

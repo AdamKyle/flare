@@ -86,7 +86,30 @@ class KingdomResourcesService {
      * @return void
      */
     public function updateKingdom(): void {
+
+        $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
+
         if ($this->kingdom->npc_owned) {
+            if ($lastTimeWalked > 10) {
+                $x = $this->kingdom->x_position;
+                $y = $this->kingdom->y_position;
+                $plane = $this->kingdom->gameMap->name;
+
+                $this->kingdom->units()->delete();
+                $this->kingdom->buildings()->delete();
+
+                $this->kingdom->delete();
+
+                Character::chunkById(100, function($characters) {
+                    foreach ($characters as $character) {
+                        broadcast(new UpdateGlobalMap($character));
+                        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+                    }
+                });
+
+                broadcast(new GlobalMessageEvent('A kingdom at: (X/Y) ' . $x . '/' . $y . ' on ' .$plane .' Plane has crumbled to the earth clearing up space for a new kingdom'));
+            }
+
             return;
         }
 
@@ -99,7 +122,6 @@ class KingdomResourcesService {
             return;
         }
 
-        $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
 
         $this->increaseOrDecreaseMorale($lastTimeWalked);
 
@@ -108,6 +130,7 @@ class KingdomResourcesService {
             $this->increaseCurrentResource();
             $this->increaseTreasury();
         }
+
 
         if (!$this->doNotNotify) {
             $this->notifyUser();
