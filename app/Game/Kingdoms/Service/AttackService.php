@@ -144,7 +144,7 @@ class AttackService {
             return $this->handleSettlerUnit($defender, $unitMovement, $character);
         }
 
-        $this->notifyHandler->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
+        $this->notifyHandler->setSentUnits($this->unitsSent)->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
         if (!$this->anySurvivingUnits()) {
 

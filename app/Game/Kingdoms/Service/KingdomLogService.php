@@ -69,13 +69,14 @@ class KingdomLogService {
         $oldDefender = $this->log->old_defender;
         $newDefender = $this->log->new_defender;
 
-
         if ($value->kingdomWasAttacked()) {
             $kingdomAttacked   = $this->kingdomAttacked->setLog($this->log);
 
             $data['kingdom']   = $this->fetchKingdomInformation($oldDefender, $newDefender);
             $data['buildings'] = $kingdomAttacked->fetchBuildingDamageReport();
             $data['units']     = $kingdomAttacked->fetchUnitDamageReport();
+            $data['defender_units'] = $kingdomAttacked->fetchUnitKillReport();
+            $data['defender_buildings'] = [];
         } else if ($value->attackedKingdom() || $value->lostAttack()) {
             $attackedKingdom            = $this->attackedKingdom->setLog($this->log);
 
@@ -89,7 +90,7 @@ class KingdomLogService {
 
             $data['kingdom'] = $this->fetchKingdomInformation($oldDefender);
         }
-        //dump($data);
+
         return $data;
     }
 

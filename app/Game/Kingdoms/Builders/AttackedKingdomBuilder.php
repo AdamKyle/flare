@@ -43,7 +43,7 @@ class AttackedKingdomBuilder {
                 if ($amountLeft === $unit['amount']) {
                     $amountLeft = 0.0;
                 } else {
-                    $amountLeft = $amountLeft / $unit['amount'];
+                    $amountLeft = number_format($amountLeft / $unit['amount'], 2);
                 }
             } else {
                 $amountLeft = 1.0;
@@ -70,7 +70,7 @@ class AttackedKingdomBuilder {
                 if ($amountLeft === $building['current_durability']) {
                     $amountLeft = 0.0;
                 } else {
-                    $amountLeft = $amountLeft / $building['current_durability'];
+                    $amountLeft = number_format($amountLeft / $building['current_durability'], 2);
                 }
             } else {
                 $amountLeft = 1.0;

@@ -155,14 +155,14 @@ class NotifyHandler {
 
         $value = new KingdomLogStatusValue($status);
 
-        KingdomLog::create([
+        $attackLog = KingdomLog::create([
             'character_id'    => $this->defendingCharacter->id,
             'status'          => $status,
             'to_kingdom_id'   => $this->defendingKingdom->id,
             'from_kingdom_id' => $this->attackingKingdom->id,
             'old_defender'    => $value->lostKingdom() ? [] : $this->oldDefender,
-            'new_defender'    => $value->lostKingdom() ? [] : $this->newDefender,
-            'units_set'       => $this->sentUnits,
+            'new_defender'    => $value->lostKingdom() ? [] : (is_null($this->newDefender) ? $defender : $this->newDefender),
+            'units_sent'       => $this->sentUnits,
             'units_survived'  => $this->survivingUnits,
             'published'       => true,
         ]);
@@ -198,7 +198,6 @@ class NotifyHandler {
      * @param Character $character
      */
     public function notifyAttacker(string $status, Kingdom $defender, Character $character) {
-
         $logStatus = new KingdomLogStatusValue($status);
 
         if (!$logStatus->unitsReturning()) {
@@ -211,7 +210,7 @@ class NotifyHandler {
                 'units_sent' => $this->sentUnits,
                 'units_survived' => $this->survivingUnits,
                 'old_defender' => $this->oldDefender,
-                'new_defender' => $this->newDefender,
+                'new_defender' => is_null($this->newDefender) ? $defender->toArray() : $this->newDefender,
                 'published' => ($logStatus->lostAttack() || $logStatus->tookKingdom()),
             ]);
         }

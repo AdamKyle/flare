@@ -25,10 +25,8 @@
             @endif
         </x-tabs.tab-content-section>
         <x-tabs.tab-content-section tab="enemy">
-            @if (
-                KingdomLogStatus::statusType($type)->attackedKingdom() ||
-                KingdomLogStatus::statusType($type)->lostAttack()
-            )
+            @if (!KingdomLogStatus::statusType($type)->tookKingdom())
+
                 @include('game.kingdoms.partials.attacked-kingdom-defender-data', ['log' => $log])
             @endif
         </x-tabs.tab-content-section>

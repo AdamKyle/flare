@@ -65,6 +65,33 @@ class KingdomAttackedBuilder {
         return $buildingChanges;
     }
 
+    public function fetchUnitKillReport(): array {
+        $oldUnits = $this->log->units_sent;
+        $unitsSurvived = $this->log->units_survived;
+
+        $unitLosses = [];
+
+        foreach ($oldUnits as $index => $unit) {
+            $amountLeft = $unitsSurvived[$index]['amount'];
+
+            if ($amountLeft > 0) {
+                if ($amountLeft === $unit['amount']) {
+                    $amountLeft = 0.0;
+                } else {
+                    $amountLeft = number_format($amountLeft / $unit['amount'], 2);
+                }
+            } else {
+                $amountLeft = 1.0;
+            }
+
+            $unitLosses[GameUnit::find($unit['unit_id'])->name] = [
+                'amount_killed' => $amountLeft,
+            ];
+        }
+
+        return $unitLosses;
+    }
+
     public function fetchUnitDamageReport(): array {
         $oldDefenderUnits = $this->log->old_defender['units'];
         $newDefenderUnits = $this->log->new_defender['units'];
