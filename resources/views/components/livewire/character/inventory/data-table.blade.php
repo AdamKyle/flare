@@ -171,9 +171,17 @@
                     @forelse($slots as $slot)
                         <tr wire:key="slots-table-{{$slot->id}}">
                             @if ($batchSell || $onlyUsable)
-                                <td>
-                                    <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
-                                </td>
+                                @if ($onlyUsable && !$slot->item->damages_kingdoms)
+                                    <td>
+                                        <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
+                                    </td>
+                                @elseif ($onlyUsable && $slot->item->damages_kingdoms)
+                                    <td></td>
+                                @else
+                                    <td>
+                                        <input type="checkbox" wire:model="selected" value="{{$slot->id}}"/>
+                                    </td>
+                                @endif
                             @endif
                             <td><a href="{{route('game.items.item', [
                                     'item' => $slot->item->id

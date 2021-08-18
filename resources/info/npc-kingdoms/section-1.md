@@ -25,3 +25,8 @@ Upon taking the kingdom, the character will see a message, and a global message 
 The map will also update to show that a player has taken that kingdom.
 
 [map image]
+
+## NPC Kingdoms Can Crumble
+
+Should an NPC kingdom not be taken in 5 days of it being handed over, the kingdom will crumble, freeing space up
+for new players to settle.

@@ -1,13 +1,5 @@
 # NPC’s
 
-> ### ATTN!
->
-> This document does not give you NPC names, accept in the table below. The reason is, this game can change the NPC names. 
-> Consult the table below to know which NPC and which type that NPC is, to relate to the documentation here.
->
-> All NPC commands can be seen in the below table.
-
-
 Npc’s in Planes of Tlessa are entities that you can interact with via chat only. 
 Some NPC’s will require you to be at their location, while others don’t care where you are. If an NPC requires you to be at 
 their location, and you message them when you are not, you will see:
@@ -25,6 +17,11 @@ There are three types of NPC’s in Tlessa: Kingdom Owner, Quest Giver and Conju
 This npc is responsible for taking kingdoms from players who have not walked their kingdoms in at least 5 days.
 
 They will hold the kingdom and allow other players to attack or take the kingdom via a command.
+
+Should a character delete their account, all their kingdoms are handed to the NPC who holds the kingdoms.
+
+If no one takes these kingdoms with in five days of the NPC being given or taking the kingdom, the kingdom will crumble into ruins, freeing up
+the space for another player, maybe a new player, to settle a new kingdom.
 
 ## Quest NPC
 
@@ -54,8 +51,9 @@ Upon selecting one and conjuring (lets do private)
 
 You will see a global message, and you will be given the coordinates.
 
+You can also choose to conjure publicly, in which case every one will get a global message:
+
+[PUBLIC conjure]
+
+
 ## NPC List
-
-[NPC List]
-
-

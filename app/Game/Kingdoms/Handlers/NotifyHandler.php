@@ -161,7 +161,9 @@ class NotifyHandler {
             'to_kingdom_id'   => $this->defendingKingdom->id,
             'from_kingdom_id' => $this->attackingKingdom->id,
             'old_defender'    => $value->lostKingdom() ? [] : $this->oldDefender,
-            'new_defender'    => $value->lostKingdom() ? [] :$this->newDefender,
+            'new_defender'    => $value->lostKingdom() ? [] : $this->newDefender,
+            'units_set'       => $this->sentUnits,
+            'units_survived'  => $this->survivingUnits,
             'published'       => true,
         ]);
 
@@ -209,6 +211,7 @@ class NotifyHandler {
                 'units_sent' => $this->sentUnits,
                 'units_survived' => $this->survivingUnits,
                 'old_defender' => $this->oldDefender,
+                'new_defender' => $this->newDefender,
                 'published' => ($logStatus->lostAttack() || $logStatus->tookKingdom()),
             ]);
         }

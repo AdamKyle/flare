@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Builders;
 
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomLog;
 
@@ -27,6 +28,60 @@ class AttackedKingdomBuilder {
 
     public function attackedKingdomReport(): array {
         return $this->unitAttackInfo();
+    }
+
+    public function fetchUnitDamageReport(): array {
+        $oldUnits = $this->log->old_defender['units'];
+        $newUnits = $this->log->new_defender['units'];
+
+        $unitLosses = [];
+
+        foreach ($oldUnits as $index => $unit) {
+            $amountLeft = $newUnits[$index]['amount'];
+
+            if ($amountLeft > 0) {
+                if ($amountLeft === $unit['amount']) {
+                    $amountLeft = 0.0;
+                } else {
+                    $amountLeft = $amountLeft / $unit['amount'];
+                }
+            } else {
+                $amountLeft = 1.0;
+            }
+
+            $unitLosses[GameUnit::find($unit['game_unit_id'])->name] = [
+                'amount_killed' => $amountLeft,
+            ];
+        }
+
+        return $unitLosses;
+    }
+
+    public function fetchBuildingsDamageReport(): array {
+        $oldBuildings = $this->log->old_defender['buildings'];
+        $newBuildings = $this->log->new_defender['buildings'];
+
+        $buildingLosses = [];
+
+        foreach ($oldBuildings as $index => $building) {
+            $amountLeft = $newBuildings[$index]['current_durability'];
+
+            if ($amountLeft > 0) {
+                if ($amountLeft === $building['current_durability']) {
+                    $amountLeft = 0.0;
+                } else {
+                    $amountLeft = $amountLeft / $building['current_durability'];
+                }
+            } else {
+                $amountLeft = 1.0;
+            }
+
+            $buildingLosses[GameBuilding::find($building['game_building_id'])->name] = [
+                'durability_lost' => $amountLeft,
+            ];
+        }
+
+        return $buildingLosses;
     }
 
     public function lostAttack(): array {

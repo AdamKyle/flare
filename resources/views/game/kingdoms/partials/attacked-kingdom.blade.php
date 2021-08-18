@@ -3,11 +3,11 @@
         @if (empty($log['units']))
             @if ($lost)
                 <x-cards.card>
-                    You lost all your units in the attack.
+                    You lost all your units in the attack. Check the enemy data tab for more info.
                 </x-cards.card>
             @else
                 <x-cards.card>
-                    None of your units were lost in this attack.
+                    None of your units were lost in this attack. Check the enemy data tab for more info.
                 </x-cards.card>
             @endif
         @else

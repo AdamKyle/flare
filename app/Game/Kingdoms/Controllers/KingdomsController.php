@@ -34,6 +34,7 @@ class KingdomsController extends Controller {
     }
 
     public function attackLog(Character $character, KingdomLog $kingdomLog) {
+        //dd($kingdomLog);
         return view('game.kingdoms.attack-log', [
             'log'       => $this->kingdomLogService->setLog($kingdomLog)->attackReport(),
             'type'      => $kingdomLog->status,

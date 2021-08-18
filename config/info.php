@@ -21,9 +21,23 @@ return [
     'celestials'        => [],
     'disenchanting'     => [],
     'npc-kingdoms'      => [],
-    'npcs'              => [],
+    'npcs'              => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.npcs.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ]
+    ],
     'currencies'        => [],
-    'quests'            => [],
+    'quests'            => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.quests.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ]
+    ],
     'usable-items'      => [],
     'combat'            => [],
     'kingdoms'          => [
