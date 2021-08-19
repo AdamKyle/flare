@@ -18,6 +18,9 @@
                 @case('labyrinth')
                     Access Labyrinth Plane
                     @break
+                @case('dungeon')
+                    Access Dungeons Plane
+                @break
                 @default
                     N/A
             @endswitch

@@ -13,7 +13,9 @@ class ItemModifiers extends Component
 
     public $effects = [
         ItemEffectsValue::WALK_ON_WATER,
+        ItemEffectsValue::WALK_ON_DEATH_WATER,
         ItemEffectsValue::LABYRINTH,
+        ItemEffectsValue::DUNGEON,
     ];
 
     public $editing = false;

@@ -29,6 +29,10 @@ trait ItemsShowInformation {
             if ($effect->labyrinth()) {
                 $effects = 'Use Traverse (beside movement actions) to traverse to Labyrinth plane';
             }
+
+            if ($effect->dungeon()) {
+                $effects = 'Use Traverse (beside movement actions) to traverse to Dungeon plane';
+            }
         }
 
         if ($item->usable) {

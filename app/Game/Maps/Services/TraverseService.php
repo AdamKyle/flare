@@ -86,6 +86,14 @@ class TraverseService {
             return !empty($hasItem);
         }
 
+        if ($gameMap->name === 'Dungeons') {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::DUNGEON;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
         if ($gameMap->name === 'Surface') {
             return true;
         }
@@ -138,7 +146,9 @@ class TraverseService {
 
     protected function changeLocation(Character $character, array $cache) {
 
-        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y)) {
+        if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y)
+        ) {
 
             $x = $cache['x'];
             $y = $cache['y'];

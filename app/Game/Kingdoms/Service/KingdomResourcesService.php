@@ -90,7 +90,9 @@ class KingdomResourcesService {
         $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
 
         if ($this->kingdom->npc_owned) {
-            if ($lastTimeWalked > 10) {
+            $lastTimeWalked = $this->kingdom->updated_at->diffInDays(now());
+
+            if ($lastTimeWalked >= 5) {
                 $x = $this->kingdom->x_position;
                 $y = $this->kingdom->y_position;
                 $plane = $this->kingdom->gameMap->name;

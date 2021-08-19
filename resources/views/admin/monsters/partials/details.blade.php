@@ -4,15 +4,15 @@
             <div class="col-md-4">
                 <dl>
                     <dt>str</dt>
-                    <dd>{{$monster->str}}</dd>
+                    <dd>{{number_format($monster->str)}}</dd>
                     <dt>dex</dt>
-                    <dd>{{$monster->dex}}</dd>
+                    <dd>{{number_format($monster->dex)}}</dd>
                     <dt>dur</dt>
-                    <dd>{{$monster->dur}}</dd>
+                    <dd>{{number_format($monster->dur)}}</dd>
                     <dt>chr</dt>
-                    <dd>{{$monster->chr}}</dd>
+                    <dd>{{number_format($monster->chr)}}</dd>
                     <dt>int</dt>
-                    <dd>{{$monster->int}}</dd>
+                    <dd>{{number_format($monster->int)}}</dd>
                     <dt>Damage Stat</dt>
                     <dd>{{$monster->damage_stat}}</dd>
                 </dl>
@@ -26,13 +26,13 @@
                     <dt>Drop Check</dt>
                     <dd>{{$monster->drop_check * 100}}%</dd>
                     <dt>AC</dt>
-                    <dd>{{$monster->ac}}</dd>
+                    <dd>{{number_format($monster->ac)}}</dd>
                     <dt>XP</dt>
                     <dd>{{$monster->xp}}</dd>
                     <dt>Max Level<sup>*</sup></dt>
                     <dd>{{$monster->max_level}}</dd>
-                    <dt>Gold</dt>
-                    <dd>{{$monster->gold}}</dd>
+                    <dt>Gold Reward</dt>
+                    <dd>{{number_format($monster->gold)}}</dd>
                 </dl>
             </div>
             <div class="col-md-4">
@@ -59,6 +59,8 @@
                         <dl>
                             <dt>Name</dt>
                             <dd>{{$skill->name}}</dd>
+                            <dt>Level</dt>
+                            <dd>{{$skill->level}}</dd>
                             <dt>Bonus</dt>
                             <dd>{{$skill->skill_bonus * 100}}%</dd>
                         </dl>
@@ -76,10 +78,16 @@
 </div>
 
 @if (!is_null($monster->quest_item_id))
+    <hr />
     <div class="row page-titles">
         <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">{{$monster->questitem->affix_name}}</h4>
-            <span style="font-size: 12px;"><strong>Drop Chance:</strong> {{$monster->quest_item_drop_chance * 100}}%</span>
+            <h4 class="mt-2">{{$monster->questitem->affix_name}} (Quest Item)</h4>
+            <span style="font-size: 12px;">
+                <strong>Drop Chance:</strong> {{$monster->quest_item_drop_chance * 100}}%
+                @if(!is_null($quest))
+                    , used in: <a href="#">{{$quest->name}}</a>
+                @endif
+            </span>
         </div>
     </div>
     <div class="card">

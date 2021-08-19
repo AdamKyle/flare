@@ -36,7 +36,7 @@ class ServerMessageBuilder {
             case 'cannot_move_up':
                 return 'You cannot go that way.';
             case 'cannot_walk_on_water':
-                return 'You cannot walk on water without a Flask of Fresh Air.';
+                return 'You cannot move that way, you are missing the appropriate quest item.';
             case 'not_enough_gold':
                 return 'You dont have enough Gold for that.';
             case 'not_enough_gold_dust':

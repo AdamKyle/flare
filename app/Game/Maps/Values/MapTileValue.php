@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Values;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Facades\Storage;
 
 class MapTileValue {
@@ -49,6 +50,41 @@ class MapTileValue {
     }
 
     /**
+     * Is the current tile a death water tile?
+     *
+     * @param int $color
+     * @return bool
+     */
+    public function isDeathWaterTile(int $color): bool {
+        $invalidColors = [
+            255255200,
+        ];
+
+        return in_array($color, $invalidColors);
+    }
+
+    /**
+     * Can the character walk on death water?
+     *
+     * @param Character $character
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
+    public function canWalkOnDeathWater(Character $character, int $x, int $y): bool {
+        $color = $this->getTileColor($character, $x, $y);
+
+        if ($this->isDeathWaterTile((int) $color)) {
+            return $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::WALK_ON_DEATH_WATER;
+            })->isNotEmpty();
+        }
+
+        // We are not death water
+        return true;
+    }
+
+    /**
      * Can we teleport to water based locations?
      *
      * @param Character $character
@@ -61,11 +97,9 @@ class MapTileValue {
         $color = $this->getTileColor($character, $x, $y);
 
         if ($this->isWaterTile((int) $color)) {
-            $hasItem = $character->inventory->slots->filter(function($slot) {
-                return $slot->item->effect === 'walk-on-water';
+            return $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::WALK_ON_WATER;
             })->isNotEmpty();
-
-            return $hasItem;
         }
 
         // We are not water

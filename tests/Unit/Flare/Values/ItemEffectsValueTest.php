@@ -19,6 +19,12 @@ class ItemEffectsValueTest extends TestCase {
         $this->assertTrue($value->labyrinth());
     }
 
+    public function testIsDungeon() {
+        $value = new ItemEffectsValue('dungeon');
+
+        $this->assertTrue($value->dungeon());
+    }
+
     public function testThrowError() {
 
         $this->expectException(\Exception::class);

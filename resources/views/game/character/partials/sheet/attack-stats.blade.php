@@ -3,7 +3,7 @@
 
     <dd>{{$characterInfo['maxHealth']}}</dd>
     <dt>Max Attack:</dt>
-    <dd>{{$character->getInformation()->buildTotalAttack()}}</dd>
+    <dd>{{number_format($character->getInformation()->buildTotalAttack())}}</dd>
     <dt>Max Heal For:</dt>
     <dd>{{$characterInfo['maxHeal']}}</dd>
     <dt>Max AC:</dt>

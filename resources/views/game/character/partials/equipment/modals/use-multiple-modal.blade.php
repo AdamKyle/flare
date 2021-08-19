@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div wire:loading.delay class="alert alert-info">
+                <div wire:loading class="alert alert-info" style="width:100%">
                     <i class="fas fa-spinner fa-spin"></i> Applying items ...
                 </div>
                 @php
@@ -47,7 +47,7 @@
                     </dl>
                     <hr />
                 @endforeach
-                <div wire:loading.delay class="alert alert-info">
+                <div wire:loading class="alert alert-info" style="width:100%">
                     <i class="fas fa-spinner fa-spin"></i> Applying items ...
                 </div>
             </div>

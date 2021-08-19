@@ -109,7 +109,7 @@ class EquipItemService {
             })->isNotEmpty();
 
 
-            if ($hasBowEquipped) {
+            if ($hasBowEquipped && ($characterSlot->item->type === 'weapon' || $characterSlot->item->type === 'shield')) {
                 $this->unequipBothHands();
             } else {
                 $itemForPosition = $this->character->inventory->slots->filter(function($slot) {

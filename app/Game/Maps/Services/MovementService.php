@@ -11,6 +11,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -115,6 +116,14 @@ class MovementService {
                 return $this->moveCharacter($character, $params);
             } else {
                 return $this->errorResult('cannot walk on water.');
+            }
+        }
+
+        if ($this->mapTile->isDeathWaterTile((int) $mapTileColor)) {
+            if ($this->mapTile->canWalkOnDeathWater($character, $xPosition, $yPosition)) {
+                return $this->moveCharacter($character, $params);
+            } else {
+                return $this->errorResult('cannot walk on death water.');
             }
         }
 
@@ -284,10 +293,17 @@ class MovementService {
      * @return array
      */
     public function teleport(Character $character, int $x, int $y, int $cost, int $timeout): array {
-        $canTeleport = $this->mapTile->canWalkOnWater($character, $x, $y);
+        $canTeleportToWater = $this->mapTile->canWalkOnWater($character, $x, $y);
+        $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
 
-        if (!$canTeleport) {
-            $item = Item::where('effect', 'walk-on-water')->first();
+        if (!$canTeleportToWater) {
+            $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
+
+            return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
+        }
+
+        if (!$canTeleportToDeathWater) {
+            $item = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
 
             return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
         }

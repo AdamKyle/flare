@@ -8,18 +8,23 @@
 </div>
 @include('admin.monsters.partials.details', [
     'monster' => $monster,
+    'quest'   => $quest,
     'canEdit' => true,
 ])
 
 @if ($monster->can_cast)
     <hr />
+    <h4 class="mt-2">Evasion</h4>
     <div class="card">
         <div class="card-body">
-
+            <div class="alert alert-info mt-2">
+                Spell Evasion will reduce the players spell damage, while Artifact annulment will reduce the characters artifact damage.
+                Players can equip rings to increase their own spell evasion and artifact annulment to reduce the enemies spells and artifact damage.
+            </div>
             <dl class="mt-3">
                 <dt>Max Cast For</dt>
                 <dd>{{number_format($monster->max_spell_damage)}}</dd>
-                <dt>Max Cast For</dt>
+                <dt>Max Artifact Damage</dt>
                 <dd>{{number_format($monster->max_artifact_damage)}}</dd>
             </dl>
         </div>
@@ -28,6 +33,7 @@
 
 @if ($monster->is_celestial_entity)
     <hr />
+    <h4 class="mt-2">Celestial Conjuration Cost</h4>
     <div class="card">
         <div class="card-body">
             <div class="alert alert-info mb-2 mt-2">
