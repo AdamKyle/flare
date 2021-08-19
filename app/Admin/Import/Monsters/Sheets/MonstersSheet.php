@@ -36,6 +36,12 @@ class MonstersSheet implements ToCollection {
     protected function returnCleanMonster(array $monster) {
         $cleanData = [];
 
+        if (is_null($monster['is_celestial_entity'])) {
+            $monster['is_celestial_entity'] = false;
+        } else {
+            $monster['is_celestial_entity'] = true;
+        }
+
         foreach ($monster as $key => $value) {
             if (!is_null($value)) {
 

@@ -112,7 +112,7 @@ class ServerMessageBuilderTest extends TestCase
     {
         $message = resolve(ServerMessageBuilder::class)->build('cannot_walk_on_water');
 
-        $this->assertEquals('You cannot walk on water without a Flask of Fresh Air.', $message);
+        $this->assertEquals('You cannot move that way, you are missing the appropriate quest item.', $message);
     }
 
     public function testGetMessageCannotCraft()

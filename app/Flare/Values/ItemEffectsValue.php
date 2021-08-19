@@ -21,7 +21,7 @@ class ItemEffectsValue {
         self::WALK_ON_WATER       => 'walk-on-water',
         self::WALK_ON_DEATH_WATER => 'walk-on-death-water',
         self::LABYRINTH           => 'labyrinth',
-        self::DUNGEON             => 'dungon',
+        self::DUNGEON             => 'dungeon',
     ];
 
     /**

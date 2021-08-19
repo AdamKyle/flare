@@ -2,8 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-
-use App\Flare\Models\Quest;
+use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
@@ -12,6 +11,8 @@ use App\Admin\Exports\Monsters\MonstersExport;
 use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 
 class MonstersController extends Controller {
+
+    use MonstersShowInformation;
 
     public function __construct() {
         $this->middleware('is.admin')->except([
@@ -24,16 +25,7 @@ class MonstersController extends Controller {
     }
 
     public function show(Monster $monster) {
-        $quest = null;
-
-        if (!is_null($monster->questItem)) {
-            $quest = Quest::where('item_id', $monster->questItem->id)->first();
-        }
-        dump($monster->quest_item_id);
-        return view('admin.monsters.monster', [
-            'monster' => $monster,
-            'quest'   => $quest,
-        ]);
+        return $this->renderMonsterShow($monster);
     }
 
     public function create() {

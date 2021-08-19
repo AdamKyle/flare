@@ -110,7 +110,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $character = $this->character->getCharacter();
@@ -164,7 +164,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $location = $this->createLocation([
@@ -209,7 +209,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $location = $this->createLocation([
@@ -273,7 +273,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $location = $this->createLocation([
@@ -340,7 +340,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $character = $this->character->getCharacter();
@@ -371,7 +371,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $character = $this->character->getCharacter();
@@ -436,7 +436,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
         $response = $this->actingAs($user)
@@ -463,7 +463,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $response = $this->actingAs($user)
@@ -490,7 +490,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $response = $this->actingAs($user)
@@ -560,7 +560,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(true);
 
         $response = $this->actingAs($user)
@@ -835,7 +835,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $response = $this->actingAs($user)
@@ -952,7 +952,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $response = $this->actingAs($user)
@@ -1038,7 +1038,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $response = $this->actingAs($user)
@@ -1062,7 +1062,7 @@ class MapControllerApiTest extends TestCase
 
         $this->app->instance(MapTileValue::class, $water);
 
-        $water->shouldReceive('getTileColor')->once()->andReturn("1");
+        $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
         $response = $this->actingAs($user)

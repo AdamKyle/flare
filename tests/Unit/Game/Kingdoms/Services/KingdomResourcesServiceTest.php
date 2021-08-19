@@ -311,7 +311,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->assertTrue($kingdom->current_morale < .50);
         $this->assertFalse($kingdom->current_wood < 500);
-        $this->assertFalse($kingdom->current_population > 0);
+        $this->assertTrue($kingdom->current_population > 0);
     }
 
     public function testKingdomAdjustMorale() {
