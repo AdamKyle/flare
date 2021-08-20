@@ -35,6 +35,8 @@ class MessageSentEvent implements ShouldBroadcastNow
 
     public $y;
 
+    public $mapName;
+
     /**
      * Create a new event instance.
      *
@@ -53,6 +55,7 @@ class MessageSentEvent implements ShouldBroadcastNow
         $this->name    = auth()->user()->hasRole('Admin') ? 'Admin' : $user->character->name;
         $this->x       = $message->x_position;
         $this->y       = $message->y_position;
+        $this->mapName = $message->map_name;
     }
 
     /**

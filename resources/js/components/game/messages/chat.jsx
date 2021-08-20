@@ -69,6 +69,7 @@ export default class Chat extends React.Component {
       message['from_god'] = this.isGod(event.user);
       message['x'] = event.x;
       message['y'] = event.y;
+      message['map'] = event.mapName;
 
       const messages = cloneDeep(this.state.messages);
 
@@ -181,7 +182,7 @@ export default class Chat extends React.Component {
 
   fetchLocationInfo(message) {
     return (
-      <span>[{message.x}/{message.y}]</span>
+      <span>[{message.map} | {message.x}/{message.y}]</span>
     );
   }
 

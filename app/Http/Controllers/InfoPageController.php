@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Flare\Traits\Controllers\MonstersShowInformation;
 use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\Adventure;
@@ -19,7 +20,7 @@ use App\Flare\Traits\Controllers\ItemsShowInformation;
 class InfoPageController extends Controller
 {
 
-    use ItemsShowInformation;
+    use ItemsShowInformation, MonstersShowInformation;
 
     /**
      * Show the application dashboard.
@@ -111,9 +112,7 @@ class InfoPageController extends Controller
     }
 
     public function viewMonster(Request $request, Monster $monster) {
-        return view('information.monsters.monster', [
-            'monster' => $monster,
-        ]);
+        return $this->renderMonsterShow($monster);
     }
 
     public function viewLocation(Request $request, Location $location) {

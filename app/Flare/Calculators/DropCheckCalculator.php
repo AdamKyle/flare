@@ -38,9 +38,10 @@ class DropCheckCalculator {
         }
 
         $roll = rand(1, 1000);
-        $roll += $roll * $bonus;
+        $roll += round($roll * $bonus);
+        $dc   = round((1000 - (1000 * $monster->drop_check)));
 
-        return $roll  > (1000 - (1000 * $monster->drop_check));
+        return $roll > $dc;
     }
 
     /**
@@ -69,9 +70,10 @@ class DropCheckCalculator {
         }
 
         $roll = rand(1, 1000);
-        $roll += $roll * $totalBonus;
+        $roll += round($roll * $totalBonus);
+        $dc   = round((1000 - (1000 * $monster->drop_check)));
 
-        return $roll  > (100 - (100 * $monster->quest_item_drop_chance));
+        return $roll > $dc;
     }
 
     /**

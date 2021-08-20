@@ -159,10 +159,11 @@ class ConjureService {
         ]);
 
         $user = $character->user;
+        $characterMapId = $character->map->game_map_id;
 
         $character = new Item($character->refresh(), $this->characterTransformer);
         $character = $this->manager->createData($character)->toArray();
-        $npc       = Npc::where('type', NpcTypes::SUMMONER)->first();
+        $npc       = Npc::where('type', NpcTypes::SUMMONER)->where('game_map_id', $characterMapId)->first();
 
         event(new UpdateTopBarBroadcastEvent($character, $user));
 

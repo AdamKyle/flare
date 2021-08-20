@@ -30,7 +30,7 @@ class DropsCheckListener
         }
 
         $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
-        //dd($canGetDrop);
+
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
@@ -53,11 +53,15 @@ class DropsCheckListener
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
         if (!$event->character->isInventoryFull()) {
 
-            $alreadyHas = $event->character->inventory->slots->filter(function ($slot) use ($item) {
+            $doesntHave = $event->character->inventory->slots->filter(function ($slot) use ($item) {
                 return $slot->item_id === $item->id && $item->type === 'quest';
-            })->all();
+            })->isEmpty();
 
-            if (empty($alreadyHas)) {
+            $hasCompletedQuest = $event->character->questsCompleted->filter(function($questCompleted) use ($item) {
+                return $questCompleted->quest->item_id === $item->id;
+            })->isEmpty();
+
+            if ($doesntHave && $hasCompletedQuest) {
                 $event->character->inventory->slots()->create([
                     'item_id' => $item->id,
                     'inventory_id' => $event->character->inventory->id,

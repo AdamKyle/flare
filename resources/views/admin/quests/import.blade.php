@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title title="Import NPC Data" route="{{route('home')}}" color="success" link="Home">
+    <x-core.page-title title="Import Quest Data" route="{{route('home')}}" color="success" link="Home">
     </x-core.page-title>
 
     <x-cards.card>

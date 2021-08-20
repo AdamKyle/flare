@@ -11,6 +11,9 @@
                 You <strong>cannot</strong> mix and match sets or sets with non set items. <strong>It's one or the other.</strong>
             </div>
         @endif
+        <div class="alert alert-info mt-2 mb-3 hide" wire:loading.class.remove="hide">
+            <i class="fas fa-spinner fa-spin"></i> processing ...
+        </div>
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage">
@@ -43,8 +46,8 @@
 
 
                     @if ($allowMassDestroy)
-                        <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2"><i class="fas fa-spinner fa-spin" wire:loading></i> Destroy All</button>
-                        <button type="button" wire:click="destroyAllItems('disenchant')" class="btn btn-primary btn-sm ml-2"><i class="fas fa-spinner fa-spin" wire:loading></i> Disenchant All</button>
+                        <button type="button" wire:click="destroyAllItems" class="btn btn-danger btn-sm ml-2"> Destroy All</button>
+                        <button type="button" wire:click="destroyAllItems('disenchant')" class="btn btn-primary btn-sm ml-2">Disenchant All</button>
                     @endif
                 </x-data-tables.per-page>
                 <x-data-tables.search wire:model="search" />

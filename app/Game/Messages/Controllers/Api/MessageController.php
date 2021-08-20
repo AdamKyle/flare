@@ -51,6 +51,24 @@ class MessageController extends Controller {
                                 $message->y    = $message->y_position;
                                 $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
 
+                                $mapName = '';
+
+                                switch ($message->color) {
+                                    case '#ffffff':
+                                        $mapName = 'SUR';
+                                        break;
+                                    case '#ffad47':
+                                        $mapName = 'LABY';
+                                        break;
+                                    case '#755c59':
+                                        $mapName = 'DUN';
+                                        break;
+                                    default:
+                                        $mapName = 'SUR';
+                                }
+
+                                $message->map = $mapName;
+
                                 return $message;
                             })
                             ->all();
@@ -71,6 +89,22 @@ class MessageController extends Controller {
 
             $x     = $character->map->character_position_x;
             $y     = $character->map->character_position_y;
+            $mapName = '';
+
+            switch ($character->map->gameMap->name) {
+                case 'Surface':
+                    $mapName = 'SUR';
+                    break;
+                case 'Labyrinth':
+                    $mapName = 'LABY';
+                    break;
+                case 'Dungeons':
+                    $mapName = 'DUN';
+                    break;
+                default:
+                    $mapName = 'SUR';
+            }
+
             $color = (new MapChatColor($character->map->gameMap->name))->getColor();
         }
 
@@ -80,6 +114,8 @@ class MessageController extends Controller {
             'x_position' => $x,
             'y_position' => $y,
         ]);
+
+        $message->map_name = $mapName;
 
         broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();
 

@@ -7,10 +7,12 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Models\User;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -21,12 +23,14 @@ use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
 use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
 class NpcCommandHandler {
@@ -44,6 +48,11 @@ class NpcCommandHandler {
     private $characterAttackTransformer;
 
     /**
+     * @var MonsterTransfromer $monsterTransformer
+     */
+    private $monsterTransformer;
+
+    /**
      * @var Manager $manager
      */
     private $manager;
@@ -58,14 +67,18 @@ class NpcCommandHandler {
      *
      * @param NpcServerMessageBuilder $npcServerMessageBuilder
      * @param CharacterAttackTransformer $characterAttackTransformer
+     * @param MonsterTransfromer $monsterTransformer
+     * @param Manager $manager
      */
     public function __construct(
-        NpcServerMessageBuilder $npcServerMessageBuilder,
+        NpcServerMessageBuilder    $npcServerMessageBuilder,
         CharacterAttackTransformer $characterAttackTransformer,
-        Manager $manager,
+        MonsterTransfromer         $monsterTransformer,
+        Manager                    $manager,
     ) {
         $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
         $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->monsterTransformer         = $monsterTransformer;
         $this->manager                    = $manager;
     }
 
@@ -287,6 +300,8 @@ class NpcCommandHandler {
                 $characterData = new Item($character->refresh(), $this->characterAttackTransformer);
                 event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
+                $this->updateActions($character->map->game_map_id, $character);
+
                 broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('skill_unlocked', $npc), true));
                 broadcast(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
             }
@@ -342,5 +357,16 @@ class NpcCommandHandler {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return true;
+    }
+
+    protected function updateActions(int $mapId, Character $character) {
+        $user      = $character->user;
+        $character = new Item($character->refresh(), $this->characterAttackTransformer);
+        $monsters  = new Collection(Monster::where('published', true)->where('game_map_id', $mapId)->orderBy('max_level', 'asc')->get(), $this->monsterTransformer);
+
+        $character = $this->manager->createData($character)->toArray();
+        $monster   = $this->manager->createData($monsters)->toArray();
+
+        broadcast(new UpdateActionsBroadcast($character, $monster, $user));
     }
 }

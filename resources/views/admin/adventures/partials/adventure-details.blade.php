@@ -13,7 +13,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-location"> Loctations : <span class="danger">*</span> </label>
             <select class="custom-select form-control required" id="adventure-location" name="location_ids[]" multiple>
@@ -33,7 +33,7 @@
             </select>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-item-reward"> Reward Item : </label>
             <select class="custom-select form-control" id="adventure-item-reward" name="reward_item_id">
