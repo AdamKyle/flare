@@ -11,8 +11,9 @@
                 You <strong>cannot</strong> mix and match sets or sets with non set items. <strong>It's one or the other.</strong>
             </div>
         @endif
-        <div class="alert alert-info mt-2 mb-3 hide" wire:loading.class.remove="hide">
-            <i class="fas fa-spinner fa-spin"></i> processing ...
+        <div class="alert alert-warning mt-2 mb-3 hide" wire:loading.class.remove="hide" wire:target="destroyAllItems">
+            <i class="fas fa-spinner fa-spin"></i> Processing request. <strong>Do not</strong> refresh or leave this page. The page will refresh when done.
+            You can check the game tab (if you have that open in a separate tab) to see each item be disenchanted.
         </div>
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">

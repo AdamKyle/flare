@@ -42,7 +42,7 @@ export default class UnitSelection extends React.Component {
         });
       }
     });
-    console.log(unitsToSend, this.props.attackingKingdoms);
+
     this.setState({
       unitsToSend: unitsToSend,
       loading: false,

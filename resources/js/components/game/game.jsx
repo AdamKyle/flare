@@ -272,7 +272,6 @@ export default class Game extends React.Component {
   }
 
   render() {
-    console.log(this.state.windowWidth);
     return (
       <>
         <div className="row">

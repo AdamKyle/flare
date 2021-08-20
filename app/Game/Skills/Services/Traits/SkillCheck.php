@@ -14,10 +14,10 @@ trait SkillCheck {
      */
     public function getDCCheck(Skill $skill, int $dcIncrease = 0): int {
 
-        $dcCheck = (rand(1, 100) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
+        $dcCheck = (rand(1, 1000) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
 
-        if ($dcCheck > 100) {
-            return 99;
+        if ($dcCheck > 1000) {
+            return 999;
         } else if ($dcCheck <= 0) {
             return 1;
         }

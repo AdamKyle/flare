@@ -145,7 +145,7 @@ export default class KingdomModal extends React.Component {
           {
             this.props.disableMapButtons() ?
               <p className="mt-3 text-center text-danger">
-                You cannot currently telport to this kingdom.
+                You cannot currently teleport to this kingdom.
               </p>
               : null
           }

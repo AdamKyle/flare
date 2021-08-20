@@ -85,7 +85,6 @@ export default class Boons extends React.Component {
     let duration = moment.duration(then.diff(now)).asSeconds();
 
     const isHours = (duration / 3600) >= 1;
-    console.log(duration);
     if (duration > 0) {
       return (
         <>

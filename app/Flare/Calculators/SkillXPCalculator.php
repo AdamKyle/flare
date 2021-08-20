@@ -22,7 +22,8 @@ class SkillXPCalculator {
     public function fetchSkillXP(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
         $adventureBonus = $this->fetchAdventureBonus($adventure);
         $xpTowards      = $this->getXpTowards($skill, $monster);
-        $totalBonus     = 1 + ($skill->skill_training_bonus + $adventureBonus);
+        $totalBonus     = $skill->skill_training_bonus + $adventureBonus;
+
 
         return (5 + $xpTowards) * $totalBonus;
     }

@@ -273,6 +273,7 @@ export default class Map extends React.Component {
         mapUrl: event.mapDetails.map_url,
         locations: event.mapDetails.locations,
         kingdoms: event.mapDetails.my_kingdoms,
+        npcKingdoms: event.mapDetails.npc_kingdoms,
         portList: event.mapDetails.port_details,
         adventures: event.mapDetails.adventure_details,
         currentPort: event.mapDetails.port_details !== null ? event.mapDetails.port_details.current_port : null,
@@ -304,6 +305,14 @@ export default class Map extends React.Component {
         });
 
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
+
+        this.props.updateTeleportLoations(
+          this.state.teleportLocations,
+          event.mapDetails.character_map.character_position_x,
+          event.mapDetails.character_map.character_position_y
+        );
+
+        this.props.updatePlayerPosition()
       });
     });
 

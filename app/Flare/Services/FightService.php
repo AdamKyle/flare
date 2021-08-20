@@ -498,7 +498,7 @@ class FightService {
                 ];
             } else {
                 return [
-                    'The enemies spells have no effect ...'
+                    'The enemies spells have been nullified by you ...'
                 ];
             }
         }

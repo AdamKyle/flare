@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <div wire:loading.class.remove="hide" class="alert alert-info hide mt-2 mb-3">
-                    <i class="fas fa-spinner fa-spin"></i> Applying items ...
+                    <i class="fas fa-spinner fa-spin"></i> Applying items. <strong>Do not</strong> refresh the page. The page will refresh when done.
                 </div>
                 @php
                     $slots = $character->inventory->slots()->findMany($selected);
@@ -48,7 +48,7 @@
                     <hr />
                 @endforeach
                 <div wire:loading.class.remove="hide" class="alert alert-info hide mt-2 mb-3">
-                    <i class="fas fa-spinner fa-spin"></i> Applying items ...
+                    <i class="fas fa-spinner fa-spin"></i> Applying items. <strong>Do not</strong> refresh the page. The page will refresh when done.
                 </div>
             </div>
             <div class="modal-footer">

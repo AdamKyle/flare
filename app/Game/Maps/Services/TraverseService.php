@@ -129,8 +129,8 @@ class TraverseService {
         if ($newXPosition !== $xPosition && $newYPosition !== $yPosition) {
             $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
 
-            if ($this->mapTileValue->isWaterTile($color)) {
-                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you can\'t walk on water.'));
+            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color)) {
+                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
             }
         }
 
@@ -207,7 +207,6 @@ class TraverseService {
      * @param Character $character
      */
     protected function updateMap(Character $character) {
-
         broadcast(new UpdateMapBroadcast($this->locationService->getLocationData($character->refresh()), $character->user));
     }
 

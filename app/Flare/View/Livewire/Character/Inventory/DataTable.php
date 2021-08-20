@@ -168,14 +168,14 @@ class DataTable extends Component
     }
 
     public function destroyAllItems(DisenchantService $disenchantService, string $type = null) {
+        $this->totalGoldDust = 0;
 
         if ($type === 'disenchant') {
             $this->character->inventory->slots->filter(function($slot) use ($disenchantService) {
                 if (!$slot->equipped && $slot->item->type !== 'quest') {
                     if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
                         $disenchantService->disenchantWithSkill($this->character, $slot);
-
-                        $this->totalGoldDust += $disenchantService->getGoldDust();
+                        $this->totalGoldDust = $disenchantService->getGoldDust();
                     }
                 }
             });
@@ -185,7 +185,7 @@ class DataTable extends Component
                     if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
                         $disenchantService->disenchantWithOutSkill($this->character, $slot);
 
-                        $this->totalGoldDust += $disenchantService->getGoldDust();
+                        $this->totalGoldDust = $disenchantService->getGoldDust();
                     }
 
                     $slot->delete();
@@ -196,18 +196,6 @@ class DataTable extends Component
         $this->resetSelect();
 
         session()->flash('success', 'You gained: '.$this->totalGoldDust.' Gold Dust from all items destroyed.');
-
-        return redirect()->to(route('game.character.sheet'));
-    }
-
-    public function useAllItems(UseItemService $useItemService) {
-        $this->character->inventory->slots->filter(function($slot) use ($useItemService) {
-            if ($slot->item->usable && !$slot->item->damages_kingdoms) {
-                $useItemService->useItem($slot, $this->character, $slot->item);
-            }
-        });
-
-        session()->flash('success', 'Used every single item in your inventory. Check: Active Boons tab');
 
         return redirect()->to(route('game.character.sheet'));
     }

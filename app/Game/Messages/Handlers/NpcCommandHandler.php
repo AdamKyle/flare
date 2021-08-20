@@ -188,6 +188,7 @@ class NpcCommandHandler {
             $kingdom->update([
                 'character_id' => $character->id,
                 'npc_owned'    => false,
+                'last_walked'  => now(),
             ]);
 
             $this->addKingdomToCache($character->refresh(), $kingdom->refresh());

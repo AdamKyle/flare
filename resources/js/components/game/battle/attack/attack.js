@@ -216,13 +216,13 @@ export default class Attack {
 
       if (totalDamage <= 0) {
         this.battleMessages.push({
-          message: attacker.name + '\'s Spells have no effect!'
+          message: attacker.name + '\'s Spells were annulled!'
         });
 
         return;
       } else if ($totalDamage !== attacker.artifact_damage) {
         this.battleMessages.push({
-          message: this.attackerName + '\'s Artifacts have their potency reduced by the enemies artifact annulment'
+          message: this.attackerName + '\'s Spells have their potency reduced by the enemies artifact annulment'
         });
       }
 
@@ -305,7 +305,7 @@ export default class Attack {
 
       if (attacker.has_affixes) {
         this.battleMessages.push({
-          message: 'The enchantments on your equipment lash out at the enemy!'
+          message: 'Your enchanted equipment glows before the enemy.'
         });
       }
 
