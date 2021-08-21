@@ -20,7 +20,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-damage-mod-bonus">Base Attack Mod (Skills): </label>
                 <input
@@ -34,9 +34,9 @@
                 >
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
-                <label for="item-fight-time-out-mod-bonus">Base Fight Timeout Mod (Skills): </label>
+                <label for="item-base-fight-time-out-mod-bonus">Base Fight Timeout Mod (Skills): </label>
                 <input
                     type="number"
                     steps="0.01"
@@ -44,6 +44,50 @@
                     id="item-fight-time-out-mod-bonus"
                     name="item-fight-time-out-mod-bonus"
                     wire:model="item.fight_time_out_mod_bonus"
+                    {{is_null($item) ? '' : ($item->usable ? 'disabled' : '')}}
+                >
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item-base-healing-mod-bonus">Base Healing Mod (Skills): </label>
+                <input
+                    type="number"
+                    steps="0.01"
+                    class="form-control"
+                    id="item-base-healing-mod-bonus"
+                    name="item-base-healing-mod-bonus"
+                    wire:model="item.base_healing_mod_bonus"
+                    {{is_null($item) ? '' : ($item->usable ? 'disabled' : '')}}
+                >
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item-base-ac-mod-bonus">Base AC Mod (Skills): </label>
+                <input
+                    type="number"
+                    steps="0.01"
+                    class="form-control"
+                    id="item-base-ac-mod-bonus"
+                    name="item-base-ac-mod-bonus"
+                    wire:model="item.base_ac_mod_bonus"
+                    {{is_null($item) ? '' : ($item->usable ? 'disabled' : '')}}
+                >
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="item-base-move-timeout-mod-mod-bonus">Base Move Timeout Mod (Skills): </label>
+                <input
+                    type="number"
+                    steps="0.01"
+                    class="form-control"
+                    id="item-base-move-timeout-mod-mod-bonus"
+                    name="item-base-move-timeout-mod-mod-bonus"
+                    wire:model="item.move_time_out_mod_bonus"
                     {{is_null($item) ? '' : ($item->usable ? 'disabled' : '')}}
                 >
             </div>

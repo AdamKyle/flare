@@ -34,6 +34,9 @@ class ItemModifiers extends Component
         'item.effect'                   => 'nullable',
         'item.fight_time_out_mod_bonus' => 'nullable',
         'item.base_damage_mod_bonus'    => 'nullable',
+        'item.base_healing_mod_bonus'   => 'nullable',
+        'item.base_ac_mod_bonus'        => 'nullable',
+        'item.move_time_out_mod_bonus'  => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];
