@@ -2,11 +2,9 @@
 
 namespace Tests\Setup\Character;
 
-use App\Flare\Models\GameMap;
-use App\Game\Skills\Values\SkillTypeValue;
 use Str;
-use Hash;
 use Illuminate\Database\Eloquent\Collection;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
@@ -21,7 +19,6 @@ use Tests\Traits\CreateMap;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
-use Tests\Traits\CreateSecurityQuestion;
 
 class CharacterFactory {
 
@@ -33,8 +30,7 @@ class CharacterFactory {
         CreateMap,
         CreateGameMap,
         CreateGameSkill,
-        CreateSkill,
-        CreateSecurityQuestion;
+        CreateSkill;
 
     private Character $character;
 
@@ -69,8 +65,6 @@ class CharacterFactory {
             'game_class_id' => $class->id,
             'game_race_id'  => $race->id,
         ]);
-
-        $this->createSecurityQuestions();
 
         $this->createInventory();
 
@@ -433,23 +427,6 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $looting->id,
-        ]);
-    }
-
-    protected function createSecurityQuestions() {
-
-        $user = $this->getUser();
-
-        $this->createSecurityQuestion([
-            'user_id'  => $user->id,
-            'question' => 'test question',
-            'answer'   => Hash::make('test'),
-        ]);
-
-        $this->createSecurityQuestion([
-            'user_id'  => $this->character->user->id,
-            'question' => 'test question 2',
-            'answer'   => Hash::make('test2'),
         ]);
     }
 
