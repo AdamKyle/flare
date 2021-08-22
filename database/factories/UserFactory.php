@@ -26,7 +26,7 @@ class UserFactory extends Factory
         return [
             'email'                   => $this->faker->unique()->safeEmail,
             'email_verified_at'       => now(),
-            'password'                => Hash::make('ReallyLongPassword'), // => password
+            'password'                => Hash::make('ReallyLongPassword'),
             'remember_token'          => Str::random(10),
             'message_throttle_count'  => 0,
             'is_silenced'             => false,

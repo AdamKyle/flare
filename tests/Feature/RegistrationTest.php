@@ -90,6 +90,30 @@ class RegistrationTest extends TestCase
       $this->assertEquals($class->name, $user->character->class->name);
     }
 
+    public function testCannotRegisterWhenBanned() {
+        $this->createUser(['is_banned' => true]);
+
+        $race  = $this->createRace([
+            'dex_mod' => 2,
+        ]);
+
+        $class = $this->createClass([
+            'str_mod' => 2,
+            'damage_stat' => 'str',
+        ]);
+
+        $this->visit('/login')
+            ->click('Register')
+            ->submitForm('Register', [
+                'email'                 => 'a@example.net',
+                'password'              => 'TestExamplePassword',
+                'password_confirmation' => 'TestExamplePassword',
+                'name'                  => 'bobtest',
+                'race'                  => $race->id,
+                'class'                 => $class->id,
+            ])->see('You have been banned until: ');
+    }
+
 
     public function testCannotRegisterWhenNoMap() {
 
