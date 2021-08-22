@@ -145,7 +145,7 @@ class ItemDetails extends Component
         if ($itemValidator->validate($this, $this->item)) {
 
             if (is_null($this->item->can_drop)) {
-                $this->item->can_drop = true;
+                $this->item->can_drop = false;
             }
 
             if (is_null($this->item->craft_only)) {
