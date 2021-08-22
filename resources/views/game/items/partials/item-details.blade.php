@@ -39,9 +39,9 @@
         <dt>Skill Level Trivial</dt>
         <dd>{{$item->skill_level_trivial}}</dd>
         <dt>Gold Cost:</dt>
-        <dd>{{$item->cost}}</dd>
+        <dd>{{number_format($item->cost)}}</dd>
         <dt>God Dust Cost:</dt>
-        <dd>{{!is_null($item->gold_dust_cost) ? $item->gold_dust_cost : 0}}</dd>
+        <dd>{{!is_null($item->gold_dust_cost) ? number_format($item->gold_dust_cost) : 0}}</dd>
         <dt>Shards Cost:</dt>
         <dd>{{!is_null($item->shards_cost) ? $item->shards_cost : 0}}</dd>
     </dl>
