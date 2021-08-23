@@ -6,7 +6,7 @@
 
 ## Skill Break Down
 
-Lets break down whats all in a skill, you can see this information by clicking on a skill above:
+Let's break down what's all in a skill, you can see this information by clicking on a skill above:
 
 - **Base Damage Modifier**: This affects your core damage. If a skill increments this, then it is calculated into the damage done to the creature at the time of the attack, assuming the attack landed successfully.
 - **Base Healing Modifier**: This affects your healing amount when you use spells to heal. In battle these spells will trigger automatically assuming you have a healing spell equipped.
@@ -14,26 +14,23 @@ Lets break down whats all in a skill, you can see this information by clicking o
 
 > ### ATTN!
 >
-> You will see these through out this guide. These three modifier attributes can also exist on artifacts, quest items, enchanted items and even regular items them selves.
+> You will see these throughout this guide. These three modifier attributes can also exist on artifacts, quest items, enchanted items and even regular items them selves.
 
 - **Fight Timeout Modifier**: With every kill, comes a timeout of 10 seconds, 20 if the enemy has killed you. These modifiers take a specific percentage off your timer. [Learn more about timers](/information/time-gates)
 - **Skill Bonus Per Level**: The percentage bonus applied per level up (to a maximum of 99.00%)
 
 > ### ATTN!
 > 
-> If a skill makes use of the above mentioned modifiers, it will receive no skill bonus per level, instead the bonus to those modifiers will increase.
+> If a skill makes use of the above-mentioned modifiers, it will receive no skill bonus per level, instead the bonus to those modifiers will increase.
 > 
 > Monsters can also have skills that affect these modifiers as well.
 
 When viewing your character skeet, you will see a list of skills. Each one of those skills can be clicked on to get relevant details about said skill and about where you are in training that skill. (see image below).
 
-## Additional skills can be added
+## Class Skills
 
-Overtime The Creator can add new skills or modify existing ones. If the skills if modified you will not be notified, these would be balancing changes that The Creator will inform the players of.
-
-How ever if a new skill is created and assigned to all players, then every player will be notified of a new skill. If you are logged in, you'll see it in chat, if not, you'll be emailed.
-
-If additional skills are added, you'll be able to see details in game via the character sheet section as well as on this page.
+There are some skills that are class based only. Some might have restrictions like a Prophet needing Healing spells equipped in order to get their bonus.
+These skills mostly increase the damage, the fight timout, the healing and/or the armour class bonus.
 
 ## Training skills
 
@@ -94,3 +91,9 @@ When a skill levels there are two ways the next level xp is calculated. That is 
 
 - **For skills that can be trained**: This value is between 100 and 150 xp needed to level the skill.
 - **For crafting skills**: This value is between 100 and 200xp needed to level that skill.
+
+## Lots of skills, what do I focus on?
+
+You might feel overwhelmed with the amount of skills you csn train, the fact that you can only train one at a time, unless you are crafting or enchanting or such.
+
+The best place to start is train your class skills for a bit, before upping accuracy. From there, it depends on what you want. To fight faster? To craft better gear?

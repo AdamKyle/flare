@@ -15,3 +15,11 @@ Both races and classes can provide these additional bonuses.
 > ### ATTN!
 >
 > Monsters can also have accuracy and dodge skills. While at first, you'll probably start out fighting simple enemies, as you level and start to fight harder critters, you'll end up seeing that you either need gear that appends additional bonuses to these skills or you'll need to level these skills up.
+
+## To Hit and Damage
+
+As you might notice each class comes with two stats to focus on. Damage Stat and To Hit Stat.
+
+The To Hit Stat is used for determining if you can hit the enemy or not. The Higher this stat is, the better your odds in conjunction with the Accuracy [Skill](/information/skill-information) level.
+
+The Damage Stat is the core stat used in determining how much damage you do with your skills, items and any relevant bonuses and boons.

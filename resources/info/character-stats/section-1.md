@@ -26,35 +26,27 @@ The core stats of a character are:
 
 Each class corresponds to one of these stats for their base damage stat.
 
-## Dexterity, AC and Your Skills
+There is also, under it, a: **To focus on for Hit%**. Most gear will increase all stats, some gear is more stat specific such as Bows and Spells.
 
-When it comes to being able to attack, that is actually hit your enemy, you’ll need to raise your dexterity. This is to counter their AC and their Dodge. Your accuracy plays a role in attempting to land an attack on the enemy. You can compensate for lack of accuracy levels, by equipping gear that has accuracy boosting and/or dexterity boosting items.
+Every class will also want to focus on their Accuracy [skill](/information/skill-information) via training, which will also increase the HIT chance
+in conjunction with the stat.
 
-When it comes to dodging an attack, your skill level in dodging, and your dexterity play a role. Again, you can make up for the lack of dodging levels by having gear that increases the skill bonus for dodging.
+## Gear And Stats
 
-Finally, when it comes to blocking we take into account, just your armour class (AC). 
+Tlessa is a game about progressing down the enemy list and fighting stronger creatures, being able to kill them in on shot and quickly is the goal.
 
-However, if you are the attacker, you are using your base damage stat plus your accuracy bonus to push past their defenses.
+To that end, characters need stronger and better gear. The Shop will allow you to buy gear up to the cost of Two Billion gold. There is gear beyond that, however
+you will need the appropriate crafting skill to be at the right level to get the "craft only" gear.
 
-Gear that can balance, dexterity, damage stat, accuracy and dodge while increasing your AC, is what you should hope to attain, craft and enchant or purchase from the market board, or – should your looting skill be high enough/you be lucky enough, find off creatures.
-
-**Items are randomly generated when they drop off enemies**
-
-> ### ATTN!
-> 
-> All gear you can buy from the in game shop will affect your core stats. Body will always have the highest followed by weapon. When buying new gear you will want to 
-> replace your body and weapon first, assuming you can afford it. There are some affixes that can also increase one or more stats, some affixes are designed to raise a classes core 
-> stat, while others give bonuses to skills and even all stats.
+Gear alone, from the shop, will get you to the bottom of the list, but for even more of an added bonus, gear with affixes will get you even further, specifically those that affect your stats.
 
 ## Other stats matter too
 
 You might think: “ok, I am a Dark Dwarf who is a Vampire. All I need is durability gear.”
 
-While that’s fair, you’ll also need gear that helps your dexterity rise in order to be able to hit anything.
-
 What about intelligence to enchant? Unlike crafting you cannot enchant items if you don’t have the intelligence.
 
-This is where having “sets” of armour and weapons, spells and artifacts as well as rings that boost your primary damage stat, your dexterity and your intelligence will come in handy.
+This is where having “[sets]()” of armour and weapons, spells and artifacts as well as rings that boost your primary damage stat, your dexterity and your intelligence will come in handy.
 
 Depending on what you are doing, your gear will affect your stats and skills in some way. 
 
@@ -67,7 +59,8 @@ You are never just a Dark Dwarf with the class of Vampire and the damage stat of
 
 ## Final Note
 
-As a fresh, out of the gate, character, you wont have access to a lot of the gear mentioned. Or the gold to purchase it. There will always be a monster or two, an adventure or two that you can go on to level these skills and find some loot as you level up and get stronger.
+As a fresh, out of the gate, character, you won't have access to a lot of the gear mentioned. 
+Or the gold to purchase it. There will always be a monster or two, an adventure or two that you can go on to level these skills and find some loot as you level up and get stronger.
 
 > ### ATTN!
 >

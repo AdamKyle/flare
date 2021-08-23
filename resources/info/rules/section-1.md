@@ -30,8 +30,6 @@ Will not be tolerated and will result in the appropriate punishment.
 
 **Do not post your personal information in chat**. This includes but **not limited to**: Email, address, real name, phone number, credit card or any other identifiable information about you.
 
-Do not chat from your kingdom. **This is not a hard rule**, <em>just a bit of advice</em>. The only consequence will be people hunting for kingdoms.
-
 With that said your location in game is shown in chat as X,Y coordinates.
 
 Last but not least, no auction in chat. If you want to sell something go to the [market board](/information/market-bnoard). Failure to head this rule can result in being silenced and then, for repeat offenders, banned.

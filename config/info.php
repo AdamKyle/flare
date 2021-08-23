@@ -21,6 +21,7 @@ return [
     'celestials'        => [],
     'disenchanting'     => [],
     'npc-kingdoms'      => [],
+    'equipment-sets'    => [],
     'npcs'              => [
         [
             'livewire'            => true,

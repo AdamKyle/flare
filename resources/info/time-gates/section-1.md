@@ -46,6 +46,9 @@ Your character can die in a few ways. Fighting monsters and dying in an adventur
 - Adventure
 - Craft
 - Enchant
+- Disenchant
+- Destroy
+- Alchemy
 - Equip/Unequip
 - Sell/Buy from either the shop or market board.
 - Traverse

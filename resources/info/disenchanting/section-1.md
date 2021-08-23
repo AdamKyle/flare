@@ -4,7 +4,7 @@ When items drop in battle:
 
 [Image]
 
-you have two options: Destroy and Disenchant
+You have two options: Destroy and Disenchant
 
 If you choose to destroy the item, and it has affixes attached – you will get between 1-25 gold dust. This is a guaranteed amount of gold dust for destroying the item.
 
@@ -18,6 +18,14 @@ When managing your inventory, you’ll see a "Disenchant All" button:
 
 [Image]
 
-Clicking it will disenchant all items with affixes that are not equipped in your inventory. Clicking Destroy all will destroy all non equipped and quest items in your inventory and give you appropriate gold dust for enchanted items and destroys regular items.
+Clicking it will disenchant all items with affixes that are not equipped in your inventory. 
 
-When managing your inventory, if you destroy or disenchant all items in your inventory that are capable of being destroyed or disenchanted the gold dust amount will update on the game tab. (This assumes, you play with a tab open for the game, and a tab open for your inventory)
+> ### ATTN!
+> 
+> When you click this button, especially if you have a lot of enchanted gear in your inventory, **DO NOT** refresh the page or close the tab. Instead, you will see a loading notice.
+> The page will refresh for you automatically once done. If you play with the character tab open in one tab and the game in another, you can switch over to your game tab and see each item be disenchanted.
+
+Clicking Destroy all will destroy all non equipped and quest items in your inventory and give you appropriate gold dust for enchanted items and destroys regular items.
+
+When managing your inventory, if you destroy or disenchant all items in your inventory that are capable of being destroyed or 
+disenchanted the gold dust amount will update on the game tab. (This assumes, you play with a tab open for the game, and a tab open for your inventory)

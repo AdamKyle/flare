@@ -23,6 +23,7 @@
           <li><a href="{{route('info.page', ['pageName' => 'character-stats'])}}">Stats</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'skill-information'])}}">Skills</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'equipment'])}}">Equipment</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'equipment-sets'])}}">Equipment Sets</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'currencies'])}}">Currencies</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'combat'])}}">Combat</a></li>
       </ul>

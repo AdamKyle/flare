@@ -23,6 +23,13 @@
                             field="damage_stat"
                         />
                         <x-data-tables.header-row
+                            wire:click.prevent="sortBy('to_hit_stat')"
+                            header-text="To Hit Stat"
+                            sort-by="{{$sortBy}}"
+                            sort-field="{{$sortField}}"
+                            field="to_hit_stat"
+                        />
+                        <x-data-tables.header-row
                             wire:click.prevent="sortBy('str_mod')"
                             header-text="Strength Modifier"
                             sort-by="{{$sortBy}}"
@@ -107,6 +114,7 @@
                                     @endif
                                 </td>
                                 <td>{{$class->damage_stat}}</td>
+                                <td>{{$class->to_hit_stat}}</td>
                                 <td>{{$class->str_mod}} pts. </td>
                                 <td>{{$class->dur_mod}} pts. </td>
                                 <td>{{$class->dex_mod}} pts. </td>
