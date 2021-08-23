@@ -6,7 +6,7 @@ class MapChatColor {
 
     CONST SURFACE   = '#ffffff';
     CONST LABYRINTH = '#ffad47';
-    const DUNGEONS  = '#755c59';
+    const DUNGEONS  = '#ccb9a5';
 
     /**
      * MapChatColor constructor.

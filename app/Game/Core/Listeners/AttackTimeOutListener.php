@@ -27,6 +27,10 @@ class AttackTimeOutListener
             $time = $time - ($time * $this->findTimeReductions($event->character));
         }
 
+        if ($time <= 0) {
+            $time = 1;
+        }
+
         $event->character->update([
             'can_attack'          => false,
             'can_attack_again_at' => now()->addSeconds($time),
@@ -39,7 +43,7 @@ class AttackTimeOutListener
 
     protected function findTimeReductions(Character $character) {
         $skill = $character->skills->filter(function($skill) {
-            return $skill->reduces_time && is_null($skill->game_class_id);
+            return ($skill->fight_time_out_mod > 0.0) && is_null($skill->baseSkill->game_class_id);
         })->first();
 
         if (is_null($skill)) {

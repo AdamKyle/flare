@@ -40,15 +40,15 @@
                             <div class="col-md-12">
                                 <dl>
                                     <dt>Weapon Attack:</dt>
-                                    <dd>{{$character->getInformation()->buildAttack()}}</dd>
+                                    <dd>{{number_format($character->getInformation()->buildAttack())}}</dd>
                                     <dt>Rings Attack:</dt>
-                                    <dd>{{$character->getInformation()->getTotalRingDamage()}}</dd>
+                                    <dd>{{number_format($character->getInformation()->getTotalRingDamage())}}</dd>
                                     <dt>Spell Damage:</dt>
-                                    <dd>{{$character->getInformation()->getTotalSpellDamage()}}</dd>
+                                    <dd>{{number_format($character->getInformation()->getTotalSpellDamage())}}</dd>
                                     <dt>Artifact Damage:</dt>
-                                    <dd>{{$character->getInformation()->getTotalArtifactDamage()}}</dd>
+                                    <dd>{{number_format($character->getInformation()->getTotalArtifactDamage())}}</dd>
                                     <dt>Heal For:</dt>
-                                    <dd>{{$character->getInformation()->buildHealFor()}}</dd>
+                                    <dd>{{number_format($character->getInformation()->buildHealFor())}}</dd>
                                 </dl>
                             </div>
                         </div>

@@ -149,7 +149,7 @@ class NotifyHandler {
      * @throws \Exception
      */
     public function notifyDefender(string $status, Kingdom $defender) {
-        if (is_null($defender->character_id)) {
+        if (is_null($defender->character_id) || is_null($this->defendingCharacter)) {
             return;
         }
 

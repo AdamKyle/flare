@@ -144,6 +144,12 @@ class Skill extends Model
     }
 
     public function getFightTimeOutModAttribute() {
+        $value = $this->baseSkill->fight_time_out_mod_bonus_per_level;
+
+        if (is_null($value) || !($value > 0.0)) {
+            return 0.0;
+        }
+
         $baseBonus = $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'fight_time_out_mod_bonus', true);
 
@@ -151,6 +157,12 @@ class Skill extends Model
     }
 
     public function getMoveTimeOutModAttribute() {
+        $value = $this->baseSkill->move_time_out_mod_bonus_per_level;
+
+        if (is_null($value) || !($value > 0.0)) {
+            return 0.0;
+        }
+
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'move_time_out_mod_bonus', true);
 
         $baseBonus = $this->calculateTotalTimeBonus($this, 'move_time_out_mod_bonus_per_level');

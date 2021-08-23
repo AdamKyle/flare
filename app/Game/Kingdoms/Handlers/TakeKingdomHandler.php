@@ -57,13 +57,16 @@ class TakeKingdomHandler {
 
         $this->setOldKingdom($defender);
 
-        $this->removeKingdomFromCache($defendingCharacter, $defender);
+        if (!is_null($defendingCharacter)) {
+            $this->removeKingdomFromCache($defendingCharacter, $defender);
 
-        event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
+            event(new UpdateMapDetailsBroadcast($defendingCharacter->map, $defendingCharacter->user, $this->movementService, true));
+        }
 
         $defender->update([
-            'character_id' => $attacker->id,
-            'current_morale' => .10
+            'character_id'   => $attacker->id,
+            'current_morale' => .10,
+            'npc_owned'      => false,
         ]);
 
         $kingdom = $this->updateKingdomsUnits($defender->refresh(), $survivingUnits);
@@ -92,12 +95,20 @@ class TakeKingdomHandler {
      * @param Kingdom $kingdom
      */
     protected function setOldKingdom(Kingdom $kingdom) {
-        $this->oldKingdom = Kingdom::where('id', $kingdom->id)
-                                   ->where('character_id', $kingdom->character->id)
-                                   ->first()
-                                   ->load('units', 'buildings')
-                                   ->toArray();
+        $oldKingdom = Kingdom::where('id', $kingdom->id);
 
+        if (!is_null($kingdom->character)) {
+            $oldKingdom = $oldKingdom->where('character_id', $kingdom->character->id)
+                                      ->first()
+                                      ->load('units', 'buildings')
+                                      ->toArray();
+        } else {
+            $oldKingdom = $oldKingdom->first()
+                                     ->load('units', 'buildings')
+                                     ->toArray();
+        }
+
+        $this->oldKingdom = $oldKingdom;
     }
 
 

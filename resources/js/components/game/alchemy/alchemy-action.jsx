@@ -150,17 +150,17 @@ export default class AlchemyAction extends React.Component {
     const foundItem = this.state.itemsToCraft.filter(item => item.id === this.state.itemToCraft)[0];
 
     this.setState({
-      canCraft: false,
       showSuccess: false,
     }, () => {
-      this.props.updateCanCraft(event.canCraft);
-
       axios.post('/api/transmute/' + this.props.characterId, {
         item_to_craft: this.state.itemToCraft,
       }).then((result) => {
         if (!_.isEmpty(result.data.items)) {
           this.setState({
-            itemsToCraft: result.data.items
+            itemsToCraft: result.data.items,
+            canCraft: false,
+          }, () =>  {
+            this.props.updateCanCraft(false);
           });
         }
       }).catch((err) => {

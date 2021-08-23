@@ -45,17 +45,13 @@ class AlchemyService {
         if ($item->gold_dust_cost > $character->gold_dust) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold_dust'));
 
-            return $this->successResult([
-                'items' => $this->fetchAlchemistItems($character),
-            ]);
+            return $this->errorResult('not enough gold dust.');
         }
 
         if ($item->shards_cost > $character->shards) {
             event(new ServerMessageEvent($character->user, 'not_enough_shards'));
 
-            return $this->successResult([
-                'items' => $this->fetchAlchemistItems($character),
-            ]);
+            return $this->errorResult('not enough shards.');
         }
 
         return $this->attemptTransmute($character, $skill, $item);
