@@ -34,7 +34,7 @@ class CharacterFactory {
 
     private Character $character;
 
-    private ?InventorySetManagement $inventorySetManagement;
+    private $inventorySetManagement;
 
     /**
      * Creates a base character associated with a user.
@@ -109,7 +109,7 @@ class CharacterFactory {
      */
     public function InventorySetManagement(): InventorySetManagement {
 
-        if (!is_null($this->inventorySetManagement)) {
+        if (is_null($this->inventorySetManagement)) {
             $this->inventorySetManagement = new InventorySetManagement($this->character, $this);
         }
 
@@ -395,20 +395,17 @@ class CharacterFactory {
     }
 
     /**
-     * Gets the users security Questions
-     *
-     * @return Collection
+     * Create the core inventory.
      */
-    public function getSecurityQuestions(): Collection {
-        return $this->getUser()->securityQuestions;
-    }
-
     protected function createInventory() {
         $this->character->inventory()->create([
             'character_id' => $this->character->id,
         ]);
     }
 
+    /**
+     * Assign Base Skills
+     */
     protected function assignBaseSkills() {
         $accuracy = $this->createGameSkill(['name' => 'Accuracy']);
         $dodge    = $this->createGameSkill(['name' => 'Dodge']);

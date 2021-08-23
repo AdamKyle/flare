@@ -217,7 +217,7 @@ class KingdomResourcesService {
         ]);
 
         if (!$notify) {
-            $this->removeKingdomFromCache($character->user, $this->kingdom->refresh());
+            $this->removeKingdomFromCache($character, $this->kingdom->refresh());
         } else {
             $this->npcTookKingdom($character->user, $this->kingdom);
         }

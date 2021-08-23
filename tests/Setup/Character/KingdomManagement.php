@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\User;
+use App\Game\Core\Traits\KingdomCache;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
 use Tests\Traits\CreateKingdom;
@@ -16,7 +17,8 @@ class KingdomManagement {
     use CreateKingdom,
         CreateGameBuilding,
         CreateKingdomBuilding,
-        CreateGameUnit;
+        CreateGameUnit,
+        KingdomCache;
 
     /**
      * @var Character $charactr
@@ -53,6 +55,8 @@ class KingdomManagement {
             'character_id' => $this->character->id,
             'game_map_id'  => $this->character->map->game_map_id,
         ], $options));
+
+        $this->addKingdomToCache($this->character, $this->kingdom);
 
         return $this;
     }

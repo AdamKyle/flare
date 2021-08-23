@@ -127,8 +127,6 @@ class AttackServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
-        $this->assertEmpty($this->getKingdoms($defender->character));
-        $this->assertCount(2, $this->getKingdoms($character));
     }
 
     public function testTakeKingdomWhenMoraleIsAlreadyAtZero() {
@@ -170,8 +168,6 @@ class AttackServiceTest extends TestCase {
         $character = $character->refresh();
 
         $this->assertEquals(2, $character->kingdoms->count());
-        $this->assertEmpty($this->getKingdoms($defender->character));
-        $this->assertCount(2, $this->getKingdoms($character));
     }
 
     protected function createUnitMovement(Kingdom $defenderKingdom, Kingdom $attackingKingdom): UnitMovementQueue {

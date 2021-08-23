@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Models\Skill;
 use App\Flare\Models\UserSiteAccessStatistics;
 use App\Flare\Transformers\MarketItemsTransfromer;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
@@ -59,6 +60,8 @@ class AccountDeletionJob implements ShouldQueue
             $kingdomResourcesService->setKingdom($kingdom)->giveNPCKingdoms(false);
         }
 
+        $user->character->skills()->delete();
+
         $this->deleteCharacter($user->character);
 
         $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
@@ -101,39 +104,20 @@ class AccountDeletionJob implements ShouldQueue
                 $slot->delete();
             }
 
-            $inventorySets->delete();
+            $set->delete();
         }
     }
 
     protected function deleteCharacter(Character $character) {
-        foreach ($character->skills as $skill) {
-            $skill->delete();
-        }
+        $character->skills()->delete();
 
-        foreach ($character->adventureLogs as $log) {
-            $log->delete();
-        }
+        $character->adventureLogs()->delete();
 
-        foreach ($character->notifications as $notification) {
-            $notification->delete();
-        }
+        $character->notifications()->delete();
 
-        foreach ($character->snapShots as $snapShot) {
-            $snapShot->delete();
-        }
+        $character->snapShots()->delete();
 
         $character->map->delete();
-
-        foreach($character->kingdoms as $kingdom) {
-            $kingdom->update([
-                'character_id'   => null,
-                'npc_owned'      => true,
-                'current_morale' => 0.10
-            ]);
-
-            broadcast(new UpdateNPCKingdoms($kingdom->gameMap));
-            broadcast(new UpdateGlobalMap($character));
-        }
 
         $character->delete();
     }
