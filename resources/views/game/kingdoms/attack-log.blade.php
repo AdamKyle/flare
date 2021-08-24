@@ -10,7 +10,7 @@
 
     <x-tabs.pill-tabs-container>
         <x-tabs.tab tab="log" title="Log" selected="true" active="true" />
-        <x-tabs.tab tab="enemy" title="Enemy Data" selected="false" active="false" />
+        <x-tabs.tab tab="enemy" title="Enemy Data" selected="false" active="false" disabled="{{KingdomLogStatus::statusType($type)->tookKingdom()}}"/>
     </x-tabs.pill-tabs-container>
     <x-tabs.tab-content>
         <x-tabs.tab-content-section tab="log" active="true">
