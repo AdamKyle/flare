@@ -216,23 +216,36 @@ class ShopControllerTest extends TestCase
         $this->assertFalse(empty($questItems));
     }
 
+    public function testCanBulkBuy() {
+
+        $user = $this->character->updateCharacter(['gold' => 100000000])->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]),
+        [
+            'items' => [$this->item->id]
+        ])->response;
+
+        $response->assertSessionHas('success', 'Puchased all selected items.');
+    }
+
     public function testFailToBulkBuyWhenNoGold() {
 
         $user = $this->character->updateCharacter(['gold' => 0])->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id], [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
             'items' => [$this->item->id]
-        ]))->response;
+        ])->response;
 
         $response->assertSessionHas('error', 'You do not have enough gold.');
     }
 
+
     public function testFailToBulkBuyWhenNoItems() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id], [
+        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]),[
             'items' => []
-        ]))->response;
+        ])->response;
 
         $response->assertSessionHas('error', 'No items could be found. Did you select any?');
     }

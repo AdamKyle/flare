@@ -12,6 +12,7 @@ class InventoryManagement {
 
     private $characterFactory;
 
+    private $slotIds = [];
     /**
      * Constructor
      *
@@ -139,16 +140,33 @@ class InventoryManagement {
      * @return InventoryManagement
      */
     public function giveItem(Item $item, bool $equip = false, string $position = null): InventoryManagement {
-        $this->character->inventory->slots()->create([
+        $this->slotIds[] = $this->character->inventory->slots()->create([
             'inventory_id' => $this->character->inventory->id,
             'item_id'      => $item->id,
             'equipped'     => $equip,
             'position'     => $position,
-        ]);
+        ])->id;
 
         $this->character = $this->character->refresh();
 
         return $this;
+    }
+
+    /**
+     * Get the slot id of an item given to th character.
+     *
+     * You must first use the giveItem command, before calling this.
+     * The index param is the index of the array starting at 0.
+     *
+     * @param int $index
+     * @return int|null
+     */
+    public function getSlotId(int $index) {
+        if (isset($this->slotIds[$index])) {
+            return $this->slotIds[$index];
+        }
+
+        return null;
     }
 
     /**

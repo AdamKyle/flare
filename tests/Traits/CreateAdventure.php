@@ -5,12 +5,7 @@ namespace Tests\Traits;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
-use App\Flare\Values\BaseSkillValue;
-use Database\Seeders\GameSkillsSeeder;
-use Tests\Traits\CreateItem;
-use Tests\traits\CreateMonster;
 
 trait CreateAdventure {
 
@@ -45,9 +40,9 @@ trait CreateAdventure {
     }
 
     public function createLog(
-        Character $character, 
-        Adventure $adventure, 
-        bool $inProgress = false, 
+        Character $character,
+        Adventure $adventure,
+        bool $inProgress = false,
         int $lastCompletedLevel = 1
     ): AdventureLog {
 

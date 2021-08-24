@@ -62,12 +62,12 @@ class CharacterInventoryController extends Controller {
         $service = $characterInventoryService->setCharacter($character)
                                              ->setInventorySlot($itemToEquip)
                                              ->setPositions($validPositions->getPositions($itemToEquip->item))
-                                             ->setInventory($request);
+                                             ->setInventory($request->item_to_equip_type);
 
         $viewData = [
             'details'     => [],
             'itemToEquip' => $itemToEquip->item,
-            'type'        => $service->getType($request, $itemToEquip->item),
+            'type'        => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $request->item_to_equip_type : null),
             'slotId'      => $itemToEquip->id,
             'characterId' => $character->id,
             'bowEquipped' => false,
@@ -76,6 +76,7 @@ class CharacterInventoryController extends Controller {
         ];
 
         if ($service->inventory()->isNotEmpty()) {
+            dump('in here?');
             $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
 
 
@@ -85,7 +86,7 @@ class CharacterInventoryController extends Controller {
             $viewData = [
                 'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory(), $character),
                 'itemToEquip'  => $itemToEquip->item,
-                'type'         => $service->getType($request, $itemToEquip->item),
+                'type'         => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $request->item_to_equip_type : null),
                 'slotId'       => $itemToEquip->id,
                 'slotPosition' => $itemToEquip->position,
                 'characterId'  => $character->id,
@@ -139,14 +140,7 @@ class CharacterInventoryController extends Controller {
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
 
         if (is_null($foundItem)) {
-            // If there is no item, maybe it's apart of the inventory set?
-            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
-
-            if (is_null($inventorySet)) {
-                return redirect()->back()->with('error', 'No item found to be equipped.');
-            } else {
-                $foundItem = $inventorySet->slots->find($request->item_to_remove);
-            }
+            return redirect()->back()->with('error', 'No item found to be equipped.');
         }
 
         $foundItem->update([
@@ -197,7 +191,7 @@ class CharacterInventoryController extends Controller {
         }
 
         if ($slot->equipped) {
-            return redirect()->back()->with('error', 'Cannot destory equipped item.');
+            return redirect()->back()->with('error', 'Cannot destroy equipped item.');
         }
 
         $name = $slot ->item->affix_name;
@@ -262,8 +256,7 @@ class CharacterInventoryController extends Controller {
     }
 
     public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
-        $slot          = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
-        $itemAffixName = $slot->item->affix_name;
+        $slot = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
 
         if (is_null($slot)) {
             return redirect()->back()->with('error', 'Either the slot or the inventory set does not exist.');
@@ -291,8 +284,8 @@ class CharacterInventoryController extends Controller {
     }
 
     public function equipSet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
-        if ($character->id !== $inventorySet->character->id) {
-            return redirect()->back()->with('error', 'Invalid input.');
+        if (!$inventorySet->can_be_equipped) {
+            return redirect()->back()->with('error', 'Set cannot be equipped.');
         }
 
         $inventorySetService->equipInventorySet($character, $inventorySet);

@@ -143,6 +143,38 @@ class ItemsControllerTest extends TestCase
         $response->assertSessionHas('success', 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.');
     }
 
+    public function testCannotUseItemMaxBoons() {
+        $this->item->update([
+            'usable' => true,
+            'stat_increase' => true,
+            'increase_stat_by' => 0.08,
+            'lasts_for' => 10
+        ]);
+
+        $item = $this->item->refresh();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->inventoryManagement()->giveItem($item)->getCharacter();
+
+        for ($i = 1; $i <= 10; $i++) {
+            $this->createCharacterBoon([
+                'character_id' => $character->id,
+                'stat_bonus' => 0.08,
+                'started' => now(),
+                'complete' => now()->addHour(10),
+                'type' => ItemUsabilityType::STAT_INCREASE
+            ]);
+        }
+
+        $character = $character->refresh();
+
+        $response = $this->actingAs($character->user)->post(route('game.item.use', [
+            'character' => $character->id,
+            'item'      => $item->id,
+        ]))->response;
+
+        $response->assertSessionHas('error', 'You can only have a max of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.');
+    }
+
     public function testUseItemAffectsSkills() {
         $this->item->update([
             'usable' => true,

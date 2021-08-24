@@ -34,7 +34,7 @@ class ShopController extends Controller {
     public function shopSell(Character $character) {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
-        
+
         return view('game.core.shop.sell', [
             'isLocation' => !is_null($location),
             'gold'       => $character->gold,
@@ -75,6 +75,7 @@ class ShopController extends Controller {
             event(new BuyItemEvent($item, $character));
         }
 
+
         return redirect()->back()->with('success', 'Puchased all selected items.');
 
     }
@@ -96,7 +97,7 @@ class ShopController extends Controller {
         }
 
         event(new BuyItemEvent($item, $character));
-        
+
         return redirect()->back()->with('success', 'Purchased: ' . $item->affix_name . '.');
     }
 
@@ -105,7 +106,7 @@ class ShopController extends Controller {
         $inventorySlot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === (int) $request->slot_id && !$slot->equipped;
         })->first();
-        
+
         if (is_null($inventorySlot)) {
             return redirect()->back()->with('error', 'Item not found.');
         }
@@ -115,7 +116,7 @@ class ShopController extends Controller {
         event(new SellItemEvent($inventorySlot, $character));
 
         $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
-        
+
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 

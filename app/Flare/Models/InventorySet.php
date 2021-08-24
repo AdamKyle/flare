@@ -27,7 +27,10 @@ class InventorySet extends Model {
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'is_equipped'     => 'boolean',
+        'can_be_equipped' => 'boolean',
+    ];
 
     public function character() {
         return $this->belongsTo(Character::class);

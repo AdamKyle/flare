@@ -107,7 +107,7 @@ class CharacterFactory {
      *
      * @return InventorySetManagement
      */
-    public function InventorySetManagement(): InventorySetManagement {
+    public function inventorySetManagement(): InventorySetManagement {
 
         if (is_null($this->inventorySetManagement)) {
             $this->inventorySetManagement = new InventorySetManagement($this->character, $this);

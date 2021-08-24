@@ -67,38 +67,39 @@ class CharacterInventoryService {
      * @param Request $request
      * @return CharacterInventoryService
      */
-    public function setInventory(Request $request): CharacterInventoryService {
+    public function setInventory(string $type): CharacterInventoryService {
 
         if (empty($this->positions)) {
-            $this->inventory =  $this->getInventory($request);
+            $this->inventory =  $this->getInventory($type);
 
             return $this;
         }
 
-        $this->inventory = $this->getInventory($request, true);
+        $this->inventory = $this->getInventory($type, true);
 
         return $this;
     }
 
-    protected function getInventory(Request $request, bool $useArray = false) {
-        $inventory = $this->character->inventory->slots->filter(function($slot) use($request, $useArray) {
+    protected function getInventory(string $type, bool $useArray = false) {
+        $inventory = $this->character->inventory->slots->filter(function($slot) use($type, $useArray) {
             if ($useArray) {
                 return in_array($slot->position, $this->positions) && $slot->equipped;
             }
 
-            return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
+            return $slot->item->type === $type && $slot->equipped;
         });
 
         if ($inventory->isEmpty()) {
             $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
             if (!is_null($equippedSet)) {
-                $inventory = $equippedSet->slots->filter(function($slot) use($request, $useArray) {
+                $inventory = $equippedSet->slots->filter(function($slot) use($type, $useArray) {
                     if ($useArray) {
+                        dump($slot, $this->positions);
                         return in_array($slot->position, $this->positions) && $slot->equipped;
                     }
 
-                    return $slot->item->type === $request->item_to_equip_type && $slot->equipped;
+                    return $slot->item->type === $type && $slot->equipped;
                 });
             }
         }
@@ -122,9 +123,9 @@ class CharacterInventoryService {
      * @param Item $item
      * @return string
      */
-    public function getType(Request $request, Item $item): string {
-        if ($request->has('item_to_equip_type')) {
-            return $this->fetchType($request->item_to_equip_type);
+    public function getType(Item $item, string $type = null): string {
+        if (!is_null($type)) {
+            return $this->fetchType($type);
         }
 
         if ($item->type === 'bow') {
@@ -139,10 +140,6 @@ class CharacterInventoryService {
             'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour'
         ];
 
-        if (in_array($type, $acceptedTypes)) {
-            return $type;
-        }
-
-        return 'armour';
+        return in_array($type, $acceptedTypes) ? $type : 'armour';
     }
 }

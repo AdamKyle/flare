@@ -49,13 +49,9 @@ class InventorySetService {
             return $slot->item_id === $item->id;
         })->first();
 
-        if (is_null($slotWithItem)) {
-            return $this->errorResult('No such item found in this inventory set.');
-        }
-
         $character = $inventorySet->character;
 
-        if ($character->inventory_max === $character->inventory->slots->count()) {
+        if ($character->inventory_max < $character->inventory->slots->count()) {
             return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
         }
 

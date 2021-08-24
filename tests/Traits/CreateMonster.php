@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Values\BaseSkillValue;
-use Tests\Traits\CreateGameSkill;
 
 trait CreateMonster {
 
