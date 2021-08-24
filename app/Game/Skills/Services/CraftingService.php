@@ -114,7 +114,11 @@ class CraftingService {
 
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
         if ($this->attemptToPickUpItem($character, $item)) {
-            event(new UpdateSkillEvent($skill));
+
+            if (!$tooEasy) {
+                event(new UpdateSkillEvent($skill));
+            }
+
             $this->updateCharacterGold($character, $item->cost);
         }
     }

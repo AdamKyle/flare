@@ -57,7 +57,7 @@ class AlchemyServiceTest extends TestCase
 
         $response = $alchemyService->transmute($character, $item->id);
 
-        $this->assertCount(1, $response['items']);
+        $this->assertEquals(422, $response['status']);
     }
 
     public function testShardsCostIsTooMuch() {
@@ -70,7 +70,7 @@ class AlchemyServiceTest extends TestCase
 
         $response = $alchemyService->transmute($character, $item->id);
 
-        $this->assertCount(1, $response['items']);
+        $this->assertEquals(422, $response['status']);
     }
 
     public function testFailToTransmuteSkillLevelRequiredToHigh() {
