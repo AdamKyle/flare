@@ -36,6 +36,7 @@ class ItemTransfromer extends TransformerAbstract {
             'skill_bonus'          => $item->skill_bonus,
             'item_prefix'          => $item->itemPrefix,
             'item_suffix'          => $item->itemSuffix,
+            'usable'               => $item->usable,
             'crafting_type'        => $item->crafting_type,
             'skill_level_req'      => $item->skill_level_required,
             'skill_level_trivial'  => $item->skill_level_trivial,

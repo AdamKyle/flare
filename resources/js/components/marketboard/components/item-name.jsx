@@ -15,6 +15,10 @@ export default class ItemName extends React.Component {
       return 'one-enchant';
     }
 
+    if (this.props.item.usable) {
+      return 'usable-item';
+    }
+
     return 'normal-item';
   }
 

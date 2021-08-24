@@ -4,6 +4,7 @@ import ReactDatatable from '@ashvin27/react-datatable';
 import Card from '../game/components/templates/card';
 import MarketHistory from './market-history';
 import PurchaseModal from './purchase-modal';
+import ItemName from "./components/item-name";
 
 export default class Board extends Component {
   constructor(props) {
@@ -13,7 +14,12 @@ export default class Board extends Component {
       {
         key: "name",
         text: "Name",
-        sortable: true
+        sortable: true,
+        cell: row => <div data-tag="allowRowEvents">
+          <div>
+            <ItemName item={row} />
+          </div>
+        </div>,
       },
       {
         key: "type",

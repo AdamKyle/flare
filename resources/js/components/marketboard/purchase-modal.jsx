@@ -70,20 +70,23 @@ export default class PurchaseModal extends React.Component {
   }
 
   getCostPercentage() {
-    return (this.props.modalData.listed_price / this.state.item.cost) * 100;
+    return (this.props.modalData.listed_price / this.state.item.cost);
   }
 
   render() {
-    let percentage = 0;
+    let percentage = 0.0;
     let text = '';
 
     if (!this.state.loading) {
-      percentage = parseInt(this.getCostPercentage().toFixed(0)) || 0;
+      percentage = this.getCostPercentage();
     }
 
     if (percentage > 1.0) {
-      text = 'above';
+      text       = 'above';
+      percentage = percentage.toFixed(2) * 100;
     } else {
+      percentage = 100 - 100 * percentage.toFixed(2);
+
       if (percentage === 0.0) {
         text = 'far below'
       } else {
@@ -105,7 +108,7 @@ export default class PurchaseModal extends React.Component {
             {this.props.modalData.name}
             {this.state.loading ?
               <span className={'ml-2'} style={{fontSize: '16px', position: 'realitive', top: '-10px'}}>calculating ...</span> :
-              <span className={percentage > 1.0 ? 'text-danger' : 'text-success' + " ml-2"} style={{fontSize: '16px', position: 'relative', top: '-2px', left: '5px'}}>
+              <span className={percentage > 100.00 ? 'text-danger' : 'text-success' + " ml-2"} style={{fontSize: '16px', position: 'relative', top: '-2px', left: '5px'}}>
                 {percentage}% {text} base cost
               </span>
             }

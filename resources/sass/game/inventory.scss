@@ -38,6 +38,14 @@
   }
 }
 
+.usable-item {
+  color: #e32ca4;
+
+  &:hover, &:visited, &:focus {
+    color: #e32ca4;;
+  }
+}
+
 .color-gold {
   color: $gold;
 }
