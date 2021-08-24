@@ -70,16 +70,12 @@
   left: 10px;
 }
 
-@include media-breakpoint-down(md) {
-  .map-card {
-    width: 75%;
-    margin: 0 auto;
-  }
+.map-card {
+  max-width: 500px;
 }
 
-@include media-breakpoint-down(sm) {
+.center-element {
   .map-card {
-    width: 100%;
-    margin: 0;
+    margin: 0 auto;
   }
 }
