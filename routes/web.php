@@ -22,6 +22,7 @@ Route::get('/information/locations/{location}', ['as' => 'info.page.location', '
 Route::get('/information/unit/{unit}', ['as' => 'info.page.unit', 'uses' => 'InfoPageController@viewUnit']);
 Route::get('/information/item/{item}', ['as' => 'info.page.item', 'uses' => 'InfoPageController@viewItem']);
 Route::get('/information/affix/{affix}', ['as' => 'info.page.affix', 'uses' => 'InfoPageController@viewAffix']);
+Route::get('/information/map/{map}', ['as' => 'info.page.map', 'uses' => 'InfoPageController@viewMap']);
 
 Route::get('/releases', ['as' => 'releases.list', 'uses' => 'ReleasesController@index']);
 

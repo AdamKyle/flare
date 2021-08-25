@@ -17,7 +17,14 @@ return [
     'equipment'         => [],
     'traverse'          => [],
     'teleport'          => [],
-    'planes'            => [],
+    'planes'            => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.maps.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+        ]
+    ],
     'celestials'        => [],
     'disenchanting'     => [],
     'npc-kingdoms'      => [],

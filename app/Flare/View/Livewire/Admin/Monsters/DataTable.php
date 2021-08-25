@@ -15,6 +15,8 @@ class DataTable extends Component
     use WithPagination, WithSorting;
 
     public $adventureId = null;
+    public $onlyMapName = null;
+    public $withCelestials = false;
     public $search      = '';
     public $sortField   = 'max_level';
     public $perPage     = 10;
@@ -38,7 +40,15 @@ class DataTable extends Component
             })->select('monsters.*');
         }
 
+        if (!is_null($this->onlyMapName)) {
+            $monsters = $monsters->join('game_maps', function($join) {
+                $join->on('game_maps.id', 'monsters.game_map_id')
+                    ->where('game_maps.name', $this->onlyMapName);
+            })->select('monsters.*');
+        }
+
         return $monsters->where('published', $this->published)
+                        ->where('is_celestial_entity', $this->withCelestials)
                         ->orderBy($this->sortField, $this->sortBy)
                         ->paginate($this->perPage);
     }

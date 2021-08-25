@@ -9,7 +9,7 @@
             link="Back"
             color="primary"
         >
-        <x-item-display-color :item="$item" />
+            <x-item-display-color :item="$item" />
         </x-core.page-title-slot>
         <hr />
         @if ($item->market_sellable)

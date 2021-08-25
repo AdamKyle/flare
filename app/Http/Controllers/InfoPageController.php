@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
+use App\Flare\Values\ItemEffectsValue;
 use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\Adventure;
@@ -95,6 +97,27 @@ class InfoPageController extends Controller
     public function viewClass(Request $request, GameClass $class) {
         return view('information.classes.class', [
             'class' => $class,
+        ]);
+    }
+
+    public function viewMap(GameMap $map) {
+
+        $effects = '';
+
+        switch ($map->name) {
+            case 'Labyrinth':
+                $effects = ItemEffectsValue::LABYRINTH;
+                break;
+            case 'Dungeons':
+                $effects = ItemEffectsValue::DUNGEON;
+            default:
+                $effects = '';
+        }
+
+        return view('information.maps.map', [
+            'map' => $map,
+            'itemNeeded' => Item::where('effect', $effects)->first(),
+            'mapUrl' => Storage::disk('maps')->url($map->path),
         ]);
     }
 
