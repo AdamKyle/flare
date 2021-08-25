@@ -71,15 +71,15 @@ class KingdomsControllerTest extends TestCase
         $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
             'character' => Character::first()->id
         ]), [
-            'x_position'     => 16,
-            'y_position'     => 16,
+            'x_position'     => 496,
+            'y_position'     => 496,
             'name'           => 'Apple Sauce',
             'color'          => [193, 66, 66, 1],
             'kingdom_amount' => 0
         ])->response;
 
         $content = json_decode($response->content());
-
+        
         $this->assertEquals(200, $response->status());
         $this->assertTrue(Cache::has('character-kingdoms-Sample-' . $this->character->getCharacter()->id));
 
