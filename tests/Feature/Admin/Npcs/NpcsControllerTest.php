@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\Admin\Npcs;
 
+use App\Admin\Exports\Npcs\NpcsExport;
 use App\Flare\Values\NpcCommandTypes;
-use Event;
-use Mail;
-use Queue;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Mail\GenericMail;
 use Tests\TestCase;
-use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateUser;
@@ -72,5 +70,13 @@ class NpcsControllerTest extends TestCase
         $this->actingAs($this->user)->visit(route('npcs.edit', [
             'npc' => $this->npc
         ]))->see($this->npc->name);
+    }
+
+    public function testCanSeeExportNpcs() {
+        $this->actingAs($this->user)->visitRoute('npcs.export')->see('Export NPC Data');
+    }
+
+    public function testCanSeeImportNpcs() {
+        $this->actingAs($this->user)->visitRoute('npcs.import')->see('Import NPC Data');
     }
 }

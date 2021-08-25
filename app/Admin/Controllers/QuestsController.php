@@ -51,6 +51,9 @@ class QuestsController extends Controller {
         return view('admin.quests.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new QuestsExport, 'quests.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -58,6 +61,9 @@ class QuestsController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function import(QuestsImportRequest $request) {
         Excel::import(new QuestsImport, $request->quests_import);
 

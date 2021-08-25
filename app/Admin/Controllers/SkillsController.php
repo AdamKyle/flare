@@ -43,6 +43,9 @@ class SkillsController extends Controller {
         return view('admin.skills.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new SkillsExport, 'skills.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -50,6 +53,9 @@ class SkillsController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(SkillsImport $request) {
         Excel::import(new ExcelImportSkills, $request->skills_import, null, \Maatwebsite\Excel\Excel::XLSX);
 

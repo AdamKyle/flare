@@ -53,6 +53,9 @@ class ItemsController extends Controller {
         return view('admin.items.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export(Request $request) {
         $response = Excel::download(new ItemsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -60,6 +63,9 @@ class ItemsController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(ItemsImportRequest $request) {
         Excel::import(new ItemsImport, $request->items_import);
 

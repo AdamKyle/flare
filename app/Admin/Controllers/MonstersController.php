@@ -50,6 +50,9 @@ class MonstersController extends Controller {
         return view('admin.monsters.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new MonstersExport, 'monsters.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -57,6 +60,9 @@ class MonstersController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(MonstersImportRequest $request) {
         Excel::import(new MonstersImport, $request->monsters_import);
 

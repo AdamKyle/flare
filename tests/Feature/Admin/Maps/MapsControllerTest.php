@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use App\Flare\Models\GameMap;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateRole;
 use Tests\Setup\Character\CharacterFactory;
@@ -15,7 +16,8 @@ class MapsControllerTest extends TestCase
 {
     use RefreshDatabase,
         CreateUser,
-        CreateRole;
+        CreateRole,
+        CreateGameMap;
 
     private $user;
 
@@ -76,5 +78,47 @@ class MapsControllerTest extends TestCase
         $user = (new CharacterFactory)->createBaseCharacter()->getUser();
 
         $this->actingAs($user)->visit(route('game'))->visit(route('maps.upload'))->dontSee('Upload Map')->see('You don\'t have permission to view that.');
+    }
+
+    public function testViewCreateMapBonusesForm() {
+        $gameMap = $this->createGameMap();
+
+        $this->actingAs($this->user)
+            ->visit(route('map.bonuses', ['gameMap' => $gameMap]))
+            ->see('Map Bonuses');
+    }
+
+    public function testSaveMapBonuses() {
+        $gameMap = $this->createGameMap();
+
+        $this->actingAs($this->user)
+            ->visit(route('map.bonuses', ['gameMap' => $gameMap]))
+            ->see('Map Bonuses')
+            ->submitForm('Submit', [
+                'xp_bonus'             => .20,
+                'skill_training_bonus' => .20,
+                'drop_chance_bonus'    => .30,
+                'enemy_stat_bonus'     => .34,
+            ])->see($gameMap->name . ' now has bonuses.');
+
+        $gameMap = $gameMap->refresh();
+
+        $this->assertEquals(.20, $gameMap->xp_bonus);
+    }
+
+    public function testCanSeeMapBonuses() {
+
+        $gameMap = $this->createGameMap([
+            'xp_bonus'             => .20,
+            'skill_training_bonus' => .20,
+            'drop_chance_bonus'    => .30,
+            'enemy_stat_bonus'     => .34,
+        ]);
+
+        $this->actingAs($this->user)
+            ->visit(route('view.map.bonuses', ['gameMap' => $gameMap]))
+            ->see('Map Bonuses')
+            ->see('XP Bonus:')
+            ->see('20%');
     }
 }

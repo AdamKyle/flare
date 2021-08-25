@@ -48,6 +48,9 @@ class NpcsController extends Controller {
         return view('admin.npcs.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new NpcsExport(), 'npcs.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -55,6 +58,9 @@ class NpcsController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function import(NpcsImportRequest $request) {
         Excel::import(new NpcsImport, $request->npcs_import);
 

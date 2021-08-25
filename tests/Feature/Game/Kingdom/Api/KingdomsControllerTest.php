@@ -79,7 +79,7 @@ class KingdomsControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-        
+
         $this->assertEquals(200, $response->status());
         $this->assertTrue(Cache::has('character-kingdoms-Sample-' . $this->character->getCharacter()->id));
 

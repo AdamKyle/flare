@@ -16,10 +16,14 @@ class KingdomsController extends Controller {
         return view('admin.kingdoms.export');
     }
 
+
     public function import() {
         return view('admin.kingdoms.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new KingdomsExport, 'kingdoms.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -27,6 +31,9 @@ class KingdomsController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(KingdomImportRequest $request) {
 
         if (GameBuilding::count() > 1) {

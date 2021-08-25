@@ -56,6 +56,9 @@ class AffixesController extends Controller {
         return view('admin.affixes.import');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function export() {
         $response = Excel::download(new AffixesExport, 'affixes.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
@@ -63,6 +66,9 @@ class AffixesController extends Controller {
         return $response;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function importData(AffixesImportRequest $request) {
         Excel::import(new AffixesImport, $request->affixes_import);
 
