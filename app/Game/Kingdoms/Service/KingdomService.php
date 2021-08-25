@@ -97,13 +97,8 @@ class KingdomService {
         $downLeft  = Location::where('x', $x - 16)->where('y', $y + 16)->where('game_map_id', $character->map->game_map_id)->first();
         $downRight = Location::where('x', $x + 16)->where('y', $y + 16)->where('game_map_id', $character->map->game_map_id)->first();
 
-        if (!is_null($up) || !is_null($down) || !is_null($left) || !is_null($right) ||
-            !is_null($upLeft) || !is_null($upRight) || !is_null($downLeft) || !is_null($downRight))
-        {
-            return false;
-        }
-
-        return true;
+        return (!is_null($up) || !is_null($down) || !is_null($left) || !is_null($right) ||
+            !is_null($upLeft) || !is_null($upRight) || !is_null($downLeft) || !is_null($downRight));
     }
 
     /**

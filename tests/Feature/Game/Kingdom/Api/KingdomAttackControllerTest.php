@@ -2,14 +2,17 @@
 
 namespace Tests\Feature\Game\Kingdom\Api;
 
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\KingdomLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 
 class KingdomAttackControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, CreateItem;
 
     private $character;
 
@@ -306,6 +309,68 @@ class KingdomAttackControllerTest extends TestCase
         $this->assertEquals(200, $response->status());
 
         $this->assertNotEmpty($content);
+    }
+
+    public function testGetKingdomsWithUnitsWithUsableItems() {
+        $item = $this->createItem([
+            'name'                => 'test',
+            'type'                => 'alchemy',
+            'base_damage'         => 10,
+            'cost'                => 100,
+            'crafting_type'       => 'alchemy',
+            'description'         => 'sample',
+            'can_resurrect'       => false,
+            'resurrection_chance' => 0.0,
+            'usable'              => true,
+            'damages_kingdoms'    => true,
+        ]);
+
+        $this->character->getCharacterFactory()->inventoryManagement()->giveItem($item);
+
+        $response = $this->actingAs($this->character->getUser())->json('GET', route('kingdoms.with.units', [
+            'character' => $this->character->getCharacter()->id
+        ]))->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(200, $response->status());
+        $this->assertNotEmpty($content->items);
+        $this->assertNotEmpty($content);
+    }
+
+    public function testDropItemsOnKingdom() {
+        $item = $this->createItem([
+            'name'                => 'test',
+            'type'                => 'alchemy',
+            'base_damage'         => 10,
+            'cost'                => 100,
+            'crafting_type'       => 'alchemy',
+            'description'         => 'sample',
+            'can_resurrect'       => false,
+            'resurrection_chance' => 0.0,
+            'usable'              => true,
+            'damages_kingdoms'    => true,
+            'kingdom_damage'      => 0.10,
+        ]);
+
+        $this->character->getCharacterFactory()->inventoryManagement()->giveItemMultipleTimes($item, 100);
+
+        $character = $this->character->getCharacter();
+
+        $slotIds = $character->inventory->slots->filter(function($slot) {
+           return $slot->item->damages_kingdoms;
+        })->take(20)->pluck('id');
+
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.attack-with-items', [
+            'character' => $this->character->getCharacter()->id
+        ]), [
+            'slots_selected' => $slotIds,
+            'defender_id'    => $this->createEnemyKingdom()->id,
+        ])->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertTrue(KingdomLog::all()->isNotEmpty());
     }
 
     protected function createEnemyKingdom(): Kingdom {

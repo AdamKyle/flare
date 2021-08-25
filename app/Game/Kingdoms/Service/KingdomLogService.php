@@ -69,7 +69,7 @@ class KingdomLogService {
         $oldDefender = $this->log->old_defender;
         $newDefender = $this->log->new_defender;
 
-        if ($value->kingdomWasAttacked()) {
+        if ($value->kingdomWasAttacked() || $value->bombsDropped()) {
             $kingdomAttacked   = $this->kingdomAttacked->setLog($this->log);
 
             $data['kingdom']   = $this->fetchKingdomInformation($oldDefender, $newDefender);

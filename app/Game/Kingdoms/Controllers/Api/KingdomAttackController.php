@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
+use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Requests\UseItemsRequest;
@@ -78,10 +80,10 @@ class KingdomAttackController extends Controller {
             $slot->delete();
         }
 
-        $kingdom = Kingdom::find($request->defender_id);
-
-        $buildings = $kingdom->buildings;
-        $units     = $kingdom->units;
+        $kingdom    = Kingdom::with('buildings', 'units')->find($request->defender_id);
+        $oldKingdom = $kingdom;
+        $buildings  = $kingdom->buildings;
+        $units      = $kingdom->units;
 
         foreach ($buildings as $building) {
             $newDurability =  round($building->current_durability - ($building->current_durability * $damageToKingdom));
@@ -109,10 +111,18 @@ class KingdomAttackController extends Controller {
             ]);
         }
 
+        KingdomLog::create([
+            'character_id'    => $kingdom->character->id,
+            'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
+            'old_defender'    => $oldKingdom->toArray(),
+            'new_defender'    => $kingdom->refresh()->toArray(),
+            'published'       => true,
+        ]);
+
         if (!is_null($kingdom->character_id)) {
             $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position .
                 '/' . $kingdom->y_position . ' on the ' .
-                $kingdom->gameMap->name . ' plane, has had an item dropped on it doing: ' . ($damageToKingdom * 100) . '% to Buildings and Units.';
+                $kingdom->gameMap->name . ' plane, has had an item dropped on it doing: ' . ($damageToKingdom * 100) . '% to Buildings and Units. Check your Attack logs for more info!';
 
             $notifyHandler->sendMessage($kingdom->character->user, 'kingdom-attacked', $message);
         }

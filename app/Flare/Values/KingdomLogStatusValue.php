@@ -15,6 +15,7 @@ class KingdomLogStatusValue {
     const LOST_KINGDOM     = 'lost kingdom';
     const KINGDOM_ATTACKED = 'kingdom attacked';
     const UNITS_RETURNING  = 'units returning';
+    const BOMBS_DROPPED    = 'bombs dropped';
 
     /**
      * @var string[] $values
@@ -26,6 +27,7 @@ class KingdomLogStatusValue {
         self::LOST_KINGDOM     => 'lost kingdom',
         self::KINGDOM_ATTACKED => 'kingdom attacked',
         self::UNITS_RETURNING  => 'units returning',
+        self::BOMBS_DROPPED    => 'bombs dropped'
     ];
 
     /**
@@ -96,5 +98,14 @@ class KingdomLogStatusValue {
      */
     public function unitsReturning(): bool {
         return $this->value === self::UNITS_RETURNING;
+    }
+
+    /**
+     * Were the bombs dropped?
+     *
+     * @return bool
+     */
+    public function bombsDropped(): bool {
+        return $this->value === self::BOMBS_DROPPED;
     }
 }

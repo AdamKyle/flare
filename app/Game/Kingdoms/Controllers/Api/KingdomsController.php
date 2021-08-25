@@ -50,7 +50,7 @@ class KingdomsController extends Controller {
         $kingdom = Kingdom::where('name', $request->name)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {
-            return respone()->json(['message' => 'Name is taken'], 422);
+            return response()->json(['message' => 'Name is taken'], 422);
         }
 
         $kingdomService->setParams($request->all(), $character);
@@ -160,7 +160,7 @@ class KingdomsController extends Controller {
 
         if ($request->amount <= 0) {
             return response()->json([
-                'message' => "Too few units to recuit."
+                'message' => "Too few units to recruit."
             ], 422);
         }
 

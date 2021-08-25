@@ -153,6 +153,26 @@ class InventoryManagement {
     }
 
     /**
+     * Give the same item multiple times.
+     *
+     * @param Item $item
+     * @param int $amount
+     * @return $this
+     */
+    public function giveItemMultipleTimes(Item $item, $amount = 1): InventoryManagement {
+        for ($i = 1; $i <= $amount; $i++) {
+            $this->slotIds[] = $this->character->inventory->slots()->create([
+                'inventory_id' => $this->character->inventory->id,
+                'item_id'      => $item->id,
+            ])->id;
+        }
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
      * Get the slot id of an item given to th character.
      *
      * You must first use the giveItem command, before calling this.

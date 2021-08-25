@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Kingdom\Api;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use DB;
 use Mail;
 use Cache;
@@ -14,7 +15,6 @@ use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Mail\RecruitedUnits;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
@@ -87,6 +87,31 @@ class KingdomsControllerTest extends TestCase
         $this->assertTrue(
             $this->character->getCharacter()->kingdoms->first()->buildings->isNotEmpty()
         );
+    }
+
+    public function testCannotSettleKingdomWithSameName() {
+        $this->createGameBuilding();
+
+        $this->createKingdom([
+            'character_id' => $this->character->getCharacter()->id,
+            'name' => 'Apple Sauce',
+            'game_map_id' => GameMap::first()->id,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.settle', [
+            'character' => Character::first()->id
+        ]), [
+            'x_position'     => 16,
+            'y_position'     => 16,
+            'name'           => 'Apple Sauce',
+            'color'          => [193, 66, 66, 1],
+            'kingdom_amount' => 0
+        ])->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals('Name is taken', $content->message);
     }
 
     public function testCannotAffordToSettleKingdom() {
@@ -548,6 +573,38 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals("You don't have the resources.", $content->message);
     }
 
+    public function testFailToUpgradeMaxLevel() {
+        $this->createKingdom([
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
+        ]);
+
+        $gameBuilding = $this->createGameBuilding([
+            'is_resource_building' => true,
+            'max_level' => 1
+        ]);
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => $gameBuilding->id,
+            'kingdom_id'         => Kingdom::first()->id,
+            'level'              => 1,
+            'current_defence'    => $gameBuilding->base_defence,
+            'current_durability' => $gameBuilding->base_durability,
+            'max_defence'        => $gameBuilding->base_defence,
+            'max_durability'     => $gameBuilding->base_durability,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdoms.building.upgrade', [
+            'character' => Character::first()->id,
+            'building'  => KingdomBuilding::first()->id,
+        ]))->response;
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals(422, $response->status());
+        $this->assertEquals("Building is already max level.", $content->message);
+    }
+
     public function testRecruitUnit() {
         $kingdom = $this->createKingdom([
             'character_id'       => Character::first()->id,
@@ -754,7 +811,71 @@ class KingdomsControllerTest extends TestCase
 
         $kingdom = $kingdom->refresh();
 
-        $this->assertEquals('Too few units to recuit.', $content->message);
+        $this->assertEquals('Too few units to recruit.', $content->message);
+    }
+
+    public function testFailToRecruitMoreThenMax() {
+        $kingdom = $this->createKingdom([
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
+            'current_stone'      => 1000,
+            'current_wood'       => 1000,
+            'current_clay'       => 1000,
+            'current_iron'       => 1000,
+            'current_population' => 100,
+        ]);
+
+        $this->createGameUnit();
+
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
+        ]), [
+            'amount' => KingdomMaxValue::MAX_UNIT + 1000
+        ])->response;
+
+        $this->assertEquals(422, $response->status());
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('Too many units', $content->message);
+    }
+
+    public function testFailToRecruitAlreadyAtMax() {
+        $kingdom = $this->createKingdom([
+            'character_id'       => Character::first()->id,
+            'game_map_id'        => GameMap::first()->id,
+            'current_stone'      => 1000,
+            'current_wood'       => 1000,
+            'current_clay'       => 1000,
+            'current_iron'       => 1000,
+            'current_population' => 100,
+        ]);
+
+        $gameUnit = $this->createGameUnit();
+
+        $kingdom->units()->create([
+            'kingdom_id' => $kingdom->id,
+            'game_unit_id' => $gameUnit->id,
+            'amount' => KingdomMaxValue::MAX_UNIT,
+        ]);
+
+        $user = $this->character->getUser();
+
+        $response = $this->actingAs($user)->json('POST', route('kingdoms.recruit.units', [
+            'kingdom'  => Kingdom::first()->id,
+            'gameUnit' => GameUnit::first()->id,
+        ]), [
+            'amount' => 10
+        ])->response;
+
+        $this->assertEquals(422, $response->status());
+
+        $content = json_decode($response->content());
+
+        $this->assertEquals('Too many units', $content->message);
     }
 
     public function testNotEnoughResourcesToRecruit() {

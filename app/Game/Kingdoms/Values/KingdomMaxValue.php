@@ -14,8 +14,4 @@ class KingdomMaxValue {
     public static function isTreasuryAtMax(Kingdom $kingdom): bool {
         return $kingdom->treasury === self::MAX_TREASURY;
     }
-
-    public static function canRecruitMoreUnits(KingdomUnit $unit): bool {
-        return $unit->amount !== self::MAX_UNIT;
-    }
 }
