@@ -29,22 +29,12 @@ trait ClassBasedBonuses {
         if ($classType->isProphet()) {
             $class = $character->class;
 
-            $healingSpellsEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
-                return $slot->item->type === 'spell-healing' && $slot->equipped;
-            })->isNotEmpty();
-
-            if ($healingSpellsEquipped) {
+            if ($this->prophetHasHealingSpells($character)) {
                 $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_healing_mod');
             }
         }
 
         return $classBonus;
-    }
-
-    public function prophetHasHealingSpells(Character $character): bool {
-        return $this->getEquippedInventory($character)->slots->filter(function($slot) {
-            return $slot->item->type === 'spell-healing' && $slot->equipped;
-        })->isNotEmpty();
     }
 
     /**
@@ -63,16 +53,24 @@ trait ClassBasedBonuses {
         if ($classType->isProphet()) {
             $class = $character->class;
 
-            $healingSpellsEquipped = $this->getEquippedInventory($character)->slots->filter(function($slot) {
-                return $slot->item->type === 'spell-healing' && $slot->equipped;
-            })->isNotEmpty();
-
-            if ($healingSpellsEquipped) {
+            if ($this->prophetHasHealingSpells($character)) {
                 $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
             }
         }
 
         return $classBonus;
+    }
+
+    /**
+     * Does the prophet have healing spells equipped?
+     *
+     * @param Character $character
+     * @return bool
+     */
+    public function prophetHasHealingSpells(Character $character): bool {
+        return $this->getEquippedInventory($character)->slots->filter(function($slot) {
+            return $slot->item->type === 'spell-healing' && $slot->equipped;
+        })->isNotEmpty();
     }
 
     /**

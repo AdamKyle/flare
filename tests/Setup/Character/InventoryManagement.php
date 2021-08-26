@@ -159,11 +159,13 @@ class InventoryManagement {
      * @param int $amount
      * @return $this
      */
-    public function giveItemMultipleTimes(Item $item, $amount = 1): InventoryManagement {
+    public function giveItemMultipleTimes(Item $item, int $amount = 1, bool $equip = false, string $position = null): InventoryManagement {
         for ($i = 1; $i <= $amount; $i++) {
             $this->slotIds[] = $this->character->inventory->slots()->create([
                 'inventory_id' => $this->character->inventory->id,
                 'item_id'      => $item->id,
+                'equipped'     => $equip,
+                'position'     => $position,
             ])->id;
         }
 

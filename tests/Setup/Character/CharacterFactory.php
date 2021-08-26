@@ -2,6 +2,7 @@
 
 namespace Tests\Setup\Character;
 
+use App\Flare\Models\GameClass;
 use Str;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameMap;
@@ -45,12 +46,18 @@ class CharacterFactory {
      * - Base Skills: Accuracy, Looting and Dodge.
      *
      * @param array $raceOptions
-     * @param array $classOptions
+     * @param array|GameClass $classOptions
      * @return CharacterFactory
      */
-    public function createBaseCharacter(array $raceOptions = [], array $classOptions = []): CharacterFactory {
+    public function createBaseCharacter(array $raceOptions = [], array|GameClass $classOptions = []): CharacterFactory {
         $race  = $this->createRace($raceOptions);
-        $class = $this->createClass($classOptions);
+
+        if ($classOptions instanceof GameClass) {
+            $class = $classOptions;
+        } else {
+            $class = $this->createClass($classOptions);
+        }
+
         $user  = $this->createUser();
 
         $this->character = $this->createCharacter([
@@ -311,17 +318,19 @@ class CharacterFactory {
      *
      * @param GameSkill $skill
      * @param int $level | 1
+     * @param bool $locked
+     * @param array $options
      * @return characterFactory
      */
-    public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false): CharacterFactory {
-        $this->character->skills()->create([
+    public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false, array $options = []): CharacterFactory {
+        $this->character->skills()->create(array_merge([
             'game_skill_id' => $skill->id,
             'character_id'  => $this->character->id,
             'level'         => $level,
             'xp'            => 0,
             'xp_max'        => 100,
             'is_locked'     => $locked,
-        ]);
+        ], $options));
 
         return $this;
     }

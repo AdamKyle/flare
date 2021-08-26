@@ -2,13 +2,13 @@
 
 namespace App\Flare\Traits\Controllers;
 
+use Auth;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Values\SkillTypeValue;
 
@@ -19,7 +19,7 @@ trait ItemsShowInformation {
         $skills  = [];
         $skill   = null;
 
-        if (!is_null($item->effects)) {
+        if (!is_null($item->effect)) {
             $effect = new ItemEffectsValue($item->effect);
 
             if ($effect->walkOnWater()) {
@@ -31,7 +31,11 @@ trait ItemsShowInformation {
             }
 
             if ($effect->dungeon()) {
-                $effects = 'Use Traverse (beside movement actions) to traverse to Dungeon plane';
+                $effects = 'Use Traverse (beside movement actions) to traverse to Dungeons plane';
+            }
+
+            if ($effect->walkOnDeathWater()) {
+                $effects = 'Walk on Water (Aka: Death Water) in Dungeons Plane';
             }
         }
 
@@ -50,7 +54,7 @@ trait ItemsShowInformation {
 
 
         if ($item->usable) {
-            if (auth()->user()->hasRole('Admin')) {
+            if (Auth::guest() || auth()->user()->hasRole('Admin')) {
                 $skill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
             } else if (auth()->user()) {
                 $skill = auth()->user()->character->skills->filter(function($skill) {
