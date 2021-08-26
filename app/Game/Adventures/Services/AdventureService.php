@@ -2,7 +2,6 @@
 
 namespace App\Game\Adventures\Services;
 
-use App\Game\Adventures\Jobs\AdventureJob;
 use Mail;
 use Cache;
 use App\Flare\Models\Adventure;
@@ -85,8 +84,8 @@ class AdventureService {
      * @param int $maxLevel
      * @return void
      */
-    public function processAdventure(int $currentLevel, int $maxLevel, bool $characterModeling = false): void {
-        $this->processLevel($currentLevel, $maxLevel, $characterModeling);
+    public function processAdventure(int $currentLevel, int $maxLevel): void {
+        $this->processLevel($currentLevel, $maxLevel);
     }
 
     /**
@@ -112,7 +111,7 @@ class AdventureService {
         }
     }
 
-    protected function processLevel(int $currentLevel, int $maxLevel, bool $characterModeling = false): void {
+    protected function processLevel(int $currentLevel, int $maxLevel): void {
         $attackService = resolve(AdventureFightService::class, [
             'character' => $this->character,
             'adventure' => $this->adventure,
@@ -127,18 +126,15 @@ class AdventureService {
         $attackService = $attackService->processBattle();
 
         if ($attackService->isCharacterDead()) {
-            $this->characterIsDead($attackService, $adventureLog, $currentLevel, $characterModeling);
+            $this->characterIsDead($attackService, $adventureLog, $currentLevel);
 
             return;
         }
 
         if ($attackService->isMonsterDead()) {
-            $this->monsterIsDead($attackService, $adventureLog, $characterModeling);
+            $this->monsterIsDead($attackService, $adventureLog);
 
             if ($this->adventure->levels === $currentLevel) {
-                if ($characterModeling) {
-                    return;
-                }
 
                 $this->adventureIsOver($adventureLog, $currentLevel);
 
@@ -147,11 +143,8 @@ class AdventureService {
         }
 
         if ($attackService->tooLong()) {
-            if ($characterModeling) {
-                $this->setCharacterModelingLogs($attackService, false, true);
-            }
 
-            $this->adventureTookToLong($attackService, $adventureLog, $characterModeling);
+            $this->adventureTookToLong($attackService, $adventureLog);
 
             $this->adventureIsOver($adventureLog, $currentLevel, true);
 
@@ -161,10 +154,7 @@ class AdventureService {
         $attackService->resetLogInfo();
     }
 
-    protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog, bool $characterModeling = false) {
-        if ($characterModeling) {
-            return $this->setCharacterModelingLogs($attackService, false, true);
-        }
+    protected function adventureTookToLong(FightService $attackService, AdventureLog $adventureLog) {
 
         Cache::delete('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
@@ -190,11 +180,7 @@ class AdventureService {
         }
     }
 
-    protected function characterIsDead(FightService $attackService, AdventureLog $adventureLog, int $level, bool $characterModeling = false) {
-
-        if ($characterModeling) {
-            return $this->setCharacterModelingLogs($attackService, true);
-        }
+    protected function characterIsDead(FightService $attackService, AdventureLog $adventureLog, int $level) {
 
         Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
@@ -229,11 +215,7 @@ class AdventureService {
         event(new CreateAdventureNotificationEvent($adventureLog->refresh()));
     }
 
-    protected function monsterIsDead(FightService $attackService, AdventureLog $adventureLog = null, bool $characterModeling = false) {
-        if ($characterModeling) {
-            $this->setCharacterModelingLogs($attackService);
-            return;
-        }
+    protected function monsterIsDead(FightService $attackService, AdventureLog $adventureLog = null) {
 
         $monster     = $attackService->getMonster();
         $xpReduction = 0.0;
@@ -258,10 +240,6 @@ class AdventureService {
         }
 
         $this->rewards['exp'] += $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction) * ($xpBonus > 2 ? $xpBonus : (1 + $xpBonus));
-
-        $drop      = null;
-        $questDrop = null;
-        $gold      = 0;
 
         $dropChanceBonus   = 0.0;
 
@@ -290,19 +268,6 @@ class AdventureService {
         $this->rewards['gold'] += $gold;
 
         $this->setLogs($attackService, $adventureLog);
-    }
-
-    protected function setCharacterModelingLogs(FightService $attackService, bool $dead = false, bool $tookTooLong = false) {
-        if (empty($this->logInformation)) {
-            $this->logInformation[$this->name] = [
-                'logs'  => $attackService->getLogInformation(),
-                'character_dead' => $dead,
-                'took_to_long' => $tookTooLong,
-            ];
-        } else {
-            $this->logInformation[$this->name]['logs'][] = $attackService->getLogInformation();
-            $this->logInformation[$this->name]['took_too_long'] = $tookTooLong;
-        }
     }
 
     protected function setLogs(FightService $attackService, AdventureLog $adventureLog) {

@@ -12,7 +12,6 @@ use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
 use App\Admin\Console\Commands\GiveKingdomsToNpcs;
-use App\Charts\BattleSimulationChart;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -53,7 +52,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $router = $this->app['router'];
 
         $charts->register([
-            BattleSimulationChart::class,
             AllCharacterGoldChart::class,
         ]);
 

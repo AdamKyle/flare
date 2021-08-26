@@ -18,12 +18,12 @@ class UpdateCharacterStatsService {
 
     /**
      * Updates the characters racial stats.
-     * 
+     *
      * Will update all characters with their racial stats. We start by subtracting the old race modifier and apply the new racial modifier.
      * Because racial modifiers only get applied once, we don thave to worry about the characters stats being messed up.
-     * 
+     *
      * Characters do not get told of racial stat adjustments, how ever their top bar will be updated.
-     * 
+     *
      * @param GameRace $oldRace
      * @param GameRace $newRace
      * @return void
@@ -31,18 +31,10 @@ class UpdateCharacterStatsService {
     public function updateRacialStats(GameRace $oldRace, GameRace $newRace): void {
         Character::where('game_race_id', $newRace->id)->chunkById(1000, function($characters) use($oldRace, $newRace) {
             foreach ($characters as $character) {
-                if ($character->user->is_test) {
-                    if (!Cache::has('updating-test-characters')) {
-                        Cache::put('updating-test-characters', true);
-                    }
+                $character = $this->updateCharacterStatsForRace($character, $oldRace, $newRace);
 
-                    $this->updateTestCharacterRace($character, $oldRace, $newRace);
-                } else {
-                    $character = $this->updateCharacterStatsForRace($character, $oldRace, $newRace);
+                event(new UpdateTopBarEvent($character));
 
-                    event(new UpdateTopBarEvent($character));
-                }
-                
                 $lastCharacter = Character::where('game_race_id', $newRace->id)->orderBy('id', 'desc')->first();
 
                 if ($character->id === $lastCharacter->id) {
@@ -54,12 +46,12 @@ class UpdateCharacterStatsService {
 
     /**
      * Update the characters class stats.
-     * 
+     *
      * When a characters class is modifierd we will update the states, buy subtracting old and adding new.
-     * 
+     *
      * The only time we alert the player of a change to their character class is if the base damage stat changes.
      * Once that happens we update the user via server message or mail if they are not logged in.
-     * 
+     *
      * @param GameClass $oldClass
      * @param GameClass $newClass
      * @return void
@@ -67,17 +59,9 @@ class UpdateCharacterStatsService {
     public function updateClassStats(GameClass $oldClass, GameClass $newClass): void {
         Character::where('game_class_id', $newClass->id)->chunkById(1000, function($characters) use($oldClass, $newClass) {
             foreach ($characters as $character) {
-                if ($character->user->is_test) {
-                    if (!Cache::has('updating-test-characters')) {
-                        Cache::put('updating-test-characters', true);
-                    }
+                $character = $this->updateCharacterStatsForClass($character, $oldClass, $newClass);
 
-                    $this->updateTestCharacterClass($character, $oldClass, $newClass);
-                } else {
-                    $character = $this->updateCharacterStatsForClass($character, $oldClass, $newClass);
-                    
-                    $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
-                }
+                $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
 
                 $lastCharacter = Character::where('game_class_id', $newClass->id)->orderBy('id', 'desc')->first();
 
@@ -119,7 +103,7 @@ class UpdateCharacterStatsService {
         $character = $this->updateCharacterStatsForClass($character->refresh(), $oldClass, $newClass);
 
         $character = $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
-        
+
         LevelTestCharacter::dispatch($character, 1000, auth()->user())->delay(now()->addMinutes(1));
     }
 
@@ -139,7 +123,7 @@ class UpdateCharacterStatsService {
     protected function adjustCharacterDamageStat(Character $character, GameClass $oldClass, GameClass $newClass) {
         if ($oldClass->damage_stat !== $newClass->damage_stat) {
             $totalToAdjust = ($character->level - 1) * 2;
-            
+
             if ($character->level > 1) {
                 $character->{$oldClass->damage_stat} -= $totalToAdjust;
                 $character->{$oldClass->damage_stat} += $character->level - 1;
@@ -148,7 +132,7 @@ class UpdateCharacterStatsService {
                 $character->{$newClass->damage_stat} += $totalToAdjust;
             }
 
-            if (!$character->user->is_test) {                
+            if (!$character->user->is_test) {
                 if (UserOnlineValue::isOnline($character->user)) {
                     event(new UpdateTopBarEvent($character->refresh()));
                     event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));

@@ -289,40 +289,6 @@ class AdventureServiceTest extends TestCase
         }
     }
 
-    public function testProcessAdventureWithMultipleLevelsCharacterModeling()
-    {
-        $adventure = $this->createNewAdventure(null, 5);
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-                                        ->levelCharacterUp(10)
-                                        ->updateCharacter(['can_move' => false])
-                                        ->createAdventureLog($adventure)
-                                        ->updateSkill('Accuracy', [
-                                            'level' => 10,
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->updateSkill('Dodge', [
-                                            'level' => 10
-                                        ])
-                                        ->updateSkill('Looting', [
-                                            'level' => 10
-                                        ])
-                                        ->getCharacter();
-
-        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
-
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService->processAdventure($i, $adventure->levels, true);
-        }
-
-        $logs = $adventureService->getLogInformation();
-
-        $this->assertNotEmpty($logs);
-        $this->assertEquals(4, count($logs['sample']));
-    }
-
     public function testProcessAdventureWithMultipleLevelsNotTrainingSkills()
     {
         $adventure = $this->createNewAdventure(null, 5);
@@ -423,54 +389,6 @@ class AdventureServiceTest extends TestCase
         $this->assertEquals(1, $character->adventureLogs->first()->last_completed_level);
     }
 
-    public function testProcessAdventureCharacterDiesCharacterModeling()
-    {
-        $monster = $this->createMonster([
-            'name' => 'Monster',
-            'damage_stat' => 'str',
-            'xp' => 10,
-            'str' => 500,
-            'dur' => 500,
-            'dex' => 500,
-            'chr' => 500,
-            'int' => 500,
-            'ac' => 500,
-            'gold' => 1,
-            'max_level' => 500,
-            'health_range' => '999-9999',
-            'attack_range' => '99-999',
-            'drop_check' => 0.1,
-        ]);
-
-        $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-                                        ->updateCharacter(['can_move' => false])
-                                        ->createAdventureLog($adventure)
-                                        ->updateSkill('Accuracy', [
-                                            'level' => 0,
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->updateSkill('Dodge', [
-                                            'level' => 0
-                                        ])
-                                        ->updateSkill('Looting', [
-                                            'level' => 0
-                                        ])
-                                        ->getCharacter();
-
-        $this->actingAs($character->user);
-
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
-
-            $adventureService->processAdventure($i, $adventure->levels, true);
-        }
-
-        $this->assertNotEmpty($adventureService->getLogInformation());
-    }
 
     public function testProcessAdventureCharacterDiesNotLoggedIn()
     {
@@ -576,54 +494,6 @@ class AdventureServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertTrue($character->can_move);
-    }
-
-    public function testAdventureTookTooLongUserOnlineCharacterModeling() {
-        $monster = $this->createMonster([
-            'name' => 'Monster',
-            'damage_stat' => 'str',
-            'xp' => 10,
-            'str' => 1,
-            'dur' => 12,
-            'dex' => 23, // This is the same as the character, to make the aadventure take too long.
-            'chr' => 12,
-            'int' => 10,
-            'ac' => 18,
-            'gold' => 1,
-            'max_level' => 10,
-            'health_range' => '10-20',
-            'attack_range' => '1-4',
-            'drop_check' => 0.1,
-        ]);
-
-        $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-                                        ->levelCharacterUp(10)
-                                        ->updateCharacter(['can_move' => false])
-                                        ->createAdventureLog($adventure)
-                                        ->getCharacter();
-
-        $this->actingAs($character->user);
-
-        DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
-            'last_activity'=> 1602801731,
-        ]]);
-
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
-
-            $adventureService->processAdventure($i, $adventure->levels, true);
-        }
-
-        $this->assertNotEmpty($adventureService->getLogInformation());
     }
 
     public function testAdventureTookTooLongUserNotOnline() {
