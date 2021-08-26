@@ -135,7 +135,7 @@ class InfoPageController extends Controller
     }
 
     public function viewMonster(Request $request, Monster $monster) {
-        return $this->renderMonsterShow($monster);
+        return $this->renderMonsterShow($monster, 'information.monsters.monster');
     }
 
     public function viewLocation(Request $request, Location $location) {

@@ -49,6 +49,7 @@
       <ul aria-expanded="false" class="collapse">
           <li><a href="{{route('info.page', ['pageName' => 'kingdoms'])}}">Kingdoms</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'attacking-kingdoms'])}}">Attacking A Kingdom</a></li>
+          <li><a href="{{route('info.page', ['pageName' => 'items-and-kingdoms'])}}">Items and Kingdoms</a></li>
           <li><a href="{{route('info.page', ['pageName' => 'npc-kingdoms'])}}">NPC Kingdom</a></li>
       </ul>
     </li>

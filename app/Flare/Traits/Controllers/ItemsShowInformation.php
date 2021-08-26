@@ -59,7 +59,7 @@ trait ItemsShowInformation {
             }
         }
 
-        return view('game.items.item', [
+        return view($viewName, [
             'item'      => $item,
             'monster'   => Monster::where('quest_item_id', $item->id)->first(),
             'quest'     => Quest::where('item_id', $item->id)->orWhere('reward_item', $item->id)->first(),

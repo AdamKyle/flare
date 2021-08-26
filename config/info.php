@@ -48,6 +48,7 @@ return [
     ],
     'usable-items'      => [],
     'combat'            => [],
+    'items-and-kingdoms' => [],
     'kingdoms'          => [
         [
             'livewire'            => true,

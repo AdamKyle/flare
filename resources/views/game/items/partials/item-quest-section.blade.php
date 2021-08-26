@@ -15,9 +15,15 @@
             <dl>
                 <dt>Drops from: </dt>
                 <dd>
-                    <a href="{{route('game.monsters.monster', [
+                    @guest
+                        <a href="{{route('info.page.monster', [
                                         'monster' => $monster->id
                                     ])}}">{{$monster->name}}</a>
+                    @else
+                        <a href="{{route('game.monsters.monster', [
+                                        'monster' => $monster->id
+                                    ])}}">{{$monster->name}}</a>
+                    @endif
                 </dd>
                 <dt>Drop chance: </dt>
                 <dd>

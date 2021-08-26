@@ -58,6 +58,7 @@ class MaxCurrenciesValue {
             return $this->amount >= self::MAX_SHARDS;
         }
 
+        // @codeCoverageIgnore
         return true;
     }
 

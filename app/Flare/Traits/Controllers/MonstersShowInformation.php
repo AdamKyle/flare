@@ -15,14 +15,14 @@ trait MonstersShowInformation {
      * @param Monster $monster
      * @return View|Factory
      */
-    public function renderMonsterShow(Monster $monster): View|Factory {
+    public function renderMonsterShow(Monster $monster, $viewName = 'admin.monsters.monster'): View|Factory {
         $quest = null;
 
         if (!is_null($monster->questItem)) {
             $quest = Quest::where('item_id', $monster->questItem->id)->first();
         }
 
-        return view('admin.monsters.monster', [
+        return view($viewName, [
             'monster' => $monster,
             'quest'   => $quest,
         ]);

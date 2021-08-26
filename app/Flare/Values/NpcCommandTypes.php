@@ -89,13 +89,8 @@ class NpcCommandTypes
      * If it does return it, if not throw an exception.
      *
      * @return string
-     * @throws Exception
      */
     public function getNamedValue(): string {
-        if (isset(self::$namedValues[$this->value])) {
-            return self::$namedValues[$this->value];
-        }
-
-        throw new Exception($this->value . ' does not exist for named value');
+        return self::$namedValues[$this->value];
     }
 }

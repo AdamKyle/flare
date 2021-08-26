@@ -1,6 +1,6 @@
-@extends('layouts.information', [
-    'pageTitle' => 'Class'
-])
+@extends('layouts.information')
+
+@dump('hello')
 
 @section('content')
     <div class="mt-3">

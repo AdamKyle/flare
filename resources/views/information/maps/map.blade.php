@@ -25,7 +25,7 @@
                 </p>
                 <ul>
                     <li>
-                        <a href="{{route('game.items.item', ['item' => $itemNeeded])}}">
+                        <a href="{{route('info.page.item', ['item' => $itemNeeded])}}">
                             <x-item-display-color :item="$itemNeeded" />
                         </a>
                     </li>

@@ -25,6 +25,12 @@ class ItemEffectsValueTest extends TestCase {
         $this->assertTrue($value->dungeon());
     }
 
+    public function testIsWalkOnDeathWater() {
+        $value = new ItemEffectsValue('walk-on-death-water');
+
+        $this->assertTrue($value->walkOnDeathWater());
+    }
+
     public function testThrowError() {
 
         $this->expectException(\Exception::class);
