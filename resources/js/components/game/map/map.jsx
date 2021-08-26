@@ -330,17 +330,17 @@ export default class Map extends React.Component {
   }
 
   getMaxLeft() {
-    if (this.state.windowWidth > 1700) {
-      return -100
-    } else if (this.state.windowWidth < 450) {
-      return -150
-    } else if (this.state.windowWidth < 992) {
-      return -100
-    } else if (this.state.windowWidth < 1200) {
-      return 0;
-    }
+    // if (this.state.windowWidth > 1700) {
+    //   return -115
+    // } else if (this.state.windowWidth < 450) {
+    //   return -150
+    // } else if (this.state.windowWidth < 992) {
+    //   return -100
+    // } else if (this.state.windowWidth < 1200) {
+    //   return 0;
+    // }
 
-    return -150;
+    return -110;
   }
 
   componentDidUpdate() {

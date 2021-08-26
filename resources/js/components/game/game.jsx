@@ -275,7 +275,7 @@ export default class Game extends React.Component {
     return (
       <>
         <div className="row">
-          <div className={this.state.windowWidth <= 1366 ? "col-12" : "col-12 col-lg-6 col-xl-9 col-xxl-9 col-xxxl-9"}>
+          <div className={this.state.windowWidth <= 1900 ? "col-12" : "col-12 col-lg-9"}>
             <CharacterInfoTopSection
               characterId={this.props.characterId}
               userId={this.props.userId}
@@ -358,9 +358,9 @@ export default class Game extends React.Component {
           </div>
           <div
             className={
-              this.state.windowWidth <= 1366 ?
+              this.state.windowWidth <= 1900 ?
                 'col-12 center-element'
-              : 'col-12 col-sm-8 col-lg-6 col-xl-3 col-xxl-3 col-xxxl-3'
+              : 'col-12 col-lg-3'
             }
           >
             <Map

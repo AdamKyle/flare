@@ -33,7 +33,7 @@ export const movePlayer = (positionX, positionY, movementDirection) => {
     return getServerMessage('cannot_move_down');
   }
 
-  if (x > 464) {
+  if (x > 496) {
     return getServerMessage('cannot_move_right');
   }
 
