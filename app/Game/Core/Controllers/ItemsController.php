@@ -33,7 +33,7 @@ class ItemsController extends Controller {
     }
 
     public function show(Item $item) {
-        return $this->renderItemShow('game.items.show', $item);
+        return $this->renderItemShow('game.items.item', $item);
     }
 
     public function useItem(Character $character, Item $item) {
