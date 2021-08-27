@@ -51,6 +51,7 @@ export default class Map extends React.Component {
       kingdoms: [],
       characterMapName: null,
       otherKingdoms: [],
+      mapIsOpen: true,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);
@@ -325,7 +326,8 @@ export default class Map extends React.Component {
 
   updateWidth() {
     this.setState({
-      windowWidth: window.innerWidth
+      windowWidth: window.innerWidth,
+      mapIsOpen: window.innerWidth > 1900 ? true : false,
     });
   }
 
@@ -410,6 +412,12 @@ export default class Map extends React.Component {
     }, () => {
       this.props.updatePlayerPosition({});
     });
+  }
+
+  manageMap() {
+    this.setState({
+      mapIsOpen: !this.state.mapIsOpen,
+    })
   }
 
   move(coordinates) {
@@ -505,7 +513,13 @@ export default class Map extends React.Component {
 
     return (
       <div className="card mb-4 map-card">
-        <div className="card-body">
+        <button
+          className={this.state.windowWidth < 1900 ? 'btn btn-primary btn-sm' : 'hide'}
+          onClick={this.manageMap.bind(this)}
+        >
+          {this.state.mapIsOpen ? 'Close Map' : 'Show Map'}
+        </button>
+        <div className={this.state.mapIsOpen ? "card-body" : 'hide'}>
           <div className="map-body">
             <Draggable
               position={this.state.controlledPosition}
