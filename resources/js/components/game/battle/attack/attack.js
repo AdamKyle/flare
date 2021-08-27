@@ -111,7 +111,10 @@ export default class Attack {
   }
 
   toHitCalculation(toHit, dex, accuracy, dodge) {
-    return ((toHit + toHit * accuracy) / 10000) - ((dex / 10000) * dodge);
+    const enemyDex = (dex / 10000);
+    const hitChance = ((toHit + toHit * accuracy) / 100);
+
+    return (enemyDex + enemyDex * dodge) - hitChance;
   }
 
   castSpells(attacker, defender, type) {

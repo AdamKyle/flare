@@ -16,7 +16,11 @@ If you disenchant the item, there is a chance to get either 1 gold dust, or betw
 
 When managing your inventory, you’ll see a "Disenchant All" button:
 
-[Image]
+<div class="mb-4">
+    <a href="/storage/info/disenchanting/images/buttons.png" class="glightbox">
+        <img src="/storage/info/disenchanting/images/buttons.png" class="img-fluid" />
+    </a>
+</div>
 
 Clicking it will disenchant all items with affixes that are not equipped in your inventory. 
 

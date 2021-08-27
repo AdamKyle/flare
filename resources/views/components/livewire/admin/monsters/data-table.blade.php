@@ -111,7 +111,7 @@
                                 <td>{{$monster->health_range}}</td>
                                 <td>{{$monster->attack_range}}</td>
                                 <td>{{$monster->xp}}</td>
-                                <td>{{$monster->gold}}</td>
+                                <td>{{number_format($monster->gold)}}</td>
                                 @guest
                                 @else
                                 <td>

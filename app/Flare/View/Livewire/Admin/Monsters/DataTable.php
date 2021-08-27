@@ -23,6 +23,7 @@ class DataTable extends Component
     public $published   = true;
     public $canTest     = false;
     public $testCharacters = [];
+    public $only = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -45,6 +46,10 @@ class DataTable extends Component
                 $join->on('game_maps.id', 'monsters.game_map_id')
                     ->where('game_maps.name', $this->onlyMapName);
             })->select('monsters.*');
+        }
+
+        if ($this->only === 'celestials') {
+            $this->withCelestials = true;
         }
 
         return $monsters->where('published', $this->published)

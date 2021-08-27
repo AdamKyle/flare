@@ -74,6 +74,8 @@ class DataTable extends Component
 
         if (!is_null($this->type)) {
             $items = $items->where('type', $this->type);
+        } else if ($this->craftOnly && $this->type !== 'alchemy') {
+            $items = $items->where('type', '!=', 'alchemy');
         }
 
         $this->showAlchemy = false;

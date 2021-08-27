@@ -43,6 +43,16 @@
                 'onlyMapName' => $map->name,
                 'withCelestials' => true,
             ])
+            <h3>NPC's</h3>
+            <hr />
+            @livewire('admin.npcs.data-table', [
+                'forMap' => $map->id,
+            ])
+            <h3>Quests</h3>
+            <hr />
+            @livewire('admin.quests.data-table', [
+                'forMap' => $map->id,
+            ])
         </x-cards.card>
     </div>
 @endsection

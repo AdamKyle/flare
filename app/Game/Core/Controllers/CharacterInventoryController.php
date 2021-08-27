@@ -76,7 +76,6 @@ class CharacterInventoryController extends Controller {
         ];
 
         if ($service->inventory()->isNotEmpty()) {
-            dump('in here?');
             $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
 
 

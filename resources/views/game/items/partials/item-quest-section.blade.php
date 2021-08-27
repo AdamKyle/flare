@@ -51,27 +51,39 @@
             <dl>
                 <dt>Adventure Name: </dt>
                 <dd>
-                    @if (auth()->user()->hasRole('Admin'))
-                        <a href="{{route('adventures.adventure', [
-                                            'adventure' => $adventure->id
-                                        ])}}">{{$adventure->name}}</a>
+                    @auth
+                        @if (auth()->user()->hasRole('Admin'))
+                            <a href="{{route('adventures.adventure', [
+                                                'adventure' => $adventure->id
+                                            ])}}">{{$adventure->name}}</a>
+                        @else
+                            <a href="{{route('map.adventures.adventure', [
+                                                'adventure' => $adventure->id
+                                            ])}}">{{$adventure->name}}</a>
+                        @endif
                     @else
-                        <a href="{{route('map.adventures.adventure', [
-                                            'adventure' => $adventure->id
-                                        ])}}">{{$adventure->name}}</a>
-                    @endif
+                        <a href="{{route('info.page.adventure', [
+                                                'adventure' => $adventure->id
+                                            ])}}">{{$adventure->name}}</a>
+                    @endauth
                 </dd>
                 <dt>Location of adventure: </dt>
                 <dd>
-                    @if (auth()->user()->hasRole('Admin'))
-                        <a href="{{route('locations.location', [
-                                            'location' => $adventure->location->id
-                                        ])}}">{{$adventure->location->name}}</a>
+                    @auth
+                        @if (auth()->user()->hasRole('Admin'))
+                            <a href="{{route('locations.location', [
+                                                'location' => $adventure->location->id
+                                            ])}}">{{$adventure->location->name}}</a>
+                        @else
+                            <a href="{{route('game.locations.location', [
+                                                'location' => $adventure->location->id
+                                            ])}}">{{$adventure->location->name}}</a>
+                        @endif
                     @else
-                        <a href="{{route('game.locations.location', [
-                                            'location' => $adventure->location->id
-                                        ])}}">{{$adventure->location->name}}</a>
-                    @endif
+                        <a href="{{route('info.page.location', [
+                                                'location' => $adventure->location->id
+                                            ])}}">{{$adventure->location->name}}</a>
+                    @endauth
 
                 </dd>
                 <dt>X/Y: </dt>
@@ -85,15 +97,21 @@
             <dl>
                 <dt>Quest Name: </dt>
                 <dd>
-                    @if (auth()->user()->hasRole('Admin'))
-                        <a href="{{route('quests.show', [
-                                                'quest' => $quest->id
-                                            ])}}">{{$quest->name}}</a>
+                    @auth
+                        @if (auth()->user()->hasRole('Admin'))
+                            <a href="{{route('quests.show', [
+                                                    'quest' => $quest->id
+                                                ])}}">{{$quest->name}}</a>
+                        @else
+                            <a href="{{route('game.quests.show', [
+                                                    'quest' => $quest->id
+                                                ])}}">{{$quest->name}}</a>
+                        @endif
                     @else
-                        <a href="{{route('game.quests.show', [
-                                                'quest' => $quest->id
-                                            ])}}">{{$quest->name}}</a>
-                    @endif
+                        <a href="{{route('information.quests.quest', [
+                                                    'quest' => $quest->id
+                                                ])}}">{{$quest->name}}</a>
+                    @endauth
                 </dd>
             </dl>
         @endif

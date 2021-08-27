@@ -75,7 +75,6 @@ Come celestials might drop quest items, these can then be turned into the quest 
 
 ## List of Celestial Entities
 
-[List of Celestials]
 
 
 

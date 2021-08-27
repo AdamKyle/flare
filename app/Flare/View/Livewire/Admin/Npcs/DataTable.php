@@ -15,9 +15,15 @@ class DataTable extends Component {
     public $search      = '';
     public $sortField   = 'name';
     public $perPage     = 10;
+    public $forMap      = null;
 
     public function fetchNpcs() {
-        $npcs = Npc::dataTableSearch($this->search)->get();
+
+        if (!is_null($this->forMap)) {
+            $npcs = Npc::dataTableSearch($this->search)->where('game_map_id', $this->forMap)->get();
+        } else {
+            $npcs = Npc::dataTableSearch($this->search)->get();
+        }
 
         $npcs = $npcs->transform(function($npc) {
             $npc->type        = (new NpcTypes($npc->type))->getNamedValue();

@@ -294,7 +294,10 @@ class FightService {
     }
 
     protected function toHitCalculation(int $toHit, int $dex, float $accuracy, float $dodge) {
-        return abs((($toHit + $toHit * $accuracy) / 10000) - (($dex / 10000) * $dodge));
+        $dex   = ($dex / 10000);
+        $toHit = ($toHit + $toHit * $accuracy) / 100;
+
+        return ($dex + $dex * $dodge) - $toHit;
     }
 
     protected function blockedAttack($defender, $attacker): bool {

@@ -95,7 +95,6 @@ class CharacterInventoryService {
             if (!is_null($equippedSet)) {
                 $inventory = $equippedSet->slots->filter(function($slot) use($type, $useArray) {
                     if ($useArray) {
-                        dump($slot, $this->positions);
                         return in_array($slot->position, $this->positions) && $slot->equipped;
                     }
 

@@ -12,3 +12,5 @@ Gear is also useless without affixes. A capped character, at the time of this wr
 with no affixes - cannot fight the final surface mob.
 
 You craft to then enchant the gear, as stated previously.
+
+Below you can see all the "craft only" gear that you cannot buy from the shop.

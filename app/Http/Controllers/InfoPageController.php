@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Npc;
+use App\Flare\Models\Quest;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
 use Storage;
@@ -54,12 +56,16 @@ class InfoPageController extends Controller
                 $before        = null;
                 $showSkillInfo = false;
                 $showDropDown  = false;
+                $type          = null;
+                $craftOnly     = false;
 
                 if (isset(config('info.' . $pageName)[$index])) {
-                    $view     = config('info.' . $pageName)[$index]['view'];
-                    $livewire = config('info.' . $pageName)[$index]['livewire'];
-                    $only     = config('info.' . $pageName)[$index]['only'];
-                    $before   = config('info.' . $pageName)[$index]['insert_before_table'];
+                    $view      = config('info.' . $pageName)[$index]['view'];
+                    $livewire  = config('info.' . $pageName)[$index]['livewire'];
+                    $only      = config('info.' . $pageName)[$index]['only'];
+                    $before    = config('info.' . $pageName)[$index]['insert_before_table'];
+                    $type      = config('info.' . $pageName)[$index]['type'];
+                    $craftOnly = config('info.' . $pageName)[$index]['craft_only'];
 
                     if (isset(config('info.' . $pageName)[$index]['showSkillInfo'])) {
                         $showSkillInfo = config('info.' . $pageName)[$index]['showSkillInfo'];
@@ -75,6 +81,8 @@ class InfoPageController extends Controller
                     'view'          => $view,
                     'livewire'      => $livewire,
                     'only'          => $only,
+                    'type'          => $type,
+                    'craftOnly'     => $craftOnly,
                     'before'        => $before,
                     'showSkillInfo' => $showSkillInfo,
                     'showDropDown'  => $showDropDown,
@@ -167,6 +175,25 @@ class InfoPageController extends Controller
     public function viewAffix(Request $request, ItemAffix $affix) {
         return view('information.affixes.affix', [
             'itemAffix' => $affix
+        ]);
+    }
+
+    public function viewNpc(Npc $npc) {
+        return view('information.npcs.npc', [
+            'npc' => $npc
+        ]);
+    }
+
+    public function viewQuest(Quest $quest) {
+        $skill = null;
+
+        if ($quest->unlocks_skill) {
+            $skill = GameSkill::where('type', $quest->unlocks_skill_type)->where('is_locked', true)->first();
+        }
+
+        return view('information.quests.quest', [
+            'quest'       => $quest,
+            'lockedSkill' => $skill,
         ]);
     }
 

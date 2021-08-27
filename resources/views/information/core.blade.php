@@ -26,6 +26,8 @@
                         'only'          => $section['only'],
                         'showSkillInfo' => $section['showSkillInfo'],
                         'showDropDown'  => $section['showDropDown'],
+                        'type'          => $section['type'],
+                        'craftOnly'     => $section['craftOnly'],
                     ])
                 </div>
                 @else

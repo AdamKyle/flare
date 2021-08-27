@@ -52,7 +52,6 @@
                             field="shards_cost"
                         />
                         @auth
-                        @else
                             @if (auth()->user()->hasRole('Admin'))
                                 <x-data-tables.header-row>
                                     Actions
@@ -65,7 +64,7 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="#">{{$quest->name}}
+                                        <a href="{{route('information.quests.quest', ['quest' => $quest->id])}}">{{$quest->name}}
                                         </a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
@@ -73,11 +72,7 @@
                                                 'quest' => $quest->id
                                             ])}}">{{$quest->name}}</a>
                                         @else
-                                            @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
-                                                <a href="#">{{$quest->name}}</a>
-                                            @else
-                                                <a href="#">{{$quest->name}}</a>
-                                            @endif
+                                            <a href="{{route('information.quests.quest', ['quest' => $quest->id])}}">{{$quest->name}}</a>
                                         @endif
                                     @endguest
                                 </td>

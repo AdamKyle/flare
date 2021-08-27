@@ -47,7 +47,6 @@
                         />
 
                         @auth
-                        @else
                             @if (auth()->user()->hasRole('Admin'))
                                 <x-data-tables.header-row>
                                     Actions
@@ -60,7 +59,7 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="#">{{$npc->real_name}}
+                                        <a href="{{route('information.npcs.npc', ['npc' => $npc->id])}}">{{$npc->real_name}}
                                         </a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
@@ -68,18 +67,14 @@
                                                 'npc' => $npc->id
                                             ])}}">{{$npc->real_name}}</a>
                                         @else
-                                            @if ($previousUrlIsInfo = strpos(url()->previous(), 'information') !== false)
-                                                <a href="#">{{$npc->real_name}}</a>
-                                            @else
-                                                <a href="#">{{$npc->real_name}}</a>
-                                            @endif
+                                            <a href="{{route('information.npcs.npc', ['npc' => $npc->id])}}">{{$npc->real_name}}</a>
                                         @endif
                                     @endguest
                                 </td>
                                 <td>{{$npc->gameMap->name}}</td>
                                 <td>{{$npc->moves_around_the_map ? 'Yes' : 'No'}}</td>
                                 <td>{{$npc->must_be_at_same_location ? 'Yes' : 'No'}}</td>
-                                <td>{{$npc->text_command_to_message}}</td>
+                                <td>{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</td>
                                 @guest
                                 @else
                                     <td>

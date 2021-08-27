@@ -37,6 +37,15 @@
                             <dt>Defense Modifier</dt>
                             <dd>+ {{$class->deffense_mod * 100}} %</dd>
                         </dl>
+                        @if ($class->gameSkills->isNotEmpty())
+                            <hr />
+                            <h2>Class Skills</h2>
+                            <ul>
+                                @foreach ($class->gameSkills as $skill)
+                                    <li><a href="{{route('info.page.skill', ['skill' => $skill->id])}}">{{$skill->name}}</a></li>
+                                @endforeach
+                            </ul>
+                        @endif
                         @if (!is_null(auth()->user()))
                             @if (auth()->user()->hasRole('Admin'))
                                 <a href="{{route('classes.edit', [

@@ -12,7 +12,7 @@
                     I am very sad to see you go, but I understand. If you are sure this is what you want to do, please know the following:
                 </p>
                 <ul>
-                    <li>All details about you will be deleted, email, password, security questions and so on.</li>
+                    <li>All details about you will be deleted, including: Email and Password</li>
                     <li>All kingdoms will be given to the NPC who holds kingdoms.</li>
                     <li>All market listings will be deleted.</li>
                 </ul>
