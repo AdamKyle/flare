@@ -218,51 +218,61 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          {this.props.building.level >= this.props.building.max_level ?
-            <div className="alert alert-success mt-5">
-              This building is already max level and cannot upgrade any further.
-            </div>
-            : <>
-              <h5 className="mt-1">Gain Upon Upgrading</h5>
-              <hr/>
-              <UpgradeSection building={this.props.building}/>
-            </>}
-
-          {!this.isCurrentlyInQueue() ?
-            <div className="alert alert-warning mb-2 mt-2">
-              Cannot upgrade building. Currently in queue. Please wait till it's finished.
-            </div>
-            : !this.canUpgrade() && !(this.props.building.level >= this.props.building.max_level) ?
-              <>
-                <div className="alert alert-warning mb-2 mt-2">
-                  You don't seem to have the resources to upgrade this building. You can move this modal
-                  by clicking and dragging on the title, to compare the required resources with what you currently have.
+          <div className="row">
+            {this.props.building.level >= this.props.building.max_level ?
+              <div className="col-md-12">
+                <div className="alert alert-success mt-5">
+                  This building is already max level and cannot upgrade any further.
                 </div>
-                <BuildingCostSection
-                  building={this.props.building}
-                  canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
-                />
-              </>
-              : !this.buildingNeedsToBeRebuilt() && !(this.props.building.level >= this.props.building.max_level) ?
-                <>
+              </div>
+              : <div className="col-md-6">
+                  <h5 className="mt-1">Gain Upon Upgrading</h5>
                   <hr/>
-                  <h5 className="mt-1">Cost to upgrade</h5>
-                  <hr/>
-                  <div className="mt-2 mb-2 alert alert-info">
-                    You can click and drag the title to move the modal and make sure you have the resources before
-                    attempting to upgrade.
+                  <UpgradeSection building={this.props.building}/>
+                </div>
+            }
+
+            {!this.isCurrentlyInQueue() ?
+              <div className="col-md-6">
+                <div className="alert alert-warning mb-2 mt-2">
+                  Cannot upgrade building. Currently in queue. Please wait till it's finished.
+                </div>
+              </div>
+              : !this.canUpgrade() && !(this.props.building.level >= this.props.building.max_level) ?
+                <div className="col-md-6">
+                  <div className="alert alert-warning mb-2 mt-2">
+                    You don't seem to have the resources to upgrade this building. You can move this modal
+                    by clicking and dragging on the title, to compare the required resources with what you currently have.
                   </div>
                   <BuildingCostSection
                     building={this.props.building}
                     canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
                   />
-                </>
+                </div>
+                : !this.buildingNeedsToBeRebuilt() && !(this.props.building.level >= this.props.building.max_level) ?
+                  <div className="col-md-6">
+                    <hr/>
+                    <h5 className="mt-1">Cost to upgrade</h5>
+                    <hr/>
+                    <div className="mt-2 mb-2 alert alert-info">
+                      You can click and drag the title to move the modal and make sure you have the resources before
+                      attempting to upgrade.
+                    </div>
+                    <BuildingCostSection
+                      building={this.props.building}
+                      canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
+                    />
+                  </div>
                 : !(this.props.building.level >= this.props.building.max_level) ?
-                  <div className="alert alert-info mt-5">
-                    Rebuilding the building will require the amount of resources to upgrade to the current level.
-                    You can see this in the Cost section above.
-                  </div> : null
-          }
+                    <div className="col-md-6">
+                      <div className="alert alert-info mt-5">
+                        Rebuilding the building will require the amount of resources to upgrade to the current level.
+                        You can see this in the Cost section above.
+                      </div>
+                    </div>
+                : null
+            }
+          </div>
           {
             this.state.loading ?
               <div className="progress loading-progress kingdom-loading " style={{position: 'relative'}}>

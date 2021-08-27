@@ -109,18 +109,12 @@ class InfoPageController extends Controller
     }
 
     public function viewMap(GameMap $map) {
-
-        $effects = '';
-
-        switch ($map->name) {
-            case 'Labyrinth':
-                $effects = ItemEffectsValue::LABYRINTH;
-                break;
-            case 'Dungeons':
-                $effects = ItemEffectsValue::DUNGEON;
-            default:
-                $effects = '';
-        }
+        
+        $effects = match ($map->name) {
+            'Labyrinth' => ItemEffectsValue::LABYRINTH,
+            'Dungeons' => ItemEffectsValue::DUNGEON,
+            default => '',
+        };
 
         return view('information.maps.map', [
             'map' => $map,

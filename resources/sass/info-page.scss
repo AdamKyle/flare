@@ -13,6 +13,9 @@
 }
 
 .info-sidebar {
+
+  overflow-y: scroll;
+  
   @media only screen and (max-width: 1027px) {
     display: none;
   }

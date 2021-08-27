@@ -81,7 +81,7 @@ class KingdomAttackController extends Controller {
         }
 
         $kingdom    = Kingdom::with('buildings', 'units')->find($request->defender_id);
-        $oldKingdom = $kingdom;
+        $oldKingdom = $kingdom->toArray();
         $buildings  = $kingdom->buildings;
         $units      = $kingdom->units;
 
@@ -97,8 +97,6 @@ class KingdomAttackController extends Controller {
             ]);
         }
 
-        $kingdomHandler->setKingdom($kingdom->refresh())->decreaseMorale();
-
         foreach ($units as $unit) {
             $newAmount = round($unit->amount - ($unit->amount * $damageToKingdom));
 
@@ -111,11 +109,14 @@ class KingdomAttackController extends Controller {
             ]);
         }
 
+        $kingdom = $kingdomHandler->setKingdom($kingdom->refresh())->decreaseMorale()->getKingdom();
+
         KingdomLog::create([
             'character_id'    => $kingdom->character->id,
             'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
-            'old_defender'    => $oldKingdom->toArray(),
-            'new_defender'    => $kingdom->refresh()->toArray(),
+            'old_defender'    => $oldKingdom,
+            'new_defender'    => $kingdom->toArray(),
+            'to_kingdom_id'   => $kingdom->id,
             'published'       => true,
         ]);
 

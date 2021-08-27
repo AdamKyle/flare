@@ -13,7 +13,7 @@
             </dl>
         </x-cards.card>
     </div>
-    <div class="{{!empty($log['defender_buildings']) ? 'col-md-6' : 'col-md-12'}}">
+    <div class="{{!empty($log['defender_buildings']) ? 'col-md-6' : 'hide'}}">
         <x-cards.card>
             @if (empty($log['defender_units']))
                 <p class="text-info">None of their units were affected. If you lost no units, then chances are they have no units.</p>

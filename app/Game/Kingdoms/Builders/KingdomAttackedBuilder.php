@@ -71,6 +71,10 @@ class KingdomAttackedBuilder {
 
         $unitLosses = [];
 
+        if (is_null($oldUnits)) {
+         return $unitLosses;
+        }
+
         foreach ($oldUnits as $index => $unit) {
             $amountLeft = $unitsSurvived[$index]['amount'];
 

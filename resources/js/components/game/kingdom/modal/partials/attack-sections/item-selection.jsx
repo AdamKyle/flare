@@ -20,7 +20,7 @@ export default class ItemSelection extends React.Component {
     return this.props.items.map((item) => {
       return (
         <option key={item.id} value={item.id}>
-          {item.item.name}
+          {item.item.name} ({item.item.kingdom_damage * 100}%)
         </option>
       )
     })
@@ -79,17 +79,19 @@ export default class ItemSelection extends React.Component {
         <div className="alert alert-info">
           <p>
             You can skip this page if you don't want to use any items. You can select as many items as you would like.
-            Each one will do damage one at a time, alerting the player that their kingdom was attacked.
+            The damage will be added up at the bottom and done all at once. The defending player will be alerted.
           </p>
           <p>
-            The damage shown below, will do damage to the kingdoms: Units <strong>and</strong> Buildings
+            The damage shown below, will do damage to the kingdoms: Units <strong>and</strong> Buildings. If buildings
+            are significantly damaged, the defending kingdoms morale will be updated.
           </p>
           <p>
-            To use the items, select them and click "Use items". Clicking next will not use the items.
+            To use the items, select them and click "Use items". Clicking next will not use the items. You still need to send
+            in a Settler, even if you do damage equal to or above 100%.
           </p>
         </div>
         <div className="form-group mt-2">
-          <label htmlFor="kingom-select">Select Kingdoms</label>
+          <label htmlFor="kingom-select">Select items to use</label>
           <select
             multiple={true}
             value={this.kingdoms_selected}

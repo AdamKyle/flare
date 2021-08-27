@@ -51,7 +51,7 @@ export default class Map extends React.Component {
       kingdoms: [],
       characterMapName: null,
       otherKingdoms: [],
-      mapIsOpen: true,
+      mapIsOpen: false,
     }
 
     this.echo = Echo.private('show-timeout-move-' + this.props.userId);

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, Button} from 'react-bootstrap';
+import {Modal, Button, Alert} from 'react-bootstrap';
 import KingdomSelection from './partials/attack-sections/kingdom-selection';
 import UnitSelection from './partials/attack-sections/unit-selection';
 import LoadingModal from "../../components/loading/loading-modal";
@@ -25,6 +25,7 @@ export default class KingdomAttackModal extends React.Component {
       enableNext: false,
       enableAttack: false,
       fetchingAttackData: true,
+      showItemDroppedMessage: false,
       loading: false,
     }
   }
@@ -172,6 +173,7 @@ export default class KingdomAttackModal extends React.Component {
   updateItems(items) {
     this.setState({
       items: items,
+      showItemDroppedMessage: true,
     }, () => {
       const steps = this.state.steps;
 
@@ -184,6 +186,12 @@ export default class KingdomAttackModal extends React.Component {
           finalStep: 1,
         });
       }
+    });
+  }
+
+  showItemDropped() {
+    this.setState({
+      showItemDroppedMessage: !this.state.showItemDroppedMessage
     });
   }
 
@@ -251,6 +259,18 @@ export default class KingdomAttackModal extends React.Component {
                 </div>
               </div>
               : null
+          }
+          {
+            this.state.showItemDroppedMessage ?
+              <Alert variant="success" onClose={this.showItemDropped.bind(this)} dismissible>
+                <Alert.Heading>Bombs away!</Alert.Heading>
+                <p>
+                  You dropped items on the kingdom doing devastating damage!
+                  You can continue to drop more items, or select a kingdom if you have not used all your items.
+                </p>
+              </Alert>
+            :
+              null
           }
           { this.state.steps.length === 3 && this.state.currentStep === 0 ?
               this.state.items.length > 0 ?

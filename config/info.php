@@ -35,6 +35,14 @@ return [
             'insert_before_table' => null,
             'type'                => null,
             'craft_only'          => false,
+        ],
+        [
+            'livewire'            => true,
+            'view'                => 'admin.npcs.data-table',
+            'only'                => \App\Flare\Values\NpcTypes::SUMMONER,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
         ]
     ],
     'disenchanting'     => [],

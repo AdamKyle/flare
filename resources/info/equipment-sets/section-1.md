@@ -30,7 +30,7 @@ Let's click this and see what happens!
     </a>
 </div>
 
-You can select a set tp save the equipment to. The set must be empty in order for you to save the set, so we will only show you 
+You can select a set to save the equipment to. The set must be empty in order for you to save the set, so we will only show you 
 empty sets in the dropdown. Once the set is saved:
 
 <div class="mb-4">

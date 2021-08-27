@@ -45,7 +45,12 @@ class DataTable extends Component {
         }
 
         return $logs->transform(function($log) {
-            $log->from_kingdom_name = $log->from_kingdom->name . ' At (X/Y) ' . $log->from_kingdom->x_position . '/' . $log->from_kingdom->y_position;
+            if (is_null($log->from_kingdom)) {
+                $log->from_kingdom_name = 'Unknown';
+            } else {
+                $log->from_kingdom_name = $log->from_kingdom->name . ' At (X/Y) ' . $log->from_kingdom->x_position . '/' . $log->from_kingdom->y_position;
+            }
+
             $log->to_kingdom_name   = $log->to_kingdom->name . ' At (X/Y) ' . $log->to_kingdom->x_position . '/' . $log->to_kingdom->y_position;
             $log->time_happened     = $log->created_at->format('y-m-d g:i A');
 

@@ -31,9 +31,9 @@ would make you severely overpowered, add affixes towards that, and you are even 
 
 The attack formula:
 
-    const attack = (attacker.base_stat + Math.round(attacker.dex / 2)) * attackerAccuracy;
+    hitChance = ((toHit + toHit * accuracy) / 100);
 
-    return attack > enemyDodge;
+    return (enemyDex + enemyDex * dodge) - hitChance; // Gives percentage
 
 That is to see if you can hit, if you can hit, we then check if your base stat, the damage stat, is greater than their ac or not.
 
@@ -43,12 +43,31 @@ Your healing will kick in only if you are in need of healing.
 Because healing spells have a chance to resurrect you upon death, if you die, that chance, combined from items and class 
 based bonuses is compared to see if you can automatically resurrect and fight again.
 
+Prophets have an automatic 5% chance to resurrect.
+
+If you have two healing spells at 70% chance to resurrect that's an instant resurrect as the percentage chance is now 140%.
+
 ## Spells, Artifacts and Rings matter
 
 As mentioned earlier, spells, artifacts and rings can fire independently of weather you miss or not. Rings will increase spell evasion and artifact annulment to
 reduce the enemies spells and artifacts. Normal Critters will not pose an issue, however [Celestial Entities](/information/celestials) will have spell evasion and artifact annulment as well as be able to cast
 spells and use artifacts.
 
-Healing Spells have a chance to resurrect th player and stack if you have two healing spells equipped.
+## Bows
+
+Bows are a new weapon type in Tlessa that allow the character to attack faster. These are the only weapons that affect fight time out modifier across all
+skills that have a fight time out modifier bonus.
+
+Bows also only increase AGI and Dex unlike other weapons that increase all stats except for Focus and Agi. Bows are duel welded and will
+not allow you to have another weapon equipped. Bows are generally for Rangers.
+
+## Class Skills
+
+When it comes to combat, accuracy and you to hit stat, along with your damage stat are the vital aspects of the game - the higher these values, the better the
+chance to hit, however some class skills effect aspects of your character: For example having a shield and weapon equipped as a fighter gives you
+your class skills attack and defence bonus modifiers, however choosing to duel wield two weapons only gets your attack bonus.
+
+Class Skills raise a set of bonuses and modifiers over time while fighting creatures. It is suggested that players go for this skill and accuracy, 
+flipping back and forth as they level. However, players are free to level what ever skills they choose, in any order.
 
 
