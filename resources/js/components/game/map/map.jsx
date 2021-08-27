@@ -319,6 +319,7 @@ export default class Map extends React.Component {
 
     this.setState({
       windowWidth: window.innerWidth,
+      mapIsOpen: window.innerWidth > 1900 ? true : false,
     });
 
     window.addEventListener("resize", this.updateWidth.bind(this));
