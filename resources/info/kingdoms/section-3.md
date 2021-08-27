@@ -107,9 +107,6 @@ If your kingdom is taken, by another player, your treasury will be lost and give
   your 6th will cost 50,000 gold. If you don’t have the gold, you can Attack other kingdoms, reduce their morale to
   0 and send in a special unit called a “settler” who will settle the kingdom. See [Attacking a kingdom](/information/attacking-kingdoms).
 
-> ### ATTN!
->
-> In theory a single player who can walk on water can settle 14700 kingdoms (for the Surface map) as well as any other plane of existence. To settle that many kingdoms you would need: ~146+ million gold.
->
-> It should also be noted there is no way for you spend real world money to increase resources per hour,
-> decrease building or unit recruitment time.
+- Kingdoms that do not get walked for five days are handed over to the [NPC Kingdom Holder](/information/npc-kingdoms).
+
+- You can use [special items on kingdoms to attack them](/information/items-and-kingdoms).
