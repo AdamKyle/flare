@@ -11,12 +11,10 @@
 
                 <input type="hidden" name="slot_id" value={{$slot->id}} />
 
-                @if ($slot->item->crafting_type === 'armour')
-                    <input type="hidden" name="item_to_equip_type" value={{$slot->item->type}} />
-                @endif
-
                 @if ($slot->item->type === 'bow')
                     <input type="hidden" name="item_to_equip_type" value="weapon" />
+                @else
+                    <input type="hidden" name="item_to_equip_type" value={{$slot->item->type}} />
                 @endif
             </form>
 

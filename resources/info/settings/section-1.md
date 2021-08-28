@@ -47,6 +47,31 @@ Deleting your account will do the following:
 
 You are of course welcome to come back at anytime.
 
+## Email Settings
+
+There are some email settings that you can enable or disable. For your convience the game has opted you out of some of the more annoying emails,
+that you can enable if you wish.
+
+*The image below is only some of the options*
+
+<div class="mb-4">
+    <a href="/storage/info/settings/images/email-settings.png" class="glightbox">
+        <img src="/storage/info/settings/images/email-settings.png" class="img-fluid" />
+    </a>
+</div>
+
+There are a few emails out side of this that you cannot disable:
+
+- Password reset
+- You have been banned
+- You have been silenced and are not logged in when it wears off
+- You have been unbanned
+- You have deleted your account - final confirmation email.
+
+These are called system emails and cannot be opted out of.
+
+We will never send you any email outside of this.
+
 ## Chat Settings
 
 There are some chat settings that are disabled by default for you. Feel free to enable these:

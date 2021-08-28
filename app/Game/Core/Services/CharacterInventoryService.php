@@ -69,6 +69,12 @@ class CharacterInventoryService {
      */
     public function setInventory(string $type): CharacterInventoryService {
 
+        // Bows are considered weapons but have no position as they are duel wielded
+        // weapons.
+        if ($type === 'weapon' && empty($this->position)) {
+            $this->positions = ['right-hand', 'left-hand'];
+        }
+
         if (empty($this->positions)) {
             $this->inventory =  $this->getInventory($type);
 

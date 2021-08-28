@@ -18,7 +18,6 @@ class ItemComparison {
      * @return array
      */
     public function fetchDetails(Item $toCompare, Collection $inventorySlots, Character $character): array {
-
         $this->character = $character;
 
         $comparison = [];
