@@ -25,6 +25,28 @@ Character names can also be forced changed by The Creator if they are deemed ina
 
 Under that, you can see some email settings – you can turn these on and off to your leisure.
 
+## Account Deletion
+
+Characters may choose to delete their account. Doing so will present you with a confirmation:
+
+<div class="mb-4">
+    <a href="/storage/info/settings/images/delete-confirmation.png" class="glightbox">
+        <img src="/storage/info/settings/images/delete-confirmation.png" class="img-fluid" />
+    </a>
+</div>
+
+Should you continue, you will be logged out and a few minutes later you will receive an email confirming your account has been deleted.
+
+Deleting your account will do the following:
+
+- Hand all your kingdoms to the NPC kingdom holder
+- Delist and Delete all market listings
+- Delete your character
+- Delete your User account including email and password.
+- A global message will go out and alert the players that you have decided to leave and that we wish you well.
+
+You are of course welcome to come back at anytime.
+
 ## Chat Settings
 
 There are some chat settings that are disabled by default for you. Feel free to enable these:
