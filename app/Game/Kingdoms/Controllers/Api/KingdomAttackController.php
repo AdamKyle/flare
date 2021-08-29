@@ -115,7 +115,7 @@ class KingdomAttackController extends Controller {
             'character_id'    => $kingdom->character->id,
             'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
             'old_defender'    => $oldKingdom,
-            'new_defender'    => $kingdom->toArray(),
+            'new_defender'    => $kingdom->with('units', 'buildings')->toArray(),
             'to_kingdom_id'   => $kingdom->id,
             'published'       => true,
         ]);

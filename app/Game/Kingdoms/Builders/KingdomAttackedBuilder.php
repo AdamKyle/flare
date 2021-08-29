@@ -101,7 +101,7 @@ class KingdomAttackedBuilder {
         $newDefenderUnits = $this->log->new_defender['units'];
 
         $unitChanges = [];
-
+        dump($oldDefenderUnits, $newDefenderUnits);
         foreach ($oldDefenderUnits as $index => $unitInfo) {
             $oldAmount = $unitInfo['amount'];
             $newAmount = $newDefenderUnits[$index]['amount'];
