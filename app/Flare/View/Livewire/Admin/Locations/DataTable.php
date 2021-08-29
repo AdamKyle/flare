@@ -16,6 +16,7 @@ class DataTable extends Component
     public $search      = '';
     public $sortField   = 'name';
     public $perPage     = 10;
+    public $gameMapId   = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -44,9 +45,6 @@ class DataTable extends Component
 
             $column = ($this->sortField !== 'game_maps.name' ? 'locations.name' : 'game_maps.name');
 
-            return $location->orderBy($column, $this->sortBy)
-                            ->select('locations.*')
-                            ->paginate($this->perPage);
         } else  {
             $location = Location::dataTableSearch($this->search);
 
@@ -57,12 +55,17 @@ class DataTable extends Component
             }
 
             $column = 'locations.' . $this->sortField;
-
-
-            return $location->orderBy($column, $this->sortBy)
-                            ->select('locations.*')
-                            ->paginate($this->perPage);
         }
+
+        if (!is_null($this->gameMapId)) {
+            $locations = $location->where('game_map_id', $this->gameMapId);
+        }
+
+        $locations = $location->orderBy($column, $this->sortBy)
+                              ->select('locations.*')
+                              ->paginate($this->perPage);
+
+        return $locations;
     }
 
     public function render()

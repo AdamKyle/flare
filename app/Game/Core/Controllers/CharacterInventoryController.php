@@ -59,15 +59,21 @@ class CharacterInventoryController extends Controller {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
+        $type = $request->item_to_equip_type;
+
+        if ($type === 'spell-healing' || $type === 'spell-damage') {
+            $type = 'spell';
+        }
+
         $service = $characterInventoryService->setCharacter($character)
                                              ->setInventorySlot($itemToEquip)
                                              ->setPositions($validPositions->getPositions($itemToEquip->item))
-                                             ->setInventory($request->item_to_equip_type);
+                                             ->setInventory($type);
 
         $viewData = [
             'details'     => [],
             'itemToEquip' => $itemToEquip->item,
-            'type'        => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $request->item_to_equip_type : null),
+            'type'        => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $type : null),
             'slotId'      => $itemToEquip->id,
             'characterId' => $character->id,
             'bowEquipped' => false,
@@ -85,7 +91,7 @@ class CharacterInventoryController extends Controller {
             $viewData = [
                 'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory(), $character),
                 'itemToEquip'  => $itemToEquip->item,
-                'type'         => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $request->item_to_equip_type : null),
+                'type'         => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $type : null),
                 'slotId'       => $itemToEquip->id,
                 'slotPosition' => $itemToEquip->position,
                 'characterId'  => $character->id,

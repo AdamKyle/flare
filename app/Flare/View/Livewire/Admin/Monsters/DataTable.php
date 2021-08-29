@@ -32,7 +32,7 @@ class DataTable extends Component
             $this->page = 1;
         }
 
-        $monsters = Monster::dataTableSearch($this->search);
+        $monsters = Monster::where('monsters.name', 'like', '%'.$this->search.'%');
 
         if (!is_null($this->adventureId)) {
             $monsters = $monsters->join('adventure_monster', function($join) {

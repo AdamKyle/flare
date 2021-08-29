@@ -107,11 +107,17 @@ class Skill extends Model
 
     public function getBaseDamageModAttribute() {
 
+        $value = $this->baseSkill->base_damage_mod_bonus_per_level;
+
+        if (is_null($value) || !($value > 0.0)) {
+            return 0.0;
+        }
+
         $itemBonus  = $this->getItemBonuses($this->baseSkill, 'base_damage_mod_bonus', true);
         $itemBonus += $this->getItemBonuses($this->baseSkill, 'skill_bonus', true);
 
         $baseBonus = (
-            $this->baseSkill->base_damage_mod_bonus_per_level * $this->level
+            $value * $this->level
         );
 
         $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'base_damage_mod_bonus');
@@ -120,10 +126,16 @@ class Skill extends Model
     }
 
     public function getBaseHealingModAttribute() {
+        $value = $this->baseSkill->base_healing_mod_bonus_per_level;
+
+        if (is_null($value) || !($value > 0.0)) {
+            return 0.0;
+        }
+
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'base_damage_mod_bonus', true);
 
         $baseBonus = (
-            $this->baseSkill->base_healing_mod_bonus_per_level * $this->level
+            $value * $this->level
         );
 
         $baseBonus += $this->getCharacterBoonsBonus($baseBonus, 'base_healing_mod_bonus');

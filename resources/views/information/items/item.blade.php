@@ -1,7 +1,5 @@
 @extends('layouts.information')
 
-@dump('hello')
-
 @section('content')
     <div class="mt-3">
         <x-core.page-title-slot

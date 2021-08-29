@@ -72,6 +72,16 @@
             @livewire('admin.quests.data-table', [
                 'forMap' => $map->id,
             ])
+            <h3>Adventures</h3>
+            <hr />
+            @livewire('admin.adventures.data-table', [
+                'gameMapId' => $map->id,
+            ])
+            <h3>Locations</h3>
+            <hr />
+            @livewire('admin.locations.data-table', [
+                'gameMapId' => $map->id,
+            ])
         </x-cards.card>
     </div>
 @endsection
