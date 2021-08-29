@@ -11,10 +11,10 @@ export default class QueueModal extends React.Component {
   render() {
     if (this.props.queueType === 'building') {
       return <BuildingQueue buildings={this.props.kingdom.buildings} queueData={this.props.queueData}
-                            close={this.props.close} show={this.props.show} openTimeOutModal={this.openTimeOutModal.bind(this)}/>
+                            close={this.props.close} show={this.props.show} openTimeOutModal={this.props.openTimeOutModal}/>
     } else {
       return <UnitQueue kingdom={this.props.kingdom} units={this.props.kingdom.recruitable_units}
-                        queueData={this.props.queueData} close={this.props.close} show={this.props.show} openTimeOutModal={this.openTimeOutModal.bind(this)}/>
+                        queueData={this.props.queueData} close={this.props.close} show={this.props.show} openTimeOutModal={this.props.openTimeOutModal}/>
     }
   }
 }
