@@ -43,23 +43,21 @@ class ItemsControllerTest extends TestCase
 
     public function testCanColorForOneAffix() {
         $this->item->item_suffix_id = $this->createItemAffix([
-            'name'                 => 'sample',
-            'base_damage_mod'      => 0.10,
-            'type'                 => 'suffix',
-            'description'          => 'test',
-            'base_healing_mod'     => 0.10,
-            'str_mod'              => 0.10,
-            'dur_mod'              => 0.10,
-            'dex_mod'              => 0.10,
-            'chr_mod'              => 0.10,
-            'int_mod'              => 0.10,
-            'skill_name'           => 0.10,
-            'skill_training_bonus' => 0.10,
+            'name'                     => 'sample',
+            'base_damage_mod'          => 0.10,
+            'type'                     => 'suffix',
+            'description'              => 'test',
+            'base_healing_mod'         => 0.10,
+            'str_mod'                  => 0.10,
+            'dur_mod'                  => 0.10,
+            'dex_mod'                  => 0.10,
+            'chr_mod'                  => 0.10,
+            'int_mod'                  => 0.10,
         ])->id;
 
         $this->item->save();
 
-        $this->visitRoute('game.items.item', ['item' => Item::first()->id])->see('Rusty Dagger')->see('one-enchant');
+        $this->visitRoute('game.items.item', ['item' => $this->item])->see('Rusty Dagger')->see('one-enchant');
     }
 
     public function testCanColorForTwoAffix() {

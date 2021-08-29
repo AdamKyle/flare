@@ -12,10 +12,14 @@
             These items can crafted via
 
             @if (isset($skill))
-                @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{route('skills.skill', ['skill' => $skill->id])}}">Alchemy</a>.
-                @elseif (auth()->user())
-                    <a href="{{route('skill.character.info', ['skill' => $skill->id])}}">Alchemy</a>.
+                @auth
+                    @if (auth()->user()->hasRole('Admin'))
+                        <a href="{{route('skills.skill', ['skill' => $skill->id])}}">Alchemy</a>.
+                    @elseif (auth()->user())
+                        <a href="{{route('skill.character.info', ['skill' => $skill->id])}}">Alchemy</a>.
+                    @endif
+                @else
+                    <a href="{{route('info.page.skill', ['skill' => $skill->id])}}">Alchemy</a>.
                 @endif
             @endif
         </p>

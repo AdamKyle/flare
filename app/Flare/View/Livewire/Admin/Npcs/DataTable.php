@@ -27,6 +27,8 @@ class DataTable extends Component {
 
             if (!is_null($this->only)) {
                 $npcs = $npcs->where('type', $this->only)->get();
+            } else {
+                $npcs = $npcs->get();
             }
         }
 

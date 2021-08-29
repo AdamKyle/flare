@@ -1,59 +1,19 @@
-# NPC’s
+# NPC's
 
-Npc’s in Planes of Tlessa are entities that you can interact with via chat only. 
-Some NPC’s will require you to be at their location, while others don’t care where you are. If an NPC requires you to be at 
-their location, and you message them when you are not, you will see:
+Tless comes with NPC characters that you interact with via chat. To do this you would type, into the chat box:
 
-[Image]
+    /m NPCName: Command
 
-In chat.
+This will show messages to you based on what you are attempting to do. To conjure [Celestials](/information/celestials),
+[Taking Kingdoms](/information/npc-kingdoms) or to complete [quests](/information/quests).
 
-To interact with an NPC you can type: `/m NPCName: Command` This is done the same way as private messaging another player in game.
+As you might have noticed there is a verity that you can do. Below is a list of NPC's along with their accepted commands.
 
-There are three types of NPC’s in Tlessa: Kingdom Owner, Quest Giver and Conjurer.
+These commands must be typed exactly, or they won't work.
 
-## Kingdom Owner NPC
+Some NPC's, as you can see below, require you to be at their exact location. You can always mesage a NPc their command to see where they are
+as they will tell you their location and what plane they are on.
 
-This npc is responsible for taking kingdoms from players who have not walked their kingdoms in at least 5 days.
+Some NPC's can be on Water or (with Dungeons plane) Death Water, so make sure you have the appropriate quest item to access the NPC.
 
-They will hold the kingdom and allow other players to attack or take the kingdom via a command.
-
-Should a character delete their account, all their kingdoms are handed to the NPC who holds the kingdoms.
-
-If no one takes these kingdoms with in five days of the NPC being given or taking the kingdom, the kingdom will crumble into ruins, freeing up
-the space for another player, maybe a new player, to settle a new kingdom.
-
-## Quest NPC
-
-These NPC’s can take items, gold, gold dust and shards from you in exchange for rewards. 
-For example there is currently a quest to unlock alchemy in which one has to defeat a Celestial Entity to get a quest item to drop.
-
-Upon obtaining the quest item the player would then message the NPC to exchange the quest item.
-
-Quest NPC’s usually require you to be at their location to make the exchange. 
-Upon doing so, you'll get a global message in chat along with server messages for the reward:
-
-[Image]
-
-## Conjurer NPC
-
-These NPC’s usually require you to be at their location in order to conjure. Much like a Quest NPC.
-
-Upon messaging a Conjurer NPC, a new panel will open:
-
-[Image]
-
-From here you can select the celestial the type of conjuration. You can read more about celestial entities here.
-
-Upon selecting one and conjuring (lets do private)
-
-[Private conjure]
-
-You will see a global message, and you will be given the coordinates.
-
-You can also choose to conjure publicly, in which case every one will get a global message:
-
-[PUBLIC conjure]
-
-
-## NPC List
+Finally, NPC's with multiple quests or "Quest Chains", will require you to speak to the NPC multiple times to complete each quest.

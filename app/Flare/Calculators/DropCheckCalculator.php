@@ -70,7 +70,7 @@ class DropCheckCalculator {
         }
 
         $roll = rand(1, 1000);
-        $roll += round($roll * $totalBonus);
+        $roll = round($roll + $roll * $totalBonus);
         $dc   = round((1000 - (1000 * $monster->drop_check)));
 
         return $roll > $dc;

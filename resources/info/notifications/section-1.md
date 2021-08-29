@@ -11,8 +11,8 @@ The game comes with a few ways to notify you. One is through the notifications c
 As well as notifications that can be in chat:
 
 <div class="mb-4">
-    <a href="/storage/info/notifications/images/server-notification.png" class="glightbox">
-        <img src="/storage/info/notifications/images/server-notification.png" class="img-fluid" />
+    <a href="/storage/info/notifications/images/server-notifications.png" class="glightbox">
+        <img src="/storage/info/notifications/images/server-notifications.png" class="img-fluid" />
     </a>
 </div>
 

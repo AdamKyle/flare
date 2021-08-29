@@ -34,10 +34,10 @@ Let's go over these:
   - **Unit recruitment**: Recruiting units can take seconds, minutes or even hours, depending on the amount of units you are recruiting.
   - **Building Repair**: Has a timer based on current level of building. Repairs can only be done when a building reaches durability of 0. Leveling a damaged building, that is one that has a durability below its max but above 0, will replace current durability with the new max.
   - **Unit Movement**: All units have a moment speed. This speed is applied to the units regardless of how many you send, but stacks with other units that have a slower or equal movement speed. Distance is also taken into consideration.
-    
+- **Celestial Fights**: If the [Celestial](/information/celstials) Entity is not killed in one hit, there is a ten-second server time out to allow other players who might have joined a chance to land a hit.
 ### Character death
 
-Your character can die in a few ways. Fighting monsters and dying in an adventure. When you die, you cannot:
+Your character can die in a few ways. Fighting monsters and dying in an adventure as well as Celestials killing you. When you die, you cannot:
 
 - Move
 - Attack
@@ -50,11 +50,13 @@ Your character can die in a few ways. Fighting monsters and dying in an adventur
 - Destroy
 - Alchemy
 - Equip/Unequip
+- Manage [Sets](/information/equipment-sets)
 - Sell/Buy from either the shop or market board.
 - Traverse
 - Destroy items
 - Train skills
 - Manage kingdoms.
+- Speak to [NPC's](/information/npcs)
 
 You will be told to revive and that you are dead and dead people cannot do things.
 

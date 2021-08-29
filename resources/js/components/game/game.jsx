@@ -360,7 +360,7 @@ export default class Game extends React.Component {
             className={
               this.state.windowWidth <= 1900 ?
                 'col-12 center-element'
-              : 'col-12 col-lg-3'
+              : 'col-12 col-lg-3 move-map'
             }
           >
             <Map

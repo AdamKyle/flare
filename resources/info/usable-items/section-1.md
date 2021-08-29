@@ -1,52 +1,32 @@
-# Usable Items
+# Usable items and Alchemy
 
-There are three types of items in Tlessa: Equip, Quest and Usable.
+With the new skill called Alchemy - which can only be unlocked after completing a quest, players can craft new items 
+that cannot be sold to the shop, destroyed or disenchanted and do not drop.
 
-Usable items allow you to exactly as they state. For example, maybe you have items that increase stats for a period-of-time 
-(in minutes) or maybe you have items that do damage to kingdoms.
+These items can be sold on the market board for any amount of gold you see fit.
 
-These items can only be crafted (or purchased from the market board), can be sold on the market board 
-and require both Shards and Gold dust (see Currencies).
+Usable items require two things to craft: Gold Dust and Shards, which you can read about in [currencies](/information/currencies).
 
-These items cannot be destroyed or disenchanted.
-
-These items require you to have access to Alchemy skill.
-
-Crafting these items is done the same way as crafting a weapon. As you level the Alchemy skill, 
-more items will be unlocked at their appropriate levels, see table below.
-
-## Using Items
-
-There are two ways to use items, either via the inventory or when attacking a kingdom.
-
-Using an item via the inventory you can choose to click “Use all” which will use 
-all applicable non kingdom damaging items. These items can affect stats, skill bonuses and skill xp. 
-You can also use the drop-down to use specific items, one at a time.
-
-When using kingdom damaging items, you must be at the kingdom you wish to drop them on. You can use as many items in one attack as you want.
-
-## Stat and Skill items
-
-When using these types of usable items, their bonuses will stack. So, feel free to use as many items as you want on yourself.
-
-These items will not stack in the sense that you use 10 items that each last 10 minutes and increase all stats by .05% that it 
-will be: 50 minutes and 50%. Instead, its 10 minutes for each item you use and 50% total. This way if you use 1 item then another 
-5 minutes later that affect the same thing, yes, they will stack (bonus and stat wise), but their times will end differently.
-
-Using an item on the character sheet, while you have the game open in another tab will update stats in the game tab and skill bonuses 
-automatically. You will also be told via chat when these items wear off.
-
-## Kingdom Damaging Items
-
-These items, as stated, must be used while at the kingdom you wish to attack. These will do damage to the kingdom’s 
-buildings and units. Any morale damage suffered only happens when applicable buildings (see me, investigate buildings table) 
-durability hit 0.
-
-The defender will be told of each item and how much % wise it did to the kingdom.
-
-Chat will then see a global message go out.
+Using these you can begin to level the Skill: Alchemy by crafting these items.
 
 > ### ATTN!
->
-> None of the useable items can be bought with real world money. You can, as stated, buy them from the market board with gold only.
+> 
+> There are not enough items for the average player to level from level 1-400. More items will be added over time.
 
+Right now there are two types of usable items: Boons and Kingdom Damaging Items.
+
+## Boons
+
+Character boons are bonuses applied to the character for a limited amount of time. Character may have up to ten boons applied at
+any time. If a character uses ten items that effect, for example: stats - then all those bonuses will stack.
+
+When a player uses a boon, if they play with the game tab in another screen - the effects of the items will be applied automatically.
+
+## Kingdom Damaging
+
+Checkout [Items and Kingdoms](/information/items-and-kingdoms) for more information.
+
+There are items that you can craft that when dropped on a kingdom will do damage to that kingdom. They can do a percentage of damage that stack
+with the more items you use. This will alert the defending player that their kingdom is under attack.
+
+Below is a list of items that you can currently craft in the game.
