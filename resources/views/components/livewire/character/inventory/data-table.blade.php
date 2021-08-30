@@ -13,7 +13,8 @@
         @endif
         <div class="alert alert-warning mt-2 mb-3 hide" wire:loading.class.remove="hide" wire:target="destroyAllItems">
             <i class="fas fa-spinner fa-spin"></i> Processing request. <strong>Do not</strong> refresh or leave this page. The page will refresh when done.
-            You can check the game tab (if you have that open in a separate tab) to see each item be disenchanted.
+            You can check the game tab (if you have that open in a separate tab) to see each item be disenchanted. It is advised you do not do any additional
+            actions while this is processing as it can slow the game down.
         </div>
         <x-cards.card additionalClasses="overflow-table">
             <div class="row pb-2">

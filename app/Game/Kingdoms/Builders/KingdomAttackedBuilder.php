@@ -101,7 +101,7 @@ class KingdomAttackedBuilder {
         $newDefenderUnits = $this->log->new_defender['units'];
 
         $unitChanges = [];
-        dump($oldDefenderUnits, $newDefenderUnits);
+
         foreach ($oldDefenderUnits as $index => $unitInfo) {
             $oldAmount = $unitInfo['amount'];
             $newAmount = $newDefenderUnits[$index]['amount'];
@@ -119,7 +119,7 @@ class KingdomAttackedBuilder {
                 $percentage = 1 - ($newAmount / $oldAmount);
 
                 $unitChanges[$unitName] = [
-                    'lost_all'    => true,
+                    'lost_all'    => $percentage <= 0.0,
                     'old_amount'  => $oldAmount,
                     'new_amount'  => $newAmount,
                     'lost'        => number_format($percentage, 2),

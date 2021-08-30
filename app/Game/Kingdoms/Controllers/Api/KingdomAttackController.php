@@ -81,6 +81,7 @@ class KingdomAttackController extends Controller {
         }
 
         $kingdom    = Kingdom::with('buildings', 'units')->find($request->defender_id);
+        $defender   = $kingdom->character;
         $oldKingdom = $kingdom->toArray();
         $buildings  = $kingdom->buildings;
         $units      = $kingdom->units;
@@ -109,23 +110,25 @@ class KingdomAttackController extends Controller {
             ]);
         }
 
-        $kingdom = $kingdomHandler->setKingdom($kingdom->refresh())->decreaseMorale()->getKingdom();
+        $kingdom = $kingdomHandler->setKingdom($kingdom)
+                                  ->decreaseMorale()
+                                  ->getKingdom();
 
-        KingdomLog::create([
-            'character_id'    => $kingdom->character->id,
-            'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
-            'old_defender'    => $oldKingdom,
-            'new_defender'    => $kingdom->with('units', 'buildings')->toArray(),
-            'to_kingdom_id'   => $kingdom->id,
-            'published'       => true,
-        ]);
+        if (!is_null($defender)) {
+            KingdomLog::create([
+                'character_id'    => $defender->id,
+                'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
+                'old_defender'    => $oldKingdom,
+                'new_defender'    => $kingdom->toArray(),
+                'to_kingdom_id'   => $kingdom->id,
+                'published'       => true,
+            ]);
 
-        if (!is_null($kingdom->character_id)) {
             $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position .
                 '/' . $kingdom->y_position . ' on the ' .
                 $kingdom->gameMap->name . ' plane, has had an item dropped on it doing: ' . ($damageToKingdom * 100) . '% to Buildings and Units. Check your Attack logs for more info!';
 
-            $notifyHandler->sendMessage($kingdom->character->user, 'kingdom-attacked', $message);
+            $notifyHandler->sendMessage($defender->user, 'kingdom-attacked', $message);
         }
 
         $message = $character->name . ' Has caused the earth to shake, the buildings to crumble and the units to slaughtered at: ' .

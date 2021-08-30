@@ -1,31 +1,51 @@
 # Combat
-Tlessa is all about stats. Increasing your stats to do more damage, to fight harder critters and to get more drops.
 
-Tlessa, to do all this, uses combat - like any other game – to push you forward. Tlessa draws heavy for inspiration on games like Disgea for its combat. Those familiar with the series will know that there is not much in the way of tactical elements to Tlessa.
+Tlessa at it's core is all about fighting monsters to get better gear to take on harder creatures. There are various [affixes](/information/enchanting)
+that can effect gear and thus your modded stats. When you equip gear that increases a stat by x%, we do not increase your base stat, instead
+we add all the bonuses onto the stat, one at a time:
 
-This makes Tlessa a very grindy game. You grind for stats, you grind skill levels, you grind for coin and drops. All to make yourself better. That's the aspect most might be familiar with.
+    $stat = $stat + $stat * $bonus
 
-To do this, you will click. You will click attack, the faster you get to click again the better, the more damage you do and the faster you can kill, the more XP, Drops, Gold and Skill Xp.
+This done in a loop, thus your stats can get very high very quickly. On top of this is layered things like your skills base damage modifier
+or your armour class modifier.
 
-You attack, you kill, or you die, and you repeat.
+When your character attacks, we break down your attack for you:
 
-What is going on behind the scenes when it comes to attacking and how much does your stats really impact your ability to fight?
+<div class="mb-4">
+    <a href="/storage/info/combat/images/attack-info.png" class="glightbox">
+        <img src="/storage/info/combat/images/attack-info.png" class="img-fluid" />
+    </a>
+</div>
+
+The more types of items you have equipped the more damage you can do. Each item in the shop will increase your stats. 
+Specific affixes that you can only attach via enchanting, can add increased power on top of this.
+
+> ### ATTN!
+> 
+> A character fully decked out in shop gear, with no affixes, can make it to the bottom of the surface critter list and most of the way
+> down Labyrinth and Dungeons list. The first [Celestial Entity](/information/celestials) for surface is also able to be
+> taken down by characters with high stats.
+> 
+> Harder creatures will involve you training crafting and enchanting to make even more powerful craft only gear
+> that will help in taking these harder creatures down.
 
 ## Core Concept
 
-When it comes to combat, the core concept is for you to be able to kill the monster in **one hit**. Not many. You want to kill it, attack again, kill it, attack again. If you find that you cannot kill a creature in one hit, its because of your gear and/or your level.
+Kill the creature in one hit and be able to attack again as fast as possible. 
+
+This where skills that effect Fight Timout Modifier
+or gear that effect the skill (a combination of both) comes in handy in relation to the damage you can do and avoid taking.
+
+The faster you can kill = the more you kill = more rewards.
 
 ## Stats and Level matter.
 
-With in Tlessa, you have a set level to reach, this is called the cap. Each level gets you 1 point into your stats and 2 points into your class core stat.
-With no equipment, by the time you reach level 1000, your stats will be around 1-5k
+Having the best gear is great, but first you will have to work your way there. Every character has two stats to focus on and a class skill
+that increases their damage, healing, ac, fight time out modifiers or a combination of the aforementioned.
 
-With the max shop equipment, that is gear at 2 Billion per piece, your stats will be much, much higher, around 40-100k. This will be enough to kill the strongest critter from the list
-as well as the strongest [Celestial Entities](/information/celestials) in the game.
+As you level, you get 1 point in each stat and 2 in your primary damage stat. You can see your damage stat on the [character sheet](/information/character-stats).
 
-Beyond this is craft only sets, which cost between 2.1 Billion and 2.4 Billion per set item and cannot be bought from the shop. These require high level crafting skills and
-would make you severely overpowered, add affixes towards that, and you are even stronger.
-
+This combined with gear, affixes and skill bonuses will power your character up the proverbial ladder.
 
 ## How Does Attack Work?
 
@@ -52,6 +72,13 @@ If you have two healing spells at 70% chance to resurrect that's an instant resu
 As mentioned earlier, spells, artifacts and rings can fire independently of weather you miss or not. Rings will increase spell evasion and artifact annulment to
 reduce the enemies spells and artifacts. Normal Critters will not pose an issue, however [Celestial Entities](/information/celestials) will have spell evasion and artifact annulment as well as be able to cast
 spells and use artifacts.
+
+## Spell Evasion and Artifact annulment
+
+These two stats only effect your ability to reduce the enemies spell damage and artifact damage that an enemy can have. While regular critters, that is
+from the drop-down list (unless otherwise specified) do not have spells or artifacts that fire, [Celestial Entities](/information/celestials) do.
+
+As mentioned, rings will increase this evasion. If you manage to have over 100% then you will take no spell or artifact damage.
 
 ## Bows
 

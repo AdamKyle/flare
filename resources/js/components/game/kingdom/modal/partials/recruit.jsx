@@ -9,7 +9,7 @@ export default class Recruit extends React.Component {
     this.state = {
       max: this.props.currentPopulation,
       value: "",
-      canRecruit: false,
+      canRecruit: true,
       loading: false,
     }
   }
@@ -121,6 +121,7 @@ export default class Recruit extends React.Component {
   }
 
   render() {
+    console.log(this.state.canRecruit, this.props.unit.can_recruit_more);
     return (
       <div>
         <hr/>
@@ -185,11 +186,21 @@ export default class Recruit extends React.Component {
                 </OverlayTrigger>
               </dd>
             </dl>
-            <input className="form-control" type="number" min={0} max={this.state.max} value={this.state.value} onChange={this.amountChange.bind(this)} />
+            <input
+              className="form-control"
+              type="number"
+              min={0}
+              max={this.state.max}
+              value={this.state.value}
+              onChange={this.amountChange.bind(this)}
+            />
           </div>
           <div className="col-md-6">
-            <button className="btn btn-primary unit-recruit-button" disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more}
-                    onClick={this.recruitUnits.bind(this)}>Recruit Selected Amount
+            <button className="btn btn-primary unit-recruit-button"
+                    disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more}
+                    onClick={this.recruitUnits.bind(this)}
+            >
+              Recruit Selected Amount
             </button>
           </div>
         </div>

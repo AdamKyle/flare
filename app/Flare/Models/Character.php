@@ -3,17 +3,9 @@
 namespace App\Flare\Models;
 
 use App\Flare\Builders\CharacterInformationBuilder;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
-use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\Skill;
-use App\Flare\Models\Inventory;
 use App\Flare\Models\Traits\WithSearch;
-use App\Flare\Models\User;
 use Database\Factories\CharacterFactory;
 
 class Character extends Model
@@ -144,10 +136,6 @@ class Character extends Model
 
     public function notifications() {
         return $this->hasMany(Notification::class, 'character_id', 'id');
-    }
-
-    public function snapShots() {
-        return $this->hasMany(CharacterSnapShot::class, 'character_id', 'id');
     }
 
     public function kingdoms() {

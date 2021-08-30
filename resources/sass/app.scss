@@ -172,6 +172,10 @@ dd {
   margin: 0 auto;
 }
 
+.side-bar-scroll {
+  overflow-y: scroll;
+}
+
 .keep-down {
   @media (max-width: 768px) {
     margin-top: 70px;

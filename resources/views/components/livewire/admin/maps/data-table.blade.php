@@ -39,13 +39,14 @@
                     <x-data-tables.body>
                         @forelse($maps as $map)
                             <tr>
-
-
                                 @guest
                                     <td class="text-center">
                                         <a href="{{route('info.page.map', ['map' => $map])}}">{{$map->name}}</a>
                                     </td>
                                 @elseif (auth()->user()->hasRole('Admin'))
+                                    <td>
+                                        <a href="{{route('info.page.map', ['map' => $map])}}">{{$map->name}}</a>
+                                    </td>
                                     <td>{{$map->default ? 'Yes' : 'No'}}</td>
                                     <td>{{$map->characters_using}}</td>
 

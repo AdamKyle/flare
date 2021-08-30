@@ -27,7 +27,7 @@ class AdventuresController extends Controller {
             'adventure' => null,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::where('published', true)->where('is_celestial_entity', false)->orderBy('game_map_id', 'asc')->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->where('is_celestial_entity', false)->orderBy('game_map_id', 'asc')->orderBy('max_level', 'asc')->pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -36,7 +36,7 @@ class AdventuresController extends Controller {
             'adventure' => $adventure,
             'locations' => Location::all()->pluck('name', 'id')->toArray(),
             'items'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'monsters'  => Monster::where('published', true)->where('is_celestial_entity', false)->orderBy('game_map_id', 'asc')->pluck('name', 'id')->toArray(),
+            'monsters'  => Monster::where('published', true)->where('is_celestial_entity', false)->orderBy('game_map_id', 'asc')->orderBy('max_level', 'asc')->pluck('name', 'id')->toArray(),
         ]);
     }
 

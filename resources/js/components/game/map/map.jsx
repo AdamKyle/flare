@@ -146,6 +146,7 @@ export default class Map extends React.Component {
     });
 
     this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event) => {
+      //console.log('globalMapUpdate', event, this.state.otherKingdoms);
       if (event.mapName === this.state.characterMapName) {
         this.setState({
           otherKingdoms: event.otherKingdoms.filter((ok) => ok.character_id !== this.state.characterId),
@@ -154,10 +155,15 @@ export default class Map extends React.Component {
     });
 
     this.enemyKingdomMoraleUpdate.listen('Game.Kingdoms.Events.UpdateEnemyKingdomsMorale', (event) => {
+
       if (this.state.otherKingdoms.length > 0) {
         let otherKingdoms = this.state.otherKingdoms;
 
-        otherKingdoms.find((ok) => ok.id === event.enemyMorale.id).current_morale = event.enemyMorale.current_morale;
+        const index = otherKingdoms.findIndex((ok) => ok.id === event.enemyMorale.id);
+
+        if (index !== -1) {
+          otherKingdoms[index].current_morale = event.enemyMorale.current_morale;
+        }
 
         this.setState({
           otherKingdoms: otherKingdoms,

@@ -7,6 +7,8 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
@@ -74,6 +76,10 @@ class TakeKingdomHandler {
         $this->addKingdomToCache($attacker, $kingdom);
 
         $this->stopOtherAttacks($attacker);
+
+        event(new AddKingdomToMap($attacker));
+
+        broadcast(new UpdateGlobalMap($attacker));
 
         event(new UpdateMapDetailsBroadcast($attacker->map, $attacker->user, $this->movementService, true));
 

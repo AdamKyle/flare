@@ -267,13 +267,24 @@ class FightService {
         $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
                 $join->on('game_skills.id', 'skills.game_skill_id')
                      ->where('game_skills.name', 'Accuracy');
-        })->first()->skill_bonus;
+        })->first();
 
         $dodgeBonus    = $defender->skills()->join('game_skills', function($join) {
                 $join->on('game_skills.id', 'skills.game_skill_id')
                      ->where('game_skills.name', 'Dodge');
-        })->first()->skill_bonus;
+        })->first();
 
+        if (is_null($accuracyBonus)) {
+            $accuracyBonus = 0.0;
+        } else {
+            $accuracyBonus = $accuracyBonus->skill_bonus;
+        }
+
+        if (is_null($dodgeBonus)) {
+            $dodgeBonus = 0.0;
+        } else {
+            $dodgeBonus = $dodgeBonus->skill_bonus;
+        }
 
         if ($defender instanceof  Character) {
             $toHit = $this->toHitCalculation($attacker->dex, $this->characterInformation->statMod('dex'), $accuracyBonus, $dodgeBonus);
