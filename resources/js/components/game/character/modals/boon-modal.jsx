@@ -9,11 +9,12 @@ export default class BoonModal extends React.Component {
     this.state = {
       loading: false,
       message: null,
+      canceling: false,
     }
   }
 
   componentDidUpdate() {
-    const found = this.props.characterboons.filter((cb) => cb.id === this.props.boon.id);
+    const found = this.props.characterBoons.filter((cb) => cb.id === this.props.boon.id);
 
     if (found.length === 0) {
       this.setState({
@@ -26,6 +27,33 @@ export default class BoonModal extends React.Component {
   }
 
   cancel() {
+    this.setState({
+      canceling: true,
+    }, () => {
+      axios.post('/api/character-sheet/'+this.props.boon.character_id+'/remove-boon/' + this.props.boon.id)
+        .then((result) => {
+
+          this.props.showSuccess(true);
+          this.props.fetchBoons();
+
+          this.setState({
+            canceling: false
+          }, () => {
+            this.props.close();
+          });
+        })
+        .catch((err) => {
+          this.setState({
+            canceling: false
+          }, () => {
+            console.error(err);
+
+            if (response.status === 401 || response.status === 429) {
+              return location.reload()
+            }
+          });
+        });
+    })
 
   }
 
@@ -56,69 +84,71 @@ export default class BoonModal extends React.Component {
           }
           {
             this.props.boon.type === 'Effects skill' ?
-              <>
+              <div className="mb-2">
                 <dl>
                   <dt>Skills affected</dt>
                   <dd>{this.props.boon.affected_skills}</dd>
                   {
-                    this.props.boon.affected_skill_base_ac_mod_bonus !== null ?
+                    this.props.boon.base_ac_mod_bonus !== null ?
                       <>
                         <dt>Skill Base AC Mod</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_base_ac_mod_bonus * 100} %</dd>
+                        <dd className="text-success">+{this.props.boon.base_ac_mod_bonus * 100} %</dd>
                       </>
                     : null
                   }
                   {
-                    this.props.boon.affected_skill_base_damage_mod_bonus !== null ?
+                    this.props.boon.base_damage_mod_bonus !== null ?
                       <>
                         <dt>Skill Base Damge Mod</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_base_damage_mod_bonus * 100} %</dd>
+                        <dd className="text-success">+{this.props.boon.base_damage_mod_bonus * 100} %</dd>
                       </>
                       : null
                   }
                   {
-                    this.props.boon.affected_skill_base_healing_mod_bonus !== null ?
+                    this.props.boon.base_healing_mod_bonus !== null ?
                       <>
                         <dt>Skill Base Healing Mod</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_base_healing_mod_bonus * 100} %</dd>
+                        <dd className="text-success">+{this.props.boon.base_healing_mod_bonus * 100} %</dd>
                       </>
                       : null
                   }
                   {
-                    this.props.boon.affected_skill_bonus !== null ?
+                    this.props.boon.skill_bonus !== null ?
                       <>
                         <dt>Skill Bonus</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_bonus * 100} %</dd>
+                        <dd className="text-success">+{this.props.boon.skill_bonus * 100} %</dd>
                       </>
                       : null
                   }
                   {
-                    this.props.boon.affected_skill_fight_time_out_mod_bonus !== null ?
+                    this.props.boon.fight_time_out_mod_bonus !== null ?
                       <>
                         <dt>Skill Fight Time Out Bonus</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_fight_time_out_mod_bonus * 100} %</dd>
+                        <dd className="text-success">+{this.props.boon.fight_time_out_mod_bonus * 100} %</dd>
                       </>
                       : null
                   }
                   {
-                    this.props.boon.affected_skill_move_time_out_mod_bonus !== null ?
-                      <>
-                        <dt>Skill Move Time Out Bonus</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_move_time_out_mod_bonus * 100} %</dd>
-                      </>
-                      : null
-                  }
-                  {
-                    this.props.boon.affected_skill_training_bonus !== null ?
+                    this.props.boon.skill_training_bonus !== null ?
                       <>
                         <dt>Skill XP Bonus</dt>
-                        <dd className="text-success">+{this.props.boon.affected_skill_training_bonus * 100} %</dd>
+                        <dd className="text-success">+{this.props.boon.skill_training_bonus * 100} %</dd>
                       </>
                       : null
                   }
                 </dl>
-              </>
+              </div>
               : null
+          }
+
+          {
+            this.state.canceling ?
+              <div className="progress" style={{position: 'relative', height: '4px'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+            :
+              null
           }
 
           <Modal.Footer>

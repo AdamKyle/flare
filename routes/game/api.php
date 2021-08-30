@@ -7,6 +7,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::get('/character-sheet/{character}/active-boons', ['uses' => 'Api\CharacterSheetController@activeBoons']);
     Route::get('/character-location-data/{character}', ['uses' => 'Api\CharacterSheetController@basicLocationInformation']);
     Route::post('/character-sheet/{character}/name-change', ['uses' => 'Api\CharacterSheetController@nameChange']);
+    Route::post('/character-sheet/{character}/remove-boon/{boon}', ['uses' => 'Api\CharacterSheetController@cancelBoon']);
 
     Route::get('/notifications', ['uses' => 'Api\NotificationsController@index']);
     Route::post('/notifications/clear', ['uses' => 'Api\NotificationsController@clear']);

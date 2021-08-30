@@ -3,11 +3,13 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
+use App\Game\Core\Services\UseItemService;
 use App\Http\Controllers\Controller;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
@@ -90,5 +92,15 @@ class CharacterSheetController extends Controller {
         return response()->json([
             'active_boons' => $boons,
         ]);
+    }
+
+    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService) {
+        if ($character->id !== $boon->character_id) {
+            return response()->json(['message' => 'You cannot do that.'], 422);
+        }
+
+        $useItemService->removeBoon($character, $boon);
+
+        return response()->json(['message' => 'Boon has been deleted'], 200);
     }
 }

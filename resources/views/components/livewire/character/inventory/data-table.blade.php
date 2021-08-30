@@ -213,11 +213,6 @@
                                         'character' => $character
                                     ])
 
-                                    @include('game.character.partials.equipment.modals.use-modal', [
-                                        'slot'      => $slot,
-                                        'character' => $character
-                                    ])
-
                                     @include('game.character.partials.equipment.modals.move-to-set-modal', [
                                         'slot'      => $slot,
                                         'character' => $character
@@ -234,7 +229,8 @@
                                         <button class="btn btn-primary" data-toggle="modal" data-target="#slot-use-{{$slot->id}}">Use</button>
                                         @include('game.character.partials.equipment.modals.use-modal', [
                                             'slot'      => $slot,
-                                            'character' => $character
+                                            'character' => $character,
+                                            'skills'    => $slot->affects_skills,
                                         ])
                                     @else
                                         N/A

@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -53,6 +54,20 @@ class UseItemService {
         $this->updateCharacter($character, $item);
 
         $slot->delete();
+    }
+
+    /**
+     * Removes a boon from the character and updates their info.
+     *
+     * @param Character $character
+     * @param CharacterBoon $boon
+     */
+    public function removeBoon(Character $character, CharacterBoon $boon) {
+        $boon->delete();
+
+        $character = $character->refresh();
+
+        $this->updateCharacter($character);
     }
 
     public function updateCharacter(Character $character, Item $item = null) {

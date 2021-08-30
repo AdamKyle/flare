@@ -106,7 +106,6 @@
                     <x-tabs.tab tab="sets" title="Sets" selected="false" active="false" />
                     <x-tabs.tab tab="usable" title="Usable Items" selected="false" active="false" />
                     <x-tabs.tab tab="quest" title="Quest Items" selected="false" active="false" />
-
                 </x-tabs.pill-tabs-container>
                 <x-tabs.tab-content>
                     <x-tabs.tab-content-section tab="inventory" active="true">

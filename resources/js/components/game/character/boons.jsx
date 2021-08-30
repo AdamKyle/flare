@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDatatable from '@ashvin27/react-datatable';
 import moment from 'moment';
 import {CountdownCircleTimer} from 'react-countdown-circle-timer';
+import {Alert} from 'react-bootstrap';
 import Card from '../components/templates/card';
 import BoonModal from "./modals/boon-modal";
 
@@ -14,6 +15,7 @@ export default class Boons extends React.Component {
       boonToCancel: null,
       showBoonModal: false,
       loading: true,
+      showSuccess: false,
     }
 
     this.boons_config = {
@@ -52,6 +54,16 @@ export default class Boons extends React.Component {
   }
 
   componentDidMount() {
+    this.fetchBoons();
+
+    this.updateUnitMovements.listen('Game.Core.Events.CharacterBoonsUpdateBroadcastEvent', (event) => {
+      this.setState({
+        characterBoons: event.boons,
+      });
+    });
+  }
+
+  fetchBoons() {
     axios.get('/api/character-sheet/' + this.props.characterId + '/active-boons').then((result) => {
       this.setState({
         characterBoons: result.data.active_boons,
@@ -69,12 +81,6 @@ export default class Boons extends React.Component {
           return window.location.replace('/game');
         }
       }
-    });
-
-    this.updateUnitMovements.listen('Game.Core.Events.CharacterBoonsUpdateBroadcastEvent', (event) => {
-      this.setState({
-        characterBoons: event.boons,
-      });
     });
   }
 
@@ -138,7 +144,14 @@ export default class Boons extends React.Component {
     })
   }
 
+  showSuccess(show) {
+    this.setState({
+      showSuccess: show
+    });
+  }
+
   render() {
+    console.log(this.state.characterBoons);
     if (this.state.loading) {
       return (
         <Card>
@@ -162,6 +175,14 @@ export default class Boons extends React.Component {
             :
 
             <>
+              {
+                this.state.showSuccess ?
+                  <Alert variant="success" onClose={() => this.showSuccess(false)} dismissible>
+                      You removed a boon!
+                  </Alert>
+                :
+                  null
+              }
               <ReactDatatable
                 config={this.boons_config}
                 records={this.state.characterBoons}
@@ -176,7 +197,9 @@ export default class Boons extends React.Component {
               show={this.state.showBoonModal}
               close={this.closeCancelBoon.bind(this)}
               boon={this.state.boonToCancel}
+              fetchBoons={this.fetchBoons.bind(this)}
               characterBoons={this.state.characterBoons}
+              showSuccess={this.showSuccess.bind(this)}
             />
             : null
         }
