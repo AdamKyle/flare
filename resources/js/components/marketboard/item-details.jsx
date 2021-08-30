@@ -7,15 +7,6 @@ export default class ItemDetails extends React.Component {
     super(props)
   }
 
-  getEffect(item) {
-    switch (item.effect) {
-      case ('walk-on-water'):
-        return 'Walk on water';
-      default:
-        return 'N/A'
-    }
-  }
-
   renderAffixDetails(type) {
     const item = this.props.item['item_' + type];
 

@@ -68,8 +68,6 @@ class Item extends Model
         'stat_increase',
         'increase_stat_by',
         'affects_skill_type',
-        'increase_skill_bonus_by',
-        'increase_skill_training_bonus_by',
         'can_resurrect',
         'resurrection_chance',
         'spell_evasion',

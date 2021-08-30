@@ -75,6 +75,8 @@ export default class SellItemModal extends React.Component {
   }
 
   render() {
+    const suggestedPrice = this.props.modalData.cost;
+    console.log(this.props.modalData);
     return (
       <Modal
         show={this.props.showModal}
@@ -98,8 +100,8 @@ export default class SellItemModal extends React.Component {
             only, of the cost of the item plus cost of attached affixes. Use this as a guide only.
           </div>
           <div className="form-group">
-            <label htmlFor="listPirce">List For</label>
-            <input type="number" min={0} className="form-control" id="listPirce" onChange={this.salePrice.bind(this)} placeholder={this.props.modalData.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/>
+            <label htmlFor="listPirce">List For (suggested price: {suggestedPrice > 0 ? suggestedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' Gold' : 'anything'})</label>
+            <input type="number" min={0} className="form-control" id="listPirce" onChange={this.salePrice.bind(this)} />
             <small id="emailHelp" className="form-text text-muted">There is a 5% sales tax for listing items.</small>
           </div>
           <MarketHistory type={this.props.modalData.type}/>
