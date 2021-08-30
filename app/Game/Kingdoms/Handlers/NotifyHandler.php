@@ -238,6 +238,10 @@ class NotifyHandler {
         if ($logStatus->tookKingdom()) {
             $characterName = $defender->character->name;
 
+            if ($this->oldDefender['npc_owned']) {
+                $characterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+            }
+
             $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
                 ' on the ' . $mapName . ' plane. Any surviving units have been added to the kingdoms units. Check the kingdom attack logs for more info.';
 
@@ -274,9 +278,16 @@ class NotifyHandler {
      * @param Character $character
      */
     public function kingdomHasFallenMessage(Character $character) {
+        $map          = $character->map->gameMap->name;
+        
+        if (is_null($this->defendingCharacter)) {
+            $defenderName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+        } else {
+            $defenderName = $this->defendingCharacter->name;
+        }
 
-        $message = $this->defendingCharacter->name . '\'s kingdom on the ' .
-            $this->defendingCharacter->map->gameMap->name . ' plane, has fallen! ' .
+        $message = $defenderName. '\'s kingdom on the ' .
+            $map . ' plane, has fallen! ' .
             $character->name . ' is now the rightful ruler!';
 
         broadcast(new GlobalMessageEvent($message));

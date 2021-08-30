@@ -87,6 +87,16 @@ class KingdomResourcesService {
      */
     public function updateKingdom(): void {
 
+
+        // If the kingdom has never been walked, take it.
+        if (is_null($this->kingdom->last_walked)) {
+            $this->giveNPCKingdoms();
+
+            $this->doNotNotify = true;
+
+            return;
+        }
+
         $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
 
         if ($this->kingdom->npc_owned) {
@@ -111,15 +121,6 @@ class KingdomResourcesService {
 
                 broadcast(new GlobalMessageEvent('A kingdom at: (X/Y) ' . $x . '/' . $y . ' on ' .$plane .' Plane has crumbled to the earth clearing up space for a new kingdom'));
             }
-
-            return;
-        }
-
-        // If the kingdom has never been walked, take it.
-        if (is_null($this->kingdom->last_walked)) {
-            $this->giveNPCKingdoms();
-
-            $this->doNotNotify = true;
 
             return;
         }
@@ -162,7 +163,7 @@ class KingdomResourcesService {
         if ($lastWalked > 5) {
 
             if ($currentMorale <= 0.0) {
-                $this->giveNPCKingdoms();
+                $this->giveNPCKingdoms(false);
 
                 $this->doNotNotify = true;
 
@@ -213,7 +214,8 @@ class KingdomResourcesService {
         $this->kingdom->update([
             'character_id'   => null,
             'npc_owned'      => true,
-            'current_morale' => 0.10
+            'current_morale' => 0.10,
+            'last_walked'    => now(),
         ]);
 
         if (!$notify) {
