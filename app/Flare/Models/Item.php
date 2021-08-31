@@ -72,6 +72,8 @@ class Item extends Model
         'resurrection_chance',
         'spell_evasion',
         'artifact_annulment',
+        'increase_skill_bonus_by',
+        'increase_skill_training_bonus_by'
 
     ];
 

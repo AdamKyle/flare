@@ -2,6 +2,7 @@ import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 import ItemDetails from "../item-details";
 import MarketHistory from "../market-history";
+import UsableItemDetails from "../usable-item-details";
 
 export default class SellItemModal extends React.Component {
 
@@ -105,7 +106,12 @@ export default class SellItemModal extends React.Component {
             <small id="emailHelp" className="form-text text-muted">There is a 5% sales tax for listing items.</small>
           </div>
           <MarketHistory type={this.props.modalData.type}/>
-          <ItemDetails item={this.props.modalData} />
+          {
+            this.props.modalData.usable ?
+              <UsableItemDetails item={this.props.modalData}/>
+            :
+              <ItemDetails item={this.props.modalData}/>
+          }
           {
             this.state.posting ?
               <div className="progress mb-2 mt-2" style={{position: 'relative', height: '5px'}}>

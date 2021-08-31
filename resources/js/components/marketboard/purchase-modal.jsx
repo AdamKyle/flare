@@ -1,6 +1,7 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 import ItemDetails from './item-details';
+import UsableItemDetails from "./usable-item-details";
 
 export default class PurchaseModal extends React.Component {
 
@@ -70,6 +71,10 @@ export default class PurchaseModal extends React.Component {
   }
 
   getCostPercentage() {
+    if (this.state.item.usable) {
+      return 0.0;
+    }
+
     return (this.props.modalData.listed_price / this.state.item.cost);
   }
 
@@ -79,11 +84,15 @@ export default class PurchaseModal extends React.Component {
 
     if (!this.state.loading) {
       percentage = this.getCostPercentage();
+
     }
 
     if (percentage > 1.0) {
       text       = 'above';
       percentage = percentage.toFixed(2) * 100;
+    } else if (percentage <= 0.0) {
+      text = 'Alchemy Item (unknown base cost)';
+      percentage = 0;
     } else {
       percentage = 100 - 100 * percentage.toFixed(2);
 
@@ -109,7 +118,12 @@ export default class PurchaseModal extends React.Component {
             {this.state.loading ?
               <span className={'ml-2'} style={{fontSize: '16px', position: 'realitive', top: '-10px'}}>calculating ...</span> :
               <span className={percentage > 100.00 ? 'text-danger' : 'text-success' + " ml-2"} style={{fontSize: '16px', position: 'relative', top: '-2px', left: '5px'}}>
-                {percentage}% {text} base cost
+                {
+                  percentage === 0 ?
+                    <>{text}</>
+                  :
+                    <>{percentage}% {text} base cost</>
+                }
               </span>
             }
 
@@ -134,7 +148,12 @@ export default class PurchaseModal extends React.Component {
             Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it your self, or significantly cheaper. Most items will be listed for higher,
             due to the inherit risk in crafting and enchanting.
           </p> }
-          {this.state.loading ? 'Loading please wait ...' : <ItemDetails item={this.state.item}/>}
+          { this.state.loading ?
+            'Loading please wait ...' :
+              this.state.item.usable ?
+                <UsableItemDetails item={this.state.item} /> :
+                  <ItemDetails item={this.state.item}/>
+          }
           {
             this.state.purchasing ?
               <div className="progress loading-progress mt-3" style={{position: 'relative'}}>
