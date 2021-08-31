@@ -7,6 +7,10 @@ export default class ItemDetails extends React.Component {
     super(props)
   }
 
+  formatFloat(float) {
+    return float.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  }
+
   renderAffixDetails(type) {
     const item = this.props.item['item_' + type];
 
@@ -24,6 +28,8 @@ export default class ItemDetails extends React.Component {
           <dd>{item.base_ac_mod !== null ? item.base_ac_mod * 100 : 0}%</dd>
           <dt>Base Healing Modifier:</dt>
           <dd>{item.base_healing_mod !== null ? item.base_healing_mod * 100 : 0}%</dd>
+          <dt>Base Fight Timeout Mod:</dt>
+          <dd>{(item.fight_time_out_mod_bonus * 100).toFixed(0)}%</dd>
           <dt>Str Modifier:</dt>
           <dd>{item.str_mod !== null ? (item.str_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Dex Modifier:</dt>
@@ -36,9 +42,9 @@ export default class ItemDetails extends React.Component {
           <dd>{item.chr_mod !== null ? (item.chr_mod * 100).toFixed(0) : 0}%</dd>
           <dt>Skill Name:</dt>
           <dd>{item.skill_name === null ? 'N/A' : item.skill_name}</dd>
-          <dt>Skill Training Bonus:</dt>
+          <dt>Skill XP Bonus (When training):</dt>
           <dd>{item.skill_name === null ? 0 : item.skill_training_bonus * 100}%</dd>
-          <dt>Skill Bonus:</dt>
+          <dt>Skill Bonus (When Using):</dt>
           <dd>{item.skill_name === null ? 0 : item.skill_bonus * 100}%</dd>
         </dl>
         <hr/>
@@ -108,7 +114,7 @@ export default class ItemDetails extends React.Component {
   }
 
   render() {
-
+    console.log(this.props.item);
     return (
       <Accordion>
         <Card>
@@ -119,6 +125,9 @@ export default class ItemDetails extends React.Component {
           </Card.Header>
           <Accordion.Collapse eventKey="0">
             <Card.Body>
+              <div className="alert alert-info mb-3">
+                Values include (any) attached affixes.
+              </div>
               <Row>
                 <Col xs={6}>
                   <h3>Item Details</h3>
@@ -153,29 +162,61 @@ export default class ItemDetails extends React.Component {
                   <Card>
                     <Card.Body>
                       <dl>
-                        <dt><strong>Base Damage</strong>:</dt>
+                        <dt><strong>Attack <sup>*</sup></strong>:</dt>
                         <dd>{this.props.item.base_damage}</dd>
-                        <dt><strong>Base AC</strong>:</dt>
+                        <dt><strong>AC</strong>:</dt>
                         <dd>{this.props.item.base_ac}</dd>
-                        <dt><strong>Base Healing</strong>:</dt>
+                        <dt><strong>Healing</strong>:</dt>
                         <dd>{this.props.item.base_healing}</dd>
-                        <dt><strong>Base Damage Mod</strong>:</dt>
+                        <dt><strong>Base Attack Mod</strong>:</dt>
                         <dd>{this.props.item.base_damage_mod * 100}%</dd>
-                        <dt><strong>Base AC</strong>:</dt>
+                        <dt><strong>Fight Timeout Modifier <sup>**</sup></strong>:</dt>
+                        <dd>{this.props.item.fight_time_out_mod_bonus * 100}%</dd>
+                        <dt><strong>Base Damage Modifier <sup>**</sup></strong>:</dt>
+                        <dd>{this.props.item.base_damage_mod_bonus * 100}%</dd>
+                        <dt><strong>AC Mod</strong>:</dt>
                         <dd>{this.props.item.base_ac_mod * 100}%</dd>
-                        <dt><strong>Base Healing</strong>:</dt>
-                        <dd>{this.props.item.base_healing_mod * 100}%</dd>
+                        <dt><strong>Spell Evasion Modifier</strong>:</dt>
+                        <dd>{this.props.item.spell_evasion * 100}%</dd>
+                        <dt><strong>Artifact Annulment Modifier</strong>:</dt>
+                        <dd>{this.props.item.artifact_annulment * 100}%</dd>
+                        {
+                          this.props.item.can_resurrect ?
+                            <>
+                              <dt>Resurrection Chance <sup>rc</sup>:</dt>
+                              <dd>{this.props.item.resurrection_chance * 100}%</dd>
+                            </>
+                          : null
+                        }
                         <dt><strong>Strength</strong>:</dt>
-                        <dd>{this.props.item.str_modifier.toFixed(2) * 100}%</dd>
+                        <dd>{(this.props.item.str_modifier * 100).toFixed(0)}%</dd>
                         <dt><strong>Durability</strong>:</dt>
-                        <dd>{this.props.item.dur_modifier.toFixed(2) * 100}%</dd>
+                        <dd>{(this.props.item.dur_modifier * 100).toFixed(0)}%</dd>
                         <dt><strong>Dexterity</strong>:</dt>
-                        <dd>{this.props.item.dex_modifier.toFixed(2) * 100}%</dd>
+                        <dd>{(this.props.item.dex_modifier * 100).toFixed(0)}%</dd>
                         <dt><strong>Charisma</strong>:</dt>
-                        <dd>{this.props.item.chr_modifier.toFixed(2) * 100}%</dd>
+                        <dd>{(this.props.item.chr_modifier * 100).toFixed(0)}%</dd>
                         <dt><strong>Intelligence</strong>:</dt>
-                        <dd>{this.props.item.int_modifier.toFixed(2) * 100}%</dd>
+                        <dd>{(this.props.item.int_modifier * 100).toFixed(0)}%</dd>
+                        <dt><strong>Agility</strong>:</dt>
+                        <dd>{(this.props.item.agi_modifier * 100).toFixed(0)}%</dd>
+                        <dt><strong>Focus</strong>:</dt>
+                        <dd>{(this.props.item.focus_modifier * 100).toFixed(0)}%</dd>
                       </dl>
+                      <p className="mt-3 mb-3">
+                        <sup>*</sup> Attack includes Base Attack Modifier applied automatically, rounded to the nearest
+                        whole number.
+                      </p>
+                      <p>
+                        <sup>**</sup> Applies to all skills that increase this modifier.
+                      </p>
+                      {
+                        this.props.item.can_resurrect ?
+                          <p>
+                            <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.
+                          </p>
+                        : null
+                      }
                     </Card.Body>
                   </Card>
                 </Col>

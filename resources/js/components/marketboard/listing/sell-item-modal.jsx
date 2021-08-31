@@ -76,7 +76,7 @@ export default class SellItemModal extends React.Component {
 
   render() {
     const suggestedPrice = this.props.modalData.cost;
-    console.log(this.props.modalData);
+
     return (
       <Modal
         show={this.props.showModal}
