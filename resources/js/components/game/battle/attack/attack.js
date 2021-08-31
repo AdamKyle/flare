@@ -96,6 +96,14 @@ export default class Attack {
     let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
     let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
 
+    if (attackerAccuracy > 1.0) {
+      return true;
+    }
+
+    if (defenderDodge > 1.0) {
+       return false;
+    }
+
     if (Math.sign(toHitBase) === - 1) {
       toHitBase = Math.abs(toHitBase);
     }

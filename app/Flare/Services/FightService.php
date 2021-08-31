@@ -280,6 +280,14 @@ class FightService {
             $accuracyBonus = $accuracyBonus->skill_bonus;
         }
 
+        if ($accuracyBonus > 1.0) {
+            return true;
+        }
+
+        if ($dodgeBonus > 1.0) {
+            return false;
+        }
+
         if (is_null($dodgeBonus)) {
             $dodgeBonus = 0.0;
         } else {
