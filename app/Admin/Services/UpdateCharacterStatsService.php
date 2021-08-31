@@ -72,16 +72,6 @@ class UpdateCharacterStatsService {
         });
     }
 
-    protected function updateTestCharacterRace(Character $character, GameRace $oldRace, GameRace $newRace) {
-        $character->update(
-            $character->snapShots()->where('snap_shot->level', 1)->first()->snap_shot
-        );
-
-        $character = $this->updateCharacterStatsForRace($character->refresh(), $oldRace, $newRace);
-
-        LevelTestCharacter::dispatch($character, 1000, auth()->user(), true)->delay(now()->addMinutes(1));
-    }
-
     protected function updateCharacterStatsForRace(Character $character, GameRace $oldRace, GameRace $newRace): Character {
         $character->update([
             'str'           => ($character->str - $oldRace->str_mod) + $newRace->str_mod,

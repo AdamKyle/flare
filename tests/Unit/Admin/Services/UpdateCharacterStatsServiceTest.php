@@ -38,7 +38,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
         $race = GameRace::find($this->character->game_race_id);
 
         $oldRace = $race->replicate();
-        
+
         $race->update([
             'str_mod' => 100
         ]);
@@ -52,7 +52,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
         $class = GameClass::find($this->character->game_class_id);
 
         $oldClass = $class->replicate();
-        
+
         $class->update([
             'str_mod' => 100
         ]);
@@ -74,7 +74,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
         $this->character->update([
             'level' => 2
         ]);
-        
+
         $class->update([
             'str_mod' => 100,
             'damage_stat' => 'dex',
@@ -94,7 +94,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
         $class = GameClass::find($this->character->game_class_id);
 
         $oldClass = $class->replicate();
-        
+
         $class->update([
             'str_mod' => 100,
             'damage_stat' => 'dex'
@@ -114,7 +114,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
         $class = GameClass::find($this->character->game_class_id);
 
         $oldClass = $class->replicate();
-        
+
         $class->update([
             'str_mod' => 100,
             'damage_stat' => 'dex'
@@ -145,7 +145,6 @@ class UpdateCharacterStatsServiceTest extends TestCase
         Queue::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()
-                                           ->giveSnapShot()
                                            ->getCharacter();
 
         $race = GameRace::find($character->race->id);
@@ -157,7 +156,7 @@ class UpdateCharacterStatsServiceTest extends TestCase
         ]);
 
         resolve(UpdateCharacterStatsService::class)->updateRacialStats($oldRace, $race->refresh());
-        
+
         $character = $character->refresh();
 
         $this->assertEquals(100, $character->race->str_mod);
@@ -167,11 +166,10 @@ class UpdateCharacterStatsServiceTest extends TestCase
         Queue::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()
-                                           ->giveSnapShot()
                                            ->getCharacter();
 
         $class = GameClass::find($character->class->id);
-        
+
         $oldClass = $class->replicate();
 
         $class->update([
@@ -181,13 +179,13 @@ class UpdateCharacterStatsServiceTest extends TestCase
 
 
         resolve(UpdateCharacterStatsService::class)->updateClassStats($oldClass, $class->refresh());
-        
+
         $character = $character->refresh();
 
         $this->assertEquals(100, $character->class->str_mod);
         $this->assertEquals('int', $character->class->damage_stat);
     }
-    
+
 
     protected function baseSetUp() {
 
