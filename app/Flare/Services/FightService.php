@@ -264,21 +264,8 @@ class FightService {
     }
 
     protected function canHit($attacker, $defender): bool {
-        $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
-                $join->on('game_skills.id', 'skills.game_skill_id')
-                     ->where('game_skills.name', 'Accuracy');
-        })->first();
-
-        $dodgeBonus    = $defender->skills()->join('game_skills', function($join) {
-                $join->on('game_skills.id', 'skills.game_skill_id')
-                     ->where('game_skills.name', 'Dodge');
-        })->first();
-
-        if (is_null($accuracyBonus)) {
-            $accuracyBonus = 0.0;
-        } else {
-            $accuracyBonus = $accuracyBonus->skill_bonus;
-        }
+        $accuracyBonus = $this->fetchAccuracyBonus($attacker);
+        $dodgeBonus    = $this->fetchDodgeBonus($defender);
 
         if ($accuracyBonus > 1.0) {
             return true;
@@ -286,12 +273,6 @@ class FightService {
 
         if ($dodgeBonus > 1.0) {
             return false;
-        }
-
-        if (is_null($dodgeBonus)) {
-            $dodgeBonus = 0.0;
-        } else {
-            $dodgeBonus = $dodgeBonus->skill_bonus;
         }
 
         if ($defender instanceof  Character) {
@@ -312,6 +293,59 @@ class FightService {
         return rand(1, 100) > $needToHit;
     }
 
+    /**
+     * Fetch the accuracy bonus of the attacker.
+     *
+     * @param $attacker
+     * @return float
+     */
+    protected function fetchAccuracyBonus($attacker): float {
+        $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                ->where('game_skills.name', 'Accuracy');
+        })->first();
+
+        if (is_null($accuracyBonus)) {
+            $accuracyBonus = 0.0;
+        } else {
+            $accuracyBonus = $accuracyBonus->skill_bonus;
+        }
+
+        return $accuracyBonus;
+    }
+
+    /**
+     * Fetch the dpdge bonus of the defender.
+     *
+     * @param $defender
+     * @return float
+     */
+    protected function fetchDodgeBonus($defender): float {
+        $dodgeBonus    = $defender->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                ->where('game_skills.name', 'Dodge');
+        })->first();
+
+        if (is_null($dodgeBonus)) {
+            $dodgeBonus = 0.0;
+        } else {
+            $dodgeBonus = $dodgeBonus->skill_bonus;
+        }
+
+        return $dodgeBonus;
+    }
+
+    /**
+     * Calculate the ToHit Percentage.
+     *
+     * This consists of dexterity, to hit stat, accuracy and the enemy dodge.
+     *
+     * @param int $toHit
+     * @param int $dex
+     * @param float $accuracy
+     * @param float $dodge
+     * @return float|int
+     */
     protected function toHitCalculation(int $toHit, int $dex, float $accuracy, float $dodge) {
         $dex   = ($dex / 10000);
         $toHit = ($toHit + $toHit * $accuracy) / 100;
@@ -319,6 +353,13 @@ class FightService {
         return ($dex + $dex * $dodge) - $toHit;
     }
 
+    /**
+     * Was the attack blocked?
+     *
+     * @param $defender
+     * @param $attacker
+     * @return bool
+     */
     protected function blockedAttack($defender, $attacker): bool {
         $baseStat = $attacker->{$defender->damage_stat};
         $ac       = $defender->ac;
@@ -334,6 +375,15 @@ class FightService {
         return $ac > $baseStat;
     }
 
+    /**
+     * Casts your healing spells.
+     *
+     * Monsters do not have healing spells, but players do.
+     *
+     * @param $defender
+     * @return array
+     * @throws \Exception
+     */
     protected function castHealingSpell($defender) {
         $messages = [];
 
@@ -350,6 +400,13 @@ class FightService {
         return $messages;
     }
 
+    /**
+     * Casts spells and deals with dealing damage.
+     *
+     * @param $attacker
+     * @param $defender
+     * @return array
+     */
     protected function castSpell($attacker, $defender) {
         $messages = [];
 
@@ -369,6 +426,14 @@ class FightService {
         return $messages;
     }
 
+    /**
+     * Use rings.
+     *
+     * Only the character has rings.
+     *
+     * @param $attacker
+     * @return array
+     */
     protected function useRings($attacker): array {
         $messages = [];
 
@@ -386,6 +451,13 @@ class FightService {
         return $messages;
     }
 
+    /**
+     * Deal artifact damage.
+     *
+     * @param $attacker
+     * @param $defender
+     * @return array
+     */
     protected function useAtifacts($attacker, $defender) {
         $messages = [];
 
@@ -406,6 +478,15 @@ class FightService {
         return $messages;
     }
 
+    /**
+     * Deals artifact damage either from player or monster.
+     *
+     * Damage can be annulled based on defenders' annulment percentage.
+     *
+     * @param $attacker
+     * @param $defender
+     * @return string[]|void
+     */
     protected function artifactDamage($attacker, $defender) {
         if ($attacker instanceof Character) {
             $baseArtifactDamage = $this->characterInformation->getTotalArtifactDamage();
@@ -466,6 +547,15 @@ class FightService {
         }
     }
 
+    /**
+     * Deal spell damage to the enemy.
+     *
+     * Spell damage can be evaded based on the defenders spell evasion.
+     *
+     * @param $attacker
+     * @param $defender
+     * @return string[]|void
+     */
     protected function spellDamage($attacker, $defender) {
         if ($attacker instanceof Character) {
             $spellDamage = $this->characterInformation->getTotalSpellDamage();
@@ -526,6 +616,14 @@ class FightService {
         }
     }
 
+    /**
+     * Complete the attack on the defender.
+     *
+     * @param $attacker
+     * @param $defender
+     * @return array
+     * @throws \Exception
+     */
     protected function completeAttack($attacker, $defender): array {
         $messages = [];
 
@@ -573,6 +671,12 @@ class FightService {
         return $messages;
     }
 
+    /**
+     * Fetches the monsters attack damage from their attack range.
+     *
+     * @param $attacker
+     * @return int
+     */
     protected function fetchMonsterAttack($attacker) {
         $attackRange = explode('-', $attacker->attack_range);
 
