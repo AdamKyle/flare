@@ -33,7 +33,7 @@ Well in the chat you will see:
 
 <div class="mb-4">
     <a href="/storage/info/usable-items/images/used-item.png" class="glightbox">
-        <img src="/storage/info/usable-items/images/used-items.png" class="img-fluid" />
+        <img src="/storage/info/usable-items/images/used-item.png" class="img-fluid" />
     </a>
 </div>
 

@@ -2,7 +2,11 @@
 
 When items drop in battle:
 
-[Image]
+<div class="mb-4">
+    <a href="/storage/info/disenchanting/images/item-drop.png" class="glightbox">
+        <img src="/storage/info/disenchanting/images/item-drop.png" class="img-fluid" />
+    </a>
+</div>
 
 You have two options: Destroy and Disenchant
 
