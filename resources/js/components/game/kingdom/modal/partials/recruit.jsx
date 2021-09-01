@@ -121,7 +121,6 @@ export default class Recruit extends React.Component {
   }
 
   render() {
-    console.log(this.state.canRecruit, this.props.unit.can_recruit_more);
     return (
       <div>
         <hr/>

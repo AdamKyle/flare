@@ -8,7 +8,6 @@ export default class UsableItemDetails extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className="mb-3">
         <Card>

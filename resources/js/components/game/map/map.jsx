@@ -146,7 +146,6 @@ export default class Map extends React.Component {
     });
 
     this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event) => {
-      //console.log('globalMapUpdate', event, this.state.otherKingdoms);
       if (event.mapName === this.state.characterMapName) {
         this.setState({
           otherKingdoms: event.otherKingdoms.filter((ok) => ok.character_id !== this.state.characterId),

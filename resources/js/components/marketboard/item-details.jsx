@@ -114,7 +114,6 @@ export default class ItemDetails extends React.Component {
   }
 
   render() {
-    console.log(this.props.item);
     return (
       <Accordion>
         <Card>

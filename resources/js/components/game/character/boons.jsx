@@ -151,7 +151,6 @@ export default class Boons extends React.Component {
   }
 
   render() {
-    console.log(this.state.characterBoons);
     if (this.state.loading) {
       return (
         <Card>
