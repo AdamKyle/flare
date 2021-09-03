@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Jobs\UpdateKingdomJob;
 use App\Flare\Models\Character;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
@@ -48,9 +49,9 @@ class UpdateKingdom extends Command
      */
     public function handle(KingdomResourcesService $service)
     {
-        Kingdom::chunkById(100, function($kingdoms) use ($service) {
+        Kingdom::chunkById(250, function($kingdoms) use ($service) {
             foreach ($kingdoms as $kingdom) {
-                $service->setKingdom($kingdom)->updateKingdom();
+                UpdateKingdomJob::dispatch($kingdom);
             }
         });
 

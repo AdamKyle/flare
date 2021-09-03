@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Traits;
 
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Cache;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
@@ -106,9 +107,17 @@ trait KingdomCache {
 
         $cache = Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
 
-        Cache::put('character-kingdoms-'  . $plane . '-' . $character->id, $this->removeKingdom($kingdom, $cache));
+        if (is_null($cache)) {
+            $cache = $this->getKingdoms($character);
+        }
 
-        return Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
+        if (!is_null($cache)) {
+            Cache::put('character-kingdoms-' . $plane . '-' . $character->id, $this->removeKingdom($kingdom, $cache));
+
+            return Cache::get('character-kingdoms-'  . $plane . '-' . $character->id);
+        }
+
+        return $this->getKingdoms($character);
     }
 
     /**

@@ -42,7 +42,7 @@
                 </dd>
                 <dt>X/Y: </dt>
                 <dd>
-                    {{$location->x}} / {{$loation->y}}
+                    {{$location->x}} / {{$location->y}}
                 </dd>
             </dl>
         @endif

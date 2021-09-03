@@ -87,19 +87,34 @@ class KingdomResourcesService {
      */
     public function updateKingdom(): void {
 
-
-        // If the kingdom has never been walked, take it.
-        if (is_null($this->kingdom->last_walked)) {
+        if (is_null($this->kingdom->last_walked) && !$this->kingdom->npc_owned) {
             $this->giveNPCKingdoms();
 
             $this->doNotNotify = true;
 
-            return;
-        }
+        } else if (!is_null($this->kingdom->last_walked) && !$this->kingdom->npc_owned) {
+            $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
 
-        $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
+            if ($lastTimeWalked > 10) {
+                $this->giveNPCKingdoms();
 
-        if ($this->kingdom->npc_owned) {
+                return;
+            }
+
+            $this->increaseOrDecreaseMorale($lastTimeWalked);
+
+            if ($lastTimeWalked < 5) {
+                $this->updateCurrentPopulation();
+                $this->increaseCurrentResource();
+                $this->increaseTreasury();
+            }
+
+            if (!$this->doNotNotify) {
+                $this->notifyUser();
+            }
+
+            $this->doNotNotify = false;
+        } else if ($this->kingdom->npc_owned) {
             $lastTimeWalked = $this->kingdom->updated_at->diffInDays(now());
 
             if ($lastTimeWalked >= 5) {
@@ -121,25 +136,7 @@ class KingdomResourcesService {
 
                 broadcast(new GlobalMessageEvent('A kingdom at: (X/Y) ' . $x . '/' . $y . ' on ' .$plane .' Plane has crumbled to the earth clearing up space for a new kingdom'));
             }
-
-            return;
         }
-
-
-        $this->increaseOrDecreaseMorale($lastTimeWalked);
-
-        if ($lastTimeWalked < 5) {
-            $this->updateCurrentPopulation();
-            $this->increaseCurrentResource();
-            $this->increaseTreasury();
-        }
-
-
-        if (!$this->doNotNotify) {
-            $this->notifyUser();
-        }
-
-        $this->doNotNotify = false;
     }
 
     /**
@@ -211,18 +208,18 @@ class KingdomResourcesService {
     public function giveNPCKingdoms(bool $notify = true) {
         $character = $this->kingdom->character;
 
+        if (!$notify) {
+            $this->removeKingdomFromCache($character, $this->kingdom->refresh());
+        } else {
+            $this->npcTookKingdom($character->user, $this->kingdom);
+        }
+
         $this->kingdom->update([
             'character_id'   => null,
             'npc_owned'      => true,
             'current_morale' => 0.10,
             'last_walked'    => now(),
         ]);
-
-        if (!$notify) {
-            $this->removeKingdomFromCache($character, $this->kingdom->refresh());
-        } else {
-            $this->npcTookKingdom($character->user, $this->kingdom);
-        }
 
         broadcast(new UpdateNPCKingdoms($this->kingdom->gameMap));
         broadcast(new UpdateGlobalMap($character));
