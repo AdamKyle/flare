@@ -7,6 +7,8 @@
         <th>dex</th>
         <th>chr</th>
         <th>int</th>
+        <th>agi</th>
+        <th>focus</th>
         <th>ac</th>
         <th>is_celestial_entity</th>
         <th>gold_cost</th>
@@ -40,6 +42,8 @@
             <td>{{$monster->dex}}</td>
             <td>{{$monster->chr}}</td>
             <td>{{$monster->int}}</td>
+            <td>{{$monster->agi}}</td>
+            <td>{{$monster->focus}}</td>
             <td>{{$monster->ac}}</td>
             <th>{{$monster->is_celestial_entity}}</th>
             <th>{{$monster->gold_cost}}</th>

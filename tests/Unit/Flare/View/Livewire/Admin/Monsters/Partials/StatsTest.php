@@ -40,6 +40,8 @@ class StatsTest extends TestCase
                                     ->set('monster.dex', 10)
                                     ->set('monster.chr', 10)
                                     ->set('monster.int', 10)
+                                    ->set('monster.agi', 10)
+                                    ->set('monster.focus', 10)
                                     ->set('monster.ac', 'ac')
                                     ->set('monster.damage_stat', 'str')
                                     ->set('monster.xp', 100)
@@ -67,6 +69,8 @@ class StatsTest extends TestCase
                                     ->set('monster.dex', $monster->dex)
                                     ->set('monster.chr', $monster->chr)
                                     ->set('monster.int', $monster->int)
+                                    ->set('monster.agi', $monster->agi)
+                                    ->set('monster.focus', $monster->focus)
                                     ->set('monster.ac', $monster->ac)
                                     ->set('monster.damage_stat', 'str')
                                     ->set('monster.xp', $monster->xp)
@@ -84,7 +88,7 @@ class StatsTest extends TestCase
 
     public function testInitialMonsterIsArray() {
         $monster = $this->createMonster()->load('skills');
-        
+
         Livewire::test(Stats::class, ['monster' => $monster->toArray()])->assertSet('monster.name', $monster->name);
     }
 }

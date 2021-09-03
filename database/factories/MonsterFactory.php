@@ -30,6 +30,8 @@ class MonsterFactory extends Factory
             'dex'          => 1,
             'chr'          => 1,
             'int'          => 1,
+            'agi'          => 1,
+            'focus'        => 1,
             'ac'           => 1,
             'health_range' => '1-8',
             'attack_range' => '1-6',

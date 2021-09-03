@@ -13,6 +13,10 @@
                     <dd>{{number_format($monster->chr)}}</dd>
                     <dt>int</dt>
                     <dd>{{number_format($monster->int)}}</dd>
+                    <dt>agi</dt>
+                    <dd>{{number_format($monster->int)}}</dd>
+                    <dt>focus</dt>
+                    <dd>{{number_format($monster->int)}}</dd>
                     <dt>Damage Stat</dt>
                     <dd>{{$monster->damage_stat}}</dd>
                 </dl>

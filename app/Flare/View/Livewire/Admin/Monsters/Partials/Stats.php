@@ -22,6 +22,8 @@ class Stats extends Component
         'monster.dex'                 => 'required',
         'monster.chr'                 => 'required',
         'monster.int'                 => 'required',
+        'monster.agi'                 => 'required',
+        'monster.focus'               => 'required',
         'monster.ac'                  => 'required',
         'monster.gold'                => 'required',
         'monster.max_level'           => 'required',

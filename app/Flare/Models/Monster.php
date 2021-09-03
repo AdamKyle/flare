@@ -27,6 +27,8 @@ class Monster extends Model
         'dex',
         'chr',
         'int',
+        'agi',
+        'focus',
         'ac',
         'gold',
         'max_level',

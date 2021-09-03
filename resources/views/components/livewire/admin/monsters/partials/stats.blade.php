@@ -52,6 +52,8 @@
                     <option value="dur">Dur</option>
                     <option value="int">Int</option>
                     <option value="chr">Chr</option>
+                    <option value="agi">Agi</option>
+                    <option value="focus">Focus</option>
                 </select>
                 @error('monster.damage_stat') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
@@ -91,6 +93,22 @@
                 <label for="intelligence">Intelligence: </label>
                 <input type="number" class="form-control" name="intelligence" value="" wire:model="monster.int">
                 @error('monster.int') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="agility">Agility: </label>
+                <input type="number" class="form-control" name="agility" value="" wire:model="monster.agi">
+                @error('monster.agi') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="focus">Focus: </label>
+                <input type="number" class="form-control" name="focus" value="" wire:model="monster.focus">
+                @error('monster.focus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>
