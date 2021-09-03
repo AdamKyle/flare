@@ -36,9 +36,22 @@
             <dl>
                 <dt>Found By Visiting: </dt>
                 <dd>
-                    <a href="{{route('locations.location', [
+                    @auth
+                        @if (auth()->user()->hasRole('Admin'))
+                            <a href="{{route('locations.location', [
                                         'location' => $location->id
                                     ])}}">{{$location->name}}</a>
+                        @else
+                            <a href="{{route('game.locations.location', [
+                                                'location' => $location->id
+                                            ])}}">{{$location->name}}</a>
+                        @endif
+                    @else
+                        <a href="{{route('info.page.location', [
+                                                'location' => $location->id
+                                            ])}}">{{$location->name}}</a>
+                    @endauth
+
                 </dd>
                 <dt>X/Y: </dt>
                 <dd>
@@ -72,23 +85,23 @@
                     @auth
                         @if (auth()->user()->hasRole('Admin'))
                             <a href="{{route('locations.location', [
-                                                'location' => $adventure->location->id
-                                            ])}}">{{$adventure->location->name}}</a>
+                                                'location' => $location->id
+                                            ])}}">{{$adventure->locations->first()->name}}</a>
                         @else
                             <a href="{{route('game.locations.location', [
-                                                'location' => $adventure->location->id
-                                            ])}}">{{$adventure->location->name}}</a>
+                                                'location' => $adventure->locations->first()->id
+                                            ])}}">{{$adventure->locations->first()->name}}</a>
                         @endif
                     @else
                         <a href="{{route('info.page.location', [
-                                                'location' => $adventure->location->id
-                                            ])}}">{{$adventure->location->name}}</a>
+                                                'location' => $adventure->locations->first()->id
+                                            ])}}">{{$adventure->locations->first()->name}}</a>
                     @endauth
 
                 </dd>
                 <dt>X/Y: </dt>
                 <dd>
-                    {{$adventure->location->x}} / {{$adventure->loation->y}}
+                    {{$adventure->locations->first()->x}} / {{$adventure->locations->first()->y}}
                 </dd>
             </dl>
         @endif
