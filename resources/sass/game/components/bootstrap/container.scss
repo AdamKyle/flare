@@ -1,0 +1,7 @@
+.small-container {
+  max-width: 75%;
+
+  @include media-breakpoint-down(md) {
+    max-width: 100%;
+  }
+}
