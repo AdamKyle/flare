@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Core;
+namespace Tests\Unit\Game\Core\Services;
 
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Services\CharacterInventoryService;
