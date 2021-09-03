@@ -26,6 +26,8 @@ class MonsterTransfromer extends TransformerAbstract {
             'dex'                => $monster->dex,
             'chr'                => $monster->chr,
             'int'                => $monster->int,
+            'agi'                => $monster->agi,
+            'focus'              => $monster->focus,
             'to_hit_base'        => $monster->dex / 10000,
             'ac'                 => $monster->ac,
             'health_range'       => $monster->health_range,

@@ -14,7 +14,7 @@ export default class Monster {
 
     const healthRange = this.monster.health_range.split('-');
 
-    return randomNumber(healthRange[0], healthRange[1]) + 10 + this.monster.dur;
+    return parseInt(randomNumber(healthRange[0], healthRange[1]) + 10 + this.monster.dur);
   }
 
   attack() {
@@ -25,6 +25,6 @@ export default class Monster {
 
     const attackRange = this.monster.attack_range.split('-');
 
-    return randomNumber(attackRange[0], attackRange[1]) + this.monster[this.monster.damage_stat];
+    return parseInt(randomNumber(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat]) / 2);
   }
 }
