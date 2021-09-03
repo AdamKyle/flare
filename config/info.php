@@ -27,6 +27,16 @@ return [
             'craft_only'          => false,
         ]
     ],
+    'quest-items'            => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.items.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => 'quest',
+            'craft_only'          => false,
+        ]
+    ],
     'celestials'        => [
         [
             'livewire'            => true,

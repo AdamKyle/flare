@@ -93,13 +93,16 @@
         </ul>
     </li>
     <li>
-        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-eye-monster"></i><span class="hide-menu">Monsters</span></a>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-eye-monster"></i><span class="hide-menu">Lists</span></a>
         <ul aria-expanded="false" class="collapse">
             <li>
-                <a href="{{route('info.page', ['pageName' => 'celestials'])}}">Celestials</a>
+                <a href="{{route('info.page', ['pageName' => 'celestials'])}}">Celestial List</a>
             </li>
             <li>
                 <a href="{{route('info.page', ['pageName' => 'monsters'])}}">Monsters List</a>
+            </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'quest-items'])}}">Quest Item List</a>
             </li>
         </ul>
     </li>
