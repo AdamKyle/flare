@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container welcome">
+    <div class="container small-container welcome">
         <div class="row justify-content-center">
             <div class="col-xl-8 col-lg-11 col-md-12">
                 <div class="jumbotron  mt-5">

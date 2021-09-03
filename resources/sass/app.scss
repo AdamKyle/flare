@@ -28,7 +28,6 @@
 @import 'game/character-sheet';
 @import 'game/top-bar';
 @import 'game/inventory';
-@import 'game/shop';
 @import 'game/icons';
 @import 'game/kingdom';
 
@@ -40,6 +39,7 @@
 @import 'game/components/livewire/data-tables';
 
 // Bootstrap Components:
+@import 'game/components/bootstrap/container';
 @import 'game/components/bootstrap/card';
 @import 'game/components/bootstrap/button';
 @import 'game/components/bootstrap/modal';

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mb-5">
+<div class="container small-container mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="row page-titles">
