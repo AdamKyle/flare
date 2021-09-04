@@ -1,4 +1,5 @@
 import ExtraActionType from "./extra-action-type";
+import {random} from "lodash";
 
 export default class Damage {
 
@@ -22,6 +23,7 @@ export default class Damage {
 
     monsterCurrentHealth = this.tripleAttackChance(attacker, monsterCurrentHealth);
     monsterCurrentHealth = this.doubleDamage(attacker, monsterCurrentHealth);
+    monsterCurrentHealth = this.vampireThirstChance(attacker, monsterCurrentHealth);
 
     return monsterCurrentHealth;
   }
@@ -35,6 +37,10 @@ export default class Damage {
   canAutoHit(attacker) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return false;
+      }
 
       if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
 
@@ -77,6 +83,10 @@ export default class Damage {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
+      if (!this.canUse(extraActionChance.chance)) {
+        return monsterCurrentHealth;
+      }
+
       if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
         this.battleMessages.push({
           message: 'A fury takes over you. You notch the arrows thrice at the enemies direction',
@@ -98,6 +108,10 @@ export default class Damage {
   doubleDamage(attacker, monsterCurrentHealth) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return monsterCurrentHealth;
+      }
 
       if (extraActionChance.type === ExtraActionType.FIGHTERS_DOUBLE_DAMAGE && extraActionChance.has_item) {
         this.battleMessages.push({
@@ -121,6 +135,10 @@ export default class Damage {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
+      if (!this.canUse(extraActionChance.chance)) {
+        return monsterCurrentHealth;
+      }
+
       if (extraActionChance.type === ExtraActionType.HERETICS_DOUBLE_CAST && extraActionChance.has_item) {
         this.battleMessages.push({
           message: 'Magic crackles through the air as you cast again!',
@@ -131,6 +149,34 @@ export default class Damage {
     }
 
     return monsterCurrentHealth;
+  }
+
+  vampireThirstChance(attacker, monsterCurrentHealth) {
+    if (attacker.extra_action_chance.class_name === attacker.class) {
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
+        this.battleMessages.push({
+          message: 'There is a thirst child, its in your soul! Lash out and kill!',
+        });
+
+        const totalAttack = Math.round(attacker.dur - attacker.dur * 0.05);
+
+        monsterCurrentHealth = monsterCurrentHealth - totalAttack;
+
+        this.battleMessages.push({
+          message: attacker.name + ' hit for (thirst!) ' + totalAttack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        });
+      }
+    }
+
+    return monsterCurrentHealth;
+  }
+
+  canUse(extraActionChance) {
+    const dc = Math.round(100 - (100 * extraActionChance));
+
+    return random(1, 100) > dc;
   }
 
   getMessages() {

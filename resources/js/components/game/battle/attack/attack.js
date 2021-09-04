@@ -1,6 +1,7 @@
 import Monster from '../monster/monster';
 import {random} from 'lodash';
 import Damage from "./damage";
+import Healing from "./healing";
 
 export default class Attack {
 
@@ -163,6 +164,8 @@ export default class Attack {
       this.battleMessages.push({
         message: 'Light floods your eyes as your wounds heal over for: ' + defender.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       });
+
+      this.extraHealing(defender);
     }
 
     if (this.characterCurrentHealth <= 0 && defender.resurrection_chance !== 0.0) {
@@ -177,8 +180,18 @@ export default class Attack {
         this.battleMessages.push({
           message: 'Breath enters your lungs and you come back to life, healing for: ' + defender.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         });
+
+        this.extraHealing(defender);
       }
     }
+  }
+
+  extraHealing(defender) {
+    const healing = new Healing();
+
+    this.characterCurrentHealth = healing.extraHealing(defender, this.characterCurrentHealth);
+
+    this.battleMessages = [...this.battleMessages, ...healing.getMessages()];
   }
 
   useArtifacts(attacker, defender, type) {

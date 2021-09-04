@@ -15,4 +15,12 @@ export default class ExtraActionType {
   static get THIEVES_SHADOW_DANCE() {
     return 'thieves shadow dance';
   }
+
+  static get VAMPIRE_THIRST() {
+    return 'vampire thirst';
+  }
+
+  static get PROPHET_HEALING() {
+    return 'prophet healing';
+  }
 }
