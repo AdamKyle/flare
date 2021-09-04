@@ -19,6 +19,16 @@ mix.react('resources/js/app.js', 'public/js')
    .react('resources/js/helpers/character-boons.js', 'public/js')
    .react('resources/js/helpers/admin-statistics.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
+   .extract([
+     'react',
+     'react-dom',
+     'react-bootstrap',
+     'jquery',
+     'lodash',
+     'moment',
+     'bootstrap',
+     'axios',
+   ])
    .sourceMaps()
    .version()
    .sourceMaps()

@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Values\CharacterClassValue;
+use App\Flare\Values\ClassAttackValue;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -26,6 +27,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'level'               => $character->level,
             'ac'                  => $characterInformation->buildDefence(),
             'name'                => $character->name,
+            'class'               => $character->class->name,
             'dex'                 => $characterInformation->statMod('dex'),
             'to_hit_base'         => $this->getToHitBase($character, $characterInformation),
             'base_stat'           => $characterInformation->statMod($character->class->damage_stat),
@@ -51,6 +53,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'is_dead'             => $character->is_dead,
             'is_alchemy_locked'   => $this->isAlchemyLocked($character),
             'gold'                => $character->gold,
+            'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
         ];
     }
 

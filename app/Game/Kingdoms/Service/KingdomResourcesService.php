@@ -249,22 +249,6 @@ class KingdomResourcesService {
 
         if ($morale === 0 || $morale === 0.0) {
 
-            $newAmount = $this->kingdom->current_population + 20;
-
-            if ($newAmount > $this->kingdom->max_population) {
-                $newAmount = $this->kingdom->max_population;
-            }
-
-            $this->kingdom->update([
-                'current_population' => $newAmount,
-            ]);
-
-            $this->kingdom = $this->kingdom->refresh();
-
-            return;
-        }
-
-        if ($building->current_durability === 0) {
             $newAmount = $this->kingdom->current_population + 30;
 
             if ($newAmount > $this->kingdom->max_population) {
@@ -280,8 +264,24 @@ class KingdomResourcesService {
             return;
         }
 
+        if ($building->current_durability === 0) {
+            $newAmount = $this->kingdom->current_population + round($building->population_increase/ 2);
+
+            if ($newAmount > $this->kingdom->max_population) {
+                $newAmount = $this->kingdom->max_population;
+            }
+
+            $this->kingdom->update([
+                'current_population' => $newAmount,
+            ]);
+
+            $this->kingdom = $this->kingdom->refresh();
+
+            return;
+        }
+
         if (!is_null($building)) {
-            $newCurrent = $this->kingdom->current_population + round($building->population_increase / 2);
+            $newCurrent = $this->kingdom->current_population + $building->population_increase;
 
             if ($newCurrent > $this->kingdom->max_population) {
                 $newCurrent = $this->kingdom->max_population;

@@ -1,5 +1,6 @@
 import Monster from '../monster/monster';
 import {random} from 'lodash';
+import Damage from "./damage";
 
 export default class Attack {
 
@@ -92,6 +93,16 @@ export default class Attack {
   }
 
   canHit(attacker, defender) {
+    const damage         = new Damage();
+
+    if (attacker.hasOwnProperty('class')) {
+      if (damage.canAutoHit(attacker)) {
+        this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
+
+        return true;
+      }
+    }
+
     let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
     let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
@@ -204,21 +215,10 @@ export default class Attack {
 
   spellDamage(attacker, defender, type) {
     if (type === 'player') {
-      let totalDamage = Math.round(attacker.spell_damage - (attacker.spell_damage * defender.spell_evasion));
+      const damage = new Damage();
 
-      if (totalDamage < 0) {
-        this.battleMessages.push({
-          message: this.attackerName + '\'s Spells have no effect!'
-        });
-
-        return;
-      }
-
-      this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
-
-      this.battleMessages.push({
-        message: attacker.name + ' spells hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
+      this.monsterCurrentHealth = damage.spellDamage(attacker, defender, this.monsterCurrentHealth);
+      this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
     }
 
     if (type === 'monster') {
@@ -311,19 +311,10 @@ export default class Attack {
   }
 
   doAttack(attacker, type) {
-    if (type === 'player') {
-      this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.attack;
+    const damage = new Damage();
 
-      if (attacker.has_affixes) {
-        this.battleMessages.push({
-          message: 'Your enchanted equipment glows before the enemy.'
-        });
-      }
-
-      this.battleMessages.push({
-        message: attacker.name + ' hit for (weapon) ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    }
+    this.monsterCurrentHealth = damage.doAttack(attacker, this.monsterCurrentHealth);
+    this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
 
     if (type === 'monster') {
       const monster = new Monster(attacker);
