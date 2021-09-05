@@ -63,6 +63,7 @@ export default class Chat extends React.Component {
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
+
       const message = event.message;
       message['user'] = event.user;
       message['name'] = event.name;
@@ -74,7 +75,7 @@ export default class Chat extends React.Component {
       const messages = cloneDeep(this.state.messages);
 
       messages.unshift(message);
-
+      console.log('messages', messages);
       this.setState({
         messages: messages
       });
@@ -181,6 +182,7 @@ export default class Chat extends React.Component {
   }
 
   fetchLocationInfo(message) {
+    console.log(message);
     return (
       <span>[{message.map} | {message.x}/{message.y}]</span>
     );

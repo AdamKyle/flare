@@ -83,13 +83,19 @@ class MessageController extends Controller {
         $x         = 0;
         $y         = 0;
         $color     = null;
+        $mapName   = null;
+
+        $message = auth()->user()->messages()->create([
+            'message'    => $request->message,
+            'x_position' => $x,
+            'y_position' => $y,
+        ]);
 
         if (!auth()->user()->hasRole('Admin')) {
             $character = auth()->user()->character;
 
             $x     = $character->map->character_position_x;
             $y     = $character->map->character_position_y;
-            $mapName = '';
 
             switch ($character->map->gameMap->name) {
                 case 'Surface':
@@ -106,16 +112,19 @@ class MessageController extends Controller {
             }
 
             $color = (new MapChatColor($character->map->gameMap->name))->getColor();
+
+            $message->color      = $color;
+            $message->x_position = $x;
+            $message->y_position = $y;
+
+            $message->save();
         }
 
-        $message = auth()->user()->messages()->create([
-            'message'    => $request->message,
-            'color'      => $color,
-            'x_position' => $x,
-            'y_position' => $y,
-        ]);
+        $message = $message->refresh();
 
-        $message->map_name = $mapName;
+        if (!is_null($mapName)) {
+            $message->map_name = $mapName;
+        }
 
         broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();
 
