@@ -7,6 +7,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Values\View\ClassBonusInformation;
 use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\Adventure;
@@ -105,11 +106,12 @@ class InfoPageController extends Controller
     public function viewClass(Request $request, GameClass $class) {
         return view('information.classes.class', [
             'class' => $class,
+            'classBonus' => (new ClassBonusInformation())->buildClassBonusDetails($class->name),
         ]);
     }
 
     public function viewMap(GameMap $map) {
-        
+
         $effects = match ($map->name) {
             'Labyrinth' => ItemEffectsValue::LABYRINTH,
             'Dungeons' => ItemEffectsValue::DUNGEON,

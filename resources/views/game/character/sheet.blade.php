@@ -31,24 +31,43 @@
                             @include('game.character.partials.sheet.core-stats', ['character' => $character])
                         </div>
                         <hr />
-                        <h5>Attack Break Down</h5>
-                        <p class="mt-2">
-                            These include any attached affixes and skill bonuses:
-                        </p>
-                        <hr />
-                        <div class="row mt-2">
-                            <div class="col-md-12">
-                                <dl>
-                                    <dt>Weapon Attack:</dt>
-                                    <dd>{{number_format($character->getInformation()->buildAttack())}}</dd>
-                                    <dt>Rings Attack:</dt>
-                                    <dd>{{number_format($character->getInformation()->getTotalRingDamage())}}</dd>
-                                    <dt>Spell Damage:</dt>
-                                    <dd>{{number_format($character->getInformation()->getTotalSpellDamage())}}</dd>
-                                    <dt>Artifact Damage:</dt>
-                                    <dd>{{number_format($character->getInformation()->getTotalArtifactDamage())}}</dd>
-                                    <dt>Heal For:</dt>
-                                    <dd>{{number_format($character->getInformation()->buildHealFor())}}</dd>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Attack Break Down</h5>
+                                <p class="mt-2">
+                                    These include any attached affixes and skill bonuses:
+                                </p>
+                                <hr />
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <dl>
+                                            <dt>Weapon Attack:</dt>
+                                            <dd>{{number_format($character->getInformation()->buildAttack())}}</dd>
+                                            <dt>Rings Attack:</dt>
+                                            <dd>{{number_format($character->getInformation()->getTotalRingDamage())}}</dd>
+                                            <dt>Spell Damage:</dt>
+                                            <dd>{{number_format($character->getInformation()->getTotalSpellDamage())}}</dd>
+                                            <dt>Artifact Damage:</dt>
+                                            <dd>{{number_format($character->getInformation()->getTotalArtifactDamage())}}</dd>
+                                            <dt>Heal For:</dt>
+                                            <dd>{{number_format($character->getInformation()->buildHealFor())}}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Class Attack Bonus</h5>
+                                <p class="mt-2">
+                                    {{$classBonus['description']}}
+                                </p>
+                                <hr />
+                                <dl className="mt-2">
+                                    <dt>Type:</dt>
+                                    <dd>{{$classBonus['type']}}</dd>
+                                    <dt>Base Chance:</dt>
+                                    <dd>{{$classBonus['base_chance'] * 100}}%</dd>
+                                    <dt>Requirements:</dt>
+                                    <dd>{{$classBonus['requires']}}</dd>
                                 </dl>
                             </div>
                         </div>

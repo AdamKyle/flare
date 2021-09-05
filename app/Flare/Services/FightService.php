@@ -2,6 +2,8 @@
 namespace App\Flare\Services;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Handlers\AttackExtraActionHandler;
+use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 
@@ -216,7 +218,9 @@ class FightService {
             return;
         }
 
-        if (!$this->canHit($attacker, $defender)) {
+        $extraAttack = resolve(AttackExtraActionHandler::class);
+
+        if (!$this->canHit($attacker, $defender, $extraAttack)) {
             $messages   = array_merge($messages, $this->castSpell($attacker, $defender));
             $messages   = array_merge($messages, $this->useAtifacts($attacker, $defender));
             $messages   = array_merge($messages, $this->useRings($attacker));
@@ -247,7 +251,9 @@ class FightService {
             return $this->attack($defender, $attacker);
         }
 
-        $messages          = $this->completeAttack($attacker, $defender);
+        $messages          = $extraAttack->getMessages();
+
+        $messages          = array_merge($messages, $this->completeAttack($attacker, $defender));
 
         $this->counter     = 0;
 
@@ -263,7 +269,14 @@ class FightService {
         $this->attack($defender, $attacker);
     }
 
-    protected function canHit($attacker, $defender): bool {
+    protected function canHit($attacker, $defender, AttackExtraActionHandler $extraActionHandler): bool {
+
+        if ($attacker instanceof  Character) {
+            if ($extraActionHandler->canAutoAttack($this->characterInformation)) {
+                return true;
+            }
+        }
+
         $accuracyBonus = $this->fetchAccuracyBonus($attacker);
         $dodgeBonus    = $this->fetchDodgeBonus($defender);
 
@@ -391,9 +404,9 @@ class FightService {
             $healFor = $this->characterInformation->buildHealFor();
 
             if ($healFor > 0 && $this->currentCharacterHealth !== $this->characterInformation->buildHealth()) {
-                $this->currentCharacterHealth = $healFor;
+                $this->currentCharacterHealth += $healFor;
 
-                $messages[] = ['Light floods your eyes as your wounds heal over for: ' . $healFor];
+                $messages[] = ['Light floods your eyes as your wounds heal over for: ' . number_format($healFor)];
             }
         }
 
@@ -413,7 +426,8 @@ class FightService {
         if ($attacker instanceof Character) {
             if ($this->characterInformation->hasDamageSpells()) {
                 $messages[] = ['Your spells burst forward towards the enemy!'];
-                $messages[] = $this->spellDamage($attacker, $defender);
+
+                $messages = array_merge($messages, $this->spellDamage($attacker, $defender));
             }
         }
 
@@ -558,32 +572,12 @@ class FightService {
      */
     protected function spellDamage($attacker, $defender) {
         if ($attacker instanceof Character) {
-            $spellDamage = $this->characterInformation->getTotalSpellDamage();
-            $totalDamage = ceil($spellDamage - ($spellDamage * $defender->spell_evasion));
 
-            if ($totalDamage > 0) {
-                $health = $this->currentMonsterHealth - $totalDamage;
+            $extraAttack = resolve(AttackExtraActionHandler::class);
 
-                if ($health < 0) {
-                    $health = 0;
-                }
+            $extraAttack->castSpells($this->characterInformation, $this->currentMonsterHealth, $defender);
 
-                $this->currentMonsterHealth = $health;
-
-                if ($spellDamage !== $totalDamage) {
-                    return [
-                        'Your spells hit the enemy for: ' . $totalDamage . ' (Partially Annulled)',
-                    ];
-                }
-
-                return [
-                    'Your spells hit the enemy for: ' . $totalDamage,
-                ];
-            } else {
-                return [
-                    'Your spells have no effect ...'
-                ];
-            }
+            return $extraAttack->getMessages();
         }
 
         if ($defender instanceof Character){
@@ -629,19 +623,15 @@ class FightService {
 
         if ($attacker instanceof Character) {
 
-            $characterAttack = $this->characterInformation->buildAttack();
-
-            $this->currentMonsterHealth -= $characterAttack;
-
-            if ($this->characterInformation->hasAffixes()) {
-                $messages[] = ['The enchantments on your equipment lash out at the enemy!'];
-            }
-
             $messages = array_merge($messages, $this->castSpell($attacker, $defender));
             $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
             $messages = array_merge($messages, $this->useRings($attacker));
 
-            $messages[] = [$this->character->name . ' hit for (weapon): ' . number_format($characterAttack)];
+            $extraAttack = resolve(AttackExtraActionHandler::class);
+
+            $this->currentMonsterHealth = $extraAttack->doAttack($this->characterInformation, $this->currentMonsterHealth);
+
+            $messages = array_merge($messages, $extraAttack->getMessages());
 
         } else {
             $monsterAttack = $this->fetchMonsterAttack($attacker);
@@ -655,6 +645,8 @@ class FightService {
 
             if ($this->currentCharacterHealth > 0 && $this->currentCharacterHealth < $this->characterInformation->buildHealth()) {
                 $messages = array_merge($messages, $this->castHealingSpell($defender));
+
+                $messages = array_merge($messages, $this->extraHealing());
             } else if ($this->currentCharacterHealth <= 0) {
                 $resChance = $this->characterInformation->fetchResurrectionChance();
                 $dc        = 100 - 100 * $resChance;
@@ -664,11 +656,20 @@ class FightService {
                     $this->currentCharacterHealth = 0;
 
                     $messages = array_merge($messages, $this->castHealingSpell($defender));
+                    $messages = array_merge($messages, $this->extraHealing());
                 }
             }
         }
 
         return $messages;
+    }
+
+    protected function extraHealing(): array {
+        $extraHealing = resolve(HealingExtraActionHandler::class);
+
+        $this->currentCharacterHealth = $extraHealing->extraHealing($this->characterInformation, $this->currentCharacterHealth);
+
+        return $extraHealing->getMessages();
     }
 
     /**

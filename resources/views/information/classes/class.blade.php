@@ -39,13 +39,27 @@
                         </dl>
                         @if ($class->gameSkills->isNotEmpty())
                             <hr />
-                            <h2>Class Skills</h2>
+                            <h5>Class Skills</h5>
                             <ul>
                                 @foreach ($class->gameSkills as $skill)
                                     <li><a href="{{route('info.page.skill', ['skill' => $skill->id])}}">{{$skill->name}}</a></li>
                                 @endforeach
                             </ul>
+                            <hr />
                         @endif
+                        <h5>Class Attack Bonus</h5>
+                        <p class="mt-2">
+                            {{$classBonus['description']}}
+                        </p>
+                        <hr />
+                        <dl className="mt-2">
+                            <dt>Type:</dt>
+                            <dd>{{$classBonus['type']}}</dd>
+                            <dt>Base Chance:</dt>
+                            <dd>{{$classBonus['base_chance'] * 100}}%</dd>
+                            <dt>Requirements:</dt>
+                            <dd>{{$classBonus['requires']}}</dd>
+                        </dl>
                         @if (!is_null(auth()->user()))
                             @if (auth()->user()->hasRole('Admin'))
                                 <a href="{{route('classes.edit', [

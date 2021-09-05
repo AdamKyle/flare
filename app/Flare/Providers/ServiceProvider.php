@@ -3,6 +3,8 @@
 namespace App\Flare\Providers;
 
 
+use App\Flare\Handlers\AttackExtraActionHandler;
+use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -111,6 +113,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(FightService::class, function($app, $paramters) {
             return new FightService($paramters['character'], $paramters['monster']);
+        });
+
+        $this->app->bind(AttackExtraActionHandler::class, function($app) {
+            return new AttackExtraActionHandler();
+        });
+
+        $this->app->bind(HealingExtraActionHandler::class, function($app) {
+            return new HealingExtraActionHandler();
         });
     }
 

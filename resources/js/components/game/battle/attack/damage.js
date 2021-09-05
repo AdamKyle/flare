@@ -160,7 +160,7 @@ export default class Damage {
           message: 'There is a thirst child, its in your soul! Lash out and kill!',
         });
 
-        const totalAttack = Math.round(attacker.dur - attacker.dur * 0.05);
+        const totalAttack = Math.round(attacker.dur - attacker.dur * 0.95);
 
         monsterCurrentHealth = monsterCurrentHealth - totalAttack;
 

@@ -37,6 +37,10 @@ class CharacterInformationBuilder {
         return $this;
     }
 
+    public function getCharacter(): Character {
+        return $this->character;
+    }
+
     /**
      * Get the characters total stat mode for a stat
      *

@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers;
 
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Events\GlobalTimeOut;
+use App\Game\Core\Values\View\ClassBonusInformation;
 use App\Http\Controllers\Controller;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -21,6 +22,7 @@ class CharacterSheetController extends Controller {
         return view ('game.character.sheet', [
             'character' => $character,
             'maxLevel'  => number_format(MaxLevel::MAX_LEVEL),
+            'classBonus' => (new ClassBonusInformation())->buildClassBonusDetails($character->class->name),
             'characterInfo' => [
                 'maxAttack' => number_format($characterInfo->buildAttack()),
                 'maxHealth' => number_format($characterInfo->buildHealth()),
