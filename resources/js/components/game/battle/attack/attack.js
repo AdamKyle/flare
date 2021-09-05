@@ -324,10 +324,13 @@ export default class Attack {
   }
 
   doAttack(attacker, type) {
-    const damage = new Damage();
 
-    this.monsterCurrentHealth = damage.doAttack(attacker, this.monsterCurrentHealth);
-    this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
+    if (type === 'player') {
+      const damage = new Damage();
+
+      this.monsterCurrentHealth = damage.doAttack(attacker, this.monsterCurrentHealth);
+      this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
+    }
 
     if (type === 'monster') {
       const monster = new Monster(attacker);
