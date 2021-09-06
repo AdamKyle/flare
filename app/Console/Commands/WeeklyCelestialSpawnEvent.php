@@ -2,10 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Jobs\DailyGoldDustJob;
-use App\Flare\Models\Character;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use Cache;
 use Illuminate\Console\Command;
 use Facades\App\Flare\Values\UserOnlineValue;
+use App\Flare\Jobs\WeeklyCelestialSpawnEvent as SpawnCancelingJob;
 
 class WeeklyCelestialSpawnEvent extends Command
 {
@@ -39,6 +40,11 @@ class WeeklyCelestialSpawnEvent extends Command
     public function handle() {
         Cache::put('celestial-spawn-rate', .8);
 
-        WeeklyCelestialSpawnEvent::dispatch()->delay(now()->addMinutes(10)/*now()->addHours(2)*/);
+        SpawnCancelingJob::dispatch()->delay(now()->addDay());
+
+        event(new GlobalMessageEvent('The gates have swung open and the Celestial\'s are free.
+        get your weapons ready! (Celestials have a 80% chance to spawn regardless of plane based on any
+        movement type except traverse - for the next 24 hours! Only one will spawn per hour unless it is killed.)'
+        ));
     }
 }

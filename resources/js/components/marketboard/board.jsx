@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import ReactDatatable from '@ashvin27/react-datatable';
+import {Tab, Tabs} from 'react-bootstrap';
 import Card from '../game/components/templates/card';
 import MarketHistory from './market-history';
 import PurchaseModal from './purchase-modal';
@@ -164,7 +165,6 @@ export default class Board extends Component {
       });
     }
 
-
     axios.get('/api/market-board/items', params).then((result) => {
       this.setState({
         records: result.data.items,
@@ -235,7 +235,7 @@ export default class Board extends Component {
       >
         {this.state.message !== null ? this.renderMessage() : null}
 
-        {!this.state.hasItemId && this.state.allowBuying ? <MarketHistory type={this.state.type}/> : null}
+        <MarketHistory type={this.state.type} itemId={this.props.hasOwnProperty('itemId') ? this.props.itemId : null}/>
 
         {
           this.state.loading ?

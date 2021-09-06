@@ -3,6 +3,7 @@
 namespace App\Flare\Traits\Controllers;
 
 use Auth;
+use Illuminate\Contracts\View\View;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -14,7 +15,26 @@ use App\Game\Skills\Values\SkillTypeValue;
 
 trait ItemsShowInformation {
 
+    /**
+     * Renders show view.
+     *
+     * @param string $viewName
+     * @param Item $item
+     * @return View
+     * @throws \Exception
+     */
     public function renderItemShow(string $viewName, Item $item) {
+        return view($viewName, $this->itemShowDetails($item));
+    }
+
+    /**
+     * Get base details.
+     *
+     * @param Item $item
+     * @return array
+     * @throws \Exception
+     */
+    public function itemShowDetails(Item $item): array {
         $effects = 'N/A';
         $skills  = [];
         $skill   = null;
@@ -51,8 +71,6 @@ trait ItemsShowInformation {
             $skills = $query->pluck('name')->toArray();
         }
 
-
-
         if ($item->usable) {
             if (Auth::guest() || auth()->user()->hasRole('Admin')) {
                 $skill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
@@ -63,7 +81,7 @@ trait ItemsShowInformation {
             }
         }
 
-        return view($viewName, [
+        return [
             'item'      => $item,
             'monster'   => Monster::where('quest_item_id', $item->id)->first(),
             'quest'     => Quest::where('item_id', $item->id)->first(),
@@ -72,6 +90,6 @@ trait ItemsShowInformation {
             'effects'   => $effects,
             'skills'    => $skills,
             'skill'     => $skill,
-        ]);
+        ];
     }
 }

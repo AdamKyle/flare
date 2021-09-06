@@ -1,6 +1,6 @@
 <div class="row">
     @if (!is_null($item->itemPrefix))
-        <div class="col-md-6">
+        <div class="{{is_null($item->itemSuffix) ? 'col-md-12' : 'col-md-6'}}">
             <div class="card">
                 <div class="card-body">
                     <h5 class="mb-2">Prefix</h5>
@@ -39,7 +39,7 @@
         </div>
     @endif
     @if (!is_null($item->itemSuffix))
-        <div class="col-md-6">
+        <div class="{{is_null($item->itemPrefix) ? 'col-md-12' : 'col-md-6'}}">
             <div class="card">
                 <div class="card-body">
                     <h5 class="mb-2">Suffix</h5>

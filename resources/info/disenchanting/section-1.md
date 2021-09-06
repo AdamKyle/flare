@@ -41,3 +41,12 @@ Clicking Destroy all will destroy all non equipped and quest items in your inven
 
 When managing your inventory, if you destroy or disenchant all items in your inventory that are capable of being destroyed or 
 disenchanted the gold dust amount will update on the game tab. (This assumes, you play with a tab open for the game, and a tab open for your inventory)
+
+
+## Daily Lotto
+
+Every day at 12:00pm America/Edmonton Time, there will be a chance for one player to win 10K in gold dust while others get between 1 and 1000 gold dust.
+
+Players do not have to do anything for this, if you are logged in you will see this in your top bar as well as in the chat!
+
+The person who wins the lottery, triggers a global message.

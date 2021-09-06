@@ -68,6 +68,7 @@ export default class MarketHistory extends React.Component {
     axios.get('/api/market-board/history', {
       params: {
         type: this.props.type,
+        item_id: this.props.itemId,
         when: typeof when !== 'undefined' ? when : null,
       }
     }).then((result) => {

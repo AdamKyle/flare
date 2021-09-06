@@ -20,14 +20,20 @@ class CurrentListings extends Component
     public $character          = null;
 
     protected $paginationTheme = 'bootstrap';
-    
+
     public function getDataQueryProperty() {
         $marketBoard = MarketBoard::where('character_id', $this->character->id)->join('characters', function($join) {
             $join->on('characters.id', '=', 'market_board.character_id');
         })->join('items', function($join) {
-            $join->on('items.id', '=', 'market_board.item_id');
+            $join = $join->on('items.id', '=', 'market_board.item_id');
+
+            if (!empty($this->search)) {
+                $join->where('items.name', 'like', '%'.$this->search.'%');
+            }
+
+            return $join;
         })->select('market_board.*');
-        
+
         return $marketBoard->orderBy($this->sortField, $this->sortBy);
     }
 
