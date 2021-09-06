@@ -59,6 +59,7 @@ export default class Board extends Component {
       hasItemId: false,
       allowBuying: true,
       type: null,
+      loading: true,
     }
 
     this.update = Echo.join('update-market');
@@ -77,6 +78,7 @@ export default class Board extends Component {
         this.setState({
           records: result.data.items,
           gold: result.data.gold,
+          loading: false,
         });
       }).catch((error) => {
         if (error.hasOwnProperty('response')) {
@@ -234,6 +236,15 @@ export default class Board extends Component {
         {this.state.message !== null ? this.renderMessage() : null}
 
         {!this.state.hasItemId && this.state.allowBuying ? <MarketHistory type={this.state.type}/> : null}
+
+        {
+          this.state.loading ?
+            <div className="progress mb-2 mt-2" style={{position: 'relative', height: '5px'}}>
+              <div className="progress-bar progress-bar-striped indeterminate">
+              </div>
+            </div>
+            : null
+        }
 
         <ReactDatatable
           config={this.config}
