@@ -7,6 +7,7 @@ use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Skill;
 use App\Game\Skills\Services\Traits\SkillCheck;
 
 class DisenchantService {
@@ -35,7 +36,7 @@ class DisenchantService {
             $dcCheck       = $this->getDCCheck($disenchantSkill, 0);
 
             if ($characterRoll > $dcCheck) {
-                $goldDust = $this->updateGoldDust($character);
+                $goldDust = $this->updateGoldDust($character, false, $disenchantSkill);
 
                 event(new ServerMessageEvent($character->user, 'disenchanted', $goldDust));
                 event(new UpdateSkillEvent($disenchantSkill));
@@ -79,8 +80,12 @@ class DisenchantService {
      * @param bool $failedCheck
      * @return int
      */
-    protected function updateGoldDust(Character $character, bool $failedCheck = false): int {
-        $goldDust = !$failedCheck ? rand(1, 150) : 1;
+    protected function updateGoldDust(Character $character, bool $failedCheck = false, Skill $skill = null): int {
+        $goldDust = !$failedCheck ? rand(30, 1000) : 1;
+
+        if (!$failedCheck && !is_null($skill)) {
+            $goldDust += $goldDust * $skill->bonus;
+        }
 
         $character->update([
             'gold_dust' => $character->gold_dust + $goldDust

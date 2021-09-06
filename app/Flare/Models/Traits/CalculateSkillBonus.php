@@ -38,10 +38,6 @@ trait CalculateSkillBonus {
             }
         }
 
-        if (!is_null($item->{$skillAttribute})) {
-            $baseSkillTraining += $item->{$skillAttribute};
-        }
-
         return $baseSkillTraining;
     }
 

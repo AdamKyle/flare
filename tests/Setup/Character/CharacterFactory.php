@@ -138,6 +138,20 @@ class CharacterFactory {
     }
 
     /**
+     * Lets you update the character's user profile.
+     *
+     * @param array $changes
+     * @return $this
+     */
+    public function updateUser(array $changes = []): CharacterFactory {
+        $this->character->user()->update($changes);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
      * Give the character a snapshot.
      *
      * Make sure to call this before leveling the chracter up in situations where

@@ -2,8 +2,11 @@
 
 namespace Tests\Console;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Mail\KingdomsUpdated;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateKingdom;
@@ -23,7 +26,7 @@ class UpdateKingdomTest extends TestCase
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
-            'game_map_id'        => 1,
+            'game_map_id'        => GameMap::first()->id,
             'current_stone'      => 0,
             'current_wood'       => 110,
             'current_clay'       => 0,
@@ -74,5 +77,75 @@ class UpdateKingdomTest extends TestCase
         $kingdom = Kingdom::first();
 
         $this->assertTrue($kingdom->current_wood !== 110);
+    }
+
+    public function testEmailCharacterKingdomWasUpdated()
+    {
+
+        Mail::fake();
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->updateUser([
+                'kingdoms_update_email' => true,
+            ])
+            ->getCharacter();
+
+        $kingdom = $this->createKingdom([
+            'character_id'       => $character->id,
+            'game_map_id'        => GameMap::first()->id,
+            'current_stone'      => 0,
+            'current_wood'       => 110,
+            'current_clay'       => 0,
+            'current_iron'       => 0,
+            'current_population' => 0,
+            'last_walked'        => now(),
+        ]);
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => $this->createGameBuilding([
+                'is_resource_building' => true,
+                'increase_wood_amount' => 150,
+            ])->id,
+            'kingdom_id'         => $kingdom->id,
+            'level'              => 1,
+            'current_defence'    => 100,
+            'current_durability' => 100,
+            'max_defence'        => 100,
+            'max_durability'     => 100,
+        ]);
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => $this->createGameBuilding([
+                'is_farm' => true,
+            ])->id,
+            'kingdom_id'         => $kingdom->id,
+            'level'              => 1,
+            'current_defence'    => 100,
+            'current_durability' => 100,
+            'max_defence'        => 100,
+            'max_durability'     => 100,
+        ]);
+
+        $this->createKingdomBuilding([
+            'game_building_id'   => $this->createGameBuilding([
+                'name' => 'Keep',
+            ])->id,
+            'kingdom_id'         => $kingdom->id,
+            'level'              => 1,
+            'current_defence'    => 100,
+            'current_durability' => 100,
+            'max_defence'        => 100,
+            'max_durability'     => 100,
+        ]);
+
+        $this->assertEquals(0, $this->artisan('update:kingdom'));
+
+        $kingdom = Kingdom::first();
+
+        $this->assertTrue($kingdom->current_wood !== 110);
+
+        Mail::assertSent(KingdomsUpdated::class);
     }
 }

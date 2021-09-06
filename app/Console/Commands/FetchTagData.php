@@ -7,7 +7,9 @@ use GitHub;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-
+/**
+ * @codeCoverageIgnore
+ */
 class FetchTagData extends Command
 {
     /**

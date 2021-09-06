@@ -192,7 +192,6 @@ class Skill extends Model
         $bonus = ($this->baseSkill->skill_bonus_per_level * ($this->level - 1));
         $bonus += $this->getItemBonuses($this->baseSkill);
 
-
         $bonus += $this->getCharacterBoonsBonus($bonus, 'skill_bonus');
 
         $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
@@ -256,6 +255,7 @@ class Skill extends Model
         if (!$equippedOnly) {
             foreach ($this->character->inventory->slots as $slot) {
                 if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
+
                     $bonus += $this->calculateBonus($slot->item, $this->baseSkill, $skillAttribute);
                 }
             }

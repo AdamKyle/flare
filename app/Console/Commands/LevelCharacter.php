@@ -25,7 +25,7 @@ class LevelCharacter extends Command
      *
      * @var string
      */
-    protected $signature = 'level:character {id} {toLevel}';
+    protected $signature = 'level:character {id} {levels}';
 
     /**
      * The console command description.
@@ -57,15 +57,15 @@ class LevelCharacter extends Command
             return $this->error('Character not found.');
         }
 
-        if ($this->argument('toLevel') > MaxLevel::MAX_LEVEL) {
+        if ($this->argument('levels') > MaxLevel::MAX_LEVEL) {
             return $this->error('Level too high');
         }
 
-        $bar = $this->output->createProgressBar($this->argument('toLevel'));
+        $bar = $this->output->createProgressBar($this->argument('levels'));
 
         $bar->start();
 
-        for ($i = 1; $i <= $this->argument('toLevel'); $i++) {
+        for ($i = 1; $i <= $this->argument('levels'); $i++) {
             $characterService->levelUpCharacter($character);
 
             $bar->advance();
@@ -75,6 +75,6 @@ class LevelCharacter extends Command
 
         $this->newLine(1);
 
-        $this->line('All Done! Character leveled to: ' . $this->argument('toLevel'));
+        $this->line('All Done! Character leveled to: ' . $this->argument('levels') + 1);
     }
 }

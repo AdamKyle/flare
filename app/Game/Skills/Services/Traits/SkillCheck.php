@@ -14,10 +14,10 @@ trait SkillCheck {
      */
     public function getDCCheck(Skill $skill, int $dcIncrease = 0): int {
 
-        $dcCheck = (rand(1, 1000) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
+        $dcCheck = (rand(1, 400) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
 
-        if ($dcCheck > 1000) {
-            return 999;
+        if ($dcCheck > 400) {
+            return 399;
         } else if ($dcCheck <= 0) {
             return 1;
         }
@@ -33,10 +33,10 @@ trait SkillCheck {
      */
     public function characterRoll(Skill $skill) {
         if ( $skill->skill_bonus >= 1.0) {
-            return 101; // instant success.
+            return 401;
         }
 
-        $roll = rand(1, 1000);
+        $roll = rand(1, 400);
         $roll += $roll * $skill->skill_bonus;
 
         return $roll;
