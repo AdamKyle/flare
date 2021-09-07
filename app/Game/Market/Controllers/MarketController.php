@@ -2,6 +2,7 @@
 
 namespace App\Game\Market\Controllers;
 
+use App\Flare\Traits\Controllers\ItemsShowInformation;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use App\Http\Controllers\Controller;
@@ -15,7 +16,7 @@ use App\Game\Core\Traits\UpdateMarketBoard;
 
 class MarketController extends Controller {
 
-    use UpdateMarketBoard;
+    use UpdateMarketBoard, ItemsShowInformation;
 
     private $manager;
 
@@ -66,9 +67,13 @@ class MarketController extends Controller {
             $this->sendUpdate($this->transformer, $this->manager);
         }
 
-        return view('game.core.market.edit-current-listing', [
-            'marketBoard' => $marketBoard
-        ]);
+        $item = $this->itemShowDetails($marketBoard->refresh()->item);
+
+        unset($item['item']);
+
+        return view('game.core.market.edit-current-listing', array_merge([
+            'marketBoard' => $marketBoard,
+        ], $item));
     }
 
     public function updateCurrentListing(Request $request, MarketBoard $marketBoard) {

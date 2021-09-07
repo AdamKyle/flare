@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import ReactDatatable from '@ashvin27/react-datatable';
+import {Alert} from 'react-bootstrap';
 import Card from '../../game/components/templates/card';
 import ItemName from "../components/item-name";
 import SellItemModal from "./sell-item-modal";
@@ -48,6 +49,7 @@ export default class CharacterItems extends Component {
       showModal: false,
       modalData: {},
       is404: false,
+      showSuccess: false,
     }
   }
 
@@ -107,8 +109,15 @@ export default class CharacterItems extends Component {
     this.setState({
       modalData: {},
       showModal: false,
+      showSuccess: true,
     }, () => {
       this.typeChange('reset');
+    });
+  }
+
+  closeSuccess() {
+    this.setState({
+      showSuccess: false,
     });
   }
 
@@ -183,6 +192,13 @@ export default class CharacterItems extends Component {
         ]}
         onChange={this.typeChange.bind(this)}
       >
+        {
+          this.state.showSuccess ?
+            <Alert variant="success" onClose={this.closeSuccess.bind(this)} dismissible>
+              Your item was listed on the market board!
+            </Alert>
+          : null
+        }
         {
           this.state.is404 ?
             <div className="alert alert-danger mb-2 mt-2">

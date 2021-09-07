@@ -20,6 +20,7 @@ use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Support\Facades\Cache;
 
 class MovementService {
 
@@ -433,7 +434,14 @@ class MovementService {
      * @return bool
      */
     public function canConjure() {
-        return rand(1, self::CHANCE_FOR_CELESTIAL_TO_SPAWN) > (self::CHANCE_FOR_CELESTIAL_TO_SPAWN - 1);
+
+        $needed = self::CHANCE_FOR_CELESTIAL_TO_SPAWN - 1;
+
+        if (Cache::has('celestial-spawn-rate')) {
+            $needed = $needed - ($needed * Cache::get('celestial-spawn-rate'));
+        }
+
+        return rand(1, self::CHANCE_FOR_CELESTIAL_TO_SPAWN) > $needed;
     }
 
     /**

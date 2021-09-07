@@ -20,4 +20,15 @@ any player, moving (directional buttons), teleportation or setting sail.
 When a Celestial Entity is conjured or spawns, there is a chance for the creature, if it lands on a kingdom, to do damage to the kingdom.
 This is a one-in-a-billion chance to do damage.
 
+> ## ATTN!
+> 
+> Every week at 1pm America/Edmonton time the gates will swing open! This gives Celestials across any plane a 80%
+> chance to spawn based on any players' movement action, with the exception of traverse.
+> 
+> During this time only one will spawn till its killed, if it is not killed, it will be removed in the hourly reset.
+> 
+> This event will last for 1 day and start every Wednesday at 1pm America/Edmonton time.
+> 
+> Players will want access to all planes as well as the ability to walk on  both types of water, Surface and Labyrinth's water as well as Dungeons.
+
 Below are is a table of all the Celestial Entities:

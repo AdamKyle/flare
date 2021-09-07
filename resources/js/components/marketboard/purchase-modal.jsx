@@ -142,12 +142,12 @@ export default class PurchaseModal extends React.Component {
           }
           <p>Is this the item you would like to purchase? It
             will <strong>cost</strong>: {(this.props.modalData.listed_price * 1.05).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold (incl. 5% tax)</p>
-          {this.state.loading ? 'Loading please wait ...' : <p>
-            <strong> Base cost</strong>: {this.state.item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold
-            <br />
-            Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it your self, or significantly cheaper. Most items will be listed for higher,
-            due to the inherit risk in crafting and enchanting.
-          </p> }
+          {this.state.loading ? 'Loading please wait ...' : <>
+            <p><strong> Base cost</strong>: {this.state.item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold</p>
+
+            <p>Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it your self, or significantly cheaper. Most items will be listed for higher,
+              due to the inherit risk in crafting and enchanting.</p>
+          </> }
           { this.state.loading ?
             'Loading please wait ...' :
               this.state.item.usable ?
