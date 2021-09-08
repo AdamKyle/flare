@@ -217,23 +217,8 @@ class Skill extends Model
 
         $bonus = 0.0;
 
-        foreach($this->character->inventory->slots as $slot) {
-            if ($slot->equipped) {
-                $bonus += $this->calculateTrainingBonus($slot->item, $this->baseSkill);
-            }
-
-            if ($slot->item->type ==='quest') {
-                $bonus += $this->calculateTrainingBonus($slot->item, $this->baseSkill);
-            }
-        }
-
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons()->where('affect_skill_type', $this->baseSkill->type)->get();
-
-            if ($boons->isNotEmpty()) {
-                $bonus += $boons->sum('skill_training_bonus');
-            }
-        }
+        $bonus += $this->getItemBonuses($this->baseSkill);
+        $bonus += $this->getCharacterBoonsBonus($bonus, 'skill_training_bonus');
 
         return $bonus;
     }
