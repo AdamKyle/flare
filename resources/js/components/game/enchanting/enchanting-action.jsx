@@ -141,8 +141,6 @@ export default class EnchantingAction extends React.Component {
         affixList: result.data.affixes,
         inventoryList: result.data.character_inventory,
         itemToEnchant: 0,
-        prefixId: 0,
-        suffixId: 0,
         cost: 0,
       });
     }).catch((err) => {

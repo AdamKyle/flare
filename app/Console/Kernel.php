@@ -39,8 +39,8 @@ class Kernel extends ConsoleKernel {
 
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
-        
-        // Give people a chance to win daily lottery for gold dust
+
+        // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
         $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
 
         // Clear the celestials every hour.
