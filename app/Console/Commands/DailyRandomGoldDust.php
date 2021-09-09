@@ -49,7 +49,7 @@ class DailyRandomGoldDust extends Command
     public function handle() {
         Character::chunkById(100, function($characters) {
             foreach ($characters as $character) {
-                DailyGoldDustJob::dispatch($character);
+                DailyGoldDustJob::dispatch($character)->onConnection('character_daily');
             }
         });
     }

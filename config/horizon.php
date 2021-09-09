@@ -174,6 +174,33 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
+        'supervisor-kingdoms' => [
+            'connection' => 'kingdom_jobs',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'memory' => 128,
+            'tries' => 1,
+            'nice' => 0,
+        ],
+        'supervisor-daily-characters' => [
+            'connection' => 'character_daily',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'memory' => 128,
+            'tries' => 1,
+            'nice' => 0,
+        ],
+        'supervisor-weekly-spawn' => [
+            'connection' => 'weekly_spawn',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'memory' => 128,
+            'tries' => 1,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -183,10 +210,34 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'supervisor-kingdoms' => [
+                'maxProcesses' => 10,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'supervisor-daily-characters' => [
+                'maxProcesses' => 10,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
+            'supervisor-weekly-spawn' => [
+                'maxProcesses' => 10,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
             'supervisor-1' => [
+                'maxProcesses' => 3,
+            ],
+            'supervisor-kingdoms' => [
+                'maxProcesses' => 3,
+            ],
+            'supervisor-daily-characters' => [
+                'maxProcesses' => 3,
+            ],
+            'supervisor-weekly-spawn' => [
                 'maxProcesses' => 3,
             ],
         ],

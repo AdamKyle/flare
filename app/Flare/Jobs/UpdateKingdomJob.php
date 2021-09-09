@@ -17,6 +17,7 @@ use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Exception;
 use Illuminate\Support\Collection;
 use League\Fractal\Manager;
 use Mail;

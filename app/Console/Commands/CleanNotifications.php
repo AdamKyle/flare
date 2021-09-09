@@ -39,11 +39,7 @@ class CleanNotifications extends Command
      */
     public function handle()
     {
-        Notification::where('read', true)->chunk(100, function($notifications) {
-            foreach($notifications as $notification) {
-                $notification->delete();
-            }
-        });
+        Notification::where('read', true)->delete();
 
         $this->info('cleaned');
     }

@@ -66,6 +66,30 @@ return [
             'block_for' => null,
         ],
 
+        'kingdom_jobs' => [
+            'driver' => 'redis',
+            'connection' => 'kingdom_jobs',
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => 90,
+            'block_for' => null,
+        ],
+
+        'character_daily' => [
+            'driver' => 'redis',
+            'connection' => 'character_daily',
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => 90,
+            'block_for' => null,
+        ],
+
+        'weekly_spawn' => [
+            'driver' => 'redis',
+            'connection' => 'weekly_spawn',
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => 90,
+            'block_for' => null,
+        ],
+
     ],
 
     /*

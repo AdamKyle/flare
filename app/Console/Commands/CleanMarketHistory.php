@@ -41,11 +41,7 @@ class CleanMarketHistory extends Command
      */
     public function handle()
     {
-        MarketHistory::where('created_at', '<=', Carbon::today()->subDays(60))->chunkById(100, function($histories) {
-            foreach($histories as $history) {
-                $history->delete();
-            }
-        });
+        MarketHistory::where('created_at', '<=', Carbon::today()->subDays(60))->delete();
 
         $this->info('cleaned');
     }

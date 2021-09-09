@@ -2,6 +2,7 @@
 
 namespace App\Flare\Jobs;
 
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -20,8 +21,18 @@ class WeeklyCelestialSpawnEvent implements ShouldQueue
 
     public function handle() {
 
-        if (Cache::has('celestial-spawn-rate')) {
-            Cache::delete('celestial-spawn-rate');
+        if (Cache::has('celestial-event-date') && Cache::has('celestial-spawn-rate')) {
+            if (now()->isAfter(Cache::get('celestial-event-date'))) {
+                Cache::delete('celestial-spawn-rate');
+                Cache::delete('celestial-event-date');
+
+                event(new GlobalMessageEvent('
+                The Creator has managed to get the gates under control!
+                The Celestials have been locked away again! Come back next Wednesday!
+                '));
+            } else {
+                WeeklyCelestialSpawnEvent::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
+            }
         }
     }
 }

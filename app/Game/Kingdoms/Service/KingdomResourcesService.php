@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\KingdomLog;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
@@ -122,10 +123,16 @@ class KingdomResourcesService {
                 $y = $this->kingdom->y_position;
                 $plane = $this->kingdom->gameMap->name;
 
+                KingdomLog::where('from_kingdom_id', $this->kingdom->id)->delete();
+                KingdomLog::where('to_kingdom_id', $this->kingdom->id)->delete();
+
+                $this->kingdom->unitsMovementQueue()->delete();
+                $this->kingdom->buildingsQueue()->delete();
+                $this->kingdom->unitsQueue()->delete();
                 $this->kingdom->units()->delete();
                 $this->kingdom->buildings()->delete();
 
-                $this->kingdom->delete();
+                $this->kingdom->refresh()->delete();
 
                 Character::chunkById(100, function($characters) {
                     foreach ($characters as $character) {

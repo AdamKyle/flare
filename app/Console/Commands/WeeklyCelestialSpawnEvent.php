@@ -38,9 +38,11 @@ class WeeklyCelestialSpawnEvent extends Command
      * Execute the console command.
      */
     public function handle() {
-        Cache::put('celestial-spawn-rate', .8);
 
-        SpawnCancelingJob::dispatch()->delay(now()->addDay());
+        Cache::put('celestial-spawn-rate', .8);
+        Cache::put('celestial-event-date', now()->addDay());
+
+        SpawnCancelingJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
 
         event(new GlobalMessageEvent('The gates have swung open and the Celestial\'s are free.
         get your weapons ready! (Celestials have a 80% chance to spawn regardless of plane based on any
