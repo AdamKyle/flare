@@ -2282,16 +2282,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.58.0",
+            "version": "v8.60.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "1b819bf99d87bd543a4d4895e5b3350f61ea7a23"
+                "reference": "44f16a31a1d4ac8a51605550d7796e2273984a48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/1b819bf99d87bd543a4d4895e5b3350f61ea7a23",
-                "reference": "1b819bf99d87bd543a4d4895e5b3350f61ea7a23",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/44f16a31a1d4ac8a51605550d7796e2273984a48",
+                "reference": "44f16a31a1d4ac8a51605550d7796e2273984a48",
                 "shasum": ""
             },
             "require": {
@@ -2446,7 +2446,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-08-31T13:55:57+00:00"
+            "time": "2021-09-08T13:37:21+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -6379,16 +6379,16 @@
         },
         {
             "name": "spatie/laravel-collection-macros",
-            "version": "7.3.0",
+            "version": "7.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-collection-macros.git",
-                "reference": "6e39f61d8de3487b01031d50adea15c64e1f3507"
+                "reference": "99791ca95d6404b78628d0bfc896ca43391baab4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/6e39f61d8de3487b01031d50adea15c64e1f3507",
-                "reference": "6e39f61d8de3487b01031d50adea15c64e1f3507",
+                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/99791ca95d6404b78628d0bfc896ca43391baab4",
+                "reference": "99791ca95d6404b78628d0bfc896ca43391baab4",
                 "shasum": ""
             },
             "require": {
@@ -6445,7 +6445,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-collection-macros/issues",
-                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.3.0"
+                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.4.0"
             },
             "funding": [
                 {
@@ -6453,7 +6453,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-07-15T10:58:15+00:00"
+            "time": "2021-09-07T06:40:26+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -10488,16 +10488,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "2.12.0",
+            "version": "2.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "74dcc32a2895a126d1e5f2cd3bbab499cac66db1"
+                "reference": "567b0a4ab04367603e61729b0ca133fb7b4819db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/74dcc32a2895a126d1e5f2cd3bbab499cac66db1",
-                "reference": "74dcc32a2895a126d1e5f2cd3bbab499cac66db1",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/567b0a4ab04367603e61729b0ca133fb7b4819db",
+                "reference": "567b0a4ab04367603e61729b0ca133fb7b4819db",
                 "shasum": ""
             },
             "require": {
@@ -10560,7 +10560,7 @@
                 "issues": "https://github.com/facade/ignition/issues",
                 "source": "https://github.com/facade/ignition"
             },
-            "time": "2021-08-24T09:53:54+00:00"
+            "time": "2021-09-10T07:19:07+00:00"
         },
         {
             "name": "filp/whoops",
@@ -11418,33 +11418,33 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.13.0",
+            "version": "1.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "be1996ed8adc35c3fd795488a653f4b518be70ea"
+                "reference": "d86dfc2e2a3cd366cee475e52c6bb3bbc371aa0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/be1996ed8adc35c3fd795488a653f4b518be70ea",
-                "reference": "be1996ed8adc35c3fd795488a653f4b518be70ea",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/d86dfc2e2a3cd366cee475e52c6bb3bbc371aa0e",
+                "reference": "d86dfc2e2a3cd366cee475e52c6bb3bbc371aa0e",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.2",
-                "php": "^7.2 || ~8.0, <8.1",
+                "php": "^7.2 || ~8.0, <8.2",
                 "phpdocumentor/reflection-docblock": "^5.2",
                 "sebastian/comparator": "^3.0 || ^4.0",
                 "sebastian/recursion-context": "^3.0 || ^4.0"
             },
             "require-dev": {
-                "phpspec/phpspec": "^6.0",
+                "phpspec/phpspec": "^6.0 || ^7.0",
                 "phpunit/phpunit": "^8.0 || ^9.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.11.x-dev"
+                    "dev-master": "1.x-dev"
                 }
             },
             "autoload": {
@@ -11479,9 +11479,9 @@
             ],
             "support": {
                 "issues": "https://github.com/phpspec/prophecy/issues",
-                "source": "https://github.com/phpspec/prophecy/tree/1.13.0"
+                "source": "https://github.com/phpspec/prophecy/tree/1.14.0"
             },
-            "time": "2021-03-17T13:42:18+00:00"
+            "time": "2021-09-10T09:02:12+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
