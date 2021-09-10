@@ -31,6 +31,18 @@ class DataTable extends Component
     protected $paginationTheme = 'bootstrap';
 
     public function getDataProperty() {
+        if ($this->only === 'quest-items-book') {
+            return $this->dataQuery->get()->filter(function($item) {
+                return $item->type === 'quest';
+            })->paginate($this->perPage);
+        }
+
+        if ($this->type === 'alchemy') {
+            return $this->dataQuery->get()->filter(function($item) {
+                return $item->type === 'alchemy';
+            })->paginate($this->perPage);
+        }
+
         return $this->dataQuery->paginate($this->perPage);
     }
 
@@ -44,7 +56,7 @@ class DataTable extends Component
         if (!is_null($this->only)) {
             if ($this->only === 'quest-items-book') {
                 $items = $items->where('name', 'like', '%Book%')
-                               ->where('name', 'like', '%Diary%')
+                               ->orWhere('name', 'like', '%Diary%')
                                ->where('type', '=', 'quest');
             } else {
                 $items = $items->where('type', '!=', 'quest');

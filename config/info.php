@@ -56,6 +56,7 @@ return [
         ]
     ],
     'disenchanting'     => [],
+    'chat-commands'     => [],
     'npc-kingdoms'      => [],
     'equipment-sets'    => [],
     'npcs'              => [

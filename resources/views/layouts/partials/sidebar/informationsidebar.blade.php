@@ -17,6 +17,11 @@
         ])}}"><i class="fas fa-smoking-ban"></i> Core Rules</a>
     </li>
     <li>
+        <a href="{{route('info.page', [
+            'pageName' => 'chat-commands'
+        ])}}"><i class="far fa-comment"></i> Chat Commands</a>
+    </li>
+    <li>
       <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-player"></i><span class="hide-menu">Character Information</span></a>
       <ul aria-expanded="false" class="collapse">
           <li><a href="{{route('info.page', ['pageName' => 'races-and-classes'])}}">Race and Class</a></li>
