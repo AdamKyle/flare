@@ -30,10 +30,10 @@ return [
     'quest-items'            => [
         [
             'livewire'            => true,
-            'view'                => 'admin.items.data-table',
+            'view'                => 'info.quest-items.data-table',
             'only'                => null,
             'insert_before_table' => null,
-            'type'                => 'quest',
+            'type'                => null,
             'craft_only'          => false,
         ]
     ],
