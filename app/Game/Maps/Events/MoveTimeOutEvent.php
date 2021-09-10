@@ -26,15 +26,15 @@ class MoveTimeOutEvent
 
     /**
      * Constructor
-     * 
+     *
      * @param Character $character
      * @param int $timeOut | 0
      * @param bool $setSail | false
      */
     public function __construct(Character $character, int $timeOut = 0, bool $setSail = false)
     {
-        $this->timeOut   = $timeOut;
-        $this->character = $character;
-        $this->setSail   = $setSail;
+        $this->timeOut     = $timeOut;
+        $this->character   = $character;
+        $this->setSail     = $setSail;
     }
 }

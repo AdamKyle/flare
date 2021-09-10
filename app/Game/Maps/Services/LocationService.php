@@ -100,7 +100,7 @@ class LocationService {
             'adventure_completed_at' => $character->can_adventure_again_at,
             'is_dead'                => $character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
-            'celestials'             => CelestialFight::where('x_position', $character->x_position)->where('y_position', $character->y_position)->with('monster')->get()->toArray(),
+            'celestials'             => $this->getCelestialEntity($character),
             'can_settle_kingdom'     => $this->canSettle,
             'can_attack_kingdom'     => $this->canAttack,
             'can_manage_kingdom'     => $this->canManage,
@@ -113,6 +113,15 @@ class LocationService {
                 $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
             })->count(),
         ];
+    }
+
+    protected function getCelestialEntity(Character $character) {
+        return CelestialFight::with('monster')->join('monsters', function($join) use($character) {
+            $join->on('monsters.id', 'celestial_fights.monster_id')
+                ->where('x_position', $character->x_position)
+                ->where('y_position', $character->y_position)
+                ->where('monsters.game_map_id', $character->map->gameMap->id);
+        })->select('celestial_fights.*')->get();
     }
 
     /**

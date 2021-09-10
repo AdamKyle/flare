@@ -57,6 +57,10 @@ trait ItemsShowInformation {
             if ($effect->walkOnDeathWater()) {
                 $effects = 'Walk on Water (Aka: Death Water) in Dungeons Plane';
             }
+
+            if ($effect->teleportToCelestial()) {
+                $effects = 'Use /pct to find and teleport/traverse to the public Celestial Entity';
+            }
         }
 
         if ($item->usable && !is_null($item->affects_skill_type)) {

@@ -19,6 +19,8 @@ class NpcServerMessageBuilder {
                 return $npc->real_name . ' smiles in your direction. "It\'s done!"';
             case 'cannot_have':
                 return  '"Sorry, you can\'t have that."';
+            case 'too_poor':
+                return '"I despise peasants! I spit on the ground before you! Come back when you can afford such treasures!"';
             case 'not_enough_gold':
                 return '"I do not like dealing with poor people. You do not have the gold child!"';
             case 'conjure':
@@ -65,6 +67,8 @@ class NpcServerMessageBuilder {
                 return '"Here child, take this for your hard work!"';
             case 'skill_unlocked':
                 return '"Child, I have done something magical! I have unlocked a skill for you!"';
+            case 'take_currency':
+                return '"Child! I shall take those shiny coins from you! I have something for you in return!"';
             default:
                 return '';
         }

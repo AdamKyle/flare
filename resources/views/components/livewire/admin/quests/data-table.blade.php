@@ -77,7 +77,13 @@
                                     @endguest
                                 </td>
                                 <td>{{$quest->npc_name}}</td>
-                                <td>{{$quest->item->name}}</td>
+                                <td>
+                                    @if (!is_null($quest->item))
+                                        {{$quest->item->name}}
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
                                 <td>{{number_format($quest->gold_cost)}}</td>
                                 <td>{{number_format($quest->gold_dust_cost)}}</td>
                                 <td>{{number_format($quest->shards_cost)}}</td>

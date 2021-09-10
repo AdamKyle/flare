@@ -9,3 +9,13 @@
     border-color: lighten($blue, 25%);
     color: rgb(244, 241, 241);
 }
+
+.btn-chat-action {
+  font-weight: 400;
+  color: #eadba5;
+  text-decoration: underline;
+
+  &:hover {
+    box-shadow: none;
+  }
+}

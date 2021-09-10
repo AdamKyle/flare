@@ -8,6 +8,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::group(['middleware' => 'throttle:chat'], function () {
         Route::post('/public-message', ['uses' => 'Api\MessageController@postPublicMessage']);
         Route::post('/private-message', ['uses' => 'Api\MessageController@sendPrivateMessage']);
+        Route::post('/public-entity/', ['uses' => 'Api\MessageController@publicEntity']);
     });
 });
 

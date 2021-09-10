@@ -1,6 +1,6 @@
 <?php
 
-Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,2'])->group(function() {
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2'])->group(function() {
     Route::get('/actions', ['uses' => 'Api\BattleController@index']);
     Route::get('/celestial-beings/{character}', ['uses' => 'Api\CelestialBattleController@celestialMonsters']);
     Route::get('/celestial-fight/{character}/{celestialFight}', ['uses' => 'Api\CelestialBattleController@fetchCelestialFight']);

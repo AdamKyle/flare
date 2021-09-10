@@ -11,7 +11,7 @@ use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Http\Controllers\Controller;
-use App\Game\Battle\Request\ConjureRequest;
+use App\Game\Battle\Request\PublicEntityRequest;
 use App\Game\Battle\Services\ConjureService;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
@@ -46,7 +46,7 @@ class CelestialBattleController extends Controller {
         ], 200);
     }
 
-    public function conjure(ConjureRequest $request, Character $character) {
+    public function conjure(PublicEntityRequest $request, Character $character) {
         $npc     = Npc::where('type', NpcTypes::SUMMONER)->first();
 
         if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {

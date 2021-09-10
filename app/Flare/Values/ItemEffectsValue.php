@@ -9,19 +9,21 @@ class ItemEffectsValue {
      */
     private $value;
 
-    const WALK_ON_WATER       = 'walk-on-water';
-    const WALK_ON_DEATH_WATER = 'walk-on-death-water';
-    const LABYRINTH           = 'labyrinth';
-    const DUNGEON             = 'dungeon';
+    const WALK_ON_WATER         = 'walk-on-water';
+    const WALK_ON_DEATH_WATER   = 'walk-on-death-water';
+    const LABYRINTH             = 'labyrinth';
+    const DUNGEON               = 'dungeon';
+    const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::WALK_ON_WATER       => 'walk-on-water',
-        self::WALK_ON_DEATH_WATER => 'walk-on-death-water',
-        self::LABYRINTH           => 'labyrinth',
-        self::DUNGEON             => 'dungeon',
+        self::WALK_ON_WATER         => 'walk-on-water',
+        self::WALK_ON_DEATH_WATER   => 'walk-on-death-water',
+        self::LABYRINTH             => 'labyrinth',
+        self::DUNGEON               => 'dungeon',
+        self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial'
     ];
 
     /**
@@ -75,5 +77,14 @@ class ItemEffectsValue {
      */
     public function dungeon(): bool {
         return $this->value === self::DUNGEON;
+    }
+
+    /**
+     * Can we teleport to celestial?
+     *
+     * @return bool
+     */
+    public function teleportToCelestial(): bool {
+        return $this->value === self::TELEPORT_TO_CELESTIAL;
     }
 }

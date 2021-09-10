@@ -32,21 +32,25 @@
                 @endif
                 <dt>Required Item:</dt>
                 <dd>
-                    @auth
-                        @if (auth()->user()->hasRole('Admin'))
-                            <a href="{{route('items.item', [
-                                        'item' => $quest->item->id
-                                    ])}}">{{$quest->item->name}}</a>
+                    @if (!is_null($quest->item))
+                        @auth
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a href="{{route('items.item', [
+                                            'item' => $quest->item->id
+                                        ])}}">{{$quest->item->name}}</a>
+                            @else
+                                <a href="{{route('game.items.item', [
+                                            'item' => $quest->item->id
+                                        ])}}">{{$quest->item->name}}</a>
+                            @endif
                         @else
-                            <a href="{{route('game.items.item', [
-                                        'item' => $quest->item->id
-                                    ])}}">{{$quest->item->name}}</a>
-                        @endif
+                            <a href="{{route('info.page.item', [
+                                            'item' => $quest->item->id
+                                        ])}}">{{$quest->item->name}}</a>
+                        @endauth
                     @else
-                        <a href="{{route('info.page.item', [
-                                        'item' => $quest->item->id
-                                    ])}}">{{$quest->item->name}}</a>
-                    @endauth
+                        None Required.
+                    @endif
 
                 </dd>
 

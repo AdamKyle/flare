@@ -69,8 +69,8 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function setSail(SetSailValidation $request, Location $location, Character $character, MovementService $movementSevice) {
-        $response = $movementSevice->setSail($character, $location, $request->all());
+    public function setSail(SetSailValidation $request, Location $location, Character $character, MovementService $movementService) {
+        $response = $movementService->setSail($character, $location, $request->all());
 
         $status = $response['status'];
 

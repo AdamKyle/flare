@@ -182,7 +182,6 @@ export default class Chat extends React.Component {
   }
 
   fetchLocationInfo(message) {
-    console.log(message);
     return (
       <span>[{message.map} | {message.x}/{message.y}]</span>
     );
@@ -200,7 +199,7 @@ export default class Chat extends React.Component {
               <li key={message.id + '_server-message_link'}>
                 <div className="server-message">
                   <a href={message.link} target="_blank">{message.message}</a>
-                  <a href="#" className="ml-1" onClick={() => this.destroy(message.event_id)}>Destroy</a> or <a href="#" onClick={() => this.disenchant(message.event_id)}>Disenchant</a>.
+                  <button className="ml-1 btn btn-link btn-chat-action" onClick={() => this.destroy(message.event_id)}>Destroy</button> or <button className="btn btn-link btn-chat-action" onClick={() => this.disenchant(message.event_id)}>Disenchant</button>.
                 </div>
               </li>
             )
@@ -356,6 +355,28 @@ export default class Chat extends React.Component {
     });
   }
 
+  publicEntity(teleportTo) {
+    if (this.state.user.is_silenced) {
+      return this.buildErrorMessage('You cannot talk again until: ' + this.state.user.can_talk_again_at);
+    }
+
+    this.setState({
+      message: ''
+    });
+
+    axios.post('/api/public-entity/', {
+      attempt_to_teleport: teleportTo,
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload;
+        }
+      }
+    });
+  }
+
   disenchant(itemId) {
     axios.post('/api/disenchant/' + itemId).catch((err) => {
       if (err.hasOwnProperty('response')) {
@@ -389,11 +410,7 @@ export default class Chat extends React.Component {
       } else if (this.state.message.length > 140) {
         getServerMessage('message_length_max');
       } else {
-        if (this.state.message.includes('/m')) {
-          this.postPrivateMessage()
-        } else {
-          this.postMessage();
-        }
+        this.handleChat();
       }
     }
   }
@@ -404,11 +421,19 @@ export default class Chat extends React.Component {
     } else if (this.state.message.length > 140) {
       getServerMessage('message_length_max');
     } else {
-      if (this.state.message.includes('/m')) {
-        this.postPrivateMessage()
-      } else {
-        this.postMessage();
-      }
+      this.handleChat();
+    }
+  }
+
+  handleChat() {
+    const celestialCommand = this.state.message.includes('/pc') || this.state.message.includes('/pct');
+
+    if (celestialCommand) {
+      this.publicEntity(this.state.message.includes('/pct'))
+    } else if (this.state.message.includes('/m')) {
+      this.postPrivateMessage()
+    } else {
+      this.postMessage();
     }
   }
 

@@ -175,9 +175,12 @@ class MovementService {
                                           ->get()
                                           ->toArray();
 
-        $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
-                                         ->where('y_position', $character->y_position)
-                                         ->first();
+        $celestialEntity = CelestialFight::with('monster')->join('monsters', function($join) use($character) {
+            $join->on('monsters.id', 'celestial_fights.monster_id')
+                 ->where('x_position', $character->x_position)
+                 ->where('y_position', $character->y_position)
+                 ->where('monsters.game_map_id', $character->map->gameMap->id);
+        })->select('celestial_fights.*')->first();
 
         if (!is_null($celestialEntity)) {
             $this->celestialEntities[] = $celestialEntity->toArray();

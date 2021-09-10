@@ -21,7 +21,7 @@
         <tr>
             <td>{{$quest->name}}</td>
             <td>{{$quest->npc->real_name}}</td>
-            <td>{{$quest->item->name}}</td>
+            <td>{{!is_null($quest->item) ? $quest->item->name : ''}}</td>
             <td>{{$quest->gold_dust_cost}}</td>
             <td>{{$quest->shard_cost}}</td>
             <td>{{$quest->gold_cost}}</td>

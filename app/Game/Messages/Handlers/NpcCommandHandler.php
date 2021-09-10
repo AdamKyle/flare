@@ -234,6 +234,30 @@ class NpcCommandHandler {
                 $this->handleReward($character, $quest, $npc);
 
                 return true;
+            } else {
+                if (!$this->canHaveReward($character, $npc)) {
+                    return false;
+                }
+
+                if (!$this->canPay($character, $quest, $npc)) {
+                    return false;
+                }
+
+                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
+
+                $character->update([
+                    'gold' => !is_null($quest->gold_cost) ? $character->gold - $quest->gold_cost : $character->gold,
+                    'gold_dust' => !is_null($quest->gold_dust_cost) ? $character->gold_dust - $quest->gold_dust_cost : $character->gold_dust,
+                    'shards' => !is_null($quest->shards_cost) ? $character->shards - $quest->shards_cost : $character->shards,
+                ]);
+
+                event(new UpdateTopBarEvent($character->refresh()));
+
+                broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name));
+
+                $this->handleReward($character, $quest, $npc);
+
+                return true;
             }
         }
 
@@ -266,6 +290,28 @@ class NpcCommandHandler {
         }
 
         return true;
+    }
+
+    private function canPay(Character $character, Quest $quest, Npc $npc) : bool {
+        $canPay = false;
+
+        if (!is_null($quest->gold_cost)) {
+            $canPay = $character->gold > $quest->gold_cost;
+        }
+
+        if (!is_null($quest->gold_dust_cost)) {
+            $canPay = $character->gold_dust > $quest->gold_dust_cost;
+        }
+
+        if (!is_null($quest->shards_cost)) {
+            $canPay = $character->shards > $quest->shards_cost;
+        }
+
+        if (!$canPay) {
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('too_poor', $npc), true));
+        }
+
+        return $canPay;
     }
 
     private function handleReward(Character $character, Quest $quest, Npc $npc) {

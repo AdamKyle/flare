@@ -3,6 +3,11 @@
 namespace App\Game\Messages\Controllers\Api;
 
 
+use App\Flare\Models\CelestialFight;
+use App\Flare\Values\ItemEffectsValue;
+use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\Maps\Services\MovementService;
+use App\Game\Messages\Request\PublicEntityRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Messages\Events\MessageSentEvent;
@@ -185,6 +190,60 @@ class MessageController extends Controller {
 
         broadcast(new ServerMessageEvent($user, $this->serverMessage->build('no_matching_user')));
 
+
+        return response()->json([], 200);
+    }
+
+    public function publicEntity(PublicEntityRequest $request, MovementService $movementService) {
+        $user = auth()->user();
+
+        $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
+
+        $map = $celestial->monster->gameMap;
+        $x   = $celestial->x_position;
+        $y   = $celestial->y_position;
+
+        if (is_null($celestial)) {
+            broadcast(new ServerMessageEvent($user, 'There are no celestials in the world right now child!'));
+
+            return response()->json([], 200);
+        }
+
+        if ($request->attempt_to_teleport) {
+            $hasItem = $user->character->inventory->slots->filter(function($slot) {
+                if ($slot->item->type === 'quest' && !is_null($slot->item->effect)) {
+                    return (new ItemEffectsValue($slot->item->effect))->teleportToCelestial();
+                }
+            })->isNotEmpty();
+
+            if ($hasItem) {
+                if (!$map->default) {
+                    $traverse = $movementService->updateCharacterPlane($celestial->monster->gameMap->id, $user->character);
+                }
+
+                if ($traverse['status'] === 422) {
+                    broadcast(new ServerMessageEvent($user, $traverse['message']));
+                    return response()->json([], 200);
+                }
+
+                $movement = $movementService->teleport($user->character, $celestial->x_position, $celestial->y_position, 0 , 0);
+
+                if ($movement['status'] === 422) {
+                    broadcast(new ServerMessageEvent($user, $movement['message']));
+                    return response()->json([], 200);
+                }
+
+                $message = 'Child! ' . $celestial->monster->name  .' is at (X/Y): '. $x .'/'. $y. ' on the: '. $map->name .'Plane. I have teleported you there free of charge!';
+            } else {
+                broadcast(new ServerMessageEvent($user, 'You are missing a quest item to do that child.'));
+
+                return response()->json([], 200);
+            }
+        } else {
+            $message = 'Child! ' . $celestial->monster->name  .' is at (X/Y): '. $x .'/'. $y. ' on the: '. $map->name .'Plane.';
+        }
+
+        broadcast(new ServerMessageEvent($user, $message));
 
         return response()->json([], 200);
     }

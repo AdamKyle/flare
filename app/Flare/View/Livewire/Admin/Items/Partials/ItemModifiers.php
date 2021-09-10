@@ -16,6 +16,7 @@ class ItemModifiers extends Component
         ItemEffectsValue::WALK_ON_DEATH_WATER,
         ItemEffectsValue::LABYRINTH,
         ItemEffectsValue::DUNGEON,
+        ItemEffectsValue::TELEPORT_TO_CELESTIAL,
     ];
 
     public $editing = false;

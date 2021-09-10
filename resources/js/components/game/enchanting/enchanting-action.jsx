@@ -140,8 +140,17 @@ export default class EnchantingAction extends React.Component {
       this.setState({
         affixList: result.data.affixes,
         inventoryList: result.data.character_inventory,
-        itemToEnchant: 0,
         cost: 0,
+      }, () => {
+        if (result.data.character_inventory.length > 0) {
+          const inventory = this.reorderInventory(result.data.character_inventory);
+
+          this.findNextItemToEnchant(inventory[0]);
+        } else {
+          this.setState({
+            itemToEnchant: 0,
+          });
+        }
       });
     }).catch((err) => {
       if (err.hasOwnProperty('response')) {
@@ -159,9 +168,16 @@ export default class EnchantingAction extends React.Component {
 
   }
 
+  findNextItemToEnchant(slot) {
+    this.calculateCost(slot.item_id);
+  }
+
   setItemToEnchant(event) {
+    this.calculateCost(parseInt(event.target.value))
+  }
+
+  calculateCost(value) {
     let cost       = 0;
-    const value    = parseInt(event.target.value);
     let foundAffix = null;
 
     if (this.state.suffixId !== null && this.state.suffixId !== 0) {
@@ -299,6 +315,13 @@ export default class EnchantingAction extends React.Component {
 
   buildInventoryOptions() {
     const inventory = this.state.inventoryList;
+
+    return this.reorderInventory(inventory).map((slot) => {
+      return (<option key={'item-' + slot.id} value={slot.item.id}>{slot.item.affix_name}</option>);
+    });
+  }
+
+  reorderInventory(inventory) {
     const newInventory = [];
 
     for (const slot of inventory) {
@@ -309,9 +332,7 @@ export default class EnchantingAction extends React.Component {
       }
     }
 
-    return newInventory.map((slot) => {
-      return (<option key={'item-' + slot.id} value={slot.item.id}>{slot.item.affix_name}</option>);
-    });
+    return newInventory;
   }
 
   buildSuffixOptions() {
