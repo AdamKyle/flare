@@ -55,19 +55,19 @@ class UpdateKingdom extends Command
             }
         });
 
-        User::chunkById(100, function($users) {
-            foreach ($users as $user) {
-                if (Cache::has('kingdoms-updated-' . $user->id)) {
-                    if ($user->kingdoms_update_email && !UserOnlineValue::isOnline($user)) {
-                        $kingdoms = $this->getKingdomEmailData(Cache::pull('kingdoms-updated-' . $user->id));
-
-                        Mail::to($user->email)->send((new KingdomsUpdated($user, $kingdoms)));
-                    } else {
-                        Cache::delete('kingdoms-updated-' . $user->id);
-                    }
-                }
-            }
-        });
+//        User::chunkById(100, function($users) {
+//            foreach ($users as $user) {
+//                if (Cache::has('kingdoms-updated-' . $user->id)) {
+//                    if ($user->kingdoms_update_email && !UserOnlineValue::isOnline($user)) {
+//                        $kingdoms = $this->getKingdomEmailData(Cache::pull('kingdoms-updated-' . $user->id));
+//
+//                        Mail::to($user->email)->send((new KingdomsUpdated($user, $kingdoms)));
+//                    } else {
+//                        Cache::delete('kingdoms-updated-' . $user->id);
+//                    }
+//                }
+//            }
+//        });
     }
 
     protected function getKingdomEmailData(array $kingdoms) {

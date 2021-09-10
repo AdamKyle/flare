@@ -27,12 +27,14 @@ class WeeklyCelestialSpawnEvent implements ShouldQueue
                 Cache::delete('celestial-event-date');
 
                 event(new GlobalMessageEvent('
-                The Creator has managed to get the gates under control!
+                The Creator has managed to get the celestial gates under control!
                 The Celestials have been locked away again! Come back next Wednesday!
                 '));
             } else {
                 WeeklyCelestialSpawnEvent::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
             }
+        } else {
+            event(new GlobalMessageEvent('The celestial gates have slammed shut early.'));
         }
     }
 }

@@ -120,37 +120,7 @@ class KingdomResourcesService {
             $lastTimeWalked = $this->kingdom->updated_at->diffInDays(now());
 
             if ($lastTimeWalked >= 5) {
-                $x = $this->kingdom->x_position;
-                $y = $this->kingdom->y_position;
-                $plane = $this->kingdom->gameMap->name;
-
-                KingdomLog::where('from_kingdom_id', $this->kingdom->id)->delete();
-                KingdomLog::where('to_kingdom_id', $this->kingdom->id)->delete();
-
-                $this->kingdom->unitsMovementQueue()->delete();
-                $this->kingdom->buildingsQueue()->delete();
-                $this->kingdom->unitsQueue()->delete();
-                $this->kingdom->units()->delete();
-                $this->kingdom->buildings()->delete();
-
-                $this->kingdom->refresh()->delete();
-
-                Session::where('last_activity', '<', now()->addHour()->timestamp)
-                    ->whereNotNull('user_id')
-                    ->chunkById(100, function($sessions) {
-                    foreach ($sessions as $session) {
-                        $user = User::find($session->user_id);
-
-                        if (!$user->hasRole('admin')) {
-                            $character = $user->character;
-
-                            broadcast(new UpdateGlobalMap($character));
-                            broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
-                        }
-                    }
-                });
-
-                broadcast(new GlobalMessageEvent('A kingdom at: (X/Y) ' . $x . '/' . $y . ' on ' .$plane .' Plane has crumbled to the earth clearing up space for a new kingdom'));
+                $this->removeKingdomFromMap();
             }
         }
     }
@@ -242,19 +212,55 @@ class KingdomResourcesService {
         broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
     }
 
-    protected function putUpdatedKingdomIntoCache(int $kingdomId, array $cache = []): array {
-        $isNpcOwned = Kingdom::find($kingdomId)->npc_owned;
+    protected function removeKingdomFromMap() {
+        $x     = $this->kingdom->x_position;
+        $y     = $this->kingdom->y_position;
+        $plane = $this->kingdom->gameMap->name;
+
+        KingdomLog::where('from_kingdom_id', $this->kingdom->id)->delete();
+        KingdomLog::where('to_kingdom_id', $this->kingdom->id)->delete();
+
+
+        $this->kingdom->buildingsQueue()->truncate();
+        $this->kingdom->unitsMovementQueue()->truncate();
+        $this->kingdom->unitsQueue()->truncate();
+        $this->kingdom->units()->delete();
+        $this->kingdom->buildings()->delete();
+
+        $this->kingdom->refresh()->delete();
+
+        $this->alertUsersOfKingdomRemoval();
+
+        broadcast(new GlobalMessageEvent('A kingdom at: (X/Y) ' . $x . '/' . $y . ' on ' .$plane .' Plane has crumbled to the earth clearing up space for a new kingdom'));
+    }
+
+    protected function alertUsersOfKingdomRemoval() {
+        UserOnlineValue::getUsersOnlineQuery()->chunkById(100, function($sessions) {
+            foreach ($sessions as $session) {
+                $user = User::find($session->user_id);
+
+                if (!$user->hasRole('Admin')) {
+                    $character = $user->character;
+
+                    broadcast(new UpdateGlobalMap($character));
+                    broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+                }
+            }
+        });
+    }
+
+    protected function putUpdatedKingdomIntoCache(array $cache = []): array {
+        $isNpcOwned = Kingdom::find($this->kingdom->id)->npc_owned;
 
         if ($isNpcOwned) {
-            $key = array_search($kingdomId, $cache);
+            $key = array_search($this->kingdom->id, $cache);
 
             if ($key !== false) {
                 unset($cache[$key]);
             }
         } else {
-            $cache[] = $kingdomId;
+            $cache[] = $this->kingdom->id;
         }
-
 
         return $cache;
     }
@@ -479,13 +485,11 @@ class KingdomResourcesService {
         if (Cache::has('kingdoms-updated-' . $user->id)) {
             $cache = Cache::get('kingdoms-updated-' . $user->id);
 
-            $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
-
-            Cache::put('kingdoms-updated-' . $user->id, $cache);
+            $cache = $this->putUpdatedKingdomIntoCache($cache);
         } else {
-            $cache = $this->putUpdatedKingdomIntoCache($kingdom->id);
-
-            Cache::put('kingdoms-updated-' . $user->id, $cache);
+            $cache = $this->putUpdatedKingdomIntoCache();
         }
+
+        Cache::put('kingdoms-updated-' . $user->id, $cache);
     }
 }

@@ -19,6 +19,7 @@ use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use Mail;
 use Illuminate\Bus\Queueable;
