@@ -197,6 +197,11 @@ class MessageController extends Controller {
     public function publicEntity(PublicEntityRequest $request, MovementService $movementService) {
         $user = auth()->user();
 
+        if (!$user->character->can_move || !$user->character->can_adventure || $user->character->is_dead) {
+            broadcast(new ServerMessageEvent($user, 'You are to preoccupied to do this. (You must be able to move and cannot be dead).'));
+            return response()->json([], 200);
+        }
+
         $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
 
         $map = $celestial->monster->gameMap;

@@ -317,7 +317,7 @@ export default class Map extends React.Component {
           event.mapDetails.character_map.character_position_x,
           event.mapDetails.character_map.character_position_y
         );
-        
+
         if (event.mapDetails.celestials.length > 0) {
           this.props.updateCelestial(event.mapDetails.celestials[0]);
         } else {
