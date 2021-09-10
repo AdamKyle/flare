@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Session;
 use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
@@ -134,10 +135,18 @@ class KingdomResourcesService {
 
                 $this->kingdom->refresh()->delete();
 
-                Character::chunkById(100, function($characters) {
-                    foreach ($characters as $character) {
-                        broadcast(new UpdateGlobalMap($character));
-                        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+                Session::where('last_activity', '<', now()->addHour()->timestamp)
+                    ->whereNotNull('user_id')
+                    ->chunkById(100, function($sessions) {
+                    foreach ($sessions as $session) {
+                        $user = User::find($session->user_id);
+
+                        if (!$user->hasRole('admin')) {
+                            $character = $user->character;
+
+                            broadcast(new UpdateGlobalMap($character));
+                            broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+                        }
                     }
                 });
 
