@@ -44,7 +44,8 @@ class DataTable extends Component
         if (!is_null($this->only)) {
             if ($this->only === 'quest-items-book') {
                 $items = $items->where('name', 'like', '%Book%')
-                               ->where('type', 'quest');
+                               ->where('name', 'like', '%Diary%')
+                               ->where('type', '=', 'quest');
             } else {
                 $items = $items->where('type', '!=', 'quest');
             }
