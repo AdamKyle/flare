@@ -3,6 +3,8 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use App\Game\Core\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,25 +20,17 @@ class ShopService {
      * @return int
      */
     public function sellAllItemsInInventory(Character $character): int {
-        $itemsToSell = $character->inventory->slots->filter(function($slot) {
+        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function($slot) {
             return !$slot->equipped && $slot->item->type !== 'quest' && (is_null($slot->item->itemPrefix) && is_null($slot->item->itemSuffix));
-        })->all();
-
-        $itemsToSell = collect($itemsToSell);
+        });
 
         if ($itemsToSell->isEmpty()) {
             return 0;
         }
 
-        $totalSoldFor = 0;
+        $cost = $itemsToSell->sum('item.cost');
 
-        foreach ($itemsToSell as $itemSlot) {
-            $totalSoldFor += SellItemCalculator::fetchTotalSalePrice($itemSlot->item);
-
-            event(new SellItemEvent($itemSlot, $character));
-        }
-
-        return $totalSoldFor;
+        return round($cost - ($cost * 0.05));
     }
 
     /**
