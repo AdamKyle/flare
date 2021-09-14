@@ -312,19 +312,19 @@ class InventorySetService {
             return $slot->item->type === 'spell-damage';
         }));
 
-        if ($damageSpells->count() >= 2) {
+        if ($damageSpells->count() > 2) {
             return false;
         }
 
-        if ($healingSpells->count() >= 2) {
+        if ($healingSpells->count() > 2) {
             return false;
         }
 
-        if ($healingSpells->count() >= 2 && $damageSpells->count() > 0) {
+        if ($healingSpells->count() > 2 && $damageSpells->count() > 0) {
             return false;
         }
 
-        if ($healingSpells->count() > 0 && $damageSpells->count() >= 2) {
+        if ($healingSpells->count() > 0 && $damageSpells->count() > 2) {
             return false;
         }
 

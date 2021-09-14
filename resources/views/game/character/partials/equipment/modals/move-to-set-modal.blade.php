@@ -28,7 +28,7 @@
                 @php
                     $index = $character->inventorySets->search(function($set) {
                         return $set->is_equipped;
-                    })
+                    });
                 @endphp
                 @if ($index !== false)
                     <div class="alert alert-warning mb-3">
