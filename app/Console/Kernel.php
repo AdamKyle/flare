@@ -8,6 +8,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CleanNotifications;
 use App\Console\Commands\MoveInfoFiles;
 use App\Console\Commands\UpdateKingdom;
+use Spatie\ShortSchedule\ShortSchedule;
 
 class Kernel extends ConsoleKernel {
 
@@ -57,6 +58,17 @@ class Kernel extends ConsoleKernel {
 
         // clean the adventure logs every week on monday at 2 am.
         $schedule->command('clean:adventure-logs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
+    }
+
+    /**
+     * Spatties short scheduler
+     *
+     * This allows commands to run very fast, as opposed to every minute at the least.
+     *
+     * @param ShortSchedule $schedule
+     */
+    protected function shortSchedule(ShortSchedule $schedule) {
+        $schedule->command('update:map-count')->everySecond();
     }
 
     /**

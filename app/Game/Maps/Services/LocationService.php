@@ -108,11 +108,18 @@ class LocationService {
             'my_kingdoms'            => $this->getKingdoms($character),
             'npc_kingdoms'           => Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
             'other_kingdoms'         => $this->getEnemyKingdoms($character),
-            'characters_on_map'      => Character::join('maps', function($query) use ($character) {
-                $mapId = $character->map->game_map_id;
-                $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
-            })->count(),
+            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
         ];
+    }
+
+    protected function getActiveUsersCountForMap(Character $character): int {
+        return Character::join('maps', function($query) use ($character) {
+            $mapId = $character->map->game_map_id;
+            $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
+        })->join('sessions', function($join) {
+            $join->on('sessions.user_id', 'characters.user_id')
+                 ->where('last_activity', '<', now()->addHours()->timestamp);
+        })->count();
     }
 
     protected function getCelestialEntity(Character $character) {

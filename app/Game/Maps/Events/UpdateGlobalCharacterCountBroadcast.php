@@ -34,11 +34,18 @@ class UpdateGlobalCharacterCountBroadcast implements ShouldBroadcastNow {
      */
     public function __construct(GameMap $gameMap)
     {
-        $this->characterCount = Character::join('maps', function($query) use ($gameMap) {
-            $query->on('characters.id', 'maps.character_id')->where('game_map_id', '=', $gameMap->id);
-        })->count();
+        $this->characterCount = $this->getCharacterCount($gameMap);
 
         $this->mapName = $gameMap->name;
+    }
+
+    protected function getCharacterCount(GameMap $gameMap) {
+        return Character::join('maps', function($query) use ($gameMap) {
+            $query->on('characters.id', 'maps.character_id')->where('game_map_id', $gameMap->id);
+        })->join('sessions', function($join) {
+            $join->on('sessions.user_id', 'characters.user_id')
+                ->where('last_activity', '<', now()->addHours()->timestamp);
+        })->count();
     }
 
     /**

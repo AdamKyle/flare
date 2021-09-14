@@ -33,7 +33,8 @@
         "owen-it/laravel-auditing": "^12.0",
         "pusher/pusher-php-server": "^4.0",
         "spatie/laravel-collection-macros": "^7.0",
-        "spatie/laravel-permission": "^3.16"
+        "spatie/laravel-permission": "^3.16",
+        "spatie/laravel-short-schedule": "^1.4"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8.1",

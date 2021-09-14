@@ -194,6 +194,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/markdown" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/manager" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/graham-campbell/github" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/laravel-short-schedule" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/temporary-directory" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
