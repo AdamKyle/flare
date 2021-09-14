@@ -27,6 +27,10 @@
                         <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->int_mod * 100}}%</dd>
                         <dt>Chr Modifier:</dt>
                         <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->chr_mod * 100}}%</dd>
+                        <dt>Agi Modifier:</dt>
+                        <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->agi_mod * 100}}%</dd>
+                        <dt>Focus Modifier:</dt>
+                        <dd class="{{$item->itemPrefix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->focus_nod * 100}}%</dd>
                         <dt>Skill Name:</dt>
                         <dd>{{is_null($item->itemPrefix->skill_name) ? 'N/A' : $item->itemPrefix->skill_name}}</dd>
                         <dt>Skill XP Bonus (When Training):</dt>
@@ -66,6 +70,10 @@
                         <dd class="{{$item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->int_mod * 100}}%</dd>
                         <dt>Chr Modifier:</dt>
                         <dd class="{{$item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->chr_mod * 100}}%</dd>
+                        <dt>Agi Modifier:</dt>
+                        <dd class="{{$item->itemSuffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->agi_mod * 100}}%</dd>
+                        <dt>Focus Modifier:</dt>
+                        <dd class="{{$item->itemSuffix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_nod * 100}}%</dd>
                         <dt>Skill Name:</dt>
                         <dd>{{is_null($item->itemSuffix->skill_name) ? 'N/A' : $item->itemSuffix->skill_name}}</dd>
                         <dt>Skill XP Bonus (When Training):</dt>

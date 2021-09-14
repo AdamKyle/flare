@@ -2,6 +2,7 @@
 
 namespace App\Admin\Providers;
 
+use App\Admin\Services\ItemsService;
 use App\Charts\AllCharacterGoldChart;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use ConsoleTVs\Charts\Registrar as Charts;
@@ -36,6 +37,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(UserService::class, function($app) {
             return new UserService();
+        });
+
+        $this->app->bind(ItemsService::class, function($app) {
+            return new ItemsService();
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

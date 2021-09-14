@@ -74,7 +74,6 @@ class Item extends Model
         'artifact_annulment',
         'increase_skill_bonus_by',
         'increase_skill_training_bonus_by'
-
     ];
 
     /**

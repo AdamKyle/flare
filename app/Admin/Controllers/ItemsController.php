@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Exports\Items\ItemsExport;
 use App\Admin\Import\Items\ItemsImport;
+use App\Admin\Services\ItemsService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -72,35 +73,10 @@ class ItemsController extends Controller {
         return redirect()->back()->with('success', 'imported item data.');
     }
 
-    public function delete(Item $item) {
-        $slots = InventorySlot::where('item_id', $item->id)->get();
-        $name  = $item->affix_name;
+    public function delete(Item $item, ItemsService $itemsService) {
+        $response = $itemsService->deleteItem($item);
 
-        if ($slots->isEmpty()) {
-            $item->delete();
-
-            return redirect()->back()->with('success', $name . ' was deleted successfully.');
-        }
-
-        foreach($slots as $slot) {
-            $character = $slot->inventory->character;
-
-            $slot->delete();
-
-            $gold = SellItemCalculator::fetchTotalSalePrice($item);
-
-            $character->gold += $gold;
-            $character->save();
-
-            $character = $character->refresh();
-
-            event(new ServerMessageEvent($character->user, 'deleted_item', $name));
-            event(new UpdateTopBarEvent($character));
-        }
-
-        $item->delete();
-
-        return redirect()->back()->with('success', $name . ' was deleted successfully.');
+        return redirect()->back()->with('success', $response['message']);
     }
 
     public function deleteAll(Request $request) {

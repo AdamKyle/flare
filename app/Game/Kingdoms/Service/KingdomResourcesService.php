@@ -366,12 +366,12 @@ class KingdomResourcesService {
                                   ->where('game_building_id', GameBuilding::where('name', 'Keep')->first()->id)
                                   ->first();
 
-            $total = 10000 + (10000 * ($keep->level / 100));
+            $total = 1000 + (1000 * ($keep->level / 100));
 
             return $this->updateTreasury($total);
         }
 
-        return $this->updateTreasury(1000);
+        return $this->updateTreasury(100);
     }
 
 

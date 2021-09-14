@@ -71,6 +71,7 @@
                     </dl>
                 </div>
                 <div class="col-md-6">
+                    @dump($details['slot']->item->itemSuffix)
                     <dl>
                         <dt>Str mod:</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->str_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->str_mod * 100}}%</dd>
@@ -83,9 +84,9 @@
                         <dt>Int mod:</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->int_mod * 100}}%</dd>
                         <dt>Agi mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->agi_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->agi_mod * 100}}%</dd>
                         <dt>Focus mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->focus_mod * 100}}%</dd>
+                        <dd class="{{$details['slot']->item->itemSuffix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->focus_mod * 100}}%</dd>
                     </dl>
                 </div>
             </div>
