@@ -17,6 +17,7 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\Cache;
 
 class MovementService {
 
-    use ResponseBuilder;
+    use ResponseBuilder, LiveCharacterCount;
 
     /**
      * @var array $portDetails
@@ -471,10 +472,7 @@ class MovementService {
             'adventure_details' => $this->adventureDetails(),
             'kingdom_details'   => $this->kingdomDetails(),
             'celestials'        => $this->celestialEntities(),
-            'characters_on_map' => Character::join('maps', function($query) use ($character) {
-                $mapId = $character->map->game_map_id;
-                $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
-            })->count()
+            'characters_on_map' => $this->getActiveUsersCountForMap($character),
         ]);
     }
 
