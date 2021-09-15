@@ -23,7 +23,11 @@ export default class InventorySection extends React.Component {
         key: "affix_name",
         text: "Name",
         sortable: true,
-        cell: row => <div><ItemName item={row} useAffixName={true} /></div>
+        cell: row => <div>
+          <a href={'/items/' + row.id} target="_blank">
+            <ItemName item={row} useAffixName={true} />
+          </a>
+        </div>
       },
       {
         key: "type",
@@ -113,6 +117,8 @@ export default class InventorySection extends React.Component {
               You can assign items to sets by clicking the action drop down and assigning the item to a set. You can also choose
               to equip all items save them as a set from the equip tab.
             </p>
+
+            <p>Clicking the name will open the item details in a new window</p>
           </div>
           {
             this.state.successMessage !== null ?
@@ -123,6 +129,10 @@ export default class InventorySection extends React.Component {
               </div>
             : null
           }
+          <hr />
+            <button className='btn btn-danger mr-2'>Destroy All</button>
+            <button className='btn btn-primary mr-2'>Disenchant All</button>
+          <hr />
           <ReactDatatable
             config={this.inventory_config}
             records={this.formatDataForTable()}
