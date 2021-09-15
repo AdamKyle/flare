@@ -11,6 +11,8 @@ export default class InventoryBase extends React.Component {
       loading: true,
       inventory: {},
     }
+
+    this.updateInventory = Echo.private('update-inventory-' + this.props.userId);
   }
 
   getSlotId(itemId) {
@@ -43,6 +45,12 @@ export default class InventoryBase extends React.Component {
           }
         }
       });
+
+    this.updateInventory.listen('Game.Core.Events.CharacterInventoryUpdateBroadCastEvent', (event) => {
+      this.setState({
+        inventory: event.inventory,
+      });
+    });
   }
 
   render() {

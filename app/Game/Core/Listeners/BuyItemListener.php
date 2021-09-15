@@ -4,6 +4,7 @@ namespace App\Game\Core\Listeners;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\BuyItemEvent;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 
 class BuyItemListener
 {
@@ -19,6 +20,8 @@ class BuyItemListener
         ]);
 
         $event->character->refresh();
+
+        event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
 
         event(new UpdateTopBarEvent($event->character));
     }

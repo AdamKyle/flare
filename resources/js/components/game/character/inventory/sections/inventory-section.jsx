@@ -1,8 +1,9 @@
 import React, {Fragment} from 'react';
-import {Card} from 'react-bootstrap';
+import {Card, Alert} from 'react-bootstrap';
 import ReactDatatable from '@ashvin27/react-datatable';
 import ItemName from "../../../../marketboard/components/item-name";
 import InventorySectionDropDowns from "./inventory-section-drop-downs";
+import DestroyModal from "../modals/destroy-modal";
 
 export default class InventorySection extends React.Component {
 
@@ -19,7 +20,7 @@ export default class InventorySection extends React.Component {
 
     this.inventory_headers = [
       {
-        key: "name",
+        key: "affix_name",
         text: "Name",
         sortable: true,
         cell: row => <div><ItemName item={row} useAffixName={true} /></div>
@@ -55,14 +56,46 @@ export default class InventorySection extends React.Component {
             characterId={this.props.characterId}
             item={row}
             getSlotId={this.props.getSlotId}
+            manageDestroyModal={this.manageDestroyModal.bind(this)}
+            manageSetModal={this.manageSetModal.bind(this)}
           />
         </Fragment>
       },
     ];
+
+    this.state = {
+      successMessage: null,
+      showDestroyModal: false,
+      showSetModal: false,
+      itemForDestroy: null,
+    }
   }
 
   formatDataForTable() {
     return this.props.inventory.map((i) => i.item);
+  }
+
+  clearSuccessMessage() {
+    this.setState({
+      successMessage: null,
+    })
+  }
+
+  manageDestroyModal(item, successMessage) {
+    this.setState({
+      showDestroyModal: !this.state.showDestroyModal,
+      itemForDestroy: typeof item !== 'undefined' ? item : null,
+    }, () => {
+      this.setState({
+        successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
+      })
+    });
+  }
+
+  manageSetModal() {
+    this.setState({
+      showSetModal: !this.state.showSetModal
+    });
   }
 
   render() {
@@ -81,11 +114,32 @@ export default class InventorySection extends React.Component {
               to equip all items save them as a set from the equip tab.
             </p>
           </div>
+          {
+            this.state.successMessage !== null ?
+              <div className="mb-3">
+                <Alert variant="success" onClose={this.clearSuccessMessage.bind(this)} dismissible>
+                  {this.state.successMessage}
+                </Alert>
+              </div>
+            : null
+          }
           <ReactDatatable
             config={this.inventory_config}
             records={this.formatDataForTable()}
             columns={this.inventory_headers}
           />
+
+          {
+            this.state.showDestroyModal && this.state.itemForDestroy !== null ?
+              <DestroyModal
+                characterId={this.props.characterId}
+                item={this.state.itemForDestroy}
+                getSlotId={this.props.getSlotId}
+                open={this.state.showDestroyModal}
+                close={this.manageDestroyModal.bind(this)}
+              />
+              : null
+          }
         </Card.Body>
       </Card>
     )

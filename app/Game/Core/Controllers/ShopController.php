@@ -2,9 +2,10 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Flare\Models\Character;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Flare\Models\Character;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -50,6 +51,8 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'You have nothing that you can sell.');
         }
 
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
 
@@ -75,6 +78,7 @@ class ShopController extends Controller {
             event(new BuyItemEvent($item, $character));
         }
 
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         return redirect()->back()->with('success', 'Puchased all selected items.');
 
@@ -117,6 +121,8 @@ class ShopController extends Controller {
 
         $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
 
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
@@ -128,6 +134,8 @@ class ShopController extends Controller {
         }
 
         $totalSoldFor = $service->fetchTotalSoldFor($inventorySlots, $character);
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
     }

@@ -17,6 +17,6 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
 
     Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
-
+        Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
     });
 });

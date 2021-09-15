@@ -1,5 +1,6 @@
 import React from 'react';
 import {Dropdown} from "react-bootstrap";
+import DestroyModal from "../modals/destroy-modal";
 
 export default class InventorySectionDropDowns extends React.Component {
 
@@ -18,31 +19,22 @@ export default class InventorySectionDropDowns extends React.Component {
       this.props.getSlotId(this.props.item.id)
   }
 
-  manageDestroyModal() {
-    this.setState({
-      showDestroyModal: !this.state.showDestroyModal
-    });
-  }
-
-  manageSetModal() {
-    this.setState({
-      showSetModal: !this.state.showSetModal
-    });
-  }
-
   render() {
     return (
-      <Dropdown>
-        <Dropdown.Toggle variant="primary" id="actions">
-          Actions
-        </Dropdown.Toggle>
+      <>
+        <Dropdown>
+          <Dropdown.Toggle variant="primary" id="actions">
+            Actions
+          </Dropdown.Toggle>
 
-        <Dropdown.Menu>
-          <Dropdown.Item href={this.buildHref()}>Equip</Dropdown.Item>
-          <Dropdown.Item onClick={this.manageDestroyModal.bind(this)}>Destroy</Dropdown.Item>
-          <Dropdown.Item onClick={this.manageSetModal.bind(this)}>Assign to Set</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+          <Dropdown.Menu>
+            <Dropdown.Item href={this.buildHref()}>Equip</Dropdown.Item>
+            <Dropdown.Item onClick={() => this.props.manageDestroyModal(this.props.item)}>Destroy</Dropdown.Item>
+            <Dropdown.Item onClick={this.props.manageSetModal}>Assign to Set</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+
+      </>
     );
   }
 }
