@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Models\CelestialFight;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
+use Illuminate\Support\Facades\Log;
 use Storage;
 use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
@@ -86,7 +87,7 @@ class LocationService {
         $this->processLocation($character);
 
         $this->kingdomManagement($character);
-
+        Log::info($character->map_url);
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),
             'character_map'          => $character->map,
