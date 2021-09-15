@@ -5,6 +5,7 @@ namespace App\Game\Market\Controllers\Api;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Item as ItemModel;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\MarketBoard;
@@ -199,6 +200,8 @@ class MarketController extends Controller {
 
         $this->sendUpdate($this->transformer, $this->manager);
 
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
         return response()->json([], 200);
     }
 
@@ -243,6 +246,7 @@ class MarketController extends Controller {
 
         event(new UpdateTopBarEvent($listing->character->refresh()));
         event(new UpdateTopBarEvent($character->refresh()));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax).';
 
