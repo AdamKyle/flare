@@ -32,6 +32,10 @@ class CraftingController extends Controller {
     }
 
     public function craft(CraftingValidation $request, Character $character) {
+        if (!$character->can_craft) {
+            return response()->json(['message' => 'invalid input.'], 429);
+        }
+
         $response = $this->craftingService->craft($character, $request->all());
 
         $status = $response['status'];

@@ -22,6 +22,10 @@ class AlchemyController extends Controller {
     }
 
     public function transmute(AlchemyValidation $request, Character $character) {
+        if (!$character->can_craft) {
+            return response()->json(['message' => 'invalid input.'], 429);
+        }
+
         $response = $this->alchemyService->transmute($character, $request->item_to_craft);
 
         $status = $response['status'];

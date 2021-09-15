@@ -40,6 +40,10 @@ class MapController extends Controller {
     }
 
     public function move(MoveRequest $request, Character $character, MovementService $movementSevice) {
+        if (!$character->can_move) {
+            return response()->json(['invalid input'], 429);
+        }
+
         $response = $movementSevice->updateCharacterPosition($character, $request->all());
 
         $status = $response['status'];
@@ -50,6 +54,10 @@ class MapController extends Controller {
     }
 
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService) {
+        if (!$character->can_move) {
+            return response()->json(['invalid input'], 429);
+        }
+
         $response = $movementService->updateCharacterPlane($request->map_id, $character);
 
         $status   = $response['status'];
@@ -60,6 +68,10 @@ class MapController extends Controller {
     }
 
     public function teleport(TeleportRequest $request, Character $character, MovementService $movementSevice) {
+        if (!$character->can_move) {
+            return response()->json(['invalid input'], 429);
+        }
+
         $response = $movementSevice->teleport($character, $request->x, $request->y, $request->cost, $request->timeout);
 
         $status = $response['status'];
@@ -70,6 +82,10 @@ class MapController extends Controller {
     }
 
     public function setSail(SetSailValidation $request, Location $location, Character $character, MovementService $movementService) {
+        if (!$character->can_move) {
+            return response()->json(['invalid input'], 429);
+        }
+        
         $response = $movementService->setSail($character, $location, $request->all());
 
         $status = $response['status'];
