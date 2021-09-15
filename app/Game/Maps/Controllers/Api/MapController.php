@@ -85,7 +85,7 @@ class MapController extends Controller {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
-        
+
         $response = $movementService->setSail($character, $location, $request->all());
 
         $status = $response['status'];
