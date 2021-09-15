@@ -71,7 +71,6 @@
                     </dl>
                 </div>
                 <div class="col-md-6">
-                    @dump($details['slot']->item->itemSuffix)
                     <dl>
                         <dt>Str mod:</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->str_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->str_mod * 100}}%</dd>
