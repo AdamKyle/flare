@@ -119,6 +119,10 @@
                 </dl>
             </x-cards.card-with-title>
             <div class="mt-3">
+                <div id="character-inventory"
+                     data-character="{{$character->id}}"
+                     data-user="{{$character->user->id}}"
+                ></div>
                 <x-tabs.pill-tabs-container>
                     <x-tabs.tab tab="inventory" title="Inventory" selected="true" active="true" />
                     <x-tabs.tab tab="equipped" title="Equipped" selected="false" active="false" />
@@ -197,5 +201,6 @@
 @push('scripts')
     <script>
         characterBoons('active-boons');
+        characterInventory('character-inventory');
     </script>
 @endpush

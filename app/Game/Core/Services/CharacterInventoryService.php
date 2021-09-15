@@ -61,6 +61,18 @@ class CharacterInventoryService {
         return $this;
     }
 
+    public function getInventoryForApi(): array {
+        return [
+            'inventory' => $this->fetchCharacterInventory()->values(),
+        ];
+    }
+
+    public function fetchCharacterInventory(): Collection {
+        return $this->character->inventory->slots->filter(function($slot) {
+            return !$slot->equipped && !$slot->item->usable && $slot->item->type !== 'quest';
+        });
+    }
+
     /**
      * Set the inventory
      *

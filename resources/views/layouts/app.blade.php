@@ -37,6 +37,7 @@
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
     <script src={{mix('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
     <script src={{mix('js/character-boons.js')}} type="text/javascript"></script>
+    <script src={{mix('js/character-inventory.js')}} type="text/javascript"></script>
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
 

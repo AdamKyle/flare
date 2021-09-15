@@ -24,7 +24,7 @@ export default class ItemName extends React.Component {
 
   render() {
     return (
-      <span className={this.getClass()}>{this.props.item.name}</span>
+      <span className={this.getClass()}>{this.props.useAffixName ? this.props.item.affix_name : this.props.item.name}</span>
     );
   }
 }

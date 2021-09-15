@@ -13,4 +13,10 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::post('/notifications/clear', ['uses' => 'Api\NotificationsController@clear']);
     Route::post('/notifications/{notification}/clear', ['uses' => 'Api\NotificationsController@clearNotification']);
     Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);
+
+    Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
+
+    Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
+
+    });
 });
