@@ -68,7 +68,7 @@ class Kernel extends ConsoleKernel {
      * @param ShortSchedule $schedule
      */
     protected function shortSchedule(ShortSchedule $schedule) {
-        $schedule->command('update:map-count')->everySecond();
+        $schedule->command('update:map-count')->everySeconds(5);
     }
 
     /**
