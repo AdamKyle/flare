@@ -30,6 +30,10 @@ class ShopService {
 
         $cost = $itemsToSell->sum('item.cost');
 
+        $ids = $itemsToSell->pluck('id');
+
+        $character->inventory->slots()->whereIn('id', $ids)->delete();
+
         return round($cost - ($cost * 0.05));
     }
 
