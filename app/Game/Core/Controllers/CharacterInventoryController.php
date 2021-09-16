@@ -2,28 +2,29 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Flare\Models\InventorySet;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Game\Core\Events\UpdateAttackStats;
-use App\Game\Core\Requests\MoveItemRequest;
-use App\Game\Core\Requests\RemoveItemRequest;
-use App\Game\Core\Requests\SaveEquipmentAsSet;
-use App\Game\Core\Services\InventorySetService;
+use Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\User;
+use App\Flare\Models\InventorySet;
+use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Requests\MoveItemRequest;
+use App\Game\Core\Requests\RemoveItemRequest;
+use App\Game\Core\Requests\SaveEquipmentAsSet;
+use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
 use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Values\ValidEquipPositionsValue;
-use Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
 
 class CharacterInventoryController extends Controller {
 
@@ -121,9 +122,7 @@ class CharacterInventoryController extends Controller {
                                            ->setCharacter($character)
                                            ->equipItem();
 
-            if (auth()->user()->hasRole('Admin')) {
-                return redirect()->to(route('admin.character.modeling.sheet', ['character' => $character]))->with('success', $item->affix_name . ' Equipped.');
-            }
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
             return redirect()->to(route('game.character.sheet'))->with('success', $item->affix_name . ' Equipped.');
 

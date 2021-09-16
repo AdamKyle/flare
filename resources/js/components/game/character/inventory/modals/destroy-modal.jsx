@@ -39,17 +39,17 @@ export default class DestroyModal extends React.Component {
           return window.location.replace('/game');
         }
 
-        if (response.hasOwnProperty('message')) {
+        if (response.data.hasOwnProperty('message')) {
           this.setState({
             showError: true,
-            errorMessage: response.message
+            errorMessage: response.data.message
           });
         }
 
-        if (response.hasOwnProperty('error')) {
+        if (response.data.hasOwnProperty('error')) {
           this.setState({
             showError: true,
-            errorMessage: response.message
+            errorMessage: response.data.error
           });
         }
       });

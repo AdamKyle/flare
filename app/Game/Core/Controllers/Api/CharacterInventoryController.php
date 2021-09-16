@@ -2,22 +2,36 @@
 
 namespace App\Game\Core\Controllers\Api;
 
-use App\Game\Core\Requests\MoveItemRequest;
-use App\Game\Core\Services\InventorySetService;
+use App\Flare\Models\InventorySet;
+use App\Game\Core\Requests\RemoveItemRequest;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Skills\Jobs\DisenchantItem;
 use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Requests\MoveItemRequest;
+use App\Game\Core\Services\InventorySetService;
 
 class CharacterInventoryController extends Controller {
 
     private $characterInventoryService;
 
-    public function __construct(CharacterInventoryService $characterInventoryService) {
+    private $characterTransformer;
+
+    private $manager;
+
+    public function __construct(CharacterInventoryService $characterInventoryService,
+                                CharacterAttackTransformer $characterTransformer, Manager $manager) {
 
         $this->characterInventoryService = $characterInventoryService;
+        $this->characterTransformer      = $characterTransformer;
+        $this->manager                   = $manager;
     }
 
     public function inventory(Character $character) {
@@ -91,8 +105,6 @@ class CharacterInventoryController extends Controller {
         }
 
         return response()->json(['message' => 'You have nothing to disenchant.']);
-
-
     }
 
     public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
@@ -120,5 +132,118 @@ class CharacterInventoryController extends Controller {
         return response()->json([
             'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
         ]);
+    }
+
+    public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
+        $slot = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
+
+        if (is_null($slot)) {
+            return response()->json(['message' => 'Either the slot or the inventory set does not exist.'], 422);
+        }
+
+        if ($slot->inventorySet->is_equipped) {
+            return response()->json(['message' => 'You cannot move an equipped item into your inventory from this set. Unequip it first.'], 422);
+        }
+
+        $itemName = $slot->item->affix_name;
+
+        $result = $inventorySetService->removeItemFromInventorySet($slot->inventorySet, $slot->item);
+
+        if ($result['status'] !== 200) {
+            return response()->json(['message' => $result['message']], 422);
+        }
+
+        $character = $character->refresh();
+
+        $index     = $character->inventorySets->search(function($set) use ($request) {
+            return $set->id === $request->inventory_set_id;
+        });
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => $itemName . ' Has been removed from Set ' . $index + 1 . ' and placed back into your inventory.'], 200);
+    }
+
+    public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
+        $currentInventoryAmount    = $character->inventory_max - $inventorySet->slots->count();
+        $originalInventorySetCount = $inventorySet->slots->count();
+        $itemsRemoved              = 0;
+
+        foreach ($inventorySet->slots as $slot) {
+
+            if ($currentInventoryAmount !== 0) {
+                $inventorySetService->removeItemFromInventorySet($inventorySet, $slot->item);
+
+                $currentInventoryAmount -= 1;
+                $itemsRemoved           += 1;
+            }
+        }
+
+        $setIndex = $character->inventorySets->search(function($set) use ($inventorySet) {
+            return $set->id === $inventorySet->id;
+        });
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1], 200);
+    }
+
+    public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService) {
+        if ($request->inventory_set_equipped) {
+            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
+            $inventoryIndex = $character->inventorySets->search(function($set) { return $set->is_equipped; });
+
+            $inventorySetService->unEquipInventorySet($inventorySet);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            return response()->json(['message' => 'Unequipped Set ' . $inventoryIndex + 1 . '.'], 200);
+        }
+
+        $foundItem = $character->inventory->slots->find($request->item_to_remove);
+
+        if (is_null($foundItem)) {
+            return response()->json(['error' => 'No item found to be equipped.'], 422);
+        }
+
+        $foundItem->update([
+            'equipped' => false,
+            'position' => null,
+        ]);
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => 'Unequipped item.'], 200);
+    }
+
+    public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService) {
+        if ($request->is_set_equipped) {
+            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
+
+            $inventorySetService->unEquipInventorySet($inventorySet);
+        } else {
+            $character->inventory->slots->each(function($slot) {
+                $slot->update([
+                    'equipped' => false,
+                    'position' => null,
+                ]);
+            });
+        }
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character, $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => 'All items have been removed.'], 200);
     }
 }

@@ -1,6 +1,8 @@
 import React from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
 import InventorySection from "./sections/inventory-section";
+import EquippedSection from "./sections/equipped-section";
+import SetsSection from "./sections/sets-section";
 
 export default class InventoryBase extends React.Component {
 
@@ -73,10 +75,19 @@ export default class InventoryBase extends React.Component {
                 />
               </Tab>
               <Tab eventKey="equipped" title="Equipped">
-                Equipped Component Here
+                <EquippedSection
+                  characterId={this.props.characterId}
+                  equipped={this.state.inventory.equipped}
+                />
               </Tab>
               <Tab eventKey="sets" title="Sets">
-                Sets Component Here
+                <SetsSection
+                  characterId={this.props.characterId}
+                  sets={this.state.inventory.sets}
+                />
+              </Tab>
+              <Tab eventKey="usable-items" title="Usable Items">
+                Usable Items Component Here
               </Tab>
               <Tab eventKey="quest-items" title="Quest Items">
                 Quest Items Component Here

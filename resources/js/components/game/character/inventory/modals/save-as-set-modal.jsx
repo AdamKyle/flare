@@ -1,7 +1,7 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 
-export default class MoveToSetModal extends React.Component {
+export default class SaveAsSetModal extends React.Component {
 
   constructor(props) {
     super(props);
@@ -28,8 +28,7 @@ export default class MoveToSetModal extends React.Component {
         });
       }
 
-      axios.post('/api/character/'+this.props.characterId+'/inventory/move-to-set', {
-        slot_id: this.props.getSlotId(this.props.item.id),
+      axios.post('/api/character/'+this.props.characterId+'/inventory/save-equipped-as-set', {
         move_to_set:  this.state.selectedSet,
       })
         .then((result) => {

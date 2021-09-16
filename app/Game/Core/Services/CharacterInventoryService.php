@@ -5,6 +5,7 @@ namespace App\Game\Core\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 
@@ -62,19 +63,57 @@ class CharacterInventoryService {
     }
 
     public function getInventoryForApi(): array {
+        $equipped = $this->fetchEquipped();
+
         return [
-            'inventory' => $this->fetchCharacterInventory()->values(),
-            'usable_sets' => $this->character->inventorySets()
-                                             ->where('is_equipped', false)
-                                             ->pluck('id')
-                                             ->toArray(),
+            'inventory'   => $this->fetchCharacterInventory()->values(),
+            'usable_sets' => $this->getUsableSets(),
+            'equipped'    => !is_null($equipped) ? $equipped : [],
+            'sets'        => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
         ];
     }
 
+    public function getUsableSets(): array {
+        $ids = $this->character->inventorySets()
+                    ->where('is_equipped', false)
+                    ->pluck('id')
+                    ->toArray();
+
+        $indexes = [];
+
+        foreach ($ids as $id) {
+            $indexes[] = $this->character->inventorySets->search(function($set) use($id) {
+                return $set->id === $id;
+            }) + 1;
+        }
+
+        return $indexes;
+    }
+
+    /**
+     * Fetches the characters inventory.
+     *
+     * - Does not include equipped, usable or quest items.
+     * - Only comes from inventory, does not include sets.
+     *
+     * @return Collection
+     */
     public function fetchCharacterInventory(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
             return !$slot->equipped && !$slot->item->usable && $slot->item->type !== 'quest';
         });
+    }
+
+    public function fetchEquipped(): Collection|InventorySet|null {
+        $inventory = $this->character->inventory->slots()->with('item')->get()->filter(function($slot) {
+            return $slot->equipped;
+        });
+
+        if ($inventory->isNotEmpty()) {
+            return $inventory->values();
+        }
+
+        return $this->character->inventorySets()->with(['slots', 'slots.item'])->where('is_equipped', true)->first();
     }
 
     /**
