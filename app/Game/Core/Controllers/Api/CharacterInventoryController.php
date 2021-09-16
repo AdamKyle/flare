@@ -68,25 +68,31 @@ class CharacterInventoryController extends Controller {
             return (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id));
         })->values();
 
-        $jobs = [];
+        if ($slots->isNotEmpty()) {
+            $jobs = [];
 
-        foreach ($slots as $index => $slot) {
-            if ($index !== 0) {
-                dump($index . ' ' . ($slots->count() - 1));
-                if ($index === ($slots->count() - 1)) {
-                    $jobs[] = new DisenchantItem($character, $slot->id, true);
-                } else {
-                    $jobs[] = new DisenchantItem($character, $slot->id);
+            foreach ($slots as $index => $slot) {
+                if ($index !== 0) {
+                    dump($index . ' ' . ($slots->count() - 1));
+                    if ($index === ($slots->count() - 1)) {
+                        $jobs[] = new DisenchantItem($character, $slot->id, true);
+                    } else {
+                        $jobs[] = new DisenchantItem($character, $slot->id);
+                    }
                 }
             }
+
+            DisenchantItem::withChain($jobs)->dispatch($character, $slots->first()->id);
+
+            return response()->json(['message' => 'You can freely move about. 
+                Your inventory will update as items disenchant. Check chat to see 
+                the total gold dust earned.'
+            ]);
         }
 
-        DisenchantItem::withChain($jobs)->dispatch($character, $slots->first()->id);
+        return response()->json(['message' => 'You have nothing to disenchant.']);
 
-        return response()->json(['message' => 'You can freely move about. 
-            Your inventory will update as items disenchant. Check chat to see 
-            the total gold dust earned.'
-        ]);
+
     }
 
     public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {

@@ -126,7 +126,6 @@ export default class InventorySection extends React.Component {
   }
 
   manageDisenchantModal(successMessage) {
-    console.log(successMessage);
     this.setState({
       showDisenchantModal: !this.state.showDisenchantModal,
     }, () => {
