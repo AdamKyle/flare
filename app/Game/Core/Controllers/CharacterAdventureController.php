@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use Illuminate\Http\Request;
 use App\Flare\Models\AdventureLog;
 use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
@@ -111,6 +112,8 @@ class CharacterAdventureController extends Controller {
         }
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         if (empty($messages)) {
             $messages = [
