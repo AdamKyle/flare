@@ -68,6 +68,7 @@ export default class InventoryBase extends React.Component {
                 <InventorySection
                   characterId={this.props.characterId}
                   inventory={this.state.inventory.inventory}
+                  usableSets={this.state.inventory.usable_sets}
                   getSlotId={this.getSlotId.bind(this)}
                 />
               </Tab>

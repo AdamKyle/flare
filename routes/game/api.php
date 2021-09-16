@@ -18,5 +18,8 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
 
     Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
         Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
+        Route::post('/character/{character}/inventory/destroy-all', ['uses' => 'Api\CharacterInventoryController@destroyAll']);
+        Route::post('/character/{character}/inventory/disenchant-all', ['uses' => 'Api\CharacterInventoryController@disenchantAll']);
+        Route::post('/character/{character}/inventory/move-to-set', ['uses' => 'Api\CharacterInventoryController@moveToSet']);
     });
 });

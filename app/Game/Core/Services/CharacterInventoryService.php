@@ -64,6 +64,10 @@ class CharacterInventoryService {
     public function getInventoryForApi(): array {
         return [
             'inventory' => $this->fetchCharacterInventory()->values(),
+            'usable_sets' => $this->character->inventorySets()
+                                             ->where('is_equipped', false)
+                                             ->pluck('id')
+                                             ->toArray(),
         ];
     }
 

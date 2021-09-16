@@ -30,7 +30,7 @@ export default class InventorySectionDropDowns extends React.Component {
           <Dropdown.Menu>
             <Dropdown.Item href={this.buildHref()}>Equip</Dropdown.Item>
             <Dropdown.Item onClick={() => this.props.manageDestroyModal(this.props.item)}>Destroy</Dropdown.Item>
-            <Dropdown.Item onClick={this.props.manageSetModal}>Assign to Set</Dropdown.Item>
+            <Dropdown.Item onClick={() => this.props.manageMoveItemToSetModal(this.props.item)}>Assign to Set</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
 

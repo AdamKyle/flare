@@ -28,6 +28,7 @@ export default class DestroyModal extends React.Component {
           this.props.close(null, result.data.message);
         });
       }).catch((error) => {
+        this.setState({loading: false});
         const response = error.response;
 
         if (response.status === 401) {

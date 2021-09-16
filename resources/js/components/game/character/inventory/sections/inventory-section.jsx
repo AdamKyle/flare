@@ -4,6 +4,9 @@ import ReactDatatable from '@ashvin27/react-datatable';
 import ItemName from "../../../../marketboard/components/item-name";
 import InventorySectionDropDowns from "./inventory-section-drop-downs";
 import DestroyModal from "../modals/destroy-modal";
+import DestroyAllModal from "../modals/destroy-all-modal";
+import DisenchantModal from "../modals/disenchant-modal";
+import MoveToSetModal from "../modals/move-to-set-modal";
 
 export default class InventorySection extends React.Component {
 
@@ -62,6 +65,7 @@ export default class InventorySection extends React.Component {
             getSlotId={this.props.getSlotId}
             manageDestroyModal={this.manageDestroyModal.bind(this)}
             manageSetModal={this.manageSetModal.bind(this)}
+            manageMoveItemToSetModal={this.manageMoveItemToSetModal.bind(this)}
           />
         </Fragment>
       },
@@ -69,9 +73,13 @@ export default class InventorySection extends React.Component {
 
     this.state = {
       successMessage: null,
+      itemForDestroy: null,
+      itemToMove: null,
       showDestroyModal: false,
       showSetModal: false,
-      itemForDestroy: null,
+      showDestroyAllModal: false,
+      showDisenchantModal: false,
+      showMoveItemModal: false,
     }
   }
 
@@ -92,6 +100,38 @@ export default class InventorySection extends React.Component {
     }, () => {
       this.setState({
         successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
+      })
+    });
+  }
+
+  manageMoveItemToSetModal(item, successMessage) {
+    this.setState({
+      showMoveItemModal: !this.state.showMoveItemModal,
+      itemToMove: typeof item !== 'undefined' ? item : null,
+    }, () => {
+      this.setState({
+        successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
+      })
+    });
+  }
+
+  manageDestroyAllModal(successMessage) {
+    this.setState({
+      showDestroyAllModal: !this.state.showDestroyAllModal,
+    }, () => {
+      this.setState({
+        successMessage: typeof successMessage !== 'object' ? successMessage : null,
+      })
+    });
+  }
+
+  manageDisenchantModal(successMessage) {
+    console.log(successMessage);
+    this.setState({
+      showDisenchantModal: !this.state.showDisenchantModal,
+    }, () => {
+      this.setState({
+        successMessage: typeof successMessage !== 'object' ? successMessage : null,
       })
     });
   }
@@ -130,8 +170,16 @@ export default class InventorySection extends React.Component {
             : null
           }
           <hr />
-            <button className='btn btn-danger mr-2'>Destroy All</button>
-            <button className='btn btn-primary mr-2'>Disenchant All</button>
+            <button className='btn btn-danger mr-2'
+                    onClick={this.manageDestroyAllModal.bind(this)}
+            >
+              Destroy All
+            </button>
+            <button className='btn btn-primary mr-2'
+                    onClick={this.manageDisenchantModal.bind(this)}
+            >
+              Disenchant All
+            </button>
           <hr />
           <ReactDatatable
             config={this.inventory_config}
@@ -147,6 +195,39 @@ export default class InventorySection extends React.Component {
                 getSlotId={this.props.getSlotId}
                 open={this.state.showDestroyModal}
                 close={this.manageDestroyModal.bind(this)}
+              />
+              : null
+          }
+
+          {
+            this.state.showDestroyAllModal ?
+              <DestroyAllModal
+                characterId={this.props.characterId}
+                open={this.state.showDestroyAllModal}
+                close={this.manageDestroyAllModal.bind(this)}
+              />
+              : null
+          }
+
+          {
+            this.state.showDisenchantModal ?
+              <DisenchantModal
+                characterId={this.props.characterId}
+                open={this.state.showDisenchantModal}
+                close={this.manageDisenchantModal.bind(this)}
+              />
+              : null
+          }
+
+          {
+            this.state.showMoveItemModal ?
+              <MoveToSetModal
+                characterId={this.props.characterId}
+                open={this.state.showMoveItemModal}
+                close={this.manageMoveItemToSetModal.bind(this)}
+                getSlotId={this.props.getSlotId}
+                sets={this.props.usableSets}
+                item={this.state.itemToMove}
               />
               : null
           }
