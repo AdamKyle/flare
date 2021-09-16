@@ -66,15 +66,32 @@ class CharacterInventoryService {
         $equipped = $this->fetchEquipped();
 
         return [
-            'inventory'   => $this->fetchCharacterInventory()->values(),
-            'usable_sets' => $this->getUsableSets(),
-            'equipped'    => !is_null($equipped) ? $equipped : [],
-            'sets'        => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
-            'quest_items' => $this->getQuestItems()
+            'inventory'    => $this->fetchCharacterInventory()->values(),
+            'usable_sets'  => $this->getUsableSets(),
+            'equipped'     => !is_null($equipped) ? $equipped : [],
+            'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
+            'quest_items'  => $this->getQuestItems(),
+            'usable_items' => $this->getUsableItems(),
         ];
     }
 
-    public function getQuestItems() {
+    /**
+     * Returns the usable items.
+     *
+     * @return Collection
+     */
+    public function getUsableItems(): Collection {
+        return $this->character->inventory->slots->filter(function($slot) {
+            return $slot->item->usable;
+        })->values();
+    }
+
+    /**
+     * Returns the quest items.
+     *
+     * @return Collection
+     */
+    public function getQuestItems(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest';
         })->values();

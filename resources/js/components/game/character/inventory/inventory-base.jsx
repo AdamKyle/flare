@@ -4,6 +4,7 @@ import InventorySection from "./sections/inventory-section";
 import EquippedSection from "./sections/equipped-section";
 import SetsSection from "./sections/sets-section";
 import QuestSection from "./sections/quest-section";
+import UsableItemsSection from "./sections/usable-items-section";
 
 export default class InventoryBase extends React.Component {
 
@@ -88,7 +89,10 @@ export default class InventoryBase extends React.Component {
                 />
               </Tab>
               <Tab eventKey="usable-items" title="Usable Items">
-                Usable Items Component Here
+                <UsableItemsSection
+                  characterId={this.props.characterId}
+                  usableItems={this.state.inventory.usable_items}
+                />
               </Tab>
               <Tab eventKey="quest-items" title="Quest Items">
                 <QuestSection questItems={this.state.inventory.quest_items} />
