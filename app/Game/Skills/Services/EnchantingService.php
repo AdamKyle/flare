@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -114,6 +115,8 @@ class EnchantingService {
 
             event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
 
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
             return $this->successResult([
                 'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
                 'character_inventory' => array_values($this->fetchCharacterInventory($character)),
@@ -121,6 +124,8 @@ class EnchantingService {
         } catch (Exception $e) {
             // Something went wrong, give their gold back
             $this->giveGoldBack($character->refresh(), $params['cost']);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
             return $this->errorResult($e->getMessage());
         }
@@ -194,10 +199,10 @@ class EnchantingService {
             }
 
             /**
-             * If the affix wasn't too easy to atach, attempt to enchant with the difficulty check
+             * If the affix wasn't too easy to attach, attempt to enchant with the difficulty check
              * in place.
              *
-             * If we fail to do this then we retrun from the loop.
+             * If we fail to do this then we return from the loop.
              */
             if (!$this->wasTooEasy) {
                 if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {

@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
@@ -38,6 +39,8 @@ class DropsCheckListener
 
             if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {
                 $this->attemptToPickUpItem($event, $drop);
+
+                event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
             }
         }
 
@@ -46,6 +49,8 @@ class DropsCheckListener
 
             if ($canGetQuestItem) {
                 $this->attemptToPickUpItem($event, $event->monster->questItem);
+
+                event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
             }
         }
     }

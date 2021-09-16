@@ -4,6 +4,7 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -63,6 +64,8 @@ class CraftingService {
         $this->attemptToCraftItem($character, $skill, $item);
 
         event(new CraftedItemTimeOutEvent($character->refresh()));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         return $this->successResult([
             'items' => $this->getItems($params['type'], $skill)

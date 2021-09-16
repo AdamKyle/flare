@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
@@ -34,6 +35,8 @@ class DisenchantingController extends Controller {
 
         if (!is_null($foundItem)) {
             $this->disenchantingService->disenchantWithSkill($character, $foundItem);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
         } else {
             event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
         }
@@ -44,14 +47,16 @@ class DisenchantingController extends Controller {
     public function destroy(Item $item) {
         $character = auth()->user()->character->refresh();
 
-        $foundItem = $character->inventory->slots->filter(function($slot) use ($item) {
-            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item_id === $item->id) {
-                return $slot;
-            }
-        })->first();
+        $foundSlot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
-        if (!is_null($foundItem)) {
-            $this->disenchantingService->disenchantWithOutSkill($character, $foundItem);
+        if (!is_null($foundSlot)) {
+            $name = $foundSlot->item->affix_name;
+
+            $foundSlot->delete();
+
+            event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
         } else {
             event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
         }

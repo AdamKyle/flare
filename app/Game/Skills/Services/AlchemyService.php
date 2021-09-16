@@ -4,6 +4,7 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -65,9 +66,14 @@ class AlchemyService {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
             event(new CraftedItemTimeOutEvent($character->refresh()));
 
+            $this->pickUpItem($character, $item, $skill, true);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
             return $this->successResult([
                 'items' => $this->fetchAlchemistItems($character),
             ]);
+
         }
 
         if ($skill->level >= $item->skill_level_trivial) {

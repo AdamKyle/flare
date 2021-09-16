@@ -9,6 +9,7 @@ use App\Flare\Services\FightService;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -105,6 +106,8 @@ class CelestialFightService {
             $celestialFight->delete();
 
             event(new UpdateCelestialFight(null, true));
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
             return $this->successResult([
                 'battle_over' => true,

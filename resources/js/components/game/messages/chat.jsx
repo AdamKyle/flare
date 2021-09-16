@@ -75,7 +75,7 @@ export default class Chat extends React.Component {
       const messages = cloneDeep(this.state.messages);
 
       messages.unshift(message);
-      console.log('messages', messages);
+
       this.setState({
         messages: messages
       });
@@ -259,7 +259,7 @@ export default class Chat extends React.Component {
           elements.push(
             <li key={message.id}>
               <div className="message" style={{'color': message.color}}>
-                {message.x !== 0 && message.y !== 0 ? this.fetchLocationInfo(message) : null} <strong
+                {message.x !== null && message.y !== null ? this.fetchLocationInfo(message) : null} <strong
                 onClick={this.messageUser.bind(this)}
                 data-name={message.name}>{message.name}</strong>: {message.message}
               </div>
