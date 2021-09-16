@@ -3,6 +3,7 @@ import {Tabs, Tab} from 'react-bootstrap';
 import InventorySection from "./sections/inventory-section";
 import EquippedSection from "./sections/equipped-section";
 import SetsSection from "./sections/sets-section";
+import QuestSection from "./sections/quest-section";
 
 export default class InventoryBase extends React.Component {
 
@@ -90,7 +91,7 @@ export default class InventoryBase extends React.Component {
                 Usable Items Component Here
               </Tab>
               <Tab eventKey="quest-items" title="Quest Items">
-                Quest Items Component Here
+                <QuestSection questItems={this.state.inventory.quest_items} />
               </Tab>
             </Tabs>
         }

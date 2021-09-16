@@ -19,6 +19,10 @@ export default class ItemName extends React.Component {
       return 'usable-item';
     }
 
+    if (this.props.item.type === 'quest') {
+      return 'quest-item';
+    }
+
     return 'normal-item';
   }
 

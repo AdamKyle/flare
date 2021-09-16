@@ -70,9 +70,24 @@ class CharacterInventoryService {
             'usable_sets' => $this->getUsableSets(),
             'equipped'    => !is_null($equipped) ? $equipped : [],
             'sets'        => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
+            'quest_items' => $this->getQuestItems()
         ];
     }
 
+    public function getQuestItems() {
+        return $this->character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest';
+        })->values();
+    }
+
+    /**
+     * Gets a list of usable slot's
+     *
+     * We return the index + 1 which refers to the slot number.
+     * ie, index of 0, is Slot 1 and so on.
+     *
+     * @return array
+     */
     public function getUsableSets(): array {
         $ids = $this->character->inventorySets()
                     ->where('is_equipped', false)
