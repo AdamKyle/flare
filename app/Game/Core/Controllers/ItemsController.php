@@ -35,22 +35,4 @@ class ItemsController extends Controller {
     public function show(Item $item) {
         return $this->renderItemShow('game.items.item', $item);
     }
-
-    public function useItem(Character $character, Item $item) {
-        if ($character->boons->count() === 10) {
-            return redirect()->back()->with('error', 'You can only have a max of ten boons applied. Check active boons to see which ones you have. You can always cancel one by clicking on the row.');
-        }
-
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
-           return $slot->item_id === $item->id;
-        })->first();
-
-        if (is_null($slot)) {
-            return redirect()->back()->with('error', 'You don\'t have this item.');
-        }
-
-        $this->useItemService->useItem($slot, $character, $item);
-
-        return redirect()->back()->with('success', 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.');
-    }
 }

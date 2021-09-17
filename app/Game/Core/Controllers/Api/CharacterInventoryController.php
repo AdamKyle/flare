@@ -186,6 +186,7 @@ class CharacterInventoryController extends Controller {
 
         $result = $inventorySetService->removeItemFromInventorySet($slot->inventorySet, $slot->item);
 
+        // Chances are no inventory space.
         if ($result['status'] !== 200) {
             return response()->json(['message' => $result['message']], 422);
         }
@@ -344,13 +345,16 @@ class CharacterInventoryController extends Controller {
 
         $jobs = [];
 
+        /**
+         * @codeCoverageIgnore
+         */
         foreach ($slots as $index => $slot) {
             if ($index !== 0) {
-                $jobs[] = new UseMultipleItems($character, $slot);
+                $jobs[] = new UseMultipleItems($character, $slot->id);
             }
         }
 
-        UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first());
+        UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first()->id);
 
         return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
     }

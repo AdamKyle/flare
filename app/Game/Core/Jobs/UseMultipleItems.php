@@ -26,18 +26,18 @@ class UseMultipleItems implements ShouldQueue
     private $character;
 
     /**
-     * @var InventorySlot $slot
+     * @var int $slotId
      */
-    private $slot;
+    private $slotId;
 
     /**
      * @param Character $character
      * @param InventorySlot $slot
      */
-    public function __construct(Character $character, InventorySlot $slot)
+    public function __construct(Character $character, int $slotId)
     {
         $this->character = $character;
-        $this->slot      = $slot;
+        $this->slotId    = $slotId;
     }
 
     /**
@@ -46,9 +46,17 @@ class UseMultipleItems implements ShouldQueue
      * @param UseItemService $useItemService
      */
     public function handle(UseItemService $useItemService) {
-        // If less then 11 it will only apply up to a total of ten boons.
+        $inventorySlot = InventorySlot::where('inventory_id', $this->character->inventory->id)
+                                      ->where('id', $this->slotId)
+                                      ->first();
+
+        if (is_null($inventorySlot)) {
+            dump('wtf?');
+        }
+
+        // If less than 11 it will only apply up to a total of ten boons.
         if ($this->character->refresh()->boons->count() < 11) {
-            $useItemService->useItem($this->slot, $this->character, $this->slot->item);
+            $useItemService->useItem($inventorySlot, $this->character, $inventorySlot->item);
 
             event(new CharacterInventoryUpdateBroadCastEvent($this->character->user));
         }

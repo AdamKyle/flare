@@ -29,8 +29,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
         Route::post('/character/{character}/inventory-set/remove', ['uses' => 'Api\CharacterInventoryController@removeFromSet']);
         Route::post('/character/{character}/inventory-set/{inventorySet}/remove-all', ['uses' => 'Api\CharacterInventoryController@emptySet']);
 
-
         Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
-        Route::post('/character/{character}/inventory/use-many', ['uses' => 'Api\CharacterInventoryController@useManyitems']);
+        Route::post('/character/{character}/inventory/use-many', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
     });
 });

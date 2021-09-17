@@ -174,6 +174,7 @@ export default class SetTabSection extends React.Component {
     this.setState({loading: true});
     axios.post('/api/character/'+this.props.characterId+'/inventory-set/equip/'+this.props.set.id)
       .then((result) => {
+        console.log(result);
         this.setState({loading: false});
         this.setSuccessMessage(result.data.message);
       }).catch((error) => {
@@ -244,7 +245,7 @@ export default class SetTabSection extends React.Component {
         {
           this.state.errorMessage !== null ?
             <div className="mb-3">
-              <Alert variant="success" onClose={this.clearErrorMessage.bind(this)} dismissible>
+              <Alert variant="danger" onClose={this.clearErrorMessage.bind(this)} dismissible>
                 {this.state.errorMessage}
               </Alert>
             </div>
