@@ -1,35 +1,40 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
+import ItemName from "../../../../marketboard/components/item-name";
 
-export default class SaveAsSetModal extends React.Component {
+export default class UseManyItemsModal extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
       loading: false,
-      showError: false,
       errorMessage: null,
-      selectedSet: "",
+      selectedItems: [],
     }
   }
 
-  moveToSet() {
+  useSelected() {
     this.setState({
-      showError: false,
       errorMessage: null,
       loading: true,
     }, () => {
-      if (this.state.selectedSet === "") {
+      if (this.state.selectedItems.length === 0) {
         return this.setState({
-          showError: true,
-          errorMessage: 'Please select a set.',
+          errorMessage: 'Please select some items to use.',
           loading: false,
         });
       }
 
-      axios.post('/api/character/'+this.props.characterId+'/inventory/save-equipped-as-set', {
-        move_to_set:  this.state.selectedSet,
+      if (this.state.selectedItems.length > 10) {
+        return this.setState({
+          errorMessage: 'You selected too many items. You may only have a max of ten boons applied at a time.',
+          loading: false,
+        });
+      }
+
+      axios.post('/api/character/'+this.props.characterId+'/inventory/use-many', {
+        slot_ids: this.state.selectedItems,
       })
         .then((result) => {
           this.setState({
@@ -52,14 +57,12 @@ export default class SaveAsSetModal extends React.Component {
 
           if (response.data.hasOwnProperty('message')) {
             this.setState({
-              showError: true,
               errorMessage: response.data.message
             });
           }
 
           if (response.data.hasOwnProperty('error')) {
             this.setState({
-              showError: true,
               errorMessage: response.data.error
             });
           }
@@ -68,12 +71,23 @@ export default class SaveAsSetModal extends React.Component {
   }
 
   setOptions() {
-    return this.props.sets.map((set) => <option value={set} key={set}>Set {set}</option>)
+    return this.props.usableItems.map((ui) => <option value={ui.id} key={ui.id}>
+      {ui.item.name}
+    </option>)
   }
 
   setSelectedSet(event) {
+    var options = event.target.options;
+    var value   = [];
+
+    for (var i = 0, l = options.length; i < l; i++) {
+      if (options[i].selected) {
+        value.push(parseInt(options[i].value) || 0);
+      }
+    }
+
     this.setState({
-      selectedSet: parseInt(event.target.value) || ""
+      selectedItems: value
     });
   }
 
@@ -85,37 +99,37 @@ export default class SaveAsSetModal extends React.Component {
         backdrop="static"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Move to set</Modal.Title>
+          <Modal.Title>Use Multiple Items</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {
-            this.state.showError ?
+            this.state.selectedItems.length > 10 ?
+              <div className="alert alert-danger mt-2 mb-3">
+                <p>Nope. You can only use 10 items.</p>
+              </div>
+              : null
+          }
+          {
+            this.state.errorMessage !== null ?
               <div className="alert alert-danger mt-2 mb-3">
                 <p>{this.state.errorMessage}</p>
               </div>
               : null
           }
           <p>
-            You may select below a set which you wish to move this item to. You can only select sets that
-            are not currently equipped.
+            Below are the items you may use from your inventory. You may select a maximum of ten.
           </p>
+
           <p>
-            The set can be equipped if it complies with the rules of sets:
+            You can use CTRL/CMD and SHIFT to manipulate your selections.
           </p>
-          <ul>
-            <li>1 Weapon, 1 Shield or 2 Weapons or 1 Bow</li>
-            <li>1 Of each armour (Body, Leggings, Sleeves, Feet, Gloves and Helmet)</li>
-            <li>2 Rings</li>
-            <li>2 Spells (1 Healing, 1 Damage or 2 Healing or 2 Damage)</li>
-            <li>2 Artifacts</li>
-          </ul>
-          <p>Please note that you may only select sets that do not currently have items in them for this process.</p>
           <p>
             <select className="form-control monster-select" id="monsters" name="monsters"
                     value={this.state.selectedSet}
                     onChange={this.setSelectedSet.bind(this)}
+                    disabled={this.props.usableItems.length === 0}
+                    multiple={true}
             >
-              <option value="" key="-1">Please select a set</option>
               {this.setOptions()}
             </select>
           </p>
@@ -132,8 +146,8 @@ export default class SaveAsSetModal extends React.Component {
           <Button variant="secondary" onClick={this.props.close}>
             Close
           </Button>
-          <Button variant="success" onClick={this.moveToSet.bind(this)}>
-            Move to set.
+          <Button variant="success" onClick={this.useSelected.bind(this)} disabled={this.state.selectedItems.length > 10 || this.props.usableItems.length === 0}>
+            Use Items.
           </Button>
         </Modal.Footer>
       </Modal>

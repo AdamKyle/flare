@@ -3,6 +3,7 @@ import ItemName from "../../../../marketboard/components/item-name";
 import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
 import EquippedSectionDropDowns from "./equipped-section-drop-downs";
+import SaveAsSetModal from "../modals/save-as-set-modal";
 
 export default class EquippedSection extends React.Component {
 
@@ -62,6 +63,7 @@ export default class EquippedSection extends React.Component {
             setSuccessMessage={this.setSuccessMessage.bind(this)}
             setErrorMessage={this.setErrorMessage.bind(this)}
             hasSetEquipped={typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped)}
+            loading={this.state.loading}
           />
         </Fragment>
       },
@@ -71,6 +73,7 @@ export default class EquippedSection extends React.Component {
       successMessage: null,
       errorMessage: null,
       manageOpenSaveAsSet: false,
+      loading: false,
     }
   }
 
@@ -129,11 +132,14 @@ export default class EquippedSection extends React.Component {
   }
 
   unequipAll() {
+    this.setState({loading: true});
     axios.post('/api/character/'+this.props.characterId+'/inventory/unequip-all', {
       is_set_equipped: typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped),
     }).then((result) => {
+      this.setState({loading: false});
       this.setSuccessMessage(result.data.message)
     }).catch((error) => {
+      this.setState({loading: false});
       if (error.hasOwnProperty('response')) {
         const response = error.response;
 
@@ -207,7 +213,7 @@ export default class EquippedSection extends React.Component {
           <hr />
           <button className='btn btn-danger mr-2'
                   onClick={this.unequipAll.bind(this)}
-                  disabled={this.props.equipped.length === 0}
+                  disabled={this.props.equipped.length === 0 || this.state.loading}
           >
             Unequip All
           </button>
@@ -215,17 +221,36 @@ export default class EquippedSection extends React.Component {
                   onClick={this.manageOpenSaveAsSet.bind(this)}
                   disabled={
                     typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped) ||
-                      this.props.equipped.length === 0
+                      this.props.equipped.length === 0 || this.state.loading
                   }
           >
             Save as set
           </button>
           <hr />
+          {
+            this.state.loading ?
+              <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+              : null
+          }
           <ReactDatatable
             config={this.equipped_Config}
             records={this.formatDataForTable()}
             columns={this.equipped_headers}
           />
+          {
+            this.state.openSaveAsSet ?
+              <SaveAsSetModal
+                characterId={this.props.characterId}
+                sets={this.props.usableSets}
+                open={this.state.openSaveAsSet}
+                close={this.manageOpenSaveAsSet.bind(this)}
+                setSuccessMessage={this.setSuccessMessage.bind(this)}
+              />
+            : null
+          }
         </Card.Body>
       </Card>
     )

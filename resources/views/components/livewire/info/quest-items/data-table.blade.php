@@ -16,6 +16,13 @@
                         sort-field="{{$sortField}}"
                         field="name"
                     />
+                    <x-data-tables.header-row
+                      wire:click.prevent="sortBy('description')"
+                      header-text="Description"
+                      sort-by="{{$sortBy}}"
+                      sort-field="{{$sortField}}"
+                      field="description"
+                    />
                 </x-data-tables.header>
                 <x-data-tables.body>
                     @forelse($items as $item)
@@ -26,6 +33,9 @@
                                 ])}}">
                                     <x-item-display-color :item="$item" />
                                 </a>
+                            </td>
+                            <td>
+                                {{$item->description}}
                             </td>
                         </tr>
                     @empty

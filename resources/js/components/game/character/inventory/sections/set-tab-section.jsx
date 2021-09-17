@@ -56,7 +56,7 @@ export default class SetTabSection extends React.Component {
         cell: row => <Fragment>
           <button
             className="btn btn-primary"
-            disabled={this.props.set.is_equipped}
+            disabled={this.props.set.is_equipped || this.state.loading}
             onClick={() => this.removeItem(row)}
           >
             Remove
@@ -68,6 +68,7 @@ export default class SetTabSection extends React.Component {
     this.state = {
       successMessage: null,
       errorMessage: null,
+      loading: false,
     }
   }
 
@@ -108,12 +109,15 @@ export default class SetTabSection extends React.Component {
   }
 
   removeItem(item) {
+    this.setState({loading: true});
     axios.post('/api/character/'+this.props.characterId+'/inventory-set/remove', {
       slot_id: this.fetchSlotId(item.id),
       inventory_set_id: this.props.set.id,
     }).then((result) => {
+      this.setState({loading: false});
       this.setSuccessMessage(result.data.message);
     }).catch((error) => {
+      this.setState({loading: false});
       if (error.hasOwnProperty('response')) {
         const response = error.response;
 
@@ -137,10 +141,13 @@ export default class SetTabSection extends React.Component {
   }
 
   removeAll() {
+    this.setState({loading: true});
     axios.post('/api/character/'+this.props.characterId+'/inventory-set/'+this.props.set.id+'/remove-all')
       .then((result) => {
+        this.setState({loading: false});
         this.setSuccessMessage(result.data.message);
       }).catch((error) => {
+        this.setState({loading: false});
         if (error.hasOwnProperty('response')) {
           const response = error.response;
 
@@ -161,6 +168,36 @@ export default class SetTabSection extends React.Component {
           }
         }
       });
+  }
+
+  equipSet() {
+    this.setState({loading: true});
+    axios.post('/api/character/'+this.props.characterId+'/inventory-set/equip/'+this.props.set.id)
+      .then((result) => {
+        this.setState({loading: false});
+        this.setSuccessMessage(result.data.message);
+      }).catch((error) => {
+        this.setState({loading: false});
+        if (error.hasOwnProperty('response')) {
+          const response = error.response;
+
+          if (response.status === 401) {
+            return location.reload()
+          }
+
+          if (response.status === 429) {
+            return window.location.replace('/game');
+          }
+
+          if (response.data.hasOwnProperty('message')) {
+            this.setErrorMessage(response.data.message)
+          }
+
+          if (response.data.hasOwnProperty('error')) {
+            this.setErrorMessage(response.data.error)
+          }
+        }
+    });
   }
 
   render() {
@@ -216,13 +253,28 @@ export default class SetTabSection extends React.Component {
 
         <hr />
         <button
-          className="btn btn-danger"
-          disabled={this.props.set.is_equipped || this.props.set.slots.length === 0}
+          className="btn btn-danger mr-2"
+          disabled={this.props.set.is_equipped || this.props.set.slots.length === 0 || this.state.loading}
           onClick={this.removeAll.bind(this)}
         >
           Empty Set
         </button>
+        <button
+          className="btn btn-primary"
+          disabled={this.props.set.is_equipped || this.props.set.slots.length === 0 || this.state.loading}
+          onClick={this.equipSet.bind(this)}
+        >
+          Equip Set
+        </button>
         <hr />
+        {
+          this.state.loading ?
+            <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+              <div className="progress-bar progress-bar-striped indeterminate">
+              </div>
+            </div>
+            : null
+        }
         <ReactDatatable
           config={this.set_config}
           records={this.formatDataForTable()}

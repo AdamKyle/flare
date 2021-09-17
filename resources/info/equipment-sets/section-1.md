@@ -15,8 +15,8 @@ It is suggested that you equip the set of items you want to save, and then save 
 Lets assume we have our equipped items:
 
 <div class="mb-4">
-    <a href="/storage/info/equipment-sets/images/equip-items.png" class="glightbox">
-        <img src="/storage/info/equipment-sets/images/equip-items.png" class="img-fluid" />
+    <a href="/storage/info/equipment-sets/images/equipped-item.png" class="glightbox">
+        <img src="/storage/info/equipment-sets/images/equipped-item.png" class="img-fluid" />
     </a>
 </div>
 
@@ -25,8 +25,8 @@ As you can see there is a button called: Save as set.
 Let's click this and see what happens!
 
 <div class="mb-4">
-    <a href="/storage/info/equipment-sets/images/select-set.png" class="glightbox">
-        <img src="/storage/info/equipment-sets/images/select-set.png" class="img-fluid" />
+    <a href="/storage/info/equipment-sets/images/move-to-set-modal.png" class="glightbox">
+        <img src="/storage/info/equipment-sets/images/move-to-set-modal.png" class="img-fluid" />
     </a>
 </div>
 
@@ -34,8 +34,14 @@ You can select a set to save the equipment to. The set must be empty in order fo
 empty sets in the dropdown. Once the set is saved:
 
 <div class="mb-4">
-    <a href="/storage/info/equipment-sets/images/set-success.png" class="glightbox">
-        <img src="/storage/info/equipment-sets/images/set-success.png" class="img-fluid" />
+    <a href="/storage/info/equipment-sets/images/set-selection.png" class="glightbox">
+        <img src="/storage/info/equipment-sets/images/set-selection.png" class="img-fluid" />
+    </a>
+</div>
+
+<div class="mb-4">
+    <a href="/storage/info/equipment-sets/images/set-moved.png" class="glightbox">
+        <img src="/storage/info/equipment-sets/images/set-moved.png" class="img-fluid" />
     </a>
 </div>
 
@@ -44,8 +50,8 @@ You will see the above success message. This will tell you two things, that you 
 We can see this here:
 
 <div class="mb-4">
-    <a href="/storage/info/equipment-sets/images/see-set-equipped.png" class="glightbox">
-        <img src="/storage/info/equipment-sets/images/see-set-equipped.png" class="img-fluid" />
+    <a href="/storage/info/equipment-sets/images/set-equipped.png" class="glightbox">
+        <img src="/storage/info/equipment-sets/images/set-equipped.png" class="img-fluid" />
     </a>
 </div>
 
@@ -72,8 +78,8 @@ If the set does not conform to the above rules, then the set will be treated as 
 You can see your set here:
 
 <div class="mb-4">
-    <a href="/storage/info/equipment-sets/images/see-set.png" class="glightbox">
-        <img src="/storage/info/equipment-sets/images/see-set.png" class="img-fluid" />
+    <a href="/storage/info/equipment-sets/images/cant-equip-set.png" class="glightbox">
+        <img src="/storage/info/equipment-sets/images/cant-equip-set.png" class="img-fluid" />
     </a>
 </div>
 

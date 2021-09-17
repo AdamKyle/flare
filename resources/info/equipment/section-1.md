@@ -3,6 +3,14 @@
 Equipment in Tlessa works differently then other games. All the core pieces you can buy from the shop will raise all your stats. Your body piece and weapon are what you will want to aim for when buying new gear.
 The body will always increase stats the most (all your core stats), while weapons will increase the stats (core stats) by a smaller but equal amount. All stat increases stack across all pieces of equipment.
 
+> ### ATTN!!
+> 
+> It is best to play with your character sheet open in one tab and your game in the other. The inventory is live.
+> This means any gear you get, craft, enchant, buy (market or shop) all end up in your inventory in real time.
+> 
+> Some inventory actions happen in the background, and thus you will be told to see chat or the Active Boons tab on character sheet.
+> If you are told to see chat, its best you open the game in a separate tab - this applies to Disenchanting and Using items.
+
 Let’s equip some items. If you do not have any you can head over to shop:
 
 <div class="mb-4">
@@ -38,8 +46,15 @@ Click on the equip tab above your inventory table:
 
 Here you can see that we are already have an item equipped. All items in both the inventory and equipped table as well as any other table showing an item (shops, market board, information section …) can be clicked on to get more details about the item.
 
-However, we got us some nice weapons and armour, lets head back to the inventory section (by clicking the inventory tab beside equipment). In this table, on some items that are not quest items, you will see an actions section.
-In that dropdown you can choose to destroy the item, or you can equip the item. If the item is already equipped to you, it will appear in the equipped section, allowing you to unequip it.
+However, we got us some nice weapons and armour, lets head back to the inventory section (by clicking the inventory tab beside equipment). In this table, you will see an actions section.
+
+<div class="mb-4">
+    <a href="/storage/info/equipment/images/equipping.png" class="glightbox">
+        <img src="/storage/info/equipment/images/equipping.png" class="img-fluid" />
+    </a>
+</div>
+
+In that dropdown you can choose to destroy the item, you can equip the item, or you can save it to a [set](/information/equipment-sets). If the item is already equipped to you, it will appear in the equipped section, allowing you to unequip it.
 Once you selected an item you want to equip, go ahead and click the actions dropdown and click equip to come to the next page, the compare page:
 
 <div class="mb-4">

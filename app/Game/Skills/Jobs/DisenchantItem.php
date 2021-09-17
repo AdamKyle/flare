@@ -68,7 +68,7 @@ class DisenchantItem implements ShouldQueue
 
         if ($this->isLastJob) {
             $goldDust = Cache::pull('character-' . $this->character->id);
-            dump('Do I ever get here?');
+
             event(new ServerMessageEvent($this->character->user, 'You gained a total of: ' . $goldDust . ' Gold Dust from disenchanting.'));
         }
 

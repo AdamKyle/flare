@@ -3,7 +3,12 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\Item;
+use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\RemoveItemRequest;
+use App\Game\Core\Requests\SaveEquipmentAsSet;
+use App\Game\Core\Requests\UseManyItemsValidation;
+use App\Game\Core\Services\UseItemService;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
@@ -87,7 +92,6 @@ class CharacterInventoryController extends Controller {
 
             foreach ($slots as $index => $slot) {
                 if ($index !== 0) {
-                    dump($index . ' ' . ($slots->count() - 1));
                     if ($index === ($slots->count() - 1)) {
                         $jobs[] = new DisenchantItem($character, $slot->id, true);
                     } else {
@@ -132,6 +136,39 @@ class CharacterInventoryController extends Controller {
         return response()->json([
             'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
         ]);
+    }
+
+    public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character, InventorySetService $inventorySetService) {
+        $currentlyEquipped = $character->inventory->slots->filter(function($slot) {
+            return $slot->equipped;
+        });
+
+        $inventorySet = $character->inventorySets()->find($request->move_to_set);
+
+        foreach ($currentlyEquipped as $equipped) {
+            $inventorySet->slots()->create(array_merge(['inventory_set_id' => $inventorySet->id], $equipped->getAttributes()));
+
+            $equipped->delete();
+        }
+
+        $inventorySet->update([
+            'is_equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $setIndex = $character->inventorySets->search(function($set) {
+            return $set->is_equipped;
+        });
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character, $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped (equipment has been moved to the set)']);
     }
 
     public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
@@ -245,5 +282,76 @@ class CharacterInventoryController extends Controller {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         return response()->json(['message' => 'All items have been removed.'], 200);
+    }
+
+    public function useItem(Character $character, Item $item, UseItemService $useItemService) {
+        if ($character->boons->count() === 10) {
+            return response()->json(['message' => 'You can only have a max of ten boons applied. 
+            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
+        }
+
+        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+            return $slot->item_id === $item->id;
+        })->first();
+
+        if (is_null($slot)) {
+            return response()->json(['message' => 'You don\'t have this item.'], 422);
+        }
+
+        $useItemService->useItem($slot, $character, $item);
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.'], 200);
+    }
+
+    public function equipItemSet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
+        if (!$inventorySet->can_be_equipped) {
+            return response()->json(['message' => 'Set cannot be equipped.'], 422);
+        }
+
+        $inventorySetService->equipInventorySet($character, $inventorySet);
+
+        $character->refresh();
+
+        $setIndex = $character->inventorySets->search(function($set) {
+            return $set->is_equipped;
+        });
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $characterData = new ResourceItem($character, $this->characterTransformer);
+        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped']);
+    }
+
+    public function UseManyItems(UseManyItemsValidation $request, Character $character) {
+        if ($character->boons->count() === 10) {
+            return response()->json(['message' => 'You can only have a max of ten boons applied. 
+            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
+        }
+
+        $slots = $character->inventory->slots()->findMany($request->slot_ids);
+
+        if ($slots->isEmpty()) {
+            return response()->json(['message' => 'You do not own any of these items. What are you doing?'], 422);
+        }
+
+        $jobs = [];
+
+        foreach ($slots as $index => $slot) {
+            if ($index !== 0) {
+                $jobs[] = new UseMultipleItems($character, $slot);
+            }
+        }
+
+        UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first());
+
+        return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
     }
 }

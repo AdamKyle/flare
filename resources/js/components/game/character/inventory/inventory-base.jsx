@@ -80,6 +80,7 @@ export default class InventoryBase extends React.Component {
                 <EquippedSection
                   characterId={this.props.characterId}
                   equipped={this.state.inventory.equipped}
+                  usableSets={this.state.inventory.savable_sets}
                 />
               </Tab>
               <Tab eventKey="sets" title="Sets">

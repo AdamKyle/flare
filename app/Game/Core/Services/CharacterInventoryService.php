@@ -68,6 +68,7 @@ class CharacterInventoryService {
         return [
             'inventory'    => $this->fetchCharacterInventory()->values(),
             'usable_sets'  => $this->getUsableSets(),
+            'savable_sets' => $this->getSaveableSets(),
             'equipped'     => !is_null($equipped) ? $equipped : [],
             'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
             'quest_items'  => $this->getQuestItems(),
@@ -117,6 +118,24 @@ class CharacterInventoryService {
             $indexes[] = $this->character->inventorySets->search(function($set) use($id) {
                 return $set->id === $id;
             }) + 1;
+        }
+
+        return $indexes;
+    }
+
+    public function getSaveableSets(): array {
+        $ids = $this->character->inventorySets()
+            ->doesntHave('slots')
+            ->where('is_equipped', false)
+            ->pluck('id')
+            ->toArray();
+
+        $indexes = [];
+
+        foreach ($ids as $id) {
+            $indexes[] = $this->character->inventorySets->search(function($set) use($id) {
+                    return $set->id === $id;
+                }) + 1;
         }
 
         return $indexes;

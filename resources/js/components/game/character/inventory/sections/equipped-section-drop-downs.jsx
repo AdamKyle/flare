@@ -45,7 +45,7 @@ export default class EquippedSectionDropDowns extends React.Component {
   render() {
     return (
       <>
-        <Dropdown>
+        <Dropdown disabled={this.props.loading}>
           <Dropdown.Toggle variant="primary" id="actions">
             Actions
           </Dropdown.Toggle>
