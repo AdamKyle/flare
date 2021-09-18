@@ -2,6 +2,8 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Skills\Jobs\ProcessAlchemy;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Skills\Requests\AlchemyValidation;
@@ -26,12 +28,10 @@ class AlchemyController extends Controller {
             return response()->json(['message' => 'invalid input.'], 429);
         }
 
-        $response = $this->alchemyService->transmute($character, $request->item_to_craft);
+        event(new CraftedItemTimeOutEvent($character));
 
-        $status = $response['status'];
+        ProcessAlchemy::dispatch($character, $request->item_to_craft);
 
-        unset($response['status']);
-
-        return response()->json($response, $status);
+        return response()->json([], 200);
     }
 }

@@ -25,6 +25,7 @@ export default class AlchemyAction extends React.Component {
 
     this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
     this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.alchemyList = Echo.private('update-alchemy-list-' + this.props.userId);
 
   }
 
@@ -70,6 +71,12 @@ export default class AlchemyAction extends React.Component {
       this.setState({
         goldDust: event.characterSheet.goldDust,
         shards: event.characterSheet.shards,
+      });
+    });
+
+    this.alchemyList.listen('Game.Skills.Events.UpdateCharacterAlchemyList', (event) => {
+      this.setState({
+        itemsToCraft: event.items,
       });
     });
   }
@@ -208,7 +215,7 @@ export default class AlchemyAction extends React.Component {
 
     return (
       <>
-        <div className={"row mb-3 " + (!this.state.showSuccess ? 'hide' : '')}>
+        <div className={"row mb-2 mt-2 " + (!this.state.showSuccess ? 'hide' : '')}>
           <div className="col-md-10">
             <div className="alert alert-success">You got new items to craft! Check the list.</div>
           </div>

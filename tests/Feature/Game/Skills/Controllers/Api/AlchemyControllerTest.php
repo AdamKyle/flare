@@ -56,10 +56,6 @@ class AlchemyControllerTest extends TestCase
                 'item_to_craft' => $this->item->id
             ])->response;
 
-        $content = json_decode($response->content());
-
         $this->assertEquals(200, $response->status());
-
-        $this->assertCount(1, $content->items);
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -36,15 +38,17 @@ class AlchemyServiceTest extends TestCase
             'type' => 'alchemy',
             'skill_level_required' => 0,
         ]);
+
+        Event::fake([ServerMessageEvent::class]);
     }
 
     public function testAlchemyFailsItemDoesNotExist() {
         $alchemyService = resolve(AlchemyService::class);
         $character = $this->character->getCharacter();
 
-        $response = $alchemyService->transmute($character, 100);
+        $alchemyService->transmute($character, 100);
 
-        $this->assertEquals(422, $response['status']);
+        Event::assertDispatched(ServerMessageEvent::class);
     }
 
     public function testGoldDustIsTooMuch() {
@@ -55,9 +59,9 @@ class AlchemyServiceTest extends TestCase
         $alchemyService = resolve(AlchemyService::class);
         $character = $this->character->getCharacter();
 
-        $response = $alchemyService->transmute($character, $item->id);
+        $alchemyService->transmute($character, $item->id);
 
-        $this->assertEquals(422, $response['status']);
+        Event::assertDispatched(ServerMessageEvent::class);
     }
 
     public function testShardsCostIsTooMuch() {
@@ -68,9 +72,9 @@ class AlchemyServiceTest extends TestCase
         $alchemyService = resolve(AlchemyService::class);
         $character = $this->character->getCharacter();
 
-        $response = $alchemyService->transmute($character, $item->id);
+        $alchemyService->transmute($character, $item->id);
 
-        $this->assertEquals(422, $response['status']);
+        Event::assertDispatched(ServerMessageEvent::class);
     }
 
     public function testFailToTransmuteSkillLevelRequiredToHigh() {
@@ -81,9 +85,9 @@ class AlchemyServiceTest extends TestCase
         $alchemyService = resolve(AlchemyService::class);
         $character = $this->character->getCharacter();
 
-        $response = $alchemyService->transmute($character, $item->id);
+        $alchemyService->transmute($character, $item->id);
 
-        $this->assertCount(0, $response['items']);
+        Event::assertDispatched(ServerMessageEvent::class);
     }
 
     public function testCreateAlchemyItem() {
@@ -101,9 +105,7 @@ class AlchemyServiceTest extends TestCase
         $alchemyService = resolve(AlchemyService::class);
         $character = $this->character->getCharacter();
 
-        $response = $alchemyService->transmute($character, $item->id);
-
-        $this->assertCount(1, $response['items']);
+        $alchemyService->transmute($character, $item->id);
 
         $slot = $character->refresh()->inventory->slots(function($slot) {
             return $slot->item_id === $this->item->id;
@@ -129,9 +131,7 @@ class AlchemyServiceTest extends TestCase
             'inventory_max' => 0
         ])->getCharacter();
 
-        $response = $alchemyService->transmute($character, $item->id);
-
-        $this->assertCount(1, $response['items']);
+        $alchemyService->transmute($character, $item->id);
 
         $slot = $character->refresh()->inventory->slots(function($slot) {
             return $slot->item_id === $this->item->id;
