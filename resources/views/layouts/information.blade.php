@@ -23,11 +23,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
 
     @livewireStyles
-
+    <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
+    <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
+    <script src={{mix('js/app.js')}} type="text/javascript"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
-    <script src="{{ asset('js/vendor.js') }}"></script>
-    <script src="{{ asset('js/manifest.js') }}"></script>
 </head>
 <body class="fix-header fix-sidebar card-no-border">
     <div id="main-wrapper">

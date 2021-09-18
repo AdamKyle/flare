@@ -16,13 +16,18 @@ $(function () {
         }
     });
 
-    $('#sidebarnav li a').on('click', function() {
+    $('#sidebarnav li a').unbind('click').on('click', function(event) {
+        event.preventDefault();
         const foundElement = $(this).parent().find('ul');
 
         if (foundElement.hasClass('collapse')) {
             foundElement.attr('aria-expanded', true);
             foundElement.removeClass('collapse');
         } else {
+            if ($(this).attr('href')) {
+                window.location = $(this).attr('href');
+            }
+
             foundElement.attr('aria-expanded', false);
             foundElement.addClass('collapse');
         }
