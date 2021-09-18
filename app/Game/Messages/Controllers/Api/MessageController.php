@@ -222,13 +222,14 @@ class MessageController extends Controller {
             })->isNotEmpty();
 
             if ($hasItem) {
+
                 if (!$map->default) {
                     $traverse = $movementService->updateCharacterPlane($celestial->monster->gameMap->id, $user->character);
-                }
 
-                if ($traverse['status'] === 422) {
-                    broadcast(new ServerMessageEvent($user, $traverse['message']));
-                    return response()->json([], 200);
+                    if ($traverse['status'] === 422) {
+                        broadcast(new ServerMessageEvent($user, $traverse['message']));
+                        return response()->json([], 200);
+                    }
                 }
 
                 $movement = $movementService->teleport($user->character, $celestial->x_position, $celestial->y_position, 0 , 0);

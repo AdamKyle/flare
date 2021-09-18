@@ -11,8 +11,8 @@ export default class EquippedSection extends React.Component {
     super(props);
 
     this.equipped_Config = {
-      page_size: 25,
-      length_menu: [25, 50, 75],
+      page_size: 10,
+      length_menu: [10, 25, 50, 75],
       show_pagination: true,
       pagination: 'advance',
       hideSizePerPage: true,
@@ -132,7 +132,7 @@ export default class EquippedSection extends React.Component {
   }
 
   unequipAll() {
-    this.setState({loading: true});
+    this.setState({loading: true, errorMessage: null, successMessage: null});
     axios.post('/api/character/'+this.props.characterId+'/inventory/unequip-all', {
       is_set_equipped: typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped),
     }).then((result) => {

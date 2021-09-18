@@ -18,7 +18,7 @@
                     <div class="card-body">
                         <p>{!! nl2br(e($skill->description)) !!}</p>
                         <hr />
-                        @if (!$skill->can_train)
+                        @if (!$skill->can_train && !$skill->skillType()->isDisenchanting())
                             <div class="alert alert-info mb-3 mt-2">
                                 @if ($skill->skillType()->isCrafting())
                                     <p>

@@ -50,10 +50,6 @@ class UseMultipleItems implements ShouldQueue
                                       ->where('id', $this->slotId)
                                       ->first();
 
-        if (is_null($inventorySlot)) {
-            dump('wtf?');
-        }
-
         // If less than 11 it will only apply up to a total of ten boons.
         if ($this->character->refresh()->boons->count() < 11) {
             $useItemService->useItem($inventorySlot, $this->character, $inventorySlot->item);

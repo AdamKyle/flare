@@ -9,8 +9,8 @@ export default class SetTabSection extends React.Component {
     super(props);
 
     this.set_config = {
-      page_size: 25,
-      length_menu: [25, 50, 75],
+      page_size: 10,
+      length_menu: [10, 25, 50, 75],
       show_pagination: true,
       pagination: 'advance',
       hideSizePerPage: true,
@@ -109,7 +109,8 @@ export default class SetTabSection extends React.Component {
   }
 
   removeItem(item) {
-    this.setState({loading: true});
+    this.setState({loading: true, errorMessage: null, successMessage: null});
+
     axios.post('/api/character/'+this.props.characterId+'/inventory-set/remove', {
       slot_id: this.fetchSlotId(item.id),
       inventory_set_id: this.props.set.id,
@@ -141,7 +142,8 @@ export default class SetTabSection extends React.Component {
   }
 
   removeAll() {
-    this.setState({loading: true});
+    this.setState({loading: true, errorMessage: null, successMessage: null});
+
     axios.post('/api/character/'+this.props.characterId+'/inventory-set/'+this.props.set.id+'/remove-all')
       .then((result) => {
         this.setState({loading: false});

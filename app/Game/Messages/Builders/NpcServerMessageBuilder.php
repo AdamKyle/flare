@@ -34,7 +34,7 @@ class NpcServerMessageBuilder {
             case 'adventuring':
                 return '"Child, you are adventuring. Come chat with me when you are NOT busy!"';
             case 'paid_conjuring':
-                return  $npc->real_name . ' take your currency and smiles: "Thank you child. I shall begin the conjuration at once."';
+                return  $npc->real_name . ' takes your currency and smiles: "Thank you child. I shall begin the conjuration at once."';
             case 'already_conjured':
                 return '"No child! I have already conjured for you!"';
             case 'public_exists':

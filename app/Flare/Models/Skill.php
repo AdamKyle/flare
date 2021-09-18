@@ -114,7 +114,6 @@ class Skill extends Model
         }
 
         $itemBonus  = $this->getItemBonuses($this->baseSkill, 'base_damage_mod_bonus', true);
-        $itemBonus += $this->getItemBonuses($this->baseSkill, 'skill_bonus', true);
 
         $baseBonus = (
             $value * $this->level
@@ -240,7 +239,6 @@ class Skill extends Model
         if (!$equippedOnly) {
             foreach ($this->character->inventory->slots as $slot) {
                 if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
-
                     $bonus += $this->calculateBonus($slot->item, $this->baseSkill, $skillAttribute);
                 }
             }

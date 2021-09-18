@@ -207,13 +207,18 @@ class CharacterInventoryController extends Controller {
         $originalInventorySetCount = $inventorySet->slots->count();
         $itemsRemoved              = 0;
 
-        foreach ($inventorySet->slots as $slot) {
+        // Only grab the amount of items your inventory can hold.
+        foreach ($inventorySet->slots()->take($currentInventoryAmount)->get() as $slot) {
 
             if ($currentInventoryAmount !== 0) {
-                $inventorySetService->removeItemFromInventorySet($inventorySet, $slot->item);
+                if ($inventorySetService->removeItemFromInventorySet($inventorySet, $slot->item)) {
+                    $currentInventoryAmount -= 1;
+                    $itemsRemoved           += 1;
 
-                $currentInventoryAmount -= 1;
-                $itemsRemoved           += 1;
+                    continue;
+                }
+
+                break;
             }
         }
 

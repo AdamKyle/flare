@@ -14,8 +14,8 @@ export default class InventorySection extends React.Component {
     super(props);
 
     this.inventory_config = {
-      page_size: 25,
-      length_menu: [25, 50, 75],
+      page_size: 10,
+      length_menu: [10, 25, 50, 75],
       show_pagination: true,
       pagination: 'advance',
       hideSizePerPage: true,

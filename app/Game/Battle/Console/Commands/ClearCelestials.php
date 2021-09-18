@@ -59,7 +59,9 @@ class ClearCelestials extends Command
                 foreach ($fights as $fight) {
                     CharacterInCelestialFight::where('celestial_fight_id', $fight->id)->delete();
 
-                    event(new GlobalMessageEvent($fight->monster->name . ' has vanished from the surface plane (hourly reset).'));
+                    $monster = $fight->monster;
+
+                    event(new GlobalMessageEvent($monster->name . ' has vanished from the '.$monster->gameMap->name.' plane (hourly reset).'));
 
                     $fight->delete();
 

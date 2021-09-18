@@ -8,6 +8,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class InventorySetService {
 
@@ -44,15 +45,17 @@ class InventorySetService {
      * @param Item $item
      * @return array
      */
-    public function removeItemFromInventorySet(InventorySet $inventorySet, Item $item): array {
+    public function removeItemFromInventorySet(InventorySet $inventorySet, Item $item): bool {
         $slotWithItem = $inventorySet->slots->filter(function($slot) use ($item) {
             return $slot->item_id === $item->id;
         })->first();
 
         $character = $inventorySet->character;
 
-        if ($character->inventory_max < $character->inventory->slots->count()) {
-            return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
+        if ($character->inventory->slots->count() >= $character->inventory_max) {
+            event (new ServerMessageEvent($character->user,  'Not enough inventory space to put this item back into your inventory.'));
+
+            return false;
         }
 
         $character->inventory->slots()->create([
@@ -68,7 +71,7 @@ class InventorySetService {
             'can_be_equipped' => $this->isSetEquippable($inventorySet),
         ]);
 
-        return $this->successResult(['message' => 'Removed item from inventory set and placed back into inventory.']);
+        return true;
     }
 
     /**
