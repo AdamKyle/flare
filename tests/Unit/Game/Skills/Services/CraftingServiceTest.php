@@ -2,9 +2,11 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -38,18 +40,26 @@ class CraftingServiceTest extends TestCase
     }
 
     public function testItemDoesntExistForCrafting() {
+        Event::fake([ServerMessageEvent::class]);
+
         $craftingService = resolve(CraftingService::class);
 
         $character = $this->character->getCharacter();
 
-        $this->assertEquals(422, $craftingService->craft($character, ['item_to_craft' => 890, 'type' => 'weapon'])['status']);
+        $craftingService->craft($character, ['item_to_craft' => 890, 'type' => 'weapon']);
+
+        Event::assertDispatched(ServerMessageEvent::class);
     }
 
     public function testCantAffordCrafting() {
+        Event::fake([ServerMessageEvent::class]);
+
         $craftingService = resolve(CraftingService::class);
 
         $character = $this->character->getCharacter();
 
-        $this->assertCount(1, $craftingService->craft($character, ['item_to_craft' => $this->item->id, 'type' => 'weapon'])['items']);
+        $craftingService->craft($character, ['item_to_craft' => 890, 'type' => 'weapon']);
+
+        Event::assertDispatched(ServerMessageEvent::class);
     }
 }

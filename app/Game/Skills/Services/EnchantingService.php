@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Services;
 
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -16,8 +17,9 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use Illuminate\Support\Facades\Log;
 
 class EnchantingService {
 
@@ -90,72 +92,45 @@ class EnchantingService {
      *
      * @param Character $character
      * @param array $params
+     * @param InventorySlot $slot
+     * @return array
      */
-    public function enchant(Character $character, array $params): array {
+    public function enchant(Character $character, array $params, InventorySlot $slot): void {
         $characterInfo   = $this->characterInformationBuilder->setCharacter($character);
         $enchantingSkill = $this->getEnchantingSkill($character);
-        $slot            = $this->getSlotFromInventory($character, $params['slot_id']);
-
-        if (is_null($slot)) {
-            return $this->errorResult('No such inventory slot.');
-        }
 
         if ($params['cost'] > $character->gold) {
-            return $this->errorResult('Not enough gold.');
-        }
+            new GameServerMessageEvent($character->user, 'Not Enough Gold.');
 
-        $timeOut = $this->timeForEnchanting($slot->item);
+            return;
+        }
 
         $this->updateCharacterGold($character, $params['cost']);
 
         try {
-            $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character, $params['cost']);
+            $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 
             $this->enchantItemService->updateSlot($slot);
 
-            event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
+            $this->updateCharacterAffixList($character, $characterInfo, $enchantingSkill);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-            return $this->successResult([
-                'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
-                'character_inventory' => array_values($this->fetchCharacterInventory($character)),
-            ]);
         } catch (Exception $e) {
             // Something went wrong, give their gold back
             $this->giveGoldBack($character->refresh(), $params['cost']);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-            return $this->errorResult($e->getMessage());
+            $this->updateCharacterAffixList($character, $characterInfo, $enchantingSkill);
+
+            Log::error($e->getMessage());
+
+            event(new GameServerMessageEvent($character->user, 'You should not be seeing this. We have reverted the changes. Alert discord Bugs channel. Screen shot this.'));
         }
     }
 
-    protected function getEnchantingSkill(Character $character): Skill {
-        return $character->skills()->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
-    }
-
-    protected function getSlotFromInventory(Character $character, int $slotId) {
-        return $character->refresh()->inventory->slots->where('id', $slotId)->where('equipped', false)->first();
-    }
-
-    protected function fetchCharacterInventory(Character $character): Array {
-        return $character->refresh()->inventory->slots->filter(function($slot) {
-            if ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && !$slot->equipped) {
-                return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
-            }
-        })->all();
-    }
-
-    protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
-        return ItemAffix::select('name', 'cost', 'id', 'type')
-                        ->where('int_required', '<=', $builder->statMod('int'))
-                        ->where('skill_level_required', '<=', $enchantingSkill->level)
-                        ->orderBy('cost', 'asc')
-                        ->get();
-    }
-
-    protected function timeForEnchanting(Item $item) {
+    public function timeForEnchanting(Item $item) {
 
         if (!is_null($item->itemPrefix) && !is_null($item->itemSuffix)) {
             return 'tripple';
@@ -166,6 +141,38 @@ class EnchantingService {
         }
 
         return null;
+    }
+
+    public function getSlotFromInventory(Character $character, int $slotId) {
+        return $character->refresh()->inventory->slots->where('id', $slotId)->where('equipped', false)->first();
+    }
+
+    protected function updateCharacterAffixList(Character $character, CharacterInformationBuilder $characterInfo, Skill $enchantingSkill) {
+        $user             = $character->user;
+        $availableAffixes = $this->getAvailableAffixes($characterInfo, $enchantingSkill);
+        $inventory        = $this->fetchCharacterInventory($character);
+
+        event(new UpdateCharacterEnchantingList($user, $availableAffixes, $inventory));
+    }
+
+    protected function getEnchantingSkill(Character $character): Skill {
+        return $character->skills()->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
+    }
+
+    protected function fetchCharacterInventory(Character $character): array {
+        return $character->refresh()->inventory->slots->filter(function($slot) {
+            if ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && !$slot->equipped) {
+                return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+            }
+        })->values()->toArray();
+    }
+
+    protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
+        return ItemAffix::select('name', 'cost', 'id', 'type')
+                        ->where('int_required', '<=', $builder->statMod('int'))
+                        ->where('skill_level_required', '<=', $enchantingSkill->level)
+                        ->orderBy('cost', 'asc')
+                        ->get();
     }
 
     protected function attachAffixes

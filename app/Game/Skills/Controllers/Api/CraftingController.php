@@ -2,6 +2,9 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Skills\Jobs\ProcessCraft;
+use Composer\XdebugHandler\Process;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -36,12 +39,10 @@ class CraftingController extends Controller {
             return response()->json(['message' => 'invalid input.'], 429);
         }
 
-        $response = $this->craftingService->craft($character, $request->all());
+        event(new CraftedItemTimeOutEvent($character));
 
-        $status = $response['status'];
+        ProcessCraft::dispatch($character, $request->all());
 
-        unset($response['status']);
-
-        return response()->json($response, $status);
+        return response()->json([], 200);
     }
 }

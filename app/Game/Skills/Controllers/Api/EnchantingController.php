@@ -2,6 +2,8 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Skills\Jobs\ProcessEnchant;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Skills\Requests\EnchantingValidation;
@@ -33,12 +35,18 @@ class EnchantingController extends Controller {
             return response()->json(['message' => 'invalid input.'], 429);
         }
 
-        $response = $this->enchantingService->enchant($character, $request->all());
+        $slot = $this->enchantingService->getSlotFromInventory($character, $request->slot_id);
 
-        $status = $response['status'];
+        if (is_null($slot)) {
+            return response()->json(['message' => 'invalid input.'], 422);
+        }
 
-        unset($response['status']);
+        $timeOut = $this->enchantingService->timeForEnchanting($slot->item);
 
-        return response()->json($response, $status);
+        event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
+
+        ProcessEnchant::dispatch($character, $slot, $request->all());
+
+        return response()->json([], 200);
     }
 }

@@ -29,6 +29,7 @@ export default class EnchantingAction extends React.Component {
 
     this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
     this.topBar = Echo.private('update-top-bar-' + this.props.userId);
+    this.enchanting = Echo.private('update-enchanting-list-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -51,6 +52,24 @@ export default class EnchantingAction extends React.Component {
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       this.setState({gold: event.characterSheet.gold});
+    });
+
+    this.enchanting.listen('Game.Skills.Events.UpdateCharacterEnchantingList', (event) => {
+      console.log(event);
+      this.setState({
+        affixList: event.availableAffixes,
+        inventoryList: event.inventory,
+      }, () => {
+        if (event.inventory.length > 0) {
+          const inventory = this.reorderInventory(event.inventory);
+
+          this.findNextItemToEnchant(inventory[0]);
+        } else {
+          this.setState({
+            itemToEnchant: 0,
+          });
+        }
+      });
     });
 
     axios.get('/api/enchanting/' + this.props.characterId).then((result) => {
@@ -136,23 +155,7 @@ export default class EnchantingAction extends React.Component {
       cost: this.state.cost,
     }
 
-    axios.post('/api/enchant/' + this.props.characterId, params).then((result) => {
-      this.setState({
-        affixList: result.data.affixes,
-        inventoryList: result.data.character_inventory,
-        cost: 0,
-      }, () => {
-        if (result.data.character_inventory.length > 0) {
-          const inventory = this.reorderInventory(result.data.character_inventory);
-
-          this.findNextItemToEnchant(inventory[0]);
-        } else {
-          this.setState({
-            itemToEnchant: 0,
-          });
-        }
-      });
-    }).catch((err) => {
+    axios.post('/api/enchant/' + this.props.characterId, params).catch((err) => {
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
@@ -416,13 +419,13 @@ export default class EnchantingAction extends React.Component {
 
     return (
       <>
-        <div className={"row mt-3 " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>
+        <div className={"row mt-2 mb-2 " + (_.isEmpty(this.state.inventoryList) && !this.state.loading ? '' : 'hide')}>
           <div className="col-md-10">
             <div className="alert alert-danger">You have no items to enchant.</div>
           </div>
         </div>
 
-        <div className={"row mb-3 " + (!this.state.showSuccess ? 'hide' : '')}>
+        <div className={"row mb-2 mt-2 " + (!this.state.showSuccess ? 'hide' : '')}>
           <div className="col-md-10">
             <div className="alert alert-success">You got new affixes to enchant! Check the lists.</div>
           </div>

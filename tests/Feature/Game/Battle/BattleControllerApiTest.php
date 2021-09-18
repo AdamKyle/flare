@@ -146,10 +146,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsCharacterIsDead() {
-        Queue::Fake();
-
-        Event::fake([ServerMessageEvent::class, UpdateTopBarBroadcastEvent::class]);
-
         $user      = $this->character->getUser();
         $character = $this->character->getCharacter();
 
@@ -163,15 +159,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDead() {
-        Queue::Fake();
-
-        Event::fake([
-            ServerMessageEvent::class,
-            DropsCheckEvent::class,
-            GoldRushCheckEvent::class,
-            AttackTimeOutEvent::class,
-            UpdateTopBarBroadcastEvent::class,
-        ]);
 
         $user      = $this->character->getUser();
         $character = $this->character->getCharacter();
@@ -193,8 +180,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadNoXpMaxLevel() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -231,8 +216,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsWhenCharacterCannotAttack() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -263,8 +246,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsWhenCharacterAlreadyDead() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -296,8 +277,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterLevelUp() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -326,8 +305,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedItem() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
@@ -357,8 +334,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedQuestItem() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
@@ -407,8 +382,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterDidNotGainQuestItem() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
@@ -457,8 +430,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedQuestItemMonsterDropChanceIsMax() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
@@ -505,8 +476,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsCharacterCannotPickUpItem() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             GoldRushCheckEvent::class,
@@ -538,8 +507,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testBattleResultsMonsterIsDeadAndCharacterGainedGoldRush() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -566,37 +533,7 @@ class BattleControllerApiTest extends TestCase
         $this->assertNotEquals(0, $character->gold);
     }
 
-    public function testBattleResultsMonsterIsDeadCannotAttackAgain() {
-        Queue::Fake();
-
-        Event::fake([
-            ServerMessageEvent::class,
-            DropsCheckEvent::class,
-            GoldRushCheckEvent::class,
-            ShowTimeOutEvent::class,
-            UpdateTopBarBroadcastEvent::class,
-        ]);
-
-        $character = $this->character->getCharacter();
-        $user      = $this->character->getUser();
-        $monster   = $this->monster->getMonster();
-
-        $response = $this->actingAs($user)
-                         ->json('POST', '/api/battle-results/' . $character->id, [
-                             'is_defender_dead' => true,
-                             'defender_type' => 'monster',
-                             'monster_id' => $monster->id,
-                         ])
-                         ->response;
-
-        $this->assertEquals(200, $response->status());
-
-        $this->assertFalse($this->character->getCharacter()->can_attack);
-    }
-
     public function testCharacterGetsFullXPWhenMonsterMaxLevelIsHigherThenCharacterLevel() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -625,8 +562,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testCharacterGetsOneThirdXPWhenMonsterMaxLevelIsLowerThenCharacterLevel() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -653,8 +588,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testCharacterSeesErrorForUnknownType() {
-        Queue::Fake();
-
         Event::fake([
             ServerMessageEvent::class,
             DropsCheckEvent::class,
@@ -688,7 +621,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testWhenCharacterIsDeadReturnFourOhOne() {
-        Queue::fake();
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
@@ -700,7 +632,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testCharacterCannotFightWhenDead() {
-        Queue::fake();
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
@@ -720,7 +651,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testWhenCharacterIsDead() {
-        Queue::fake();
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter();
@@ -736,7 +666,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testSkillLevelUpFromFight() {
-        Queue::fake();
 
         $character = $this->character->updateSkill('Looting', [
             'xp'                 => 99,
@@ -776,8 +705,6 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testSkillDoesNotLevelUpFromFight() {
-        Queue::fake();
-
         $character = $this->character->updateSkill('Looting', [
             'level'              => 100,
             'xp'                 => 99,

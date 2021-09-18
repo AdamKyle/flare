@@ -2,6 +2,8 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Game\Battle\Jobs\BattleAttackHandler;
+use App\Game\Core\Events\AttackTimeOutEvent;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
@@ -62,7 +64,8 @@ class BattleController extends Controller {
 
             switch ($request->defender_type) {
                 case 'monster':
-                    $this->battleEventHandler->processMonsterDeath($character, $request->monster_id);
+                    event(new AttackTimeOutEvent($character));
+                    BattleAttackHandler::dispatch($character, $request->monster_id);
                     break;
                 default:
                     return response()->json([

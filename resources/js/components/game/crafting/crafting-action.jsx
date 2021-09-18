@@ -24,7 +24,7 @@ export default class CraftingAction extends React.Component {
 
     this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
     this.topBar = Echo.private('update-top-bar-' + this.props.userId);
-
+    this.craftingList = Echo.private('update-crafting-list-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -47,6 +47,12 @@ export default class CraftingAction extends React.Component {
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       this.setState({
         gold: event.characterSheet.gold,
+      });
+    });
+
+    this.craftingList.listen('Game.Skills.Events.UpdateCharacterCraftingList', (event) => {
+      this.setState({
+        itemsToCraft: event.items,
       });
     });
   }
@@ -230,7 +236,7 @@ export default class CraftingAction extends React.Component {
 
     return (
       <>
-        <div className={"row mb-3 " + (!this.state.showSuccess ? 'hide' : '')}>
+        <div className={"row mb-2 mt-2 " + (!this.state.showSuccess ? 'hide' : '')}>
           <div className="col-md-10">
             <div className="alert alert-success">You got new items to craft! Check the list.</div>
           </div>

@@ -52,8 +52,6 @@ class BattleEventHandler {
         event(new DropsCheckEvent($character, $monster));
         event(new GoldRushCheckEvent($character, $monster));
 
-        event(new AttackTimeOutEvent($character));
-
         $characterData = new Item($character, $this->characterAttackTransformer);
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
     }

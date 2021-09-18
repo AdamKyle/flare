@@ -5,14 +5,15 @@ namespace App\Game\Skills\Services;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Skills\Events\UpdateCharacterCraftingList;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
-use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\SkillCheck;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 
 class CraftingService {
 
@@ -43,33 +44,33 @@ class CraftingService {
      *
      * @param Character $character
      * @param array params
-     * @return array
+     * @return void
      */
-    public function craft(Character $character, array $params): array {
+    public function craft(Character $character, array $params): void {
         $item = Item::find($params['item_to_craft']);
         $skill = $this->fetchCraftingSkill($character, $params['type']);
 
         if (is_null($item)) {
-            return $this->errorResult('Invalid item.');
+            event(new GameServerMessageEvent($character->user, 'Invalid Item'));
+
+            event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
+
+            return;
         }
 
         if ($item->cost > $character->gold) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold'));
 
-            return $this->successResult([
-                'items' => $this->getItems($params['type'], $skill)
-            ]);
+            event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
+
+            return;
         }
 
         $this->attemptToCraftItem($character, $skill, $item);
 
-        event(new CraftedItemTimeOutEvent($character->refresh()));
-
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-        return $this->successResult([
-            'items' => $this->getItems($params['type'], $skill)
-        ]);
+        event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
     }
 
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item) {

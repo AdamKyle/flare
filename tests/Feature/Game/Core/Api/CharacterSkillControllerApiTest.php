@@ -414,8 +414,6 @@ class CharacterSkillControllerApiTest extends TestCase {
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue($content->items[0]->name === 'sample 2');
-        $this->assertEquals(1, count($content->items));
         $this->assertTrue($currentGold === $character->refresh()->gold);
     }
 
@@ -504,8 +502,6 @@ class CharacterSkillControllerApiTest extends TestCase {
         $this->assertEquals(0, $skill->xp);
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue($content->items[0]->name === 'sample 2');
-        $this->assertEquals(2, count($content->items));
     }
 
     public function testCanEnchantItemTooEasy() {
@@ -621,7 +617,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $item      = $character->inventory->slots->first()->item;
 
-        $this->assertEquals(422, $response->status());
+        $this->assertEquals(200, $response->status());
         $this->assertTrue($currentGold === $character->gold);
         $this->assertNull($item->item_suffix_id);
     }
