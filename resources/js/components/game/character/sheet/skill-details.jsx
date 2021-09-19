@@ -1,9 +1,10 @@
 import React, {Fragment} from 'react';
-import {Card, Tab, Tabs, OverlayTrigger, Tooltip} from "react-bootstrap";
+import {Card, Tab, Tabs, OverlayTrigger, Tooltip, Alert} from "react-bootstrap";
+import TrainSkillModal from "../modals/train-skill-modal";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
-    Xp Towards: {xpTowards}%
+    Xp Towards: {xpTowards * 100}%
   </Tooltip>
 );
 
@@ -15,25 +16,78 @@ export default class SkillDetails extends React.Component {
     this.state = {
       showTrainModal: false,
       successMessage: null,
+      errorMessage: null,
+      skillToTrain: null,
+      loading: false,
     }
   }
 
   clearSuccessMessage() {
     this.setState({
       successMessage: null,
-    })
+    });
   }
 
   setSuccessMessage(message) {
     this.setState({
       successMessage: message,
-    })
+    });
   }
 
-  manageTrainSkill() {
+  clearErrorMessage() {
     this.setState({
-      showTrainModal: !this.state.showTrainModal
-    })
+      errorMessage: null,
+    });
+  }
+
+  manageTrainSkill(skill) {
+    this.setState({
+      showTrainModal: !this.state.showTrainModal,
+      skillToTrain: typeof skill !== 'undefined' ? skill : null,
+    });
+  }
+
+  stopTrainingSkill(skill) {
+    this.setState({
+      showError: false,
+      errorMessage: null,
+      successMessage: null,
+      loading: true,
+    }, () => {
+      axios.post('/api/skill/cancel-train/' + this.props.characterId + '/' + skill.id)
+        .then((result) => {
+          this.setState({
+            loading: false,
+          }, () => {
+            this.setSuccessMessage(result.data.message);
+          });
+        }).catch((error) => {
+        this.setState({loading: false});
+        const response = error.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return window.location.replace('/game');
+        }
+
+        if (response.data.hasOwnProperty('message')) {
+          this.setState({
+            showError: true,
+            errorMessage: result.data.message,
+          });
+        }
+
+        if (response.data.hasOwnProperty('error')) {
+          this.setState({
+            showError: true,
+            errorMessage: result.data.error,
+          });
+        }
+      });
+    });
   }
 
 
@@ -73,6 +127,7 @@ export default class SkillDetails extends React.Component {
                   <button
                     className={s.is_training ? 'btn btn-success btn-sm train-skill-btn' : 'btn btn-primary btn-sm train-skill-btn'}
                     disabled={!this.props.canAdventure || this.props.isDead}
+                    onClick={() => this.manageTrainSkill(s)}
                   >
                     Train { s.is_training ? <i className="ml-2 fas fa-check"></i> : null }
                   </button>
@@ -82,6 +137,7 @@ export default class SkillDetails extends React.Component {
                         <button
                           className="btn btn-danger btn-sm ml-2 train-skill-btn"
                           disabled={!this.props.canAdventure || this.props.isDead}
+                          onClick={() => this.stopTrainingSkill(s)}
                         >
                           Stop
                         </button>
@@ -188,6 +244,33 @@ export default class SkillDetails extends React.Component {
     return (
       <Card>
         <Card.Body>
+          {
+            this.state.successMessage !== null ?
+              <div className="mt-2 mb-3">
+                <Alert variant="success" onClose={this.clearSuccessMessage.bind(this)} dismissible>
+                  {this.state.successMessage}
+                </Alert>
+              </div>
+              : null
+          }
+
+          {
+            this.state.errorMessage !== null ?
+              <div className="mt-2 mb-3">
+                <Alert variant="danger" onClose={this.clearErrorMessage.bind(this)} dismissible>
+                  {this.state.errorMessage}
+                </Alert>
+              </div>
+              : null
+          }
+          {
+            this.state.loading ?
+              <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+              : null
+          }
           <Tabs defaultActiveKey="training-skills" id="skill-section">
             <Tab eventKey="training-skills" title="Training Skills">
               <div className="character-skill-info">
@@ -235,6 +318,18 @@ export default class SkillDetails extends React.Component {
               </div>
             </Tab>
           </Tabs>
+
+          {
+            this.state.showTrainModal && this.state.skillToTrain !== null ?
+              <TrainSkillModal
+                characterId={this.props.characterId}
+                setSuccessMessage={this.setSuccessMessage.bind(this)}
+                open={this.state.showTrainModal}
+                close={this.manageTrainSkill.bind(this)}
+                skill={this.state.skillToTrain}
+              />
+            : null
+          }
         </Card.Body>
       </Card>
     );

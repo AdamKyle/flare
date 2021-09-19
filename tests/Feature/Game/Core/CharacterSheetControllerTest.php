@@ -42,7 +42,7 @@ class CharacterSheetControllerTest extends TestCase
 
         $this->actingAs($user)
                     ->visitRoute('game.character.sheet')
-                    ->see('Character Name')
-                    ->see($character->name);
+                    ->see('Character Sheet')
+                    ->see('Game');
     }
 }

@@ -10,6 +10,12 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
     // Fetch Alchemy Items
     Route::get('/alchemy/{character}', ['uses' => 'Api\AlchemyController@alchemyItems']);
 
+    // Handle Training a specific skill.
+    Route::post('/skill/train/{character}', ['uses' => 'Api\SkillsController@train']);
+
+    // Handle Canceling the train of that skill.
+    Route::post('/skill/cancel-train/{character}/{skill}', ['uses' => 'Api\SkillsController@cancelTrain']);
+
     Route::group(['middleware' => 'throttle:crafting'], function() {
         // Craft Item
         Route::post('/craft/{character}', ['uses' => 'Api\CraftingController@craft']);
