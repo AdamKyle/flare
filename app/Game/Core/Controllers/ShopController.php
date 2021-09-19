@@ -47,6 +47,10 @@ class ShopController extends Controller {
 
         $totalSoldFor = $service->sellAllItemsInInventory($character);
 
+        $character->update([
+            'gold' => $character->gold + $totalSoldFor,
+        ]);
+
         if ($totalSoldFor === 0) {
             return redirect()->back()->with('error', 'You have nothing that you can sell.');
         }
