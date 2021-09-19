@@ -46,7 +46,7 @@ class ShopController extends Controller {
 
         $totalSoldFor = $service->sellAllItemsInInventory($character);
 
-        $character->updated([
+        $character->update([
             'gold' => $character->gold + $totalSoldFor,
         ]);
 
