@@ -4,13 +4,13 @@ namespace App\Game\Adventures\Controllers\Api;
 
 use Cache;
 use App\Http\Controllers\Controller;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Game\Adventures\Events\EmbarkOnAdventureEvent;
 use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
 
 class AdventureController extends Controller {
-
 
     public function __construct() {
         $this->middleware('is.character.dead')->except('getLogs');
@@ -38,6 +38,8 @@ class AdventureController extends Controller {
         $character = $character->refresh();
 
         event(new EmbarkOnAdventureEvent($character, $adventure));
+
+        event(new UpdateTopBarEvent($character));
 
         return response()->json([
             'message'                => 'Adventure has started!',
@@ -67,6 +69,8 @@ class AdventureController extends Controller {
         Cache::forget('character_'.$character->id.'_adventure_'.$adventure->id);
 
         event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user, true));
+
+        event(new UpdateTopBarEvent($character));
 
         $adventureLog->delete();
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Adventures\Jobs;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Adventure;
 use Illuminate\Bus\Queueable;
@@ -86,6 +87,8 @@ class AdventureJob implements ShouldQueue
 
         if ($this->currentLevel === $this->adventure->levels) {
             Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
+
+            event(new UpdateTopBarEvent($this->character->refresh()));
         }
     }
 }

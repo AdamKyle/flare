@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Game\Battle\Values\MaxLevel;
+use App\Game\Core\Values\View\ClassBonusInformation;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -24,11 +25,13 @@ class CharacterSheetTransformer extends TransformerAbstract {
         return [
             'id'                => $character->id,
             'name'              => $character->name,
-            'attack'            => number_format($characterInformation->buildAttack()),
+            'attack'            => number_format($characterInformation->buildTotalAttack()),
             'health'            => number_format($characterInformation->buildHealth()),
             'ac'                => number_format($characterInformation->buildDefence()),
+            'heal_for'          => number_format($characterInformation->buildHealFor()),
             'skills'            => $this->fetchSkills($character->skills),
             'damage_stat'       => $character->damage_stat,
+            'to_hit_stat'       => $character->class->to_hit_stat,
             'race'              => $character->race->name,
             'class'             => $character->class->name,
             'inventory_max'     => $character->inventory_max,
@@ -50,11 +53,23 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'int_modded'        => number_format(round($characterInformation->statMod('int'))),
             'agi_modded'        => number_format(round($characterInformation->statMod('agi'))),
             'focus_modded'      => number_format(round($characterInformation->statMod('focus'))),
+            'spell_evasion'     => $characterInformation->getTotalSpellEvasion(),
+            'artifact_anull'    => $characterInformation->getTotalAnnulment(),
+            'res_chance'        => $characterInformation->fetchResurrectionChance(),
+            'weapon_attack'     => number_format($characterInformation->buildAttack()),
+            'rings_attack'      => number_format($characterInformation->getTotalRingDamage()),
+            'spell_damage'      => number_format($characterInformation->getTotalSpellDamage()),
+            'artifact_damage'   => number_format($characterInformation->getTotalArtifactDamage()),
             'gold'              => number_format($character->gold),
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
             'force_name_change' => $character->force_name_change,
             'timeout_until'     => $character->user->timeout_until,
+            'class_bonus'       => (new ClassBonusInformation())->buildClassBonusDetails($character->class->name),
+            'inventory_used'    => $character->getInventoryCount(),
+            'inventory_max'     => $character->inventory_max,
+            'can_adventure'     => $character->can_adventure,
+            'is_dead'           => $character->is_dead,
         ];
     }
 }

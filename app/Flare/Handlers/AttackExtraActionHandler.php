@@ -167,7 +167,12 @@ class AttackExtraActionHandler {
     }
 
     private function calculateSpellDamage(int $spellDamage, $defender): int {
-        return ceil($spellDamage - ($spellDamage * $defender->spell_evasion));
+        if ($defender->spell_evasion > 0.0000) {
+            return ceil($spellDamage - ($spellDamage * $defender->spell_evasion));
+        }
+
+        return $spellDamage;
+
     }
 
     private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth): int {

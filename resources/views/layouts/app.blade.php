@@ -38,6 +38,7 @@
     <script src={{mix('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
     <script src={{mix('js/character-boons.js')}} type="text/javascript"></script>
     <script src={{mix('js/character-inventory.js')}} type="text/javascript"></script>
+    <script src={{mix('js/character-sheet.js')}} type="text/javascript"></script>
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
 
