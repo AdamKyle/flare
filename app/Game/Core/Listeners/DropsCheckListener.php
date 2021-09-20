@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Flare\Builders\RandomItemDropBuilder;
@@ -13,6 +14,8 @@ use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class DropsCheckListener
 {
+
+    use CanHaveQuestItem;
 
     /**
      * Handle the event.
@@ -58,15 +61,7 @@ class DropsCheckListener
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
         if (!$event->character->isInventoryFull()) {
 
-            $doesntHave = $event->character->inventory->slots->filter(function ($slot) use ($item) {
-                return $slot->item_id === $item->id && $item->type === 'quest';
-            })->isEmpty();
-
-            $hasCompletedQuest = $event->character->questsCompleted->filter(function($questCompleted) use ($item) {
-                return $questCompleted->quest->item_id === $item->id;
-            })->isEmpty();
-
-            if ($doesntHave && $hasCompletedQuest) {
+            if ($this->canHaveItem($event->character, $item)) {
                 $event->character->inventory->slots()->create([
                     'item_id' => $item->id,
                     'inventory_id' => $event->character->inventory->id,
