@@ -9,6 +9,7 @@ export default class SetTabSection extends React.Component {
     super(props);
 
     this.set_config = {
+      key_column: 'id',
       page_size: 10,
       length_menu: [10, 25, 50, 75],
       show_pagination: true,

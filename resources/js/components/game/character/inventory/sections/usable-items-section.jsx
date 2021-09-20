@@ -2,7 +2,7 @@ import React, {Fragment} from 'react';
 import ItemName from "../../../../marketboard/components/item-name";
 import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
-import EquippedSectionDropDowns from "./equipped-section-drop-downs";
+import EquippedSectionDropDowns from "./equipped-section-button";
 import UseManyItemsModal from "../modals/use-many-items-modal";
 
 export default class UsableItemsSection extends React.Component {
@@ -11,6 +11,7 @@ export default class UsableItemsSection extends React.Component {
     super(props);
 
     this.usable_config = {
+      key_column: 'id',
       page_size: 10,
       length_menu: [10, 25, 50, 75],
       show_pagination: true,

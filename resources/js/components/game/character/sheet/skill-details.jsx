@@ -93,8 +93,8 @@ export default class SkillDetails extends React.Component {
 
   renderSkills(type) {
     return this.props.skills.map((s) => s.skill_type === type || s.skill_type === 'Effects Directional Move Timer' || s.skill_typw === 'Effects Battle Timer' ?
-      <Fragment>
-        <dt>
+      <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
+        <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
              target="_blank"
              className={s.is_locked ? 'text-danger' : ''}
@@ -102,7 +102,7 @@ export default class SkillDetails extends React.Component {
             {s.name} {s.is_locked ? <i className="fas fa-lock"></i> : null}
           </a>
         </dt>
-        <dd>
+        <dd key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <div className="row">
             <div className={s.can_train ? 'col-xs-12 col-sm-3' : 'col-xs-12 col-sm-4'}>
               Level: {s.level} / {s.max_level}
@@ -146,7 +146,7 @@ export default class SkillDetails extends React.Component {
                           delay={{ show: 250, hide: 400 }}
                           overlay={renderTooltip(s.xp_towards)}
                         >
-                          <i class="ml-2 fas fa-info-circle skill-info-icon text-info"></i>
+                          <i className="ml-2 fas fa-info-circle skill-info-icon text-info"></i>
                         </OverlayTrigger>
                       </Fragment>
                     : null
@@ -163,8 +163,8 @@ export default class SkillDetails extends React.Component {
 
   renderCraftingSkills() {
     return this.props.skills.map((s) => s.skill_type === 'Crafting' || s.skill_type === 'Enchanting' || s.skill_type == 'Alchemy'   ?
-      <Fragment>
-        <dt>
+      <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
+        <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
              target="_blank"
              className={s.is_locked ? 'text-danger' : ''}
@@ -172,7 +172,7 @@ export default class SkillDetails extends React.Component {
             {s.name} {s.is_locked ? <i className="fas fa-lock"></i> : null}
           </a>
         </dt>
-        <dd>
+        <dd key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <div className="row">
             <div className="col-xs-12 col-sm-4">
               Level: {s.level} / {s.max_level}
@@ -205,8 +205,8 @@ export default class SkillDetails extends React.Component {
       && s.skill_type !== 'Alchemy'
       && s.skill_type !== 'Effects Directional Move Timer'
       && s.skill_type !== 'Effects Battle Timer'?
-      <Fragment>
-        <dt>
+      <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
+        <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
              target="_blank"
              className={s.is_locked ? 'text-danger' : ''}
@@ -214,7 +214,7 @@ export default class SkillDetails extends React.Component {
             {s.name} {s.is_locked ? <i className="fas fa-lock"></i> : null}
           </a>
         </dt>
-        <dd>
+        <dd key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <div className="row">
             <div className="col-xs-12 col-sm-4">
               Level: {s.level} / {s.max_level}

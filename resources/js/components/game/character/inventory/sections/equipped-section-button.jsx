@@ -1,8 +1,6 @@
 import React from 'react';
-import {Dropdown} from "react-bootstrap";
-import DestroyModal from "../modals/destroy-modal";
 
-export default class EquippedSectionDropDowns extends React.Component {
+export default class EquippedSectionButton extends React.Component {
 
   constructor(props) {
     super(props);
@@ -44,18 +42,9 @@ export default class EquippedSectionDropDowns extends React.Component {
 
   render() {
     return (
-      <>
-        <Dropdown disabled={this.props.loading}>
-          <Dropdown.Toggle variant="primary" id="actions">
-            Actions
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={this.unequipItem.bind(this)}>Unequip</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-
-      </>
+      <button onClick={this.unequipItem.bind(this)} className="btn btn-primary">
+        Unequip
+      </button>
     );
   }
 }

@@ -14,6 +14,7 @@ export default class InventorySection extends React.Component {
     super(props);
 
     this.inventory_config = {
+      key_column: 'slot_id',
       page_size: 10,
       length_menu: [10, 25, 50, 75],
       show_pagination: true,
@@ -80,6 +81,23 @@ export default class InventorySection extends React.Component {
       showDestroyAllModal: false,
       showDisenchantModal: false,
       showMoveItemModal: false,
+      inventoryItems: [],
+    }
+  }
+
+  componentDidMount() {
+    this.setState({
+      inventoryItems: this.props.inventory.map((i) => i.item['slot_id'] = i.id),
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const inventoryItems = this.props.inventory.map((i) => i.item);
+
+    if (this.state.inventoryItems.length !== inventoryItems.length) {
+      this.setState({
+        inventoryItems: inventoryItems,
+      });
     }
   }
 
@@ -180,6 +198,7 @@ export default class InventorySection extends React.Component {
               Disenchant All
             </button>
           <hr />
+
           <ReactDatatable
             config={this.inventory_config}
             records={this.formatDataForTable()}

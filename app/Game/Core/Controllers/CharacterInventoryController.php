@@ -34,6 +34,7 @@ class CharacterInventoryController extends Controller {
 
     private $manager;
 
+
     public function __construct(EquipItemService $equipItemService, CharacterAttackTransformer $characterTransformer, Manager $manager) {
 
         $this->equipItemService     = $equipItemService;
@@ -103,17 +104,21 @@ class CharacterInventoryController extends Controller {
         }
 
 
-        Cache::put($character->user->id . '-compareItemDetails', $viewData, now()->addMinutes(10));
+        Cache::put($character->user->id . '-compareItemDetails' . $itemToEquip->id, $viewData, now()->addMinutes(10));
 
-        return redirect()->to(route('game.inventory.compare-items', ['user' => $character->user]));
+        return redirect()->to(route('game.inventory.compare-items', ['user' => $character->user, 'slot' => $itemToEquip->id]));
     }
 
-    public function compareItem(User $user) {
-        if (!Cache::has($user->id . '-compareItemDetails')) {
+    public function compareItem(Request $request, User $user) {
+        if (!$request->has('slot')) {
+            return redirect()->route('game.character.sheet')->with('error', 'You are not allowed to do that.');
+        }
+
+        if (!Cache::has($user->id . '-compareItemDetails' . $request->slot)) {
             return redirect()->route('game.character.sheet')->with('error', 'Item comparison expired.');
         }
 
-        return view('game.character.equipment', Cache::get($user->id . '-compareItemDetails'));
+        return view('game.character.equipment', Cache::get($user->id . '-compareItemDetails' . $request->slot));
     }
 
     public function equipItem(EquipItemValidation $request, Character $character) {

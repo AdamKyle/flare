@@ -2,8 +2,8 @@ import React, {Fragment} from 'react';
 import ItemName from "../../../../marketboard/components/item-name";
 import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
-import EquippedSectionDropDowns from "./equipped-section-drop-downs";
 import SaveAsSetModal from "../modals/save-as-set-modal";
+import EquippedSectionButton from "./equipped-section-button";
 
 export default class EquippedSection extends React.Component {
 
@@ -11,6 +11,7 @@ export default class EquippedSection extends React.Component {
     super(props);
 
     this.equipped_Config = {
+      key_column: 'slot_id',
       page_size: 10,
       length_menu: [10, 25, 50, 75],
       show_pagination: true,
@@ -56,7 +57,7 @@ export default class EquippedSection extends React.Component {
         name: "actions",
         text: "Actions",
         cell: row => <Fragment>
-          <EquippedSectionDropDowns
+          <EquippedSectionButton
             characterId={this.props.characterId}
             item={row}
             findEquippedSlotId={this.findEquippedSlotId.bind(this)}
@@ -74,6 +75,24 @@ export default class EquippedSection extends React.Component {
       errorMessage: null,
       manageOpenSaveAsSet: false,
       loading: false,
+      equippedItems: [],
+    }
+  }
+
+  componentDidMount() {
+    console.log(this.formatDataForTable());
+    this.setState({
+      equippedItems: this.formatDataForTable()
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const equippedItems = this.formatDataForTable()
+
+    if (this.state.equippedItems.length !== equippedItems.length) {
+      this.setState({
+        equippedItems: equippedItems,
+      });
     }
   }
 
@@ -103,11 +122,19 @@ export default class EquippedSection extends React.Component {
 
   formatDataForTable() {
     if (Array.isArray(this.props.equipped)) {
-      return this.props.equipped.map((e) => e.item);
+      return this.props.equipped.map((e) => {
+        e.item['slot_id'] = e.id;
+
+        return e.item;
+      });
     }
 
     if (typeof this.props.equipped === 'object') {
-      return this.props.equipped.slots.map((s) => s.item);
+      return this.props.equipped.slots.map((s) => {
+        e.item['slot_id'] = e.id;
+
+        return e.item;
+      });
     }
   }
 
@@ -237,7 +264,7 @@ export default class EquippedSection extends React.Component {
           }
           <ReactDatatable
             config={this.equipped_Config}
-            records={this.formatDataForTable()}
+            records={this.state.equippedItems}
             columns={this.equipped_headers}
           />
           {
