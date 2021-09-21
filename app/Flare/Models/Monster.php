@@ -48,6 +48,7 @@ class Monster extends Model
         'max_artifact_damage',
         'spell_evasion',
         'artifact_annulment',
+        'affix_resistance',
         'shards',
     ];
 
@@ -79,6 +80,7 @@ class Monster extends Model
         'shards'                 => 'integer',
         'spell_evasion'          => 'decimal:4',
         'artifact_annulment'     => 'decimal:4',
+        'affix_resistance'       => 'decimal:4',
     ];
 
     public function skills() {
@@ -96,5 +98,4 @@ class Monster extends Model
     protected static function newFactory() {
         return MonsterFactory::new();
     }
-
 }

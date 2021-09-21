@@ -39,8 +39,9 @@ class MonsterTransfromer extends TransformerAbstract {
             'has_artifacts'      => $monster->can_use_artifacts,
             'artifact_damage'    => $monster->max_artifact_damage,
             'spell_damage'       => $monster->max_spell_damage,
-            'artifact_annulment' => $monster->artifact_annulment,
-            'spell_evasion'      => $monster->spell_evasion,
+            'artifact_annulment' => (float) $monster->artifact_annulment,
+            'spell_evasion'      => (float) $monster->spell_evasion,
+            'affix_resistance'   => (float) $monster->damage_can_stack,
         ];
     }
 }

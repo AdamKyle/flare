@@ -2,6 +2,8 @@
 
 namespace App\Game\Adventures\Services;
 
+use App\Game\Core\Traits\CanHaveQuestItem;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Mail;
 use Cache;
 use App\Flare\Models\Adventure;
@@ -20,6 +22,8 @@ use App\Game\Adventures\Mail\AdventureCompleted;
 
 
 class AdventureService {
+
+    use CanHaveQuestItem;
 
     /**
      * @var Character $character
@@ -320,11 +324,21 @@ class AdventureService {
                 return $slot->item_id === $rewardItemId;
             })->first();
 
-            if (is_null($foundItem)) {
+            if (is_null($foundItem) &&
+                $this->canHaveItem(
+                    $this->character->refresh(),
+                    $adventureLog->adventure->itemReward
+                )
+            ) {
+
                 $this->character->inventory->slots()->create([
                     'inventory_id' => $this->character->inventory->id,
                     'item_id'      => $rewardItemId,
                 ]);
+
+                $message = $this->character->name . ' has found: ' . $adventureLog->adventure->itemReward->affix_name;
+
+                broadcast(new GlobalMessageEvent($message));
 
                 event(new ServerMessageEvent($this->character->user, 'found_item', $adventureLog->adventure->itemReward->name));
             }

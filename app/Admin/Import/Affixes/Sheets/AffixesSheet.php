@@ -38,6 +38,14 @@ class AffixesSheet implements ToCollection {
             $item['can_drop'] = false;
         }
 
+        if (!isset($item['damage_can_stack'])) {
+            $item['damage_can_stack'] = false;
+        }
+
+        if (!isset($item['irresistible_damage'])) {
+            $item['irresistible_damage'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'skill_name') {

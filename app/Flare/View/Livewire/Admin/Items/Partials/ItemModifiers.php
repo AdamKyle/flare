@@ -17,6 +17,7 @@ class ItemModifiers extends Component
         ItemEffectsValue::LABYRINTH,
         ItemEffectsValue::DUNGEON,
         ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+        ItemEffectsValue::AFFIXES_IRRESISTIBLE,
     ];
 
     public $editing = false;

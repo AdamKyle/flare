@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\ClassBasedBonuses;
 use App\Flare\Values\CharacterClassValue;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemUsabilityType;
 use Illuminate\Support\Collection;
 
@@ -243,6 +244,90 @@ class CharacterInformationBuilder {
     }
 
     /**
+     * Can your affixes be resisted at all?
+     *
+     * If you have the quest item that has the AFFIXES_IRRESISTIBLE
+     * effect, then you cannot be resisted for affixes.
+     *
+     * @return bool
+     */
+    public function canAffixesBeResisted(): bool {
+        return $this->character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE;
+        })->isEmpty();
+    }
+
+    /**
+     * Determine the affix damage.
+     *
+     * Some affixes cannot stack their damage, so we only return the highest if you pass in false.
+     *
+     * If you want the stacking ones only, then this will return the total value of those.
+     *
+     * Fetches from both prefix and suffix.
+     *
+     * @param bool $canStack
+     * @return int
+     */
+    public function getTotalAffixDamage(bool $canStack = true): int {
+        $slots = $this->fetchInventory()->filter(function ($slot) use ($canStack) {
+
+            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
+
+                if ($canStack) {
+                    if ($slot->item->itemPrefix->damage > 0 && $slot->item->itemPrefix->damage_can_stack) {
+                        return $slot;
+                    }
+                } else {
+                    if ($slot->item->itemPrefix->damage > 0 && !$slot->item->itemPrefix->damage_can_stack) {
+                        return $slot;
+                    }
+                }
+
+            }
+
+            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
+                if ($canStack) {
+                    if ($slot->item->itemSuffix->damage > 0 && $slot->item->itemSuffix->damage_can_stack) {
+                        return $slot;
+                    }
+                } else {
+                    if ($slot->item->itemSuffix->damage > 0 && !$slot->item->itemSuffix->damage_can_stack) {
+                        return $slot;
+                    }
+                }
+            }
+        });
+
+        $totalResistibleDamage = 0;
+
+        if ($canStack) {
+            foreach ($slots as $slot) {
+                if (!is_null($slot->item->itemPrefix)) {
+                    $totalResistibleDamage += $slot->item->itemPrefix->damage;
+                }
+
+                if (!is_null($slot->item->itemSuffix)) {
+                    $totalResistibleDamage += $slot->item->itemSuffix->damage;
+                }
+            }
+        } else {
+            $totalHighestPrefix = $this->getHighestDamageValueFromAffixes($slots, 'itemPrefix');
+            $totalHighestSuffix = $this->getHighestDamageValueFromAffixes($slots, 'itemSuffix');
+
+            if ($totalHighestPrefix > $totalHighestSuffix) {
+                return $totalHighestPrefix;
+            }
+
+            $totalResistibleDamage = $totalHighestSuffix;
+        }
+
+
+
+        return $totalResistibleDamage;
+    }
+
+    /**
      * Does the character have any damage spells
      *
      * @return bool
@@ -296,6 +381,24 @@ class CharacterInformationBuilder {
      */
     public function getTotalSpellEvasion(): float {
         return  $this->getSpellEvasion();
+    }
+
+    protected function getHighestDamageValueFromAffixes(Collection $slots, string $suffixType): int {
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->{$suffixType})) {
+                if ($slot->item->{$suffixType}->damage > 0) {
+                    $values[] = $slot->item->{$suffixType}->damage;
+                }
+            }
+        }
+
+        if (empty($values)) {
+            return 0;
+        }
+
+        return max($values);
     }
 
     protected function getSpellEvasion(): float {

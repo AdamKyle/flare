@@ -30,6 +30,9 @@ class ItemAffix extends Model
         'int_mod',
         'agi_mod',
         'focus_mod',
+        'damage',
+        'irresistible_damage',
+        'damage_can_stack',
         'cost',
         'skill_name',
         'skill_training_bonus',
@@ -73,7 +76,10 @@ class ItemAffix extends Model
         'int_required'                     => 'integer',
         'skill_level_required'             => 'integer',
         'skill_level_trivial'              => 'integer',
+        'damage'                           => 'integer',
         'can_drop'                         => 'boolean',
+        'irresistible_damage'              => 'boolean',
+        'damage_can_stack'                 => 'boolean',
     ];
 
     protected static function newFactory() {

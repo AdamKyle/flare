@@ -28,6 +28,14 @@
                         <dd class="{{$details['slot']->item->itemPrefix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
                         <dd class="{{$details['slot']->item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->skill_bonus * 100}}%</dd>
+                        @if ($details['slot']->item->itemPrefix->damage !== 0)
+                            <dt>Damage:</dt>
+                            <dd>{{$details['slot']->item->itemPrefix->damage}}</dd>
+                            <dt>Is Damage Irresistible?:</dt>
+                            <dd>{{$details['slot']->item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                            <dt>Can Stack:</dt>
+                            <dd>{{$details['slot']->item->itemPrefix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+                        @endif
                     </dl>
                 </div>
                 <div class="col-md-6">
@@ -68,6 +76,14 @@
                         <dd class="{{$details['slot']->item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->skill_bonus * 100}}%</dd>
+                        @if ($details['slot']->item->itemSuffix->damage !== 0)
+                            <dt>Damage:</dt>
+                            <dd class="text-success">{{$details['slot']->item->itemSuffix->damage}}</dd>
+                            <dt>Is Damage Irresistible?:</dt>
+                            <dd>{{$details['slot']->item->itemSuffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                            <dt>Can Stack:</dt>
+                            <dd>{{$details['slot']->item->itemSuffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+                        @endif
                     </dl>
                 </div>
                 <div class="col-md-6">

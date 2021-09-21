@@ -141,15 +141,9 @@ class AttackExtraActionHandler {
 
             $monsterCurrentHealth = $health;
 
-            if ($spellDamage !== $totalDamage) {
-                $this->messages[] = [
-                    'Your spells hit the enemy for: ' . $totalDamage . ' (Partially Annulled)',
-                ];
-            } else {
-                $this->messages[] =  [
-                    'Your spells hit the enemy for: ' . $totalDamage,
-                ];
-            }
+            $this->messages[] =  [
+                'Your spells hit the enemy for: ' . $totalDamage,
+            ];
 
         } else {
             $this->messages[] =  [
@@ -167,8 +161,11 @@ class AttackExtraActionHandler {
     }
 
     private function calculateSpellDamage(int $spellDamage, $defender): int {
-        if ($defender->spell_evasion > 0.0000) {
-            return ceil($spellDamage - ($spellDamage * $defender->spell_evasion));
+        $spellEvasion = (float) $defender->spell_evasion;
+        $dc = 100 - $spellEvasion;
+
+        if ($dc <= 0 || rand(0, 100) > $dc) {
+            return 0;
         }
 
         return $spellDamage;
@@ -179,10 +176,6 @@ class AttackExtraActionHandler {
         $characterAttack = $characterInformationBuilder->buildAttack();
 
         $monsterCurrentHealth -= $characterAttack;
-
-        if ($characterInformationBuilder->hasAffixes()) {
-            $this->messages[] = ['The enchantments on your equipment lash out at the enemy!'];
-        }
 
         $character = $characterInformationBuilder->getCharacter();
 

@@ -83,6 +83,37 @@
                     </dl>
                 </div>
             </div>
+
+            @if ($itemAffix->damage !== 0)
+                <h2 class="mt-2 mb-2">Damage Information</h2>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Affixes such as these will fire automatically. How ever enemies can out right
+                            resist the damage done. All enemies have a % of resistance against affixes. Celestials have a higher
+                            amount of resistance then regular drop down critters.
+                        </p>
+                        <p>
+                            Unlike artifact Annulment and Spell Evasion, the resistance will not reduce damage done, instead it will
+                            out right nullify the damage. If the enchantment is marked as irresistible damage, then the enemy cannot resist
+                            the incoming damage.
+                        </p>
+                        <p>
+                            These affixes will fire, regardless if you miss or hit. These affixes cannot stack unless otherwise stated.
+                            That means, having multiple will do nothing, you'll take the highest of all non stacking damaging affixes.
+                        </p>
+                        <dl>
+                            <dt>Damage:</dt>
+                            <dd>{{$itemAffix->damage}}</dd>
+                            <dt>Is Damage Irresistible?:</dt>
+                            <dd>{{$itemAffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                            <dt>Can Stack:</dt>
+                            <dd>{{$itemAffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+                        </dl>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

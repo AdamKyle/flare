@@ -131,9 +131,9 @@ export default class EquippedSection extends React.Component {
 
     if (typeof this.props.equipped === 'object') {
       return this.props.equipped.slots.map((s) => {
-        e.item['slot_id'] = e.id;
+        s.item['slot_id'] = s.id;
 
-        return e.item;
+        return s.item;
       });
     }
   }

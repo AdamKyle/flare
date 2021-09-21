@@ -40,6 +40,8 @@ class ItemAffixFactory extends Factory
             'skill_level_required'     => 1,
             'skill_level_trivial'      => 10,
             'fight_time_out_mod_bonus' => 0,
+            'irresistible_damage'      => false,
+            'damage_can_stack'         => false,
         ];
     }
 }

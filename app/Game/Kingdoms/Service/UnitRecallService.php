@@ -51,7 +51,13 @@ class UnitRecallService {
 
         $recall = UnitMovementQueue::create($unitMovement);
 
-        MoveUnits::dispatch($recall->id, 0, 'recalled', $character)->delay(now()->addMinutes($timeToRecall));
+        $timeForDelay = $timeToRecall;
+
+        if ($timeForDelay > 15) {
+            $timeForDispatch = $timeToRecall / 10;
+        }
+
+        MoveUnits::dispatch($recall->id, 0, 'recalled', $character, $timeForDispatch)->delay(now()->addMinutes($timeForDispatch));
 
         UpdateUnitMovementLogs::dispatch($character);
     }

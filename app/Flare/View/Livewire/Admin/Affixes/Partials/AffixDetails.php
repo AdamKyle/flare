@@ -25,6 +25,9 @@ class AffixDetails extends Component
         'itemAffix.skill_level_required' => 'required',
         'itemAffix.skill_level_trivial'  => 'required',
         'itemAffix.can_drop'             => 'nullable',
+        'itemAffix.damage'               => 'nullable',
+        'itemAffix.irresistible_damage'  => 'nullable',
+        'itemAffix.damage_can_stack'     => 'nullable',
     ];
 
     protected $messages = [
@@ -44,6 +47,18 @@ class AffixDetails extends Component
 
         if (is_null($this->itemAffix->can_drop)) {
             $this->itemAffix->can_drop = false;
+        }
+
+        if (is_null($this->itemAffix->irresistible_damage)) {
+            $this->itemAffix->irresistible_damage = false;
+        }
+
+        if (is_null($this->itemAffix->damage)) {
+            $this->itemAffix->damage = 0;
+        }
+
+        if (is_null($this->itemAffix->damage_can_stack)) {
+            $this->itemAffix->damage_can_stack = false;
         }
 
         $this->itemAffix->save();

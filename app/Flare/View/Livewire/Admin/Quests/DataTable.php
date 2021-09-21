@@ -11,11 +11,12 @@ class DataTable extends Component
 {
     use WithPagination, WithSorting;
 
-    public $search      = '';
-    public $sortField   = 'name';
-    public $perPage     = 10;
-    public $forMap      = null;
-    public $forNpc      = null;
+    public $search             = '';
+    public $sortField          = 'name';
+    public $perPage            = 10;
+    public $forMap             = null;
+    public $forNpc             = null;
+    protected $paginationTheme = 'bootstrap';
 
     public function fetchQuests() {
         if (!is_null($this->forMap)) {

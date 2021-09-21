@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Core\Traits\CanHaveQuestItem;
+use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Flare\Builders\RandomItemDropBuilder;

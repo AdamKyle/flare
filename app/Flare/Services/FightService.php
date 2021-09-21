@@ -221,6 +221,7 @@ class FightService {
         $extraAttack = resolve(AttackExtraActionHandler::class);
 
         if (!$this->canHit($attacker, $defender, $extraAttack)) {
+            $messages   = array_merge($messages, $this->useAffixes($attacker, $defender));
             $messages   = array_merge($messages, $this->castSpell($attacker, $defender));
             $messages   = array_merge($messages, $this->useAtifacts($attacker, $defender));
             $messages   = array_merge($messages, $this->useRings($attacker));
@@ -239,12 +240,24 @@ class FightService {
         }
 
         if ($this->blockedAttack($defender, $attacker)) {
-            $this->logInformation[] = [
+            $logInfo = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
-                'messages'   => [[$defender->name . ' blocked the attack!']],
+                'messages'   => [],
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
+
+            if ($defender instanceof Character) {
+                $messages = array_merge($messages, $this->useAffixes($attacker, $defender));
+                $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
+                $messages = array_merge($messages, $this->useRings($attacker));
+            }
+
+            $messages[] = [$defender->name . ' blocked the attack!'];
+
+            $logInfo['messages'] = $messages;
+
+            $this->logInformation = $logInfo;
 
             $this->counter += 1;
 
@@ -389,6 +402,48 @@ class FightService {
     }
 
     /**
+     * Let your affixes fire off.
+     *
+     * @param $attacker
+     * @param $defender
+     * @return array
+     */
+    protected function useAffixes($attacker, $defender): array {
+        $messages = [];
+
+        if ($attacker instanceof Character) {
+            $totalDamage = $this->characterInformation->getTotalAffixDamage();
+            $cantResist  = !$this->characterInformation->canAffixesBeResisted();
+
+            if ($cantResist) {
+                $messages[] = ['The enemy cannot resist your enchantments! They are so glowy!'];
+
+                $totalDamage += $this->characterInformation->getTotalAffixDamage(false);
+            } else {
+                $dc = 100 - $defender->affix_resistance;
+
+                if ($dc <= 0 || rand(1, 100) > $dc) {
+                    $messages[] = ['Your damaging enchantments (resistible) have been resisted.'];
+                } else {
+                    $totalDamage += $this->characterInformation->getTotalAffixDamage(false);
+                }
+            }
+
+            $monsterNewHealth = $this->currentMonsterHealth - $totalDamage;
+
+            if ($monsterNewHealth < 0) {
+                $this->currentMonsterHealth = 0;
+            } else {
+                $this->currentMonsterHealth = $monsterNewHealth;
+            }
+
+            $messages[] = ['Your enchantments glow with rage. Your enemy '.$cantResist ? 'cowers: ' : 'cowers. (non resisted dmg): '. $totalDamage];
+        }
+
+        return $messages;
+    }
+
+    /**
      * Casts your healing spells.
      *
      * Monsters do not have healing spells, but players do.
@@ -503,8 +558,15 @@ class FightService {
      */
     protected function artifactDamage($attacker, $defender) {
         if ($attacker instanceof Character) {
-            $baseArtifactDamage = $this->characterInformation->getTotalArtifactDamage();
-            $artifactDamage = $baseArtifactDamage - ($baseArtifactDamage * $defender->artifact_annulment);
+            $defenderArtifactAnnulment = $this->characterInformation->getTotalAnnulment();
+            $dc                        = 100 - $defenderArtifactAnnulment;
+            $artifactDamage            = $this->characterInformation->getTotalArtifactDamage();
+
+            if ($dc <= 0 || rand(1, 100) > $dc) {
+                return [
+                    'Your artifacts were annulled ...'
+                ];
+            }
 
             if ($artifactDamage > 0) {
                 $health = ceil($this->currentMonsterHealth - $artifactDamage);
@@ -515,27 +577,24 @@ class FightService {
 
                 $this->currentMonsterHealth = $health;
 
-                if ($baseArtifactDamage !== $artifactDamage) {
-                    return [
-                        'Your artifacts hit the enemy for: ' . $artifactDamage . ' (Partially annulled)',
-                    ];
-                }
-
                 return [
                     'Your artifacts hit the enemy for: ' . $artifactDamage,
-                ];
-            } else {
-                return [
-                    'Your artifacts were annulled ...'
                 ];
             }
         }
 
         if ($defender instanceof Character){
-            $baseArtifactDamage = rand(1, $defender->max_artifact_damage);
-            $artifactDamage = $baseArtifactDamage - ($baseArtifactDamage * $this->characterInformation->getTotalAnnulment());
+            $defenderArtifactAnnulment = $this->characterInformation->getTotalSpellEvasion();;
+            $dc                        = 100 - $defenderArtifactAnnulment;
+            $artifactDamage            = rand(1, $attacker->max_artifact_damage);
 
             if ($artifactDamage > 0) {
+                if ($dc <= 0 || rand(1, 100) > $dc) {
+                    return [
+                        'The enemies artifacts were annulled!'
+                    ];
+                }
+
                 $health = $this->currentCharacterHealth - $artifactDamage;
 
                 if ($health < 0) {
@@ -544,18 +603,8 @@ class FightService {
 
                 $this->currentCharacterHealth = $health;
 
-                if ($baseArtifactDamage !== $artifactDamage) {
-                    return [
-                        'The enemies artifacts lash out in intense energy doing: ' . $artifactDamage . ' (Partially annulled)',
-                    ];
-                }
-
                 return [
                     'The enemies artifacts lash out in intense energy doing: ' . $artifactDamage,
-                ];
-            }else {
-                return [
-                    'The enemies artifacts were annulled ...'
                 ];
             }
         }
@@ -581,11 +630,18 @@ class FightService {
         }
 
         if ($defender instanceof Character){
-            $spellDamage = rand(1, $attacker->max_spell_damage);
-            $totalDamage = $spellDamage - ($spellDamage * $this->characterInformation->getTotalSpellEvasion());
+            $defenderArtifactAnnulment = $this->characterInformation->getTotalSpellEvasion();
+            $dc                        = 100 - $defenderArtifactAnnulment;
+            $spellDamage               = rand(1, $attacker->max_spell_damage);
 
-            if ($totalDamage > 0) {
-                $health = $this->currentCharacterHealth - $totalDamage;
+            if ($spellDamage > 0) {
+                if ($dc <= 0 || rand(1, 100) > $dc) {
+                    return [
+                        'The enemies spells have no effect!'
+                    ];
+                }
+
+                $health = $this->currentCharacterHealth - $spellDamage;
 
                 if ($health < 0) {
                     $health = 0;
@@ -593,18 +649,8 @@ class FightService {
 
                 $this->currentCharacterHealth = $health;
 
-                if ($spellDamage !== $totalDamage) {
-                    return [
-                            'The enemies spells burst towards you, slamming into you for: ' . $totalDamage . ' (Partially Annulled)',
-                    ];
-                }
-
                 return [
-                    'The enemies spells burst towards you, slamming into you for: ' . $totalDamage,
-                ];
-            } else {
-                return [
-                    'The enemies spells have been nullified by you ...'
+                    'The enemies spells burst towards you, slamming into you for: ' . $spellDamage,
                 ];
             }
         }
@@ -623,6 +669,7 @@ class FightService {
 
         if ($attacker instanceof Character) {
 
+            $messages = array_merge($messages, $this->useAffixes($attacker, $defender));
             $messages = array_merge($messages, $this->castSpell($attacker, $defender));
             $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
             $messages = array_merge($messages, $this->useRings($attacker));

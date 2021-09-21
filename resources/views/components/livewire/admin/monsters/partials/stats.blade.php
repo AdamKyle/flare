@@ -215,15 +215,20 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="spell_evasion">Spell Evasion Percentage: </label>
             <input type="number" class="form-control" name="spell_evasion" value="" wire:model="monster.spell_evasion">
             @error('monster.spell_evasion') <span class="text-danger">{{ $message }}</span> @enderror
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="artifact_annulment">Artifact Annulment Percentage: </label>
             <input type="number" class="form-control" name="artifact_annulment" value="" wire:model="monster.artifact_annulment">
             @error('monster.artifact_annulment') <span class="text-danger">{{ $message }}</span> @enderror
+        </div>
+        <div class="col-md-4">
+            <label for="affix_resistance">Affix Resistance Percentage: </label>
+            <input type="number" class="form-control" name="affix_resistance" value="" wire:model="monster.affix_resistance">
+            @error('monster.affix_resistance') <span class="text-danger">{{ $message }}</span> @enderror
         </div>
     </div>
 </div>

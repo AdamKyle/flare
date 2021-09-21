@@ -51,6 +51,26 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="affix-damage">Damage</label>
+                <input type="number" min="0" steps="0" class="form-control" id="affix-damage" wire:model="itemAffix.damage">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="affix-damage-irresistible" wire:model="itemAffix.irresistible_damage">
+                <label class="form-check-label" for="affix-damage-irresistible">Is Damage Irresistible?</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="affix-damage-stackable" wire:model="itemAffix.damage_can_stack">
+                <label class="form-check-label" for="affix-damage-stackable">Is Damage Stackable (having more then one stacks it)?</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="affix-can-drop" wire:model="itemAffix.can_drop">

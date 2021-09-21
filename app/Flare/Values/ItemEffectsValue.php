@@ -14,6 +14,7 @@ class ItemEffectsValue {
     const LABYRINTH             = 'labyrinth';
     const DUNGEON               = 'dungeon';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
+    const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
 
     /**
      * @var string[] $values
@@ -23,7 +24,8 @@ class ItemEffectsValue {
         self::WALK_ON_DEATH_WATER   => 'walk-on-death-water',
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
-        self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial'
+        self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
+        self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible'
     ];
 
     /**
@@ -77,6 +79,15 @@ class ItemEffectsValue {
      */
     public function dungeon(): bool {
         return $this->value === self::DUNGEON;
+    }
+
+    /**
+     * Does this item make your affixes irresistible to the enemy?
+     *
+     * @return bool
+     */
+    public function areAffixesIrresistible(): bool {
+        return $this->value === self::AFFIXES_IRRESISTIBLE;
     }
 
     /**

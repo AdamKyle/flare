@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Core\Traits;
+namespace App\Game\Core\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Models\Quest;
 
 Trait CanHaveQuestItem {
 
@@ -15,7 +16,11 @@ Trait CanHaveQuestItem {
         $hasCompletedQuest = $character->questsCompleted->filter(function($questCompleted) use ($item) {
             return $questCompleted->quest->item_id === $item->id;
         })->isEmpty();
+        
+        if ($hasCompletedQuest) {
+            return $doesntHave;
+        }
 
-        return $doesntHave && $hasCompletedQuest;
+        return false;
     }
 }

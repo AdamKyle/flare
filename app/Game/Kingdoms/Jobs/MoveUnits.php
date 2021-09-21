@@ -25,12 +25,15 @@ class MoveUnits implements ShouldQueue
 
     public $type;
 
-    public function __construct(int $movementId, int $defenderId, string $type, Character $character)
+    public $timeForDispatch;
+
+    public function __construct(int $movementId, int $defenderId, string $type, Character $character, int|float $timeForDispatch)
     {
-        $this->movementId = $movementId;
-        $this->type       = $type;
-        $this->defenderId = $defenderId;
-        $this->character  = $character;
+        $this->movementId      = $movementId;
+        $this->type            = $type;
+        $this->defenderId      = $defenderId;
+        $this->character       = $character;
+        $this->timeForDispatch = $timeForDispatch;
     }
 
     public function handle(AttackService $attackService, UnitReturnService $unitReturnService) {
@@ -38,6 +41,16 @@ class MoveUnits implements ShouldQueue
 
         if (is_null($unitMovement)) {
             return;
+        }
+
+        if (!$unitMovement->completed_at->lessThanOrEqualTo(now())) {
+            return MoveUnits::dispatch(
+                $this->movementId,
+                $this->defenderId,
+                $this->type,
+                $this->character,
+                $this->timeForDispatch
+            )->delay(now()->addMinutes($this->timeForDispatch));
         }
 
         switch ($this->type) {

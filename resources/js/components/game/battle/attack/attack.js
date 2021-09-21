@@ -40,6 +40,7 @@ export default class Attack {
     }
 
     if (!this.canHit(attacker, defender, type)) {
+      this.affixesFire(attacker, defender, type);
       this.castSpells(attacker, defender, type);
       this.useArtifacts(attacker, defender, type);
       this.useRings(attacker, defender, type);
@@ -55,6 +56,10 @@ export default class Attack {
       }
     } else {
       if (this.blockedAttack(defender, attacker, type)) {
+        this.affixesFire(attacker, defender, type);
+        this.useArtifacts(attacker, defender, type);
+        this.useRings(attacker, defender, type);
+
         this.battleMessages.push({
           message: defender.name + ' blocked the (weapon) attack!'
         });
@@ -65,6 +70,7 @@ export default class Attack {
           return this.attack(defender, attacker, false, 'monster');
         }
       } else {
+        this.affixesFire(attacker, defender, type);
         this.castSpells(attacker, defender, type);
         this.useArtifacts(attacker, defender, type);
         this.useRings(attacker, defender, type);
@@ -135,6 +141,15 @@ export default class Attack {
     const hitChance = ((toHit + toHit * accuracy) / 100);
 
     return (enemyDex + enemyDex * dodge) - hitChance;
+  }
+
+  affixesFire(attacker, defender, type) {
+    if (type === 'player') {
+      const damage = new Damage();
+
+      this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth);
+      this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
+    }
   }
 
   castSpells(attacker, defender, type) {
@@ -235,19 +250,15 @@ export default class Attack {
     }
 
     if (type === 'monster') {
-      const damage   = random(1, attacker.spell_damage);
-      let totalDamage = Math.round(damage - (damage * defender.spell_evasion));
+      const dc        = 100 - defender.spell_evasion;
+      let totalDamage = attacker.spell_damage;
 
-      if (totalDamage <= 0) {
+      if (dc <= 0 || random(1, 100) > dc) {
         this.battleMessages.push({
-          message: attacker.name + '\'s Spells were annulled!'
+          message: this.attackerName + '\'s Spells failed to do anything.'
         });
 
         return;
-      } else if ($totalDamage !== attacker.artifact_damage) {
-        this.battleMessages.push({
-          message: this.attackerName + '\'s Spells have their potency reduced by the enemies artifact annulment'
-        });
       }
 
       this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
@@ -260,18 +271,15 @@ export default class Attack {
 
   artifactDamage(attacker, defender, type) {
     if (type === 'player') {
-      let totalDamage = Math.round(attacker.artifact_damage - (attacker.artifact_damage * defender.artifact_annulment));
+      const dc        = 100 - defender.artifact_annulment;
+      let totalDamage = attacker.artifact_damage;
 
-      if (totalDamage <= 0) {
+      if (dc <= 0 || random(1, 100) > dc) {
         this.battleMessages.push({
           message: this.attackerName + '\'s Artifacts are annulled!'
         });
 
         return;
-      } else if (totalDamage !== attacker.artifact_damage) {
-        this.battleMessages.push({
-          message: this.attackerName + '\'s Artifacts have their potency reduced by the enemies artifact annulment'
-        });
       }
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
@@ -282,12 +290,12 @@ export default class Attack {
     }
 
     if (type === 'monster') {
-      const damage    = random(1, attacker.artifact_damage);
-      let totalDamage = Math.round(damage - (damage * defender.artifact_damage));
+      const dc        = 100 - defender.artifact_annulment;
+      let totalDamage = attacker.artifact_damage;
 
-      if (totalDamage < 0) {
+      if (dc <= 0 || random(1, 100) > dc) {
         this.battleMessages.push({
-          message: attacker.name + '\'s Artifacts are annulled!',
+          message: this.attackerName + '\'s Artifacts are annulled!'
         });
 
         return;

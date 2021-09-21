@@ -30,6 +30,14 @@
             <dd>{{$details['replaces_item']->itemPrefix->base_ac_mod * 100}}%</dd>
             <dt>Description:</dt>
             <dd>{{$details['replaces_item']->itemPrefix->description}}</dd>
+            @if ($details['replaces_item']->item->itemPrefix->damage !== 0)
+                <dt>Damage:</dt>
+                <dd class="text-success">{{$details['replaces_item']->item->itemPrefix->damage}}</dd>
+                <dt>Is Damage Irresistible?:</dt>
+                <dd>{{$details['replaces_item']->item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                <dt>Can Stack:</dt>
+                <dd>{{$details['replaces_item']->item->itemPrefix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+            @endif
         </dl>
     @endif
     @if (!is_null($details['replaces_item']->itemPrefix))
@@ -44,6 +52,14 @@
             <dd>{{$details['replaces_item']->itemSuffix->base_ac_mod * 100}}%</dd>
             <dt>Description:</dt>
             <dd>{{$details['replaces_item']->itemSuffix->description}}</dd>
+            @if ($details['replaces_item']->item->itemSuffix->damage !== 0)
+                <dt>Damage:</dt>
+                <dd class="text-success">{{$details['replaces_item']->item->itemSuffix->damage}}</dd>
+                <dt>Is Damage Irresistible?:</dt>
+                <dd>{{$details['replaces_item']->item->itemSuffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                <dt>Can Stack:</dt>
+                <dd>{{$details['replaces_item']->item->itemSuffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+            @endif
         </dl>
     @endif
 @endif

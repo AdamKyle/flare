@@ -11,12 +11,6 @@ export default class Damage {
   doAttack(attacker, monsterCurrentHealth) {
     monsterCurrentHealth = monsterCurrentHealth - attacker.attack;
 
-    if (attacker.has_affixes) {
-      this.battleMessages.push({
-        message: 'Your enchanted equipment glows before the enemy.'
-      });
-    }
-
     this.battleMessages.push({
       message: attacker.name + ' hit for (weapon) ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     });
@@ -24,6 +18,41 @@ export default class Damage {
     monsterCurrentHealth = this.tripleAttackChance(attacker, monsterCurrentHealth);
     monsterCurrentHealth = this.doubleDamage(attacker, monsterCurrentHealth);
     monsterCurrentHealth = this.vampireThirstChance(attacker, monsterCurrentHealth);
+
+    return monsterCurrentHealth;
+  }
+
+  affixDamage(attacker, defender, monsterCurrentHealth) {
+    let totalDamage   = attacker.stacking_affix;
+    const cantResist  = attacker.cant_resist_affixes;
+
+    if (cantResist) {
+      this.battleMessages.push({
+        'message': 'The enemy cannot resist your enchantments! They are so glowy!'
+      });
+
+      totalDamage += attacker.non_stacking_affix
+    } else {
+      if (attacker.non_stacking_affix > 0) {
+        const dc = 100 - defender.affix_resistance;
+
+        if (dc <= 0 || random(1, 100) > dc) {
+          this.battleMessages.push({
+            'message': 'Your damaging enchantments (resistible) have been resisted.'
+          });
+        } else {
+          totalDamage += attacker.non_stacking_affix
+        }
+      }
+    }
+
+    if (totalDamage > 0) {
+      monsterCurrentHealth = monsterCurrentHealth - totalDamage;
+
+      this.battleMessages.push({
+        'message': 'Your enchantments glow with rage. Your enemy '+ cantResist ? 'cowers: ' : 'cowers. (non resisted dmg): ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      });
+    }
 
     return monsterCurrentHealth;
   }
@@ -56,18 +85,15 @@ export default class Damage {
   }
 
   calculateSpellDamage(attacker, defender, monsterCurrentHealth, increaseDamage) {
-    let totalDamage = Math.round(attacker.spell_damage - (attacker.spell_damage * defender.spell_evasion));
+    const dc        = 100 - defender.spell_evasion;
+    let totalDamage = attacker.spell_damage;
 
-    if (totalDamage < 0) {
+    if (dc <= 0 || random(1, 100) > dc) {
       this.battleMessages.push({
-        message: this.attackerName + '\'s Spells have no effect!'
+        message: this.attackerName + '\'s Spells failed to do anything.'
       });
 
       return;
-    }
-
-    if (increaseDamage) {
-      totalDamage = Math.round(totalDamage + totalDamage * 0.5);
     }
 
     monsterCurrentHealth = monsterCurrentHealth - totalDamage;

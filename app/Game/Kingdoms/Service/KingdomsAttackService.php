@@ -98,7 +98,13 @@ class KingdomsAttackService {
                     'is_attacking'    => true,
                 ]);
 
-                MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character)->delay(now()->addMinutes($totalTime));
+                $timeForDispatch = $totalTime;
+
+                if ($totalTime > 15) {
+                    $timeForDispatch = $totalTime / 10;
+                }
+
+                MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character, $timeForDispatch)->delay(now()->addMinutes($timeForDispatch));
 
                 $kingdom = new Item($kingdom->refresh(), $this->kingdomTransformer);
 

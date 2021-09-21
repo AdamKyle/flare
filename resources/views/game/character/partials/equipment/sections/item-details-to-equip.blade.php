@@ -22,6 +22,14 @@
                         <dd class="{{$item->itemPrefix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
                         <dd class="{{$item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->skill_bonus * 100}}%</dd>
+                        @if ($item->itemPrefix->damage !== 0)
+                            <dt>Damage:</dt>
+                            <dd>{{$item->itemPrefix->damage}}</dd>
+                            <dt>Is Damage Irresistible?:</dt>
+                            <dd>{{$item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                            <dt>Can Stack:</dt>
+                            <dd>{{$item->itemPrefix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+                        @endif
                     </dl>
                 </div>
                 <div class="col-md-6">
@@ -64,6 +72,14 @@
                         <dd class="{{$item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->skill_training_bonus * 100}}%</dd>
                         <dt>Bonus (when using):</dt>
                         <dd class="{{$item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->skill_bonus * 100}}%</dd>
+                        @if ($item->itemSuffix->damage !== 0)
+                            <dt>Damage:</dt>
+                            <dd class="text-success">{{$item->itemSuffix->damage}}</dd>
+                            <dt>Is Damage Irresistible?:</dt>
+                            <dd>{{$item->itemSuffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
+                            <dt>Can Stack:</dt>
+                            <dd>{{$item->itemSuffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+                        @endif
                     </dl>
                 </div>
                 <div class="col-md-6">

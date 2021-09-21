@@ -83,6 +83,7 @@ export default class FightSection extends React.Component {
   }
 
   battleMessages() {
+    console.log(this.state.battleMessages);
     return this.state.battleMessages.map((message) => {
       return <div key={message.message}><span className="battle-message">{message.message}</span> <br/></div>
     });

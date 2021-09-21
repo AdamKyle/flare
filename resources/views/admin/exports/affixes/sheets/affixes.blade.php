@@ -13,6 +13,7 @@
             <th>int_mod</th>
             <th>agi_mod</th>
             <th>focus_mod</th>
+            <th>damage</th>
             <th>int_required</th>
             <th>skill_level_required</th>
             <th>skill_level_trivial</th>
@@ -26,6 +27,8 @@
             <td>fight_time_out_mod_bonus</td>
             <td>move_time_out_mod_bonus</td>
             <th>can_drop</th>
+            <th>damage_can_stack</th>
+            <th>irresistible_damage</th>
             <th>cost</th>
             <th>type</th>
         </tr>
@@ -45,6 +48,7 @@
             <td>{{$affix->int_mod}}</td>
             <td>{{$affix->agi_mod}}</td>
             <td>{{$affix->focus_mod}}</td>
+            <td>{{$affix->damage}}</td>
             <td>{{$affix->int_required}}</td>
             <td>{{$affix->skill_level_required}}</td>
             <td>{{$affix->skill_level_trivial}}</td>
@@ -58,6 +62,8 @@
             <td>{{$affix->fight_time_out_mod_bonus}}</td>
             <td>{{$affix->move_time_out_mod_bonus}}</td>
             <td>{{$affix->can_drop}}</td>
+            <td>{{$affix->damage_can_stack}}</td>
+            <td>{{$affix->irresistible_damage}}</td>
             <td>{{$affix->cost}}</td>
             <td>{{$affix->type}}</td>
         </tr>

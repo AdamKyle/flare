@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Services;
 
-use App\Core\Traits\CanHaveQuestItem;
+use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -132,19 +132,26 @@ class AdventureRewardService {
                         return;
                     }
 
-                    if ($this->canHaveItem($character, $item)) {
+                    if ($item->type === 'quest') {
+                        if ($this->canHaveItem($character, $item)) {
+                            $character->inventory->slots()->create([
+                                'inventory_id' => $character->inventory->id,
+                                'item_id'      => $item->id,
+                            ]);
+
+                            $message = $character->name . ' has found: ' . $item->affix_name;
+
+                            broadcast(new GlobalMessageEvent($message));
+
+                            $this->messages[] = 'You gained the item: ' . $item->affix_name;
+                        }
+                    } else {
                         $character->inventory->slots()->create([
                             'inventory_id' => $character->inventory->id,
                             'item_id'      => $item->id,
                         ]);
 
                         $this->messages[] = 'You gained the item: ' . $item->affix_name;
-
-                        if (!is_null($item->type === 'quest')) {
-                            $message = $character->name . ' has found: ' . $item->affix_name;
-
-                            broadcast(new GlobalMessageEvent($message));
-                        }
                     }
 
                     // Remove the item.

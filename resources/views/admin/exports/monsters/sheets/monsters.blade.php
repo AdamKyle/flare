@@ -27,6 +27,7 @@
         <th>max_artifact_damage</th>
         <th>spell_evasion</th>
         <th>artifact_annulment</th>
+        <th>affix_resistance</th>
         <th>published</th>
         <th>quest_item_id</th>
         <th>quest_item_drop_chance</th>
@@ -62,6 +63,7 @@
             <th>{{$monster->max_artifact_damage}}</th>
             <th>{{$monster->spell_evasion}}</th>
             <th>{{$monster->artifact_annulment}}</th>
+            <th>{{$monster->affix_resistance}}</th>
             <td>{{$monster->published}}</td>
             <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>
