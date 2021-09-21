@@ -49,9 +49,9 @@ class CharacterInformationBuilder {
      * inventory assuming the user has anything equipped at all.
      *
      * @param Character $character
-     * @return float
+     * @return mixed
      */
-    public function statMod(string $stat): float {
+    public function statMod(string $stat) {
         $base = $this->character->{$stat};
 
         $equipped = $this->fetchInventory()->filter(function($slot) {

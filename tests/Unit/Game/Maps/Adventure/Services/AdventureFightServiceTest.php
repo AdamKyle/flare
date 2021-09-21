@@ -84,8 +84,6 @@ class AdventureFightServiceTest extends TestCase
         $logs = $fightService->getLogInformation();
 
         $this->assertFalse(empty($logs));
-
-        $this->assertEquals($logs[0]['messages'][0][0], 'Goblin blocked the attack!');
         $this->assertTrue($fightService->tooLong());
     }
 

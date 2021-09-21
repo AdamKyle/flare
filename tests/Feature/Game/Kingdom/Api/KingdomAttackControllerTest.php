@@ -6,6 +6,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\KingdomLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Kingdom;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -99,6 +100,8 @@ class KingdomAttackControllerTest extends TestCase
     }
 
     public function testAttackDefendingKingdom() {
+        Queue::fake();
+
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
@@ -124,6 +127,8 @@ class KingdomAttackControllerTest extends TestCase
     }
 
     public function testAttackDefendingKingdomWithSiegeUnits() {
+        Queue::fake();
+
         $user = $this->character->getUser();
 
         $this->character->assignUnits([
@@ -388,6 +393,4 @@ class KingdomAttackControllerTest extends TestCase
                                      ->assignUnits()
                                      ->getKingdom();
     }
-
-
 }

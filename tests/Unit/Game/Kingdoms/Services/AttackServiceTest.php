@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\KingdomLog;
-use App\Game\Core\Traits\KingdomCache;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\KingdomLog;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Service\AttackService;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Kingdoms\Service\AttackService;
+use App\Game\Core\Traits\KingdomCache;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Character\KingdomManagement;
@@ -20,10 +20,14 @@ class AttackServiceTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
+
+        Queue::fake();
     }
 
     public function tearDown(): void {
         parent::tearDown();
+
+
     }
 
     public function testSettlerUnitIsKilledWhenItsTheLastRemainingUnit() {

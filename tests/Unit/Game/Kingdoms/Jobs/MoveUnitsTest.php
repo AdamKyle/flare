@@ -7,6 +7,7 @@ use App\Flare\Models\Kingdom;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Jobs\MoveUnits;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateKingdom;
@@ -26,7 +27,7 @@ class MoveUnitsTest extends TestCase {
                                            ->givePlayerLocation()
                                            ->getCharacter();
 
-        MoveUnits::dispatch(10, 2, 'attack', $character);
+        MoveUnits::dispatch(10, 2, 'attack', $character, 10);
 
         $this->assertTrue(true);
     }
@@ -36,7 +37,7 @@ class MoveUnitsTest extends TestCase {
                                            ->givePlayerLocation()
                                            ->getCharacter();
 
-        MoveUnits::dispatch($this->createUnitMovement()->id, 2, 'something', $character);
+        MoveUnits::dispatch($this->createUnitMovement()->id, 2, 'something', $character, 10);
 
         $this->assertTrue(true);
     }
@@ -61,7 +62,7 @@ class MoveUnitsTest extends TestCase {
             'from_kingdom_id' => Kingdom::first()->id,
             'to_kingdom_id'   => Kingdom::first()->id,
             'units_moving'    => [],
-            'completed_at'    => now()->addMinutes(45),
+            'completed_at'    => now()->subMinutes(500),
             'started_at'      => now(),
             'moving_to_x'     => 16,
             'moving_to_y'     => 16,

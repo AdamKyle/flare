@@ -129,8 +129,25 @@ class CharacterInventoryControllerTest extends TestCase
             ->getUser();
 
         $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare-items', [
-            'user' => $user
+            'user' => $user,
+            'slot' => 10,
         ])->see('Item comparison expired.');
+    }
+
+    public function testYouAreNotAllowedToDoThatMissingSlot() {
+        $user = $this->character->inventoryManagement()
+            ->giveitem($this->createItem([
+                'name' => 'Spear',
+                'base_damage' => 6,
+                'type' => 'weapon',
+                'crafting_type' => 'weapon',
+            ]))
+            ->getCharacterFactory()
+            ->getUser();
+
+        $this->actingAs($user)->visitRoute('game.character.sheet')->visitRoute('game.inventory.compare-items', [
+            'user' => $user,
+        ])->see('You are not allowed to do that.');
     }
 
     public function testCannotSeeComparePage() {

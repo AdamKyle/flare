@@ -128,7 +128,7 @@ class CelestialFightService {
                     'current_health' => $celestialFight->current_health,
                 ]
             ],
-            'logs' => array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
+            'logs' => $logInfo['messages'],
         ]);
     }
 

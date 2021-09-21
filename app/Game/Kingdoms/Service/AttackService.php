@@ -270,7 +270,15 @@ class AttackService {
 
             UpdateUnitMovementLogs::dispatch($character);
 
-            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character)->delay(now()->addMinutes($timeToReturn));
+            $timeForDispatch = $timeToReturn;
+
+            if ($timeToReturn > 15) {
+                $timeForDispatch = $timeToReturn / 10;
+            }
+
+            $delay = now()->addMinutes($timeForDispatch);
+
+            MoveUnits::dispatch($unitMovement->id, $defender->id, 'return', $character, $timeForDispatch)->delay($delay);
         }
     }
 

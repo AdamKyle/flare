@@ -336,7 +336,7 @@ class CelestialBattleControllerApiTest extends TestCase {
             'gold_dust_cost'      => 1000,
         ]);
 
-        $character = $this->character->updateCharacter()->getCharacter();
+        $character = $this->character->levelCharacterUp(50)->getCharacter();
 
         $celestialFight = $this->createCelestialFight([
             'monster_id'        => $monster->id,

@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Character\KingdomManagement;
 use Tests\TestCase;
@@ -90,6 +91,8 @@ class KingdomUnitMovementApiTest extends TestCase
     }
 
     public function testCanRecallUnits() {
+        Queue::fake();
+
         $attacker = $this->createKingdom()->assignUnits([
             'attack'  => 5000,
             'defence' => 5000,
