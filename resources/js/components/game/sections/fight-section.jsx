@@ -25,6 +25,8 @@ export default class FightSection extends React.Component {
     this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
     this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
+
+    this.battleMessagesBeforeFight = [];
   }
 
   componentDidMount() {
@@ -68,7 +70,15 @@ export default class FightSection extends React.Component {
   }
 
   setMonsterInfo() {
-    const monsterInfo = new Monster(this.props.monster);
+    const monsterInfo   = new Monster(this.props.monster);
+    const slotWithAffix = this.props.character.stats_reducing_slot;
+
+    if (slotWithAffix !== null) {
+      const message = monsterInfo.reduceAllStats(this.props.character.stats_reducing_slot);
+
+      this.battleMessagesBeforeFight = message;
+    }
+
     const health = monsterInfo.health();
 
     this.setState({
@@ -83,7 +93,6 @@ export default class FightSection extends React.Component {
   }
 
   battleMessages() {
-    console.log(this.state.battleMessages);
     return this.state.battleMessages.map((message) => {
       return <div key={message.message}><span className="battle-message">{message.message}</span> <br/></div>
     });
@@ -106,6 +115,8 @@ export default class FightSection extends React.Component {
     );
 
     const state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
+
+    state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages];
 
     this.setState(state);
 

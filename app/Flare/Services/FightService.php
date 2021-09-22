@@ -61,6 +61,11 @@ class FightService {
     private $tookTooLong = false;
 
     /**
+     * @var array
+     */
+    private $battleMessageBeforeAttack = [];
+
+    /**
      * @param Character $character
      * @param Monster $monster
      * @return void
@@ -72,8 +77,10 @@ class FightService {
         $this->characterInformation   = resolve(CharacterInformationBuilder::class)->setCharacter($character);
         $this->currentCharacterHealth = $this->characterInformation->buildHealth();
 
+        $this->reduceEnemyStats();
+
         $healthRange                  = explode('-', $this->monster->health_range);
-        $this->currentMonsterHealth   = rand($healthRange[0], $healthRange[1]) + 10;
+        $this->currentMonsterHealth   = rand($healthRange[0], $healthRange[1]) + $this->monster->dur;
     }
 
     public function overrideMonsterHealth(int $monsterHealth): FightService {
@@ -90,6 +97,34 @@ class FightService {
 
     public function setAttackTimes(int $times): FightService {
         $this->attackTimes = $times;
+
+        return $this;
+    }
+
+    public function reduceEnemyStats(): FightService {
+        $affix = $this->characterInformation->findPrefixStatReductionAffix();
+
+        if (!is_null($affix)) {
+            $dc    = 100 - $this->monster->affix_resistance;
+
+            if ($dc <= 0 || rand(1, 100) > $dc) {
+                $this->battleMessageBeforeAttack[] = ['Your enemy laughs at your attempt to make them week fails.'];
+
+                return $this;
+            }
+
+            $this->monster->str   = $this->monster->str - ($this->monster->str * $affix->str_reduction);
+            $this->monster->dex   = $this->monster->dex - ($this->monster->dex * $affix->dex_reduction);
+            $this->monster->int   = $this->monster->int - ($this->monster->int * $affix->int_reduction);
+            $this->monster->dur   = $this->monster->dur - ($this->monster->dur * $affix->dur_reduction);
+            $this->monster->chr   = $this->monster->chr - ($this->monster->chr * $affix->chr_reduction);
+            $this->monster->agi   = $this->monster->agi - ($this->monster->agi * $affix->agi_reduction);
+            $this->monster->focus = $this->monster->focus - ($this->monster->focus * $affix->focus_reduction);
+
+            $this->battleMessageBeforeAttack[] = ['Your enemy sinks to their knees in agony as you make them weaker.'];
+
+            return $this;
+        }
 
         return $this;
     }
@@ -230,7 +265,7 @@ class FightService {
             $this->logInformation[] = [
                 'attacker'   => $attacker->name,
                 'defender'   => $defender->name,
-                'messages'   => $messages,
+                'messages'   => array_merge($this->battleMessageBeforeAttack, $messages),
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
@@ -255,7 +290,7 @@ class FightService {
 
             $messages[] = [$defender->name . ' blocked the attack!'];
 
-            $logInfo['messages'] = $messages;
+            $logInfo['messages'] = array_merge($this->battleMessageBeforeAttack, $messages);
 
             $this->logInformation = $logInfo;
 
@@ -275,7 +310,7 @@ class FightService {
         $this->logInformation[] = [
             'attacker'   => $attacker->name,
             'defender'   => $defender->name,
-            'messages'   => $messages,
+            'messages'   => array_merge($this->battleMessageBeforeAttack, $messages),
             'is_monster' => $attacker instanceof Character ? false : true
         ];
 
@@ -437,7 +472,13 @@ class FightService {
                 $this->currentMonsterHealth = $monsterNewHealth;
             }
 
-            $messages[] = ['Your enchantments glow with rage. Your enemy '.$cantResist ? 'cowers: ' : 'cowers. (non resisted dmg): '. $totalDamage];
+            $cantResistMessage = 'cowers. (non resisted dmg): ';
+
+            if ($cantResist) {
+                $cantResistMessage = 'cowers: ';
+            }
+
+            $messages[] = ['Your enchantments glow with rage. Your enemy ' . $cantResistMessage . $totalDamage];
         }
 
         return $messages;

@@ -49,8 +49,16 @@ export default class Damage {
     if (totalDamage > 0) {
       monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
+      let cowerMessage = 'cowers. (non resisted dmg): ';
+
+      if (cantResist) {
+        cowerMessage = 'cowers: ';
+      }
+
+      cowerMessage = cowerMessage + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
       this.battleMessages.push({
-        'message': 'Your enchantments glow with rage. Your enemy '+ cantResist ? 'cowers: ' : 'cowers. (non resisted dmg): ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        'message': 'Your enchantments glow with rage. Your enemy ' + cowerMessage,
       });
     }
 

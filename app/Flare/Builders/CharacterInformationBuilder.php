@@ -135,7 +135,7 @@ class CharacterInformationBuilder {
                     return $slot;
                 }
             }
-        })->first();
+        })->first()->item->itemPrefix;
     }
 
     /**
@@ -146,7 +146,7 @@ class CharacterInformationBuilder {
     public function findSuffixStatReductionAffixes(): Collection {
         return $this->fetchInventory()->filter(function($slot) {
             if (!is_null($slot->item->itemSuffix))  {
-                if ($slot->item->itemPrefix->reduces_enemy_stats) {
+                if ($slot->item->itemSuffix->reduces_enemy_stats) {
                     return $slot;
                 }
             }
