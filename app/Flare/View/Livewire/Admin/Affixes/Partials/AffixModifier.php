@@ -28,6 +28,16 @@ class AffixModifier extends Component
         'itemAffix.int_mod'                  => 'nullable',
         'itemAffix.agi_mod'                  => 'nullable',
         'itemAffix.focus_mod'                => 'nullable',
+        'itemAffix.str_reduction'            => 'nullable',
+        'itemAffix.dur_reduction'            => 'nullable',
+        'itemAffix.dex_reduction'            => 'nullable',
+        'itemAffix.chr_reduction'            => 'nullable',
+        'itemAffix.int_reduction'            => 'nullable',
+        'itemAffix.agi_reduction'            => 'nullable',
+        'itemAffix.focus_reduction'          => 'nullable',
+        'itemAffix.reduces_enemy_stats'      => 'nullable',
+        'itemAffix.steal_life_amount'        => 'nullable',
+        'itemAffix.entranced_chance'         => 'nullable',
         'itemAffix.skill_name'               => 'nullable',
         'itemAffix.skill_bonus'              => 'nullable',
         'itemAffix.skill_training_bonus'     => 'nullable',
@@ -53,6 +63,10 @@ class AffixModifier extends Component
         if (!is_null($this->itemAffix->skill_name) && is_null($this->itemAffix->skill_training_bonus)) {
             $this->addError('skill_training_bonus', 'Must have a valid value since you selected a skill');
         } else {
+            if (is_null($this->itemAffix->reduces_enemy_stats)) {
+                $this->itemAffix->reduces_enemy_stats = false;
+            }
+
             $this->itemAffix->save();
 
             $message = 'Created Affix: ' . $this->itemAffix->refresh()->name;

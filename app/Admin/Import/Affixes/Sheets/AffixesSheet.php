@@ -46,6 +46,10 @@ class AffixesSheet implements ToCollection {
             $item['irresistible_damage'] = false;
         }
 
+        if (!isset($item['reduces_enemy_stats'])) {
+            $item['reduces_enemy_stats'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'skill_name') {

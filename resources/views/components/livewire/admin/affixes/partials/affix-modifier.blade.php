@@ -40,16 +40,30 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="form-group">
                 <label for="item-affix-int-mod">Int Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-affix-int-mod" name="item-affix-int-mod" wire:model="itemAffix.int_mod">
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="form-group">
                 <label for="item-affix-chr-mod">Chr Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-affix-chr-mod" name="item-affix-chr-mod" wire:model="itemAffix.chr_mod">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-affix-agi-mod">Agi Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-agi-mod" name="item-affix-agi-mod" wire:model="itemAffix.agi_mod">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-affix-chr-mod">Focus Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-chr-mod" name="item-affix-chr-mod" wire:model="itemAffix.focus_mod">
             </div>
         </div>
         <div class="col-md-4">
@@ -60,16 +74,84 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-12">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="affix-reduces-enemy-stats" wire:model="itemAffix.reduces_enemy_stats">
+                <label class="form-check-label" for="affix-reduces-enemy-stats">Can This Affix Reduce Enemy Stats?</label>
+            </div>
+        </div>
+    </div>
+    <div class="{{!is_array($itemAffix) ? !is_null($itemAffix) ? $itemAffix->reduces_enemy_stats ? '' : 'hide' : 'hide' : 'hide'}}">
+        <hr />
+        <div class="alert alert-info mt-2 mb-3">
+            <p>
+                The logic states that prefixes can reduce all stats and do not stack, while suffixes can reduce individual stats and do stack.
+            </p>
+            <p>
+                These are all percentage based.
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="item-affix-str-reduction">Str Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-str-reduction" name="item-affix-str-reduction" wire:model="itemAffix.str_reduction">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="item-affix-dex-reduction">Dex Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-dex-reduction" name="item-affix-dex-reduction" wire:model="itemAffix.dex_reduction">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="item-affix-dur-reduction">Dur Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-dur-reduction" name="item-affix-dur-reduction" wire:model="itemAffix.dur_reduction">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="item-affix-int-reduction">Int Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-int-reduction" name="item-affix-int-reduction" wire:model="itemAffix.int_reduction">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="item-affix-chr-reduction">Chr Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-chr-reduction" name="item-affix-chr-reduction" wire:model="itemAffix.chr_reduction">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="item-affix-agi-reduction">Agi Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-agi-reduction" name="item-affix-agi-reduction" wire:model="itemAffix.agi_reduction">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="item-affix-chr-reduction">Focus Reduction: </label>
+                    <input type="number" steps="0.01" class="form-control" id="item-affix-chr-reduction" name="item-affix-chr-reduction" wire:model="itemAffix.focus_reduction">
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="item-affix-int-mod">Agi Mod: </label>
-                <input type="number" steps="0.01" class="form-control" id="item-affix-int-mod" name="item-affix-int-mod" wire:model="itemAffix.agi_mod">
+                <label for="item-affix-steal-life-amount">Steals % of enemy life: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-steal-life-amount" name="item-affix-steal-life-amount" wire:model="itemAffix.steal_life_amount">
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label for="item-affix-chr-mod">Focus Mod: </label>
-                <input type="number" steps="0.01" class="form-control" id="item-affix-chr-mod" name="item-affix-chr-mod" wire:model="itemAffix.focus_mod">
+                <label for="item-affix-entrance-chance">Entrance Chance: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-entrance-chance" name="item-affix-entrance-chance" wire:model="itemAffix.entrance_chance">
             </div>
         </div>
     </div>

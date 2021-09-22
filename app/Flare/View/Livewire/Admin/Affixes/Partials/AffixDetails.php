@@ -61,6 +61,10 @@ class AffixDetails extends Component
             $this->itemAffix->damage_can_stack = false;
         }
 
+        if (is_null($this->itemAffix->reduces_enemy_stats)) {
+            $this->itemAffix->reduces_enemy_stats = false;
+        }
+
         $this->itemAffix->save();
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->itemAffix->refresh());

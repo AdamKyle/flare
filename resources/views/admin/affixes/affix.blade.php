@@ -105,6 +105,9 @@
                             These affixes will fire, regardless if you miss or hit. These affixes cannot stack unless otherwise stated.
                             That means, having multiple will do nothing, you'll take the highest of all non stacking damaging affixes.
                         </p>
+                        <p>
+                            With the right quest item, you can make all damage from all affixes Irresistible.
+                        </p>
                         <dl>
                             <dt>Damage:</dt>
                             <dd>{{$itemAffix->damage}}</dd>
@@ -112,6 +115,41 @@
                             <dd>{{$itemAffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
                             <dt>Can Stack:</dt>
                             <dd>{{$itemAffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
+                        </dl>
+                    </div>
+                </div>
+            @endif
+
+            @if ($itemAffix->reduces_enemy_stats)
+                <h2 class="mt-2 mb-2">Stat Reduction</h2>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Affixes that reduce stats can and cannot stack. For example: Prefixes cannot stack, but Suffixes can.
+                        </p>
+                        <p>
+                            If you have multiple prefixes attached that reduce all enemy stats, we will take the first one. Doesn't matter
+                            what it is.
+                        </p>
+                        <p>
+                            Stat reduction is applied before anything else is done, but can be resisted unless you have the appropriate quest item.
+                        </p>
+                        <dl>
+                            <dt>Str Reduction:</dt>
+                            <dd>{{$itemAffix->str_reduction * 100}}%</dd>
+                            <dt>Dex Reduction:</dt>
+                            <dd>{{$itemAffix->dex_reduction * 100}}%</dd>
+                            <dt>Dur Reduction:</dt>
+                            <dd>{{$itemAffix->dur_reduction * 100}}%</dd>
+                            <dt>Int Reduction:</dt>
+                            <dd>{{$itemAffix->int_reduction * 100}}%</dd>
+                            <dt>Chr Reduction:</dt>
+                            <dd>{{$itemAffix->chr_reduction * 100}}%</dd>
+                            <dt>Agi Reduction:</dt>
+                            <dd>{{$itemAffix->agi_reduction * 100}}%</dd>
+                            <dt>Focus Reduction:</dt>
+                            <dd>{{$itemAffix->focus_reduction * 100}}%</dd>
                         </dl>
                     </div>
                 </div>

@@ -13,6 +13,15 @@
             <th>int_mod</th>
             <th>agi_mod</th>
             <th>focus_mod</th>
+            <th>str_reduction</th>
+            <th>dur_reduction</th>
+            <th>dex_reduction</th>
+            <th>chr_reduction</th>
+            <th>int_reduction</th>
+            <th>agi_reduction</th>
+            <th>focus_reduction</th>
+            <th>reduces_enemy_stats</th>
+            <th>steal_life_amount</th>
             <th>class_bonus</th>
             <th>damage</th>
             <th>int_required</th>
@@ -32,6 +41,7 @@
             <th>irresistible_damage</th>
             <th>cost</th>
             <th>type</th>
+            <th>entranced_chance<th>
         </tr>
     </thead>
     <tbody>
@@ -49,6 +59,15 @@
             <td>{{$affix->int_mod}}</td>
             <td>{{$affix->agi_mod}}</td>
             <td>{{$affix->focus_mod}}</td>
+            <td>{{$affix->str_reduction}}</td>
+            <td>{{$affix->dur_reduction}}</td>
+            <td>{{$affix->dex_reduction}}</td>
+            <td>{{$affix->chr_reduction}}</td>
+            <td>{{$affix->int_reduction}}</td>
+            <td>{{$affix->agi_reduction}}</td>
+            <td>{{$affix->focus_reduction}}</td>
+            <td>{{$affix->reduces_enemy_stats}}</td>
+            <td>{{$affix->steal_life_amount}}</td>
             <td>{{$affix->class_bonus}}</td>
             <td>{{$affix->damage}}</td>
             <td>{{$affix->int_required}}</td>
@@ -68,6 +87,7 @@
             <td>{{$affix->irresistible_damage}}</td>
             <td>{{$affix->cost}}</td>
             <td>{{$affix->type}}</td>
+            <td>{{$affix->entranced_chance}}</td>
         </tr>
     @endforeach
     </tbody>

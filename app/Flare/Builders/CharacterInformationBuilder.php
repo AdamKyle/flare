@@ -4,6 +4,7 @@ namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
 use App\Flare\Traits\ClassBasedBonuses;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemEffectsValue;
@@ -79,6 +80,14 @@ class CharacterInformationBuilder {
         return $base;
     }
 
+    /**
+     * Return the highest class bonus affix amount.
+     *
+     * Class bonuses do not stack, therefore we only return the highest valued
+     * version.
+     *
+     * @return float
+     */
     public function classBonus(): float {
         $slots = $this->fetchInventory()->filter(function($slot) {
            if (!is_null($slot->item->itemPrefix))  {
@@ -107,6 +116,41 @@ class CharacterInformationBuilder {
         }
 
         return empty($values) ? 0.0 : max($values);
+    }
+
+    /**
+     * Find the prefix that reduces stats.
+     *
+     * We take the first one. It makes it easier than trying to figure out
+     * which one is better.
+     *
+     * These cannot stack.
+     *
+     * @return ItemAffix|null
+     */
+    public function findPrefixStatReductionAffix(): ?ItemAffix {
+        return $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                if ($slot->item->itemPrefix->reduces_enemy_stats) {
+                    return $slot;
+                }
+            }
+        })->first();
+    }
+
+    /**
+     * Returns a collection of single stat reduction affixes.
+     *
+     * @return Collection
+     */
+    public function findSuffixStatReductionAffixes(): Collection {
+        return $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemSuffix))  {
+                if ($slot->item->itemPrefix->reduces_enemy_stats) {
+                    return $slot;
+                }
+            }
+        });
     }
 
     /**

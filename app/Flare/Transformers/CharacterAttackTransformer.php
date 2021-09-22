@@ -58,6 +58,8 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'is_alchemy_locked'   => $this->isAlchemyLocked($character),
             'gold'                => $character->gold,
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'stats_reducing_slot' => $characterInformation->findPrefixStatReductionAffix(),
+            'stat_reducing_slots' => $characterInformation->findSuffixStatReductionAffixes(),
         ];
     }
 
