@@ -79,6 +79,36 @@ class CharacterInformationBuilder {
         return $base;
     }
 
+    public function classBonus(): float {
+        $slots = $this->fetchInventory()->filter(function($slot) {
+           if (!is_null($slot->item->itemPrefix))  {
+               if ($slot->item->itemPrefix->class_bonus > 0) {
+                   return $slot;
+               }
+           }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                if ($slot->item->itemSuffix->class_bonus > 0) {
+                    return $slot;
+                }
+            }
+        });
+
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                $values[] = $slot->item->itemPrefix->class_bonus;
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                $values[] = $slot->item->itemSuffix->class_bonus;
+            }
+        }
+
+        return empty($values) ? 0.0 : max($values);
+    }
+
     /**
      * Build the attack
      *

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Values;
 
+use App\Flare\Builders\CharacterInformationBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
 
@@ -18,14 +19,17 @@ class ClassAttackValue {
 
     private $character;
 
+    private $characterInfo;
+
     private $chance = [
         'chance' => 0.05,
         'class_name' => null,
     ];
 
     public function __construct(Character $character) {
-        $this->classType = new CharacterClassValue($character->class->name);
-        $this->character = $character;
+        $this->classType     = new CharacterClassValue($character->class->name);
+        $this->characterInfo = (new CharacterInformationBuilder())->setCharacter($character);
+        $this->character     = $character;
     }
 
     public function buildAttackData() {
@@ -71,6 +75,7 @@ class ClassAttackValue {
         $this->chance['only'] = 'weapon';
         $this->chance['class_name'] = 'Fighter';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('weapon');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
 
     }
 
@@ -79,6 +84,7 @@ class ClassAttackValue {
         $this->chance['only'] = 'spell-healing';
         $this->chance['class_name'] = 'Prophet';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('spell-healing');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildThiefChance() {
@@ -86,6 +92,7 @@ class ClassAttackValue {
         $this->chance['only'] = 'weapon';
         $this->chance['class_name'] = 'Thief';
         $this->chance['has_item'] = $this->hasMultipleOfSameType('weapon', 2);
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildHereticChance() {
@@ -93,6 +100,7 @@ class ClassAttackValue {
         $this->chance['only'] = 'spell-damage';
         $this->chance['class_name'] = 'Heretic';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('spell-damage');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildRangersChance() {
@@ -100,12 +108,14 @@ class ClassAttackValue {
         $this->chance['only'] = 'bow';
         $this->chance['class_name'] = 'Ranger';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('bow');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildVampiresChance() {
         $this->chance['type'] = Self::VAMPIRE_THIRST;
         $this->chance['class_name'] = 'Vampire';
         $this->chance['has_item'] = true;
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     protected function hasItemTypeEquipped(string $type): bool {

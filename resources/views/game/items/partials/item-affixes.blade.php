@@ -19,6 +19,8 @@
                                 <dd class="{{$item->itemPrefix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
                                 <dt>Base Healing Modifier:</dt>
                                 <dd class="{{$item->itemPrefix->base_healing_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_healing_mod * 100}}%</dd>
+                                <dt>Class Bonus Mod:</dt>
+                                <dd class="{{$item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->class_bonus * 100}}%</dd>
                                 <dt>Base Fight Timeout Modifier:</dt>
                                 <dd class="{{$item->itemPrefix->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->fight_time_out_mod_bonus * 100}}%</dd>
                                 <dt>Str Modifier:</dt>
@@ -78,6 +80,8 @@
                                 <dd class="{{$item->itemSuffix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_ac_mod * 100}}%</dd>
                                 <dt>Base Healing Modifier:</dt>
                                 <dd class="{{$item->itemSuffix->base_healing_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_healing_mod * 100}}%</dd>
+                                <dt>Class Bonus Mod:</dt>
+                                <dd class="{{$item->itemSuffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->class_bonus * 100}}%</dd>
                                 <dt>Base Fight Timeout Modifier:</dt>
                                 <dd class="{{$item->itemSuffix->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->fight_time_out_mod_bonus * 100}}%</dd>
                                 <dt>Str Modifier:</dt>

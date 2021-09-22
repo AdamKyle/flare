@@ -25,6 +25,8 @@
                                 <dd>{{$itemAffix->base_ac_mod * 100}}%</dd>
                                 <dt>Base Healing Mod:</dt>
                                 <dd>{{$itemAffix->base_healing_mod * 100}}%</dd>
+                                <dt>Class Bonus Mod:</dt>
+                                <dd>{{$itemAffix->class_bonus * 100}}%</dd>
                                 <dt>Str Modifier:</dt>
                                 <dd>{{$itemAffix->str_mod * 100}}%</dd>
                                 <dt>Dex Modifier:</dt>

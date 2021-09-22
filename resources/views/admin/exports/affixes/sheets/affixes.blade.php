@@ -13,6 +13,7 @@
             <th>int_mod</th>
             <th>agi_mod</th>
             <th>focus_mod</th>
+            <th>class_bonus</th>
             <th>damage</th>
             <th>int_required</th>
             <th>skill_level_required</th>
@@ -48,6 +49,7 @@
             <td>{{$affix->int_mod}}</td>
             <td>{{$affix->agi_mod}}</td>
             <td>{{$affix->focus_mod}}</td>
+            <td>{{$affix->class_bonus}}</td>
             <td>{{$affix->damage}}</td>
             <td>{{$affix->int_required}}</td>
             <td>{{$affix->skill_level_required}}</td>

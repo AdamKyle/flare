@@ -106,7 +106,7 @@ class InfoPageController extends Controller
     public function viewClass(Request $request, GameClass $class) {
         return view('information.classes.class', [
             'class' => $class,
-            'classBonus' => (new ClassBonusInformation())->buildClassBonusDetails($class->name),
+            'classBonus' => (new ClassBonusInformation())->buildClassBonusDetailsForInfo($class->name),
         ]);
     }
 

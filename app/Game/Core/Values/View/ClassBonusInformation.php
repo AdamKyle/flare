@@ -2,19 +2,43 @@
 
 namespace App\Game\Core\Values\View;
 
+use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Models\Character;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ClassAttackValue;
 use Illuminate\Support\Str;
 
 class ClassBonusInformation {
 
-    public function buildClassBonusDetails(string $className): array {
+    public function buildClassBonusDetailsForInfo(string $className): array {
         $classAttackValue = new CharacterClassValue($className);
 
         $details = [
             'base_chance' => 0.05,
         ];
 
+        $details = array_merge($details,  $this->getClassDetails($classAttackValue, $details));
+
+        return $details;
+    }
+
+    public function buildClassBonusDetails(Character $character): array {
+        $classAttackValue = new CharacterClassValue($character->class->name);
+
+        $information = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+
+        $details = [
+            'base_chance' => 0.05,
+        ];
+
+        $details = array_merge($details,  $this->getClassDetails($classAttackValue, $details));
+
+        $details['base_chance'] = $details['base_chance'] + $information->classBonus();
+
+        return $details;
+    }
+
+    protected function getClassDetails(CharacterClassValue $classAttackValue, array $details): array  {
         if ($classAttackValue->isFighter()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::FIGHTERS_DOUBLE_DAMAGE);
             $details['requires'] = 'Weapon equipped';

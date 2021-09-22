@@ -36,6 +36,7 @@ class AffixModifier extends Component
         'itemAffix.base_ac_mod_bonus'        => 'nullable',
         'itemAffix.fight_time_out_mod_bonus' => 'nullable',
         'itemAffix.move_time_out_mod_bonus'  => 'nullable',
+        'itemAffix.class_bonus'              => 'nullable',
     ];
 
     public function update($id) {

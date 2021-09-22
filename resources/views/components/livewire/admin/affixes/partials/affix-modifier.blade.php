@@ -40,16 +40,22 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="item-affix-int-mod">Int Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-affix-int-mod" name="item-affix-int-mod" wire:model="itemAffix.int_mod">
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group">
                 <label for="item-affix-chr-mod">Chr Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-affix-chr-mod" name="item-affix-chr-mod" wire:model="itemAffix.chr_mod">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="item-affix-class-bonus-mod">Class Bonus Mod: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-class-bonus-mod" name="item-affix-class-bonus-mod" wire:model="itemAffix.class_bonus">
             </div>
         </div>
     </div>

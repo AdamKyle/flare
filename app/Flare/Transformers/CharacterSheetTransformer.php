@@ -65,7 +65,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'shards'            => number_format($character->shards),
             'force_name_change' => $character->force_name_change,
             'timeout_until'     => $character->user->timeout_until,
-            'class_bonus'       => (new ClassBonusInformation())->buildClassBonusDetails($character->class->name),
+            'class_bonus'       => (new ClassBonusInformation())->buildClassBonusDetails($character),
             'inventory_used'    => $character->getInventoryCount(),
             'inventory_max'     => $character->inventory_max,
             'can_adventure'     => $character->can_adventure,

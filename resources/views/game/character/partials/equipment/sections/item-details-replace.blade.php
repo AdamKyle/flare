@@ -26,6 +26,8 @@
             <dd>{{$details['replaces_item']->itemPrefix->base_damage_mod * 100}}%</dd>
             <dt>Base Damage Modifier (affects skills):</dt>
             <dd>{{$item->itemPrefix->base_damage_mod_bonus * 100}}%</dd>
+            <dt>Class Bonus Mod:</dt>
+            <dd class="{{$item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->class_bonus * 100}}%</dd>
             <dt>Base AC:</dt>
             <dd>{{$details['replaces_item']->itemPrefix->base_ac_mod * 100}}%</dd>
             <dt>Description:</dt>
@@ -45,9 +47,11 @@
             <dt>Name:</dt>
             <dd>{{$details['replaces_item']->itemSuffix->name}}</dd>
             <dt>Base Attack Bonus:</dt>
-            <dd>{{$details['replaces_item']->itemPrefix->base_damage_mod * 100}}%</dd>
+            <dd>{{$details['replaces_item']->itemSuffix->base_damage_mod * 100}}%</dd>
             <dt>Base Damage Modifier (affects skills):</dt>
-            <dd>{{$item->itemPrefix->base_damage_mod_bonus * 100}}%</dd>
+            <dd>{{$details['replaces_item']->itemSuffix->base_damage_mod_bonus * 100}}%</dd>
+            <dt>Class Bonus Mod:</dt>
+            <dd>{{$details['replaces_item']->itemSuffix->class_bonus * 100}}%</dd>
             <dt>Base AC:</dt>
             <dd>{{$details['replaces_item']->itemSuffix->base_ac_mod * 100}}%</dd>
             <dt>Description:</dt>

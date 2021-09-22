@@ -19,6 +19,8 @@
                         <dd>{{$details['slot']->item->itemPrefix->name}}</dd>
                         <dt>Base Damage:</dt>
                         <dd class="{{$details['slot']->item->itemPrefix->base_damage_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->base_damage_mod * 100}}%</dd>
+                        <dt>Class Bonus Mod:</dt>
+                        <dd class="{{$details['slot']->item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->class_bonus * 100}}%</dd>
                         <dt>Base AC:</dt>
                         <dd class="{{$details['slot']->item->itemPrefix->base_ac_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
@@ -67,6 +69,8 @@
                         <dd>{{$details['slot']->item->itemSuffix->name}}</dd>
                         <dt>Base Damage:</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->base_damage_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->base_damage_mod * 100}}%</dd>
+                        <dt>Class Bonus Mod:</dt>
+                        <dd class="{{$details['slot']->item->itemSuffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->class_bonus * 100}}%</dd>
                         <dt>Base AC:</dt>
                         <dd class="{{$details['slot']->item->itemSuffix->base_ac_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>

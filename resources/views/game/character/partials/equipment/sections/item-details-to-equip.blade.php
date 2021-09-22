@@ -13,6 +13,8 @@
                         <dd class="{{$item->itemPrefix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod * 100}}%</dd>
                         <dt>Base Damage Modifier (affects skills):</dt>
                         <dd class="{{$item->itemPrefix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod_bonus * 100}}%</dd>
+                        <dt>Class Bonus Mod:</dt>
+                        <dd class="{{$item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->class_bonus * 100}}%</dd>
                         <dt>Base AC:</dt>
                         <dd class="{{$item->itemPrefix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
@@ -63,6 +65,8 @@
                         <dd class="{{$item->itemSuffix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_damage_mod * 100}}%</dd>
                         <dt>Base Damage Modifier (affects skills):</dt>
                         <dd class="{{$item->itemSuffix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_damage_mod_bonus * 100}}%</dd>
+                        <dt>Class Bonus Mod:</dt>
+                        <dd class="{{$item->itemSuffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->class_bonus * 100}}%</dd>
                         <dt>Base AC:</dt>
                         <dd class="{{$item->itemSuffix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_ac_mod * 100}}%</dd>
                         <dt>Affects Skill:</dt>
