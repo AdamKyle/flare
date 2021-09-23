@@ -129,13 +129,19 @@ class CharacterInformationBuilder {
      * @return ItemAffix|null
      */
     public function findPrefixStatReductionAffix(): ?ItemAffix {
-        return $this->fetchInventory()->filter(function($slot) {
+        $slot = $this->fetchInventory()->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix))  {
                 if ($slot->item->itemPrefix->reduces_enemy_stats) {
                     return $slot;
                 }
             }
-        })->first()->item->itemPrefix;
+        })->first();
+
+        if (!is_null($slot)) {
+            return $slot->item->itemPrefix;
+        }
+
+        return null;
     }
 
     /**
