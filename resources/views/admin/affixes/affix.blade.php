@@ -154,6 +154,62 @@
                     </div>
                 </div>
             @endif
+            @if ($itemAffix->reduces_enemy_stats)
+                <h2 class="mt-2 mb-2">Stat Reduction</h2>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Affixes that reduce stats can and cannot stack. For example: Prefixes cannot stack, but Suffixes can.
+                        </p>
+                        <p>
+                            If you have multiple prefixes attached that reduce all enemy stats, we will take the first one. Doesn't matter
+                            what it is.
+                        </p>
+                        <p>
+                            Stat reduction is applied before anything else is done, but can be resisted unless you have the appropriate quest item.
+                        </p>
+                        <dl>
+                            <dt>Str Reduction:</dt>
+                            <dd>{{$itemAffix->str_reduction * 100}}%</dd>
+                            <dt>Dex Reduction:</dt>
+                            <dd>{{$itemAffix->dex_reduction * 100}}%</dd>
+                            <dt>Dur Reduction:</dt>
+                            <dd>{{$itemAffix->dur_reduction * 100}}%</dd>
+                            <dt>Int Reduction:</dt>
+                            <dd>{{$itemAffix->int_reduction * 100}}%</dd>
+                            <dt>Chr Reduction:</dt>
+                            <dd>{{$itemAffix->chr_reduction * 100}}%</dd>
+                            <dt>Agi Reduction:</dt>
+                            <dd>{{$itemAffix->agi_reduction * 100}}%</dd>
+                            <dt>Focus Reduction:</dt>
+                            <dd>{{$itemAffix->focus_reduction * 100}}%</dd>
+                        </dl>
+                    </div>
+                </div>
+            @endif
+            @if (!is_null($itemAffix->steal_life_amount))
+                <h2 class="mt-2 mb-2">Life Stealing Amount</h2>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            These Affixes can and cannot stack. If you are a vampire they will stack and you have a chance for them to fire twice.
+                            The first time they can fire is during the attack and the second time is after the enemies round if you or
+                            the enemy is still alive.
+                        </p>
+                        <p>The chance aspect depends on the enemies affix resistance, assuming you do not have the appropriate quest item.</p>
+                        <p>
+                            If you are <strong>not</strong> a vampire, these affixes will
+                            <strong>NOT</strong> stack. Instead we will use your highest and it will only fire after the enemy attack.
+                        </p>
+                        <dl>
+                            <dt>Steal Life Amount:</dt>
+                            <dd>{{$itemAffix->steal_life_amount * 100}}%</dd>
+                        </dl>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

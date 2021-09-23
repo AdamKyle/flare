@@ -78,6 +78,7 @@ export default class Attack {
         this.doAttack(attacker, type);
 
         if (type === 'monster') {
+          this.affixesLifeStealing(defender, attacker, new Damage());
           this.healSelf(defender);
         }
 
@@ -147,9 +148,23 @@ export default class Attack {
     if (type === 'player') {
       const damage = new Damage();
 
-      this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth);
+      if (attacker.class === 'Vampire') {
+        this.affixesLifeStealing(attacker, defender, damage);
+      } else {
+        this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth);
+      }
+
       this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
     }
+  }
+
+  affixesLifeStealing(attacker, defender, damage) {
+    const details = damage.affixLifeSteal(attacker, defender, this.monsterCurrentHealth, this.characterCurrentHealth);
+
+    this.monsterCurrentHealth = details.monsterCurrentHealth;
+    this.characterCurrentHealth = details.characterHealth;
+
+    this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
   }
 
   castSpells(attacker, defender, type) {
@@ -250,7 +265,7 @@ export default class Attack {
     }
 
     if (type === 'monster') {
-      const dc        = 100 - defender.spell_evasion;
+      const dc        = 100 - (100 * defender.spell_evasion);
       let totalDamage = attacker.spell_damage;
 
       if (dc <= 0 || random(1, 100) > dc) {
@@ -271,7 +286,7 @@ export default class Attack {
 
   artifactDamage(attacker, defender, type) {
     if (type === 'player') {
-      const dc        = 100 - defender.artifact_annulment;
+      const dc        = 100 - (100 * defender.artifact_annulment);
       let totalDamage = attacker.artifact_damage;
 
       if (dc <= 0 || random(1, 100) > dc) {
@@ -290,7 +305,7 @@ export default class Attack {
     }
 
     if (type === 'monster') {
-      const dc        = 100 - defender.artifact_annulment;
+      const dc        = 100 - (100 * defender.artifact_annulment);
       let totalDamage = attacker.artifact_damage;
 
       if (dc <= 0 || random(1, 100) > dc) {

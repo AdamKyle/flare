@@ -1,115 +1,22 @@
-<dl>
-    <dt>Damage:</dt>
-    <dd>{{$details['slot']->item->getTotalDamage()}} <em>(With all modifiers)</em></dd>
-    <dt>Position:</dt>
-    <dd>{{title_case(str_replace('-', ' ', $details['slot']->position))}}</dd>
-</dl>
-<hr />
 
 @if (!is_null($details['slot']->item->itemPrefix) || !is_null($details['slot']->item->itemSuffix))
     <div class="container">
-        <h4>Attached Affixes</h4>
+        <h4 class="text-center">Attached Affixes</h4>
 
-        @if (!is_null($details['slot']->item->itemPrefix))
-            <hr />
-            <div class="row">
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Name:</dt>
-                        <dd>{{$details['slot']->item->itemPrefix->name}}</dd>
-                        <dt>Base Damage:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->base_damage_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->base_damage_mod * 100}}%</dd>
-                        <dt>Class Bonus Mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->class_bonus * 100}}%</dd>
-                        <dt>Base AC:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->base_ac_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->base_ac_mod * 100}}%</dd>
-                        <dt>Affects Skill:</dt>
-                        @php $name = $details['slot']->item->itemPrefix->skill_name; @endphp
-                        <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
-                        <dt>XP Bonus (when using):</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->skill_training_bonus * 100}}%</dd>
-                        <dt>Bonus (when using):</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->skill_bonus * 100}}%</dd>
-                        @if ($details['slot']->item->itemPrefix->damage !== 0)
-                            <dt>Damage:</dt>
-                            <dd>{{$details['slot']->item->itemPrefix->damage}}</dd>
-                            <dt>Is Damage Irresistible?:</dt>
-                            <dd>{{$details['slot']->item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
-                            <dt>Can Stack:</dt>
-                            <dd>{{$details['slot']->item->itemPrefix->damage_can_stack ? 'Yes' : 'No'}}</dd>
-                        @endif
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Str mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->str_mod * 100}}%</dd>
-                        <dt>Dur mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->dur_mod * 100}}%</dd>
-                        <dt>Dex mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->dex_mod * 100}}%</dd>
-                        <dt>Chr mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->chr_mod * 100}}%</dd>
-                        <dt>Int mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->int_mod * 100}}%</dd>
-                        <dt>Agi mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->agi_mod * 100}}%</dd>
-                        <dt>Focus mod:</dt>
-                        <dd class="{{$details['slot']->item->itemPrefix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemPrefix->focus_mod * 100}}%</dd>
-                    </dl>
-                </div>
+        <div class="row">
+            <div class={{!is_null($details['slot']->item->itemSuffix) ? 'col-md-6' : 'col-md-12'}}>
+                @if (!is_null($details['slot']->item->itemPrefix))
+                    <hr />
+                    @include('game.items.partials.item-prefix', ['item' => $details['slot']->item])
+                @endif
             </div>
-        @endif
-        @if (!is_null($details['slot']->item->itemSuffix))
-            <hr />
-            <div class="row">
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Name:</dt>
-                        <dd>{{$details['slot']->item->itemSuffix->name}}</dd>
-                        <dt>Base Damage:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->base_damage_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->base_damage_mod * 100}}%</dd>
-                        <dt>Class Bonus Mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->class_bonus * 100}}%</dd>
-                        <dt>Base AC:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->base_ac_mod > 0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->base_ac_mod * 100}}%</dd>
-                        <dt>Affects Skill:</dt>
-                        @php $name = $details['slot']->item->itemSuffix->skill_name; @endphp
-                        <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
-                        <dt>XP Bonus (when using):</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->skill_training_bonus * 100}}%</dd>
-                        <dt>Bonus (when using):</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->skill_bonus * 100}}%</dd>
-                        @if ($details['slot']->item->itemSuffix->damage !== 0)
-                            <dt>Damage:</dt>
-                            <dd class="text-success">{{$details['slot']->item->itemSuffix->damage}}</dd>
-                            <dt>Is Damage Irresistible?:</dt>
-                            <dd>{{$details['slot']->item->itemSuffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
-                            <dt>Can Stack:</dt>
-                            <dd>{{$details['slot']->item->itemSuffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
-                        @endif
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Str mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->str_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->str_mod * 100}}%</dd>
-                        <dt>Dur mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->dur_mod * 100}}%</dd>
-                        <dt>Dex mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->dex_mod * 100}}%</dd>
-                        <dt>Chr mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->chr_mod * 100}}%</dd>
-                        <dt>Int mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->int_mod * 100}}%</dd>
-                        <dt>Agi mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->agi_mod * 100}}%</dd>
-                        <dt>Focus mod:</dt>
-                        <dd class="{{$details['slot']->item->itemSuffix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$details['slot']->item->itemSuffix->focus_mod * 100}}%</dd>
-                    </dl>
-                </div>
+            <div class={{!is_null($details['slot']->item->itemPrefix) ? 'col-md-6' : 'col-md-12'}}>
+                @if (!is_null($details['slot']->item->itemSuffix))
+                    <hr />
+                    @include('game.items.partials.item-suffix', ['item' => $details['slot']->item])
+                @endif
             </div>
-        @endif
+        </div>
     </div>
     <hr />
 @endif
@@ -138,3 +45,10 @@
     </div>
     <hr />
 @endif
+<h4 class="mt-3">Position</h4>
+<hr />
+<dl>
+    <dt>Position:</dt>
+    <dd>{{title_case(str_replace('-', ' ', $details['slot']->position))}}</dd>
+</dl>
+<hr />

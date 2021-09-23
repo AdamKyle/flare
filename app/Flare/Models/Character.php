@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Values\CharacterClassValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Traits\WithSearch;
@@ -174,6 +175,16 @@ class Character extends Model
         $info = resolve(CharacterInformationBuilder::class);
 
         return $info->setCharacter($this);
+    }
+
+    /**
+     * Returns the character class value.
+     *
+     * @return CharacterClassValue
+     * @throws \Exception
+     */
+    public function classType(): CharacterClassValue {
+        return new CharacterClassValue($this->class->name);
     }
 
     /**

@@ -1,111 +1,21 @@
 @if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix))
     <div class="container">
-        <h4>Attached Affixes</h4>
+        <h4 class="text-center">Attached Affixes</h4>
 
-        @if (!is_null($item->itemPrefix))
-            <hr />
-            <div class="row">
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Name:</dt>
-                        <dd>{{$item->itemPrefix->name}}</dd>
-                        <dt>Base Attack Bonus:</dt>
-                        <dd class="{{$item->itemPrefix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod * 100}}%</dd>
-                        <dt>Base Damage Modifier (affects skills):</dt>
-                        <dd class="{{$item->itemPrefix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod_bonus * 100}}%</dd>
-                        <dt>Class Bonus Mod:</dt>
-                        <dd class="{{$item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->class_bonus * 100}}%</dd>
-                        <dt>Base AC:</dt>
-                        <dd class="{{$item->itemPrefix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
-                        <dt>Affects Skill:</dt>
-                        @php $name = $item->itemPrefix->skill_name; @endphp
-                        <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
-                        <dt>XP Bonus (when using):</dt>
-                        <dd class="{{$item->itemPrefix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->skill_training_bonus * 100}}%</dd>
-                        <dt>Bonus (when using):</dt>
-                        <dd class="{{$item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->skill_bonus * 100}}%</dd>
-                        @if ($item->itemPrefix->damage !== 0)
-                            <dt>Damage:</dt>
-                            <dd>{{$item->itemPrefix->damage}}</dd>
-                            <dt>Is Damage Irresistible?:</dt>
-                            <dd>{{$item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
-                            <dt>Can Stack:</dt>
-                            <dd>{{$item->itemPrefix->damage_can_stack ? 'Yes' : 'No'}}</dd>
-                        @endif
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Str mod:</dt>
-                        <dd class="{{$item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->str_mod * 100}}%</dd>
-                        <dt>Dur mod:</dt>
-                        <dd class="{{$item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dur_mod * 100}}%</dd>
-                        <dt>Dex mod:</dt>
-                        <dd class="{{$item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dex_mod * 100}}%</dd>
-                        <dt>Chr mod:</dt>
-                        <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->chr_mod * 100}}%</dd>
-                        <dt>Int mod:</dt>
-                        <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->int_mod * 100}}%</dd>
-                        <dt>Agi mod:</dt>
-                        <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->agi_mod * 100}}%</dd>
-                        <dt>Focus mod:</dt>
-                        <dd class="{{$item->itemPrefix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->focus_mod * 100}}%</dd>
-                    </dl>
-                </div>
+        <div class="row">
+            <div class={{!is_null($item->itemSuffix) ? 'col-md-6' : 'col-md-12'}}>
+                @if (!is_null($item->itemPrefix))
+                    <hr />
+                    @include('game.items.partials.item-prefix', ['item' => $item])
+                @endif
             </div>
-        @endif
-        @if (!is_null($item->itemSuffix))
-            <hr />
-            <div class="row">
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Name:</dt>
-                        <dd>{{$item->itemSuffix->name}}</dd>
-                        <dt>Base Attack Bonus:</dt>
-                        <dd class="{{$item->itemSuffix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_damage_mod * 100}}%</dd>
-                        <dt>Base Damage Modifier (affects skills):</dt>
-                        <dd class="{{$item->itemSuffix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_damage_mod_bonus * 100}}%</dd>
-                        <dt>Class Bonus Mod:</dt>
-                        <dd class="{{$item->itemSuffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->class_bonus * 100}}%</dd>
-                        <dt>Base AC:</dt>
-                        <dd class="{{$item->itemSuffix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->base_ac_mod * 100}}%</dd>
-                        <dt>Affects Skill:</dt>
-                        @php $name = $item->itemSuffix->skill_name; @endphp
-                        <dd>{{!is_null($name) ? $name : 'N/A'}}</dd>
-                        <dt>XP Bonus (when using):</dt>
-                        <dd class="{{$item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->skill_training_bonus * 100}}%</dd>
-                        <dt>Bonus (when using):</dt>
-                        <dd class="{{$item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->skill_bonus * 100}}%</dd>
-                        @if ($item->itemSuffix->damage !== 0)
-                            <dt>Damage:</dt>
-                            <dd class="text-success">{{$item->itemSuffix->damage}}</dd>
-                            <dt>Is Damage Irresistible?:</dt>
-                            <dd>{{$item->itemSuffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
-                            <dt>Can Stack:</dt>
-                            <dd>{{$item->itemSuffix->damage_can_stack ? 'Yes' : 'No'}}</dd>
-                        @endif
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl>
-                        <dt>Str mod:</dt>
-                        <dd class="{{$item->itemSuffix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->str_mod * 100}}%</dd>
-                        <dt>Dur mod:</dt>
-                        <dd class="{{$item->itemSuffix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dur_mod * 100}}%</dd>
-                        <dt>Dex mod:</dt>
-                        <dd class="{{$item->itemSuffix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dex_mod * 100}}%</dd>
-                        <dt>Chr mod:</dt>
-                        <dd class="{{$item->itemSuffix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->chr_mod * 100}}%</dd>
-                        <dt>Int mod:</dt>
-                        <dd class="{{$item->itemSuffix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->int_mod * 100}}%</dd>
-                        <dt>Agi mod:</dt>
-                        <dd class="{{$item->itemSuffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->agi_mod * 100}}%</dd>
-                        <dt>Focus mod:</dt>
-                        <dd class="{{$item->itemSuffix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_mod * 100}}%</dd>
-                    </dl>
-                </div>
+            <div class={{!is_null($item->itemPrefix) ? 'col-md-6' : 'col-md-12'}}>
+                @if (!is_null($item->itemSuffix))
+                    <hr />
+                    @include('game.items.partials.item-suffix', ['item' => $item])
+                @endif
             </div>
-        @endif
+        </div>
     </div>
     <hr />
 @endif
@@ -128,7 +38,7 @@
     </div>
     <hr />
 @endif
-<h6>Stat Details:</h6>
+<h4>Stat Details:</h4>
 <p>These stat increases so <span class="text-success">green for any increase</span> and <span class="text-danger"> red for any decrease</span></p>
 @if (empty($details))
     @include('game.character.partials.equipment.sections.equip.details.item-stat-details', ['item' => $item])

@@ -5,7 +5,7 @@
             @include('game.character.partials.equipment.sections.currently-equipped', [
                 'details' => $equipment
             ])
-            <h6 class="mb-4">Stat Details:</h6>
+            <h4 class="mb-4">Stat Details:</h4>
             @include('game.character.partials.equipment.sections.item-stat-details', ['item' => $equipment['slot']->item])
         @endif
 

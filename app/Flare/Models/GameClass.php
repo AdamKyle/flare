@@ -57,6 +57,7 @@ class GameClass extends Model
         return $this->hasMany(GameSkill::class, 'game_class_id', 'id');
     }
 
+
     protected static function newFactory() {
         return GameClassFactory::new();
     }

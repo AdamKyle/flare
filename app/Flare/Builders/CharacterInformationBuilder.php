@@ -144,6 +144,40 @@ class CharacterInformationBuilder {
         return null;
     }
 
+    public function findLifeStealingAffixes(bool $canStack = false): float {
+        $slots = $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                if (!is_null($slot->item->itemPrefix->steal_life_amount)) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                if (!is_null($slot->item->itemSuffix->steal_life_amount)) {
+                    return $slot;
+                }
+            }
+        });
+
+        if ($canStack) {
+            return $slots->sum('item.itemSuffix.steal_life_amount') + $slots->sum('item.itemPrefix.steal_life_amount');
+        }
+
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                $values[] = $slot->item->itemPrefix->steal_life_amount;
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                $values[] = $slot->item->itemSuffix->steal_life_amount;
+            }
+        }
+
+        return empty($values) ? 0.0 : max($values);
+    }
+
     /**
      * Returns a collection of single stat reduction affixes.
      *

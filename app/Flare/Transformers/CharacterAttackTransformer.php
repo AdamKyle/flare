@@ -60,6 +60,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'stats_reducing_slot' => $characterInformation->findPrefixStatReductionAffix(),
             'stat_reducing_slots' => $characterInformation->findSuffixStatReductionAffixes(),
+            'life_steal_amount'   => $characterInformation->findLifeStealingAffixes($character->classType()->isVampire())
         ];
     }
 

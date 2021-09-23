@@ -22,6 +22,39 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
+  affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth) {
+    let totalDamage   = monsterCurrentHealth * attacker.life_steal_amount;
+    const cantResist  = attacker.cant_resist_affixes;
+
+    if (totalDamage > 0) {
+      if (cantResist) {
+        this.battleMessages.push({
+          'message': 'The enemies blood flows through the air and gives you life: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        });
+      } else {
+        const dc = 100 - (100 * defender.affix_resistance);
+
+        if (dc <= 0 || random(1, 100) > dc) {
+          this.battleMessages.push({
+            'message': 'The enemy resists your attempt to steal it\'s life.'
+          });
+        } else {
+          this.battleMessages.push({
+            'message': 'The enemies blood flows through the air and gives you life: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          });
+
+          monsterCurrentHealth = monsterCurrentHealth - totalDamage;
+          characterCurrentHealth = characterCurrentHealth + totalDamage;
+        }
+      }
+    }
+
+    return {
+      characterHealth: characterCurrentHealth,
+      monsterCurrentHealth: monsterCurrentHealth,
+    }
+  }
+
   affixDamage(attacker, defender, monsterCurrentHealth) {
     let totalDamage   = attacker.stacking_affix;
     const cantResist  = attacker.cant_resist_affixes;
@@ -34,7 +67,7 @@ export default class Damage {
       totalDamage += attacker.non_stacking_affix
     } else {
       if (attacker.non_stacking_affix > 0) {
-        const dc = 100 - defender.affix_resistance;
+        const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
           this.battleMessages.push({
@@ -93,7 +126,7 @@ export default class Damage {
   }
 
   calculateSpellDamage(attacker, defender, monsterCurrentHealth, increaseDamage) {
-    const dc        = 100 - defender.spell_evasion;
+    const dc        = 100 - (100 * defender.spell_evasion);
     let totalDamage = attacker.spell_damage;
 
     if (dc <= 0 || random(1, 100) > dc) {
