@@ -97,9 +97,7 @@ class RewardBuilder {
      */
     public function fetchGoldRush(Monster $monster, Character $character, Adventure $adventure, float $gameMapBonus = 0.0): int {
 
-        $lootingChance = $character->skills->where('name', 'Looting')->first()->skill_bonus;
-
-        $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $lootingChance, $gameMapBonus, $adventure);
+        $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $gameMapBonus, $adventure);
 
         if ($hasGoldRush) {
             return $monster->gold + rand(0, 1000);

@@ -15,18 +15,18 @@ class GoldRushCheckCalculator {
      * If true, the check passed and the character should be rewarded.
      *
      * @param Monster $monster
-     * @param float $lootingChance | 0.0
-     * @param Adaventure $adventure | null
+     * @param float $gameMapBonus
+     * @param Adventure|null $adventure | null
      * @return bool
      */
-    public function fetchGoldRushChance(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0, Adventure $adventure = null) {
-        $adventureBonus = $this->getAdventureGoldrushChance($adventure);
+    public function fetchGoldRushChance(Monster $monster, float $gameMapBonus = 0.0, Adventure $adventure = null) {
+        $adventureBonus = $this->getAdventureGoldRushChance($adventure);
 
         if ($adventureBonus >= 1.0) {
             return true;
         }
 
-        $bonus = $lootingChance + $adventureBonus + $gameMapBonus;
+        $bonus = $adventureBonus + $gameMapBonus;
 
         if ($bonus >= 1.0) {
             return true;
@@ -38,7 +38,7 @@ class GoldRushCheckCalculator {
         return $roll > (1000 - (1000 * $monster->drop_check));
     }
 
-    protected function getAdventureGoldrushChance(Adventure $adventure = null): float {
+    protected function getAdventureGoldRushChance(Adventure $adventure = null): float {
         if (!is_null($adventure)) {
             return $adventure->gold_rush_chance;
         }
