@@ -40,7 +40,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'has_artifacts'       => $characterInformation->hasArtifacts(),
             'has_affixes'         => $characterInformation->hasAffixes(),
             'non_stacking_affix'  => $characterInformation->getTotalAffixDamage(false),
-            'cant_resist_affixes' => !$characterInformation->canAffixesBeResisted(),
+            'cant_resist_affixes' => $characterInformation->canAffixesBeResisted(),
             'stacking_affix'      => $characterInformation->getTotalAffixDamage(),
             'has_damage_spells'   => $characterInformation->hasDamageSpells(),
             'heal_for'            => $characterInformation->buildHealFor(),
@@ -60,7 +60,8 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'stats_reducing_slot' => $characterInformation->findPrefixStatReductionAffix(),
             'stat_reducing_slots' => $characterInformation->findSuffixStatReductionAffixes(),
-            'life_steal_amount'   => $characterInformation->findLifeStealingAffixes($character->classType()->isVampire())
+            'life_steal_amount'   => $characterInformation->findLifeStealingAffixes($character->classType()->isVampire()),
+            'entranced_chance'    => $characterInformation->getEntrancedChance(),
         ];
     }
 

@@ -255,19 +255,21 @@ class FightService {
 
         $extraAttack = resolve(AttackExtraActionHandler::class);
 
-        if (!$this->canHit($attacker, $defender, $extraAttack)) {
-            if ($attacker instanceof Character) {
-                if ($this->character->classType()->isVampire()) {
-                    $canResist  = !$this->characterInformation->canAffixesBeResisted();
-                    $damage     = $this->characterInformation->findLifeStealingAffixes(true);
-                    $messages   = array_merge($messages, $this->useLifeStealingAffixes($damage, $canResist));
-                }
-            }
+        if ($this->entrancedEnemy($attacker, $defender)) {
+            $messages = array_merge($messages, $this->completeAttack($attacker, $defender));
 
-            $messages   = array_merge($messages, $this->useAffixes($attacker, $defender));
-            $messages   = array_merge($messages, $this->castSpell($attacker, $defender));
-            $messages   = array_merge($messages, $this->useAtifacts($attacker, $defender));
-            $messages   = array_merge($messages, $this->useRings($attacker));
+            $this->logInformation[] = [
+                'attacker'   => $attacker->name,
+                'defender'   => $defender->name,
+                'messages'   => array_merge($this->battleMessageBeforeAttack, $messages),
+                'is_monster' => $attacker instanceOf Character ? false : true
+            ];
+
+            return $this->attack($defender, $attacker);
+        }
+
+        if (!$this->canHit($attacker, $defender, $extraAttack)) {
+            $messages = $this->useItems($attacker, $defender, $messages);
             $messages[] = [$attacker->name . '(weapon) Missed!'];
 
             $this->logInformation[] = [
@@ -290,10 +292,10 @@ class FightService {
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
+            $messages = [];
+
             if ($defender instanceof Character) {
-                $messages = array_merge($messages, $this->useAffixes($attacker, $defender));
-                $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
-                $messages = array_merge($messages, $this->useRings($attacker));
+                $messages = $this->useItems($attacker, $defender, []);
             }
 
             $messages[] = [$defender->name . ' blocked the attack!'];
@@ -323,6 +325,45 @@ class FightService {
         ];
 
         $this->attack($defender, $attacker);
+    }
+
+    protected function entrancedEnemy($attacker, $defender): bool {
+        if ($attacker instanceof Character) {
+            if ($this->characterInformation->getEntrancedChance() > 0.0) {
+                if ($this->characterInformation->canAffixesBeResisted()) {
+                    $this->battleMessageBeforeAttack[] = ['The enemy is dazed by your enchantments!'];
+                    return true;
+                } else {
+                    $dc = 100 - (100 * $defender->affix_resistance);
+
+                    if ($dc <= 0 || rand(1, 100) > $dc) {
+                        $this->battleMessageBeforeAttack[] = ['The enemy is resists your entrancing enchantments!'];
+                        return false;
+                    }
+
+                    $this->battleMessageBeforeAttack[] = ['The enemy is dazed by your enchantments!'];
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected function useItems($attacker, $defender, array $messages): array {
+        if ($attacker instanceof Character) {
+            if ($this->character->classType()->isVampire()) {
+                $canResist  = $this->characterInformation->canAffixesBeResisted();
+                $damage     = $this->characterInformation->findLifeStealingAffixes(true);
+                $messages   = array_merge($messages, $this->useLifeStealingAffixes($damage, $canResist));
+            }
+        }
+
+        $messages   = array_merge($messages, $this->useAffixes($attacker, $defender));
+        $messages   = array_merge($messages, $this->castSpell($attacker, $defender));
+        $messages   = array_merge($messages, $this->useAtifacts($attacker, $defender));
+
+        return array_merge($messages, $this->useRings($attacker));
     }
 
     protected function canHit($attacker, $defender, AttackExtraActionHandler $extraActionHandler): bool {
@@ -456,7 +497,7 @@ class FightService {
 
         if ($attacker instanceof Character) {
             $totalDamage = $this->characterInformation->getTotalAffixDamage();
-            $cantResist  = !$this->characterInformation->canAffixesBeResisted();
+            $cantResist  = $this->characterInformation->canAffixesBeResisted();
 
             if ($cantResist) {
                 $messages[] = ['The enemy cannot resist your enchantments! They are so glowy!'];
@@ -741,10 +782,7 @@ class FightService {
 
         if ($attacker instanceof Character) {
 
-            $messages = array_merge($messages, $this->useAffixes($attacker, $defender));
-            $messages = array_merge($messages, $this->castSpell($attacker, $defender));
-            $messages = array_merge($messages, $this->useAtifacts($attacker, $defender));
-            $messages = array_merge($messages, $this->useRings($attacker));
+            $messages = $this->useItems($attacker, $defender, []);
 
             $extraAttack = resolve(AttackExtraActionHandler::class);
 
@@ -767,7 +805,7 @@ class FightService {
 
                 $messages = array_merge($messages, $this->extraHealing());
             } else if ($this->currentCharacterHealth > 0 && $this->currentCharacterHealth < $this->characterInformation->buildHealth()) {
-                $canResist  = !$this->characterInformation->canAffixesBeResisted();
+                $canResist  = $this->characterInformation->canAffixesBeResisted();
                 $damage     = $this->characterInformation->findLifeStealingAffixes(true);
                 $messages   = array_merge($messages, $this->useLifeStealingAffixes($damage, $canResist));
                 $messages   = array_merge($messages, $this->castHealingSpell($defender));

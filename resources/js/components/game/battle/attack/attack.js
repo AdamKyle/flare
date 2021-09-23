@@ -39,11 +39,20 @@ export default class Attack {
       return this;
     }
 
+    const isEntranced = this.canEntranceEnemy(attacker, defender, type);
+
+    if (isEntranced) {
+      this.itemUsage(attacker, defender, type);
+
+      this.doAttack(attacker, type);
+
+      if (attackAgain) {
+        return this.attack(defender, attacker, false, 'monster');
+      }
+    }
+
     if (!this.canHit(attacker, defender, type)) {
-      this.affixesFire(attacker, defender, type);
-      this.castSpells(attacker, defender, type);
-      this.useArtifacts(attacker, defender, type);
-      this.useRings(attacker, defender, type);
+      this.itemUsage(attacker, defender, type);
 
       this.battleMessages.push({
         message: this.attackerName + ' (weapon) missed!'
@@ -56,9 +65,7 @@ export default class Attack {
       }
     } else {
       if (this.blockedAttack(defender, attacker, type)) {
-        this.affixesFire(attacker, defender, type);
-        this.useArtifacts(attacker, defender, type);
-        this.useRings(attacker, defender, type);
+        this.itemUsage(attacker, defender, type);
 
         this.battleMessages.push({
           message: defender.name + ' blocked the (weapon) attack!'
@@ -70,15 +77,15 @@ export default class Attack {
           return this.attack(defender, attacker, false, 'monster');
         }
       } else {
-        this.affixesFire(attacker, defender, type);
-        this.castSpells(attacker, defender, type);
-        this.useArtifacts(attacker, defender, type);
-        this.useRings(attacker, defender, type);
+        this.itemUsage(attacker, defender, type);
 
         this.doAttack(attacker, type);
 
         if (type === 'monster') {
-          this.affixesLifeStealing(defender, attacker, new Damage());
+          if (!this.isCharacterDead()) {
+            this.affixesLifeStealing(defender, attacker, new Damage());
+          }
+
           this.healSelf(defender);
         }
 
@@ -91,6 +98,19 @@ export default class Attack {
     return this;
   }
 
+  itemUsage(attacker, defender, type) {
+    if (type === 'player') {
+      if (attacker.class === 'Vampire') {
+        this.affixesLifeStealing(attacker, defender, type);
+      }
+    }
+
+    this.affixesFire(attacker, defender, type);
+    this.castSpells(attacker, defender, type);
+    this.useArtifacts(attacker, defender, type);
+    this.useRings(attacker, defender, type);
+  }
+
   getState() {
     return {
       characterCurrentHealth: this.characterCurrentHealth,
@@ -98,6 +118,42 @@ export default class Attack {
       battleMessages: this.battleMessages,
       missCounter: this.missed
     }
+  }
+
+  canEntranceEnemy(attacker, defender, type) {
+    let canEntrance   = false;
+
+    if (type === 'player') {
+      if (attacker.entranced_chance > 0.0) {
+        const cantResist = attacker.cant_resist_affixes;
+
+
+        if (cantResist) {
+          this.battleMessages.push({
+            'message': 'The enemy is dazed by your enchantments!'
+          });
+
+          canEntrance = true;
+        } else {
+          const dc = 100 - (100 * defender.affix_resistance);
+
+          if (dc <= 0 || random(0, 100) > dc) {
+            this.battleMessages.push({
+              'message': 'The enemy is resists your entrancing enchantments!'
+            });
+
+          } else {
+            this.battleMessages.push({
+              'message': 'The enemy is dazed by your enchantments!'
+            });
+
+            canEntrance = true;
+          }
+        }
+      }
+    }
+
+    return canEntrance;
   }
 
   canHit(attacker, defender) {

@@ -178,6 +178,36 @@ class CharacterInformationBuilder {
         return empty($values) ? 0.0 : max($values);
     }
 
+    public function getEntrancedChance(): float {
+        $slots = $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                if ($slot->item->itemPrefix->entranced_chance > 0) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                if ($slot->item->itemSuffix->entranced_chance > 0) {
+                    return $slot;
+                }
+            }
+        });
+
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                $values[] = $slot->item->itemPrefix->entranced_chance;
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                $values[] = $slot->item->itemSuffix->entranced_chance;
+            }
+        }
+
+        return empty($values) ? 0.0 : max($values);
+    }
+
     /**
      * Returns a collection of single stat reduction affixes.
      *
@@ -368,7 +398,7 @@ class CharacterInformationBuilder {
     public function canAffixesBeResisted(): bool {
         return $this->character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE;
-        })->isEmpty();
+        })->isNotEmpty();
     }
 
     /**

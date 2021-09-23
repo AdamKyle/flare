@@ -151,7 +151,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="item-affix-entrance-chance">Entrance Chance: </label>
-                <input type="number" steps="0.01" class="form-control" id="item-affix-entrance-chance" name="item-affix-entrance-chance" wire:model="itemAffix.entrance_chance">
+                <input type="number" steps="0.01" class="form-control" id="item-affix-entrance-chance" name="item-affix-entrance-chance" wire:model="itemAffix.entranced_chance">
             </div>
         </div>
     </div>

@@ -210,6 +210,21 @@
                     </div>
                 </div>
             @endif
+            @if ($itemAffix->entranced_chance > 0)
+                <h2 class="mt-2 mb-2">Entrance Chance</h2>
+
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            These Affixes do not stack. You have percentage chance to entrance the enemy so they cannot block or be missed.
+                        </p>
+                        <dl>
+                            <dt>Entrance Chance:</dt>
+                            <dd>{{$itemAffix->entranced_chance * 100}}%</dd>
+                        </dl>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

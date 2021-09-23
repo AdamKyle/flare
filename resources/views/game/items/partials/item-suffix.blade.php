@@ -63,6 +63,11 @@
         <dt>Steal Life Amount:</dt>
         <dd class={{$item->itemSuffix->steal_life_amount > 0 ? 'text-success' : ''}}>{{$item->itemSuffix->steal_life_amount * 100}}%</dd>
       @endif
+
+      @if ($item->itemSuffix->entranced_chance > 0.0)
+        <dt>Entrance Chance:</dt>
+        <dd class={{$item->itemSuffix->entranced_chance > 0 ? 'text-success' : ''}}>{{$item->itemSuffix->entranced_chance * 100}}%</dd>
+      @endif
     </dl>
   </x-tabs.tab-content-section>
 </x-tabs.tab-content>

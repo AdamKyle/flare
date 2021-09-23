@@ -34,7 +34,7 @@ class AdventureFightServiceTest extends TestCase
 
         $this->seed(GameSkillsSeeder::class);
 
-        $this->setUpBaseEnviroment();
+        $this->setUpBaseEnvironment();
 
         $this->fightService = new AdventureFightService($this->character, $this->adventure);
     }
@@ -87,7 +87,7 @@ class AdventureFightServiceTest extends TestCase
         $this->assertTrue($fightService->tooLong());
     }
 
-    protected function setUpBaseEnviroment() {
+    protected function setUpBaseEnvironment() {
         $user = $this->createUser();
 
         $this->adventure = $this->createNewAdventure();
