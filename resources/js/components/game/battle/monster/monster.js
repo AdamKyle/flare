@@ -1,4 +1,6 @@
 import {randomNumber} from '../../helpers/random_number';
+import {sum, sumBy} from "lodash/math";
+import {groupBy} from "lodash/collection";
 
 export default class Monster {
 
@@ -17,11 +19,11 @@ export default class Monster {
     return parseInt(randomNumber(healthRange[0], healthRange[1]) + this.monster.dur);
   }
 
-  reduceAllStats(affix, canResist) {
+  reduceAllStats(affix, affixes, canResist) {
     let monster = JSON.parse(JSON.stringify(this.monster));
     const dc    = 100 - monster.affix_resistance;
 
-    if (canResist && (dc <= 0 || randomNumber(0, 100) > dc)) {
+    if (!canResist && (dc <= 0 || randomNumber(0, 100) > dc)) {
       return ['Your enemy laughs at your attempt to make them week fails.']
     }
 
@@ -32,6 +34,16 @@ export default class Monster {
     monster.int   = monster.int - (monster.int * affix.int_reduction);
     monster.agi   = monster.agi - (monster.agi * affix.agi_reduction);
     monster.focus = monster.focus - (monster.focus * affix.focus_reduction);
+
+    const stats    = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
+
+    for (let i = 0; i < stats.length; i++) {
+      const iteratee        = stats[i] + '_reduction';
+
+      const sumOfReductions = sumBy(affixes, iteratee);
+
+      monster[stats[i]] = monster[stats[i]] - (monster[stats[i]] * sumOfReductions);
+    }
 
     this.monster = monster;
 

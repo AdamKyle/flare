@@ -2,6 +2,10 @@
 
 namespace App\Flare\Listeners;
 
+use App\Flare\Models\Adventure;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Monster;
+use App\Flare\Models\Skill;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
@@ -21,19 +25,39 @@ class UpdateSkillListener
             return;
         }
 
-        $gameMap = $event->skill->character->map->gameMap;
+        $skillXP = $this->getSkillXp($event->skill, $event->adventure, $event->monster);
 
-        $skillXP = SkillXPCalculator::fetchSkillXP($event->skill, $event->adventure, $event->monster);
+        $this->updateSkill($event->skill, $skillXP);
+
+        if ($event->skill->type()->isDisenchanting()) {
+            $enchantingSkill = Skill::where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)
+                ->where('character_id', $event->skill->character_id)
+                ->first();
+
+            $xp = ceil($this->getSkillXp($enchantingSkill) / 2);
+
+            $this->updateSkill($enchantingSkill, $xp);
+        }
+    }
+
+    protected function getSkillXp(Skill $skill, Adventure $adventure = null, Monster $monster = null): float|int {
+        $gameMap = $skill->character->map->gameMap;
+
+        $skillXP = SkillXPCalculator::fetchSkillXP($skill, $adventure, $monster);
 
         if (!is_null($gameMap->skill_training_bonus)) {
             $skillXP = $skillXP + $skillXP * $gameMap->skill_training_bonus;
         }
 
-        $event->skill->update([
-            'xp' => $event->skill->xp + $skillXP,
+        return $skillXP;
+    }
+
+    protected function updateSkill(Skill $skill, int $skillXP) {
+        $skill->update([
+            'xp' => $skill->xp + $skillXP,
         ]);
 
-        $skill = $event->skill->refresh();
+        $skill = $skill->refresh();
 
         if ($skill->xp >= $skill->xp_max) {
             $level = $skill->level + 1;

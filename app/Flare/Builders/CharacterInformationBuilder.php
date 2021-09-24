@@ -220,7 +220,7 @@ class CharacterInformationBuilder {
                     return $slot;
                 }
             }
-        });
+        })->pluck('item.itemSuffix')->values();
     }
 
     /**

@@ -81,7 +81,7 @@ class DisenchantService {
      * @return int
      */
     protected function updateGoldDust(Character $character, bool $failedCheck = false, Skill $skill = null): int {
-        $goldDust = !$failedCheck ? rand(10, 100) : 1;
+        $goldDust = !$failedCheck ? rand(2, 10) : 1;
 
         if (!$failedCheck && !is_null($skill)) {
             $goldDust += $goldDust * $skill->bonus;

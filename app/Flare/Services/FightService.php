@@ -121,6 +121,16 @@ class FightService {
             $this->monster->agi   = $this->monster->agi - ($this->monster->agi * $affix->agi_reduction);
             $this->monster->focus = $this->monster->focus - ($this->monster->focus * $affix->focus_reduction);
 
+            $stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
+
+            for ($i = 0; $i < count($stats); $i++) {
+                $iteratee = $stats[$i] . '_reduction';
+                $sumOfReductions = $this->characterInformation->findSuffixStatReductionAffixes()->sum($iteratee);
+
+                $this->monster->{$stats[$i]} =
+                    $this->monster->{$stats[$i]} - ($this->monster->{$stats[$i]} * $sumOfReductions);
+            }
+
             $this->battleMessageBeforeAttack[] = ['Your enemy sinks to their knees in agony as you make them weaker.'];
 
             return $this;
