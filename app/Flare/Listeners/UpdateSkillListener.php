@@ -6,6 +6,7 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
+use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
@@ -30,7 +31,7 @@ class UpdateSkillListener
         $this->updateSkill($event->skill, $skillXP);
 
         if ($event->skill->type()->isDisenchanting()) {
-            $enchantingSkill = Skill::where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)
+            $enchantingSkill = Skill::where('game_skill_id', GameSkill::where('type', SkillTypeValue::ENCHANTING)->first()->id)
                 ->where('character_id', $event->skill->character_id)
                 ->first();
 

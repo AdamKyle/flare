@@ -37,7 +37,9 @@ class DisenchantingControllerTest extends TestCase
 
 
     public function testCanDisenchantItem() {
-        $character = $this->character->getCharacter();
+        $character = $this->character->getCharacterFactory()->assignSkill($this->createGameSkill([
+            'type' => SkillTypeValue::ENCHANTING,
+        ]))->getCharacter();
 
         $disenchantingService = Mockery::mock(DisenchantService::class)->makePartial();
 
@@ -57,7 +59,9 @@ class DisenchantingControllerTest extends TestCase
     }
 
     public function testCannotDisenchantItem() {
-        $character = $this->character->getCharacter();
+        $character = $this->character->getCharacterFactory()->assignSkill($this->createGameSkill([
+            'type' => SkillTypeValue::ENCHANTING,
+        ]))->getCharacter();
 
         // Delete it first:
         $this->actingAs($character->user)->json('POST', '/api/disenchant/' . $this->item->id);

@@ -606,20 +606,21 @@
         },
         {
             "name": "deployer/deployer",
-            "version": "v7.0.0-beta.25",
+            "version": "v7.0.0-beta.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/deployer.git",
-                "reference": "23be6f30bd279a8041c5000035f45cf3547a6f54"
+                "reference": "ab08d2f7a5b9bc03e4eadd9e126dc255b6cc01c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/deployer/zipball/23be6f30bd279a8041c5000035f45cf3547a6f54",
-                "reference": "23be6f30bd279a8041c5000035f45cf3547a6f54",
+                "url": "https://api.github.com/repos/deployphp/deployer/zipball/ab08d2f7a5b9bc03e4eadd9e126dc255b6cc01c4",
+                "reference": "ab08d2f7a5b9bc03e4eadd9e126dc255b6cc01c4",
                 "shasum": ""
             },
             "require": {
                 "marcj/topsort": "^2.0",
+                "php": "^8.0|^7.3",
                 "psr/http-message": "^1",
                 "react/http": "^1",
                 "symfony/console": "^5",
@@ -675,7 +676,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-09-18T14:40:05+00:00"
+            "time": "2021-09-23T22:22:54+00:00"
         },
         {
             "name": "doctrine/cache",
