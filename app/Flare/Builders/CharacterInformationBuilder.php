@@ -60,24 +60,14 @@ class CharacterInformationBuilder {
         });
 
         if ($equipped->isEmpty()) {
-            return $base;
+            return $this->characterBoons($base);
         }
 
         foreach ($equipped as $slot) {
             $base += $base * $this->fetchModdedStat($stat, $slot->item);
         }
 
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
-
-            if ($boons->isNotEmpty()) {
-                $sum = $boons->sum('stat_bonus');
-
-                $base += $base + $base * $sum;
-            }
-        }
-
-        return $base;
+        return $this->characterBoons($base);
     }
 
     /**
@@ -325,7 +315,7 @@ class CharacterInformationBuilder {
         $chance    = 0.0;
         $classType = new CharacterClassValue($this->character->class->name);
 
-        if ($classType->isVampire() || $classType->isProphet()) {
+        if ($classType->isProphet()) {
             $chance += 0.05;
         }
 
@@ -525,6 +515,25 @@ class CharacterInformationBuilder {
      */
     public function getTotalSpellEvasion(): float {
         return  $this->getSpellEvasion();
+    }
+
+    /**
+     * applies character boons to the
+     * @param $base
+     * @return float|int
+     */
+    protected function characterBoons($base) {
+        if ($this->character->boons->isNotEmpty()) {
+            $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
+
+            if ($boons->isNotEmpty()) {
+                $sum = $boons->sum('stat_bonus');
+
+                $base += $base + $base * $sum;
+            }
+        }
+
+        return $base;
     }
 
     protected function getHighestDamageValueFromAffixes(Collection $slots, string $suffixType): int {

@@ -185,7 +185,7 @@ class CharacterSheetControllerApiTest extends TestCase {
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
-            'stat_bonus'   => 0.08,
+            'stat_bonus'   => 2.0,
             'started'      => now(),
             'complete'     => now()->addMinutes(100),
             'type'         => ItemUsabilityType::STAT_INCREASE
