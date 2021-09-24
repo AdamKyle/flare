@@ -1,11 +1,18 @@
+@php
+  $baseInfoId  = Str::random(10);
+  $statsId     = Str::random(10);
+  $skillsId    = Str::random(10);
+  $damageId    = Str::random(10);
+@endphp
+
 <x-tabs.pill-tabs-container>
-  <x-tabs.tab tab="prefix-base-info" title="Base Information" selected="true" active="true" />
-  <x-tabs.tab tab="prefix-stats" title="Stats" selected="false" active="false" />
-  <x-tabs.tab tab="prefix-skills" title="Skills" selected="false" active="false" />
-  <x-tabs.tab tab="prefix-damage" title="Damage" selected="false" active="false" />
+  <x-tabs.tab tab="prefix-base-info-{{$baseInfoId}}" title="Base Information" selected="true" active="true" />
+  <x-tabs.tab tab="prefix-stats-{{$statsId}}" title="Stats" selected="false" active="false" />
+  <x-tabs.tab tab="prefix-skills-{{$skillsId}}" title="Skills" selected="false" active="false" />
+  <x-tabs.tab tab="prefix-damage-{{$damageId}}" title="Damage" selected="false" active="false" />
 </x-tabs.pill-tabs-container>
 <x-tabs.tab-content>
-  <x-tabs.tab-content-section tab="prefix-base-info" active="true">
+  <x-tabs.tab-content-section tab="prefix-base-info-{{$baseInfoId}}" active="true">
     <dl>
       <dt>Name:</dt>
       <dd>{{$item->itemPrefix->name}}</dd>
@@ -23,25 +30,48 @@
       <dd class="{{$item->itemPrefix->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->fight_time_out_mod_bonus * 100}}%</dd>
     </dl>
   </x-tabs.tab-content-section>
-  <x-tabs.tab-content-section tab="prefix-stats" active="false">
-    <dl>
-      <dt>Str Modifier:</dt>
-      <dd class="{{$item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->str_mod * 100}}%</dd>
-      <dt>Dex Modifier:</dt>
-      <dd class="{{$item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dex_mod * 100}}%</dd>
-      <dt>Dur Modifier:</dt>
-      <dd class="{{$item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dur_mod * 100}}%</dd>
-      <dt>Int Modifier:</dt>
-      <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->int_mod * 100}}%</dd>
-      <dt>Chr Modifier:</dt>
-      <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->chr_mod * 100}}%</dd>
-      <dt>Agi Modifier:</dt>
-      <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->agi_mod * 100}}%</dd>
-      <dt>Focus Modifier:</dt>
-      <dd class="{{$item->itemPrefix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->focus_nod * 100}}%</dd>
-    </dl>
+  <x-tabs.tab-content-section tab="prefix-stats-{{$statsId}}" active="false">
+    <div class="row">
+      <div class={{$item->itemPrefix->reduces_enemy_stats ? 'col-md-6' : 'col-md-12'}}>
+        <dl>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Str Mod:</dt>
+          <dd class="{{$item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->str_mod * 100}}%</dd>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Dex Mod:</dt>
+          <dd class="{{$item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dex_mod * 100}}%</dd>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Dur Mod:</dt>
+          <dd class="{{$item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dur_mod * 100}}%</dd>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Int Mod:</dt>
+          <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->int_mod * 100}}%</dd>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Chr Mod:</dt>
+          <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->chr_mod * 100}}%</dd>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Agi Mod:</dt>
+          <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->agi_mod * 100}}%</dd>
+          <dt><i class="fas fa-level-up-alt text-success"></i> Focus Mod:</dt>
+          <dd class="{{$item->itemPrefix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_nod * 100}}%</dd>
+        </dl>
+      </div>
+      <div class={{$item->itemPrefix->reduces_enemy_stats ? 'col-md-6' : 'hide'}}>
+        <dl>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Str Mod:</dt>
+          <dd>{{$item->itemPrefix->str_reduction * 100}}%</dd>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Dex Mod:</dt>
+          <dd>{{$item->itemPrefix->dex_reduction * 100}}%</dd>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Dur Mod:</dt>
+          <dd>{{$item->itemPrefix->dur_reduction * 100}}%</dd>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Int Mod:</dt>
+          <dd>{{$item->itemPrefix->int_reduction * 100}}%</dd>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Chr Mod:</dt>
+          <dd>{{$item->itemPrefix->chr_reduction * 100}}%</dd>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Agi Mod:</dt>
+          <dd>{{$item->itemPrefix->agi_reduction * 100}}%</dd>
+          <dt><i class="fas fa-level-down-alt text-danger"></i> Focus Mod:</dt>
+          <dd>{{$item->itemPrefix->focus_reduction * 100}}%</dd>
+        </dl>
+        <p class="mt-2 text-info">Affects enemies only.</p>
+      </div>
+    </div>
   </x-tabs.tab-content-section>
-  <x-tabs.tab-content-section tab="prefix-skills" active="false">
+  <x-tabs.tab-content-section tab="prefix-skills-{{$skillsId}}" active="false">
     <dl>
       <dt>Skill Name:</dt>
       <dd>{{is_null($item->itemPrefix->skill_name) ? 'N/A' : $item->itemPrefix->skill_name}}</dd>
@@ -51,7 +81,7 @@
       <dd class="{{is_null($item->itemPrefix->skill_name) ? $item->itemPrefix->skill_bonus > 0.0 ? 'text-success' : '' : ''}}">{{is_null($item->itemPrefix->skill_bonus) ? 0 : $item->itemPrefix->skill_bonus * 100}}%</dd>
     </dl>
   </x-tabs.tab-content-section>
-  <x-tabs.tab-content-section tab="prefix-damage" active="false">
+  <x-tabs.tab-content-section tab="prefix-damage-{{$damageId}}" active="false">
     <dl>
       <dt>Damage:</dt>
       <dd>{{$item->itemPrefix->damage}}</dd>

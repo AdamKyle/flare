@@ -125,16 +125,17 @@ export default class Attack {
 
     if (type === 'player') {
       if (attacker.entranced_chance > 0.0) {
-        const cantResist = attacker.cant_resist_affixes;
+        const cantResist     = attacker.cant_resist_affixes;
+        const canBeEntranced = random(1, 100) > (100 - (100 * attacker.entranced_chance));
 
 
-        if (cantResist) {
+        if (cantResist || canBeEntranced) {
           this.battleMessages.push({
             'message': 'The enemy is dazed by your enchantments!'
           });
 
           canEntrance = true;
-        } else {
+        } else if (canBeEntranced) {
           const dc = 100 - (100 * defender.affix_resistance);
 
           if (dc <= 0 || random(0, 100) > dc) {
@@ -149,6 +150,10 @@ export default class Attack {
 
             canEntrance = true;
           }
+        } else {
+          this.battleMessages.push({
+            'message': 'The enemy is resists your entrancing enchantments!'
+          });
         }
       }
     }

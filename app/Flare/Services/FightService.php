@@ -339,11 +339,16 @@ class FightService {
 
     protected function entrancedEnemy($attacker, $defender): bool {
         if ($attacker instanceof Character) {
-            if ($this->characterInformation->getEntrancedChance() > 0.0) {
-                if ($this->characterInformation->canAffixesBeResisted()) {
+            $chance = $this->characterInformation->getEntrancedChance();
+
+            if ($chance > 0.0) {
+
+                $canEntrance = rand (1, 100) > (100 - (100 * $chance));
+
+                if ($this->characterInformation->canAffixesBeResisted() || $canEntrance) {
                     $this->battleMessageBeforeAttack[] = ['The enemy is dazed by your enchantments!'];
                     return true;
-                } else {
+                } else if ($canEntrance) {
                     $dc = 100 - (100 * $defender->affix_resistance);
 
                     if ($dc <= 0 || rand(1, 100) > $dc) {
@@ -353,6 +358,9 @@ class FightService {
 
                     $this->battleMessageBeforeAttack[] = ['The enemy is dazed by your enchantments!'];
                     return true;
+                } else {
+                    $this->battleMessageBeforeAttack[] = ['The enemy is resists your entrancing enchantments!'];
+                    return false;
                 }
             }
         }
