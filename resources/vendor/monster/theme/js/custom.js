@@ -25,7 +25,12 @@ $(function () {
             foundElement.removeClass('collapse');
         } else {
             if ($(this).attr('href')) {
-                window.location = $(this).attr('href');
+
+                if ($(this).attr('target')) {
+                    return window.open($(this).attr('href'), '_blank');
+                }
+
+                return window.location = $(this).attr('href');
             }
 
             foundElement.attr('aria-expanded', false);

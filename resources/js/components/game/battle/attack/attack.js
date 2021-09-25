@@ -86,7 +86,7 @@ export default class Attack {
             this.affixesLifeStealing(defender, attacker, new Damage());
           }
 
-          this.healSelf(defender);
+          this.healSelf(defender, attacker);
         }
 
         if (attackAgain) {
@@ -101,7 +101,7 @@ export default class Attack {
   itemUsage(attacker, defender, type) {
     if (type === 'player') {
       if (attacker.class === 'Vampire') {
-        this.affixesLifeStealing(attacker, defender, type);
+        this.affixesLifeStealing(attacker, defender, new Damage());
       }
     }
 
@@ -209,11 +209,7 @@ export default class Attack {
     if (type === 'player') {
       const damage = new Damage();
 
-      if (attacker.class === 'Vampire') {
-        this.affixesLifeStealing(attacker, defender, damage);
-      } else {
-        this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth);
-      }
+      this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth);
 
       this.battleMessages       = [...this.battleMessages, ...damage.getMessages()];
     }
@@ -248,7 +244,7 @@ export default class Attack {
     }
   }
 
-  healSelf(defender) {
+  healSelf(defender, attacker) {
     if (defender.heal_for > 0 && (this.characterCurrentHealth > 0 && this.characterCurrentHealth !== this.characterMaxHealth)) {
       this.characterCurrentHealth += defender.heal_for;
 
@@ -257,6 +253,8 @@ export default class Attack {
       });
 
       this.extraHealing(defender);
+
+      this.affixesLifeStealing(defender, attacker, new Damage());
     }
 
     if (this.characterCurrentHealth <= 0 && defender.resurrection_chance !== 0.0) {
@@ -273,6 +271,8 @@ export default class Attack {
         });
 
         this.extraHealing(defender);
+
+        this.affixesLifeStealing(defender, attacker, new Damage());
       }
     }
   }
@@ -293,6 +293,7 @@ export default class Attack {
         });
 
         this.artifactDamage(attacker, defender, type);
+
       }
     } else {
       if (attacker.has_artifacts && attacker.artifact_damage !== 0) {
@@ -331,7 +332,7 @@ export default class Attack {
 
       if (dc <= 0 || random(1, 100) > dc) {
         this.battleMessages.push({
-          message: this.attackerName + '\'s Spells failed to do anything.'
+          message: attacker.name + '\'s spells fizzle and die before you.'
         });
 
         return;

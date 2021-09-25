@@ -65,6 +65,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new UpdateTopBarEvent($character->refresh()));
+
         return response()->json(['message' => 'Destroyed ' . $name . '.'], 200);
     }
 
@@ -76,6 +78,8 @@ class CharacterInventoryController extends Controller {
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json(['message' => 'Destroyed All Items.'], 200);
     }
@@ -132,6 +136,8 @@ class CharacterInventoryController extends Controller {
         });
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json([
             'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
@@ -199,6 +205,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new UpdateTopBarEvent($character->refresh()));
+
         return response()->json(['message' => $itemName . ' Has been removed from Set ' . $index + 1 . ' and placed back into your inventory.'], 200);
     }
 
@@ -228,6 +236,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new UpdateTopBarEvent($character->refresh()));
+
         return response()->json(['message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1], 200);
     }
 
@@ -254,7 +264,7 @@ class CharacterInventoryController extends Controller {
             'position' => null,
         ]);
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateTopBarEvent($character->refresh()));
 
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
@@ -280,7 +290,7 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateTopBarEvent($character->refresh()));
 
         $characterData = new ResourceItem($character, $this->characterTransformer);
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
@@ -307,6 +317,8 @@ class CharacterInventoryController extends Controller {
         $useItemService->useItem($slot, $character, $item);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json(['message' => 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.'], 200);
     }

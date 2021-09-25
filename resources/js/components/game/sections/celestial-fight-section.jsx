@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import TimeOutBar from "../timeout/timeout-bar";
 import ReviveSection from "./revive-section";
 
@@ -48,7 +48,7 @@ export default class CelestialFightSection extends React.Component {
 
     this.celestialUpdates.listen('Game.Battle.Events.UpdateCelestialFight', (event) => {
       if (event.data.close_fight) {
-        return this.props.switchBattleAction('battle-action');
+        // return this.props.switchBattleAction('battle-action');
       }
 
       this.setState({
@@ -89,6 +89,10 @@ export default class CelestialFightSection extends React.Component {
         }
       });
     });
+  }
+
+  close() {
+    this.props.switchBattleAction('battle-action');
   }
 
   revive(data) {
@@ -155,22 +159,34 @@ export default class CelestialFightSection extends React.Component {
               <hr/>
               <div className="text-center">
                 <div className="clearfix celestial-fight-actions">
-                  <div className="float-left">
-                    <button type="button" className="btn btn-primary" onClick={this.attackCelestial.bind(this)}
-                            disabled={this.props.isDead || this.props.battleIsOver || !this.state.canAttack}>Attack!
-                    </button>
-                  </div>
+                  {
+                    this.state.battleIsOver ?
+                      <button type="button"
+                              className="btn btn-primary"
+                              onClick={this.close.bind(this)}
+                      >
+                        Close
+                      </button>
+                    :
+                      <Fragment>
+                        <div className="float-left">
+                          <button type="button" className="btn btn-primary" onClick={this.attackCelestial.bind(this)}
+                                  disabled={this.props.isDead || !this.state.canAttack}>Attack!
+                          </button>
+                        </div>
 
-                  <div className="float-right">
-                    <TimeOutBar
-                      cssClass={'character-timeout'}
-                      readyCssClass={'character-ready'}
-                      timeRemaining={0}
-                      channel={'show-timeout-bar-' + this.props.userId}
-                      eventClass={'Game.Core.Events.ShowTimeOutEvent'}
-                      updateCanAttack={this.updateCanAttack.bind(this)}
-                    />
-                  </div>
+                        <div className="float-right">
+                          <TimeOutBar
+                            cssClass={'character-timeout'}
+                            readyCssClass={'character-ready'}
+                            timeRemaining={0}
+                            channel={'show-timeout-bar-' + this.props.userId}
+                            eventClass={'Game.Core.Events.ShowTimeOutEvent'}
+                            updateCanAttack={this.updateCanAttack.bind(this)}
+                          />
+                        </div>
+                      </Fragment>
+                  }
                 </div>
                 {
                   this.props.isDead ?

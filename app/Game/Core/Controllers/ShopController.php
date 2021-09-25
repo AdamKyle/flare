@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Game\Core\Jobs\PurchaseItemsJob;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -72,19 +73,11 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'No items could be found. Did you select any?');
         }
 
-        foreach ($items as $item) {
-            $character = $character->refresh();
+        PurchaseItemsJob::dispatch($character, $items);
 
-            if ($item->cost > $character->gold) {
-                return redirect()->back()->with('error', 'You do not have enough gold to buy: ' . $item->name . '. Anything before this item in the list was purchased.');
-            }
-
-            event(new BuyItemEvent($item, $character));
-        }
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-        return redirect()->back()->with('success', 'Puchased all selected items.');
+        return redirect()->back()->with('success', 'Your items are being purchased. 
+        You can check your character sheet to see them come in. if you cannot afford the items, the game chat section will update.
+        Once all items are purchased, the chat section will update to inform you.');
 
     }
 

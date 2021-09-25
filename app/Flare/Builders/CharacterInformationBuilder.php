@@ -391,6 +391,28 @@ class CharacterInformationBuilder {
         })->isNotEmpty();
     }
 
+    public function hasIrresistibleAffix(): bool {
+        return $this->fetchInventory()->filter(function ($slot) {
+            if (!is_null($slot->item->itemPrefix) && !is_null($slot->item->itemSuffix) && $slot->equipped) {
+                if ($slot->item->itemPrefix->irresistible_damage) {
+                    return $slot;
+                }
+
+                if ($slot->item->itemSuffix->irresistible_damage) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
+                return $slot->item->itemPrefix->irresistible_damage;
+            }
+
+            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
+                return $slot->item->itemSuffix->irresistible_damage;
+            }
+        })->isNotEmpty();
+    }
+
     /**
      * Determine the affix damage.
      *

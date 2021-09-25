@@ -497,14 +497,16 @@ class MovementService {
      */
     protected function teleportCharacter(Character $character, int $timeout, int $cost) {
         $character->update([
-            'can_move'          => false,
+            'can_move'          => $timeout === 0 ? true : false,
             'gold'              => $character->gold - $cost,
-            'can_move_again_at' => now()->addMinutes($timeout),
+            'can_move_again_at' => $timeout === 0 ? null : now()->addMinutes($timeout),
         ]);
 
         $character = $character->refresh();
 
-        event(new MoveTimeOutEvent($character, $timeout, true));
+        if ($timeout !== 0) {
+            event(new MoveTimeOutEvent($character, $timeout, true));
+        }
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateMapDetailsBroadcast($character->map, $character->user, $this));

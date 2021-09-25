@@ -257,18 +257,18 @@ export default class SetTabSection extends React.Component {
 
         <hr />
         <button
-          className="btn btn-danger mr-2"
-          disabled={this.props.set.is_equipped || this.props.set.slots.length === 0 || this.state.loading}
-          onClick={this.removeAll.bind(this)}
-        >
-          Empty Set
-        </button>
-        <button
           className="btn btn-primary"
           disabled={this.props.set.is_equipped || this.props.set.slots.length === 0 || this.state.loading}
           onClick={this.equipSet.bind(this)}
         >
           Equip Set
+        </button>
+        <button
+          className="btn btn-danger mr-2"
+          disabled={this.props.set.is_equipped || this.props.set.slots.length === 0 || this.state.loading}
+          onClick={this.removeAll.bind(this)}
+        >
+          Empty Set
         </button>
         <hr />
         {

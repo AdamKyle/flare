@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
@@ -37,6 +38,8 @@ class DisenchantingController extends Controller {
             $this->disenchantingService->disenchantWithSkill($character, $foundItem);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new UpdateTopBarEvent($character->refresh()));
         } else {
             event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
         }
@@ -57,6 +60,8 @@ class DisenchantingController extends Controller {
             event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new UpdateTopBarEvent($character->refresh()));
         } else {
             event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
         }

@@ -204,9 +204,10 @@ class MessageController extends Controller {
 
         $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
 
-        $map = $celestial->monster->gameMap;
-        $x   = $celestial->x_position;
-        $y   = $celestial->y_position;
+        $map          = $celestial->monster->gameMap;
+        $x            = $celestial->x_position;
+        $y            = $celestial->y_position;
+        $characterMap = $user->character->map->gameMap;
 
         if (is_null($celestial)) {
             broadcast(new ServerMessageEvent($user, 'There are no celestials in the world right now child!'));
@@ -222,8 +223,7 @@ class MessageController extends Controller {
             })->isNotEmpty();
 
             if ($hasItem) {
-
-                if (!$map->default) {
+                if (!$map->default && $characterMap->name !== $map->name) {
                     $traverse = $movementService->updateCharacterPlane($celestial->monster->gameMap->id, $user->character);
 
                     if ($traverse['status'] === 422) {

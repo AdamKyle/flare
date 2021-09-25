@@ -131,10 +131,10 @@ export default class Damage {
 
     if (dc <= 0 || random(1, 100) > dc) {
       this.battleMessages.push({
-        message: this.attackerName + '\'s Spells failed to do anything.'
+        message: 'Your spells failed to do anything.'
       });
 
-      return;
+      return monsterCurrentHealth;
     }
 
     monsterCurrentHealth = monsterCurrentHealth - totalDamage;

@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Services\UseItemService;
@@ -55,6 +56,8 @@ class UseMultipleItems implements ShouldQueue
             $useItemService->useItem($inventorySlot, $this->character, $inventorySlot->item);
 
             event(new CharacterInventoryUpdateBroadCastEvent($this->character->user));
+
+            event(new UpdateTopBarEvent($this->character->refresh()));
         }
     }
 }

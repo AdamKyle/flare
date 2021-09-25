@@ -275,6 +275,8 @@ class FightService {
                 'is_monster' => $attacker instanceOf Character ? false : true
             ];
 
+            $this->battleMessageBeforeAttack = [];
+
             return $this->attack($defender, $attacker);
         }
 
@@ -291,6 +293,8 @@ class FightService {
 
             $this->counter += 1;
 
+            $this->battleMessageBeforeAttack = [];
+
             return $this->attack($defender, $attacker);
         }
 
@@ -304,7 +308,7 @@ class FightService {
 
             $messages = [];
 
-            if ($defender instanceof Character) {
+            if ($attacker instanceof Character) {
                 $messages = $this->useItems($attacker, $defender, []);
             }
 
@@ -312,9 +316,11 @@ class FightService {
 
             $logInfo['messages'] = array_merge($this->battleMessageBeforeAttack, $messages);
 
-            $this->logInformation = $logInfo;
+            $this->logInformation[] = $logInfo;
 
             $this->counter += 1;
+
+            $this->battleMessageBeforeAttack = [];
 
             return $this->attack($defender, $attacker);
         }
@@ -333,6 +339,8 @@ class FightService {
             'messages'   => array_merge($this->battleMessageBeforeAttack, $messages),
             'is_monster' => $attacker instanceof Character ? false : true
         ];
+
+        $this->battleMessageBeforeAttack = [];
 
         $this->attack($defender, $attacker);
     }
@@ -515,7 +523,11 @@ class FightService {
 
         if ($attacker instanceof Character) {
             $totalDamage = $this->characterInformation->getTotalAffixDamage();
-            $cantResist  = $this->characterInformation->canAffixesBeResisted();
+            $cantResist  = $this->characterInformation->canAffixesBeResisted() || $this->characterInformation->hasIrresistibleAffix();
+
+            if ($totalDamage <= 0) {
+                return $messages;
+            }
 
             if ($cantResist) {
                 $messages[] = ['The enemy cannot resist your enchantments! They are so glowy!'];
@@ -553,7 +565,7 @@ class FightService {
 
     public function useLifeStealingAffixes(float $damage, bool $canResist = true) {
         $totalDamage = $this->currentMonsterHealth * $damage;
-
+        dump($totalDamage);
         if ($totalDamage > 0) {
             if ($canResist) {
                 $messages[] = ['The enemies blood flows through the air and gives you life: ' . number_format($totalDamage)];
@@ -824,7 +836,7 @@ class FightService {
                 $messages = array_merge($messages, $this->extraHealing());
             } else if ($this->currentCharacterHealth > 0 && $this->currentCharacterHealth < $this->characterInformation->buildHealth()) {
                 $canResist  = $this->characterInformation->canAffixesBeResisted();
-                $damage     = $this->characterInformation->findLifeStealingAffixes(true);
+                $damage     = $this->characterInformation->findLifeStealingAffixes($this->character->classType()->isVampire());
                 $messages   = array_merge($messages, $this->useLifeStealingAffixes($damage, $canResist));
                 $messages   = array_merge($messages, $this->castHealingSpell($defender));
             } else if ($this->currentCharacterHealth <= 0) {
@@ -835,8 +847,11 @@ class FightService {
                 if ($chRoll > $dc) {
                     $this->currentCharacterHealth = 0;
 
-
-                    $messages = array_merge($messages, $this->extraHealing());
+                    $canResist  = $this->characterInformation->canAffixesBeResisted();
+                    $damage     = $this->characterInformation->findLifeStealingAffixes($this->character->classType()->isVampire());
+                    $messages   = array_merge($messages, $this->useLifeStealingAffixes($damage, $canResist));
+                    $messages   = array_merge($messages, $this->castHealingSpell($defender));
+                    $messages   = array_merge($messages, $this->extraHealing());
                 }
             }
         }

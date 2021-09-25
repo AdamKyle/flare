@@ -75,6 +75,10 @@ class CelestialFightService {
 
             event(new UpdateCelestialFight($celestialFight, false));
 
+            if (!isset($logInfo[0]) || !isset($logInfo[1])) {
+                dump($logInfo);
+            }
+
             return $this->successResult([
                 'fight' => [
                     'character' =>[
@@ -128,7 +132,7 @@ class CelestialFightService {
                     'current_health' => $celestialFight->current_health,
                 ]
             ],
-            'logs' => $logInfo['messages'],
+            'logs' => empty($logInfo) ? [] : array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Jobs;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -73,5 +74,7 @@ class DisenchantItem implements ShouldQueue
         }
 
         event(new CharacterInventoryUpdateBroadCastEvent($this->character->user));
+
+        event(new UpdateTopBarEvent($this->character->refresh()));
     }
 }
