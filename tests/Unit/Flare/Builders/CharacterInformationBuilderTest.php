@@ -257,4 +257,66 @@ class CharacterInformationBuilderTest extends TestCase {
 
         $this->assertNotEmpty($collection);
     }
+
+    public function testGetAffixDamageThatCannotStack() {
+        $character = $this->character->inventoryManagement()
+            ->giveItem($this->createItem([
+                'name' => 'sample',
+                'item_suffix_id' => $this->createItemAffix([
+                    'name' => 'sample',
+                    'type' => 'suffix',
+                    'damage_can_stack' => false,
+                    'damage' => 100
+                ])->id,
+                'type' => 'weapon'
+            ]))
+            ->giveItem($this->createItem([
+                'name' => 'sample 2',
+                'item_prefix_id' => $this->createItemAffix([
+                    'name' => 'sample 2',
+                    'type' => 'prefix',
+                    'damage_can_stack' => false,
+                    'damage' => 1000
+                ])->id,
+                'type' => 'weapon'
+            ]))
+            ->equipItem('left_hand', 'sample')
+            ->equipItem('right_hand', 'sample 2')
+            ->getCharacter();
+
+        $amount = $this->characterInfo->setCharacter($character)->getTotalAffixDamage(false);
+
+        $this->assertEquals(1000, $amount);
+    }
+
+    public function testGetAffixDamageThatCanStack() {
+        $character = $this->character->inventoryManagement()
+            ->giveItem($this->createItem([
+                'name' => 'sample',
+                'item_suffix_id' => $this->createItemAffix([
+                    'name' => 'sample',
+                    'type' => 'suffix',
+                    'damage_can_stack' => true,
+                    'damage' => 1000
+                ])->id,
+                'type' => 'weapon'
+            ]))
+            ->giveItem($this->createItem([
+                'name' => 'sample 2',
+                'item_prefix_id' => $this->createItemAffix([
+                    'name' => 'sample 2',
+                    'type' => 'prefix',
+                    'damage_can_stack' => true,
+                    'damage' => 100
+                ])->id,
+                'type' => 'weapon'
+            ]))
+            ->equipItem('left_hand', 'sample')
+            ->equipItem('right_hand', 'sample 2')
+            ->getCharacter();
+
+        $amount = $this->characterInfo->setCharacter($character)->getTotalAffixDamage(true);
+
+        $this->assertEquals(1100, $amount);
+    }
 }

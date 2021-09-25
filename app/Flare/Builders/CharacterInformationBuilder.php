@@ -555,39 +555,19 @@ class CharacterInformationBuilder {
     }
 
     protected function getSpellEvasion(): float {
-        $skillSpellEvasion = 0.0;
-
-        $skill = $this->character->skills->filter(function($skill) {
-            return $skill->type()->isSpellEvasion();
-        })->first();
-
-        if (!is_null($skill)) {
-            $skillSpellEvasion = $skill->skill_bonus;
-        }
-
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
         })->sum('item.spell_evasion');
 
-        return $itemsEvasion + $skillSpellEvasion;
+        return $itemsEvasion;
     }
 
     protected function getArtifactAnnulment(): float {
-        $skillArtifactAnnulment = 0.0;
-
-        $skill = $this->character->skills->filter(function($skill) {
-            return $skill->type()->isArtifactAnnulment();
-        })->first();
-
-        if (!is_null($skill)) {
-            $skillArtifactAnnulment = $skill->skill_bonus;
-        }
-
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
         })->sum('item.artifact_annulment');
 
-        return $itemsEvasion + $skillArtifactAnnulment;
+        return $itemsEvasion;
     }
 
     protected function fetchSkillAttackMod(): float {

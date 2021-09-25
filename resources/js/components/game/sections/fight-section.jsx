@@ -71,14 +71,11 @@ export default class FightSection extends React.Component {
 
   setMonsterInfo() {
     const monsterInfo   = new Monster(this.props.monster);
-    const slotWithAffix = this.props.character.stats_reducing_slot ?? this.props.character.stat_reducing_slots;
     const character     = this.props.character;
 
-    if (slotWithAffix !== null) {
-      let message = monsterInfo.reduceAllStats(character.stats_reducing_slot, character.stat_reducing_slots, character.cant_resist_affixes);
+    let message = monsterInfo.reduceAllStats(character.stats_reducing_slot, character.stat_reducing_slots, character.cant_resist_affixes);
 
-      this.battleMessagesBeforeFight = message;
-    }
+    this.battleMessagesBeforeFight = message;
 
     const health = monsterInfo.health();
 
