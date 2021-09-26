@@ -22,7 +22,7 @@ At level 400, with no additional modifiers from equipment or items, you will hav
 
 If the item already has an enchantment on it, for each additional enchantment the item has an additional ten seconds will be added to the default ten seconds.
 
-> ###ATTN!
+> ### ATTN!
 >
 > If the item already has an enchantment on it, the cost to replace will be 1000 gold + New Affix Cost. 
 
