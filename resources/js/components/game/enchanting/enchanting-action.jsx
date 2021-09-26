@@ -55,7 +55,6 @@ export default class EnchantingAction extends React.Component {
     });
 
     this.enchanting.listen('Game.Skills.Events.UpdateCharacterEnchantingList', (event) => {
-      console.log(event);
       this.setState({
         affixList: event.availableAffixes,
         inventoryList: event.inventory,

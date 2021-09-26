@@ -2,12 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Admin\Services\ItemsService;
-use App\Flare\Models\Item;
-use App\Flare\Models\MarketHistory;
-use App\Flare\Models\Notification;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
+use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
 
 class RefactorItems extends Command
 {
@@ -40,21 +37,8 @@ class RefactorItems extends Command
      *
      * @return mixed
      */
-    public function handle(ItemsService $itemsService)
+    public function handle()
     {
-        $foundItem = Item::where('name', 'Spell Woven Sleeves')
-            ->whereNull('item_prefix_id')
-            ->whereNull('item_suffix_id')
-            ->whereNull('agi_mod')
-            ->whereNull('focus_mod')
-            ->first();
-
-        if (!is_null($foundItem)) {
-            $itemsService->deleteItem($foundItem);
-
-            $this->line('Found and deleted your item ...');
-        }
-
         Item::whereNotNull('item_prefix_id')->chunkById(100, function($items) {
            foreach ($items as $item) {
                $foundItem = Item::where('name', $item->name)
@@ -105,5 +89,18 @@ class RefactorItems extends Command
                 $this->line($item->affix_name . ' was updated with new stats.');
             }
         });
+
+        Item::where('cost', '<=', 1000)->update(['can_drop' => true]);
+        Item::where('cost', '>=', 1000)->update(['can_drop' => false]);
+
+        ItemAffix::where('cost', '<=', 1500)->update(['can_drop' => true]);
+        ItemAffix::where('cost', '>=', 1500)->update(['can_drop' => false]);
+
+        $this->line('');
+        $this->line('Stats: ');
+        $this->line('========');
+        $this->line('there is: '. Item::whereNotNull('item_prefix_id')->whereNotNull('item_suffix_id')->count() . ' Items with both prefixes and suffixes.');
+        $this->line('there is: '. Item::whereNotNull('item_prefix_id')->whereNull('item_suffix_id')->count() . ' Items with one prefix and no suffixes.');
+        $this->line('there is: '. Item::whereNull('item_prefix_id')->whereNotNull('item_suffix_id')->count() . ' Items with no prefixes and one suffix.');
     }
 }

@@ -2,16 +2,13 @@
 
 namespace Tests\Feature\Game\Core\Api;
 
-use Mockery;
-use Mockery\MockInterface;
-use App\Game\Core\Jobs\CharacterBoonJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateRole;

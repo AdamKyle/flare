@@ -75,10 +75,6 @@ class CelestialFightService {
 
             event(new UpdateCelestialFight($celestialFight, false));
 
-            if (!isset($logInfo[0]) || !isset($logInfo[1])) {
-                dump($logInfo);
-            }
-
             return $this->successResult([
                 'fight' => [
                     'character' =>[

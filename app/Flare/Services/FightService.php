@@ -565,7 +565,7 @@ class FightService {
 
     public function useLifeStealingAffixes(float $damage, bool $canResist = true) {
         $totalDamage = $this->currentMonsterHealth * $damage;
-        dump($totalDamage);
+
         if ($totalDamage > 0) {
             if ($canResist) {
                 $messages[] = ['The enemies blood flows through the air and gives you life: ' . number_format($totalDamage)];

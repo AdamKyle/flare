@@ -80,7 +80,6 @@ export default class EquippedSection extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.formatDataForTable());
     this.setState({
       equippedItems: this.formatDataForTable()
     })

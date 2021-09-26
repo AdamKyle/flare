@@ -76,7 +76,7 @@ class ShopController extends Controller {
         PurchaseItemsJob::dispatch($character, $items);
 
         return redirect()->back()->with('success', 'Your items are being purchased. 
-        You can check your character sheet to see them come in. if you cannot afford the items, the game chat section will update.
+        You can check your character sheet to see them come in. If you cannot afford the items, the game chat section will update.
         Once all items are purchased, the chat section will update to inform you.');
 
     }

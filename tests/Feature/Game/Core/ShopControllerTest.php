@@ -3,8 +3,10 @@
 namespace Tests\Feature\Game\Core;
 
 use App\Flare\Models\InventorySlot;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
@@ -225,18 +227,24 @@ class ShopControllerTest extends TestCase
             'items' => [$this->item->id]
         ])->response;
 
-        $response->assertSessionHas('success', 'Puchased all selected items.');
+        $response->assertSessionHas('success', 'Your items are being purchased. 
+        You can check your character sheet to see them come in. If you cannot afford the items, the game chat section will update.
+        Once all items are purchased, the chat section will update to inform you.');
     }
 
     public function testFailToBulkBuyWhenNoGold() {
 
+        Event::fake();
+
         $user = $this->character->updateCharacter(['gold' => 0])->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
+        $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
             'items' => [$this->item->id]
-        ])->response;
+        ]);
 
-        $response->assertSessionHas('error', 'You do not have enough gold.');
+        $character = $this->character->getCharacter();
+
+        $this->assertEquals($character->inventory->slots()->where('item_id', $this->item->id)->count(), 1);
     }
 
 
@@ -260,11 +268,9 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
+        $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
             'items' => [$this->item->id, $weapon->id]
-        ])->response;
-
-        $response->assertSessionHas('error', 'You do not have enough gold to buy: ' . $this->item->name . '. Anything before this item in the list was purchased.');
+        ]);
 
         $count = $this->character->getCharacter()->inventory->slots->count();
 

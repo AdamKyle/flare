@@ -177,7 +177,6 @@ export default class SetTabSection extends React.Component {
     this.setState({loading: true});
     axios.post('/api/character/'+this.props.characterId+'/inventory-set/equip/'+this.props.set.id)
       .then((result) => {
-        console.log(result);
         this.setState({loading: false});
         this.setSuccessMessage(result.data.message);
       }).catch((error) => {
@@ -264,7 +263,7 @@ export default class SetTabSection extends React.Component {
           Equip Set
         </button>
         <button
-          className="btn btn-danger mr-2"
+          className="btn btn-danger ml-2"
           disabled={this.props.set.is_equipped || this.props.set.slots.length === 0 || this.state.loading}
           onClick={this.removeAll.bind(this)}
         >
