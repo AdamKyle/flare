@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
@@ -51,13 +52,17 @@ class UseMultipleItems implements ShouldQueue
                                       ->where('id', $this->slotId)
                                       ->first();
 
+        $character = $this->character->refresh();
+
         // If less than 11 it will only apply up to a total of ten boons.
-        if ($this->character->refresh()->boons->count() < 11) {
-            $useItemService->useItem($inventorySlot, $this->character, $inventorySlot->item);
+        if ($character->boons->count() < 11) {
+            $useItemService->useItem($inventorySlot, $character, $inventorySlot->item);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($this->character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-            event(new UpdateTopBarEvent($this->character->refresh()));
+            event(new UpdateTopBarEvent($character));
+
+            event(new UpdateCharacterAttackEvent($character));
         }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Game\Skills\Services;
 
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
+use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -156,7 +157,7 @@ class EnchantingService {
     }
 
     protected function getEnchantingSkill(Character $character): Skill {
-        return $character->skills()->where('game_skill_id', GameSkill::where('name', 'Enchanting')->first()->id)->first();
+        return $character->skills()->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ENCHANTING)->first()->id)->first();
     }
 
     protected function fetchCharacterInventory(Character $character): array {

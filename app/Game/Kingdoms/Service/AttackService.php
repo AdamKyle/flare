@@ -272,8 +272,8 @@ class AttackService {
 
             $timeForDispatch = $timeToReturn;
 
-            if ($timeToReturn > 15) {
-                $timeForDispatch = $timeToReturn / 10;
+            if ($timeForDispatch > 15) {
+                $timeForDispatch = $timeForDispatch / 10;
             }
 
             $delay = now()->addMinutes($timeForDispatch);

@@ -97,7 +97,7 @@ class KingdomResourcesService {
         } else if (!is_null($this->kingdom->last_walked) && !$this->kingdom->npc_owned) {
             $lastTimeWalked = $this->kingdom->last_walked->diffInDays(now());
 
-            if ($lastTimeWalked > 10) {
+            if ($lastTimeWalked > 40) {
                 $this->giveNPCKingdoms();
 
                 return;
@@ -105,7 +105,7 @@ class KingdomResourcesService {
 
             $this->increaseOrDecreaseMorale($lastTimeWalked);
 
-            if ($lastTimeWalked < 5) {
+            if ($lastTimeWalked < 30) {
                 $this->updateCurrentPopulation();
                 $this->increaseCurrentResource();
                 $this->increaseTreasury();
@@ -143,7 +143,7 @@ class KingdomResourcesService {
         $buildings     = $this->kingdom->buildings;
         $currentMorale = $this->kingdom->current_morale;
 
-        if ($lastWalked > 5) {
+        if ($lastWalked >= 30) {
 
             if ($currentMorale <= 0.0) {
                 $this->giveNPCKingdoms(false);

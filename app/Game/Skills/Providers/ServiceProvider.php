@@ -31,8 +31,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AlchemyService;
         });
 
-        $this->app->bind(DisenchantService::class, function() {
-            return new DisenchantService;
+        $this->app->bind(DisenchantService::class, function($app) {
+            return new DisenchantService();
         });
 
         $this->app->bind(EnchantingService::class, function($app) {

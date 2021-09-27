@@ -2,6 +2,7 @@
 
 namespace App\Flare\Listeners;
 
+use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
@@ -76,6 +77,10 @@ class UpdateSkillListener
             ]);
 
             event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
+
+            if ($skill->can_train) {
+                event(new UpdateCharacterAttackEvent($skill->character->refresh()));
+            }
         }
     }
 }

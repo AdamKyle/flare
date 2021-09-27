@@ -110,7 +110,7 @@ class CharacterInventoryControllerApiTestTest extends TestCase
 
         $character = $user->character->refresh();
 
-        $this->assertCount(0, $character->inventory->slots->filter(function($slot) {
+        $this->assertCount(2, $character->inventory->slots->filter(function($slot) {
             return !$slot->equipped;
         }));
     }

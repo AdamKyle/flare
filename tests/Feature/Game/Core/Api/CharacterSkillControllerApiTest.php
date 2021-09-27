@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Core\Api;
 
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Game\Skills\Values\SkillTypeValue;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Skills\Services\CraftingService;
@@ -32,6 +33,10 @@ class CharacterSkillControllerApiTest extends TestCase {
                                                  ->givePlayerLocation()
                                                  ->assignSkill($this->createGameSkill([
                                                     'name' => 'Weapon Crafting'
+                                                 ]))
+                                                 ->assignSkill($this->createGameSkill([
+                                                     'type' => SkillTypeValue::ENCHANTING,
+                                                     'name' => 'Enchanting'
                                                  ]));
     }
 
@@ -99,15 +104,9 @@ class CharacterSkillControllerApiTest extends TestCase {
 
         $this->createItemAffix();
 
-        $skill = $this->createGameSkill([
-            'name' => 'Enchanting'
-        ]);
-
         $character = $this->character->updateCharacter([
             'gold' => 10000,
-        ])->assignSkill($skill, 400)
-          ->trainSkill($skill->name)
-          ->inventoryManagement()
+        ])->inventoryManagement()
           ->giveItem($this->createItem([
             'name' => 'sample 2',
             'type' => 'weapon',
@@ -117,11 +116,12 @@ class CharacterSkillControllerApiTest extends TestCase {
             'crafting_type' => 'weapon',
           ]))
           ->getCharacterFactory()
+          ->updateSkill('Enchanting', ['level' => 400])
           ->getCharacter();
 
         $currentGold = $character->gold;
 
-        $user        = $this->character->getUser();
+        $user        = $character->user;
         $slot        = $character->inventory->slots->first();
 
         $response = $this->actingAs($user)
@@ -130,6 +130,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                             'affix_ids' => [ItemAffix::first()->id],
                             'cost'      => 1000,
                          ])->response;
+
 
         $this->assertEquals(200, $response->status());
         $this->assertFalse($currentGold === $this->character->getcharacter()->gold);
@@ -163,6 +164,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             ])->id,
           ]))
           ->getCharacterFactory()
+          ->updateSkill('Enchanting', ['level' => 400])
           ->getCharacter();
 
         $currentGold = $character->gold;
@@ -212,6 +214,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             ])->id,
           ]))
           ->getCharacterFactory()
+          ->updateSkill('Enchanting', ['level' => 400])
           ->getCharacter();
 
         $currentGold = $character->gold;
@@ -299,6 +302,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                                         'item_suffix_id' => $this->createItemAffix()->id
                                     ]))
                                      ->getCharacterFactory()
+                                     ->updateSkill('Enchanting', ['level' => 400])
                                      ->getCharacter();
         $user      = $this->character->getUser();
 

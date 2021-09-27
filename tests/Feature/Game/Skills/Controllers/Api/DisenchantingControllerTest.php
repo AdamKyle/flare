@@ -31,6 +31,9 @@ class DisenchantingControllerTest extends TestCase
                                                  ->assignSkill($this->createGameSkill([
                                                      'type' => SkillTypeValue::DISENCHANTING,
                                                  ]))
+                                                 ->assignSkill($this->createGameSkill([
+                                                     'type' => SkillTypeValue::ENCHANTING,
+                                                 ]))
                                                  ->inventoryManagement()
                                                  ->giveItem($this->item);
     }

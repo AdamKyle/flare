@@ -29,6 +29,8 @@ class DisenchantServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::DISENCHANTING
+        ]))->assignSkill($this->createGameSkill([
+            'type' => SkillTypeValue::ENCHANTING
         ]))->inventoryManagement()->giveItem($this->item);
     }
 

@@ -116,7 +116,7 @@ export default class Attack {
       characterCurrentHealth: this.characterCurrentHealth,
       monsterCurrentHealth: this.monsterCurrentHealth,
       battleMessages: this.battleMessages,
-      missCounter: this.missed
+      missCounter: this.missed,
     }
   }
 

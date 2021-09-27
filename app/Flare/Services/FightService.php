@@ -564,6 +564,8 @@ class FightService {
     }
 
     public function useLifeStealingAffixes(float $damage, bool $canResist = true) {
+        $messages    = [];
+
         $totalDamage = $this->currentMonsterHealth * $damage;
 
         if ($totalDamage > 0) {

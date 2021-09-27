@@ -44,13 +44,15 @@ class MoveUnits implements ShouldQueue
         }
 
         if (!$unitMovement->completed_at->lessThanOrEqualTo(now())) {
-            return MoveUnits::dispatch(
+            MoveUnits::dispatch(
                 $this->movementId,
                 $this->defenderId,
                 $this->type,
                 $this->character,
                 $this->timeForDispatch
             )->delay(now()->addMinutes($this->timeForDispatch));
+
+            return;
         }
 
         switch ($this->type) {

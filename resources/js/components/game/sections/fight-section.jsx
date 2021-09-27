@@ -126,15 +126,20 @@ export default class FightSection extends React.Component {
         monster_id: this.state.monster.id,
       }).then((response) => {
         let health = state.characterCurrentHealth;
+        let monster = this.state.monster;
 
         if (health >= 0) {
           health = this.state.characterMaxHealth;
         }
 
+        if (state.monsterCurrentHealth <= 0 && health >= 0) {
+          monster = null;
+        }
+
         this.setState({
           characterCurrentHealth: health,
           canAttack: false,
-          monster: null,
+          monster: monster,
         }, () => {
           this.props.setMonster(null);
         });

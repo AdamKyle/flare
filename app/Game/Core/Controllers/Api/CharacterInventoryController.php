@@ -9,6 +9,8 @@ use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\SaveEquipmentAsSet;
 use App\Game\Core\Requests\UseManyItemsValidation;
 use App\Game\Core\Services\UseItemService;
+use App\Game\Skills\Events\UpdateCharacterEnchantingList;
+use App\Game\Skills\Services\EnchantingService;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
@@ -29,13 +31,18 @@ class CharacterInventoryController extends Controller {
 
     private $characterTransformer;
 
+    private $enchantingService;
+
     private $manager;
 
     public function __construct(CharacterInventoryService $characterInventoryService,
-                                CharacterAttackTransformer $characterTransformer, Manager $manager) {
+                                CharacterAttackTransformer $characterTransformer,
+                                EnchantingService $enchantingService,
+                                Manager $manager) {
 
         $this->characterInventoryService = $characterInventoryService;
         $this->characterTransformer      = $characterTransformer;
+        $this->enchantingService         = $enchantingService;
         $this->manager                   = $manager;
     }
 
@@ -63,6 +70,14 @@ class CharacterInventoryController extends Controller {
 
         $slot->delete();
 
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
+
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
@@ -80,6 +95,14 @@ class CharacterInventoryController extends Controller {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
+
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
 
         return response()->json(['message' => 'Destroyed All Items.'], 200);
     }
@@ -138,6 +161,14 @@ class CharacterInventoryController extends Controller {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
+
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
 
         return response()->json([
             'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
@@ -207,6 +238,14 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
+
         return response()->json(['message' => $itemName . ' Has been removed from Set ' . $index + 1 . ' and placed back into your inventory.'], 200);
     }
 
@@ -237,6 +276,14 @@ class CharacterInventoryController extends Controller {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
+
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
 
         return response()->json(['message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1], 200);
     }
@@ -271,6 +318,14 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
+
         return response()->json(['message' => 'Unequipped item.'], 200);
     }
 
@@ -296,6 +351,14 @@ class CharacterInventoryController extends Controller {
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
 
         return response()->json(['message' => 'All items have been removed.'], 200);
     }

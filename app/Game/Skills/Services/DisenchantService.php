@@ -8,6 +8,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
+use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\Traits\SkillCheck;
 
 class DisenchantService {
@@ -19,6 +20,8 @@ class DisenchantService {
      */
     private $goldDust = 0;
 
+    private $enchantingService;
+
     /**
      * Disenchant the item.
      *
@@ -26,6 +29,7 @@ class DisenchantService {
      * @param InventorySlot $slot
      */
     public function disenchantWithSkill(Character $character, InventorySlot $slot) {
+
         $disenchantSkill = $character->skills->filter(function($skill) {
            return $skill->type()->isDisenchanting();
         })->first();
@@ -40,6 +44,7 @@ class DisenchantService {
 
                 event(new ServerMessageEvent($character->user, 'disenchanted', $goldDust));
                 event(new UpdateSkillEvent($disenchantSkill));
+
             } else {
                 $this->updateGoldDust($character, true);
 
@@ -48,10 +53,18 @@ class DisenchantService {
         }
 
         $slot->delete();
+
+        $affixData = resolve(EnchantingService::class)->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
     }
 
     /**
-     * Disenchant the item, with out giving skill xp.
+     * Disenchant the item, without giving skill xp.
      *
      * @param Character $character
      * @param InventorySlot $slot
@@ -62,6 +75,14 @@ class DisenchantService {
         event(new ServerMessageEvent($character->user, 'disenchanted-with-out-skill', $goldDust));
 
         $slot->delete();
+
+        $affixData = resolve(EnchantingService::class)->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
     }
 
     /**
