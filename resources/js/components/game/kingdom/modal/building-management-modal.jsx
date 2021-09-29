@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Modal, ModalDialog} from 'react-bootstrap';
 import Draggable from 'react-draggable';
 import UpgradeSection from './partials/building-management/upgrade-section';
@@ -221,7 +221,7 @@ export default class BuildingManagementModal extends React.Component {
           <div className="row">
             {this.props.building.level >= this.props.building.max_level ?
               <div className="col-md-12">
-                <div className="alert alert-success mt-5">
+                <div className="alert alert-success mt-2">
                   This building is already max level and cannot upgrade any further.
                 </div>
               </div>
@@ -263,13 +263,23 @@ export default class BuildingManagementModal extends React.Component {
                       canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
                     />
                   </div>
-                : !(this.props.building.level >= this.props.building.max_level) ?
-                    <div className="col-md-6">
-                      <div className="alert alert-info mt-5">
-                        Rebuilding the building will require the amount of resources to upgrade to the current level.
-                        You can see this in the Cost section above.
+                : this.buildingNeedsToBeRebuilt() ?
+                    <Fragment>
+                      <div className="col-md-6">
+                        <div className="alert alert-info mt-2">
+                          Rebuilding the building will require the amount of resources to upgrade to the current level.
+                          You can see this in the Cost section above.
+                        </div>
                       </div>
-                    </div>
+                      <div className="col-md-6">
+                        <h4>Cost</h4>
+                        <hr />
+                        <BuildingCostSection
+                          building={this.props.building}
+                          canUpgrade={this.canUpgrade() && this.isCurrentlyInQueue()}
+                        />
+                      </div>
+                    </Fragment>
                 : null
             }
           </div>

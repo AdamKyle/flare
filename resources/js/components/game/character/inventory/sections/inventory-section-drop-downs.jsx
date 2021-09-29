@@ -14,8 +14,14 @@ export default class InventorySectionDropDowns extends React.Component {
   }
 
   buildHref() {
+    let type = this.props.item.type;
+
+    if (type === 'bow') {
+      type = 'weapon';
+    }
+
     return '/game/character/inventory/compare/' + this.props.characterId +
-      '?item_to_equip_type=' + this.props.item.type + '&slot_id=' +
+      '?item_to_equip_type=' + type + '&slot_id=' +
       this.props.getSlotId(this.props.item.id)
   }
 
