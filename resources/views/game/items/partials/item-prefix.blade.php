@@ -35,19 +35,19 @@
       <div class={{$item->itemPrefix->reduces_enemy_stats ? 'col-md-6' : 'col-md-12'}}>
         <dl>
           <dt><i class="fas fa-level-up-alt text-success"></i> Str Mod:</dt>
-          <dd class="{{$item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->str_mod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->str_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->str_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Dex Mod:</dt>
-          <dd class="{{$item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dex_mod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->dex_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dex_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Dur Mod:</dt>
-          <dd class="{{$item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->dur_mod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->dur_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->dur_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Int Mod:</dt>
-          <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->int_mod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->int_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->int_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Chr Mod:</dt>
-          <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->chr_mod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->chr_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->chr_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Agi Mod:</dt>
-          <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->agi_mod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->agi_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Focus Mod:</dt>
-          <dd class="{{$item->itemPrefix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_nod * 100}}%</dd>
+          <dd class="{{$item->itemPrefix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->focus_nod * 100}}%</dd>
         </dl>
       </div>
       <div class={{$item->itemPrefix->reduces_enemy_stats ? 'col-md-6' : 'hide'}}>
