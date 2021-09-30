@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\Game\Core;
 
-use App\Flare\Models\InventorySlot;
-use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Core\Jobs\PurchaseItemsJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
+use App\Flare\Models\InventorySlot;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
@@ -259,6 +260,7 @@ class ShopControllerTest extends TestCase
     }
 
     public function testNotEnoughGold() {
+        Queue::fake();
         $user = $this->character->updateCharacter(['gold' => 10])->getUser();
 
         $weapon = $this->createItem([
@@ -272,12 +274,11 @@ class ShopControllerTest extends TestCase
             'items' => [$this->item->id, $weapon->id]
         ]);
 
-        $count = $this->character->getCharacter()->inventory->slots->count();
-
-        $this->assertEquals($count, 2);
+        Queue::assertPushed(PurchaseItemsJob::class);
     }
 
     public function testBuyAllSelectedItems() {
+        Queue::fake();
         $user = $this->character->updateCharacter(['gold' => 10])->getUser();
 
         $weapon = $this->createItem([
@@ -287,13 +288,11 @@ class ShopControllerTest extends TestCase
             'cost'        => 10,
         ]);
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
+        $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter()->id]), [
             'items' => [$this->item->id, $weapon->id]
-        ])->response;
+        ]);
 
-        $count = $this->character->getCharacter()->inventory->slots->count();
-
-        $this->assertEquals($count, 2);
+        Queue::assertPushed(PurchaseItemsJob::class);
     }
 
     public function testFailToSellInBulk() {

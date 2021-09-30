@@ -71,7 +71,7 @@ class AttackedKingdomBuilder {
                 if ($amountLeft === $building['current_durability']) {
                     $amountLeft = 0.0;
                 } else {
-                    $amountLeft = number_format($amountLeft / $building['current_durability'], 2);
+                    $amountLeft = 1 - ($amountLeft / $building['current_durability']);
                 }
             } else {
                 $amountLeft = 1.0;

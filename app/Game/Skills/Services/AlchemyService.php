@@ -4,6 +4,7 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
@@ -73,6 +74,8 @@ class AlchemyService {
 
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
+            event(new UpdateTopBarEvent($character->refresh()));
+
             return;
         }
 
@@ -82,7 +85,11 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
+
+            event(new UpdateTopBarEvent($character->refresh()));
 
             return;
         }
@@ -95,12 +102,18 @@ class AlchemyService {
 
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new UpdateTopBarEvent($character->refresh()));
+
             return;
         }
 
         event(new ServerMessageEvent($character->user, 'failed_to_transmute'));
 
         event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
+
+        event(new UpdateTopBarEvent($character->refresh()));
     }
 
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {

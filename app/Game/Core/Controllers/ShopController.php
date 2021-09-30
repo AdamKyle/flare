@@ -73,7 +73,7 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'No items could be found. Did you select any?');
         }
 
-        PurchaseItemsJob::dispatch($character, $items);
+        PurchaseItemsJob::dispatch($character, $items)->onConnection('shop_buying');
 
         return redirect()->back()->with('success', 'Your items are being purchased. 
         You can check your character sheet to see them come in. If you cannot afford the items, the game chat section will update.

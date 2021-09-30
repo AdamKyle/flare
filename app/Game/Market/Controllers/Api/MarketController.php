@@ -216,7 +216,7 @@ class MarketController extends Controller {
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
 
-        if (!($character->inventory_max > $character->inventory->slots()->count())) {
+        if ($character->isInventoryFull()) {
             return response()->json(['message' => 'Inventory is full.'], 422);
         }
 

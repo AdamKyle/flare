@@ -90,6 +90,22 @@ return [
             'block_for' => null,
         ],
 
+        'shop_buying' => [
+            'driver' => 'redis',
+            'connection' => 'shop_buying',
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => 90,
+            'block_for' => null,
+        ],
+
+        'disenchanting' => [
+            'driver' => 'redis',
+            'connection' => 'disenchanting',
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => 1200,
+            'block_for' => null,
+        ],
+
     ],
 
     /*

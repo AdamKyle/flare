@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, Button} from 'react-bootstrap';
+import {Modal, Button, Alert} from 'react-bootstrap';
 import ItemDetails from './item-details';
 import UsableItemDetails from "./usable-item-details";
 
@@ -12,6 +12,7 @@ export default class PurchaseModal extends React.Component {
       item: null,
       loading: true,
       posting: false,
+      errorMessage: null,
     }
   }
 
@@ -45,9 +46,16 @@ export default class PurchaseModal extends React.Component {
     return parseInt(this.props.characterId) === this.props.modalData.character_id;
   }
 
+  removeError() {
+    this.setState({
+      errorMessage: null,
+    })
+  }
+
   purchase() {
     this.setState({
-      purchasing: true
+      purchasing: true,
+      errorMessage: null,
     }, () => {
       axios.post('/api/market-board/purchase/' + this.props.characterId, {
         market_board_id: this.props.modalData.id
@@ -55,6 +63,7 @@ export default class PurchaseModal extends React.Component {
         this.props.updateMessage('You purchased the ' + this.props.modalData.name + ' for: ' + (this.props.modalData.listed_price * 1.05) + ' Gold.', 'success');
         this.props.closeModal();
       }).catch((err) => {
+        this.setState({purchasing: false});
         if (err.hasOwnProperty('response')) {
           const response = err.response;
 
@@ -64,6 +73,12 @@ export default class PurchaseModal extends React.Component {
 
           if (response.status === 429) {
             return window.location = '/game';
+          }
+
+          if (response.data.hasOwnProperty('message')) {
+            this.setState({
+              errorMessage: response.data.message
+            });
           }
         }
       });
@@ -139,6 +154,13 @@ export default class PurchaseModal extends React.Component {
             this.belongsToCharacter() ?
               <div className="alert alert-danger mb-2 mt-2">You cannot purchase your own item.
                 If you would like to delist this item, head over to your My listings section under the market to delist.</div> : null
+          }
+          {
+            this.state.errorMessage !== null ?
+              <Alert variant="danger" onClose={this.removeError.bind(this)} dismissible>
+                {this.state.errorMessage}
+              </Alert>
+            : null
           }
           <p>Is this the item you would like to purchase? It
             will <strong>cost</strong>: {(this.props.modalData.listed_price * 1.05).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold (incl. 5% tax)</p>

@@ -46,6 +46,7 @@ class AttackTimeOutListener
             return ($skill->fight_time_out_mod > 0.0) && is_null($skill->baseSkill->game_class_id);
         })->first();
 
+
         if (is_null($skill)) {
             return 0;
         }

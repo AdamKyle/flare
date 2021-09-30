@@ -65,7 +65,7 @@ class MessageController extends Controller {
                                     case '#ffad47':
                                         $mapName = 'LABY';
                                         break;
-                                    case '#755c59':
+                                    case '#ccb9a5':
                                         $mapName = 'DUN';
                                         break;
                                     default:

@@ -38,6 +38,8 @@ class DataTable extends Component
         }
 
         if ($this->type === 'alchemy') {
+            $this->showSkillInfo = true;
+
             return $this->dataQuery->get()->filter(function($item) {
                 return $item->type === 'alchemy';
             })->paginate($this->perPage);

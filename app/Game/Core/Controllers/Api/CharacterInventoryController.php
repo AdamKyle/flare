@@ -127,7 +127,7 @@ class CharacterInventoryController extends Controller {
                 }
             }
 
-            DisenchantItem::withChain($jobs)->dispatch($character, $slots->first()->id);
+            DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
 
             return response()->json(['message' => 'You can freely move about. 
                 Your inventory will update as items disenchant. Check chat to see 

@@ -75,6 +75,7 @@ export default class AlchemyAction extends React.Component {
     });
 
     this.alchemyList.listen('Game.Skills.Events.UpdateCharacterAlchemyList', (event) => {
+      console.log(event);
       this.setState({
         itemsToCraft: event.items,
       });

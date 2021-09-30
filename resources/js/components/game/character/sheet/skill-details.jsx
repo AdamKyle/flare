@@ -91,8 +91,8 @@ export default class SkillDetails extends React.Component {
   }
 
 
-  renderSkills(type) {
-    return this.props.skills.map((s) => s.skill_type === type || s.skill_type === 'Effects Directional Move Timer' || s.skill_typw === 'Effects Battle Timer' ?
+  renderSkills() {
+    return this.props.skills.map((s) => s.can_train ?
       <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
         <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
@@ -241,6 +241,7 @@ export default class SkillDetails extends React.Component {
   }
 
   render() {
+    console.log(this.props.skills);
     return (
       <Card>
         <Card.Body>
@@ -283,7 +284,7 @@ export default class SkillDetails extends React.Component {
                   You cannot train more then one skill at a time.
                 </p>
                 <hr />
-                <dl className="mt-4">{this.renderSkills('Training')}</dl>
+                <dl className="mt-4">{this.renderSkills()}</dl>
               </div>
             </Tab>
             <Tab eventKey="crafting-skills" title="Crafting Skills">

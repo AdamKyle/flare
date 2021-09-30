@@ -201,6 +201,25 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
+        'supervisor-disenchanting' => [
+            'connection' => 'disenchanting',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'memory' => 128,
+            'tries' => 1,
+            'nice' => 0,
+            'timeout' => 900,
+        ],
+        'supervisor-shop-buying' => [
+            'connection' => 'shop_buying',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'memory' => 128,
+            'tries' => 1,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -225,6 +244,25 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'supervisor-disenchanting' => [
+                'connection' => 'disenchanting',
+                'queue' => ['default'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
+                'nice' => 0,
+                'timeout' => 900,
+            ],
+            'supervisor-shop-buying' => [
+                'connection' => 'shop_buying',
+                'queue' => ['default'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
@@ -232,12 +270,29 @@ return [
                 'maxProcesses' => 3,
             ],
             'supervisor-kingdoms' => [
+                'connection' => 'kingdom_jobs',
                 'maxProcesses' => 3,
             ],
             'supervisor-daily-characters' => [
+                'connection' => 'character_daily',
                 'maxProcesses' => 3,
             ],
             'supervisor-weekly-spawn' => [
+                'connection' => 'weekly_spawn',
+                'maxProcesses' => 3,
+            ],
+            'supervisor-disenchanting' => [
+                'connection' => 'disenchanting',
+                'queue' => ['default'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
+                'nice' => 0,
+                'timeout' => 900,
+            ],
+            'supervisor-shop-buying' => [
+                'connection' => 'shop_buying',
                 'maxProcesses' => 3,
             ],
         ],

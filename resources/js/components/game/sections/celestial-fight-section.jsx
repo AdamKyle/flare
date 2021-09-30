@@ -48,7 +48,9 @@ export default class CelestialFightSection extends React.Component {
 
     this.celestialUpdates.listen('Game.Battle.Events.UpdateCelestialFight', (event) => {
       if (event.data.close_fight) {
-        // return this.props.switchBattleAction('battle-action');
+        this.setState({
+          battleIsOver: true,
+        });
       }
 
       this.setState({

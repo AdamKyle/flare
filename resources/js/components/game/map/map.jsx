@@ -211,8 +211,12 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
-      this.updatePlayerPosition(event.map);
 
+      if (event.map.game_map.name !== this.state.characterMapName) {
+        return;
+      }
+
+      this.updatePlayerPosition(event.map);
       let myKingdoms = this.fetchKingdoms(event);
 
       this.setState({

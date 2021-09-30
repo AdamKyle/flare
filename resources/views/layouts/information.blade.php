@@ -29,7 +29,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
 </head>
-<body class="fix-header fix-sidebar card-no-border">
+<body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">
         <div id="app">
             <header class="topbar">
@@ -38,12 +38,12 @@
                         <!-- ============================================================== -->
                         <!-- toggle and nav items -->
                         <!-- ============================================================== -->
-                        <ul class="navbar-nav mr-auto mt-md-0 info-sidebar-toggler">
-                          <li class="nav-item">
-                              <a class="nav-link infoSidebarToggler text-muted" href="javascript:void(0)" onclick="showSideBar()">
-                                  <i class="fas fa-bars"></i>
-                              </a>
-                          </li>
+                        <ul class="navbar-nav mr-auto mt-md-0 ">
+                            <li class="nav-item">
+                                <a class="nav-link sidebartoggler text-muted" href="javascript:void(0)">
+                                    <i class="fas fa-bars"></i>
+                                </a>
+                            </li>
                         </ul>
                         <!-- ============================================================== -->
                         <!-- User profile -->
@@ -75,16 +75,28 @@
                 </nav>
             </header>
 
-            <aside class="left-sidebar info-sidebar" id="info-left-sidebar">
-              <!-- Sidebar scroll-->
-              <div class="scroll-sidebar">
-                  <!-- Sidebar navigation-->
-                  <nav class="sidebar-nav info-nav">
-                    @include('layouts.partials.sidebar.informationsidebar')
-                  </nav>
-                  <!-- End Sidebar navigation -->
-              </div>
-          </aside>
+            <aside class="left-sidebar">
+                <!-- Sidebar scroll-->
+                <div class="scroll-sidebar">
+                    <!-- Sidebar navigation-->
+                    <nav class="sidebar-nav">
+                        @include('layouts.partials.sidebar.informationsidebar')
+                    </nav>
+                    <!-- End Sidebar navigation -->
+                </div>
+                <!-- End Sidebar scroll-->
+            </aside>
+
+{{--            <aside class="left-sidebar info-sidebar" id="info-left-sidebar">--}}
+{{--              <!-- Sidebar scroll-->--}}
+{{--              <div class="scroll-sidebar">--}}
+{{--                  <!-- Sidebar navigation-->--}}
+{{--                  <nav class="sidebar-nav info-nav">--}}
+{{--                    @include('layouts.partials.sidebar.informationsidebar')--}}
+{{--                  </nav>--}}
+{{--                  <!-- End Sidebar navigation -->--}}
+{{--              </div>--}}
+{{--          </aside>--}}
 
           <div class="page-wrapper page p-5">
             <div class="container mb-5 info-text">
@@ -100,14 +112,11 @@
 
     @livewireScripts
 
-    <script src="{{ asset('js/manifest.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
-
     <script>
-        function showSideBar() {
-            foundSideBar = document.querySelector('#info-left-sidebar');
-            foundSideBar.classList.toggle('showSidebar');
-        }
+        // function showSideBar() {
+        //     foundSideBar = document.querySelector('#info-left-sidebar');
+        //     foundSideBar.classList.toggle('showSidebar');
+        // }
 
         var lightbox = GLightbox();
 

@@ -30,11 +30,7 @@ export default class ItemDetails extends React.Component {
         {
           this.props.item.item_prefix !== null ?
             <div className={this.props.item.item_suffix !== null ? 'col-md-6' : 'col-md-12'}>
-              <Card>
-                <Card.Body>
-                  <AffixData item={this.props.item} type={'prefix'} />
-                </Card.Body>
-              </Card>
+              <AffixData item={this.props.item} type={'prefix'} />
             </div>
           : null
         }
@@ -42,11 +38,7 @@ export default class ItemDetails extends React.Component {
         {
           this.props.item.item_suffix !== null ?
             <div className={this.props.item.item_prefix !== null ? 'col-md-6' : 'col-md-12'}>
-              <Card>
-                <Card.Body>
-                  <AffixData item={this.props.item} type={'suffix'} />
-                </Card.Body>
-              </Card>
+              <AffixData item={this.props.item} type={'suffix'} />
             </div>
           : null
         }

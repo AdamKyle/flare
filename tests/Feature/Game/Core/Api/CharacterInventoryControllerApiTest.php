@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core\Api;
 
+use App\Game\Skills\Jobs\DisenchantItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Models\Character;
@@ -80,6 +81,8 @@ class CharacterInventoryControllerApiTestTest extends TestCase
     }
 
     public function testCanDisenchantAllItems() {
+        Queue::fake();
+
         $user = $this->character->inventoryManagement()->giveitem($this->createItem([
             'name'             => 'Armour',
             'item_prefix_id'   => $this->createItemAffix(['type' => 'prefix']),
@@ -108,11 +111,9 @@ class CharacterInventoryControllerApiTestTest extends TestCase
 
         $this->actingAs($user)->JSON('post', '/api/character/'.$user->character->id.'/inventory/disenchant-all');
 
-        $character = $user->character->refresh();
 
-        $this->assertCount(2, $character->inventory->slots->filter(function($slot) {
-            return !$slot->equipped;
-        }));
+        Queue::assertPushed(DisenchantItem::class);
+
     }
 
     public function testHasNothingToDisenchant() {

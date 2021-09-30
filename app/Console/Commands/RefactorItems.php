@@ -58,6 +58,8 @@ class RefactorItems extends Command
                unset($attributes['created_at']);
                unset($attributes['updated_at']);
 
+               $attributes['market_sellable'] = true;
+
                $item->update($attributes);
 
                $this->line($item->affix_name . ' was updated with new stats.');
@@ -83,6 +85,8 @@ class RefactorItems extends Command
                 unset($attributes['item_suffix_id']);
                 unset($attributes['created_at']);
                 unset($attributes['updated_at']);
+
+                $attributes['market_sellable'] = true;
 
                 $item->update($attributes);
 

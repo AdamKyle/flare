@@ -48,7 +48,7 @@
     $previousUrlIsInfo = strpos(url()->previous(), 'information') !== false;
 @endphp
 
-<body class="fix-header fix-sidebar card-no-border {{!$previousUrlIsInfo ? 'mini-sidebar' : ''}}">
+<body class="fix-header fix-sidebar card-no-border mini-sidebar">
     <div id="main-wrapper">
         <div id="app">
             <header class="topbar">
@@ -97,34 +97,21 @@
 
             @guest
             @else
-                @if ($previousUrlIsInfo)
-                    <aside class="left-sidebar info-sidebar" id="info-left-sidebar">
-                        <!-- Sidebar scroll-->
-                        <div class="scroll-sidebar">
-                            <!-- Sidebar navigation-->
-                            <nav class="sidebar-nav info-nav">
-                                @include('layouts.partials.sidebar.informationsidebar')
-                            </nav>
-                            <!-- End Sidebar navigation -->
-                        </div>
-                    </aside>
-                @else
-                    <aside class="left-sidebar">
-                        <!-- Sidebar scroll-->
-                        <div class="scroll-sidebar">
-                            <!-- Sidebar navigation-->
-                            <nav class="sidebar-nav">
-                                @if (auth()->user()->hasRole('Admin'))
-                                    @include('layouts.partials.sidebar.adminsidebar')
-                                @else
-                                    @include('layouts.partials.sidebar.playersidebar')
-                                @endif
-                            </nav>
-                            <!-- End Sidebar navigation -->
-                        </div>
-                        <!-- End Sidebar scroll-->
-                    </aside>
-                @endif
+                <aside class="left-sidebar">
+                    <!-- Sidebar scroll-->
+                    <div class="scroll-sidebar">
+                        <!-- Sidebar navigation-->
+                        <nav class="sidebar-nav">
+                            @if (auth()->user()->hasRole('Admin'))
+                                @include('layouts.partials.sidebar.adminsidebar')
+                            @else
+                                @include('layouts.partials.sidebar.playersidebar')
+                            @endif
+                        </nav>
+                        <!-- End Sidebar navigation -->
+                    </div>
+                    <!-- End Sidebar scroll-->
+                </aside>
             @endguest
 
             @guest
