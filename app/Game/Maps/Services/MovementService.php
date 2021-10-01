@@ -509,7 +509,7 @@ class MovementService {
         }
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdateMapDetailsBroadcast($character->map, $character->user, $this));
+        event(new UpdateMapDetailsBroadcast($character->map()->with('gameMap')->first(), $character->user, $this));
     }
 
     /**

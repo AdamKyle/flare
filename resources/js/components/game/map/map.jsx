@@ -211,7 +211,7 @@ export default class Map extends React.Component {
     });
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
-
+      console.log(event);
       if (event.map.game_map.name !== this.state.characterMapName) {
         return;
       }
