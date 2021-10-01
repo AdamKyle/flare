@@ -241,7 +241,6 @@ export default class SkillDetails extends React.Component {
   }
 
   render() {
-    console.log(this.props.skills);
     return (
       <Card>
         <Card.Body>

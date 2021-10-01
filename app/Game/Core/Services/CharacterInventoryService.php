@@ -115,14 +115,22 @@ class CharacterInventoryService {
         $indexes = [];
 
         foreach ($ids as $id) {
-            $indexes[] = $this->character->inventorySets->search(function($set) use($id) {
-                return $set->id === $id;
-            }) + 1;
+            $indexes[] = [
+                'index' => $this->character->inventorySets->search(function($set) use($id) {
+                        return $set->id === $id;
+                    }) + 1,
+                'id'    => $id,
+            ];
         }
 
         return $indexes;
     }
 
+    /**
+     * Gets a list of empty inventory sets to save to.
+     *
+     * @return array
+     */
     public function getSaveableSets(): array {
         $ids = $this->character->inventorySets()
             ->doesntHave('slots')
@@ -133,9 +141,12 @@ class CharacterInventoryService {
         $indexes = [];
 
         foreach ($ids as $id) {
-            $indexes[] = $this->character->inventorySets->search(function($set) use($id) {
+            $indexes[] = [
+                'index' => $this->character->inventorySets->search(function($set) use($id) {
                     return $set->id === $id;
-                }) + 1;
+                }) + 1,
+                'id'    => $id,
+            ];
         }
 
         return $indexes;

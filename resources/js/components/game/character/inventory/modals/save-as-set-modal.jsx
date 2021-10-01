@@ -68,7 +68,7 @@ export default class SaveAsSetModal extends React.Component {
   }
 
   setOptions() {
-    return this.props.sets.map((set) => <option value={set} key={set}>Set {set}</option>)
+    return this.props.sets.map((set) => <option value={set.id} key={set.id}>Set {set.index}</option>)
   }
 
   setSelectedSet(event) {
