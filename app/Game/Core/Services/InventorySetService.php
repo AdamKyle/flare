@@ -52,7 +52,7 @@ class InventorySetService {
 
         $character = $inventorySet->character;
 
-        if ($character->inventory->slots->count() >= $character->inventory_max) {
+        if ($character->isInventoryFull()) {
             return $this->errorResult('Not enough inventory space to put this item back into your inventory.');
         }
 

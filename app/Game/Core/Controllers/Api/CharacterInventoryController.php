@@ -141,7 +141,7 @@ class CharacterInventoryController extends Controller {
     public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
         $slot         = $character->inventory->slots()->find($request->slot_id);
         $inventorySet = $character->inventorySets()->find($request->move_to_set);
-        
+
         if (is_null($slot) || is_null($inventorySet)) {
             return response()->json([
                 'message' => 'Either the slot or the inventory set does not exist.'
