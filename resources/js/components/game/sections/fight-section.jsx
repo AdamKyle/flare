@@ -1,8 +1,44 @@
 import React from 'react';
+import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import Attack from '../battle/attack/attack';
 import Monster from '../battle/monster/monster';
 import {getServerMessage} from '../helpers/server_message';
 import ReviveSection from "./revive-section";
+
+const renderAttackToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will attack with both weapons, rings, artifacts and affixes.
+    Uses Accuracy for weapons.
+  </Tooltip>
+);
+
+const renderCastingToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will attack with both spells, rings, artifacts and affixes.
+    Uses Casting Accuracy for spells.
+  </Tooltip>
+);
+
+const renderCastAndAttackToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will attack with spell in spell slot one and weapon in left hand as well as rings, artifacts and affixes.
+    Uses Casting Accuracy for the spell and Accuracy for the weapon.
+  </Tooltip>
+);
+
+const renderAttackAndCastToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will attack with weapon in right hand and spell in spell slot two as well as rings, artifacts and affixes.
+    Uses Accuracy for the weapon and then Casting Accuracy for the spell.
+  </Tooltip>
+);
+
+const renderDefendToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will use your armour class plus 5% of strength and additional 50% of ac to withstand the enemies attack.
+    Will then fire off rings, artifacts and affixes.
+  </Tooltip>
+);
 
 export default class FightSection extends React.Component {
 
@@ -209,9 +245,61 @@ export default class FightSection extends React.Component {
           {
             this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead && this.state.monster !== null ?
               <>
-                <button className="btn btn-primary" onClick={this.attack.bind(this)}
-                        disabled={this.props.isAdventuring}>Attack
-                </button>
+                <OverlayTrigger
+                  placement="right"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderAttackToolTip}
+                >
+                  <button className="btn btn-attack mr-2"
+                          disabled={this.props.isAdventuring}
+                  >
+                    <i className="ra ra-sword"></i>
+                  </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="right"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderCastingToolTip}
+                >
+                  <button className="btn btn-cast mr-2"
+                          disabled={this.props.isAdventuring}
+                  >
+                    <i className="ra ra-burning-book"></i>
+                  </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="right"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderCastAndAttackToolTip}
+                >
+                  <button className="btn btn-cast-attack mr-2"
+                          disabled={this.props.isAdventuring}
+                  >
+                    <i className="ra ra-lightning-sword"></i>
+                  </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="right"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderAttackAndCastToolTip}
+                >
+                  <button className="btn btn-attack-cast mr-2"
+                          disabled={this.props.isAdventuring}
+                  >
+                    <i className="ra ra-lightning-sword"></i>
+                  </button>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="right"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderDefendToolTip}
+                >
+                  <button className="btn btn-defend"
+                          disabled={this.props.isAdventuring}
+                  >
+                    <i className="ra ra-round-shield"></i>
+                  </button>
+                </OverlayTrigger>
                 {this.healthMeters()}
               </>
               : null
