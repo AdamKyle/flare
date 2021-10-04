@@ -657,11 +657,7 @@ class CharacterInformationBuilder {
 
         $bonus = $this->hereticSpellDamageBonus($this->character);
 
-        if ($bonus < 2) {
-            $bonus += 1;
-        }
-
-        return $damage * $bonus;
+        return $damage + $damage * $bonus;
     }
 
     protected function getArtifactDamage(): int {
@@ -723,7 +719,7 @@ class CharacterInformationBuilder {
      *
      * @return Collection
      */
-    protected function fetchInventory(): Collection
+    public function fetchInventory(): Collection
     {
         if ($this->inventory->isNotEmpty()) {
             return $this->inventory;

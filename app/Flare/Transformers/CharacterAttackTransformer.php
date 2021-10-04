@@ -2,7 +2,7 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Values\CharacterClassValue;
+use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Values\ClassAttackValue;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -21,30 +21,18 @@ class CharacterAttackTransformer extends TransformerAbstract {
      */
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterAttack      = resolve(CharacterAttackBuilder::class)->setCharacter($character);
 
         return [
             'id'                  => $character->id,
             'level'               => $character->level,
-            'ac'                  => $characterInformation->buildDefence(),
             'name'                => $character->name,
             'class'               => $character->class->name,
             'dex'                 => $characterInformation->statMod('dex'),
             'dur'                 => $characterInformation->statMod('dur'),
             'to_hit_base'         => $this->getToHitBase($character, $characterInformation),
             'base_stat'           => $characterInformation->statMod($character->class->damage_stat),
-            'attack'              => $characterInformation->buildAttack(),
-            'spell_damage'        => $characterInformation->getTotalSpellDamage(),
-            'artifact_damage'     => $characterInformation->getTotalArtifactDamage(),
-            'ring_damage'         => $characterInformation->getTotalRingDamage(),
             'health'              => $characterInformation->buildHealth(),
-            'has_artifacts'       => $characterInformation->hasArtifacts(),
-            'has_affixes'         => $characterInformation->hasAffixes(),
-            'non_stacking_affix'  => $characterInformation->getTotalAffixDamage(false),
-            'cant_resist_affixes' => $characterInformation->canAffixesBeResisted(),
-            'stacking_affix'      => $characterInformation->getTotalAffixDamage(),
-            'has_damage_spells'   => $characterInformation->hasDamageSpells(),
-            'heal_for'            => $characterInformation->buildHealFor(),
-            'resurrection_chance' => $characterInformation->fetchResurrectionChance(),
             'artifact_annulment'  => $characterInformation->getTotalAnnulment(),
             'spell_evasion'       => $characterInformation->getTotalSpellEvasion(),
             'skills'              => $this->fetchSkills($character->skills),
@@ -55,27 +43,25 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'can_adventure'       => $character->can_adventure,
             'show_message'        => $character->can_attack ? false : true,
             'is_dead'             => $character->is_dead,
-            'is_alchemy_locked'   => $this->isAlchemyLocked($character),
-            'gold'                => $character->gold,
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
-            'stats_reducing_slot' => $characterInformation->findPrefixStatReductionAffix(),
-            'stat_reducing_slots' => $characterInformation->findSuffixStatReductionAffixes(),
-            'life_steal_amount'   => $characterInformation->findLifeStealingAffixes($character->classType()->isVampire()),
-            'entranced_chance'    => $characterInformation->getEntrancedChance(),
+            'attack'              => $characterAttack->buildAttack(),
+            'cast_and_attack'     => $characterAttack->buildCastAttack(),
+            'attack_and_cast'     => $characterAttack->buildAttackAndCast(),
+            'defend'              => $characterAttack->buildDefend(),
         ];
     }
 
-    private function isAlchemyLocked(Character $character) {
-        $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isAlchemy();
-        })->first();
-
-        if (!is_null($skill)) {
-            return $skill->is_locked;
-        }
-
-        return true;
-    }
+//    private function isAlchemyLocked(Character $character) {
+//        $skill = $character->skills->filter(function($skill) {
+//            return $skill->type()->isAlchemy();
+//        })->first();
+//
+//        if (!is_null($skill)) {
+//            return $skill->is_locked;
+//        }
+//
+//        return true;
+//    }
 
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation) {
         return (int) number_format($characterInformation->statMod($character->class->to_hit_stat), 0);

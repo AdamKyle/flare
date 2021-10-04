@@ -3,6 +3,7 @@
 namespace App\Flare\Providers;
 
 
+use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
@@ -53,6 +54,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterInformationBuilder::class, function($app) {
             return new CharacterInformationBuilder();
+        });
+
+        $this->app->bind(CharacterAttackBuilder::class, function($app) {
+            return new CharacterAttackBuilder($app->make(CharacterInformationBuilder::class));
         });
 
         $this->app->bind(RandomItemDropBuilder::class, function($app) {
