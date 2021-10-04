@@ -85,13 +85,9 @@ export default class BattleAction extends React.Component {
 
   updateActions(event) {
     const monster = this.state.monsters.filter(monster => monster.id === parseInt(event.target.value))[0];
-    const monsterInfo = new Monster(monster);
-    const health = monsterInfo.health();
 
     this.setState({
       monster: monster,
-      monsterMaxHealth: health,
-      monsterCurrentHealth: health,
       battleMessages: [],
     }, () => {
       this.props.setMonster(this.state.monster);
@@ -100,9 +96,6 @@ export default class BattleAction extends React.Component {
 
   fightAgain() {
     this.setState({
-      monster: this.state.monster,
-      monsterMaxHealth: this.state.monsterMaxHealth,
-      monsterCurrentHealth: this.state.monsterMaxHealth,
       battleMessages: [],
     }, () => {
       this.props.setMonster(this.state.monster);

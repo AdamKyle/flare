@@ -19,39 +19,43 @@ export default class Monster {
     return parseInt(randomNumber(healthRange[0], healthRange[1]) + this.monster.dur);
   }
 
-  reduceAllStats(affix, affixes, canResist) {
+  reduceAllStats(affixes) {
     let monster = JSON.parse(JSON.stringify(this.monster));
     const dc    = 100 - monster.affix_resistance;
 
-    if (affix === null && affixes.length === 0) {
+    if (affixes.all_stat_reduction === null && affixes.stat_reduction.length === 0) {
       this.monster = monster;
 
       return [];
     }
 
-    if (affix !== null || affixes.length > 0) {
-      if (!canResist && (dc <= 0 || randomNumber(0, 100) > dc)) {
+    if (affix.all_stat_reduction !== null || affixes.stat_reduction.length > 0) {
+      if (!affixes.can_be_resisted && (dc <= 0 || randomNumber(0, 100) > dc)) {
         return [{message: 'Your enemy laughs at your attempt to make them week fails.'}]
       }
     }
 
-    if (affix !== null) {
-      monster.str = monster.str - (monster.str * affix.str_reduction);
-      monster.dex = monster.dex - (monster.dex * affix.dex_reduction);
-      monster.dur = monster.dur - (monster.dur * affix.dur_reduction);
-      monster.chr = monster.chr - (monster.chr * affix.chr_reduction);
-      monster.int = monster.int - (monster.int * affix.int_reduction);
-      monster.agi = monster.agi - (monster.agi * affix.agi_reduction);
-      monster.focus = monster.focus - (monster.focus * affix.focus_reduction);
+    const statReducingAffix = affix.all_stat_reduction;
+
+    if (statReducingAffix !== null) {
+      monster.str = monster.str - (monster.str * statReducingAffix.str_reduction);
+      monster.dex = monster.dex - (monster.dex * statReducingAffix.dex_reduction);
+      monster.dur = monster.dur - (monster.dur * statReducingAffix.dur_reduction);
+      monster.chr = monster.chr - (monster.chr * statReducingAffix.chr_reduction);
+      monster.int = monster.int - (monster.int * statReducingAffix.int_reduction);
+      monster.agi = monster.agi - (monster.agi * statReducingAffix.agi_reduction);
+      monster.focus = monster.focus - (monster.focus * statReducingAffix.focus_reduction);
     }
 
-    if (affixes.length > 0) {
+    const statReducingAffixes = affixes.stat_reduction;
+
+    if (statReducingAffixes.length > 0) {
       const stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
 
       for (let i = 0; i < stats.length; i++) {
         const iteratee = stats[i] + '_reduction';
 
-        const sumOfReductions = sumBy(affixes, iteratee);
+        const sumOfReductions = sumBy(statReducingAffixes, iteratee);
 
         monster[stats[i]] = monster[stats[i]] - (monster[stats[i]] * sumOfReductions);
       }

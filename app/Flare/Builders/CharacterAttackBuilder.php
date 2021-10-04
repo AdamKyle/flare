@@ -63,8 +63,6 @@ class CharacterAttackBuilder {
                 'can_be_resisted'        => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $this->characterInformationBuilder->getTotalAffixDamage(),
                 'non_stacking_damage'    => $this->characterInformationBuilder->getTotalAffixDamage(false),
-                'all_stat_reduction'     => $this->characterInformationBuilder->findPrefixStatReductionAffix(),
-                'stat_reduction'         => $this->characterInformationBuilder->findSuffixStatReductionAffixes(),
                 'stacking_life_stealing' => $this->characterInformationBuilder->findLifeStealingAffixes(true),
                 'life_stealing'          => $this->characterInformationBuilder->findLifeStealingAffixes(),
                 'entrancing_chance'      => $this->characterInformationBuilder->getEntrancedChance(),
