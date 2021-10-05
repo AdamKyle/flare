@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
@@ -21,7 +22,9 @@ class MonstersController extends Controller {
     }
 
     public function index() {
-        return view('admin.monsters.monsters');
+        return view('admin.monsters.monsters', [
+            'gameMapNames' => GameMap::all()->pluck('name')->toArray(),
+        ]);
     }
 
     public function show(Monster $monster) {

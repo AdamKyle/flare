@@ -16,6 +16,8 @@ class AddMoreStatsToMonsters extends Migration
         Schema::table('monsters', function (Blueprint $table) {
             $table->integer('max_affix_damage')->nullable()->default(0);
             $table->decimal('healing_percentage', 8, 4)->nullable()->default(0);
+            $table->decimal('entrancing_chance', 8, 4)->nullable()->default(0);
+            $table->decimal('devouring_light_chance', 8, 4)->nullable()->default(0);
         });
     }
 
@@ -29,6 +31,8 @@ class AddMoreStatsToMonsters extends Migration
         Schema::table('monsters', function (Blueprint $table) {
             $table->dropColumn('max_affix_damage');
             $table->dropColumn('healing_percentage');
+            $table->dropColumn('entrancing_chance');
+            $table->dropColumn('devouring_light_chance');
         });
     }
 }

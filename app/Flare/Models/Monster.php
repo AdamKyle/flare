@@ -51,6 +51,8 @@ class Monster extends Model
         'artifact_annulment',
         'affix_resistance',
         'healing_percentage',
+        'entrancing_chance',
+        'devouring_light_chance',
         'shards',
     ];
 
@@ -81,10 +83,12 @@ class Monster extends Model
         'max_artifact_damage'    => 'integer',
         'max_affix_damage'       => 'integer',
         'shards'                 => 'integer',
-        'spell_evasion'          => 'decimal:4',
-        'artifact_annulment'     => 'decimal:4',
-        'affix_resistance'       => 'decimal:4',
-        'healing_percentage'     => 'decimal:4',
+        'spell_evasion'          => 'float',
+        'artifact_annulment'     => 'float',
+        'affix_resistance'       => 'float',
+        'healing_percentage'     => 'float',
+        'entrancing_chance'      => 'float',
+        'devouring_light_chance' => 'float',
     ];
 
     public function skills() {

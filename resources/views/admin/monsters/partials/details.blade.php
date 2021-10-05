@@ -147,6 +147,8 @@
             <dd>{{number_format($monster->max_artifact_damage)}}</dd>
             <dt>Healing Percentage</dt>
             <dd>{{$monster->healing_percentage * 100}}%</dd>
+            <dt>Entrancing Chance</dt>
+            <dd>{{$monster->entrancing_chance * 100}}%</dd>
         </dl>
     </div>
 </div>
@@ -186,6 +188,8 @@
                 <dd>{{number_format($monster->gold_dust_cost)}}</dd>
                 <dt>Shard Reward:</dt>
                 <dd>{{number_format($monster->shards)}}</dd>
+                <dt>Devouring Light Chance:</dt>
+                <dd>{{$monster->devouring_light_chance * 100}}%</dd>
             </dl>
         </div>
     </div>

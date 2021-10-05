@@ -4,7 +4,7 @@
     'icon'         => '',
     'selected'     => 'false',
     'active'       => 'false',
-    'navLinkClass' => 'nav-link',
+    'navLinkClass' => '',
     'iconClass'    => '',
     'disabled'     => false,
 ])

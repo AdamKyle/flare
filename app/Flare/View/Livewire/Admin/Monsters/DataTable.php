@@ -44,7 +44,8 @@ class DataTable extends Component
         if (!is_null($this->onlyMapName)) {
             $monsters = $monsters->join('game_maps', function($join) {
                 $join->on('game_maps.id', 'monsters.game_map_id')
-                    ->where('game_maps.name', $this->onlyMapName);
+                     ->where('game_maps.name', $this->onlyMapName)
+                     ->where('is_celestial_entity', $this->withCelestials);
             })->select('monsters.*');
         }
 

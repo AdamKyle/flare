@@ -30,6 +30,8 @@
         <th>spell_evasion</th>
         <th>artifact_annulment</th>
         <th>affix_resistance</th>
+        <th>entrancing_chance</th>
+        <th>devouring_light_chance</th>
         <th>published</th>
         <th>quest_item_id</th>
         <th>quest_item_drop_chance</th>
@@ -68,6 +70,8 @@
             <td>{{$monster->spell_evasion}}</td>
             <td>{{$monster->artifact_annulment}}</td>
             <td>{{$monster->affix_resistance}}</td>
+            <td>{{$monster->entrancing_chance}}</td>
+            <td>{{$monster->devouring_light_chance}}</td>
             <td>{{$monster->published}}</td>
             <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>
