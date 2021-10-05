@@ -132,7 +132,7 @@ export default class FightSection extends React.Component {
     });
   }
 
-  attack() {
+  attack(attackType) {
     if (this.state.monster === null) {
       return getServerMessage('no_monster');
     }
@@ -148,52 +148,52 @@ export default class FightSection extends React.Component {
       this.state.monsterCurrentHealth
     );
 
-    const state = attack.attack(this.state.character, this.state.monster, true, 'player').getState();
+    const state = attack.attack(this.state.character, this.state.monster, true, 'player', attackType).getState()
 
-    state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages];
+    state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
 
     this.setState(state);
 
-    if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
-      axios.post('/api/battle-results/' + this.state.character.id, {
-        is_character_dead: state.characterCurrentHealth <= 0,
-        is_defender_dead: state.monsterCurrentHealth <= 0,
-        defender_type: 'monster',
-        monster_id: this.state.monster.id,
-      }).then((response) => {
-        let health = state.characterCurrentHealth;
-        let monster = this.state.monster;
-
-        if (health >= 0) {
-          health = this.state.characterMaxHealth;
-        }
-
-        if (state.monsterCurrentHealth <= 0 && health >= 0) {
-          monster = null;
-        }
-
-        this.setState({
-          characterCurrentHealth: health,
-          canAttack: false,
-          monster: monster,
-        }, () => {
-          this.props.setMonster(null);
-        });
-      }).catch((err) => {
-        if (err.hasOwnProperty('response')) {
-          const response = err.response;
-
-          if (response.status === 429) {
-            // Reload to show them their notification.
-            return this.props.openTimeOutModal();
-          }
-
-          if (response.status === 401) {
-            return location.reload();
-          }
-        }
-      });;
-    }
+    // if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
+    //   axios.post('/api/battle-results/' + this.state.character.id, {
+    //     is_character_dead: state.characterCurrentHealth <= 0,
+    //     is_defender_dead: state.monsterCurrentHealth <= 0,
+    //     defender_type: 'monster',
+    //     monster_id: this.state.monster.id,
+    //   }).then((response) => {
+    //     let health = state.characterCurrentHealth;
+    //     let monster = this.state.monster;
+    //
+    //     if (health >= 0) {
+    //       health = this.state.characterMaxHealth;
+    //     }
+    //
+    //     if (state.monsterCurrentHealth <= 0 && health >= 0) {
+    //       monster = null;
+    //     }
+    //
+    //     this.setState({
+    //       characterCurrentHealth: health,
+    //       canAttack: false,
+    //       monster: monster,
+    //     }, () => {
+    //       this.props.setMonster(null);
+    //     });
+    //   }).catch((err) => {
+    //     if (err.hasOwnProperty('response')) {
+    //       const response = err.response;
+    //
+    //       if (response.status === 429) {
+    //         // Reload to show them their notification.
+    //         return this.props.openTimeOutModal();
+    //       }
+    //
+    //       if (response.status === 401) {
+    //         return location.reload();
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   revive(data) {
@@ -243,7 +243,7 @@ export default class FightSection extends React.Component {
         <hr/>
         <div className="battle-section text-center">
           {
-            this.state.monsterCurrentHealth !== 0 && !this.state.character.is_dead && this.state.monster !== null ?
+            this.state.monsterCurrentHealth > 0 && !this.state.character.is_dead && this.state.monster !== null ?
               <>
                 <OverlayTrigger
                   placement="right"
@@ -252,6 +252,7 @@ export default class FightSection extends React.Component {
                 >
                   <button className="btn btn-attack mr-2"
                           disabled={this.props.isAdventuring}
+                          onClick={() => this.attack('attack')}
                   >
                     <i className="ra ra-sword"></i>
                   </button>
@@ -263,6 +264,7 @@ export default class FightSection extends React.Component {
                 >
                   <button className="btn btn-cast mr-2"
                           disabled={this.props.isAdventuring}
+                          onClick={() => this.attack('cast')}
                   >
                     <i className="ra ra-burning-book"></i>
                   </button>
@@ -274,6 +276,7 @@ export default class FightSection extends React.Component {
                 >
                   <button className="btn btn-cast-attack mr-2"
                           disabled={this.props.isAdventuring}
+                          onClick={() => this.attack('cast_and_attack')}
                   >
                     <i className="ra ra-lightning-sword"></i>
                   </button>
@@ -285,6 +288,7 @@ export default class FightSection extends React.Component {
                 >
                   <button className="btn btn-attack-cast mr-2"
                           disabled={this.props.isAdventuring}
+                          onClick={() => this.attack('attack_and_cast')}
                   >
                     <i className="ra ra-lightning-sword"></i>
                   </button>
@@ -296,6 +300,7 @@ export default class FightSection extends React.Component {
                 >
                   <button className="btn btn-defend"
                           disabled={this.props.isAdventuring}
+                          onClick={() => this.attack('defend')}
                   >
                     <i className="ra ra-round-shield"></i>
                   </button>

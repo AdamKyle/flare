@@ -45,14 +45,17 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'is_dead'             => $character->is_dead,
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'stat_affixes'        => [
-                'can_be_resisted'    => $characterInformation->canAffixesBeResisted(),
+                'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
-            'attack'              => $characterAttack->buildAttack(),
-            'cast_and_attack'     => $characterAttack->buildCastAttack(),
-            'attack_and_cast'     => $characterAttack->buildAttackAndCast(),
-            'defend'              => $characterAttack->buildDefend(),
+            'attack_types' => [
+                'attack'              => $characterAttack->buildAttack(),
+                'cast'                => $characterAttack->buildCastAttack(),
+                'cast_and_attack'     => $characterAttack->buildCastAndAttack(),
+                'attack_and_cast'     => $characterAttack->buildAttackAndCast(),
+                'defend'              => $characterAttack->buildDefend(),
+            ],
         ];
     }
 

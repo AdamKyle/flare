@@ -92,32 +92,64 @@
                 There are some affixes who's damage cannot be resisted, this is known as irresistible damage. Even if an enemies
                 Affix Resistance is over 100% this damage cannot be resisted.
             </p>
+            <p>
+                There is a quest item that can make your affixes irresistible, which can then be upgraded to make your rings and
+                artifacts irresistible. You can then further upgrade this to make spells irresistible.
+            </p>
+            <ul>
+                <li>Casters will use 5% of their Focus as the base DC check for enemies resistances check to see if the enemy can avoid the spell(s).</li>
+                <li>Vampires will use 5% of their Durability as the base dc check for resistances check to see if the enemy can avoid life stealing affixes.</li>
+            </ul>
         </div>
         <dl class="mt-3">
             <dt>Affix Resistance (chance):</dt>
             <dd>{{$monster->affix_resistance * 100}}%</dd>
+            <dt>Artifact Annulment (chance):</dt>
+            <dd>{{$monster->artifact_annulment * 100}}%</dd>
+            <dt>Spell Evasion (chance):</dt>
+            <dd>{{$monster->spell_evasion * 100}}%</dd>
         </dl>
     </div>
 </div>
 
-@if ($monster->can_cast)
-    <hr />
-    <h4 class="mt-2">Evasion</h4>
-    <div class="card">
-        <div class="card-body">
-            <div class="alert alert-info mt-2">
-                Spell Evasion will reduce the players spell damage, while Artifact annulment will reduce the characters artifact damage.
-                Players can equip rings to increase their own spell evasion and artifact annulment to reduce the enemies spells and artifact damage.
-            </div>
-            <dl class="mt-3">
-                <dt>Max Cast For</dt>
-                <dd>{{number_format($monster->max_spell_damage)}}</dd>
-                <dt>Max Artifact Damage</dt>
-                <dd>{{number_format($monster->max_artifact_damage)}}</dd>
-            </dl>
+<hr />
+<h4 class="mt-2">Cast, Artifacts and Affixes </h4>
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-info mt-2">
+            <p>
+                All monsters can cast to some degree, have artifacts, affixes and can heal. Here you will see the details corresponding to that.
+                There are a couple things to keep in mind however:
+            </p>
+            <ul>
+                <li>
+                    Monsters cast on their turn, same for affixes and artifacts.
+                </li>
+                <li>
+                    Monsters follow the same rules as players, if you are blocked (or miss), your rings and artifacts and affixes fire.
+                </li>
+                <li>
+                    Monsters will only heal, if they get a turn. In that case, like players, they heal at the end of their turn for a % of their Dur.
+                    This is where stat reducing affixes can come in handy. You can reduce the enemies durability so they cannot heal as much.
+                </li>
+            </ul>
+            <p>
+                There is a quest chain you can do that rewards you at the end with a new item that will annul the enemies affixes, artifacts, spells
+                and ability to heal.
+            </p>
         </div>
+        <dl class="mt-3">
+            <dt>Max Cast For</dt>
+            <dd>{{number_format($monster->max_spell_damage)}}</dd>
+            <dt>Max Artifact Damage</dt>
+            <dd>{{number_format($monster->max_artifact_damage)}}</dd>
+            <dt>Max Affix Damage</dt>
+            <dd>{{number_format($monster->max_artifact_damage)}}</dd>
+            <dt>Healing Percentage</dt>
+            <dd>{{$monster->healing_percentage * 100}}%</dd>
+        </dl>
     </div>
-@endif
+</div>
 
 @if ($monster->is_celestial_entity)
     <hr />
@@ -125,13 +157,27 @@
     <div class="card">
         <div class="card-body">
             <div class="alert alert-info mb-2 mt-2">
-                <p>This is a celestial entity which can only be conjured via a special NPC. You can learn more about those <a href="#">here</a>.</p>
+                <p>This is a celestial entity which can only be conjured via a special NPC. You can learn more about those <a href="/information/celestials">here</a>.</p>
                 <p>This creature will have a cost in <strong>Gold</strong> and <strong>Gold Dust</strong> and can be summoned either privately or publicly.</p>
                 <p>These Creatures can also give quest rewards when defeated, as well as other items.</p>
-                <p>Celestial entities also drop what are called <strong>Shards</strong>. These are used in <a href="#">Alchemy</a> in place of gold.</p>
+                <p>Celestial entities also drop what are called <strong>Shards</strong>. These are used in <a href="/information/usable-items">Alchemy</a> in place of gold.</p>
                 <p>Celestial Entities can also spawn randomly on the map by a player, any player, just moving around. When these entities spawn - be it summoned or other wise, they
                     spawn in random locations at which the player must then go to. If the location is a kingdom is a small chance of it doing damage to the kingdom. The chance of a beast spawning
                     is greater then the chance of it doing damage to a kingdom when it does spawn.</p>
+                <p>
+                    <strong>Vampires</strong> will only do half damage to these creatures via their life stealing affixes.
+                </p>
+                <p>
+                    Celestials can void you. Much like the quest item to obtain for voiding enemies of their affixes, spells,
+                    artifacts and ability to heal - a Celestial can void your affixes and artifacts. This is called: Devouring Light.
+                    All Celestials have a Devouring Light Percentage starting at or above 50%.
+                </p>
+                <p>There is a special quest item you can obtain to "devoid" their void, also known as: Devouring Darkness.
+                    This has a chance starting at 50% to void out their chance to void you. You can upgrade this item to upgrade its chance.</p>
+                <p>
+                    If you fail to kill a celestial in one hit, it will have a "flee chance". Should it meet this chance, it will flee from battle
+                    to a new location.
+                </p>
             </div>
             <dl class="mt-3">
                 <dt>Gold Cost:</dt>

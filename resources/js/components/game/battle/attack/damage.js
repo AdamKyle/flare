@@ -22,9 +22,15 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth) {
-    let totalDamage   = monsterCurrentHealth * attacker.life_steal_amount;
-    const cantResist  = attacker.cant_resist_affixes;
+  affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth, stacking) {
+    let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
+    const cantResist  = attacker.cant_be_resisted;
+
+    if (stacking) {
+      this.battleMessages.push({
+        message: 'The enemy screams in pain as you, again, drain it\'s life!'
+      });
+    }
 
     if (totalDamage > 0) {
       if (cantResist) {
@@ -56,17 +62,17 @@ export default class Damage {
   }
 
   affixDamage(attacker, defender, monsterCurrentHealth) {
-    let totalDamage   = attacker.stacking_affix;
-    const cantResist  = attacker.cant_resist_affixes;
+    let totalDamage   = attacker.stacking_damage;
+    const cantResist  = attacker.cant_be_resisted;
 
     if (cantResist) {
       this.battleMessages.push({
         'message': 'The enemy cannot resist your enchantments! They are so glowy!'
       });
 
-      totalDamage += attacker.non_stacking_affix
+      totalDamage += attacker.non_stacking_damage
     } else {
-      if (attacker.non_stacking_affix > 0) {
+      if (attacker.non_stacking_damage > 0) {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
@@ -74,7 +80,7 @@ export default class Damage {
             'message': 'Your damaging enchantments (resistible) have been resisted.'
           });
         } else {
-          totalDamage += attacker.non_stacking_affix
+          totalDamage += attacker.non_stacking_damage
         }
       }
     }

@@ -42,6 +42,8 @@ class Stats extends Component
         'monster.spell_evasion'       => 'nullable',
         'monster.artifact_annulment'  => 'nullable',
         'monster.affix_resistance'    => 'nullable',
+        'monster.healing_percentage'  => 'nullable',
+        'monster.max_affix_damage'    => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];

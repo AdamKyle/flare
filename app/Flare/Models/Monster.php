@@ -46,9 +46,11 @@ class Monster extends Model
         'can_use_artifacts',
         'max_spell_damage',
         'max_artifact_damage',
+        'max_affix_damage',
         'spell_evasion',
         'artifact_annulment',
         'affix_resistance',
+        'healing_percentage',
         'shards',
     ];
 
@@ -77,10 +79,12 @@ class Monster extends Model
         'can_use_artifacts'      => 'boolean',
         'max_spell_damage'       => 'integer',
         'max_artifact_damage'    => 'integer',
+        'max_affix_damage'       => 'integer',
         'shards'                 => 'integer',
         'spell_evasion'          => 'decimal:4',
         'artifact_annulment'     => 'decimal:4',
         'affix_resistance'       => 'decimal:4',
+        'healing_percentage'     => 'decimal:4',
     ];
 
     public function skills() {

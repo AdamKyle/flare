@@ -25,6 +25,8 @@
         <th>attack_range</th>
         <th>max_spell_damage</th>
         <th>max_artifact_damage</th>
+        <th>max_affix_damage</th>
+        <th>healing_percentage</th>
         <th>spell_evasion</th>
         <th>artifact_annulment</th>
         <th>affix_resistance</th>
@@ -59,11 +61,13 @@
             <td>{{$monster->shards}}</td>
             <td>{{$monster->health_range}}</td>
             <td>{{$monster->attack_range}}</td>
-            <th>{{$monster->max_spell_damage}}</th>
-            <th>{{$monster->max_artifact_damage}}</th>
-            <th>{{$monster->spell_evasion}}</th>
-            <th>{{$monster->artifact_annulment}}</th>
-            <th>{{$monster->affix_resistance}}</th>
+            <td>{{$monster->max_spell_damage}}</td>
+            <td>{{$monster->max_artifact_damage}}</td>
+            <td>{{$monster->max_affix_damage}}</td>
+            <td>{{$monster->healing_percentage}}</td>
+            <td>{{$monster->spell_evasion}}</td>
+            <td>{{$monster->artifact_annulment}}</td>
+            <td>{{$monster->affix_resistance}}</td>
             <td>{{$monster->published}}</td>
             <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>

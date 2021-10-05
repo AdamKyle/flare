@@ -29,13 +29,13 @@ export default class Monster {
       return [];
     }
 
-    if (affix.all_stat_reduction !== null || affixes.stat_reduction.length > 0) {
+    if (affixes.all_stat_reduction !== null || affixes.stat_reduction.length > 0) {
       if (!affixes.can_be_resisted && (dc <= 0 || randomNumber(0, 100) > dc)) {
         return [{message: 'Your enemy laughs at your attempt to make them week fails.'}]
       }
     }
 
-    const statReducingAffix = affix.all_stat_reduction;
+    const statReducingAffix = affixes.all_stat_reduction;
 
     if (statReducingAffix !== null) {
       monster.str = monster.str - (monster.str * statReducingAffix.str_reduction);

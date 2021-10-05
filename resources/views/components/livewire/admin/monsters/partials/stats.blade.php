@@ -114,6 +114,21 @@
     </div>
     <hr />
     <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="max_affix_damage">Max Affix Damage: </label>
+                <input type="number" class="form-control" name="max_affix_damage" value="" wire:model="monster.max_affix_damage">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="healing_percentage">Max Healing Amount (%): </label>
+                <input type="number" class="form-control" name="healing_percentage" value="" wire:model="monster.healing_percentage">
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label for="ac">Armour Class: </label>

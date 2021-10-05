@@ -40,27 +40,37 @@ class CharacterAttackBuilder {
         return $attack;
     }
 
-    public function buildCastAndAttack() {
+    public function buildCastAndAttack(): array {
         return $this->castAndAttackPositionalDamage('spell-one', 'left-hand');
     }
 
-    public function buildAttackAndCast() {
+    public function buildAttackAndCast(): array {
         return $this->castAndAttackPositionalDamage('spell-two', 'right-hand');
     }
 
-    public function buildDefend() {
-        return $this->baseAttack();
+    public function buildDefend(): array {
+        $baseAttack = $this->baseAttack();
+
+        $ac                    = $this->characterInformationBuilder->buildDefence();
+        $str                   = $this->characterInformationBuilder->statMod('str') * 0.05;
+
+        $ac = $ac + $ac * $str;
+
+        $baseAttack['defence'] = $ac + $ac * 0.5;
+
+        return $baseAttack;
     }
 
     protected function baseAttack(): array {
         return [
+            'name'            => $this->character->name,
             'defence'         => $this->characterInformationBuilder->buildDefence(),
             'ring_damage'     => $this->characterInformationBuilder->getTotalRingDamage(),
             'artifact_damage' => $this->characterInformationBuilder->getTotalArtifactDamage(),
             'heal_for'        => $this->characterInformationBuilder->buildHealFor(),
             'res_chance'      => $this->characterInformationBuilder->fetchResurrectionChance(),
             'affixes'         => [
-                'can_be_resisted'        => $this->characterInformationBuilder->canAffixesBeResisted(),
+                'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $this->characterInformationBuilder->getTotalAffixDamage(),
                 'non_stacking_damage'    => $this->characterInformationBuilder->getTotalAffixDamage(false),
                 'stacking_life_stealing' => $this->characterInformationBuilder->findLifeStealingAffixes(true),
