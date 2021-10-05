@@ -118,7 +118,7 @@ export default class FightSection extends React.Component {
     this.setState({
       battleMessages: [],
       missCounter: 0,
-      monster: this.props.monster,
+      monster: monsterInfo,
       monsterCurrentHealth: health,
       monsterMaxHealth: health,
     }, () => {
@@ -151,6 +151,10 @@ export default class FightSection extends React.Component {
     const state = attack.attack(this.state.character, this.state.monster, true, 'player', attackType).getState()
 
     state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
+
+    if (state.characterCurrentHealth <= 0) {
+      state.battleMessages.push({message: 'Death has come for you this day child! Resurrect to try again!'});
+    }
 
     this.setState(state);
 
@@ -231,7 +235,7 @@ export default class FightSection extends React.Component {
           <div className="progress-bar monster-bar" role="progressbar"
                style={{width: monsterCurrentHealth + '%'}}
                aria-valuenow={this.state.monsterCurrentHealth} aria-valuemin="0"
-               aria-valuemax={this.state.monsterMaxHealth}>{this.state.monster.name}</div>
+               aria-valuemax={this.state.monsterMaxHealth}>{this.state.monster.getMonster().name}</div>
         </div>
       </div>
     );

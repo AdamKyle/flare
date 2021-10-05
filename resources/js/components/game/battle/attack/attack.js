@@ -1,9 +1,6 @@
-import Monster from '../monster/monster';
-import {random} from 'lodash';
-import Damage from "./damage";
-import Healing from "./healing";
 import AttackType from "./attack-type";
 import WeaponAttack from "./attack-types/weapon-attack";
+import MonsterAttack from "../monster/monster-attack";
 
 export default class Attack {
 
@@ -25,30 +22,36 @@ export default class Attack {
 
   attack(attacker, defender, attackAgain, type, attackType) {
 
-      if (this.isMonsterDead()) {
-        this.state.battleMessages.push({
-          message: this.defender.name + ' has been defeated!'
-        });
+    if (this.isMonsterDead()) {
+      this.state.battleMessages.push({
+        message: this.defender.name + ' has been defeated!'
+      });
 
-        this.monsterCurrentHealth = 0;
+      this.monsterCurrentHealth = 0;
 
-        return this;
-      }
+      return this;
+    }
 
-      if (this.isCharacterDead()) {
-        this.state.battleMessages.push({
-          message: 'You must resurrect first!'
-        });
+    if (this.isCharacterDead()) {
+      this.state.battleMessages.push({
+        message: 'You must resurrect first!'
+      });
 
-        this.characterCurrentHealth = 0;
+      this.characterCurrentHealth = 0;
 
-        return this;
-      }
+      return this;
+    }
 
     if (type === 'monster') {
-      console.log(attacker);
+      const monsterAttack = new MonsterAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth);
 
-      return;
+      const state = monsterAttack.doAttack(attackType);
+
+      this.state.characterCurrentHealth = state.characterCurrentHealth;
+      this.state.monsterCurrentHealth   = state.monsterCurrentHealth;
+      this.state.battleMessages         = [...this.state.battleMessages, ...state.battleMessages];
+
+      return this;
     }
 
     switch (attackType) {
@@ -75,7 +78,7 @@ export default class Attack {
     this.characterCurrentHealth = this.state.characterCurrentHealth;
     this.monsterCurrentHealth   = this.state.monsterCurrentHealth;
 
-    return this.attack(defender, attacker, false, 'monster')
+    return this.attack(defender, attacker, false, 'monster', attackType)
   }
 
   getState() {

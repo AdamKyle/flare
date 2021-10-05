@@ -76,6 +76,7 @@ export default class UseItems {
 
   artifactDamage(attacker, defender, type) {
     if (type === 'player') {
+      defender        = defender.getMonster();
       const dc        = 100 - (100 * defender.artifact_annulment);
       let totalDamage = attacker.artifact_damage;
 

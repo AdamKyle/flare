@@ -53,6 +53,8 @@ export default class WeaponAttack {
 
       this.useItems(attackData, this.attacker.class)
     } else {
+      this.addMessage('Your attack missed!');
+
       this.useItems(attackData, this.attacker.class);
     }
 

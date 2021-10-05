@@ -30,6 +30,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'class'               => $character->class->name,
             'dex'                 => $characterInformation->statMod('dex'),
             'dur'                 => $characterInformation->statMod('dur'),
+            'ac'                  => $characterInformation->buildDefence(),
             'to_hit_base'         => $this->getToHitBase($character, $characterInformation),
             'base_stat'           => $characterInformation->statMod($character->class->damage_stat),
             'health'              => $characterInformation->buildHealth(),

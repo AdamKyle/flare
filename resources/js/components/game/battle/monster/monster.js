@@ -77,5 +77,9 @@ export default class Monster {
     return parseInt(randomNumber(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat]) / 2);
   }
 
+  getMonster() {
+    return this.monster;
+  }
+
 
 }

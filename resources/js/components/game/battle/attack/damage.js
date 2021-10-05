@@ -23,6 +23,7 @@ export default class Damage {
   }
 
   affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth, stacking) {
+    defender          = defender.getMonster();
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
     const cantResist  = attacker.cant_be_resisted;
 
@@ -62,6 +63,7 @@ export default class Damage {
   }
 
   affixDamage(attacker, defender, monsterCurrentHealth) {
+    defender          = defender.getMonster();
     let totalDamage   = attacker.stacking_damage;
     const cantResist  = attacker.cant_be_resisted;
 
@@ -132,6 +134,10 @@ export default class Damage {
   }
 
   calculateSpellDamage(attacker, defender, monsterCurrentHealth, increaseDamage) {
+    if (!defender.hasOwnProperty('spell_evasion')) {
+      defender = defender.getMonster();
+    }
+
     const dc        = 100 - (100 * defender.spell_evasion);
     let totalDamage = attacker.spell_damage;
 

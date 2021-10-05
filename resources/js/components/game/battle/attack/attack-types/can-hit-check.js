@@ -1,4 +1,5 @@
 import Damage from "../damage";
+import Monster from "../../monster/monster";
 
 const battleMessages = [];
 
@@ -10,6 +11,10 @@ export default class CanHitCheck {
 
   canHit (attacker, defender, battleMessages) {
     const damage        = new Damage();
+
+    if (!defender.hasOwnProperty('skills')) {
+      defender = defender.getMonster();
+    }
 
     if (attacker.hasOwnProperty('class')) {
       if (damage.canAutoHit(attacker)) {
@@ -42,7 +47,7 @@ export default class CanHitCheck {
     const percentage = Math.floor((100 - toHitBase));
 
     const needToHit = 100 - percentage;
-    console.log(this.battleMessages);
+
     return (Math.random() * (100 - 1) + 1) > needToHit;
   }
 
