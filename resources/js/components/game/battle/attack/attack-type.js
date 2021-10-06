@@ -32,6 +32,10 @@ export default class AttackType {
     return 'voided_attack_and_cast';
   }
 
+  static get DEFEND() {
+    return 'defend';
+  }
+
   static get VOIDED_DEFEND() {
     return 'voided_defend';
   }

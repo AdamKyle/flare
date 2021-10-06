@@ -1,6 +1,7 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 import LoadingModal from "../../components/loading/loading-modal";
+import AttackType from "../../battle/attack/attack-type";
 
 export default class AdventureEmbark extends React.Component {
 
@@ -10,6 +11,7 @@ export default class AdventureEmbark extends React.Component {
     this.state = {
       adventure: null,
       isLoading: true,
+      attackType: AttackType.ATTACK,
     }
   }
 
@@ -21,7 +23,9 @@ export default class AdventureEmbark extends React.Component {
   }
 
   embark() {
-    axios.post('/api/character/' + this.props.characterId + '/adventure/' + this.state.adventure.id).then((result) => {
+    axios.post('/api/character/' + this.props.characterId + '/adventure/' + this.state.adventure.id, {
+      attackType: this.state.attackType,
+    }).then((result) => {
       this.props.updateMessage(result.data.message);
       this.props.updateCharacterAdventures(result.data.adventure_completed_at);
       this.props.embarkClose();
@@ -43,6 +47,12 @@ export default class AdventureEmbark extends React.Component {
       this.setState({
         errorMessage: 'Invalid input. Please try again.'
       });
+    });
+  }
+
+  selectAttackType(event) {
+    this.setState({
+      attackType: event.target.value
     });
   }
 
@@ -94,6 +104,19 @@ export default class AdventureEmbark extends React.Component {
               <span
                 className="text-muted"><strong>Total Time</strong>: {this.state.adventure.levels * this.state.adventure.time_per_level} minutes</span>
             </div>
+            <hr />
+            <div className="form-group">
+              <label htmlFor="attack-type">Please select an Attack Type</label>
+              <select className="form-control" id="attack-type" value={this.state.attackType} onChange={this.selectAttackType.bind(this)}>
+                <option value={AttackType.ATTACK}>Attack</option>
+                <option value={AttackType.CAST}>Cast</option>
+                <option value={AttackType.CAST_AND_ATTACK}>Cast then Attack</option>
+                <option value={AttackType.ATTACK_AND_CAST}>Attack then Cast</option>
+                <option value={AttackType.DEFEND}>Defend</option>
+              </select>
+            </div>
+            <p>Each attack type corresponds to the attack button from drop down critters. This attack type will be used
+            for all floors in the adventure. Choose carefully, you cannot change it once you embark.</p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.props.embarkClose}>

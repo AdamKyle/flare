@@ -2,6 +2,7 @@
 
 namespace App\Game\Adventures\Controllers\Api;
 
+use App\Game\Adventures\Requests\AdventureEmbarkRequest;
 use Cache;
 use App\Http\Controllers\Controller;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -21,7 +22,7 @@ class AdventureController extends Controller {
         return response()->json(auth()->user()->character->adventureLogs, 200);
     }
 
-    public function adventure(Character $character, Adventure $adventure) {
+    public function adventure(AdventureEmbarkRequest $request, Character $character, Adventure $adventure) {
         $character->update([
             'can_attack'    => false,
             'can_move'      => false,
@@ -37,7 +38,7 @@ class AdventureController extends Controller {
 
         $character = $character->refresh();
 
-        event(new EmbarkOnAdventureEvent($character, $adventure));
+        event(new EmbarkOnAdventureEvent($character, $adventure, $request->attack_type));
 
         event(new UpdateTopBarEvent($character));
 

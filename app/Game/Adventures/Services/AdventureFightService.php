@@ -7,8 +7,11 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Services\FightService;
+use App\Game\Adventures\Traits\CreateBattleMessages;
 
 class AdventureFightService {
+
+    use CreateBattleMessages;
 
     /**
      * @var Character $character
@@ -37,14 +40,16 @@ class AdventureFightService {
      * @param Adventure $adventure
      * @return void
      */
-    public function __construct(Character $character, Adventure $adventure) {
+    public function __construct(Character $character, Adventure $adventure, string $attackType) {
 
         $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
 
         $this->character     = $character;
         $this->adventure     = $adventure;
+        $this->attackType    = $attackType;
 
-        $this->currentCharacterHealth = $this->characterInformation->buildHealth();
+        $this->currentCharacterHealth = 0; //$this->characterInformation->buildHealth();
+        $this->battleLogs    = [];
     }
 
     /**
@@ -52,19 +57,24 @@ class AdventureFightService {
      *
      * @return void
      */
-    public function processBattle(): FightService {
-        $this->monster              = $this->adventure->monsters()->inRandomOrder()->first();
-        $healthRange                = explode('-', $this->monster->health_range);
+    public function processFloor(): FightService {
+        $encounters                 = rand(1, $this->adventure->monsters->count());
 
-        $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+        for ($i = 1; $i <= $encounters; $i++) {
+            $monster = $this->adventure->monsters()->inRandomOrder()->first();
+            $message = 'You encounter a: ' . $monster->name;
 
-        $fightService = resolve(FightService::class, [
-            'character' => $this->character,
-            'monster'   => $this->monster,
-        ]);
+            $this->battleLogs = $this->addMessage($message, 'info-encounter');
 
-        $fightService->attack($this->character, $this->monster);
+            $fightService = resolve(FightService::class, [
+                'character' => $this->character,
+                'monster'   => $monster,
+            ]);
 
-        return $fightService;
+            $fightService->attack($this->character, $this->monster);
+
+
+        }
     }
+
 }

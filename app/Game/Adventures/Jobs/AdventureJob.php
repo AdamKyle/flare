@@ -54,11 +54,13 @@ class AdventureJob implements ShouldQueue
     public function __construct(
         Character $character,
         Adventure $adventure,
+        string $attackType,
         string $name,
         int $currentLevel,
     ) {
         $this->character          = $character;
         $this->adventure          = $adventure;
+        $this->attackType         = $attackType;
         $this->name               = $name;
         $this->currentLevel       = $currentLevel;
     }
@@ -83,7 +85,7 @@ class AdventureJob implements ShouldQueue
             'name'                => $this->name
         ]);
 
-        $adventureService->processAdventure($this->currentLevel, $this->adventure->levels);
+        $adventureService->processAdventure($this->currentLevel, $this->adventure->levels, $this->attackType);
 
         if ($this->currentLevel === $this->adventure->levels) {
             Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);

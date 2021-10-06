@@ -21,15 +21,21 @@ class EmbarkOnAdventureEvent
     public $adventure;
 
     /**
+     * @var string $attackType
+     */
+    public $attackType;
+
+    /**
      * Constructor
-     * 
+     *
      * @param Character $character
      * @param Adventure $adventure
-     * @return void
+     * @param string $attackType
      */
-    public function __construct(Character $character, Adventure $adventure)
+    public function __construct(Character $character, Adventure $adventure, string $attackType)
     {
         $this->character          = $character;
         $this->adventure          = $adventure;
+        $this->attackType         = $attackType;
     }
 }
