@@ -56,18 +56,14 @@ export default class UseItems {
   useArtifacts(attacker, defender, type) {
     if (type == 'player') {
       if (attacker.artifact_damage !== 0) {
-        this.battleMessages.push({
-          message: 'Your artifacts glow before the enemy!'
-        });
+        this.addMessage('Your artifacts glow before the enemy!');
 
         this.artifactDamage(attacker, defender, type);
 
       }
     } else {
       if (attacker.artifact_damage !== 0) {
-        this.battleMessages.push({
-          message: 'The enemies artifacts glow brightly!'
-        });
+        this.addMessage('The enemies artifacts glow brightly!');
 
         this.artifactDamage(attacker, defender, type);
       }
@@ -75,24 +71,21 @@ export default class UseItems {
   }
 
   artifactDamage(attacker, defender, type) {
+
     if (type === 'player') {
-      defender        = defender.getMonster();
+
       const dc        = 100 - (100 * defender.artifact_annulment);
       let totalDamage = attacker.artifact_damage;
 
       if (dc <= 0 || random(1, 100) > dc) {
-        this.battleMessages.push({
-          message: attacker.name + '\'s Artifacts are annulled!'
-        });
+        this.addMessage(attacker.name + '\'s Artifacts are annulled!');
 
         return;
       }
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
 
-      this.battleMessages.push({
-        message: attacker.name + ' artifacts hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
+      this.addActionMessage(attacker.name + ' artifacts hit for: ' + this.formatNumber(totalDamage));
     }
 
     if (type === 'monster') {
@@ -100,18 +93,14 @@ export default class UseItems {
       let totalDamage = attacker.artifact_damage;
 
       if (dc <= 0 || random(1, 100) > dc) {
-        this.battleMessages.push({
-          message: attacker.name + '\'s Artifacts are annulled!'
-        });
+        this.addMessage(attacker.name + '\'s Artifacts are annulled!');
 
         return;
       }
 
       this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
 
-      this.battleMessages.push({
-        message: 'Your artifacts hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
+      this.addEnemyActionMessage(attacker.name + ' artifacts hit for: ' + this.formatNumber(totalDamage));
     }
   }
 
@@ -119,9 +108,23 @@ export default class UseItems {
     if (type === 'player' && attacker.ring_damage > 0) {
       this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.ring_damage;
 
-      this.battleMessages.push({
-        message: 'Your rings hit for: ' + attacker.ring_damage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
+      this.addActionMessage('Your rings hit for: ' + this.formatNumber(attacker.ring_damage));
     }
+  }
+
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  addMessage(message) {
+    this.battleMessages.push({message: message, class: 'info-damage'});
+  }
+
+  addActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'action-fired'});
+  }
+
+  addEnemyActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'enemy-action-fired'});
   }
 }

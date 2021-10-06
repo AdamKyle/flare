@@ -7,48 +7,25 @@ export default class Damage {
     this.battleMessages = [];
   }
 
-
-  doAttack(attacker, monsterCurrentHealth) {
-    monsterCurrentHealth = monsterCurrentHealth - attacker.attack;
-
-    this.battleMessages.push({
-      message: attacker.name + ' hit for (weapon) ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-    });
-
-    monsterCurrentHealth = this.tripleAttackChance(attacker, monsterCurrentHealth);
-    monsterCurrentHealth = this.doubleDamage(attacker, monsterCurrentHealth);
-    monsterCurrentHealth = this.vampireThirstChance(attacker, monsterCurrentHealth);
-
-    return monsterCurrentHealth;
-  }
-
   affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth, stacking) {
-    defender          = defender.getMonster();
+    defender          = defender.monster;
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
     const cantResist  = attacker.cant_be_resisted;
 
     if (stacking) {
-      this.battleMessages.push({
-        message: 'The enemy screams in pain as you, again, drain it\'s life!'
-      });
+      this.addMessage('The enemy screams in pain as you, again, drain it\'s life!');
     }
 
     if (totalDamage > 0) {
       if (cantResist) {
-        this.battleMessages.push({
-          'message': 'The enemies blood flows through the air and gives you life: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-        });
+        this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(totalDamage));
       } else {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
-          this.battleMessages.push({
-            'message': 'The enemy resists your attempt to steal it\'s life.'
-          });
+          this.addMessage('The enemy resists your attempt to steal it\'s life.');
         } else {
-          this.battleMessages.push({
-            'message': 'The enemies blood flows through the air and gives you life: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-          });
+          this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(totalDamage));
 
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
           characterCurrentHealth = characterCurrentHealth + totalDamage;
@@ -63,14 +40,12 @@ export default class Damage {
   }
 
   affixDamage(attacker, defender, monsterCurrentHealth) {
-    defender          = defender.getMonster();
+    defender          = defender.monster;
     let totalDamage   = attacker.stacking_damage;
     const cantResist  = attacker.cant_be_resisted;
 
     if (cantResist) {
-      this.battleMessages.push({
-        'message': 'The enemy cannot resist your enchantments! They are so glowy!'
-      });
+      this.addMessage('The enemy cannot resist your enchantments! They are so glowy!');
 
       totalDamage += attacker.non_stacking_damage
     } else {
@@ -78,9 +53,7 @@ export default class Damage {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
-          this.battleMessages.push({
-            'message': 'Your damaging enchantments (resistible) have been resisted.'
-          });
+          this.addMessage('Your damaging enchantments (resistible) have been resisted.');
         } else {
           totalDamage += attacker.non_stacking_damage
         }
@@ -96,11 +69,9 @@ export default class Damage {
         cowerMessage = 'cowers: ';
       }
 
-      cowerMessage = cowerMessage + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      cowerMessage = cowerMessage + this.formatNumber(totalDamage);
 
-      this.battleMessages.push({
-        'message': 'Your enchantments glow with rage. Your enemy ' + cowerMessage,
-      });
+      this.addActionMessage('Your enchantments glow with rage. Your enemy ' + cowerMessage);
     }
 
     return monsterCurrentHealth;
@@ -122,9 +93,7 @@ export default class Damage {
 
       if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
 
-        this.battleMessages.push({
-          message: 'You dance along in the shadows, the enemy doesn\'t see you. Strike now!'
-        });
+        this.addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!');
 
         return true;
       }
@@ -135,7 +104,7 @@ export default class Damage {
 
   calculateSpellDamage(attacker, defender, monsterCurrentHealth, increaseDamage) {
     if (!defender.hasOwnProperty('spell_evasion')) {
-      defender = defender.getMonster();
+      defender = defender.monster;
     }
 
     const dc        = 100 - (100 * defender.spell_evasion);
@@ -167,16 +136,12 @@ export default class Damage {
       }
 
       if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
-        this.battleMessages.push({
-          message: 'A fury takes over you. You notch the arrows thrice at the enemies direction',
-        });
+        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemies direction');
 
         for (let i = 1; i <= 3; i++) {
           monsterCurrentHealth = monsterCurrentHealth - attacker.attack;
 
-          this.battleMessages.push({
-            message: attacker.name + ' hit for (weapon - triple attack) ' + attacker.attack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-          });
+          this.addActionMessage(attacker.name + ' hit for (weapon - triple attack) ' + this.formatNumber(attacker.attack));
         }
       }
     }
@@ -235,17 +200,13 @@ export default class Damage {
       const extraActionChance = attacker.extra_action_chance;
 
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
-        this.battleMessages.push({
-          message: 'There is a thirst child, its in your soul! Lash out and kill!',
-        });
+        this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
         const totalAttack = Math.round(attacker.dur - attacker.dur * 0.95);
 
         monsterCurrentHealth = monsterCurrentHealth - totalAttack;
 
-        this.battleMessages.push({
-          message: attacker.name + ' hit for (thirst!) ' + totalAttack.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        });
+        this.addActionMessage(attacker.name + ' hit for (thirst!) ' + this.formatNumber(totalAttack));
       }
     }
 
@@ -262,4 +223,15 @@ export default class Damage {
     return this.battleMessages;
   }
 
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  addMessage(message) {
+    this.battleMessages.push({message: message, class: 'info-damage'});
+  }
+
+  addActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'action-fired'});
+  }
 }

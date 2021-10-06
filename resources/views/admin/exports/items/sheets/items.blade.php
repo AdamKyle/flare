@@ -52,6 +52,8 @@
         <th>resurrection_chance</th>
         <th>spell_evasion</th>
         <th>artifact_annulment</th>
+        <th>healing_reduction</th>
+        <th>affix_damage_reduction</th>
     </tr>
     </thead>
     <tbody>
@@ -108,6 +110,8 @@
             <td>{{$item->resurrection_chance}}</td>
             <td>{{$item->spell_evasion}}</td>
             <td>{{$item->artifact_annulment}}</td>
+            <td>{{$item->healing_reduction}}</td>
+            <td>{{$item->affix_damage_reduction}}</td>
         </tr>
     @endforeach
     </tbody>

@@ -127,6 +127,8 @@ class ItemDetails extends Component
         'item.resurrection_chance'              => 'nullable',
         'item.spell_evasion'                    => 'nullable',
         'item.artifact_annulment'               => 'nullable',
+        'item.healing_reduction'                => 'nullable',
+        'item.affix_damage_reduction'           => 'nullable',
     ];
 
     protected $messages = [

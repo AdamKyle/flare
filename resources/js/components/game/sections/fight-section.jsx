@@ -55,6 +55,8 @@ export default class FightSection extends React.Component {
       canAttack: this.props.character.can_attack,
       battleMessages: [],
       missCounter: 0,
+      isCharacterVoided: false,
+      isMonsterReduced: false,
     }
 
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
@@ -100,7 +102,7 @@ export default class FightSection extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.props.monster !== null) {
+    if (this.props.monster !== null && this.state.monster === null) {
       this.setMonsterInfo();
     }
   }
@@ -108,10 +110,24 @@ export default class FightSection extends React.Component {
   setMonsterInfo() {
     const monsterInfo   = new Monster(this.props.monster);
     const character     = this.props.character;
+    let isVoided        = false;
+    let statReduced     = false;
 
-    let message = monsterInfo.reduceAllStats(character.stat_affixes);
+    if (monsterInfo.canMonsterVoidPlayer() && !this.state.isCharacterVoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
 
-    this.battleMessagesBeforeFight = message;
+      isVoided = true;
+    } else if (!this.state.isCharacterVoided) {
+      let message = monsterInfo.reduceAllStats(character.stat_affixes);
+
+      this.battleMessagesBeforeFight = message;
+
+      statReduced = true;
+    }
+
 
     const health = monsterInfo.health();
 
@@ -121,6 +137,8 @@ export default class FightSection extends React.Component {
       monster: monsterInfo,
       monsterCurrentHealth: health,
       monsterMaxHealth: health,
+      isCharacterVoided: isVoided,
+      isMonsterReduced: statReduced,
     }, () => {
       this.props.setMonster(null)
     });
@@ -128,7 +146,7 @@ export default class FightSection extends React.Component {
 
   battleMessages() {
     return this.state.battleMessages.map((message) => {
-      return <div key={message.message}><span className="battle-message">{message.message}</span> <br/></div>
+      return <div key={message.message}><span className={'battle-message ' + message.class}>{message.message}</span> <br/></div>
     });
   }
 
@@ -141,9 +159,21 @@ export default class FightSection extends React.Component {
       return getServerMessage('cant_attack');
     }
 
+    if (this.state.isCharacterVoided) {
+      attackType = 'voided_' + attackType;
+    } else if (!this.state.isMonsterReduced && !this.state.isCharacterVoided) {
+
+      if (this.state.monster.canMonsterVoidPlayer()) {
+        this.battleMessagesBeforeFight.push({
+          message: this.state.monster.monster.name + ' has voided your enchantments! You feel much weaker!',
+          class: 'enemy-action-fired'
+        });
+
+        attackType = 'voided_' + attackType;
+      }
+    }
+
     const attack = new Attack(
-      this.state.character,
-      this.state.monster,
       this.state.characterCurrentHealth,
       this.state.monsterCurrentHealth
     );
@@ -153,51 +183,58 @@ export default class FightSection extends React.Component {
     state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
 
     if (state.characterCurrentHealth <= 0) {
-      state.battleMessages.push({message: 'Death has come for you this day child! Resurrect to try again!'});
+      state.battleMessages.push({message: 'Death has come for you this day child! Resurrect to try again!', class: 'enemy-action-fired'});
     }
+
+    if (state.monsterCurrentHealth > this.state.monsterMaxHealth) {
+      state.monsterCurrentHealth = this.state.monsterMaxHealth;
+    }
+
+    state['isCharacterVoided'] = false;
+    state['isMonsterReduced']  = false;
 
     this.setState(state);
 
-    // if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
-    //   axios.post('/api/battle-results/' + this.state.character.id, {
-    //     is_character_dead: state.characterCurrentHealth <= 0,
-    //     is_defender_dead: state.monsterCurrentHealth <= 0,
-    //     defender_type: 'monster',
-    //     monster_id: this.state.monster.id,
-    //   }).then((response) => {
-    //     let health = state.characterCurrentHealth;
-    //     let monster = this.state.monster;
-    //
-    //     if (health >= 0) {
-    //       health = this.state.characterMaxHealth;
-    //     }
-    //
-    //     if (state.monsterCurrentHealth <= 0 && health >= 0) {
-    //       monster = null;
-    //     }
-    //
-    //     this.setState({
-    //       characterCurrentHealth: health,
-    //       canAttack: false,
-    //       monster: monster,
-    //     }, () => {
-    //       this.props.setMonster(null);
-    //     });
-    //   }).catch((err) => {
-    //     if (err.hasOwnProperty('response')) {
-    //       const response = err.response;
-    //
-    //       if (response.status === 429) {
-    //         // Reload to show them their notification.
-    //         return this.props.openTimeOutModal();
-    //       }
-    //
-    //       if (response.status === 401) {
-    //         return location.reload();
-    //       }
-    //     }
-    //   });
-    // }
+    if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
+      axios.post('/api/battle-results/' + this.state.character.id, {
+        is_character_dead: state.characterCurrentHealth <= 0,
+        is_defender_dead: state.monsterCurrentHealth <= 0,
+        defender_type: 'monster',
+        monster_id: this.state.monster.id,
+      }).then(() => {
+        let health = state.characterCurrentHealth;
+        let monster = this.state.monster;
+
+        if (health >= 0) {
+          health = this.state.characterMaxHealth;
+        }
+
+        if (state.monsterCurrentHealth <= 0 && health >= 0) {
+          monster = null;
+        }
+
+        this.setState({
+          characterCurrentHealth: health,
+          canAttack: false,
+          monster: monster,
+        }, () => {
+          this.props.setMonster(null);
+        });
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 429) {
+            // Reload to show them their notification.
+            return this.props.openTimeOutModal();
+          }
+
+          if (response.status === 401) {
+            return location.reload();
+          }
+        }
+      });
+    }
   }
 
   revive(data) {

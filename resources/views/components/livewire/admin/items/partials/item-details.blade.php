@@ -63,16 +63,28 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-spell-evasion">Spell Evasion: </label>
                 <input type="number" step="0.01" class="form-control" id="item-base-spell-evasion" name="item-base-spell-evasion" wire:model="item.spell_evasion" {{$item->type !== 'ring' ? 'disabled' : null}}>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-base-artifact-annulment">Artifact Annulment: </label>
                 <input type="number" class="form-control" id="item-base-artifact-annulment" name="item-base-artifact-annulment" wire:model="item.artifact_annulment" {{$item->type !== 'ring' ? 'disabled' : null}}>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item-affix-damage-reduction">Affix Damage Reduction: </label>
+                <input type="number" class="form-control" id="item-affix-damage-reduction" name="item-affix-damage-reduction" wire:model="item.affix_damage_reduction" {{$item->type !== 'ring' ? 'disabled' : null}}>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item-healing-reduction">Enemy Healing Reduction: </label>
+                <input type="number" class="form-control" id="item-healing-reduction" name="item-healing-reduction" wire:model="item.healing_reduction" {{$item->type !== 'ring' ? 'disabled' : null}}>
             </div>
         </div>
     </div>

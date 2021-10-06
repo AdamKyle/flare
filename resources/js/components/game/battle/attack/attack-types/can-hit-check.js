@@ -1,5 +1,4 @@
 import Damage from "../damage";
-import Monster from "../../monster/monster";
 
 const battleMessages = [];
 
@@ -13,7 +12,7 @@ export default class CanHitCheck {
     const damage        = new Damage();
 
     if (!defender.hasOwnProperty('skills')) {
-      defender = defender.getMonster();
+      defender = defender.monster;
     }
 
     if (attacker.hasOwnProperty('class')) {

@@ -9,37 +9,29 @@ export default class CanEntranceEnemy {
   canEntranceEnemy(attackType, defender, type) {
     let canEntrance   = false;
     const chance      = attackType.affixes.entrancing_chance;
-    defender          = defender.getMonster();
+    defender          = defender.monster;
 
     if (attackType.affixes.entrancing_chance > 0.0) {
       const cantResist     = attackType.affixes.cant_be_resisted;
       const canBeEntranced = random(1, 100) > (100 - (100 * chance));
 
       if (cantResist || canBeEntranced) {
-        this.battleMessages.push({
-          'message': 'The enemy is dazed by your enchantments!'
-        });
+        this.addMessage('The enemy is dazed by your enchantments!');
 
         canEntrance = true;
       } else if (canBeEntranced) {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(0, 100) > dc) {
-          this.battleMessages.push({
-            'message': 'The enemy is resists your entrancing enchantments!'
-          });
+          this.addMessage('The enemy is resists your entrancing enchantments!');
 
         } else {
-          this.battleMessages.push({
-            'message': 'The enemy is dazed by your enchantments!'
-          });
+          this.addMessage('The enemy is dazed by your enchantments!');
 
           canEntrance = true;
         }
       } else {
-        this.battleMessages.push({
-          'message': 'The enemy is resists your entrancing enchantments!'
-        });
+        this.addMessage('The enemy is resists your entrancing enchantments!');
       }
     }
 
@@ -52,13 +44,9 @@ export default class CanEntranceEnemy {
     const chance    = random(1, this.monsterMaxRoll(defender));
 
     if (dc > chance) {
-      this.battleMessages.push({
-        'message': 'You resist the alluring entrancing enchantments on your enemy!',
-      });
+      this.addMessage('You resist the alluring entrancing enchantments on your enemy!');
     } else {
-      this.battleMessages.push({
-        'message': defender.name + ' has trapped you in a trance like state with their enchantments!',
-      });
+      this.addMessage(attacker.name + ' has trapped you in a trance like state with their enchantments!');
 
       canEntrance = true;
     }
@@ -82,6 +70,10 @@ export default class CanEntranceEnemy {
     }
 
     return 100;
+  }
+
+  addMessage(message) {
+    this.battleMessages.push({message: message, class: 'info-damage'});
   }
 
   getBattleMessages() {

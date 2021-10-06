@@ -73,7 +73,9 @@ class Item extends Model
         'spell_evasion',
         'artifact_annulment',
         'increase_skill_bonus_by',
-        'increase_skill_training_bonus_by'
+        'increase_skill_training_bonus_by',
+        'healing_reduction',
+        'affix_damage_reduction'
     ];
 
     /**
@@ -124,6 +126,8 @@ class Item extends Model
         'resurrection_chance'              => 'float',
         'spell_evasion'                    => 'float',
         'artifact_annulment'               => 'float',
+        'healing_reduction'                => 'float',
+        'affix_damage_reduction'           => 'float',
     ];
 
     protected $appends = [

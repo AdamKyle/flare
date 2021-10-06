@@ -25,6 +25,8 @@ export default class MonsterAttack {
 
       this.addMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
 
+      this.fireOffHealing(monster);
+
       return this.setState()
     } else {
       if (this.canHit(monster, this.defender)) {
@@ -34,6 +36,8 @@ export default class MonsterAttack {
 
           this.useItems(monster);
 
+          this.fireOffHealing(monster);
+
           return this.setState()
         }
 
@@ -41,14 +45,18 @@ export default class MonsterAttack {
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-        this.addMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+        this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+
+        this.fireOffHealing(monster);
 
         return this.setState()
 
       } else {
-        this.addMessage(monster.name + ' missed!');
+        this.addActionMessage(monster.name + ' missed!');
 
         this.useItems(monster);
+
+        this.fireOffHealing(monster);
 
         return this.setState();
       }
@@ -108,15 +116,22 @@ export default class MonsterAttack {
 
     this.fireOffAffixes(attacker);
     this.fireOffSpells(attacker);
-    this.fireOffHealing(attacker);
   }
 
   fireOffAffixes(attacker) {
     if (attacker.max_affix_damage > 0) {
-      const damage = random(1, attacker.max_affix_damage);
+      const defenderReduction = this.defender.affix_damage_reduction;
+      let damage              = random(1, attacker.max_affix_damage);
+
+      if (defenderReduction > 0) {
+        damage = damage - (damage * defenderReduction);
+
+        this.addMessage('Your rings negate some of the enemies enchantment damage.');
+      }
+
       this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-      this.addMessage(attacker.name + '\'s enchantments glow, lashing out for: ' + this.formatNumber(damage));
+      this.addActionMessage(attacker.name + '\'s enchantments glow, lashing out for: ' + this.formatNumber(damage));
     }
   }
 
@@ -128,7 +143,7 @@ export default class MonsterAttack {
       if (roll < evasionChance) {
         this.currentCharacterHealth = this.currentCharacterHealth - attacker.spell_damage;
 
-        this.addMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(attacker.spell_damage));
+        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(attacker.spell_damage));
       } else {
         this.addMessage(attacker.name + '\'s spells fizzle and fail before your eyes. The enemy looks confused!');
       }
@@ -137,16 +152,31 @@ export default class MonsterAttack {
 
   fireOffHealing(attacker) {
     if (attacker.max_healing > 0) {
-      const healFor = Math.ceil(attacker.dur * attacker.max_healing);
+      const defenderHealingReduction = this.defender.healing_reduction;
+      let healFor                    = Math.ceil(attacker.dur * attacker.max_healing);
+
+      if (defenderHealingReduction > 0) {
+        healFor = healFor - healFor * defenderHealingReduction;
+
+        this.addMessage('Your rings negate some of the enemies healing power.');
+      }
 
       this.currentMonsterHealth = this.currentMonsterHealth + healFor;
 
-      this.addMessage(attacker.name + '\'s healing spells wash over them for: ' + this.formatNumber(healFor));
+      this.addHealingMessage(attacker.name + '\'s healing spells wash over them for: ' + this.formatNumber(healFor));
     }
   }
 
   addMessage(message) {
-    this.battleMessages.push({message: message});
+    this.battleMessages.push({message: message, class: 'info-damage'});
+  }
+
+  addHealingMessage(message) {
+    this.battleMessages.push({message: message, class: 'action-fired'});
+  }
+
+  addActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'enemy-action-fired'});
   }
 
   formatNumber(number) {

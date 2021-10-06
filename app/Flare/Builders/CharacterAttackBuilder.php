@@ -24,34 +24,34 @@ class CharacterAttackBuilder {
         return $this;
     }
 
-    public function buildAttack(): array {
-        $attack = $this->baseAttack();
+    public function buildAttack(bool $voided = false): array {
+        $attack = $this->baseAttack($voided);
 
-        $attack['weapon_damage'] = $this->characterInformationBuilder->buildAttack();
-
-        return $attack;
-    }
-
-    public function buildCastAttack() {
-        $attack = $this->baseAttack();
-
-        $attack['spell_damage'] = $this->characterInformationBuilder->getTotalSpellDamage();
+        $attack['weapon_damage'] = $this->characterInformationBuilder->buildAttack($voided);
 
         return $attack;
     }
 
-    public function buildCastAndAttack(): array {
-        return $this->castAndAttackPositionalDamage('spell-one', 'left-hand');
+    public function buildCastAttack(bool $voided = false) {
+        $attack = $this->baseAttack($voided);
+
+        $attack['spell_damage'] = $this->characterInformationBuilder->getTotalSpellDamage($voided);
+
+        return $attack;
     }
 
-    public function buildAttackAndCast(): array {
-        return $this->castAndAttackPositionalDamage('spell-two', 'right-hand');
+    public function buildCastAndAttack(bool $voided = false): array {
+        return $this->castAndAttackPositionalDamage('spell-one', 'left-hand', $voided);
     }
 
-    public function buildDefend(): array {
-        $baseAttack = $this->baseAttack();
+    public function buildAttackAndCast(bool $voided = false): array {
+        return $this->castAndAttackPositionalDamage('spell-two', 'right-hand', $voided);
+    }
 
-        $ac                    = $this->characterInformationBuilder->buildDefence();
+    public function buildDefend(bool $voided = false): array {
+        $baseAttack = $this->baseAttack($voided);
+
+        $ac                    = $this->characterInformationBuilder->buildDefence($voided);
         $str                   = $this->characterInformationBuilder->statMod('str') * 0.05;
 
         $ac = $ac + $ac * $str;
@@ -61,26 +61,26 @@ class CharacterAttackBuilder {
         return $baseAttack;
     }
 
-    protected function baseAttack(): array {
+    protected function baseAttack(bool $voided = false): array {
         return [
             'name'            => $this->character->name,
-            'defence'         => $this->characterInformationBuilder->buildDefence(),
-            'ring_damage'     => $this->characterInformationBuilder->getTotalRingDamage(),
-            'artifact_damage' => $this->characterInformationBuilder->getTotalArtifactDamage(),
-            'heal_for'        => $this->characterInformationBuilder->buildHealFor(),
+            'defence'         => $this->characterInformationBuilder->buildDefence($voided),
+            'ring_damage'     => $this->characterInformationBuilder->getTotalRingDamage($voided),
+            'artifact_damage' => $this->characterInformationBuilder->getTotalArtifactDamage($voided),
+            'heal_for'        => $this->characterInformationBuilder->buildHealFor($voided),
             'res_chance'      => $this->characterInformationBuilder->fetchResurrectionChance(),
             'affixes'         => [
                 'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
-                'stacking_damage'        => $this->characterInformationBuilder->getTotalAffixDamage(),
-                'non_stacking_damage'    => $this->characterInformationBuilder->getTotalAffixDamage(false),
-                'stacking_life_stealing' => $this->characterInformationBuilder->findLifeStealingAffixes(true),
-                'life_stealing'          => $this->characterInformationBuilder->findLifeStealingAffixes(),
-                'entrancing_chance'      => $this->characterInformationBuilder->getEntrancedChance(),
+                'stacking_damage'        => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(),
+                'non_stacking_damage'    => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(false),
+                'stacking_life_stealing' => $voided ? 0 : $this->characterInformationBuilder->findLifeStealingAffixes(true),
+                'life_stealing'          => $voided ? 0 : $this->characterInformationBuilder->findLifeStealingAffixes(),
+                'entrancing_chance'      => $voided ? 0 : $this->characterInformationBuilder->getEntrancedChance(),
             ]
         ];
     }
 
-    protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition): array {
+    protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition, bool $voided = false): array {
         $attack = $this->baseAttack();
 
         $spellSlotOne  = $this->fetchSlot($spellPosition);
@@ -90,11 +90,19 @@ class CharacterAttackBuilder {
         $spellDamage = 0;
 
         if (!is_null($weaponSlotOne)) {
-            $weaponDamage = $weaponSlotOne->item->getTotalDamage();
+            if (!$voided) {
+                $weaponDamage = $weaponSlotOne->item->getTotalDamage();
+            } else {
+                $weaponDamage = $weaponSlotOne->item->base_damage;
+            }
         }
 
         if (!is_null($spellSlotOne)) {
-            $spellDamage = $spellSlotOne->item->getTotalDamage();
+            if (!$voided) {
+                $spellDamage = $spellSlotOne->item->getTotalDamage();
+            } else {
+                $spellDamage = $spellSlotOne->item->base_damage;
+            }
 
             $bonus = $this->characterInformationBuilder->hereticSpellDamageBonus($this->character);
 

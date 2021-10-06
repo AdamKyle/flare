@@ -220,9 +220,14 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function buildAttack(): int {
+    public function buildAttack(bool $voided = false): int {
 
         $characterDamageStat = $this->statMod($this->character->damage_stat);
+
+        if ($voided) {
+            $characterDamageStat = $this->character->{$this->character->damage_stat};
+        }
+
         $classBonuses        = $this->getFightersDamageBonus($this->character) +
             $this->prophetDamageBonus($this->character) +
             $this->getThievesDamageBonus($this->character) +
@@ -231,7 +236,7 @@ class CharacterInformationBuilder {
 
         $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
 
-        $totalAttack = $this->getWeaponDamage();
+        $totalAttack = $this->getWeaponDamage($voided);
 
         return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
     }
@@ -266,8 +271,8 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function buildDefence(): int {
-        return round((10 + $this->getDefence()) * (1 + $this->fetchSkillACMod() + $this->getFightersDefence($this->character)));
+    public function buildDefence(bool $voided = false): int {
+        return round((10 + $this->getDefence($voided)) * (1 + $this->fetchSkillACMod() + $this->getFightersDefence($this->character)));
     }
 
     /**
@@ -278,12 +283,12 @@ class CharacterInformationBuilder {
      * @return int
      * @throws \Exception
      */
-    public function buildHealFor(): int {
+    public function buildHealFor(bool $voided = false): int {
         $classBonus    = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
 
         $classType     = new CharacterClassValue($this->character->class->name);
 
-        $healingAmount = $this->fetchHealingAmount();
+        $healingAmount = $this->fetchHealingAmount($voided);
         $dmgStat       = $this->character->class->damage_stat;
 
         if ($classType->isVampire()) {
@@ -499,8 +504,8 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function getTotalSpellDamage(): int {
-        return $this->getSpellDamage();
+    public function getTotalSpellDamage(bool $voided = false): int {
+        return $this->getSpellDamage($voided);
     }
 
     /**
@@ -508,8 +513,8 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function getTotalArtifactDamage(): int {
-        return $this->getArtifactDamage();
+    public function getTotalArtifactDamage(bool $voided = false): int {
+        return $this->getArtifactDamage($voided);
     }
 
     /**
@@ -517,8 +522,12 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function getTotalRingDamage(): int {
-        return $this->getRingDamage();
+    public function getTotalRingDamage(bool $voided = false): int {
+        return $this->getRingDamage($voided);
+    }
+
+    public function getTotalDeduction(string $type): float {
+        return $this->getDeduction($type);
     }
 
     /**
@@ -576,20 +585,34 @@ class CharacterInformationBuilder {
         return max($values);
     }
 
+    protected function getDeduction(string $type): float {
+        $itemsDeduction = $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'ring' && $slot->equipped;
+        })->pluck('item.' . $type)->toArray();
+
+        return max($itemsDeduction);
+    }
+
     protected function getSpellEvasion(): float {
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
-        })->sum('item.spell_evasion');
+        })->pluck('item.spell_evasion')->toArray();
 
-        return $itemsEvasion;
+        return max($itemsEvasion);
     }
 
     protected function getArtifactAnnulment(): float {
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
-        })->sum('item.artifact_annulment');
+        })->pluck('item.artifact_annulment')->toArray();
 
-        return $itemsEvasion;
+        return max($itemsEvasion);
+    }
+
+    protected function getHealingReduction(): float {
+        $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'ring' && $slot->equipped;
+        })->pluck('item.healing_reduction')->toArray();
     }
 
     protected function fetchSkillAttackMod(): float {
@@ -634,24 +657,33 @@ class CharacterInformationBuilder {
         return $percentageBonus;
     }
 
-    protected function getWeaponDamage(): int {
+    protected function getWeaponDamage(bool $voided = false): int {
         $damage = 0;
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'weapon') {
-                $damage += $slot->item->getTotalDamage();
+                if (!$voided) {
+                    $damage += $slot->item->getTotalDamage();
+                } else {
+                    $damage += $slot->item->base_damage;
+                }
             }
         }
 
         return $damage;
     }
 
-    protected function getSpellDamage(): int {
+    protected function getSpellDamage(bool $voided = false): int {
         $damage = 0;
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'spell-damage') {
-                $damage += $slot->item->getTotalDamage();
+                if (!$voided) {
+                    $damage += $slot->item->getTotalDamage();
+                } else {
+                    $damage += $slot->item->base_damage;
+                }
+
             }
         }
 
@@ -660,36 +692,47 @@ class CharacterInformationBuilder {
         return $damage + $damage * $bonus;
     }
 
-    protected function getArtifactDamage(): int {
+    protected function getArtifactDamage(bool $voided = false): int {
         $damage = 0;
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'artifact') {
-                $damage += $slot->item->getTotalDamage();
+                if (!$voided) {
+                    $damage += $slot->item->getTotalDamage();
+                } else {
+                    $damage += $slot->item->base_damage;
+                }
             }
         }
 
         return $damage;
     }
 
-    protected function getRingDamage(): int {
+    protected function getRingDamage(bool $voided = false): int {
         $damage = 0;
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'ring') {
-                $damage += $slot->item->getTotalDamage();
+                if (!$voided) {
+                    $damage += $slot->item->getTotalDamage();
+                } else {
+                    $damage += $slot->item->base_damage;
+                }
             }
         }
 
         return $damage;
     }
 
-    protected function getDefence(): int {
+    protected function getDefence(bool $voided = false): int {
         $defence = 0;
 
         foreach ($this->fetchInventory() as $slot) {
-
-            $defence += $slot->item->getTotalDefence();
+            if (!$voided) {
+                $defence += $slot->item->getTotalDefence();
+            } else {
+                $defence += $slot->item->base_ac;
+            }
         }
 
         if ($defence !== 10) {
@@ -699,11 +742,15 @@ class CharacterInformationBuilder {
         return $defence;
     }
 
-    protected function fetchHealingAmount(): int {
+    protected function fetchHealingAmount(bool $voided = false): int {
         $healFor = 0;
 
         foreach ($this->fetchInventory() as $slot) {
-            $healFor += $slot->item->getTotalHealing();
+            if (!$voided) {
+                $healFor += $slot->item->getTotalHealing();
+            } else {
+                $healFor += $slot->item->base_healing;
+            }
         }
 
         return $healFor;

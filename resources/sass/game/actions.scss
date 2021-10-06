@@ -99,6 +99,18 @@
   margin: 0 auto;
 }
 
+.info-damage {
+  color: #232f8e;
+}
+
+.action-fired {
+  color: #18802a;
+}
+
+.enemy-action-fired {
+  color: #b95151;
+}
+
 @include media-breakpoint-down(lg) {
   .crafting-timeout {
     top: 10px;

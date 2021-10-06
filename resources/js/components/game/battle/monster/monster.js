@@ -1,6 +1,7 @@
 import {randomNumber} from '../../helpers/random_number';
 import {sum, sumBy} from "lodash/math";
 import {groupBy} from "lodash/collection";
+import {random} from "lodash";
 
 export default class Monster {
 
@@ -19,6 +20,12 @@ export default class Monster {
     return parseInt(randomNumber(healthRange[0], healthRange[1]) + this.monster.dur);
   }
 
+  canMonsterVoidPlayer() {
+    const dc = 100 - 100 * this.monster.devouring_light_chance;
+
+    return random(1, 100) > dc;
+  }
+
   reduceAllStats(affixes) {
     let monster = JSON.parse(JSON.stringify(this.monster));
     const dc    = 100 - monster.affix_resistance;
@@ -31,7 +38,7 @@ export default class Monster {
 
     if (affixes.all_stat_reduction !== null || affixes.stat_reduction.length > 0) {
       if (!affixes.can_be_resisted && (dc <= 0 || randomNumber(0, 100) > dc)) {
-        return [{message: 'Your enemy laughs at your attempt to make them week fails.'}]
+        return [{message: 'Your enemy laughs at your attempt to make them week fails.', class: 'info-damage'}]
       }
     }
 
@@ -63,7 +70,7 @@ export default class Monster {
 
     this.monster = monster;
 
-    return [{message: 'Your enemy sinks to their knees in agony as you make them weaker.'}]
+    return [{message: 'Your enemy sinks to their knees in agony as you make them weaker.', class: 'info-damage'}]
   }
 
   attack() {
@@ -80,6 +87,5 @@ export default class Monster {
   getMonster() {
     return this.monster;
   }
-
 
 }

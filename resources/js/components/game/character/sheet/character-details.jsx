@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Col, Row} from 'react-bootstrap';
+import {Card, Col, Row, Tabs, Tab} from 'react-bootstrap';
 
 export default class CharacterDetails extends React.Component {
 
@@ -56,9 +56,9 @@ export default class CharacterDetails extends React.Component {
             </Col>
           </Row>
           <hr />
-          <Row>
-            <Col xs={12} sm={4}>
-              <dl>
+          <Tabs defaultActiveKey="stats" id="character-stats">
+            <Tab eventKey="stats" title="Stats">
+              <dl className="mt-4">
                 <dt>Strength:</dt>
                 <dd>{sheet.str}</dd>
                 <dt>Durability:</dt>
@@ -74,9 +74,9 @@ export default class CharacterDetails extends React.Component {
                 <dt>Focus:</dt>
                 <dd>{sheet.focus}</dd>
               </dl>
-            </Col>
-            <Col xs={12} sm={4}>
-              <dl>
+            </Tab>
+            <Tab eventKey="stats-modded" title="Stats Modded">
+              <dl className="mt-4">
                 <dt>Strength Modded:</dt>
                 <dd>{sheet.str_modded}</dd>
                 <dt>Durability Modded:</dt>
@@ -92,19 +92,24 @@ export default class CharacterDetails extends React.Component {
                 <dt>Focus Modded:</dt>
                 <dd>{sheet.docus_modded}</dd>
               </dl>
-            </Col>
-            <Col xs={12} sm={4}>
-              <dl>
+            </Tab>
+            <Tab eventKey="resistances-and-reductions" title="Resistances and Deductions">
+              <dl className="mt-4">
                 <dt>Spell Evasion:</dt>
-                <dd>{sheet.spell_evasion * 100}%</dd>
+                <dd>{(sheet.spell_evasion * 100).toFixed(2)}%</dd>
                 <dt>Artifact Annulment:</dt>
-                <dd>{sheet.artifact_anull * 100}%</dd>
+                <dd>{(sheet.artifact_anull * 100).toFixed(2)}%</dd>
+                <dt>Enchantment Reduction Amount<sup>**</sup>:</dt>
+                <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
+                <dt>Healing Reduction Amount<sup>**</sup>:</dt>
+                <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
                 <dt>Resurrection Chance<sup>*</sup>:</dt>
-                <dd>{sheet.res_chance * 100}%</dd>
+                <dd>{(sheet.res_chance * 100).toFixed(2)}%</dd>
               </dl>
               <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
-            </Col>
-          </Row>
+              <p className="mt-4"><sup>**</sup> Only affects enemies (on their turn).</p>
+            </Tab>
+          </Tabs>
           <hr />
           <Row>
             <Col xs={12} sm={6}>

@@ -2,19 +2,27 @@ import CanHitCheck from "./can-hit-check";
 import AttackType from "../attack-type";
 import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
+import Damage from "../damage";
 
 export default class WeaponAttack {
 
-  constructor(attacker, defender, characterCurrentHealth, monsterHealth) {
+  constructor(attacker, defender, characterCurrentHealth, monsterHealth, voided) {
+
+    if (!defender.hasOwnProperty('name')) {
+      this.defender = defender.monster;
+    } else {
+      this.defender = defender;
+    }
+
     this.attacker               = attacker;
-    this.defender               = defender;
     this.monsterHealth          = monsterHealth;
     this.characterCurrentHealth = characterCurrentHealth;
     this.battleMessages         = [];
+    this.voided                 = voided;
   }
 
   doAttack() {
-    const attackData       = this.attacker.attack_types[AttackType.ATTACK];
+    const attackData       = this.attacker.attack_types[this.voided ? AttackType.VOIDED_ATTACK : AttackType.ATTACK];
 
     const canEntranceEnemy = new CanEntranceEnemy();
 
@@ -25,7 +33,9 @@ export default class WeaponAttack {
     if (canEntrance) {
       this.monsterHealth = this.monsterHealth - attackData.weapon_damage;
 
-      this.addMessage('Your weapon(s) hits: ' + this.defender.name + ' for: ' + attackData.weapon_damage)
+      this.extraAttacks();
+
+      this.addActionMessage('Your weapon(s) hits: ' + this.defender.name + ' for: ' + attackData.weapon_damage)
 
       this.useItems(attackData, this.attacker.class);
 
@@ -49,7 +59,9 @@ export default class WeaponAttack {
 
       this.monsterHealth = this.monsterHealth - attackData.weapon_damage;
 
-      this.addMessage('Your weapon(s) hits: ' + this.defender.name + ' for: ' + attackData.weapon_damage)
+      this.extraAttacks();
+
+      this.addActionMessage('Your weapon(s) hits: ' + this.defender.name + ' for: ' + attackData.weapon_damage)
 
       this.useItems(attackData, this.attacker.class)
     } else {
@@ -79,11 +91,25 @@ export default class WeaponAttack {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
+  extraAttacks() {
+    const damage = new Damage();
+
+    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth);
+    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth);
+    this.monsterHealth = damage.vampireThirstChance(this.attacker, this.monsterHealth);
+
+    this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
+  }
+
   canBlock() {
     return this.defender.ac > this.attacker.base_stat;
   }
 
   addMessage(message) {
-    this.battleMessages.push({message: message});
+    this.battleMessages.push({message: message, class: 'info-damage'});
+  }
+
+  addActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'action-fired'});
   }
 }
