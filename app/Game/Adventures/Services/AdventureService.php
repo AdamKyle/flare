@@ -35,6 +35,8 @@ class AdventureService {
      */
     private $adventure;
 
+    private $adventureFightService;
+
     /**
      * @var RewardBuilder $rewardBuilder
      */
@@ -67,18 +69,29 @@ class AdventureService {
      * @param RewardBuilder $rewardbuilder
      * @param string $name
      */
-    public function __construct(
-        Character $character,
-        Adventure $adventure,
-        RewardBuilder $rewardBuilder,
-        string $name)
+    public function __construct(AdventureFightService $adventureFightService)
     {
-        $this->character          = $character;
-        $this->adventure          = $adventure;
-        $this->rewardBuilder      = $rewardBuilder;
-        $this->name               = $name;
+        $this->adventureFightService = $adventureFightService;
+    }
+
+    public function setCharacter(Character $character): AdventureService {
+        $this->character = $character;
 
         $this->createSkillRewardSection();
+
+        return $this;
+    }
+
+    public function setAdventure(Adventure $adventure): AdventureService {
+        $this->adventure = $adventure;
+
+        return $this;
+    }
+
+    public function setName(string $name): AdventureService {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -125,46 +138,18 @@ class AdventureService {
      * @param int $maxLevel
      */
     protected function processLevel(int $currentLevel, int $maxLevel, string $attackType): void {
-        $attackService = resolve(AdventureFightService::class, [
-            'character' => $this->character,
-            'adventure' => $this->adventure,
-        ]);
-
         $adventureLog = $this->character
                              ->adventureLogs
                              ->where('adventure_id', $this->adventure->id)
                              ->where('in_progress', true)
                              ->first();
 
-        $attackService = $attackService->processBattle();
+        $attackService = $this->adventureFightService->setCharacter($this->character, $attackType)
+                                                     ->setAdventure($this->adventure);
 
-        if ($attackService->isCharacterDead()) {
-            $this->characterIsDead($attackService, $adventureLog, $currentLevel);
+        $attackService->processFloor();
 
-            return;
-        }
-
-        if ($attackService->isMonsterDead()) {
-            $this->monsterIsDead($attackService, $adventureLog);
-
-            if ($maxLevel === $currentLevel) {
-
-                $this->adventureIsOver($adventureLog, $currentLevel);
-
-                return;
-            }
-        }
-
-        if ($attackService->tooLong()) {
-
-            $this->adventureTookToLong($attackService, $adventureLog);
-
-            $this->adventureIsOver($adventureLog, $currentLevel, true);
-
-            return;
-        }
-
-        $attackService->resetLogInfo();
+        dd($attackService->getLogs());
     }
 
     /**

@@ -5,18 +5,21 @@ namespace App\Flare\Handlers;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ClassAttackValue;
+use App\Game\Adventures\Traits\CreateBattleMessages;
 
 class AttackExtraActionHandler {
 
+    use CreateBattleMessages;
+
     private array $messages = [];
 
-    public function doAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth): int {
+    public function doAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
 
-        $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth);
-        $monsterCurrentHealth = $this->tripleAttackChance($characterInformationBuilder, $monsterCurrentHealth);
-        $monsterCurrentHealth = $this->doubleAttackChance($characterInformationBuilder, $monsterCurrentHealth);
+        $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth, $voided);
+        $monsterCurrentHealth = $this->tripleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided);
+        $monsterCurrentHealth = $this->doubleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided);
 
-        return $this->vampireThirst($characterInformationBuilder, $monsterCurrentHealth);
+        return $this->vampireThirst($characterInformationBuilder, $monsterCurrentHealth, $voided);
     }
 
     public function canAutoAttack(CharacterInformationBuilder $characterInformationBuilder): bool {
@@ -25,9 +28,9 @@ class AttackExtraActionHandler {
         if ($classType->isThief()) {
             $chance = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData()['chance'];
 
-            $this->messages[] = ['You dance along in the shadows, the enemy doesn\'t see you. Strike now!'];
+            $dc = 100 - 100 * $chance;
 
-            return true;
+            return rand (1, 100) > $dc;
         }
 
         return false;
@@ -46,7 +49,7 @@ class AttackExtraActionHandler {
     }
 
 
-    protected function tripleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth): int {
+    protected function tripleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isRanger()) {
@@ -56,17 +59,18 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $this->messages[] = ['A fury takes over you. You notch the arrows thrice at the enemies direction'];
+            $message        = 'A fury takes over you. You notch the arrows thrice at the enemies direction';
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
             for ($i = 1; $i <= 3; $i++) {
-                $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth);
+                $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth, $voided);
             }
         }
 
         return $monsterCurrentHealth;
     }
 
-    protected function doubleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth): int {
+    protected function doubleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isFighter()) {
@@ -76,15 +80,17 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $this->messages[] = ['The strength of your rage courses through your veins!'];
+            $message        = 'The strength of your rage courses through your veins!';
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
-            $characterAttack = $characterInformationBuilder->buildAttack();
+            $characterAttack = $characterInformationBuilder->buildAttack($voided);
 
             $totalDamage = ($characterAttack + $characterAttack * 0.05);
 
             $monsterCurrentHealth -= $characterAttack;
 
-            $this->messages[] = [$characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage)];
+            $message        = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
         }
 
         return $monsterCurrentHealth;
@@ -110,20 +116,28 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    protected function vampireThirst(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth): int {
+    protected function vampireThirst(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isVampire()) {
-            $this->messages[] = ['There is a thirst child, its in your soul! Lash out and kill!'];
 
-            $dur = $characterInformationBuilder->statMod('dur');
+            $message        = 'There is a thirst child, its in your soul! Lash out and kill!';
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+            if (!$voided) {
+                $dur = $characterInformationBuilder->statMod('dur');
+            } else {
+                $dur = $characterInformationBuilder->getCharacter()->dur;
+            }
+
             $character = $characterInformationBuilder->getCharacter();
 
             $totalAttack = round($dur - $dur * 0.95);
 
             $monsterCurrentHealth -= $totalAttack;
 
-            $this->messages[] = [$character->name . ' hit for (thirst!) ' . number_format($totalAttack)];
+            $message        = $character->name . ' hit for (thirst!) ' . number_format($totalAttack);
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
         }
 
         return $monsterCurrentHealth;
@@ -172,14 +186,16 @@ class AttackExtraActionHandler {
 
     }
 
-    private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth): int {
-        $characterAttack = $characterInformationBuilder->buildAttack();
+    private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+        $characterAttack = $characterInformationBuilder->buildAttack($voided);
 
         $monsterCurrentHealth -= $characterAttack;
 
         $character = $characterInformationBuilder->getCharacter();
 
-        $this->messages[] = [$character->name . ' hit for (weapon): ' . number_format($characterAttack)];
+        $message = $character->name . ' hit for (weapon): ' . number_format($characterAttack);
+
+        $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
         return $monsterCurrentHealth;
     }

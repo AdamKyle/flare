@@ -61,6 +61,10 @@ class CharacterAttackBuilder {
         return $baseAttack;
     }
 
+    public function getInformationBuilder(): CharacterInformationBuilder {
+        return $this->characterInformationBuilder;
+    }
+
     protected function baseAttack(bool $voided = false): array {
         return [
             'name'            => $this->character->name,

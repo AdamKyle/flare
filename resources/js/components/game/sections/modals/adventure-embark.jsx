@@ -24,7 +24,7 @@ export default class AdventureEmbark extends React.Component {
 
   embark() {
     axios.post('/api/character/' + this.props.characterId + '/adventure/' + this.state.adventure.id, {
-      attackType: this.state.attackType,
+      attack_type: this.state.attackType,
     }).then((result) => {
       this.props.updateMessage(result.data.message);
       this.props.updateCharacterAdventures(result.data.adventure_completed_at);

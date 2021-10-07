@@ -2,15 +2,22 @@
 
 namespace App\Flare\Handlers;
 
+use App\Flare\Handlers\AttackHandlers\AttackHandler;
 use App\Flare\Values\AttackTypeValue;
 
 class CharacterAttackHandler {
+
+    private $attackHandler;
 
     private $battleLogs = [];
 
     private $characterCurrentHealth;
 
     private $monsterCurrentHealth;
+
+    public function __construct(AttackHandler $attackHandler) {
+        $this->attackHandler = $attackHandler;
+    }
 
     public function setHealth(int $characterCurrentHealth, int $monsterCurrentHealth): CharacterAttackHandler {
         $this->characterCurrentHealth = $characterCurrentHealth;
@@ -20,10 +27,23 @@ class CharacterAttackHandler {
         return $this;
     }
 
-    public function handleAttack($attacker, $defender, $attackType) {
+    public function getMonsterHealth(): int {
+        return $this->monsterCurrentHealth;
+    }
+
+    public function getCharacterHealth(): int {
+        return $this->characterCurrentHealth;
+    }
+
+    public function getBattleLogs(): array {
+        return $this->battleLogs;
+    }
+
+    public function handleAttack($attacker, $defender, string $attackType) {
         switch ($attacker) {
             case AttackTypeValue::ATTACK:
             case AttackTypeValue::VOIDED_ATTACK:
+                $this->handleWeaponAttack($attacker, $defender, $attackType);
                 break;
             case AttackTypeValue::CAST:
             case AttackTypeValue::VOIDED_CAST:
@@ -38,5 +58,13 @@ class CharacterAttackHandler {
             case AttackTypeValue::VOIDED_DEFEND:
                 break;
         }
+    }
+
+    protected function handleWeaponAttack($attacker, $defender, string $attackType) {
+        $this->attackHandler->doAttack($attacker, $defender, $attackType);
+
+        $this->monsterCurrentHealth   = $this->attackHandler->getMonsterHealth();
+        $this->characterCurrentHealth = $this->attackHandler->getCharacterHealth();
+        $this->battleLogs             = $this->attackHandler->getBattleMessages();
     }
 }

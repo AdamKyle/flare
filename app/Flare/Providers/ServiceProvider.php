@@ -5,7 +5,13 @@ namespace App\Flare\Providers;
 
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
+use App\Flare\Handlers\AttackHandlers\AttackHandler;
+use App\Flare\Handlers\AttackHandlers\CanHitHandler;
+use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
+use App\Flare\Handlers\AttackHandlers\ItemHandler;
+use App\Flare\Handlers\CharacterAttackHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
+use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -116,8 +122,63 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MessageThrottledHandler;
         });
 
-        $this->app->bind(FightService::class, function($app, $paramters) {
-            return new FightService($paramters['character'], $paramters['monster']);
+        $this->app->bind(SetupFightHandler::class, function($app) {
+            return new SetupFightHandler(
+                $app->make(CharacterInformationBuilder::class),
+            );
+        });
+
+        $this->app->bind(CharacterAttackBuilder::class, function($app) {
+            return new CharacterAttackBuilder(
+                $app->make(CharacterInformationBuilder::class)
+            );
+        });
+
+        $this->app->bind(EntrancingChanceHandler::class, function($app) {
+            return new EntrancingChanceHandler(
+                $app->make(CharacterInformationBuilder::class)
+            );
+        });
+
+        $this->app->bind(AttackExtraActionHandler::class, function($app) {
+            return new AttackExtraActionHandler();
+        });
+
+        $this->app->bind(ItemHandler::class, function($app) {
+            return new ItemHandler(
+                $app->make(CharacterInformationBuilder::class)
+            );
+        });
+
+        $this->app->bind(CanHitHandler::class, function($app) {
+            return new CanHitHandler(
+                $app->make(AttackExtraActionHandler::class),
+                $app->make(CharacterInformationBuilder::class)
+            );
+        });
+
+        $this->app->bind(AttackHandler::class, function($app) {
+            return new AttackHandler(
+                $app->make(CharacterAttackBuilder::class),
+                $app->make(EntrancingChanceHandler::class),
+                $app->make(AttackExtraActionHandler::class),
+                $app->make(ItemHandler::class),
+                $app->make(CanHitHandler::class),
+            );
+        });
+
+        $this->app->bind(CharacterAttackHandler::class, function($app) {
+            return new CharacterAttackHandler(
+                $app->make(AttackHandler::class),
+            );
+        });
+
+        $this->app->bind(FightService::class, function($app) {
+            return new FightService(
+                $app->make(SetupFightHandler::class),
+                $app->make(CharacterInformationBuilder::class),
+                $app->make(CharacterAttackHandler::class),
+            );
         });
 
         $this->app->bind(AttackExtraActionHandler::class, function($app) {

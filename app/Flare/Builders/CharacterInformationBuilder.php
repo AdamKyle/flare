@@ -341,13 +341,17 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function buildHealth(): int {
+    public function buildHealth(bool $voided = false): int {
 
         if ($this->character->is_dead) {
             return 0;
         }
 
         $baseHealth = $this->character->dur + 10;
+
+        if ($voided) {
+            return $baseHealth;
+        }
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->equipped) {

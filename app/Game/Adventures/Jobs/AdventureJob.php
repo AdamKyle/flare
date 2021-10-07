@@ -42,6 +42,8 @@ class AdventureJob implements ShouldQueue
      */
     protected $currentLevel;
 
+    protected $attackType;
+
     /**
      * Create a new job instance.
      *
@@ -70,7 +72,7 @@ class AdventureJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(RewardBuilder $rewardBuilder)
+    public function handle(AdventureService $adventureService)
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
@@ -78,12 +80,9 @@ class AdventureJob implements ShouldQueue
             return;
         }
 
-        $adventureService = resolve(AdventureService::class, [
-            'character'           => $this->character->refresh(),
-            'adventure'           => $this->adventure,
-            'rewardBuilder'       => $rewardBuilder,
-            'name'                => $this->name
-        ]);
+        $adventureService = $adventureService->setAdventure($this->adventure)
+                                             ->setCharacter($this->character)
+                                             ->setName($this->name);
 
         $adventureService->processAdventure($this->currentLevel, $this->adventure->levels, $this->attackType);
 

@@ -2,6 +2,8 @@
 
 namespace App\Game\Adventures\Providers;
 
+use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Services\FightService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Adventures\Console\Commands\DeleteAdventureLogs;
 use App\Game\Adventures\Builders\RewardBuilder;
@@ -28,17 +30,18 @@ class ServiceProvider extends ApplicationServiceProvider
             return new RewardBuilder();
         });
 
-        $this->app->bind(AdventureFightService::class, function($app, $parameters) {
-            return new AdventureFightService($parameters['character'], $parameters['adventure']);
+        $this->app->bind(AdventureFightService::class, function($app) {
+            return new AdventureFightService(
+                $app->make(CharacterInformationBuilder::class),
+                $app->make(FightService::class),
+            );
         });
 
-        $this->app->bind(AdventureService::class, function($app, $parameters) {
+        $this->app->bind(AdventureService::class, function($app) {
             return new AdventureService(
-                $parameters['character'],
-                $parameters['adventure'],
-                $parameters['rewardBuilder'],
-                $parameters['name']
+                $app->make(AdventureFightService::class)
             );
+
         });
 
         $this->commands([DeleteAdventureLogs::class]);

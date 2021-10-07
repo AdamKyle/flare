@@ -23,15 +23,21 @@ class AdventureFightService {
      */
     private $adventure;
 
-    /**
-     * @var Monster $monster
-     */
-    private $monster;
 
     /**
      * @var CharacterInformationBuilder $characterInformation
      */
     private $characterInformation;
+
+    private $fightService;
+
+    private $battleLogs = [];
+
+    private $characterWon = true;
+
+    private $attackType = null;
+
+    private $currentCharacterHealth;
 
     /**
      * Constructor
@@ -40,16 +46,29 @@ class AdventureFightService {
      * @param Adventure $adventure
      * @return void
      */
-    public function __construct(Character $character, Adventure $adventure, string $attackType) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder, FightService $fightService) {
 
-        $this->characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $this->characterInformation = $characterInformationBuilder;
+        $this->fightService         = $fightService;
+    }
 
+    public function setCharacter(Character $character, string $attackType): AdventureFightService {
         $this->character     = $character;
-        $this->adventure     = $adventure;
         $this->attackType    = $attackType;
 
-        $this->currentCharacterHealth = 0; //$this->characterInformation->buildHealth();
-        $this->battleLogs    = [];
+        $voided = $this->isAttackVoided($attackType);
+
+        $this->characterInformation   = $this->characterInformation->setCharacter($character);
+
+        $this->currentCharacterHealth = $this->characterInformation->buildHealth($voided);
+
+        return $this;
+    }
+
+    public function setAdventure(Adventure $adventure): AdventureFightService {
+        $this->adventure = $adventure;
+
+        return $this;
     }
 
     /**
@@ -57,24 +76,35 @@ class AdventureFightService {
      *
      * @return void
      */
-    public function processFloor(): FightService {
+    public function processFloor() {
         $encounters                 = rand(1, $this->adventure->monsters->count());
 
         for ($i = 1; $i <= $encounters; $i++) {
-            $monster = $this->adventure->monsters()->inRandomOrder()->first();
-            $message = 'You encounter a: ' . $monster->name;
+            if ($this->characterWon) {
+                $monster = $this->adventure->monsters()->inRandomOrder()->first();
+                $message = 'You encounter a: ' . $monster->name;
 
-            $this->battleLogs = $this->addMessage($message, 'info-encounter');
-
-            $fightService = resolve(FightService::class, [
-                'character' => $this->character,
-                'monster'   => $monster,
-            ]);
-
-            $fightService->attack($this->character, $this->monster);
+                $this->battleLogs = $this->addMessage($message, 'info-encounter');
 
 
+                $this->characterWon = $this->fightService->processFight($this->character, $monster, $this->attackType);
+
+                $this->battleLogs = [...$this->battleLogs, ...$this->fightService->getBattleMessages()];
+
+                $this->fightService->reset();
+            }
         }
+    }
+
+    public function getLogs(): array {
+        return  [
+            'reward_info' => [],
+            'messages'    => $this->battleLogs,
+        ];
+    }
+
+    protected function isAttackVoided(string $attackType): bool {
+        return str_contains($attackType, 'voided');
     }
 
 }

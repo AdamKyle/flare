@@ -26,6 +26,15 @@ class SetupFightHandler {
     }
 
     public function setUpFight($attacker, $defender) {
+
+        if ($attacker instanceof Character) {
+            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
+        }
+
+        if ($defender instanceof Character) {
+            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($defender);
+        }
+
         if ($defender instanceof Character) {
             if ($this->isVoided($defender)) {
                 $message = 'You voided your enemies enchantments. They feel much weaker!';
@@ -47,7 +56,7 @@ class SetupFightHandler {
         // Only do this once per fight.
         if (is_null($this->attackType) && !$this->processed) {
             if ($attacker instanceof Character) {
-                $this->defender = $this->reduceEnemyStats();
+                $this->defender = $this->reduceEnemyStats($defender);
             }
         }
 
@@ -62,7 +71,7 @@ class SetupFightHandler {
         return $this->battleLogs;
     }
 
-    public function getModifiedDefender(): array {
+    public function getModifiedDefender(): Monster {
         return $this->defender;
     }
 
@@ -73,7 +82,7 @@ class SetupFightHandler {
     }
 
     protected function reduceEnemyStats($defender) {
-        $affix = $this->characterInformation->findPrefixStatReductionAffix();
+        $affix = $this->characterInformationBuilder->findPrefixStatReductionAffix();
 
         if (!is_null($affix)) {
             $dc    = 100 - $defender->affix_resistance;
@@ -87,19 +96,19 @@ class SetupFightHandler {
                 return $defender;
             }
 
-            $defender->str   = $this->monster->str - ($this->monster->str * $affix->str_reduction);
-            $defender->dex   = $this->monster->dex - ($this->monster->dex * $affix->dex_reduction);
-            $defender->int   = $this->monster->int - ($this->monster->int * $affix->int_reduction);
-            $defender->dur   = $this->monster->dur - ($this->monster->dur * $affix->dur_reduction);
-            $defender->chr   = $this->monster->chr - ($this->monster->chr * $affix->chr_reduction);
-            $defender->agi   = $this->monster->agi - ($this->monster->agi * $affix->agi_reduction);
-            $defender->focus = $this->monster->focus - ($this->monster->focus * $affix->focus_reduction);
+            $defender->str   = $defender->str - ($defender->str * $affix->str_reduction);
+            $defender->dex   = $defender->dex - ($defender->dex * $affix->dex_reduction);
+            $defender->int   = $defender->int - ($defender->int * $affix->int_reduction);
+            $defender->dur   = $defender->dur - ($defender->dur * $affix->dur_reduction);
+            $defender->chr   = $defender->chr - ($defender->chr * $affix->chr_reduction);
+            $defender->agi   = $defender->agi - ($defender->agi * $affix->agi_reduction);
+            $defender->focus = $defender->focus - ($defender->focus * $affix->focus_reduction);
 
             $stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
 
             for ($i = 0; $i < count($stats); $i++) {
                 $iteratee = $stats[$i] . '_reduction';
-                $sumOfReductions = $this->characterInformation->findSuffixStatReductionAffixes()->sum($iteratee);
+                $sumOfReductions = $this->characterInformationBuilder->findSuffixStatReductionAffixes()->sum($iteratee);
 
                 $defender->{$stats[$i]} = $defender->{$stats[$i]} - ($defender->{$stats[$i]} * $sumOfReductions);
             }
