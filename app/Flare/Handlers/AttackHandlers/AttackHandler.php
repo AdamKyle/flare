@@ -22,7 +22,7 @@ class AttackHandler {
 
     private $characterHealth;
 
-    private $monsterhealth;
+    private $monsterHealth;
 
     private $battleLogs = [];
 
@@ -57,7 +57,7 @@ class AttackHandler {
     }
 
     public function getMonsterHealth(): int {
-        return $this->monsterhealth;
+        return $this->monsterHealth;
     }
 
     public function getBattleMessages(): array {
@@ -65,6 +65,7 @@ class AttackHandler {
     }
 
     public function doAttack($attacker, $defender, string $attackType) {
+
         $this->characterAttackBuilder = $this->characterAttackBuilder->setCharacter($attacker);
         $characterInfo                = $this->characterAttackBuilder->getInformationBuilder()->setCharacter($attacker);
 
@@ -76,36 +77,53 @@ class AttackHandler {
 
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterhealth, $voided);
+            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
 
             $this->useItems($attacker, $defender, $voided);
+
+            return;
         }
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender)) {
             $this->battleLogs = $this->entrancingChanceHandler->getBattleLogs();
 
-            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterhealth, $voided);
+            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
 
             $this->useItems($attacker, $defender, $voided);
+
+            return;
+        } else {
+            $this->battleLogs = $this->entrancingChanceHandler->getBattleLogs();
         }
 
-        if ($this->canHitHandler->canHit($attacker, $defender)) {
+        if ($this->canHitHandler->canHit($attacker, $defender, $voided)) {
             if ($this->isBlocked($attackData['weapon_damage'], $defender)) {
                 $message          = $defender->name . ' Blocked your attack!';
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
                 $this->useItems($attacker, $defender, $voided);
+
+                return;
             }
-        } else {
-            $message          = 'Missed!';
-            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
+            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+
+            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
 
             $this->useItems($attacker, $defender, $voided);
+
+            dump($this->battleLogs);
+            return;
         }
+
+        $message          = 'Missed!';
+        $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
+        $this->useItems($attacker, $defender, $voided);
     }
 
     protected function isBlocked($damage, $defender): bool {
@@ -126,12 +144,12 @@ class AttackHandler {
 
     protected function useItems($attacker, $defender, bool $voided = false) {
         $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
-                                         ->setMonsterHealth($this->monsterhealth);
+                                         ->setMonsterHealth($this->monsterHealth);
 
         $itemHandler->useItems($attacker, $defender, $voided);
 
         $this->characterHealth = $itemHandler->getCharacterHealth();
-        $this->monsterhealth   = $itemHandler->getMonsterHealth();
+        $this->monsterHealth   = $itemHandler->getMonsterHealth();
         $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
     }
 }

@@ -3,6 +3,7 @@ namespace App\Flare\Services;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\CharacterAttackHandler;
+use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
@@ -23,16 +24,20 @@ class FightService {
 
     private $currentCharacterHealth;
 
+    private $monsterAttackHandler;
+
     private $battleLogs = [];
 
     public function __construct(
         SetupFightHandler $setupFightHandler,
         CharacterInformationBuilder $characterInformationBuilder,
         CharacterAttackHandler $characterAttackHandler,
+        MonsterAttackHandler $monsterAttackHandler
     ) {
         $this->setupFightHandler           = $setupFightHandler;
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->characterAttackHandler      = $characterAttackHandler;
+        $this->monsterAttackHandler        = $monsterAttackHandler;
     }
 
     public function processFight($attacker, $defender, string $attackType) {
@@ -86,10 +91,12 @@ class FightService {
             $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + $defender->dur;
         }
 
-        $this->fight($attacker, $defender, $attackType);
+        $isCharacterVoided = $newAttackType === 'voided' ? true : false;
+
+        $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
     }
 
-    public function fight($attacker, $defender, $attackType) {
+    public function fight($attacker, $defender, $attackType, bool $isDefenderVoided = false) {
 
         if ($attacker instanceof Character) {
             $this->characterAttackHandler->setHealth(
@@ -103,8 +110,12 @@ class FightService {
         }
 
         if ($attacker instanceof Monster) {
-            dump('Monster\'s Turn!');
-            // Do Attack Here.
+            $this->monsterAttackHandler->setHealth($this->currentMonsterHealth, $this->currentCharacterHealth)
+                                       ->doAttack($attacker, $defender, $isDefenderVoided);
+
+            $this->battleLogs             = [...$this->battleLogs, ...$this->monsterAttackHandler->getBattleLogs()];
+            $this->currentMonsterHealth   = $this->monsterAttackHandler->getMonsterHealth();
+            $this->currentCharacterHealth = $this->monsterAttackHandler->getCharacterHealth();
         }
 
         $this->processFight($defender, $attacker, $attackType);
@@ -121,11 +132,11 @@ class FightService {
     }
 
     protected function isCharacterDead(): bool {
-        return $this->currentCharacterHealth > 0;
+        return $this->currentCharacterHealth <= 0;
     }
 
     protected function isMonsterDead(): bool {
-        return $this->currentMonsterHealth > 0;
+        return $this->currentMonsterHealth <= 0;
     }
 
 }

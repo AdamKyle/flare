@@ -11,6 +11,7 @@ use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
 use App\Flare\Handlers\AttackHandlers\ItemHandler;
 use App\Flare\Handlers\CharacterAttackHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
+use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
@@ -157,6 +158,15 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(MonsterAttackHandler::class, function($app) {
+            return new MonsterAttackHandler(
+                $app->make(CharacterInformationBuilder::class),
+                $app->make(EntrancingChanceHandler::class),
+                $app->make(ItemHandler::class),
+                $app->make(CanHitHandler::class),
+            );
+        });
+
         $this->app->bind(AttackHandler::class, function($app) {
             return new AttackHandler(
                 $app->make(CharacterAttackBuilder::class),
@@ -178,6 +188,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SetupFightHandler::class),
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterAttackHandler::class),
+                $app->make(MonsterAttackHandler::class),
             );
         });
 

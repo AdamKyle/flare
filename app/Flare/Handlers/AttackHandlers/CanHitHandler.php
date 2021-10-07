@@ -4,6 +4,7 @@ namespace App\Flare\Handlers\AttackHandlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
+use App\Flare\Models\Character;
 
 class CanHitHandler {
 
@@ -37,6 +38,8 @@ class CanHitHandler {
         if ($dodgeBonus > 1.0) {
             return false;
         }
+
+        $toHit = 0;
 
         if ($defender instanceof  Character) {
 

@@ -38,7 +38,7 @@ class ItemHandler {
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
 
-            if ($this->character->classType()->isVampire() && !$voided) {
+            if ($attacker->classType()->isVampire() && !$voided) {
                 $canResist  = $this->characterInformation->canAffixesBeResisted();
                 $damage     = $this->characterInformation->findLifeStealingAffixes(true);
 
@@ -47,7 +47,7 @@ class ItemHandler {
         }
 
         $this->useAffixes($attacker, $defender, $voided);
-        $this->useAtifacts($attacker, $defender, $voided);
+        $this->useArtifacts($attacker, $defender, $voided);
         $this->useRings($attacker, $voided);
     }
 
@@ -174,7 +174,7 @@ class ItemHandler {
      * @param $defender
      * @return array
      */
-    protected function castSpell($attacker, $defender) {
+    public function castSpell($attacker, $defender) {
         $messages = [];
 
         if ($attacker instanceof Character) {
@@ -200,13 +200,14 @@ class ItemHandler {
      * Only the character has rings.
      *
      * @param $attacker
+     * @param bool $isVoided
      * @return array
      */
-    protected function useRings($attacker): array {
+    protected function useRings($attacker, bool $isVoided = false): array {
         $messages = [];
 
         if ($attacker instanceof Character) {
-            $ringDamage = $this->characterInformationBuilder->getTotalRingDamage();
+            $ringDamage = $this->characterInformationBuilder->getTotalRingDamage($isVoided);
             if ($ringDamage > 0) {
                 $messages[]  = ['Your rings begin to shimmer in the presence of the enemy'];
 
@@ -224,27 +225,25 @@ class ItemHandler {
      *
      * @param $attacker
      * @param $defender
-     * @return array
+     * @param bool $voided
      */
-    protected function useAtifacts($attacker, $defender, bool $voided = false) {
-        $messages = [];
+    public function useArtifacts($attacker, $defender, bool $voided = false) {
 
         if ($attacker instanceOf Character) {
             if ($this->characterInformationBuilder->hasArtifacts()) {
                 $message = 'Your artifacts glow before the enemy!';
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
-                $messages[] = $this->artifactDamage($attacker, $defender, $voided);
             }
         }
 
         if ($defender instanceOf Character) {
             if ($defender->can_use_artifacts) {
-                $messages[] = ['The enemies artifacts begin to glow ...'];
-                $messages[] = $this->artifactDamage($attacker, $defender, $voided);
+                $message = 'The enemies artifacts begin to glow ...';
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+
+                $this->artifactDamage($attacker, $defender, $voided);
             }
         }
-
-        return $messages;
     }
 
     /**
@@ -286,7 +285,7 @@ class ItemHandler {
 
         if ($defender instanceof Character){
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($defender);
-            $defenderArtifactAnnulment = $this->characterInformationBuilder->getTotalSpellEvasion();;
+            $defenderArtifactAnnulment = $this->characterInformationBuilder->getTotalDeduction('artifact_annulment');
             $dc                        = 100 - $defenderArtifactAnnulment;
             $artifactDamage            = rand(1, $attacker->max_artifact_damage);
 
@@ -318,7 +317,6 @@ class ItemHandler {
      *
      * @param $attacker
      * @param $defender
-     * @return string[]|void
      */
     protected function spellDamage($attacker, $defender) {
         if ($attacker instanceof Character) {
@@ -335,15 +333,14 @@ class ItemHandler {
         if ($defender instanceof Character){
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($defender);
 
-            $defenderArtifactAnnulment = $this->characterInformationBuilder->getTotalSpellEvasion();
+            $defenderArtifactAnnulment = $this->characterInformationBuilder->getTotalDeduction('spell_evasion');
             $dc                        = 100 - $defenderArtifactAnnulment;
             $spellDamage               = rand(1, $attacker->max_spell_damage);
 
             if ($spellDamage > 0) {
                 if ($dc <= 0 || rand(1, 100) > $dc) {
-                    return [
-                        'The enemies spells have no effect!'
-                    ];
+                    $message = 'The enemies spells have no effect!';
+                    $this->battleLogs = $this->addMessage($message, 'info-battle', $this->battleLogs);
                 }
 
                 $health = $this->currentCharacterHealth - $spellDamage;
@@ -354,9 +351,8 @@ class ItemHandler {
 
                 $this->currentCharacterHealth = $health;
 
-                return [
-                    'The enemies spells burst towards you, slamming into you for: ' . $spellDamage,
-                ];
+                $message = 'The enemies spells burst towards you, slamming into you for: ' . $spellDamage;
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
             }
         }
     }

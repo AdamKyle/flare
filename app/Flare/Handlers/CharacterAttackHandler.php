@@ -40,7 +40,7 @@ class CharacterAttackHandler {
     }
 
     public function handleAttack($attacker, $defender, string $attackType) {
-        switch ($attacker) {
+        switch ($attackType) {
             case AttackTypeValue::ATTACK:
             case AttackTypeValue::VOIDED_ATTACK:
                 $this->handleWeaponAttack($attacker, $defender, $attackType);
@@ -61,7 +61,9 @@ class CharacterAttackHandler {
     }
 
     protected function handleWeaponAttack($attacker, $defender, string $attackType) {
-        $this->attackHandler->doAttack($attacker, $defender, $attackType);
+        $this->attackHandler->setMonsterHealth($this->monsterCurrentHealth)
+                            ->setCharacterHealth($this->characterCurrentHealth)
+                            ->doAttack($attacker, $defender, $attackType);
 
         $this->monsterCurrentHealth   = $this->attackHandler->getMonsterHealth();
         $this->characterCurrentHealth = $this->attackHandler->getCharacterHealth();

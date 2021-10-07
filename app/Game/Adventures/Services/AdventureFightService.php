@@ -89,6 +89,7 @@ class AdventureFightService {
 
                 $this->characterWon = $this->fightService->processFight($this->character, $monster, $this->attackType);
 
+
                 $this->battleLogs = [...$this->battleLogs, ...$this->fightService->getBattleMessages()];
 
                 $this->fightService->reset();

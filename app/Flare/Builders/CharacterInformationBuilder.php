@@ -26,10 +26,10 @@ class CharacterInformationBuilder {
     private $inventory;
 
     /**
-     * Set the character and fetch it's inventory.
+     * Set the character and fetch its inventory.
      *
      * @param Character $character
-     * @return CharactrInformationBuilder
+     * @return CharacterInformationBuilder
      */
     public function setCharacter(Character $character): CharacterInformationBuilder {
         $this->character = $character;
@@ -49,7 +49,7 @@ class CharacterInformationBuilder {
      * Applies all bonuses to that stat based on equipped items in the
      * inventory assuming the user has anything equipped at all.
      *
-     * @param Character $character
+     * @param string $stat
      * @return mixed
      */
     public function statMod(string $stat) {
@@ -382,7 +382,7 @@ class CharacterInformationBuilder {
      */
     public function hasAffixes(): bool {
         return $this->fetchInventory()->filter(function ($slot) {
-            return ((!is_null($slot->item->itemPrefix)) || (!is_null($slot->item->itemSuffix))) && $slot->equipped;
+            return !is_null($slot->item->itemPrefix || (!is_null($slot->item->itemSuffix)) && $slot->equipped);
         })->isNotEmpty();
     }
 
@@ -396,7 +396,7 @@ class CharacterInformationBuilder {
      */
     public function canAffixesBeResisted(): bool {
         return $this->character->inventory->slots->filter(function($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE;
+            return ($slot->item->type === 'quest') && ($slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE);
         })->isNotEmpty();
     }
 
