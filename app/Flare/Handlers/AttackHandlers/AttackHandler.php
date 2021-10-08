@@ -112,11 +112,10 @@ class AttackHandler {
 
             $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
-            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+            $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
             $this->useItems($attacker, $defender, $voided);
 
-            dump($this->battleLogs);
             return;
         }
 

@@ -93,7 +93,7 @@ class FightService {
 
         $isCharacterVoided = $newAttackType === 'voided' ? true : false;
 
-        $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
+        return $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
     }
 
     public function fight($attacker, $defender, $attackType, bool $isDefenderVoided = false) {
@@ -118,7 +118,7 @@ class FightService {
             $this->currentCharacterHealth = $this->monsterAttackHandler->getCharacterHealth();
         }
 
-        $this->processFight($defender, $attacker, $attackType);
+        return $this->processFight($defender, $attacker, $attackType);
     }
 
     public function getBattleMessages(): array {

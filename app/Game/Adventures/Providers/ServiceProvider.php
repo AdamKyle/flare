@@ -34,6 +34,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AdventureFightService(
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(FightService::class),
+                $app->make(RewardBuilder::class),
             );
         });
 

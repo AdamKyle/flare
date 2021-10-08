@@ -208,12 +208,15 @@ class ItemHandler {
 
         if ($attacker instanceof Character) {
             $ringDamage = $this->characterInformationBuilder->getTotalRingDamage($isVoided);
+
             if ($ringDamage > 0) {
-                $messages[]  = ['Your rings begin to shimmer in the presence of the enemy'];
+                $message = 'Your rings begin to shimmer in the presence of the enemy';
+                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
                 $this->currentMonsterHealth -= $ringDamage;
 
-                $messages[] = ['Your rings lash out at the enemy for: ' . $ringDamage];
+                $message = 'Your rings lash out at the enemy for: ' . number_format($ringDamage);
+                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
             }
         }
 
@@ -233,6 +236,8 @@ class ItemHandler {
             if ($this->characterInformationBuilder->hasArtifacts()) {
                 $message = 'Your artifacts glow before the enemy!';
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
+                $this->artifactDamage($attacker, $defender, $voided);
             }
         }
 

@@ -159,7 +159,7 @@
     <inspection_tool class="PhpSeparateElseIfInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpSingleStatementWithBracesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpStanGlobal" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpStatementWithoutBracesInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpStatementWithoutBracesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpStaticAsDynamicMethodCallInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpStrFunctionsInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpStrictComparisonWithOperandsOfDifferentTypesInspection" enabled="true" level="WARNING" enabled_by_default="true" />

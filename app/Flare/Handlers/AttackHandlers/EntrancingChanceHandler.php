@@ -55,13 +55,10 @@ class EntrancingChanceHandler {
                     $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
                     return true;
-                } else {
-                    $message = 'The enemy is resists your entrancing enchantments!';
-                    $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
-
-                    return false;
                 }
             }
+
+            return false;
         }
 
         if ($defender instanceof  Character) {
@@ -71,10 +68,10 @@ class EntrancingChanceHandler {
 
                 return true;
             }
+        } else {
+            $message = 'You resist the alluring entrancing enchantments on your enemy!';
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
         }
-
-        $message = 'You resist the alluring entrancing enchantments on your enemy!';
-        $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
         return false;
     }
