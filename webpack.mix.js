@@ -11,15 +11,44 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.react('resources/js/app.js', 'public/js').extract()
-   .react('resources/js/helpers/kingdom-unit-movement.js', 'public/js').extract()
-   .react('resources/js/helpers/admin-chat-messages.js', 'public/js').extract()
-   .react('resources/js/helpers/admin-site-stats-components.js', 'public/js').extract()
-   .react('resources/js/helpers/character-boons.js', 'public/js').extract()
-   .react('resources/js/helpers/admin-statistics.js', 'public/js').extract()
-   .react('resources/js/helpers/character-inventory.js', 'public/js').extract()
-   .react('resources/js/helpers/character-sheet.js', 'public/js').extract()
-   .sass('resources/sass/app.scss', 'public/css')
-   .sourceMaps()
-   .version()
-   .browserSync('127.0.0.1:8000');
+const tailwindcss             = require('tailwindcss');
+const postCssImport           = require("postcss-import");
+const postCssNested           = require("postcss-nested");
+const postcssCustomProperties = require("postcss-custom-properties");
+const autoprefixer            = require("autoprefixer");
+
+mix.webpackConfig({
+  stats: {
+    hash: true,
+    version: true,
+    timings: true,
+    children: true,
+    errors: true,
+    errorDetails: true,
+    warnings: true,
+    chunks: true,
+    modules: false,
+    reasons: true,
+    source: true,
+    publicPath: true,
+  }
+}).js('resources/js/app.js', 'public/js').react().extract()
+  .js('resources/js/helpers/kingdom-unit-movement.js', 'public/js').react().extract()
+  .js('resources/js/helpers/admin-chat-messages.js', 'public/js').react().extract()
+  .js('resources/js/helpers/admin-site-stats-components.js', 'public/js').react().extract()
+  .js('resources/js/helpers/character-boons.js', 'public/js').react().extract()
+  .js('resources/js/helpers/admin-statistics.js', 'public/js').react().extract()
+  .js('resources/js/helpers/character-inventory.js', 'public/js').react().extract()
+  .js('resources/js/helpers/character-sheet.js', 'public/js').react().extract()
+  .sass('resources/sass/app.scss', 'public/css')
+  .copy('resources/vendor/theme/style.css', 'public/css/theme-style.css')
+  .postCss('resources/css/tailwind.css', 'public/css', [
+    postCssImport(),
+    require('tailwindcss/nesting')(require('postcss-nesting')),
+    tailwindcss({ config: './tailwind.config.js' }),
+    postCssNested(),
+    postcssCustomProperties(),
+    autoprefixer(),
+  ])
+  .version()
+  .sourceMaps();
