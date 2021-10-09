@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.cards.card-with-title>
-      Content here
-    </x-core.cards.card-with-title>
-    @dump($adventureLog)
+  @include('game.adventures.partials.completed-adventure-details', ['adventureLog' => $adventureLog, 'character' => $character])
 @endsection
