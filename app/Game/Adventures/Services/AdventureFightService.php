@@ -202,7 +202,7 @@ class AdventureFightService {
         }
 
         if (!is_null($questDrop)) {
-            $this->rewardData['items'] = [
+            $this->rewardData['items'][] = [
                 'id' => $questDrop->id,
                 'name' => $questDrop->affix_name,
             ];

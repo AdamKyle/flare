@@ -39,6 +39,12 @@ class CharacterInformationBuilder {
         return $this;
     }
 
+    public function hasQuestItem(int $itemId) {
+        $this->character->inventory->slots->filter(function($slot) use($itemId) {
+            $slot->item_id === $itemId && $slot->item->type === 'quest';
+        })->isNotEmpty();
+    }
+
     public function getCharacter(): Character {
         return $this->character;
     }

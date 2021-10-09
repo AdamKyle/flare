@@ -38,6 +38,7 @@ class CharacterAdventureController extends Controller {
     public function completedAdventure(AdventureLog $adventureLog) {
         return view('game.adventures.completed-adventure', [
             'adventureLog' => $adventureLog,
+            'character'    => auth()->user->character,
         ]);
     }
 
@@ -76,7 +77,8 @@ class CharacterAdventureController extends Controller {
 
         return view('game.adventures.current-adventure', [
             'log'          => $adventureLog->logs[array_key_last($adventureLog->logs)],
-            'adventureLog' => $adventureLog
+            'adventureLog' => $adventureLog,
+            'character'    => $character,
         ]);
     }
 

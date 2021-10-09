@@ -12,6 +12,17 @@ module.exports = {
   },
   prefix: 'tw-',
   theme: {
+    screens: {
+      'sm': '640px',
+
+      'md': '1024px',
+
+      'lg': '1600px',
+
+      'xl': '1920px',
+
+      '2xl': '2600px',
+    },
     container: {
       center: true,
       padding: "1rem",
