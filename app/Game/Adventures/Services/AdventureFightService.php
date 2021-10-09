@@ -37,6 +37,8 @@ class AdventureFightService {
 
     private $battleLogs = [];
 
+    private $battleMessages = [];
+
     private $originalRewardData = [];
     
     private $rewardData = [];
@@ -46,6 +48,8 @@ class AdventureFightService {
     private $characterWon = true;
 
     private $attackType = null;
+
+    private $monsterName = null;
 
     private $currentCharacterHealth;
 
@@ -104,6 +108,7 @@ class AdventureFightService {
         for ($i = 1; $i <= $encounters; $i++) {
             if ($this->characterWon) {
                 $monster = $this->adventure->monsters()->inRandomOrder()->first();
+                $this->monsterName = $monster->name . '-' . Str::random(10);
                 $message = 'You encounter a: ' . $monster->name;
 
                 $this->battleLogs = $this->addMessage($message, 'info-encounter');
@@ -115,9 +120,11 @@ class AdventureFightService {
                     $this->processRewards($monster);
                 }
 
-                $monsterName = $monster->name . '-' . Str::random(10);
+                $logs = [...$this->battleLogs, ...$this->fightService->getBattleMessages()];
 
-                $this->battleLogs[$monsterName] = [...$this->battleLogs, ...$this->fightService->getBattleMessages()];
+                $this->battleLogs = [];
+
+                $this->battleMessages[$this->monsterName] = $logs;
 
                 $this->fightService->reset();
             }
@@ -126,8 +133,8 @@ class AdventureFightService {
 
     public function getLogs(): array {
         return  [
-            'reward_info' => $this->rewardData,
-            'messages'    => $this->battleLogs,
+            'reward_info' => $this->rewardDataLogs,
+            'messages'    => $this->battleMessages,
             'won_fight'   => $this->characterWon,
         ];
     }
@@ -141,12 +148,10 @@ class AdventureFightService {
 
         $gameMap = $this->character->map->gameMap;
 
-        $monsterName = $monster->name . '-' . Str::random(10);
-
         $this->handleXP($monster, $gameMap);
         $this->handleRewards($monster, $gameMap);
 
-        $rewardData[$monsterName] = $this->rewardData;
+        $rewardData[$this->monsterName] = $this->rewardData;
 
         $this->rewardDataLogs = array_merge($this->rewardDataLogs, $rewardData);
 
@@ -164,7 +169,7 @@ class AdventureFightService {
                     ->where('game_skills.name', $this->rewardData['skill']['skill_name']);
             })->first();
 
-            $this->rewardData['skill']['exp'] += $this->rewardBuilder->fetchSkillXPReward($foundSkill, $this->adventure);
+            $this->rewardData['skill']['exp'] = $this->rewardBuilder->fetchSkillXPReward($foundSkill, $this->adventure);
         }
 
         $xpBonus = $this->adventure->exp_bonus;
@@ -175,7 +180,7 @@ class AdventureFightService {
 
         $xpReward = $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction);
 
-        $this->rewardData['exp'] += $xpReward * $xpBonus;
+        $this->rewardData['exp'] = $xpReward * $xpBonus;
     }
 
     protected function handleRewards(Monster $monster, GameMap $gameMap) {
@@ -203,7 +208,7 @@ class AdventureFightService {
             ];
         }
 
-        $this->rewardData['gold'] += $gold;
+        $this->rewardData['gold'] = $gold;
     }
 
 }

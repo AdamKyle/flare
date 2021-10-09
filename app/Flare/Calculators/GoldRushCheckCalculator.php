@@ -32,10 +32,10 @@ class GoldRushCheckCalculator {
             return true;
         }
 
-        $roll = rand(1, 1000);
-        $roll += $roll * $bonus;
+        $roll = rand(1, 10000);
+        $roll += $roll * ($bonus / 2);
 
-        return $roll > (1000 - (1000 * $monster->drop_check));
+        return $roll > (10000 - (10000 * $monster->drop_check));
     }
 
     protected function getAdventureGoldRushChance(Adventure $adventure = null): float {

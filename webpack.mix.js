@@ -32,7 +32,8 @@ mix.webpackConfig({
     source: true,
     publicPath: true,
   }
-}).js('resources/js/app.js', 'public/js').react().extract()
+}).js('resources/js/page-components/tabs.js', 'public/js/page-components')
+  .js('resources/js/app.js', 'public/js').react().extract()
   .js('resources/js/helpers/kingdom-unit-movement.js', 'public/js').react().extract()
   .js('resources/js/helpers/admin-chat-messages.js', 'public/js').react().extract()
   .js('resources/js/helpers/admin-site-stats-components.js', 'public/js').react().extract()
@@ -41,7 +42,7 @@ mix.webpackConfig({
   .js('resources/js/helpers/character-inventory.js', 'public/js').react().extract()
   .js('resources/js/helpers/character-sheet.js', 'public/js').react().extract()
   .sass('resources/sass/app.scss', 'public/css')
-  .copy('resources/vendor/theme/style.css', 'public/css/theme-style.css')
+  .copy('resources/vendor/theme/css/style.css', 'public/css/theme-style.css')
   .postCss('resources/css/tailwind.css', 'public/css', [
     postCssImport(),
     require('tailwindcss/nesting')(require('postcss-nesting')),

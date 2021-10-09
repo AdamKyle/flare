@@ -63,6 +63,10 @@ class ItemHandler {
         return $this->battleLogs;
     }
 
+    public function resetLogs() {
+        $this->battleLogs = [];
+    }
+
     /**
      * Let your affixes fire off.
      *

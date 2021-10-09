@@ -48,6 +48,10 @@ class AttackExtraActionHandler {
         return $this->messages;
     }
 
+    public function resetMessages() {
+        $this->messages = [];
+    }
+
 
     protected function tripleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);

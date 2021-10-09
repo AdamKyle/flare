@@ -58,12 +58,18 @@ class MonsterAttackHandler {
         return $this->battleLogs;
     }
 
+    public function resetLogs() {
+        $this->battleLogs = [];
+    }
+
     public function doAttack($attacker, $defender, bool $isDefenderVoided = false) {
         $monsterAttack = explode('-', $attacker->attack_range);
         $monsterAttack = rand($monsterAttack[0], $monsterAttack[1]);
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, $isDefenderVoided)) {
             $this->battleLogs = $this->entrancingChanceHandler->getBattleLogs();
+
+            $this->entrancingChanceHandler->resetLogs();
 
             $this->characterHealth -= $monsterAttack;
 
@@ -111,6 +117,8 @@ class MonsterAttackHandler {
         $this->monsterHealth   = $itemHandler->getMonsterHealth();
         $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
 
+        $itemHandler->resetLogs();
+
         $this->useAffixes($attacker, $defender);
 
         $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth);
@@ -119,6 +127,8 @@ class MonsterAttackHandler {
 
         $this->characterHealth = $itemHandler->getCharacterHealth();
         $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
+
+        $itemHandler->resetLogs();
 
         $this->heal($attacker, $defender);
     }

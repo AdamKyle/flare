@@ -107,6 +107,8 @@ class FightService {
             $this->battleLogs             = [...$this->battleLogs, ...$this->characterAttackHandler->getBattleLogs()];
             $this->currentMonsterHealth   = $this->characterAttackHandler->getMonsterHealth();
             $this->currentCharacterHealth = $this->characterAttackHandler->getCharacterHealth();
+
+            $this->characterAttackHandler->resetLogs();
         }
 
         if ($attacker instanceof Monster) {
@@ -116,6 +118,8 @@ class FightService {
             $this->battleLogs             = [...$this->battleLogs, ...$this->monsterAttackHandler->getBattleLogs()];
             $this->currentMonsterHealth   = $this->monsterAttackHandler->getMonsterHealth();
             $this->currentCharacterHealth = $this->monsterAttackHandler->getCharacterHealth();
+
+            $this->monsterAttackHandler->resetLogs();
         }
 
         return $this->processFight($defender, $attacker, $attackType);

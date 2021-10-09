@@ -219,11 +219,11 @@ class AdventureService {
         $level = 'Level ' . $currentLevel;
 
         if (is_null($logs)) {
-            $messageDetails              = [];
-            $messageDetails[$this->name] = [$level => $fightLogs['messages']];
+            $messageDetails         = [];
+            $messageDetails[$level] = $fightLogs['messages'];
 
-            $rewardDetails               = [];
-            $rewardDetails[$this->name]  = [$level => $fightLogs['reward_info']];
+            $rewardDetails          = [];
+            $rewardDetails[$level]  = $fightLogs['reward_info'];
 
             $adventureLog->update([
                 'logs'    => $messageDetails,
@@ -233,8 +233,8 @@ class AdventureService {
 
             $rewards = $adventureLog->rewards;
 
-            $logs[$this->name][$level]    = $fightLogs['messages'];
-            $rewards[$this->name][$level] = $fightLogs['reward_info'];
+            $logs[$level]    = $fightLogs['messages'];
+            $rewards[$level] = $fightLogs['reward_info'];
 
             $adventureLog->update([
                 'logs'    => $logs,

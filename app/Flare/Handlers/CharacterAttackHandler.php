@@ -39,6 +39,10 @@ class CharacterAttackHandler {
         return $this->battleLogs;
     }
 
+    public function resetLogs() {
+        $this->battleLogs = [];
+    }
+
     public function handleAttack($attacker, $defender, string $attackType) {
         switch ($attackType) {
             case AttackTypeValue::ATTACK:
@@ -52,11 +56,13 @@ class CharacterAttackHandler {
             case AttackTypeValue::VOIDED_CAST_AND_ATTACK:
                 break;
             case AttackTypeValue::ATTACK_AND_CAST:
-            case AttackTypeValue::ATTACK_AND_CAST:
+            case AttackTypeValue::VOIDED_ATTACK_AND_CAST:
                 break;
             case AttackTypeValue::DEFEND:
             case AttackTypeValue::VOIDED_DEFEND:
                 break;
+            default:
+                throw new \Exception('Unexpected value');
         }
     }
 
@@ -68,5 +74,7 @@ class CharacterAttackHandler {
         $this->monsterCurrentHealth   = $this->attackHandler->getMonsterHealth();
         $this->characterCurrentHealth = $this->attackHandler->getCharacterHealth();
         $this->battleLogs             = $this->attackHandler->getBattleMessages();
+
+        $this->attackHandler->resetLogs();
     }
 }

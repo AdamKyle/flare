@@ -64,6 +64,10 @@ class AttackHandler {
         return $this->battleLogs;
     }
 
+    public function resetLogs() {
+        $this->battleLogs = [];
+    }
+
     public function doAttack($attacker, $defender, string $attackType) {
 
         $this->characterAttackBuilder = $this->characterAttackBuilder->setCharacter($attacker);
@@ -79,7 +83,9 @@ class AttackHandler {
 
             $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
-            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+            $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+
+            $this->attackExtraActionHandler->resetMessages();
 
             $this->useItems($attacker, $defender, $voided);
 
@@ -92,12 +98,17 @@ class AttackHandler {
             $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+            $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+
+            $this->attackExtraActionHandler->resetMessages();
+            $this->entrancingChanceHandler->resetLogs();
 
             $this->useItems($attacker, $defender, $voided);
 
             return;
         } else {
-            $this->battleLogs = $this->entrancingChanceHandler->getBattleLogs();
+            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+            $this->entrancingChanceHandler->resetLogs();
         }
 
         if ($this->canHitHandler->canHit($attacker, $defender, $voided)) {
@@ -113,6 +124,8 @@ class AttackHandler {
             $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+
+            $this->attackExtraActionHandler->resetMessages();
 
             $this->useItems($attacker, $defender, $voided);
 
@@ -150,5 +163,7 @@ class AttackHandler {
         $this->characterHealth = $itemHandler->getCharacterHealth();
         $this->monsterHealth   = $itemHandler->getMonsterHealth();
         $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
+
+        $itemHandler->resetLogs();
     }
 }
