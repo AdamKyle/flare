@@ -77,10 +77,12 @@ class FightService {
 
         $this->battleLogs = [...$this->battleLogs, ...$this->setupFightHandler->getBattleMessages()];
 
-        $newDefender = $this->setupFightHandler->getModifiedDefender();
+        if ($attacker instanceof Character) {
+            $newDefender = $this->setupFightHandler->getModifiedDefender();
 
-        if (!is_null($newDefender)) {
-            $defender = $newDefender;
+            if (!is_null($newDefender)) {
+                $defender = $newDefender;
+            }
         }
 
         if (is_null($this->currentCharacterHealth) && is_null($this->currentMonsterHealth)) {
@@ -92,6 +94,8 @@ class FightService {
         }
 
         $isCharacterVoided = $newAttackType === 'voided' ? true : false;
+
+        $this->setupFightHandler->reset();
 
         return $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
     }

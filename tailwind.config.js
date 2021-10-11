@@ -1,7 +1,4 @@
 const colors = require("tailwindcss/colors");
-const aspectRatio = require("@tailwindcss/aspect-ratio");
-const forms = require('@tailwindcss/forms');
-const typography = require('@tailwindcss/typography');
 
 module.exports = {
   mode: 'jit',
@@ -97,6 +94,7 @@ module.exports = {
           twitter: "#1da1f2",
           pinterest: "#bd081c",
           whatsapp: "#25d366",
+          apple: "#505050",
         },
       },
       spacing: {
@@ -109,5 +107,15 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [aspectRatio, forms, typography],
+  plugins: [
+    function ({addUtilities}) {
+      const extendUnderline = {
+        '.underline': {
+          'textDecoration': 'underline',
+          'text-decoration-color': '#505050',
+        },
+      }
+      addUtilities(extendUnderline)
+    },
+  ]
 }

@@ -23,4 +23,20 @@ Trait CanHaveQuestItem {
 
         return false;
     }
+
+    public static function canRecieveItem(Character $character, int $itemId): bool {
+        $doesntHave = $character->inventory->slots->filter(function ($slot) use ($itemId) {
+            return $slot->item_id === $itemId && $item->type === 'quest';
+        })->isEmpty();
+
+        $hasCompletedQuest = $character->questsCompleted->filter(function($questCompleted) use ($itemId) {
+            return $questCompleted->quest->item_id === $itemId;
+        })->isEmpty();
+
+        if ($hasCompletedQuest) {
+            return $doesntHave;
+        }
+        dd($doesntHave, $hasCompletedQuest);
+        return $doesntHave;
+    }
 }

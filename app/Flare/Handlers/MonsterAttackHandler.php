@@ -54,7 +54,7 @@ class MonsterAttackHandler {
         return $this->characterHealth;
     }
 
-    public function getBattleLogs(): int {
+    public function getBattleLogs(): array {
         return $this->battleLogs;
     }
 
@@ -147,7 +147,7 @@ class MonsterAttackHandler {
                 $damage -= ceil($damage * $defenderReduction);
             }
 
-            $message = $attacker->name . '\'s enchantments glow, lashing out for: ' + number_format($damage);
+            $message = $attacker->name . '\'s enchantments glow, lashing out for: ' . number_format($damage);
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
             $this->characterHealth -= $damage;
@@ -168,7 +168,7 @@ class MonsterAttackHandler {
                 $healing -= ceil($healing * $defenderReduction);
             }
 
-            $message = $attacker->name + '\'s healing spells wash over them for: ' + number_format($healing);
+            $message = $attacker->name + '\'s healing spells wash over them for: ' . number_format($healing);
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
             $this->monsterHealth += $healing;

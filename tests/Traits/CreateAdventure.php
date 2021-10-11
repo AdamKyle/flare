@@ -3,9 +3,12 @@
 namespace Tests\Traits;
 
 use App\Flare\Models\Adventure;
+use App\Flare\Models\AdventureFloorDescriptions;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
+use Database\Factories\AdventureFloorDescriptionFactory;
+use Illuminate\Support\Str;
 
 trait CreateAdventure {
 
@@ -36,6 +39,10 @@ trait CreateAdventure {
 
         $adventure->monsters()->attach($monster);
 
+        for ($i = 1; $i <= $levels; $i++) {
+            $this->createFloorDescription($adventure->id, Str::random(10));
+        }
+
         return $adventure;
     }
 
@@ -58,5 +65,12 @@ trait CreateAdventure {
 
     protected function createMonsterForAdventure(): Monster {
         return $this->createMonster();
+    }
+
+    protected function createFloorDescription(int $adventureId, string $description) {
+        AdventureFloorDescriptions::factory()->create([
+            'adventure_id' => $adventureId,
+            'description'  => $description,
+        ]);
     }
 }

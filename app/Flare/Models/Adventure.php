@@ -57,6 +57,10 @@ class Adventure extends Model
         return $this->hasOne(Item::class, 'id', 'reward_item_id');
     }
 
+    public function floorDescriptions() {
+        return $this->hasMany(AdventureFloorDescriptions::class);
+    }
+
     protected static function newFactory() {
         return AdventureFactory::new();
     }

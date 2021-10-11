@@ -103,32 +103,15 @@ class AdventureFightService {
      * @return void
      */
     public function processFloor() {
-        $encounters                 = rand(1, $this->adventure->monsters->count());
+        $monsterCount = $this->adventure->monsters->count();
 
-        for ($i = 1; $i <= $encounters; $i++) {
-            if ($this->characterWon) {
-                $monster = $this->adventure->monsters()->inRandomOrder()->first();
-                $this->monsterName = $monster->name . '-' . Str::random(10);
-                $message = 'You encounter a: ' . $monster->name;
+        if ($monsterCount > 1) {
+            $this->handleMultipleEncounters($monsterCount);
 
-                $this->battleLogs = $this->addMessage($message, 'info-encounter');
-
-
-                $this->characterWon = $this->fightService->processFight($this->character, $monster, $this->attackType);
-
-                if ($this->characterWon) {
-                    $this->processRewards($monster);
-                }
-
-                $logs = [...$this->battleLogs, ...$this->fightService->getBattleMessages()];
-
-                $this->battleLogs = [];
-
-                $this->battleMessages[$this->monsterName] = $logs;
-
-                $this->fightService->reset();
-            }
+            return;
         }
+
+        $this->fight();
     }
 
     public function getLogs(): array {
@@ -137,6 +120,36 @@ class AdventureFightService {
             'messages'    => $this->battleMessages,
             'won_fight'   => $this->characterWon,
         ];
+    }
+
+    protected function handleMultipleEncounters(int $monsterCount) {
+        $encounters = rand(1, $monsterCount);
+
+        for ($i = 1; $i <= $encounters; $i++) {
+            if ($this->characterWon) {
+                $this->fight();
+            }
+        }
+    }
+
+    protected function fight() {
+        $monster            = $this->adventure->monsters()->inRandomOrder()->first();
+        $this->monsterName  = $monster->name . '-' . Str::random(10);
+        $message            = 'You encounter a: ' . $monster->name;
+        $this->battleLogs   = $this->addMessage($message, 'info-encounter');
+        $this->characterWon = $this->fightService->processFight($this->character, $monster, $this->attackType);
+
+        if ($this->characterWon) {
+            $this->processRewards($monster);
+        }
+
+        $logs = [...$this->battleLogs, ...$this->fightService->getBattleMessages()];
+
+        $this->battleLogs = [];
+
+        $this->battleMessages[$this->monsterName] = $logs;
+
+        $this->fightService->reset();
     }
 
     protected function isAttackVoided(string $attackType): bool {

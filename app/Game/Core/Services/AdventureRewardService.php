@@ -2,11 +2,10 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Models\Skill;
 use App\Game\Core\Traits\CanHaveQuestItem;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Game\Core\Services\CharacterService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
 class AdventureRewardService {
@@ -50,7 +49,10 @@ class AdventureRewardService {
 
         $this->handleXp($rewards['exp'], $character);
         $this->handleSkillXP($rewards, $character);
-        $this->handleItems($rewards['items'], $character);
+
+        if (!empty($reward['items'])) {
+            $this->handleItems($rewards['items'], $character);
+        }
 
         return $this;
     }
@@ -69,6 +71,28 @@ class AdventureRewardService {
     }
 
     protected function handleXp(int $xp, Character $character): void {
+        $totalLevels = floor($xp / 100);
+        $oldXP       = $character->xp;
+
+        if ($totalLevels > 0) {
+
+            for ($i = 1; $i <= $totalLevels; $i++) {
+                $this->giveXP(100, $character);
+
+                $character = $character->refresh();
+            }
+
+            $leftOver = $xp - $totalLevels * 100;
+
+            $this->giveXP($oldXP + $leftOver, $character);
+
+            return;
+        }
+
+        $this->giveXP($oldXP + $xp, $character);
+    }
+
+    protected function giveXP(int $xp, Character $character) {
         $character->xp += $xp;
         $character->save();
 
@@ -76,8 +100,6 @@ class AdventureRewardService {
             $this->characterService->levelUpCharacter($character);
 
             $this->messages[] = 'You gained a level! Now level: ' . $character->refresh()->level;
-
-            $character->refresh();
         }
     }
 
@@ -87,30 +109,54 @@ class AdventureRewardService {
                 return $skill->name === $rewards['skill']['skill_name'];
             })->first();
 
-            $skill->xp += $rewards['skill']['exp'];
-            $skill->save();
-            $skill->refresh();
+            $xp = $rewards['skill']['exp'];
 
-            if ($skill->xp >= $skill->xp_max) {
-                if ($skill->level <= $skill->max_level) {
-                    $level      = $skill->level + 1;
+            $totalLevels = floor($xp / $skill->xp_max);
+            $oldXP = $skill->xp;
 
-                    $skill->update([
-                        'level'              => $level,
-                        'xp_max'             => $skill->can_train ? rand(100, 150) : rand(100, 200),
-                        'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
-                        'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
-                        'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
-                        'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
-                        'move_time_out_mod'  => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
-                        'skill_bonus'        => $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level,
-                        'xp'                 => 0,
-                    ]);
+            if ($totalLevels > 0) {
 
-                    $skill->refresh();
+                for ($i = 1; $i <= $totalLevels; $i++) {
+                    $this->giveSkillXP(100, $skill);
 
-                    $this->messages[] = 'Your skill: ' . $skill->name . ' gained a level and is now level: ' . $skill->level;
+                    $skill = $skill->refresh();
                 }
+
+                $leftOver = $xp - $totalLevels * 100;
+
+                $this->giveSkillXP($oldXP + $leftOver, $skill);
+
+                return;
+            }
+
+            $this->giveSkillXP($oldXP + $xp, $skill);
+        }
+    }
+
+    protected function giveSkillXP(int $xp, Skill $skill) {
+        $skill->update([
+            'xp' => $xp
+        ]);
+
+        $skill = $skill->refresh();
+
+        if ($skill->xp >= $skill->xp_max) {
+            if ($skill->level <= $skill->max_level) {
+                $level      = $skill->level + 1;
+
+                $skill->update([
+                    'level'              => $level,
+                    'xp_max'             => $skill->can_train ? rand(100, 150) : rand(100, 200),
+                    'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
+                    'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
+                    'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
+                    'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
+                    'move_time_out_mod'  => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
+                    'skill_bonus'        => $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level,
+                    'xp'                 => 0,
+                ]);
+
+                $this->messages[] = 'Your skill: ' . $skill->name . ' gained a level and is now level: ' . $skill->level;
             }
         }
     }

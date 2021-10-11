@@ -4,8 +4,11 @@ namespace App\Game\Adventures\View;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Game\Core\Traits\CanHaveQuestItem;
 
 class AdventureCompletedRewards {
+
+    use CanHaveQuestItem;
 
     private static $baseReward = [
         'exp'   => 0,
@@ -54,18 +57,26 @@ class AdventureCompletedRewards {
         $items = [];
 
         foreach ($monsterRewards['items'] as $item) {
-            if ($character->getInformation()->hasQuestItem($item['id'])) {
-                $item['can_have'] = false;
-            } else {
-                $item['can_have'] = true;
-            }
-
             $foundItem = Item::find($item['id']);
 
             if ($foundItem->type === 'quest') {
-                if (self::hasItemInRewards($foundItem->id)) {
-                    continue;
+                // Do you have or have you completed a quest for this item?
+                if (self::canRecieveItem($character, $foundItem->id)) {
+                    // No duplicate items.
+                    if (!self::hasItemInRewards($foundItem->id)) {
+                        $item['can_have'] = true;
+                    }
+                } else {
+                    $item['can_have'] = false;
                 }
+            } else {
+                // Always just give regular items:
+                $item['can_have'] = true;
+            }
+
+            // No duplicates
+            if (!isset($item['can_have'])) {
+                continue;
             }
 
             $item['item'] = $foundItem;

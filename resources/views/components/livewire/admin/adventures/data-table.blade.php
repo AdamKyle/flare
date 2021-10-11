@@ -98,6 +98,9 @@
                                                 <a href="{{route('adventure.edit', [
                                                     'adventure' => $adventure->id,
                                                 ])}}" class="btn btn-primary mt-2">Edit Adventure</a>
+                                                <a href="{{route('adventure.floor_descriptions', [
+                                                    'adventure' => $adventure->id,
+                                                ])}}" class="btn btn-primary mt-2 ml-2">Manage Floor Descriptions</a>
                                             @endif
 
                                             @if (!$adventure->published && !\Cache::has('processing-adventure-' . $adventure->id))
@@ -107,28 +110,6 @@
                                                     button-title="Publish"
                                                     class="btn btn-success mt-2"
                                                 />
-                                            @endif
-                                            @if ($testCharacters->isNotEmpty() && !\Cache::has('processing-adventure-' . $adventure->id))
-                                                @if ($canTest)
-                                                    <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#adventure-test-{{$adventure->id}}">
-                                                        Test
-                                                    </button>
-                                                    @include('admin.character-modeling.partials.modals.adventure-test-modal', [
-                                                        'monster' => $adventure,
-                                                        'users'   => $testCharacters,
-                                                    ])
-                                                @endif
-
-                                                @foreach ($testCharacters as $user)
-                                                    @if ($user->character->snapShots()->where('adventure_simmulation_data->adventure_id', $adventure->id)->get()->isNotEmpty())
-                                                        <a href="{{route('admin.character.modeling.adventure-data', ['adventure' => $adventure])}}" class="btn btn-success mt-2">View Data</a>
-                                                        @break;
-                                                    @endif
-                                                @endforeach
-                                            @endif
-
-                                            @if (Cache::has('processing-adventure-' . $adventure->id))
-                                                Testing underway. We will email you when done.
                                             @endif
                                         </td>
                                     @endif

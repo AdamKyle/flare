@@ -9,6 +9,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use Cache;
+use Illuminate\Http\Request;
 
 class AdventuresController extends Controller {
 
@@ -40,6 +41,12 @@ class AdventuresController extends Controller {
         ]);
     }
 
+    public function floorDescriptions(Adventure $adventure) {
+        return view('admin.adventures.floor_descriptions', [
+            'adventure' => $adventure,
+        ]);
+    }
+
     public function update(AdventureValidation $request, Adventure $adventure) {
         $requestForModel = $request->except(['_token', 'location_ids', 'monster_ids']);
 
@@ -62,9 +69,38 @@ class AdventuresController extends Controller {
 
         $adventure->monsters()->attach($request->monster_ids);
 
-        return redirect()->route('adventures.adventure', [
+        return redirect()->route('adventure.floor_descriptions', [
             'adventure' => $adventure->id
-        ])->with('success', $adventure->name . ' created!');
+        ])->with('success', $adventure->name . ' created! Please create some floor descriptions for each floor.');
+    }
+
+    public function saveFloorDescriptions(Request $request, Adventure $adventure) {
+        $floorDescriptions = $request->all();
+
+        unset($floorDescriptions['_token']);
+
+        if (!$this->validateFloorDescriptions($adventure->levels, $floorDescriptions)) {
+            return redirect()->back()->withInput($request->input())->with('error', 'Missing floor descriptions. Each floor needs a description.');
+        }
+
+        foreach ($floorDescriptions as $key => $description) {
+            $adventure->floorDescriptions()->create([
+                'adventure_id' => $adventure->id,
+                'description'  => $description,
+            ]);
+        }
+
+        return redirect()->to(route('adventures.adventure', ['adventure' => $adventure]))->with('success', 'Saved floor descriptions.');
+    }
+
+    protected function validateFloorDescriptions(int $levels, array $request): bool {
+        for ($i = 1; $i < $levels; $i++) {
+            if (is_null($request['level-' . $i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function publish(Adventure $adventure) {

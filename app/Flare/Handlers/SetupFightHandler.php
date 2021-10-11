@@ -15,7 +15,7 @@ class SetupFightHandler {
 
     private $attackType = null;
 
-    private $defedner   = null;
+    private $defender   = null;
 
     private $processed  = false;
 
@@ -36,7 +36,7 @@ class SetupFightHandler {
         }
 
         if ($defender instanceof Character) {
-            if ($this->isVoided($defender)) {
+            if ($this->voidedEnemy($defender)) {
                 $message = 'You voided your enemies enchantments. They feel much weaker!';
 
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
@@ -44,12 +44,12 @@ class SetupFightHandler {
         }
 
         if ($defender instanceof Monster) {
-            if ($this->isVoided($defender)) {
+            if ($this->voidedEnemy($defender)) {
                 $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
 
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
-                $this->attackType = 'voided';
+                $this->attackType = 'voided_';
             }
         }
 
@@ -59,6 +59,8 @@ class SetupFightHandler {
                 $this->defender = $this->reduceEnemyStats($defender);
             }
         }
+
+        $this->defender = $defender;
 
         $this->processed = true;
     }
@@ -71,11 +73,17 @@ class SetupFightHandler {
         return $this->battleLogs;
     }
 
+    public function reset() {
+        $this->battleLogs = [];
+        $this->attackType = null;
+        $this->defender   = null;
+    }
+
     public function getModifiedDefender(): Monster {
         return $this->defender;
     }
 
-    protected function isVoided($defender) {
+    protected function voidedEnemy($defender) {
         $dc = 100 - 100 * $defender->devouring_light_chance;
 
         return rand(1, 100) > $dc;

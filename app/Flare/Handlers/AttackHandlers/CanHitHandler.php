@@ -28,6 +28,7 @@ class CanHitHandler {
             }
         }
 
+
         $accuracyBonus = $this->fetchAccuracyBonus($attacker);
         $dodgeBonus    = $this->fetchDodgeBonus($defender);
 
@@ -43,12 +44,16 @@ class CanHitHandler {
 
         if ($defender instanceof  Character) {
 
+            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($defender);
+
             $stat = $isVoided ? $defender->dex : $this->characterInformationBuilder->statMod('dex');
 
             $toHit = $this->toHitCalculation($attacker->dex, $stat, $accuracyBonus, $dodgeBonus);
         }
 
         if ($attacker instanceof Character) {
+            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
+
             $stat = $isVoided ? $attacker->{$attacker->class->to_hit_stat} :
                 $this->characterInformationBuilder->statMod($attacker->class->to_hit_stat);
 

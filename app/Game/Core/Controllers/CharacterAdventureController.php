@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Adventures\View\AdventureCompletedRewards;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use Illuminate\Http\Request;
 use App\Flare\Models\AdventureLog;
@@ -38,7 +40,7 @@ class CharacterAdventureController extends Controller {
     public function completedAdventure(AdventureLog $adventureLog) {
         return view('game.adventures.completed-adventure', [
             'adventureLog' => $adventureLog,
-            'character'    => auth()->user->character,
+            'character'    => auth()->user()->character,
         ]);
     }
 
@@ -90,6 +92,8 @@ class CharacterAdventureController extends Controller {
             return redirect()->to(route('game'))->with('error', 'You cannot collect already collected rewards.');
         }
 
+        $rewards = AdventureCompletedRewards::CombineRewards($rewards, $character);
+
         $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character);
         $messages               = $adventureRewardService->getMessages();
 
@@ -113,14 +117,20 @@ class CharacterAdventureController extends Controller {
             ]);
         }
 
-        event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
+        $character = $character->refresh();
+
+        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateTopBarEvent($character));
 
         if (empty($messages)) {
             $messages = [
                 'You are a ready for your next adventure!'
             ];
+        } else {
+            $messages[] = ['You are a ready for your next adventure!'];
         }
 
         return redirect()->to(route('game'))->with('success', $messages);
