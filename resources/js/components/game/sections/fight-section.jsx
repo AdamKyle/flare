@@ -102,8 +102,17 @@ export default class FightSection extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.props.monster !== null && this.state.monster === null) {
+    const stateMonster = this.state.monster;
+    const propsMonster = this.props.monster;
+
+    if ((propsMonster !== null && stateMonster === null)) {
       this.setMonsterInfo();
+    }
+
+    if (propsMonster !== null && stateMonster !== null) {
+      if (stateMonster.name !== propsMonster.name) {
+        this.setMonsterInfo();
+      }
     }
   }
 
@@ -127,7 +136,6 @@ export default class FightSection extends React.Component {
 
       statReduced = true;
     }
-
 
     const health = monsterInfo.health();
 
@@ -182,6 +190,8 @@ export default class FightSection extends React.Component {
 
     state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
 
+    this.battleMessagesBeforeFight = [];
+
     if (state.characterCurrentHealth <= 0) {
       state.battleMessages.push({message: 'Death has come for you this day child! Resurrect to try again!', class: 'enemy-action-fired'});
     }
@@ -200,7 +210,7 @@ export default class FightSection extends React.Component {
         is_character_dead: state.characterCurrentHealth <= 0,
         is_defender_dead: state.monsterCurrentHealth <= 0,
         defender_type: 'monster',
-        monster_id: this.state.monster.id,
+        monster_id: this.state.monster.monster.id,
       }).then(() => {
         let health = state.characterCurrentHealth;
         let monster = this.state.monster;
@@ -209,7 +219,7 @@ export default class FightSection extends React.Component {
           health = this.state.characterMaxHealth;
         }
 
-        if (state.monsterCurrentHealth <= 0 && health >= 0) {
+        if (state.monsterCurrentHealth <= 0) {
           monster = null;
         }
 
@@ -217,8 +227,6 @@ export default class FightSection extends React.Component {
           characterCurrentHealth: health,
           canAttack: false,
           monster: monster,
-        }, () => {
-          this.props.setMonster(null);
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {

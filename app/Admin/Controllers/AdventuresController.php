@@ -55,9 +55,9 @@ class AdventuresController extends Controller {
         $adventure->locations()->sync($request->location_ids);
         $adventure->monsters()->sync($request->monster_ids);
 
-        return redirect()->route('adventures.adventure', [
+        return redirect()->route('adventure.floor_descriptions', [
             'adventure' => $adventure->id
-        ])->with('success', $adventure->name . ' updated!');
+        ])->with('success', $adventure->name . ' updated! Please update your floor descriptions.');
     }
 
     public function store(AdventureValidation $request) {
@@ -83,6 +83,10 @@ class AdventuresController extends Controller {
             return redirect()->back()->withInput($request->input())->with('error', 'Missing floor descriptions. Each floor needs a description.');
         }
 
+        if ($adventure->floorDescriptions->isNotEmpty()) {
+            $adventure->floorDescriptions()->delete();
+        }
+
         foreach ($floorDescriptions as $key => $description) {
             $adventure->floorDescriptions()->create([
                 'adventure_id' => $adventure->id,
@@ -94,7 +98,7 @@ class AdventuresController extends Controller {
     }
 
     protected function validateFloorDescriptions(int $levels, array $request): bool {
-        for ($i = 1; $i < $levels; $i++) {
+        for ($i = 1; $i <= $levels; $i++) {
             if (is_null($request['level-' . $i])) {
                 return false;
             }

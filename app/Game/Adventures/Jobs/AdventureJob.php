@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterSnapShot;
@@ -81,8 +82,7 @@ class AdventureJob implements ShouldQueue
         }
 
         $adventureService = $adventureService->setAdventure($this->adventure)
-                                             ->setCharacter($this->character)
-                                             ->setName($this->name);
+                                             ->setCharacter($this->character);
 
         $adventureService->processAdventure($this->currentLevel, $this->adventure->levels, $this->attackType);
 
@@ -91,5 +91,10 @@ class AdventureJob implements ShouldQueue
 
             event(new UpdateTopBarEvent($this->character->refresh()));
         }
+    }
+
+    public function middleware()
+    {
+        return [new WithoutOverlapping($this->name)];
     }
 }

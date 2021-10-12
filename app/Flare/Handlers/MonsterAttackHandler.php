@@ -63,6 +63,7 @@ class MonsterAttackHandler {
     }
 
     public function doAttack($attacker, $defender, bool $isDefenderVoided = false) {
+
         $monsterAttack = explode('-', $attacker->attack_range);
         $monsterAttack = rand($monsterAttack[0], $monsterAttack[1]);
 
@@ -93,18 +94,22 @@ class MonsterAttackHandler {
                 return;
             }
 
+            $this->characterHealth -= $monsterAttack;
+
             $message = $attacker->name . ' hit for: ' . number_format($monsterAttack);
+
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
             $this->useItems($attacker, $defender);
 
-            return;
+             return;
         }
 
         $message          = $attacker->name . ' Missed!';
         $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
         $this->useItems($attacker, $defender);
+
     }
 
     protected function useItems($attacker, $defender) {
@@ -113,11 +118,8 @@ class MonsterAttackHandler {
 
         $itemHandler->useArtifacts($attacker, $defender);
 
-        $this->characterHealth = $itemHandler->getCharacterHealth();
-        $this->monsterHealth   = $itemHandler->getMonsterHealth();
-        $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
-
-        $itemHandler->resetLogs();
+        $this->characterHealth       = $itemHandler->getCharacterHealth();
+        $this->monsterHealth         = $itemHandler->getMonsterHealth();
 
         $this->useAffixes($attacker, $defender);
 
@@ -126,6 +128,7 @@ class MonsterAttackHandler {
         $itemHandler->castSpell($attacker, $defender);
 
         $this->characterHealth = $itemHandler->getCharacterHealth();
+
         $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
 
         $itemHandler->resetLogs();
@@ -155,7 +158,7 @@ class MonsterAttackHandler {
     }
 
     protected function heal($attacker, $defender) {
-        if ($attacker->max_healing > 0) {
+        if ($attacker->healing_percentage > 0) {
             $defenderReduction = $this->characterInformationBuilder
                 ->setCharacter($defender)
                 ->getTotalDeduction('healing_reduction');
@@ -168,8 +171,8 @@ class MonsterAttackHandler {
                 $healing -= ceil($healing * $defenderReduction);
             }
 
-            $message = $attacker->name + '\'s healing spells wash over them for: ' . number_format($healing);
-            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+            $message = $attacker->name . '\'s healing spells wash over them for: ' . number_format($healing);
+            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
             $this->monsterHealth += $healing;
         }

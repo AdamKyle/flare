@@ -125,6 +125,10 @@ class AttackExtraActionHandler {
 
         if ($classType->isVampire()) {
 
+            if (!$this->canUse($attackerInfo['chance'])) {
+                return $monsterCurrentHealth;
+            }
+
             $message        = 'There is a thirst child, its in your soul! Lash out and kill!';
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 

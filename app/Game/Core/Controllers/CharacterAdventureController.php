@@ -2,17 +2,16 @@
 
 namespace App\Game\Core\Controllers;
 
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\Controller;
+use App\Flare\Models\AdventureLog;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Adventures\View\AdventureCompletedRewards;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use Illuminate\Http\Request;
-use App\Flare\Models\AdventureLog;
-use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
-use App\Http\Controllers\Controller;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
-
-use function PHPUnit\Framework\isEmpty;
 
 class CharacterAdventureController extends Controller {
 
@@ -130,10 +129,12 @@ class CharacterAdventureController extends Controller {
                 'You are a ready for your next adventure!'
             ];
         } else {
-            $messages[] = ['You are a ready for your next adventure!'];
+            $messages[] = 'You are a ready for your next adventure!';
         }
 
-        return redirect()->to(route('game'))->with('success', $messages);
+        Cache::put('messages-' . $adventureLog->id, $messages);
+
+        return redirect()->to(route('game'))->with('collected-rewards', $adventureLog->id);
     }
 
     public function delete(AdventureLog $adventureLog) {

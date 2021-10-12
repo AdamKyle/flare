@@ -3,7 +3,9 @@
 namespace App\Flare\Handlers\AttackHandlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 
 class ItemHandler {
@@ -164,7 +166,8 @@ class ItemHandler {
             if ($healFor > 0 && $this->currentCharacterHealth !== $this->characterInformationBuilder->buildHealth()) {
                 $this->currentCharacterHealth += $healFor;
 
-                $messages[] = ['Light floods your eyes as your wounds heal over for: ' . number_format($healFor)];
+                $message = 'Light floods your eyes as your wounds heal over for: ' . number_format($healFor);
+                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
             }
         }
 
@@ -183,14 +186,14 @@ class ItemHandler {
 
         if ($attacker instanceof Character) {
             if ($this->characterInformationBuilder->hasDamageSpells()) {
-                $messages[] = ['Your spells burst forward towards the enemy!'];
-
-                $messages = array_merge($messages, $this->spellDamage($attacker, $defender));
+                $message = 'Your spells burst forward towards the enemy!';
+                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
             }
         }
 
         if ($attacker->can_cast) {
-            $messages[] = ['The enemy begins to cast their spells!'];
+            $message = 'The enemy begins to cast their spells!';
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
             $messages[] = $this->spellDamage($attacker, $defender);
         }
@@ -245,8 +248,8 @@ class ItemHandler {
             }
         }
 
-        if ($defender instanceOf Character) {
-            if ($defender->can_use_artifacts) {
+        if ($attacker instanceOf Monster) {
+            if ($attacker->can_use_artifacts) {
                 $message = 'The enemies artifacts begin to glow ...';
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
@@ -350,6 +353,8 @@ class ItemHandler {
                 if ($dc <= 0 || rand(1, 100) > $dc) {
                     $message = 'The enemies spells have no effect!';
                     $this->battleLogs = $this->addMessage($message, 'info-battle', $this->battleLogs);
+
+                    return;
                 }
 
                 $health = $this->currentCharacterHealth - $spellDamage;

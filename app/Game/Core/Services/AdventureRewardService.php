@@ -50,7 +50,7 @@ class AdventureRewardService {
         $this->handleXp($rewards['exp'], $character);
         $this->handleSkillXP($rewards, $character);
 
-        if (!empty($reward['items'])) {
+        if (!empty($rewards['items'])) {
             $this->handleItems($rewards['items'], $character);
         }
 

@@ -1,17 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-  @dump(old())
   <x-core.cards.card-with-title
-    title="Floor Descriptions"
+    title="{{'Floor Descriptions for: ' . $adventure->name}}"
   >
+    <p>
+      {{$adventure->description}}
+    </p>
     <form action="{{route('post.adventure.floor_descriptions', ['adventure' => $adventure->id])}}" method="POST">
       @csrf
       @php
         $descriptions = $adventure->floorDescriptions->pluck('description')->toArray();
       @endphp
 
-      @for ($i = 1; $i < $adventure->levels; $i++)
+      @for ($i = 1; $i <= $adventure->levels; $i++)
         @php
           $index = $i - 1;
 

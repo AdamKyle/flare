@@ -14,7 +14,7 @@
   <x-core.cards.card css="{{'tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto ' . $cssClass}}">
     <h3 class="tw-font-light">{{$level}}</h3>
     <p>
-      {{$descriptions[$currentCount]}}
+      {!! nl2br($descriptions[$currentCount]) !!}
     </p>
     <hr />
     @if (count($messages) > 1)
@@ -23,7 +23,17 @@
         <x-slot name="tabs">
           @php $counter = 0; @endphp
           @foreach ($messages as $monsterName => $enemyMessages)
-            <x-core.tabs.tab active="{{$counter === 0 ? 'true' : 'false'}}" id="{{$monsterName}}" href="{{$monsterName}}">{{explode('-', $monsterName)[0]}}</x-core.tabs.tab>
+            @php $isError = AdventureRewards::messagesHasPlayerDeath($enemyMessages); @endphp
+            <x-core.tabs.tab active="{{$counter === 0 ? 'true' : 'false'}}"
+                             id="{{$monsterName}}"
+                             href="{{$monsterName}}"
+                             error="{{$isError}}"
+            >
+              {{explode('-', $monsterName)[0]}}
+              @if ($isError)
+                <i class="ra ra-bone-bite tw-text-red-600"></i>
+              @endif
+            </x-core.tabs.tab>
             @php $counter += 1; @endphp
           @endforeach
         </x-slot>

@@ -70,7 +70,7 @@ class DailyGoldDustJob implements ShouldQueue
 
             Cache::put('won-lotto', now());
         } else {
-            $amount = rand(1,10);
+            $amount = rand(1,15);
 
             $this->character->update([
                 'gold_dust' => $this->character->gold_dust + $amount,

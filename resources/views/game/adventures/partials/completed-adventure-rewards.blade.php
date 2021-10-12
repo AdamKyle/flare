@@ -51,6 +51,7 @@
               <p class="tw-text-center">You have already collected the rewards for this adventure</p>
             @endif
           </x-core.tabs.tab-content>
+          @php $rewards = AdventureRewards::combineRewards($adventureLog->rewards, $character); @endphp
           <x-core.tabs.tab-content active="false" id="items-gained">
             @if (!empty($rewards['items']))
               <ul>

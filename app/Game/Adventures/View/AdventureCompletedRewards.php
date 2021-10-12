@@ -39,6 +39,16 @@ class AdventureCompletedRewards {
         return self::$baseReward;
     }
 
+    public static function messagesHasPlayerDeath(array $messages): bool {
+        foreach ($messages as $message) {
+            if ($message['message'] === 'You have died during the fight! Death has come for you!') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected static function updateSkillRewards(array $monsterRewards) {
         if (!isset($monsterRewards['skill'])) {
             return;
