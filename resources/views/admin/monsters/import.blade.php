@@ -4,13 +4,12 @@
     <x-core.page-title title="Import Monster Data" route="{{route('home')}}" color="success" link="Home">
     </x-core.page-title>
 
-    <x-cards.card>
-        <div class="alert alert-warning">
+    <x-core.cards.card-with-title>
+        <x-core.alerts.warning-alert title="ATTN!" icon="fas fa-exclamation">
             <p>
                 <strong>Please note</strong>: If a monster has an quest item that doesn't exist the monster will be skipped.
-                If the monster has a skill that doesn't exist, the skill for that monster will be skipped.
             </p>
-        </div>
+        </x-core.alerts.warning-alert>
 
         <div class="mt-4">
             <form class="mt-4" action="{{route('monsters.import-data')}}" method="POST" enctype="multipart/form-data">
@@ -22,5 +21,5 @@
                 <button type="submit" class="btn btn-primary">Import</button>
             </form>
         </div>
-    </x-cards.card>
+    </x-core.cards.card-with-title>
 @endsection

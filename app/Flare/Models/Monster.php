@@ -53,6 +53,10 @@ class Monster extends Model
         'healing_percentage',
         'entrancing_chance',
         'devouring_light_chance',
+        'accuracy',
+        'casting_accuracy',
+        'dodge',
+        'criticality',
         'shards',
     ];
 
@@ -89,11 +93,11 @@ class Monster extends Model
         'healing_percentage'     => 'float',
         'entrancing_chance'      => 'float',
         'devouring_light_chance' => 'float',
+        'accuracy'               => 'float',
+        'casting_accuracy'       => 'float',
+        'dodge'                  => 'float',
+        'criticality'            => 'float',
     ];
-
-    public function skills() {
-        return $this->hasMany(Skill::class);
-    }
 
     public function questItem() {
         return $this->hasOne(Item::class, 'id', 'quest_item_id');

@@ -14,16 +14,22 @@ export default class MonsterAttack {
     this.battleMessages         = [];
   }
 
-  doAttack(previousAttackType) {
+  doAttack(previousAttackType, isCharacterVoided) {
     const monster = this.attacker.getMonster();
-    const damage  = this.attacker.attack();
+    let damage    = this.attacker.attack();
 
-    if (this.entrancesEnemy(monster, this.defender)) {
-      this.useItems(monster);
+    if (this.entrancesEnemy(monster, this.defender, isCharacterVoided)) {
+      if (this.canDoCritical(monster)) {
+        this.addMessage(monster.name + ' grows enraged and lashes out with all fury! (Critical Strike!)')
+
+        damage = damage * 2;
+      }
 
       this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-      this.addMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+      this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+
+      this.useItems(monster);
 
       this.fireOffHealing(monster);
 
@@ -31,7 +37,7 @@ export default class MonsterAttack {
     } else {
       if (this.canHit(monster, this.defender)) {
 
-        if (this.isBlocked(previousAttackType, this.defender, damage)) {
+        if (this.isBlocked(previousAttackType, this.defender, damage, isCharacterVoided)) {
           this.addMessage('The enemies attack was blocked!');
 
           this.useItems(monster);
@@ -41,11 +47,17 @@ export default class MonsterAttack {
           return this.setState()
         }
 
-        this.useItems(monster);
+        if (this.canDoCritical(monster)) {
+          this.addMessage(monster.name + ' grows enraged and lashes out with all fury! (Critical Strike!)')
+
+          damage = damage * 2;
+        }
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
         this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+
+        this.useItems(monster);
 
         this.fireOffHealing(monster);
 
@@ -71,10 +83,10 @@ export default class MonsterAttack {
     }
   }
 
-  entrancesEnemy(attacker, defender) {
+  entrancesEnemy(attacker, defender, isCharacterVoided) {
     const canEntrance = new CanEntranceEnemy();
 
-    if (canEntrance.monsterCanEntrance(attacker, defender)) {
+    if (canEntrance.monsterCanEntrance(attacker, defender, isCharacterVoided)) {
       this.battleMessages = [...this.battleMessages, ...canEntrance.getBattleMessages()]
 
       return true;
@@ -88,24 +100,28 @@ export default class MonsterAttack {
   canHit(attacker, defender) {
     const canHit = new CanHitCheck()
 
-    if (canHit.canHit(attacker, defender, this.battleMessages)) {
+    if (canHit.canMonsterHit(attacker, defender, this.battleMessages)) {
       return true;
     }
 
     return false;
   }
 
-  isBlocked(attackType, defender, damage) {
-    if (AttackType.DEFEND === attackType) {
-      const defenderAC = defender.attack_types[AttackType.DEFEND].defence;
+  isBlocked(attackType, defender, damage, isCharacterVoided) {
+    if (AttackType.DEFEND === attackType || AttackType.VOIDED_DEFEND === attackType) {
+      const defenderAC = defender.attack_types[attackType].defence;
 
       return damage < defenderAC;
+    }
+
+    if (isCharacterVoided) {
+      return damage < defender.voided_ac;
     }
 
     return damage < defender.ac;
   }
 
-  useItems(attacker) {
+  useItems(attacker, isCharacterVoided) {
     const useItems = new UseItems(this.defender, this.currentMonsterHealth, this.currentCharacterHealth);
 
     useItems.useArtifacts(attacker, this.defender, 'monster');
@@ -115,7 +131,7 @@ export default class MonsterAttack {
     this.currentCharacterHealth = useItems.getCharacterCurrentHealth();
 
     this.fireOffAffixes(attacker);
-    this.fireOffSpells(attacker);
+    this.fireOffSpells(attacker, this.defender, isCharacterVoided);
   }
 
   fireOffAffixes(attacker) {
@@ -135,25 +151,54 @@ export default class MonsterAttack {
     }
   }
 
-  fireOffSpells(attacker) {
+  fireOffSpells(attacker, defender, isCharacterVoided) {
+    if (!this.canCastSpells(attacker, defender, isCharacterVoided)) {
+      this.addActionMessage(attacker.name + '\'s Spells fizzle and fail to fire.');
+
+      return;
+    }
+
     if (attacker.spell_damage > 0) {
       const evasionChance = 100 - (100 * this.defender.spell_evasion)
       const roll          = random(1, 100);
+      let damage          = attacker.spell_damage;
 
       if (roll < evasionChance) {
-        this.currentCharacterHealth = this.currentCharacterHealth - attacker.spell_damage;
+        if (this.canDoCritical(attacker)) {
+          this.addMessage(attacker.name + ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)')
 
-        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(attacker.spell_damage));
+          damage = damage * 2;
+        }
+
+        this.currentCharacterHealth = this.currentCharacterHealth - damage
+
+        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(damage));
       } else {
         this.addMessage(attacker.name + '\'s spells fizzle and fail before your eyes. The enemy looks confused!');
       }
     }
   }
 
+  canCastSpells(attacker, defender, isCharacterVoided) {
+    const canHit = new CanHitCheck()
+
+    if (canHit.canMonsterCast(attacker, defender, isCharacterVoided)) {
+      return true;
+    }
+
+    return false;
+  }
+
   fireOffHealing(attacker) {
     if (attacker.max_healing > 0) {
       const defenderHealingReduction = this.defender.healing_reduction;
       let healFor                    = Math.ceil(attacker.dur * attacker.max_healing);
+
+      if (this.canDoCritical(attacker)) {
+        this.addMessage(attacker.name + ' Glows with renewed life! (Critical Healing!)')
+
+        healFor = healFor * 2;
+      }
 
       if (defenderHealingReduction > 0) {
         healFor = healFor - healFor * defenderHealingReduction;
@@ -181,6 +226,12 @@ export default class MonsterAttack {
 
   formatNumber(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  canDoCritical(attacker) {
+    const dc = 100 - 100 * attacker.criticality;
+
+    return random(1, 100) > dc;
   }
 
 }

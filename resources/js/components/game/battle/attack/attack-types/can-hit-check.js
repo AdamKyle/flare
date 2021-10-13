@@ -1,4 +1,5 @@
 import Damage from "../damage";
+import {random} from "lodash";
 
 const battleMessages = [];
 
@@ -11,10 +12,6 @@ export default class CanHitCheck {
   canHit (attacker, defender, battleMessages) {
     const damage        = new Damage();
 
-    if (!defender.hasOwnProperty('skills')) {
-      defender = defender.monster;
-    }
-
     if (attacker.hasOwnProperty('class')) {
       if (damage.canAutoHit(attacker)) {
         this.battleMessages = [...battleMessages, ...damage.getMessages()];
@@ -24,7 +21,7 @@ export default class CanHitCheck {
     }
 
     let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
-    let defenderDodge    = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+    let defenderDodge    = defender.dodge
     let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
 
     if (attackerAccuracy > 1.0) {
@@ -35,6 +32,44 @@ export default class CanHitCheck {
       return false;
     }
 
+    return this.calculateCanHit(toHitBase);
+  }
+
+  canMonsterHit(attacker, defender, isVoided) {
+    let monsterAccuracy = attacker.accuracy;
+    let defenderDodge   = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+    let toHitBase       = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
+
+    if (monsterAccuracy > 1.0) {
+      return true;
+    }
+
+    if (defenderDodge > 1.0) {
+      return false;
+    }
+
+    return this.calculateCanHit(toHitBase);
+  }
+
+  canMonsterCast(attacker, defender, isVoided) {
+    console.log(defender);
+    const castingAccuracy = attacker.casting_accuracy;
+    let defenderFocus   = defender.focus * 0.05;
+
+    if (isVoided) {
+      defenderFocus = defender.voided_focus * 0.05;
+    }
+
+    if (defender.class === 'Prophet' || defender.class === 'Heretic') {
+      defenderFocus = defenderFocus * 0.25;
+    }
+
+    const dc = Math.ceil(defenderFocus - defenderFocus * castingAccuracy);
+
+    return random(1, defenderFocus) > dc;
+  }
+
+  calculateCanHit(toHitBase) {
     if (Math.sign(toHitBase) === - 1) {
       toHitBase = Math.abs(toHitBase);
     }

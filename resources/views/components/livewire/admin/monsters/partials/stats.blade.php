@@ -41,6 +41,37 @@
     </div>
     <hr />
     <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="health_range">Accuracy %: </label>
+                <input type="text" class="form-control" name="health_range" value="" wire:model="monster.accuracy">
+                @error('monster.health_range') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="casting_accuracy">Casting Accuracy %: </label>
+                <input type="number" class="form-control" name="casting_accuracy" value="" wire:model="monster.casting_accuracy">
+                @error('monster.casting_accuracy') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="dodge">Dodge %: </label>
+                <input type="text" class="form-control" name="dodge" value="" wire:model="monster.dodge">
+                @error('monster.dodge') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="criticality">Criticality %: </label>
+                <input type="number" step="0.01" class="form-control" name="criticality" value="" wire:model="monster.criticality">
+                @error('monster.criticality') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group">
                 <label for="damage_stat">Damage Stat: </label>

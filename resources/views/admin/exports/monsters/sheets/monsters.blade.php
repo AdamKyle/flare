@@ -10,6 +10,10 @@
         <th>agi</th>
         <th>focus</th>
         <th>ac</th>
+        <th>accuracy</th>
+        <th>casting_accuracy</th>
+        <th>dodge</th>
+        <th>criticality</th>
         <th>is_celestial_entity</th>
         <th>gold_cost</th>
         <th>gold_dust_cost</th>
@@ -36,6 +40,7 @@
         <th>quest_item_id</th>
         <th>quest_item_drop_chance</th>
         <th>game_map_id</th>
+
     </tr>
     </thead>
     <tbody>
@@ -50,6 +55,10 @@
             <td>{{$monster->agi}}</td>
             <td>{{$monster->focus}}</td>
             <td>{{$monster->ac}}</td>
+            <td>{{$monster->accuracy}}</td>
+            <td>{{$monster->casting_accuracy}}</td>
+            <td>{{$monster->dodge}}</td>
+            <td>{{$monster->criticality}}</td>
             <th>{{$monster->is_celestial_entity}}</th>
             <th>{{$monster->gold_cost}}</th>
             <th>{{$monster->gold_dust_cost}}</th>

@@ -24,7 +24,6 @@ class Skill extends Model
      */
     protected $fillable = [
         'character_id',
-        'monster_id',
         'game_skill_id',
         'currently_training',
         'is_locked',
@@ -58,10 +57,6 @@ class Skill extends Model
 
     public function character() {
         return $this->belongsTo(Character::class);
-    }
-
-    public function monster() {
-        return $this->belongsTo(Monster::class, 'monster_id', 'id');
     }
 
     public function getNameAttribute() {

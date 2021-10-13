@@ -96,7 +96,10 @@ export default class WeaponAttack {
 
     this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth);
     this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth);
-    this.monsterHealth = damage.vampireThirstChance(this.attacker, this.monsterHealth);
+    const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+
+    this.monsterHealth          = healthObject.monster_hp;
+    this.characterCurrentHealth = healthObject.character_hp;
 
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }

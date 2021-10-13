@@ -38,9 +38,9 @@ export default class CanEntranceEnemy {
     return canEntrance;
   }
 
-  monsterCanEntrance(attacker, defender) {
+  monsterCanEntrance(attacker, defender, isVoided) {
     let canEntrance = false;
-    const dc        = this.monsterChanceDC(attacker, defender);
+    const dc        = this.monsterChanceDC(attacker, defender, isVoided);
     const chance    = random(1, this.monsterMaxRoll(defender));
 
     if (dc > chance) {
@@ -54,9 +54,13 @@ export default class CanEntranceEnemy {
     return canEntrance;
   }
 
-  monsterChanceDC(attacker, defender) {
+  monsterChanceDC(attacker, defender, isVoided) {
     if (defender.class === 'Heretic' || defender.class === 'Prophet') {
-      const baseDc = (defender.focus * 0.05);
+      let baseDc = (defender.focus * 0.05);
+
+      if (isVoided) {
+        baseDc = (defender.voided_focus * 0.05);
+      }
 
       return baseDc - (baseDc * attacker.entrancing_chance);
     }

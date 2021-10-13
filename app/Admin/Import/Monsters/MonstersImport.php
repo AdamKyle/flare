@@ -13,7 +13,6 @@ class MonstersImport implements WithMultipleSheets
     {
         return [
             0 => new MonstersSheet,
-            1 => new MonstersSkillsSheet,
         ];
     }
 }

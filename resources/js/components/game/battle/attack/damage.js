@@ -195,22 +195,33 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  vampireThirstChance(attacker, monsterCurrentHealth) {
+  vampireThirstChance(attacker, monsterCurrentHealth, characterCurrentHealth) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return {
+          monster_hp: monsterCurrentHealth,
+          character_hp: characterCurrentHealth,
+        };
+      }
 
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
         const totalAttack = Math.round(attacker.dur - attacker.dur * 0.95);
 
-        monsterCurrentHealth = monsterCurrentHealth - totalAttack;
+        monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
+        characterCurrentHealth = characterCurrentHealth + totalAttack
 
-        this.addActionMessage(attacker.name + ' hit for (thirst!) ' + this.formatNumber(totalAttack));
+        this.addActionMessage(attacker.name + ' hit for (thirst!) (and healed for) ' + this.formatNumber(totalAttack));
       }
     }
 
-    return monsterCurrentHealth;
+    return {
+      monster_hp: monsterCurrentHealth,
+      character_hp: characterCurrentHealth,
+    };
   }
 
   canUse(extraActionChance) {

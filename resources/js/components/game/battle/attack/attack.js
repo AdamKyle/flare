@@ -46,7 +46,7 @@ export default class Attack {
     if (type === 'monster') {
       const monsterAttack = new MonsterAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth);
 
-      const state = monsterAttack.doAttack(attackType);
+      const state = monsterAttack.doAttack(attackType, this.isVoided);
 
       this.state.characterCurrentHealth = state.characterCurrentHealth;
       this.state.monsterCurrentHealth   = state.monsterCurrentHealth;

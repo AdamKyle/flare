@@ -26,9 +26,7 @@
             </span>
         </div>
     </div>
-    <div class="card">
-        <div class="card-body">
-            @include('game.items.partials.item-details', ['item' => $monster->questItem])
-        </div>
-    </div>
+    <x-core.cards.card>
+        @include('game.items.partials.item-details', ['item' => $monster->questItem])
+    </x-core.cards.card>
 @endif

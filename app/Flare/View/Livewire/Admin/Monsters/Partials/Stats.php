@@ -46,6 +46,10 @@ class Stats extends Component
         'monster.max_affix_damage'    => 'nullable',
         'monster.entrancing_chance'   => 'nullable',
         'monster.devouring_light_chance' => 'nullable',
+        'monster.accuracy'               => 'nullable',
+        'monster.casting_accuracy'       => 'nullable',
+        'monster.dodge'                  => 'nullable',
+        'monster.criticality'            => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];
@@ -88,20 +92,6 @@ class Stats extends Component
         }
 
         $this->monster->save();
-
-        if ($this->monster->skills->isEmpty()) {
-            $skills = [];
-
-            // Get skills:
-            foreach(GameSkill::all() as $skill) {
-                if ($skill->can_train && $skill->can_monsters_have_skill) {
-                    $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $skill);
-                }
-            }
-
-            // Set skills:
-            $this->monster->skills()->insert($skills);
-        }
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->monster);
         $this->emitTo('core.form-wizard', $functionName, $index, true);

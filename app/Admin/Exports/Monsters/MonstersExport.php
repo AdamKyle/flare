@@ -18,7 +18,6 @@ class MonstersExport implements WithMultipleSheets {
         $sheets   = [];
 
         $sheets[] = new MonstersSheet;
-        $sheets[] = new MonstersSkillsSheet;
 
         return $sheets;
     }

@@ -14,14 +14,12 @@
     @livewire('core.form-wizard', [
         'views' => [
             'admin.monsters.partials.stats',
-            'admin.monsters.partials.skills',
             'admin.monsters.partials.quest-item',
         ],
         'model'     => $monster,
         'modelName' => 'monster',
         'steps' => [
             'Monster Base Stats',
-            'Monster Skill Modifications',
             'Monster Quest Item Reward'
         ],
         'finishRoute' => 'monsters.list',
