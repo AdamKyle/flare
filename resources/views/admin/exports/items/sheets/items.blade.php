@@ -54,6 +54,8 @@
         <th>artifact_annulment</th>
         <th>healing_reduction</th>
         <th>affix_damage_reduction</th>
+        <th>devouring_light</th>
+        <th>devouring_darkness</th>
     </tr>
     </thead>
     <tbody>
@@ -112,6 +114,8 @@
             <td>{{$item->artifact_annulment}}</td>
             <td>{{$item->healing_reduction}}</td>
             <td>{{$item->affix_damage_reduction}}</td>
+            <td>{{$item->devouring_light}}</td>
+            <td>{{$item->devouring_darkness}}</td>
         </tr>
     @endforeach
     </tbody>

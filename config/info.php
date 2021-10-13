@@ -17,6 +17,7 @@ return [
     'equipment'         => [],
     'traverse'          => [],
     'teleport'          => [],
+    'voidance'          => [],
     'planes'            => [
         [
             'livewire'            => true,

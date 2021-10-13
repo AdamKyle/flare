@@ -3,12 +3,12 @@
         @if (!is_null($item->effect))
             <p>This item lets you: {{$effects}}</p>
         @endif
-        <div class="alert alert-info mb-3 mt-2">
+        <x-core.alerts.info-alert>
             <p>
                 Quest items, like this one are used automatically. For example if the quest item gives bonuses to a crafting skill or enchanting, then the skill bonus and xp
                 will be applied upon crafting or enchanting. If its an item, like Flask of Fresh Air for example - then it gets used when you attempt to walk on water for the first time.
             </p>
-        </div>
+        </x-core.alerts.info-alert>
 
         @if (!is_null($monster))
             <hr>
@@ -129,4 +129,22 @@
             </dl>
         @endif
     </x-cards.card-with-title>
+  <x-cards.card-with-title ttle="Voidance and Devoid">
+    <x-core.alerts.info-alert>
+      <p>Voidance and Devoidance come in two forms: Devouring Light and Devouring Darkness.</p>
+      <p>Devouring Light on enemies will give them a chance to void you of your enchantments and artifacts and boons,
+      making you use raw unmodified stats and damage to strike the enemy.</p>
+      <p>Devouring Light on the player will void the enemy of their enchantment damage and artifacts.</p>
+      <p>Devouring Darkness will have a chance on either side to void the others Devouring Light.</p>
+      <p>If the enemy is devoided (Devouring Darkness has fired) they cannot then void you. A Devouring Darkness successful fire will void a Devouring Light chance of ever firiing,
+      which then allows your Devouring Light a chance to fire and void the enemy for the battle.</p>
+      <p>You can read more about how this works in the <a href="/information/voidance">help section</a>.</p>
+    </x-core.alerts.info-alert>
+    <dl>
+      <dt>Devouring Light Chance:</dt>
+      <dd>{{$item->devouring_light * 100}}%</dd>
+      <dt>Devouring Darkness Chance:</dt>
+      <dd>{{$item->devouring_darkness * 100}}%</dd>
+    </dl>
+  </x-cards.card-with-title>
 </div>

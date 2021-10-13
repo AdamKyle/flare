@@ -88,7 +88,7 @@ trait ItemsShowInformation {
         return [
             'item'      => $item,
             'monster'   => Monster::where('quest_item_id', $item->id)->first(),
-            'quest'     => Quest::where('item_id', $item->id)->first(),
+            'quest'     => Quest::where('item_id', $item->id)->orWhere('reward_item', $item->id)->first(),
             'location'  => Location::where('quest_reward_item_id', $item->id)->first(),
             'adventure' => Adventure::where('reward_item_id', $item->id)->first(),
             'effects'   => $effects,

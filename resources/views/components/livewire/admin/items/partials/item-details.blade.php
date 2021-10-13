@@ -171,18 +171,34 @@
     </div>
     <div class="row">
         <div class="col-md-6">
+            <div class="form-group">
+                <label for="devouring-light-chance">Devouring Light Chance %: </label>
+                <input type="number" class="form-control" id="devouring-light-chance" name="devouring-light-chance" wire:model="item.devouring_light">
+                @error('item.devouring_light') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="devouring_darkness">Devouring Darkness Chance %: </label>
+                <input type="number" class="form-control" id="devouring_darkness" name="devouring_darkness" wire:model="item.devouring_darkness">
+                @error('item.devouring_darkness') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="item-can-drop" wire:model="item.can_drop">
                 <label class="form-check-label" for="item-can-drop">Can this item drop?</label>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="craft_only" wire:model="item.craft_only">
                 <label class="form-check-label" for="craft_only">Can only craft item?</label>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="market_sellable" wire:model="item.market_sellable">
                 <label class="form-check-label" for="market_sellable">Can this item be sold on the market?</label>

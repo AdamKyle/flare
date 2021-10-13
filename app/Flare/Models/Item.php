@@ -75,7 +75,9 @@ class Item extends Model
         'increase_skill_bonus_by',
         'increase_skill_training_bonus_by',
         'healing_reduction',
-        'affix_damage_reduction'
+        'affix_damage_reduction',
+        'devouring_light',
+        'devouring_darkness',
     ];
 
     /**
@@ -128,6 +130,8 @@ class Item extends Model
         'artifact_annulment'               => 'float',
         'healing_reduction'                => 'float',
         'affix_damage_reduction'           => 'float',
+        'devouring_light'                  => 'float',
+        'devouring_darkness'               => 'float',
     ];
 
     protected $appends = [

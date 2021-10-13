@@ -517,8 +517,8 @@ class CharacterInformationBuilder {
      *
      * @return int
      */
-    public function getTotalArtifactDamage(bool $voided = false): int {
-        return $this->getArtifactDamage($voided);
+    public function getTotalArtifactDamage(): int {
+        return $this->getArtifactDamage();
     }
 
     /**
@@ -701,11 +701,7 @@ class CharacterInformationBuilder {
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'artifact') {
-                if (!$voided) {
-                    $damage += $slot->item->getTotalDamage();
-                } else {
-                    $damage += $slot->item->base_damage;
-                }
+                $damage += $slot->item->getTotalDamage();
             }
         }
 
