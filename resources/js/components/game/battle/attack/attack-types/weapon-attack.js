@@ -35,7 +35,7 @@ export default class WeaponAttack {
 
       this.extraAttacks();
 
-      this.addActionMessage('Your weapon(s) hits: ' + this.defender.name + ' for: ' + attackData.weapon_damage)
+      this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(attackData.weapon_damage))
 
       this.useItems(attackData, this.attacker.class);
 
@@ -61,7 +61,7 @@ export default class WeaponAttack {
 
       this.extraAttacks();
 
-      this.addActionMessage('Your weapon(s) hits: ' + this.defender.name + ' for: ' + attackData.weapon_damage)
+      this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(attackData.weapon_damage))
 
       this.useItems(attackData, this.attacker.class)
     } else {
@@ -106,6 +106,10 @@ export default class WeaponAttack {
 
   canBlock() {
     return this.defender.ac > this.attacker.base_stat;
+  }
+
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
   addMessage(message) {

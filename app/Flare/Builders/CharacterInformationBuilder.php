@@ -228,17 +228,15 @@ class CharacterInformationBuilder {
             $characterDamageStat = $this->character->{$this->character->damage_stat};
         }
 
-        $classBonuses        = $this->getFightersDamageBonus($this->character) +
-            $this->prophetDamageBonus($this->character) +
-            $this->getThievesDamageBonus($this->character) +
-            $this->getVampiresDamageBonus($this->character) +
-            $this->getRangersDamageBonus($this->character);
+        $characterDamageStat = $characterDamageStat * 0.05;
 
-        $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
+        if ($this->character->classType()->isFighter()) {
+            $characterDamageStat = $characterDamageStat * 0.15;
+        }
 
         $totalAttack = $this->getWeaponDamage($voided);
 
-        return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
+        return round($characterDamageStat + $totalAttack);
     }
 
     /**
@@ -248,22 +246,11 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildTotalAttack(): int {
-
-        $characterDamageStat = $this->statMod($this->character->damage_stat);
-        $classBonuses        = $this->getFightersDamageBonus($this->character) +
-            $this->prophetDamageBonus($this->character) +
-            $this->getThievesDamageBonus($this->character) +
-            $this->getVampiresDamageBonus($this->character) +
-            $this->getRangersDamageBonus($this->character);
-
-        $damageStat = $characterDamageStat * 0.5;
-
-
-        $characterDamageStat = $damageStat + $damageStat * $this->fetchSkillAttackMod();
+        $skillBonus  = $this->fetchSkillAttackMod();
 
         $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
 
-        return round($characterDamageStat + ($totalAttack + $totalAttack * $classBonuses));
+        return round($totalAttack + $totalAttack * $skillBonus);
     }
 
     /**
@@ -279,7 +266,7 @@ class CharacterInformationBuilder {
     }
 
     /**
-     * Build the heal for
+     * Build heal for
      *
      * Fetches the total healing amount based on skills and equipment.
      *
@@ -622,6 +609,10 @@ class CharacterInformationBuilder {
             return $slot->item->type === 'ring' && $slot->equipped;
         })->pluck('item.' . $type)->toArray();
 
+        if (empty($itemsDeduction)) {
+            return 0.0;
+        }
+
         return max($itemsDeduction);
     }
 
@@ -629,6 +620,10 @@ class CharacterInformationBuilder {
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
         })->pluck('item.spell_evasion')->toArray();
+
+        if (empty($itemsEvasion)) {
+            return 0.0;
+        }
 
         return max($itemsEvasion);
     }
@@ -638,6 +633,10 @@ class CharacterInformationBuilder {
             return $slot->item->type === 'ring' && $slot->equipped;
         })->pluck('item.artifact_annulment')->toArray();
 
+        if (empty($itemsEvasion)) {
+            return 0.0;
+        }
+
         return max($itemsEvasion);
     }
 
@@ -645,13 +644,15 @@ class CharacterInformationBuilder {
         $itemsEvasion = $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'ring' && $slot->equipped;
         })->pluck('item.healing_reduction')->toArray();
+
+        return max($itemsEvasion);
     }
 
     protected function fetchSkillAttackMod(): float {
         $percentageBonus = 0.0;
 
         $skills = $this->character->skills->filter(function($skill) {
-            return is_null($skill->baseSkill->game_class_id);
+            return !is_null($skill->baseSkill->game_class_id);
         })->all();
 
         foreach ($skills as $skill) {
@@ -690,21 +691,33 @@ class CharacterInformationBuilder {
     }
 
     protected function getWeaponDamage(bool $voided = false): int {
-        $damage = 0;
+        $damage = [];
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'weapon') {
                 if (!$voided) {
-                    $damage += $slot->item->getTotalDamage();
+                    $damage[] = $slot->item->getTotalDamage();
                 } else {
-                    $damage += $slot->item->base_damage;
+                    $damage[] =  $slot->item->base_damage;
+                }
+            } else if ($slot->item->type === 'bow') {
+                if (!$voided) {
+                    $damage[] = $slot->item->getTotalDamage();
+                } else {
+                    $damage[] =  $slot->item->base_damage;
                 }
             }
         }
 
+        if (!empty($damage)) {
+            $damage = max($damage);
+        } else {
+            $damage = 0;
+        }
+
         if ($damage === 0) {
-            $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damageStat);
-            $damage = $damage * 0.05;
+            $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
+            $damage = $damage * 0.02;
         }
 
         return $damage;
@@ -734,7 +747,11 @@ class CharacterInformationBuilder {
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'artifact') {
-                $damage += $slot->item->getTotalDamage();
+                if ($damage === 0) {
+                    $damage += $slot->item->getTotalDamage();
+                } else {
+                    $damage += ceil($slot->item->getTotalDamage() / 2);
+                }
             }
         }
 
@@ -742,19 +759,23 @@ class CharacterInformationBuilder {
     }
 
     protected function getRingDamage(bool $voided = false): int {
-        $damage = 0;
+        $damage = [];
 
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'ring') {
                 if (!$voided) {
-                    $damage += $slot->item->getTotalDamage();
+                    $damage[] = $slot->item->getTotalDamage();
                 } else {
-                    $damage += $slot->item->base_damage;
+                    $damage[] = $slot->item->base_damage;
                 }
             }
         }
 
-        return $damage;
+        if (!empty($damage)) {
+            return max($damage);
+        }
+
+        return 0;
     }
 
     protected function getDefence(bool $voided = false): int {

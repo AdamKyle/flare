@@ -54,9 +54,21 @@ class CharacterAttackBuilder {
         $ac                    = $this->characterInformationBuilder->buildDefence($voided);
         $str                   = $this->characterInformationBuilder->statMod('str') * 0.05;
 
-        $ac = $ac + $ac * $str;
+        if ($voided) {
+            $str = $this->character->str * 0.05;
+        }
 
-        $baseAttack['defence'] = $ac + $ac * 0.5;
+        if ($this->character->classType()->isFighter()) {
+            $str = $this->characterInformationBuilder->statMod('str') * 0.15;
+
+            if ($voided) {
+                $str = $this->character->str * 0.15;
+            }
+        }
+
+        $ac = ceil($ac + $ac * $str);
+
+        $baseAttack['defence'] = $ac;
 
         return $baseAttack;
     }
