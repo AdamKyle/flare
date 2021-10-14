@@ -109,6 +109,15 @@ export default class CharacterDetails extends React.Component {
               <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
               <p className="mt-4"><sup>**</sup> Only affects enemies (on their turn).</p>
             </Tab>
+            <Tab eventKey="voidance" title="Devouring Light/Darkness">
+              <dl className="mt-4">
+                <dt>Devouring Light:</dt>
+                <dd>{(sheet.devouring_light * 100).toFixed(0)}%</dd>
+                <dt>Devouring Darkness:</dt>
+                <dd>{(sheet.devouring_darkness * 100).toFixed(0)}%</dd>
+              </dl>
+              <p className="mt-4">For more information, please see <a href="/information/voidance">Voidance help</a>. </p>
+            </Tab>
           </Tabs>
           <hr />
           <Row>

@@ -4,6 +4,7 @@ import Attack from '../battle/attack/attack';
 import Monster from '../battle/monster/monster';
 import {getServerMessage} from '../helpers/server_message';
 import ReviveSection from "./revive-section";
+import Voidance from "../battle/attack/voidance";
 
 const renderAttackToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -50,13 +51,15 @@ export default class FightSection extends React.Component {
       monster: null,
       monsterCurrentHealth: null,
       monsterMaxHealth: null,
-      characterMaxHealth: this.props.character.health,
-      characterCurrentHealth: this.props.character.health,
+      characterMaxHealth: null,
+      characterCurrentHealth: null,
       canAttack: this.props.character.can_attack,
       battleMessages: [],
       missCounter: 0,
       isCharacterVoided: false,
       isMonsterReduced: false,
+      isMonsterVoided: false,
+      isMonsterDevoided: false,
     }
 
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
@@ -102,27 +105,67 @@ export default class FightSection extends React.Component {
   }
 
   componentDidUpdate() {
-    const stateMonster = this.state.monster;
-    const propsMonster = this.props.monster;
 
-    if ((propsMonster !== null && stateMonster === null)) {
-      this.setMonsterInfo();
-    }
+    let stateMonster = this.state.monster;
+    let propsMonster = this.props.monster;
 
-    if (propsMonster !== null && stateMonster !== null) {
-      if (stateMonster.name !== propsMonster.name) {
-        this.setMonsterInfo();
+    if (propsMonster !== null && stateMonster === null) {
+      this.setMonsterInfo()
+    } else if (propsMonster !== null && stateMonster !== null) {
+      if (!stateMonster.hasOwnProperty('name')) {
+        stateMonster = stateMonster.monster;
+      }
+
+      if (propsMonster.name !== stateMonster.name) {
+        this.battleMessagesBeforeFight = [];
+
+        this.setState({
+          monsterCurrentHealth: null,
+          characterCurrentHealth: null,
+          characterMaxHealth: null,
+          monsterMaxHealth: null,
+        }, () => {
+          this.setMonsterInfo();
+        });
       }
     }
   }
 
   setMonsterInfo() {
+
+    if (this.state.characterCurrentHealth !== null || this.state.monsterCurrentHealth !== null) {
+      return;
+    }
+
     const monsterInfo   = new Monster(this.props.monster);
+    const voidance      = new Voidance();
     const character     = this.props.character;
     let isVoided        = false;
     let statReduced     = false;
+    let monsterVoided   = false;
+    let monsterDevoided = false;
 
-    if (monsterInfo.canMonsterVoidPlayer() && !this.state.isCharacterVoided) {
+    const monsterIsVoided = (monsterVoided || monsterDevoided);
+
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !monsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
+        class: 'action-fired'
+      });
+
+      monsterDevoided = true;
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !monsterIsVoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
+        class: 'action-fired'
+      });
+
+      monsterVoided = true;
+    }
+
+    if (monsterInfo.canMonsterVoidPlayer() && !this.state.isCharacterVoided && !monsterIsVoided) {
       this.battleMessagesBeforeFight.push({
         message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
         class: 'enemy-action-fired'
@@ -130,23 +173,36 @@ export default class FightSection extends React.Component {
 
       isVoided = true;
     } else if (!this.state.isCharacterVoided) {
-      let message = monsterInfo.reduceAllStats(character.stat_affixes);
+      let messages = monsterInfo.reduceAllStats(character.stat_affixes);
 
-      this.battleMessagesBeforeFight = message;
+      if (messages.length > 0) {
+        this.battleMessagesBeforeFight = [...this.battleMessages, ...messages];
 
-      statReduced = true;
+        statReduced = true;
+      } else {
+        statReduced = false;
+      }
     }
 
     const health = monsterInfo.health();
+    let characterHealth = this.props.character.health;
+
+    if (isVoided) {
+      characterHealth = this.props.character.voided_dur
+    }
 
     this.setState({
       battleMessages: [],
       missCounter: 0,
       monster: monsterInfo,
       monsterCurrentHealth: health,
+      characterCurrentHealth: characterHealth,
+      characterMaxHealth: characterHealth,
       monsterMaxHealth: health,
       isCharacterVoided: isVoided,
       isMonsterReduced: statReduced,
+      isMonsterVoided: monsterVoided,
+      isMonsterDevoided: monsterDevoided,
     }, () => {
       this.props.setMonster(null)
     });
@@ -183,7 +239,9 @@ export default class FightSection extends React.Component {
 
     const attack = new Attack(
       this.state.characterCurrentHealth,
-      this.state.monsterCurrentHealth
+      this.state.monsterCurrentHealth,
+      this.state.isCharacterVoided,
+      this.state.isMonsterVoided,
     );
 
     const state = attack.attack(this.state.character, this.state.monster, true, 'player', attackType).getState()
@@ -215,8 +273,10 @@ export default class FightSection extends React.Component {
         let health = state.characterCurrentHealth;
         let monster = this.state.monster;
 
-        if (health >= 0) {
+        if (health >= 0 && state.monsterCurrentHealth >= 0) {
           health = this.state.characterMaxHealth;
+        } else {
+          health = null;
         }
 
         if (state.monsterCurrentHealth <= 0) {
@@ -225,8 +285,13 @@ export default class FightSection extends React.Component {
 
         this.setState({
           characterCurrentHealth: health,
+          characterMaxHealth: health,
+          monsterCurrentHealth: monster !== null ? state.monsterCurrentHealth : null,
+          monsterMaxHealth: monster !== null ? this.state.monsterMaxHealth : null,
           canAttack: false,
           monster: monster,
+        }, () => {
+          console.log(this.state);
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {
@@ -246,10 +311,12 @@ export default class FightSection extends React.Component {
   }
 
   revive(data) {
+    const isVoided = this.state.isCharacterVoided;
+
     this.setState({
       character: data.character,
-      characterMaxHealth: data.character.health,
-      characterCurrentHealth: data.character.health,
+      characterMaxHealth: isVoided ? data.character.voided_dur : data.character.health,
+      characterCurrentHealth: isVoided ? data.character.voided_dur : data.character.health,
     }, () => {
       this.props.isCharacterDead(data.character.is_dead);
     });

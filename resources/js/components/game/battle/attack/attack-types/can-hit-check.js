@@ -35,10 +35,10 @@ export default class CanHitCheck {
     return this.calculateCanHit(toHitBase);
   }
 
-  canMonsterHit(attacker, defender, isVoided) {
+  canMonsterHit(attacker, defender) {
     let monsterAccuracy = attacker.accuracy;
     let defenderDodge   = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
-    let toHitBase       = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
+    let toHitBase       = this.toHitCalculation(attacker.to_hit_base, attacker.dex, monsterAccuracy, defenderDodge);
 
     if (monsterAccuracy > 1.0) {
       return true;
@@ -52,7 +52,6 @@ export default class CanHitCheck {
   }
 
   canMonsterCast(attacker, defender, isVoided) {
-    console.log(defender);
     const castingAccuracy = attacker.casting_accuracy;
     let defenderFocus   = defender.focus * 0.05;
 

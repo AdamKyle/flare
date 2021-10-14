@@ -58,7 +58,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'healing_reduction' => $characterInformation->getTotalDeduction('healing_reduction'),
             'affix_damage_red'  => $characterInformation->getTotalDeduction('affix_damage_reduction'),
             'res_chance'        => $characterInformation->fetchResurrectionChance(),
-            'weapon_attack'     => number_format($characterInformation->buildAttack()),
+            'weapon_attack'     => number_format($characterInformation->getTotalWeaponDamage()),
             'rings_attack'      => number_format($characterInformation->getTotalRingDamage()),
             'spell_damage'      => number_format($characterInformation->getTotalSpellDamage()),
             'artifact_damage'   => number_format($characterInformation->getTotalArtifactDamage()),
@@ -72,6 +72,8 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'inventory_max'     => $character->inventory_max,
             'can_adventure'     => $character->can_adventure,
             'is_dead'           => $character->is_dead,
+            'devouring_light'   => $characterInformation->getDevouringLight(),
+            'devouring_darkness' => $characterInformation->getDevouringDarkness(),
         ];
     }
 }

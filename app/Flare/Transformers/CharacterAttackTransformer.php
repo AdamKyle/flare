@@ -56,6 +56,8 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'can_adventure'       => $character->can_adventure,
             'show_message'        => $character->can_attack ? false : true,
             'is_dead'             => $character->is_dead,
+            'devouring_light'     => $characterInformation->getDevouringLight(),
+            'devouring_darkness'  => $characterInformation->getDevouringDarkness(),
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),

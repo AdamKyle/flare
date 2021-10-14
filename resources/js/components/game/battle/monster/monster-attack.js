@@ -14,11 +14,11 @@ export default class MonsterAttack {
     this.battleMessages         = [];
   }
 
-  doAttack(previousAttackType, isCharacterVoided) {
+  doAttack(previousAttackType, isCharacterVoided, isMonsterVoided) {
     const monster = this.attacker.getMonster();
     let damage    = this.attacker.attack();
 
-    if (this.entrancesEnemy(monster, this.defender, isCharacterVoided)) {
+    if (this.entrancesEnemy(monster, this.defender, isCharacterVoided, isMonsterVoided)) {
       if (this.canDoCritical(monster)) {
         this.addMessage(monster.name + ' grows enraged and lashes out with all fury! (Critical Strike!)')
 
@@ -29,7 +29,7 @@ export default class MonsterAttack {
 
       this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
 
-      this.useItems(monster);
+      this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
       this.fireOffHealing(monster);
 
@@ -40,7 +40,7 @@ export default class MonsterAttack {
         if (this.isBlocked(previousAttackType, this.defender, damage, isCharacterVoided)) {
           this.addMessage('The enemies attack was blocked!');
 
-          this.useItems(monster);
+          this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
           this.fireOffHealing(monster);
 
@@ -57,7 +57,7 @@ export default class MonsterAttack {
 
         this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
 
-        this.useItems(monster);
+        this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
         this.fireOffHealing(monster);
 
@@ -66,7 +66,7 @@ export default class MonsterAttack {
       } else {
         this.addActionMessage(monster.name + ' missed!');
 
-        this.useItems(monster);
+        this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
         this.fireOffHealing(monster);
 
@@ -83,7 +83,12 @@ export default class MonsterAttack {
     }
   }
 
-  entrancesEnemy(attacker, defender, isCharacterVoided) {
+  entrancesEnemy(attacker, defender, isCharacterVoided, isMonsterVoided) {
+
+    if (isMonsterVoided) {
+      return false;
+    }
+
     const canEntrance = new CanEntranceEnemy();
 
     if (canEntrance.monsterCanEntrance(attacker, defender, isCharacterVoided)) {
@@ -121,16 +126,20 @@ export default class MonsterAttack {
     return damage < defender.ac;
   }
 
-  useItems(attacker, isCharacterVoided) {
-    const useItems = new UseItems(this.defender, this.currentMonsterHealth, this.currentCharacterHealth);
+  useItems(attacker, isCharacterVoided, isMonsterVoided) {
 
-    useItems.useArtifacts(attacker, this.defender, 'monster');
+    if (!isMonsterVoided) {
+      const useItems = new UseItems(this.defender, this.currentMonsterHealth, this.currentCharacterHealth);
 
-    this.battleMessages = [...this.battleMessages, ...useItems.getBattleMessage()]
+      useItems.useArtifacts(attacker, this.defender, 'monster');
 
-    this.currentCharacterHealth = useItems.getCharacterCurrentHealth();
+      this.battleMessages = [...this.battleMessages, ...useItems.getBattleMessage()]
 
-    this.fireOffAffixes(attacker);
+      this.currentCharacterHealth = useItems.getCharacterCurrentHealth();
+
+      this.fireOffAffixes(attacker);
+    }
+
     this.fireOffSpells(attacker, this.defender, isCharacterVoided);
   }
 
@@ -140,7 +149,7 @@ export default class MonsterAttack {
       let damage              = random(1, attacker.max_affix_damage);
 
       if (defenderReduction > 0) {
-        damage = damage - (damage * defenderReduction);
+        damage = (damage - (damage * defenderReduction)).toFixed(2);
 
         this.addMessage('Your rings negate some of the enemies enchantment damage.');
       }

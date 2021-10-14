@@ -256,7 +256,10 @@ class CharacterInformationBuilder {
             $this->getVampiresDamageBonus($this->character) +
             $this->getRangersDamageBonus($this->character);
 
-        $characterDamageStat = $characterDamageStat + $characterDamageStat * $this->fetchSkillAttackMod();
+        $damageStat = $characterDamageStat * 0.5;
+
+
+        $characterDamageStat = $damageStat + $damageStat * $this->fetchSkillAttackMod();
 
         $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
 
@@ -503,6 +506,10 @@ class CharacterInformationBuilder {
         })->isNotEmpty();
     }
 
+    public function getTotalWeaponDamage(bool $voided = false): int {
+        return $this->getWeaponDamage($voided);
+    }
+
     /**
      * Get the total Spell Damage
      *
@@ -534,6 +541,14 @@ class CharacterInformationBuilder {
         return $this->getDeduction($type);
     }
 
+    public function getDevouringLight(): float {
+        return $this->fetchVoidanceAmount('devouring_light');
+    }
+
+    public function getDevouringDarkness(): float {
+        return $this->fetchVoidanceAmount('devouring_darkness');
+    }
+
     /**
      * Get total annulment
      *
@@ -550,6 +565,19 @@ class CharacterInformationBuilder {
      */
     public function getTotalSpellEvasion(): float {
         return  $this->getSpellEvasion();
+    }
+
+    protected function fetchVoidanceAmount(string $type): float {
+        $slot = $this->character->inventory->slots->filter(function($slot) use($type) {
+           return $slot->item->type === 'quest' && $slot->item->{$type} > 0;
+        })->first();
+
+        if (!is_null($slot)) {
+
+            return $slot->item->{$type};
+        }
+
+        return 0.0;
     }
 
     /**
@@ -672,6 +700,11 @@ class CharacterInformationBuilder {
                     $damage += $slot->item->base_damage;
                 }
             }
+        }
+
+        if ($damage === 0) {
+            $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damageStat);
+            $damage = $damage * 0.05;
         }
 
         return $damage;
