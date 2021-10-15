@@ -185,7 +185,7 @@ class CharacterInformationBuilder {
             if (empty($values)) {
                 $values[] = $slot->item->{$type}->steal_life_amount;
             } else {
-                $values[] = ($slot->item->{$type}->steal_life_amount / 2);
+                $values[] = ($slot->item->{$type}->steal_life_amount / 4);
             }
         }
 
