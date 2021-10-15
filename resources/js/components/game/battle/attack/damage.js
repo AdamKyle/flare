@@ -127,6 +127,24 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
+  calculateHealingTotal(attacker) {
+    const skillBonus = attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+
+    let healFor = attackData.heal_for;
+
+    const dc = 100 - 100 * skillBonus;
+
+    if (random(1, 100) > dc) {
+      this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
+
+      healFor *= 2;
+    }
+
+    this.characterCurrentHealth += healFor
+
+    this.addActionMessage('Your healing spell(s) heals for: ' + this.formatNumber(healFor.toFixed(0)))
+  }
+
   tripleAttackChance(attacker, monsterCurrentHealth) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
@@ -194,6 +212,26 @@ export default class Damage {
     }
 
     return monsterCurrentHealth;
+  }
+
+  doubleHeal(attacker, characterCurrentHealth) {
+    if (attacker.extra_action_chance.class_name === attacker.class) {
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return characterCurrentHealth;
+      }
+
+      if (extraActionChance.type === ExtraActionType.HERETICS_DOUBLE_CAST && extraActionChance.has_item) {
+        this.battleMessages.push({
+          message: 'Your prayers are heard by The Creator and he grants you extra life!',
+        });
+
+        characterCurrentHealth = this.calculateHealingTotal(attacker, defender, monsterCurrentHealth, true);
+      }
+    }
+
+    return characterCurrentHealth;
   }
 
   vampireThirstChance(attacker, monsterCurrentHealth, characterCurrentHealth) {

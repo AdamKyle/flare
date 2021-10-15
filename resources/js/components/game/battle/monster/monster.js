@@ -81,7 +81,7 @@ export default class Monster {
 
     const attackRange = this.monster.attack_range.split('-');
 
-    return parseInt(randomNumber(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat]) / 2);
+    return parseInt(randomNumber(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat] / 2));
   }
 
   getMonster() {

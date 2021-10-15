@@ -317,12 +317,11 @@ class CharacterInformationBuilder {
         $healingAmount = $this->fetchHealingAmount($voided);
         $dmgStat       = $this->character->class->damage_stat;
 
-        if ($classType->isVampire()) {
-
+        if ($classType->isRanger()) {
             if ($voided) {
-                $healingAmount += $this->character->{$dmgStat};
+                $healingAmount += $this->character->chr;
             } else {
-                $healingAmount += $this->statMod($this->$this->character->{$dmgStat}) * 0.15;
+                $healingAmount += $this->statMod('chr') * 0.15;
             }
 
         }
@@ -334,7 +333,7 @@ class CharacterInformationBuilder {
                 if ($voided) {
                     $healingAmount += $this->character->{$dmgStat};
                 } else {
-                    $healingAmount += $this->statMod($this->$this->character->{$dmgStat}) * 0.30;
+                    $healingAmount += $this->statMod($this->character->{$dmgStat}) * 0.30;
                 }
             }
         }
@@ -789,7 +788,6 @@ class CharacterInformationBuilder {
                 } else {
                     $damage += $slot->item->base_damage;
                 }
-
             }
         }
 
@@ -876,14 +874,6 @@ class CharacterInformationBuilder {
                 $healFor += $slot->item->getTotalHealing();
             } else {
                 $healFor += $slot->item->base_healing;
-            }
-        }
-
-        if ($this->character->classType()->isProphet()) {
-            if ($voided) {
-                $healFor += $healFor * ($this->character->chr * 0.15);
-            } else {
-                $healFor += $healFor * ($this->statMod('chr') * 0.15);
             }
         }
 

@@ -5,10 +5,9 @@ import UseItems from "./use-items";
 import Damage from "../damage";
 import {random} from "lodash";
 
-export default class WeaponAttack {
+export default class CastAttack {
 
   constructor(attacker, defender, characterCurrentHealth, monsterHealth, voided) {
-
     if (!defender.hasOwnProperty('name')) {
       this.defender = defender.monster;
     } else {
@@ -23,7 +22,7 @@ export default class WeaponAttack {
   }
 
   doAttack() {
-    const attackData       = this.attacker.attack_types[this.voided ? AttackType.VOIDED_ATTACK : AttackType.ATTACK];
+    const attackData       = this.attacker.attack_types[this.voided ? AttackType.VOIDED_CAST : AttackType.CAST];
 
     const canEntranceEnemy = new CanEntranceEnemy();
 
@@ -32,7 +31,9 @@ export default class WeaponAttack {
     this.battleMessages   = canEntranceEnemy.getBattleMessages();
 
     if (canEntrance) {
-      this.attackWithWeapon(attackData);
+      this.attackWithSpells(attackData);
+
+      this.healWithSpells(attackData);
 
       this.useItems(attackData, this.attacker.class);
 
@@ -41,24 +42,29 @@ export default class WeaponAttack {
 
     const canHitCheck      = new CanHitCheck();
 
-    const canHit           = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages);
+    const canHit           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
 
     this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
     if (canHit) {
       if (this.canBlock()) {
-        this.addMessage(this.defender.name + ' Blocked your attack!');
+        this.addMessage(this.defender.name + ' Blocked your damaging spell!');
+
+        this.healWithSpells(attackData);
 
         this.useItems(attackData, this.attacker.class);
 
         return this.setState();
       }
 
-      this.attackWithWeapon(attackData);
+      this.attackWithSpells(attackData);
+      this.healWithSpells(attackData);
 
       this.useItems(attackData, this.attacker.class)
     } else {
-      this.addMessage('Your attack missed!');
+      this.addMessage('Your damage spell missed!');
+
+      this.healWithSpells(attackData);
 
       this.useItems(attackData, this.attacker.class);
     }
@@ -78,25 +84,46 @@ export default class WeaponAttack {
     return state;
   }
 
-  attackWithWeapon(attackData) {
+  attackWithSpells(attackData) {
 
     const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
 
-    let damage = attackData.weapon_damage;
+    let damage = attackData.spell_damage;
 
     const dc = 100 - 100 * skillBonus;
 
     if (random(1, 100) > dc) {
-      this.addActionMessage('You become overpowered with rage! (Critical strike!)')
+      this.addActionMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)')
 
       damage *= 2;
     }
 
-    this.monsterHealth = this.monsterHealth - damage;
+    this.monsterHealth -= damage;
 
     this.extraAttacks();
 
-    this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(damage))
+    this.addActionMessage('Your damage spell hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
+  }
+
+  healWithSpells(attackData) {
+
+    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+
+    let healFor = attackData.heal_for;
+
+    const dc = 100 - 100 * skillBonus;
+
+    if (random(1, 100) > dc) {
+      this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
+
+      healFor *= 2;
+    }
+
+    this.characterCurrentHealth += healFor
+
+    this.extraHealing();
+
+    this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
   }
 
   useItems(attackData, attackerClass) {
@@ -112,12 +139,15 @@ export default class WeaponAttack {
   extraAttacks() {
     const damage = new Damage();
 
-    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth);
-    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth);
-    const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+    this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth);
 
-    this.monsterHealth          = healthObject.monster_hp;
-    this.characterCurrentHealth = healthObject.character_hp;
+    this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
+  }
+
+  extraHealing() {
+    const damage = new Damage();
+
+    this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth);
 
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }

@@ -1,6 +1,9 @@
 import AttackType from "./attack-type";
 import WeaponAttack from "./attack-types/weapon-attack";
 import MonsterAttack from "../monster/monster-attack";
+import CastAttack from "./attack-types/cast-attack";
+import {random} from "lodash";
+import UseItems from "./attack-types/use-items";
 
 export default class Attack {
 
@@ -52,6 +55,22 @@ export default class Attack {
       this.state.monsterCurrentHealth   = state.monsterCurrentHealth;
       this.state.battleMessages         = [...this.state.battleMessages, ...state.battleMessages];
 
+      if (this.state.characterCurrentHealth <= 0) {
+        this.resurrectCharacter(defender, attackType)
+
+        if (!attackType.includes('voided')) {
+          const attackData = defender.attack_types[attackType];
+
+          this.lifeSteal(defender, attacker, attackData);
+        }
+      } else {
+        if (!attackType.includes('voided')) {
+          const attackData = defender.attack_types[attackType];
+
+          this.lifeSteal(defender, attacker, attackData);
+        }
+      }
+
       return this;
     }
 
@@ -62,7 +81,7 @@ export default class Attack {
         break;
       case AttackType.CAST:
       case AttackType.VOIDED_CAST:
-        console.log(attackType);
+        this.state = (new CastAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth, this.isVoided)).doAttack();
         break;
       case AttackType.CAST_AND_ATTACK:
       case AttackType.VOIDED_CAST_AND_ATTACK:
@@ -85,6 +104,46 @@ export default class Attack {
     this.monsterCurrentHealth   = this.state.monsterCurrentHealth;
 
     return this.attack(defender, attacker, false, 'monster', attackType)
+  }
+
+  resurrectCharacter(defender, attackType) {
+    const canRes = this.characterCanResurrect(defender, attackType);
+
+    if (canRes) {
+      this.state.battleMessages.push({
+        message: 'You are pulled back from the void and given one health!',
+        class: 'action-fired'
+      });
+
+      this.state.characterCurrentHealth = 1;
+    }
+  }
+
+  characterCanResurrect(defender, attackType) {
+    const resChance = defender.attack_types[attackType].res_chance;
+    const dc        = 100 - 100 * resChance;
+    const roll      = random(1, 100);
+
+    if (roll > dc) {
+      return true;
+    }
+
+    return false;
+  }
+
+  lifeSteal(defender, attacker, attackData) {
+    const useItems = new UseItems(defender, this.state.monsterCurrentHealth, this.state.characterCurrentHealth);
+
+    if (defender.class === 'Vampire') {
+      useItems.lifeStealingAffixes(attackData, false)
+      useItems.lifeStealingAffixes(attackData, true)
+    } else {
+      useItems.lifeStealingAffixes(attackData, false);
+    }
+
+    this.state.battleMessages = [...this.state.battleMessages, ...useItems.getBattleMessage()];
+    this.state.characterCurrentHealth = useItems.getCharacterCurrentHealth();
+    this.state.monsterCurrentHealth   = useItems.getMonsterCurrentHealth();
   }
 
   getState() {

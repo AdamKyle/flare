@@ -217,7 +217,7 @@ export default class MonsterAttack {
 
       this.currentMonsterHealth = this.currentMonsterHealth + healFor;
 
-      this.addHealingMessage(attacker.name + '\'s healing spells wash over them for: ' + this.formatNumber(healFor));
+      this.addHealingMessage(attacker.name + '\'s healing spells wash over them for: ' + this.formatNumber(healFor.toFixed(0)));
     }
   }
 

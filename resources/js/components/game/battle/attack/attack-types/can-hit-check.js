@@ -35,6 +35,32 @@ export default class CanHitCheck {
     return this.calculateCanHit(toHitBase);
   }
 
+  canCast(attacker, defender) {
+    const damage        = new Damage();
+
+    if (attacker.hasOwnProperty('class')) {
+      if (damage.canAutoHit(attacker)) {
+        this.battleMessages = [...battleMessages, ...damage.getMessages()];
+
+        return true;
+      }
+    }
+
+    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
+    let defenderDodge    = defender.dodge
+    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
+
+    if (attackerAccuracy > 1.0) {
+      return true;
+    }
+
+    if (defenderDodge > 1.0) {
+      return false;
+    }
+
+    return this.calculateCanHit(toHitBase);
+  }
+
   canMonsterHit(attacker, defender) {
     let monsterAccuracy = attacker.accuracy;
     let defenderDodge   = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
