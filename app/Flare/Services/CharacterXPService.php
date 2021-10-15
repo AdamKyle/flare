@@ -11,6 +11,10 @@ class CharacterXPService {
 
     public function determineXPToAward(Character $character, int $xp): int {
 
+        if ($xp === 0) {
+            return 0;
+        }
+
         $slot = $character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::CONTNUE_LEVELING;
         })->first();
@@ -36,6 +40,8 @@ class CharacterXPService {
 
             if ($character->level === $config->max_level) {
                 return 0;
+            } else {
+                return $xp;
             }
         }
 

@@ -52,7 +52,6 @@ class CharacterRewardService {
         }
 
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
-
         $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
 
         if (!is_null($gameMap->xp_bonus)) {
