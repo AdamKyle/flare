@@ -16,6 +16,7 @@ use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\View\Components\EquipmentButtonForm;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
@@ -111,8 +112,13 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CoordinatesCache();
         });
 
+        $this->app->bind(CharacterXPService::class, function() {
+            return new CharacterXPService();
+        });
+
         $this->app->bind(CharacterRewardService::class, function($app, $paramters) {
-            return new CharacterRewardService($paramters['character']);
+            return new CharacterRewardService($paramters['character'], $app->make(CharacterXPService::class));
+
         });
 
         $this->app->bind(ItemValidator::class, function($app) {

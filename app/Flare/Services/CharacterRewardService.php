@@ -18,13 +18,19 @@ class CharacterRewardService {
     private $character;
 
     /**
+     * @var CharacterXPService $characterXpService
+     */
+    private $characterXpService;
+
+    /**
      * Constructor
      *
      * @param Character $character
-     * @return void
+     * @param CharacterXPService $characterXpService
      */
-    public function __construct(Character $character) {
-        $this->character = $character;
+    public function __construct(Character $character, CharacterXPService $characterXpService) {
+        $this->character          = $character;
+        $this->characterXpService = $characterXpService;
     }
 
     /**
@@ -46,6 +52,8 @@ class CharacterRewardService {
         }
 
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
+
+        $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
 
         if (!is_null($gameMap->xp_bonus)) {
             $xp = $xp * (1 + $gameMap->xp_bonus);

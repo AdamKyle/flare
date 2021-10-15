@@ -7,11 +7,11 @@ class MaxLevel {
     const MAX_LEVEL      = 1000;
     const HALF           = 500;
     const THREE_QUARTERS = 750;
-    const LAST_LEG       = 950;
+    const LAST_LEG       = 900;
 
-    const HALF_PERCENT           = 0.25;
+    const HALF_PERCENT           = 0.75;
     const THREE_QUARTERS_PERCENT = 0.50;
-    const LAST_LEG_PERCENT       = 0.75;
+    const LAST_LEG_PERCENT       = 0.25;
 
     /**
      * @var int $currentLevel
@@ -58,7 +58,7 @@ class MaxLevel {
             return ceil($this->xp - $total);
         }
 
-        if ($this->currentLevel === self::MAX_LEVEL) {
+        if ($this->currentLevel >= self::MAX_LEVEL) {
             return 0;
         }
 

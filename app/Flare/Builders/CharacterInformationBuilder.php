@@ -318,14 +318,24 @@ class CharacterInformationBuilder {
         $dmgStat       = $this->character->class->damage_stat;
 
         if ($classType->isVampire()) {
-            $healingAmount += $this->character->{$dmgStat} - $this->character->{$dmgStat} * .025;
+
+            if ($voided) {
+                $healingAmount += $this->character->{$dmgStat};
+            } else {
+                $healingAmount += $this->statMod($this->$this->character->{$dmgStat}) * 0.15;
+            }
+
         }
 
         if ($classType->isProphet()) {
             $hasHealingSpells = $this->prophetHasHealingSpells($this->character);
 
             if ($hasHealingSpells) {
-                $healingAmount += $this->character->{$dmgStat} * .025;
+                if ($voided) {
+                    $healingAmount += $this->character->{$dmgStat};
+                } else {
+                    $healingAmount += $this->statMod($this->$this->character->{$dmgStat}) * 0.30;
+                }
             }
         }
 
@@ -745,7 +755,9 @@ class CharacterInformationBuilder {
             }
         }
 
-        if (!empty($damage)) {
+        if ($this->character->classType()->isFighter()) {
+            $damage = array_sum($damage);
+        } else if (!empty($damage)) {
             $damage = max($damage);
         } else {
             $damage = 0;
@@ -754,6 +766,14 @@ class CharacterInformationBuilder {
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
             $damage = $damage * 0.02;
+        }
+
+        $skills = $this->character->skills->filter(function($skill) {
+            return $skill->baseSkill->base_damage_mod_bonus_per_level > 0.0;
+        });
+
+        foreach ($skills as $skill) {
+            $damage += $damage * $skill->base_damage_mod;
         }
 
         return $damage;
@@ -773,7 +793,23 @@ class CharacterInformationBuilder {
             }
         }
 
-        $bonus = $this->hereticSpellDamageBonus($this->character);
+        if ($this->character->classType()->isHeretic()) {
+            if ($voided) {
+                $damage += $damage * ($this->character->int * 0.15);
+            } else {
+                $damage += $damage * ($this->statMod('int') * 0.15);
+            }
+        }
+
+        if ($this->character->classType()->isProphet()) {
+            if ($voided) {
+                $damage += $damage * ($this->character->chr * 0.15);
+            } else {
+                $damage += $damage * ($this->statMod('chr') * 0.15);
+            }
+        }
+
+        $bonus = $this->hereticSpellDamageBonus($this->character) + $this->prophetDamageBonus($this->character);
 
         return $damage + $damage * $bonus;
     }
@@ -840,6 +876,14 @@ class CharacterInformationBuilder {
                 $healFor += $slot->item->getTotalHealing();
             } else {
                 $healFor += $slot->item->base_healing;
+            }
+        }
+
+        if ($this->character->classType()->isProphet()) {
+            if ($voided) {
+                $healFor += $healFor * ($this->character->chr * 0.15);
+            } else {
+                $healFor += $healFor * ($this->statMod('chr') * 0.15);
             }
         }
 

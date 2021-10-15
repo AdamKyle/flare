@@ -3,9 +3,9 @@
 namespace App\Flare\Calculators;
 
 use App\Flare\Models\Monster;
-use App\Game\Battle\Values\MaxLevel;
 
 class XPCalculator {
+
 
     /**
      * Calculates the total xp
@@ -30,7 +30,7 @@ class XPCalculator {
             $xp = ($xpReduction !==  0.0 ? (3.3333 - (3.3333 * $xpReduction)) : 3.3333);
         }
 
-        return (new MaxLevel($characterLevel, $xp))->fetchXP();
+        return ceil($xp);
     }
 
 }

@@ -176,7 +176,7 @@ export default class FightSection extends React.Component {
       let messages = monsterInfo.reduceAllStats(character.stat_affixes);
 
       if (messages.length > 0) {
-        this.battleMessagesBeforeFight = [...this.battleMessages, ...messages];
+        this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
 
         statReduced = true;
       } else {

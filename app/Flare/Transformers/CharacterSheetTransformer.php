@@ -2,6 +2,8 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\MaxLevelConfiguration;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use League\Fractal\TransformerAbstract;
@@ -36,7 +38,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'class'             => $character->class->name,
             'inventory_max'     => $character->inventory_max,
             'level'             => number_format($character->level),
-            'max_level'         => number_format(MaxLevel::MAX_LEVEL),
+            'max_level'         => number_format($this->getMaxLevel($character)),
             'xp'                => $character->xp,
             'xp_next'           => $character->xp_next,
             'str'               => number_format($character->str),
@@ -75,5 +77,17 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'devouring_light'   => $characterInformation->getDevouringLight(),
             'devouring_darkness' => $characterInformation->getDevouringDarkness(),
         ];
+    }
+
+    protected function getMaxLevel(Character $character) {
+        $slot = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::CONTNUE_LEVELING;
+        })->first();
+
+        if (!is_null($slot)) {
+            return MaxLevelConfiguration::first()->max_level;
+        }
+
+        return MaxLevel::MAX_LEVEL;
     }
 }

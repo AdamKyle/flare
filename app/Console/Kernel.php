@@ -35,6 +35,9 @@ class Kernel extends ConsoleKernel {
         // Clean notifications every month.
         $schedule->command('clean:notifications')->monthly()->timezone(config('app.timezone'));
 
+        // Increase the max level every month.
+        $schedule->command('increase:max_level')->monthly()->timezone(config('app.timezone'));
+
         // Update kingdoms every hour.
         $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
 

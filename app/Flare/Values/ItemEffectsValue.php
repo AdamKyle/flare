@@ -15,6 +15,7 @@ class ItemEffectsValue {
     const DUNGEON               = 'dungeon';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
+    const CONTNUE_LEVELING      = 'continue-leveling';
 
     /**
      * @var string[] $values
@@ -25,7 +26,8 @@ class ItemEffectsValue {
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
-        self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible'
+        self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
+        self::CONTNUE_LEVELING      => 'continue-leveling'
     ];
 
     /**
