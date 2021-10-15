@@ -15,7 +15,7 @@ export default class CanEntranceEnemy {
       const cantResist     = attackType.affixes.cant_be_resisted;
       const canBeEntranced = random(1, 100) > (100 - (100 * chance));
 
-      if (cantResist || canBeEntranced) {
+      if (cantResist) {
         this.addMessage('The enemy is dazed by your enchantments!');
 
         canEntrance = true;

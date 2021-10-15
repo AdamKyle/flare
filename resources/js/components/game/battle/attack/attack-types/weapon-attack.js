@@ -28,10 +28,12 @@ export default class WeaponAttack {
     const canEntranceEnemy = new CanEntranceEnemy();
 
     const canEntrance      = canEntranceEnemy.canEntranceEnemy(attackData, this.defender, 'player')
-
+    console.log(canEntranceEnemy.getBattleMessages());
     this.battleMessages   = [...this.battleMessages, canEntranceEnemy.getBattleMessages()];
 
     if (canEntrance) {
+      console.log('here');
+      console.log(this.battleMessages);
       this.attackWithWeapon(attackData);
 
       this.useItems(attackData, this.attacker.class);
