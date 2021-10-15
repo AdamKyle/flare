@@ -5,6 +5,10 @@ export default class ReviveSection extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      isLoading: false,
+    }
   }
 
   revive() {
@@ -12,9 +16,15 @@ export default class ReviveSection extends React.Component {
       return getServerMessage('cant_attack');
     }
 
+    this.setState({isLoading: true});
+
     axios.post(this.props.route).then((result) => {
-      this.props.revive(result.data);
+      this.props.revive(result.data, () => {
+        this.setState({isLoading: false});
+      });
     }).catch((err) => {
+      this.setState({isLoading: false});
+
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
@@ -32,7 +42,10 @@ export default class ReviveSection extends React.Component {
   render() {
     return (
       <>
-        <button className="btn btn-primary" onClick={this.revive.bind(this)}>Revive</button>
+        <button className="btn btn-primary" onClick={this.revive.bind(this)}>
+          Revive
+          {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null}
+        </button>
         <p className="mt-3">You are dead. Click revive to live again.</p>
       </>
     );

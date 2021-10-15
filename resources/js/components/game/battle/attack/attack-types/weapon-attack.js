@@ -3,6 +3,7 @@ import AttackType from "../attack-type";
 import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
+import {random} from "lodash";
 
 export default class WeaponAttack {
 
@@ -31,11 +32,7 @@ export default class WeaponAttack {
     this.battleMessages   = [...this.battleMessages, canEntranceEnemy.getBattleMessages()];
 
     if (canEntrance) {
-      this.monsterHealth = this.monsterHealth - attackData.weapon_damage;
-
-      this.extraAttacks();
-
-      this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(attackData.weapon_damage))
+      this.attackWithWeapon(attackData);
 
       this.useItems(attackData, this.attacker.class);
 
@@ -57,11 +54,7 @@ export default class WeaponAttack {
         return this.setState();
       }
 
-      this.monsterHealth = this.monsterHealth - attackData.weapon_damage;
-
-      this.extraAttacks();
-
-      this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(attackData.weapon_damage))
+      this.attackWithWeapon(attackData);
 
       this.useItems(attackData, this.attacker.class)
     } else {
@@ -79,6 +72,27 @@ export default class WeaponAttack {
       monsterCurrentHealth: this.monsterHealth,
       battleMessages: this.battleMessages,
     }
+  }
+
+  attackWithWeapon(attackData) {
+
+    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+
+    let damage = attackData.weapon_damage;
+
+    const dc = 100 - 100 * skillBonus;
+
+    if (random(1, 100) > dc) {
+      this.addActionMessage('You become overpowered with rage! (Critical strike!)')
+
+      damage *= 2;
+    }
+
+    this.monsterHealth = this.monsterHealth - damage;
+
+    this.extraAttacks();
+
+    this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(damage))
   }
 
   useItems(attackData, attackerClass) {

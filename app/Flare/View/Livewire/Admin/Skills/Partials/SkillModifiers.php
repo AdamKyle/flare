@@ -61,17 +61,7 @@ class SkillModifiers extends Component
         } else {
             $this->skill->save();
 
-            if (!$this->disabledSelection) {
-                if (empty($this->selectedMonsters)) {
-                    AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), null);
-                } else {
-                    foreach ($this->selectedMonsters as $monsterId) {
-                        AssignSkillsJob::dispatch($this->for, $this->skill->refresh(), auth()->user(), $monsterId);
-                    }
-                }
-            }
-
-            $message = 'Skill: ' . $this->skill->name . ' Created. Applying to selected entities!';
+            $message = 'Skill: ' . $this->skill->name . ' Created.';
 
             if ($this->editing) {
                 $message = 'Skill: ' . $this->skill->name . ' Updated';
@@ -123,21 +113,6 @@ class SkillModifiers extends Component
 
         if (is_null($this->skill)) {
             return $for;
-        }
-
-        if (!is_null($this->skill->gameClass)) {
-            $this->disabledSelection = true;
-        }
-
-        $monstersWithSkill = Monster::join('skills', function($join) {
-            $join->on('skills.monster_id', 'monsters.id')
-                 ->where('skills.game_skill_id', $this->skill->id);
-        })->select('monsters.*')->get();
-
-        if ($monstersWithSkill->isNotEmpty()) {
-            $for = 'all';
-
-            $this->disabledSelection = true;
         }
 
         return $for;

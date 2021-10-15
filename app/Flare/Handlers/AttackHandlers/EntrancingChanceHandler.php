@@ -31,7 +31,11 @@ class EntrancingChanceHandler {
         $this->battleLogs = [];
     }
 
-    public function entrancedEnemy($attacker, $defender, bool $isDefenderVoided = false): bool {
+    public function entrancedEnemy($attacker, $defender, bool $isDefenderVoided = false, bool $isAttackerVoided = false): bool {
+        if ($isAttackerVoided) {
+            return false;
+        }
+
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->setCharacter($attacker);
 

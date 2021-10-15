@@ -19,6 +19,10 @@ class SetupFightHandler {
 
     private $processed  = false;
 
+    private $monsterDevoided = false;
+
+    private $monsterVoided   = false;
+
     private $characterInformationBuilder;
 
     public function __construct(CharacterInformationBuilder $characterInformationBuilder) {
@@ -27,24 +31,29 @@ class SetupFightHandler {
 
     public function setUpFight($attacker, $defender) {
 
+
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
-        }
 
-        if ($defender instanceof Character) {
-            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($defender);
-        }
+            if ($this->devoidEnemy($attacker)) {
+                $message = 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!';
 
-        if ($defender instanceof Character) {
-            if ($this->voidedEnemy($defender)) {
-                $message = 'You voided your enemies enchantments. They feel much weaker!';
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+                $this->monsterDevoided = true;
+            }
+
+            if ($this->voidedEnemy($attacker)) {
+                $message = 'The light of the heavens shines through this darkness. The enemy is voided!';
+
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+                $this->monsterVoided = true;
             }
         }
 
-        if ($defender instanceof Monster) {
-            if ($this->voidedEnemy($defender)) {
+        if ($attacker instanceof Monster && !$this->monsterDevoided) {
+            if ($this->voidedEnemy($attacker)) {
                 $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
 
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
@@ -53,9 +62,9 @@ class SetupFightHandler {
             }
         }
 
-        // Only do this once per fight.
+        // Only do this once per fight and if you are not voided.
         if (is_null($this->attackType) && !$this->processed) {
-            if ($attacker instanceof Character) {
+            if ($attacker instanceof Character && is_null($this->attackType)) {
                 $this->defender = $this->reduceEnemyStats($defender);
             }
         }
@@ -67,6 +76,14 @@ class SetupFightHandler {
 
     public function getAttackType(): ?string {
         return $this->attackType;
+    }
+
+    public function getIsMonsterDevoided(): bool {
+        return $this->monsterDevoided;
+    }
+
+    public function getIsMonsterVoided(): bool {
+        return $this->monsterVoided;
     }
 
     public function getBattleMessages(): array {
@@ -84,7 +101,22 @@ class SetupFightHandler {
     }
 
     protected function voidedEnemy($defender) {
-        $dc = 100 - 100 * $defender->devouring_light_chance;
+
+        $devouringLight = null;
+
+        if ($defender instanceof Character) {
+            $devouringLight = $this->characterInformationBuilder->setCharacter($defender)->getDevouringLight();
+        } else {
+            $devouringLight = $defender->devouring_light_chance;
+        }
+
+        $dc = 100 - 100 * $devouringLight;
+
+        return rand(1, 100) > $dc;
+    }
+
+    protected function devoidEnemy($attacker) {
+        $dc = 100 - 100 * $attacker->devouring_darkeness;
 
         return rand(1, 100) > $dc;
     }

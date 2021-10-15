@@ -108,7 +108,7 @@ export default class Damage {
     }
 
     const dc        = 100 - (100 * defender.spell_evasion);
-    let totalDamage = attacker.spell_damage;
+    let totalDamage = (attacker.spell_damage + attacker.spell_damage * .15).toFixed(0);
 
     if (dc <= 0 || random(1, 100) > dc) {
       this.battleMessages.push({
@@ -139,9 +139,10 @@ export default class Damage {
         this.addMessage('A fury takes over you. You notch the arrows thrice at the enemies direction');
 
         for (let i = 1; i <= 3; i++) {
-          monsterCurrentHealth = monsterCurrentHealth - attacker.attack;
+          const totalDamage    = (attacker.attack + attacker.attack * .15).toFixed(0);
+          monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-          this.addActionMessage(attacker.name + ' hit for (weapon - triple attack) ' + this.formatNumber(attacker.attack));
+          this.addActionMessage(attacker.name + ' hit for (weapon - triple attack) ' + this.formatNumber(totalDamage));
         }
       }
     }
@@ -162,7 +163,7 @@ export default class Damage {
           message: 'The strength of your rage courses through your veins!',
         });
 
-        const totalDamage = (attacker.attack + attacker.attack * .5);
+        const totalDamage = (attacker.attack + attacker.attack * .15).toFixed(0);
 
         monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
@@ -209,7 +210,7 @@ export default class Damage {
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
-        const totalAttack = Math.round(attacker.dur - attacker.dur * 0.95);
+        const totalAttack = Math.round(attacker.dur - attacker.dur * 0.15);
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack

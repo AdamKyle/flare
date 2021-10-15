@@ -5,6 +5,7 @@ namespace App\Flare\Handlers\AttackHandlers;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
 
 class CanHitHandler {
 
@@ -77,6 +78,11 @@ class CanHitHandler {
      * @return float
      */
     protected function fetchAccuracyBonus($attacker): float {
+
+        if ($attacker instanceof  Monster) {
+            return $attacker->accuracy;
+        }
+
         $accuracyBonus = $attacker->skills()->join('game_skills', function($join) {
             $join->on('game_skills.id', 'skills.game_skill_id')
                 ->where('game_skills.name', 'Accuracy');
@@ -98,6 +104,11 @@ class CanHitHandler {
      * @return float
      */
     protected function fetchDodgeBonus($defender): float {
+
+        if ($defender instanceof Monster) {
+            return $defender->dodge;
+        }
+
         $dodgeBonus    = $defender->skills()->join('game_skills', function($join) {
             $join->on('game_skills.id', 'skills.game_skill_id')
                 ->where('game_skills.name', 'Dodge');

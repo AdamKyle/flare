@@ -69,61 +69,25 @@
         <div class="col-md-12">
             <div class="form-check mb-2">
                 <input type="checkbox" class="form-check-input" id="skill-can-train"
-                       wire:model="skill.can_train" {{$disabledSelection ? 'disabled' : ''}}>
+                       wire:model="skill.can_train">
                 <label class="form-check-label" for="skill-can-train">Can Train</label>
             </div>
         </div>
     </div>
-    @if (!$disabledSelection)
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="skill-for">Type: </label>
-                    <select class="form-control" name="skill_for"
-                            wire:model="for" {{$canNotAssignSkill ? 'disabled': ''}}>
-                        <option value="">Please select</option>
-                        <option value="all">Both Monsters and Characters</option>
-                        <option value="only-characters">Only Characters</option>
-                        <option value="select-monsters">Select Monsters</option>
-                        <option value="select-class">Select Class</option>
-                    </select>
-                    @error('for') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
+    @if ($for === 'select-class')
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="skill-for-class">Class: </label>
+                <select class="form-control" name="skill_for_class"
+                        wire:model="skill.game_class_id" {{$for !== 'select-class' ? 'disabled' : ''}}>
+                    <option value="">Please Select</option>
+                    @foreach($gameClasses as $gameClass)
+                        <option
+                            value={{$gameClass->id}} {{$gameClass->id === $selectedClass ? 'selected' : ''}}>{{$gameClass->name}}</option>
+                    @endforeach
+                </select>
+                @error('skill.game_class_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
-            @if ($for === 'select-monsters')
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="skill-for-monster">Monsters: </label>
-                        <select class="form-control" name="skill_for_monster" wire:model="selectedMonsters"
-                                {{$for !== 'select-monsters' ? 'disabled' : ''}} multiple>
-                            @foreach($monsters as $monster)
-                                <option value={{$monster->id}}>{{$monster->name}}</option>
-                            @endforeach
-                        </select>
-                        @error('monster') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-            @elseif ($for === 'select-class')
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="skill-for-class">Class: </label>
-                        <select class="form-control" name="skill_for_class"
-                                wire:model="skill.game_class_id" {{$for !== 'select-class' ? 'disabled' : ''}}>
-                            <option value="">Please Select</option>
-                            @foreach($gameClasses as $gameClass)
-                                <option
-                                    value={{$gameClass->id}} {{$gameClass->id === $selectedClass ? 'selected' : ''}}>{{$gameClass->name}}</option>
-                            @endforeach
-                        </select>
-                        @error('skill.game_class_id') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-            @else
-            @endif
-        </div>
-    @else
-        <div class="alert alert-info">
-            This skill is being used and cannot be modified in terms of who is using it.
         </div>
     @endif
 </div>

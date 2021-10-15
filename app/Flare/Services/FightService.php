@@ -26,6 +26,8 @@ class FightService {
 
     private $monsterAttackHandler;
 
+    private $isMonsterVoided = false;
+
     private $battleLogs = [];
 
     public function __construct(
@@ -67,6 +69,8 @@ class FightService {
         $this->setupFightHandler->setUpFight($attacker, $defender);
 
         $newAttackType = $this->setupFightHandler->getAttackType();
+
+        $this->isMonsterVoided   = $this->setupFightHandler->getIsMonsterVoided();
 
         if (!is_null($newAttackType)) {
             $attackType = $newAttackType . $attackType;
@@ -117,6 +121,7 @@ class FightService {
 
         if ($attacker instanceof Monster) {
             $this->monsterAttackHandler->setHealth($this->currentMonsterHealth, $this->currentCharacterHealth)
+                                       ->setMonsterVoided($this->isMonsterVoided)
                                        ->doAttack($attacker, $defender, $isDefenderVoided);
 
             $this->battleLogs             = [...$this->battleLogs, ...$this->monsterAttackHandler->getBattleLogs()];

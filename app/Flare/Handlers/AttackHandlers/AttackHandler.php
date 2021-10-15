@@ -92,7 +92,7 @@ class AttackHandler {
             return;
         }
 
-        if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender)) {
+        if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, false, $voided)) {
             $this->battleLogs = $this->entrancingChanceHandler->getBattleLogs();
 
             $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);

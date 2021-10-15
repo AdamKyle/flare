@@ -70,6 +70,10 @@ class CharacterInformationBuilder {
         return $this->characterBoons($base);
     }
 
+    public function getSkill(string $skillName): float {
+        return $this->character->skills()->where('name', $skillName)->first()->skill_bonus;
+    }
+
     /**
      * Return the highest class bonus affix amount.
      *
@@ -134,6 +138,12 @@ class CharacterInformationBuilder {
         return null;
     }
 
+    /**
+     * Finds the life stealing amount for a character.
+     *
+     * @param bool $canStack
+     * @return float
+     */
     public function findLifeStealingAffixes(bool $canStack = false): float {
         $slots = $this->fetchInventory()->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix))  {
@@ -150,7 +160,7 @@ class CharacterInformationBuilder {
         });
 
         if ($canStack) {
-            return $slots->sum('item.itemSuffix.steal_life_amount') + $slots->sum('item.itemPrefix.steal_life_amount');
+            return ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix')) / 2;
         }
 
         $values = [];
@@ -166,6 +176,30 @@ class CharacterInformationBuilder {
         }
 
         return empty($values) ? 0.0 : max($values);
+    }
+
+    protected function handleLifeStealingAmount(Collection $slots, string $type): float {
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (empty($values)) {
+                $values[] = $slot->item->{$type}->steal_life_amount;
+            } else {
+                $values[] = ($slot->item->{$type}->steal_life_amount / 2);
+            }
+        }
+
+        $totalPercent = 0;
+
+        foreach ($values as $value) {
+            if ($totalPercent === 0) {
+                $totalPercent = $value;
+            } else {
+                $totalPercent *= $value;
+            }
+        }
+
+        return 1 - $totalPercent;
     }
 
     public function getEntrancedChance(): float {
@@ -228,10 +262,12 @@ class CharacterInformationBuilder {
             $characterDamageStat = $this->character->{$this->character->damage_stat};
         }
 
-        $characterDamageStat = $characterDamageStat * 0.05;
+        $classType = $this->character->classType();
 
-        if ($this->character->classType()->isFighter()) {
+        if ($classType->isFighter() || $classType->isRanger() || $classType->isTheif()) {
             $characterDamageStat = $characterDamageStat * 0.15;
+        } else {
+            $characterDamageStat = $characterDamageStat * 0.05;
         }
 
         $totalAttack = $this->getWeaponDamage($voided);

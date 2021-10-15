@@ -225,7 +225,7 @@ export default class FightSection extends React.Component {
 
     if (this.state.isCharacterVoided) {
       attackType = 'voided_' + attackType;
-    } else if (!this.state.isMonsterReduced && !this.state.isCharacterVoided) {
+    } else if (!this.state.isMonsterReduced && !this.state.isCharacterVoided && !this.state.isMonsterDevoided) {
 
       if (this.state.monster.canMonsterVoidPlayer()) {
         this.battleMessagesBeforeFight.push({
@@ -290,8 +290,6 @@ export default class FightSection extends React.Component {
           monsterMaxHealth: monster !== null ? this.state.monsterMaxHealth : null,
           canAttack: false,
           monster: monster,
-        }, () => {
-          console.log(this.state);
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {
@@ -310,7 +308,8 @@ export default class FightSection extends React.Component {
     }
   }
 
-  revive(data) {
+  revive(data, callback) {
+
     const isVoided = this.state.isCharacterVoided;
 
     this.setState({
@@ -318,7 +317,7 @@ export default class FightSection extends React.Component {
       characterMaxHealth: isVoided ? data.character.voided_dur : data.character.health,
       characterCurrentHealth: isVoided ? data.character.voided_dur : data.character.health,
     }, () => {
-      this.props.isCharacterDead(data.character.is_dead);
+      this.props.isCharacterDead(data.character.is_dead, callback);
     });
   }
 

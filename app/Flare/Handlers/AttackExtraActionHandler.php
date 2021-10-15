@@ -66,8 +66,14 @@ class AttackExtraActionHandler {
             $message        = 'A fury takes over you. You notch the arrows thrice at the enemies direction';
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
+            $damage = $characterInformationBuilder->buildAttack($voided) * 0.15;
+
             for ($i = 1; $i <= 3; $i++) {
-                $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth, $voided);
+                $monsterCurrentHealth -= $damage;
+
+                $message = $character->name . ' hit for (weapon): ' . number_format($damage);
+
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
             }
         }
 
@@ -89,7 +95,7 @@ class AttackExtraActionHandler {
 
             $characterAttack = $characterInformationBuilder->buildAttack($voided);
 
-            $totalDamage = ($characterAttack + $characterAttack * 0.05);
+            $totalDamage = ($characterAttack + $characterAttack * 0.15);
 
             $monsterCurrentHealth -= $characterAttack;
 
@@ -140,7 +146,7 @@ class AttackExtraActionHandler {
 
             $character = $characterInformationBuilder->getCharacter();
 
-            $totalAttack = round($dur - $dur * 0.95);
+            $totalAttack = round($dur - $dur * 0.15);
 
             $monsterCurrentHealth -= $totalAttack;
 
@@ -196,6 +202,16 @@ class AttackExtraActionHandler {
 
     private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $characterAttack = $characterInformationBuilder->buildAttack($voided);
+
+        $dc = 100 - 100 * $characterInformationBuilder->getSkill('Criticality');
+
+        if (rand(1, 100) > $dc) {
+            $characterAttack *= 2;
+
+            $message = 'You become overpowered with rage! (Critical strike!)';
+
+            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
+        }
 
         $monsterCurrentHealth -= $characterAttack;
 

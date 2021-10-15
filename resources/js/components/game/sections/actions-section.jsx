@@ -79,9 +79,13 @@ export default class ActionsSection extends React.Component {
     }
   }
 
-  characterIsDead(isDead) {
+  characterIsDead(isDead, callback) {
     this.setState({
       isDead: isDead,
+    }, () => {
+      if (typeof callback === 'function') {
+        callback();
+      }
     });
   }
 

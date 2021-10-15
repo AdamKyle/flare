@@ -27,6 +27,8 @@ class MonsterAttackHandler {
 
     private $battleLogs = [];
 
+    private $isMonsterVoided = false;
+
     public function __construct(
         CharacterInformationBuilder $characterInformationBuilder,
         EntrancingChanceHandler $entrancingChanceHandler,
@@ -42,6 +44,12 @@ class MonsterAttackHandler {
     public function setHealth(int $monsterHealth, int $characterHealth): MonsterAttackHandler {
         $this->monsterHealth   = $monsterHealth;
         $this->characterHealth = $characterHealth;
+
+        return $this;
+    }
+
+    public function setMonsterVoided(bool $isMonsterVoided): MonsterAttackHandler {
+        $this->isMonsterVoided = $isMonsterVoided;
 
         return $this;
     }
@@ -67,7 +75,7 @@ class MonsterAttackHandler {
         $monsterAttack = explode('-', $attacker->attack_range);
         $monsterAttack = rand($monsterAttack[0], $monsterAttack[1]);
 
-        if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, $isDefenderVoided)) {
+        if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, $isDefenderVoided, $this->isMonsterVoided)) {
             $this->battleLogs = $this->entrancingChanceHandler->getBattleLogs();
 
             $this->entrancingChanceHandler->resetLogs();
@@ -113,15 +121,18 @@ class MonsterAttackHandler {
     }
 
     protected function useItems($attacker, $defender) {
-        $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
-                                         ->setMonsterHealth($this->monsterHealth);
 
-        $itemHandler->useArtifacts($attacker, $defender);
+        if (!$this->isMonsterVoided) {
+            $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
+                ->setMonsterHealth($this->monsterHealth);
 
-        $this->characterHealth       = $itemHandler->getCharacterHealth();
-        $this->monsterHealth         = $itemHandler->getMonsterHealth();
+            $itemHandler->useArtifacts($attacker, $defender);
 
-        $this->useAffixes($attacker, $defender);
+            $this->characterHealth = $itemHandler->getCharacterHealth();
+            $this->monsterHealth = $itemHandler->getMonsterHealth();
+
+            $this->useAffixes($attacker, $defender);
+        }
 
         $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth);
 
