@@ -3,6 +3,7 @@
 namespace App\Flare\Handlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Models\Character;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Adventures\Traits\CreateBattleMessages;
@@ -12,6 +13,18 @@ class AttackExtraActionHandler {
     use CreateBattleMessages;
 
     private array $messages = [];
+
+    private $characterHealth = null;
+
+    public function setCharacterhealth(int $characterhealth): AttackExtraActionHandler {
+        $this->characterHealth = $characterhealth;
+
+        return $this;
+    }
+
+    public function getCharacterHealth() {
+        return $this->characterHealth;
+    }
 
     public function doAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
 
@@ -36,12 +49,12 @@ class AttackExtraActionHandler {
         return false;
     }
 
-    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender): int {
-        $spellDamage = $characterInformationBuilder->getTotalSpellDamage();
+    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender, bool $voided = false): int {
+        $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
-        $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender);
+        $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter());
 
-        return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender);
+        return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided);
     }
 
     public function getMessages(): array {
@@ -49,6 +62,7 @@ class AttackExtraActionHandler {
     }
 
     public function resetMessages() {
+        $this->characterHealth = null;
         $this->messages = [];
     }
 
@@ -106,7 +120,7 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    protected function doubleCastChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender): int {
+    protected function doubleCastChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isHeretic()) {
@@ -118,15 +132,15 @@ class AttackExtraActionHandler {
 
             $this->messages[] = ['Magic crackles through the air as you cast again!'];
 
-            $spellDamage = $characterInformationBuilder->getTotalSpellDamage();
+            $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
-            $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender);
+            $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided);
         }
 
         return $monsterCurrentHealth;
     }
 
-    protected function vampireThirst(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+    public function vampireThirst(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isVampire()) {
@@ -149,18 +163,30 @@ class AttackExtraActionHandler {
             $totalAttack = round($dur - $dur * 0.15);
 
             $monsterCurrentHealth -= $totalAttack;
+            $this->characterHealth += $totalAttack;
 
-            $message        = $character->name . ' hit for (thirst!) ' . number_format($totalAttack);
-            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+            $message        = $character->name . ' hit for (and healed for) (thirst!) ' . number_format($totalAttack);
+            $this->messages = $this->addMessage($message, 'enemy-action-fired', $this->messages);
         }
 
         return $monsterCurrentHealth;
     }
 
-    protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender,): int {
-        $totalDamage = $this->calculateSpellDamage($spellDamage, $defender);
+    protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender, Character $character, bool $voided = false): int {
+        $totalDamage = $this->calculateSpellDamage($spellDamage, $defender, $character, $voided);
 
         if ($totalDamage > 0) {
+            $criticalChance = $character->getInformation()->getSkill('Criticality');
+
+            $critDc = 100 - 100 * $criticalChance;
+
+            if (rand(1, 100) > $critDc) {
+                $message        = 'Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)';
+                $this->messages =  $this->addMessage($message, 'action-fired', $this->messages);
+
+                $totalDamage *= 2;
+            }
+
             $health = $monsterCurrentHealth - $totalDamage;
 
             if ($health < 0) {
@@ -169,14 +195,8 @@ class AttackExtraActionHandler {
 
             $monsterCurrentHealth = $health;
 
-            $this->messages[] =  [
-                'Your spells hit the enemy for: ' . $totalDamage,
-            ];
-
-        } else {
-            $this->messages[] =  [
-                'Your spells have no effect ...'
-            ];
+            $message = 'Your spells hit the enemy for: ' . number_format($totalDamage);
+            $this->messages = $this->addMessage($message, 'info-battle', $this->messages);
         }
 
         return $monsterCurrentHealth;
@@ -188,11 +208,19 @@ class AttackExtraActionHandler {
         return rand(1, 100) > $dc;
     }
 
-    private function calculateSpellDamage(int $spellDamage, $defender): int {
+    private function calculateSpellDamage(int $spellDamage, $defender, Character $character, bool $voided = false): int {
         $spellEvasion = (float) $defender->spell_evasion;
-        $dc = 100 - $spellEvasion;
+        $dc           = 100 - 100 * $spellEvasion;
+        $maxRole      = 100;
+        $classType    = $character->classType();
 
-        if ($dc <= 0 || rand(0, 100) > $dc) {
+        if ($classType->isProphet() || $classType->isHeretic()) {
+            $castingAccuracyBonus = $character->getInformation()->getSkill('CastingAccuracy');
+            $maxRole              = ($voided ? $character->focus : $character->getInformation()->statMod('focus')) * (.05 + $castingAccuracyBonus);
+            $dc                   = $maxRole - $maxRole * $spellEvasion;
+        }
+
+        if ($dc <= 0 || rand(0, $maxRole) > $dc) {
             return 0;
         }
 

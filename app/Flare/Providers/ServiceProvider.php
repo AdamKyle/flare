@@ -7,6 +7,7 @@ use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
 use App\Flare\Handlers\AttackHandlers\CanHitHandler;
+use App\Flare\Handlers\AttackHandlers\CastHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
 use App\Flare\Handlers\AttackHandlers\ItemHandler;
 use App\Flare\Handlers\CharacterAttackHandler;
@@ -67,6 +68,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterAttackBuilder::class, function($app) {
             return new CharacterAttackBuilder($app->make(CharacterInformationBuilder::class));
         });
+
 
         $this->app->bind(RandomItemDropBuilder::class, function($app) {
             return new RandomItemDropBuilder();
@@ -173,6 +175,14 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(HealingExtraActionHandler::class, function($app) {
+            return new HealingExtraActionHandler();
+        });
+
+        $this->app->bind(AttackExtraActionHandler::class, function($app) {
+            return new AttackExtraActionHandler();
+        });
+
         $this->app->bind(AttackHandler::class, function($app) {
             return new AttackHandler(
                 $app->make(CharacterAttackBuilder::class),
@@ -183,9 +193,21 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CastHandler::class, function($app) {
+            return new CastHandler(
+                $app->make(CharacterAttackBuilder::class),
+                $app->make(EntrancingChanceHandler::class),
+                $app->make(AttackExtraActionHandler::class),
+                $app->make(HealingExtraActionHandler::class),
+                $app->make(ItemHandler::class),
+                $app->make(CanHitHandler::class),
+            );
+        });
+
         $this->app->bind(CharacterAttackHandler::class, function($app) {
             return new CharacterAttackHandler(
                 $app->make(AttackHandler::class),
+                $app->make(CastHandler::class),
             );
         });
 
@@ -196,14 +218,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterAttackHandler::class),
                 $app->make(MonsterAttackHandler::class),
             );
-        });
-
-        $this->app->bind(AttackExtraActionHandler::class, function($app) {
-            return new AttackExtraActionHandler();
-        });
-
-        $this->app->bind(HealingExtraActionHandler::class, function($app) {
-            return new HealingExtraActionHandler();
         });
     }
 

@@ -9,7 +9,7 @@ export default class CanHitCheck {
     this.battleMessages = [];
   }
 
-  canHit (attacker, defender, battleMessages) {
+  canHit (attacker, defender, battleMessages, voided) {
     const damage        = new Damage();
 
     if (attacker.hasOwnProperty('class')) {
@@ -22,7 +22,7 @@ export default class CanHitCheck {
 
     let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.dodge
-    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
+    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, defender.dex, attackerAccuracy, defenderDodge);
 
     if (attackerAccuracy > 1.0) {
       return true;
@@ -48,7 +48,7 @@ export default class CanHitCheck {
 
     let attackerAccuracy = attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.dodge
-    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, attacker.dex, attackerAccuracy, defenderDodge);
+    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, defender.focus, attackerAccuracy, defenderDodge);
 
     if (attackerAccuracy > 1.0) {
       return true;
@@ -93,7 +93,7 @@ export default class CanHitCheck {
 
     return random(1, defenderFocus) > dc;
   }
-
+  canMonsterCast
   calculateCanHit(toHitBase) {
     if (Math.sign(toHitBase) === - 1) {
       toHitBase = Math.abs(toHitBase);

@@ -48,7 +48,7 @@ export default class CastAttack {
 
     if (canHit) {
       if (this.canBlock()) {
-        this.addMessage(this.defender.name + ' Blocked your damaging spell!');
+        this.addEnemyActionMessage(this.defender.name + ' Blocked your damaging spell!');
 
         this.healWithSpells(attackData);
 
@@ -86,13 +86,27 @@ export default class CastAttack {
 
   attackWithSpells(attackData) {
 
+    const evasion = this.defender.spell_evasion;
+    let dc        = 100 - 100 * evasion;
+    let maxRole   = 100
+
+    if (this.attacker.class === 'Prophet' || this.attacker.class === 'Heretic') {
+      const bonus = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus
+      maxRole     = (this.voided ? this.attacker.voided_focus : this.attacker.focus) * (0.05 + bonus);
+      dc          = maxRole - maxRole * evasion
+    }
+
+    if (random(1, maxRole) > dc) {
+      this.addEnemyActionMessage('The enemy evades your magic!')
+
+      return;
+    }
+
     const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    let damage       = attackData.spell_damage;
+    const critDc     = 100 - 100 * skillBonus;
 
-    let damage = attackData.spell_damage;
-
-    const dc = 100 - 100 * skillBonus;
-
-    if (random(1, 100) > dc) {
+    if (random(1, 100) > critDc) {
       this.addActionMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)')
 
       damage *= 2;
@@ -141,6 +155,11 @@ export default class CastAttack {
 
     this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth);
 
+    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+
+    this.monsterHealth          = health.monster_hp;
+    this.characterCurrentHealth = health.character_hp;
+
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }
 
@@ -148,6 +167,11 @@ export default class CastAttack {
     const damage = new Damage();
 
     this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth);
+
+    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+
+    this.monsterHealth          = health.monster_hp;
+    this.characterCurrentHealth = health.character_hp;
 
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }
@@ -166,5 +190,9 @@ export default class CastAttack {
 
   addActionMessage(message) {
     this.battleMessages.push({message: message, class: 'action-fired'});
+  }
+
+  addEnemyActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'enemy-action-fired'});
   }
 }

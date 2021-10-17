@@ -20,16 +20,6 @@ class CanHitHandler {
 
     public function canHit($attacker, $defender, bool $isVoided = false): bool {
 
-        if ($attacker instanceof  Character) {
-
-            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
-
-            if ($this->attackExtraActionHandler->canAutoAttack($this->characterInformationBuilder)) {
-                return true;
-            }
-        }
-
-
         $accuracyBonus = $this->fetchAccuracyBonus($attacker);
         $dodgeBonus    = $this->fetchDodgeBonus($defender);
 
@@ -59,6 +49,49 @@ class CanHitHandler {
                 $this->characterInformationBuilder->statMod($attacker->class->to_hit_stat);
 
             $toHit = $this->toHitCalculation($stat, $defender->dex, $accuracyBonus, $dodgeBonus);
+        }
+
+        if ($toHit > 1.0) {
+            return true;
+        }
+
+        $percent = floor((100 - $toHit));
+        $needToHit = 100 - $percent;
+
+        return rand(1, 100) > $needToHit;
+    }
+
+    public function canCast($attacker, $defender, bool $isVoided = false): bool {
+
+        $accuracyBonus = $this->fetchCastingAccuracyBonus($attacker);
+        $dodgeBonus    = $this->fetchDodgeBonus($defender);
+
+        if ($accuracyBonus > 1.0) {
+            return true;
+        }
+
+        if ($dodgeBonus > 1.0) {
+            return false;
+        }
+
+        $toHit = 0;
+
+        if ($defender instanceof  Character) {
+
+            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($defender);
+
+            $stat = $isVoided ? $defender->focus : $this->characterInformationBuilder->statMod('focus');
+
+            $toHit = $this->toHitCalculation($attacker->focus, $stat, $accuracyBonus, $dodgeBonus);
+        }
+
+        if ($attacker instanceof Character) {
+            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
+
+            $stat = $isVoided ? $attacker->{$attacker->class->to_hit_stat} :
+                $this->characterInformationBuilder->statMod($attacker->class->to_hit_stat);
+
+            $toHit = $this->toHitCalculation($stat, $defender->focus, $accuracyBonus, $dodgeBonus);
         }
 
         if ($toHit > 1.0) {
@@ -121,6 +154,25 @@ class CanHitHandler {
         }
 
         return $dodgeBonus;
+    }
+
+    protected function fetchCastingAccuracyBonus($defender) {
+        if ($defender instanceof Monster) {
+            return $defender->casting_accuracy;
+        }
+
+        $bonus    = $defender->skills()->join('game_skills', function($join) {
+            $join->on('game_skills.id', 'skills.game_skill_id')
+                ->where('game_skills.name', 'Casting Accuracy');
+        })->first();
+
+        if (is_null($bonus)) {
+            $bonus = 0.0;
+        } else {
+            $bonus = $bonus->skill_bonus;
+        }
+
+        return $bonus;
     }
 
     /**

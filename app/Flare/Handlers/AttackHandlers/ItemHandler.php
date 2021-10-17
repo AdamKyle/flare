@@ -44,7 +44,7 @@ class ItemHandler {
                 $canResist  = $this->characterInformation->canAffixesBeResisted();
                 $damage     = $this->characterInformation->findLifeStealingAffixes(true);
 
-                $this->useLifeStealingAffixes($damage, $canResist);
+                $this->useLifeStealingAffixes($defender, $damage, $canResist);
             }
         }
 
@@ -120,7 +120,7 @@ class ItemHandler {
         }
     }
 
-    public function useLifeStealingAffixes(float $damage, bool $canResist = true) {
+    public function useLifeStealingAffixes($defender, float $damage, bool $canResist = true) {
         $totalDamage = ceil($this->currentMonsterHealth * $damage);
 
         if ($totalDamage > 0) {
@@ -132,7 +132,7 @@ class ItemHandler {
                 $this->currentMonsterHealth   -= $totalDamage;
                 $this->currentCharacterHealth += $totalDamage;
             } else {
-                $dc = 100 - (100 * $this->monster->affix_resistance);
+                $dc = 100 - (100 * $defender->affix_resistance);
 
                 if ($dc <= 0 || rand(1, 100) > $dc) {
                     $message = 'The enemy resists your attempt to steal it\'s life.';

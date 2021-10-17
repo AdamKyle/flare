@@ -85,7 +85,7 @@ class MonsterAttackHandler {
             $message = $attacker->name . ' hit for: ' . number_format($monsterAttack);
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
-            $this->useItems($attacker, $defender);
+            $this->useItems($attacker, $defender, $isDefenderVoided);
 
             return;
         } else {
@@ -97,7 +97,7 @@ class MonsterAttackHandler {
                 $message          = 'You blocked the enemies attack!';
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-                $this->useItems($attacker, $defender);
+                $this->useItems($attacker, $defender, $isDefenderVoided);
 
                 return;
             }
@@ -108,7 +108,7 @@ class MonsterAttackHandler {
 
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
-            $this->useItems($attacker, $defender);
+            $this->useItems($attacker, $defender, $isDefenderVoided);
 
              return;
         }
@@ -116,11 +116,54 @@ class MonsterAttackHandler {
         $message          = $attacker->name . ' Missed!';
         $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-        $this->useItems($attacker, $defender);
+        $this->useItems($attacker, $defender, $isDefenderVoided);
+
+        $this->defenderAttmptToHeal($defender, $attacker, $isDefenderVoided);
 
     }
 
-    protected function useItems($attacker, $defender) {
+    protected function defenderAttmptToHeal($defender, $attacker, bool $isDefenderVoided = false) {
+        if ($this->characterHealth <= 0) {
+            $this->attemptToRessurect($defender, $attacker, $isDefenderVoided);
+        } else if (!$isDefenderVoided){
+            $this->useLifestealingAffixes($attacker);
+        }
+    }
+
+    private function attemptToRessurect($defender, $attacker, bool $isDefenderVoided = false) {
+        $resChance = $this->characterInformationBuilder->setCharacter($defender)->fetchResurrectionChance();
+
+        $dc = 100 - 100 * $resChance;
+
+        if (rand(1, 100) > $dc) {
+            $this->characterHealth = 1;
+
+            $message = 'You are pulled back from the void and given one health!';
+            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+
+            if (!$isDefenderVoided) {
+                $this->useLifestealingAffixes($attacker);
+            }
+        }
+    }
+
+    private function useLifestealingAffixes($attacker) {
+        $handler = $this->itemHandler->setCharacterHealth($this->characterHealth)->setMonsterHealth($this->monsterHealth);
+
+        $canResist  = $this->characterInformation->canAffixesBeResisted();
+        $damage     = $this->characterInformation->findLifeStealingAffixes(true);
+
+        $handler->useLifeStealingAffixes($attacker, $damage, $canResist);
+
+        $this->monsterHealth = $handler->getMonsterHealth();
+        $this->characterHealth = $handler->getCharacterHealth();
+
+        $this->battleLogs = [...$this->battleLogs, ...$handler->getBattleMessages()];
+
+        $this->itemHandler->resetLogs();
+    }
+
+    protected function useItems($attacker, $defender, bool $isDefenderVoided = false) {
 
         if (!$this->isMonsterVoided) {
             $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
@@ -134,15 +177,20 @@ class MonsterAttackHandler {
             $this->useAffixes($attacker, $defender);
         }
 
-        $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth);
+        if ($this->canHitHandler->canCast($attacker, $defender, $isDefenderVoided)) {
+            $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth);
 
-        $itemHandler->castSpell($attacker, $defender);
+            $itemHandler->castSpell($attacker, $defender);
 
-        $this->characterHealth = $itemHandler->getCharacterHealth();
+            $this->characterHealth = $itemHandler->getCharacterHealth();
 
-        $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
+            $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
 
-        $itemHandler->resetLogs();
+            $itemHandler->resetLogs();
+        } else {
+            $message = 'The enemy fails to cast their damaging spells!';
+            $this->battleLogs = $this->addMessage($message, 'info-battle', $this->battleLogs);
+        }
 
         $this->heal($attacker, $defender);
     }

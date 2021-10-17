@@ -3,6 +3,7 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Traits\ClassBasedBonuses;
@@ -71,7 +72,9 @@ class CharacterInformationBuilder {
     }
 
     public function getSkill(string $skillName): float {
-        return $this->character->skills()->where('name', $skillName)->first()->skill_bonus;
+        $gameSkillId = GameSkill::where('name', $skillName)->first()->id;
+
+        return $this->character->skills()->where('game_skill_id', $gameSkillId)->first()->skill_bonus;
     }
 
     /**
@@ -781,6 +784,8 @@ class CharacterInformationBuilder {
     protected function getSpellDamage(bool $voided = false): int {
         $damage = 0;
 
+        $bonus = $this->hereticSpellDamageBonus($this->character);
+
         foreach ($this->fetchInventory() as $slot) {
             if ($slot->item->type === 'spell-damage') {
                 if (!$voided) {
@@ -788,6 +793,30 @@ class CharacterInformationBuilder {
                 } else {
                     $damage += $slot->item->base_damage;
                 }
+            }
+        }
+
+        if ($damage === 0) {
+           $classType = $this->character->classType();
+
+           if ($classType->isHeretic()) {
+               if (!$voided) {
+                   $damage = $this->statMod('int') * 0.2;
+               } else {
+                   $damage += $this->character->int * 0.02;
+               }
+
+               return $damage + $damage * $bonus;
+           }
+
+            if ($classType->isProphet()) {
+                if (!$voided) {
+                    $damage = $this->statMod('int') * 0.2;
+                } else {
+                    $damage += $this->character->int * 0.02;
+                }
+
+                return $damage + $damage * $bonus;
             }
         }
 
@@ -806,8 +835,6 @@ class CharacterInformationBuilder {
                 $damage += $damage * ($this->statMod('chr') * 0.15);
             }
         }
-
-        $bonus = $this->hereticSpellDamageBonus($this->character) + $this->prophetDamageBonus($this->character);
 
         return $damage + $damage * $bonus;
     }

@@ -130,6 +130,7 @@ class FightService {
             $this->currentCharacterHealth = $this->monsterAttackHandler->getCharacterHealth();
 
             $this->monsterAttackHandler->resetLogs();
+
         }
 
         return $this->processFight($defender, $attacker, $attackType);
