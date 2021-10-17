@@ -150,7 +150,7 @@ class AttackExtraActionHandler {
             }
 
             $message        = 'There is a thirst child, its in your soul! Lash out and kill!';
-            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
 
             if (!$voided) {
                 $dur = $characterInformationBuilder->statMod('dur');
@@ -166,7 +166,7 @@ class AttackExtraActionHandler {
             $this->characterHealth += $totalAttack;
 
             $message        = $character->name . ' hit for (and healed for) (thirst!) ' . number_format($totalAttack);
-            $this->messages = $this->addMessage($message, 'enemy-action-fired', $this->messages);
+            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
         }
 
         return $monsterCurrentHealth;
@@ -196,7 +196,7 @@ class AttackExtraActionHandler {
             $monsterCurrentHealth = $health;
 
             $message = 'Your spells hit the enemy for: ' . number_format($totalDamage);
-            $this->messages = $this->addMessage($message, 'info-battle', $this->messages);
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
         }
 
         return $monsterCurrentHealth;

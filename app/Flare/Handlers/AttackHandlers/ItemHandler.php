@@ -179,9 +179,10 @@ class ItemHandler {
      *
      * @param $attacker
      * @param $defender
+     * @param int|null $monsterSpellDamage
      * @return array
      */
-    public function castSpell($attacker, $defender) {
+    public function castSpell($attacker, $defender, ?int $monsterSpellDamage = null) {
         $messages = [];
 
         if ($attacker instanceof Character) {
@@ -195,7 +196,7 @@ class ItemHandler {
             $message = 'The enemy begins to cast their spells!';
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-            $messages[] = $this->spellDamage($attacker, $defender);
+            $messages[] = $this->spellDamage($attacker, $defender, $monsterSpellDamage);
         }
 
         return $messages;
@@ -329,8 +330,10 @@ class ItemHandler {
      *
      * @param $attacker
      * @param $defender
+     * @param int|null $monsterSpellDamage
+     * @return void
      */
-    protected function spellDamage($attacker, $defender) {
+    protected function spellDamage($attacker, $defender, ?int $monsterSpellDamage = null) {
         if ($attacker instanceof Character) {
 
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
@@ -347,7 +350,7 @@ class ItemHandler {
 
             $defenderArtifactAnnulment = $this->characterInformationBuilder->getTotalDeduction('spell_evasion');
             $dc                        = 100 - $defenderArtifactAnnulment;
-            $spellDamage               = rand(1, $attacker->max_spell_damage);
+            $spellDamage               = $monsterSpellDamage;
 
             if ($spellDamage > 0) {
                 if ($dc <= 0 || rand(1, 100) > $dc) {

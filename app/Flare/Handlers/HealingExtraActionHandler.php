@@ -24,14 +24,14 @@ class HealingExtraActionHandler {
 
             if (rand(1, 100) > $dc) {
                 $message = 'The heavens open and your wounds start to heal over (Critical heal!)';
-                $this->messages = $this->addMessage($message, 'enemy-action-fired', $this->messages);
+                $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
 
                 $healFor *= 2;
             }
 
             $message          = 'Your healing spell(s) heals for: ' . number_format($healFor);
 
-            $this->messages   = $this->addMessage($message, 'enemy-action-fired', $this->messages);
+            $this->messages   = $this->addMessage($message, 'action-fired', $this->messages);
 
             $characterHealth += $healFor;
 

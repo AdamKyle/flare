@@ -105,8 +105,6 @@ class CastHandler {
         }
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, false, $voided)) {
-            $this->battleLogs      = $this->entrancingChanceHandler->getBattleLogs();
-
             $this->monsterHealth   = $this->attackExtraActionHandler->castSpells($characterInfo, $this->monsterHealth, $defender, $voided);
 
             $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
@@ -159,7 +157,7 @@ class CastHandler {
         }
 
         $message          = 'Your spells fizzeled and failed!';
-        $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+        $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
         $this->useItems($attacker, $defender, $voided);
 

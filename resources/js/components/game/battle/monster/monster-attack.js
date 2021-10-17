@@ -40,7 +40,7 @@ export default class MonsterAttack {
         if (this.isBlocked(previousAttackType, this.defender, damage, isCharacterVoided)) {
           this.addMessage('The enemies attack was blocked!');
 
-          this.useItems(monster, isCharacterVoided, isMonsterVoided);
+          this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
           this.fireOffHealing(monster);
 
@@ -57,7 +57,7 @@ export default class MonsterAttack {
 
         this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
 
-        this.useItems(monster, isCharacterVoided, isMonsterVoided);
+        this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
         this.fireOffHealing(monster);
 
@@ -66,7 +66,7 @@ export default class MonsterAttack {
       } else {
         this.addActionMessage(monster.name + ' missed!');
 
-        this.useItems(monster, isCharacterVoided, isMonsterVoided);
+        this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
         this.fireOffHealing(monster);
 
@@ -116,7 +116,16 @@ export default class MonsterAttack {
     if (AttackType.DEFEND === attackType || AttackType.VOIDED_DEFEND === attackType) {
       const defenderAC = defender.attack_types[attackType].defence;
 
-      return damage < defenderAC;
+
+      if (damage < defenderAC) {
+        return true
+      }
+
+      const chanceToBlock = defenderAC / damage;
+
+      const dc = 100 - 100 * chanceToBlock
+
+      return random(1, 100) > dc;
     }
 
     if (isCharacterVoided) {
@@ -126,7 +135,7 @@ export default class MonsterAttack {
     return damage < defender.ac;
   }
 
-  useItems(attacker, isCharacterVoided, isMonsterVoided) {
+  useItems(attacker, isCharacterVoided, isMonsterVoided, previousAttackType) {
 
     if (!isMonsterVoided) {
       const useItems = new UseItems(this.defender, this.currentMonsterHealth, this.currentCharacterHealth);
@@ -140,7 +149,7 @@ export default class MonsterAttack {
       this.fireOffAffixes(attacker);
     }
 
-    this.fireOffSpells(attacker, this.defender, isCharacterVoided);
+    this.fireOffSpells(attacker, this.defender, isCharacterVoided, previousAttackType);
   }
 
   fireOffAffixes(attacker) {
@@ -160,7 +169,7 @@ export default class MonsterAttack {
     }
   }
 
-  fireOffSpells(attacker, defender, isCharacterVoided) {
+  fireOffSpells(attacker, defender, isCharacterVoided, previousAttackType) {
     if (!this.canCastSpells(attacker, defender, isCharacterVoided)) {
       this.addActionMessage(attacker.name + '\'s Spells fizzle and fail to fire.');
 
@@ -171,6 +180,12 @@ export default class MonsterAttack {
       const evasionChance = 100 - (100 * this.defender.spell_evasion)
       const roll          = random(1, 100);
       let damage          = attacker.spell_damage;
+
+      if (this.isBlocked(previousAttackType, defender, damage, isCharacterVoided)) {
+        this.addHealingMessage('You managed to block the enemies spells with your armour!');
+
+        return;
+      }
 
       if (roll < evasionChance) {
         if (this.canDoCritical(attacker)) {
@@ -191,7 +206,7 @@ export default class MonsterAttack {
   canCastSpells(attacker, defender, isCharacterVoided) {
     const canHit = new CanHitCheck()
 
-    if (canHit.canMonsterCast(attacker, defender, isCharacterVoided)) {
+    if (canHit.canCast(attacker, defender, isCharacterVoided)) {
       return true;
     }
 

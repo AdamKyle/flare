@@ -7,6 +7,7 @@ use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackHandlers\CanHitHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
 use App\Flare\Handlers\AttackHandlers\ItemHandler;
+use App\Flare\Values\AttackTypeValue;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 
 class MonsterAttackHandler {
@@ -70,7 +71,7 @@ class MonsterAttackHandler {
         $this->battleLogs = [];
     }
 
-    public function doAttack($attacker, $defender, bool $isDefenderVoided = false) {
+    public function doAttack($attacker, $defender, string $attackType, bool $isDefenderVoided = false) {
 
         $monsterAttack = explode('-', $attacker->attack_range);
         $monsterAttack = rand($monsterAttack[0], $monsterAttack[1]);
@@ -85,7 +86,7 @@ class MonsterAttackHandler {
             $message = $attacker->name . ' hit for: ' . number_format($monsterAttack);
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
-            $this->useItems($attacker, $defender, $isDefenderVoided);
+            $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
 
             return;
         } else {
@@ -93,11 +94,11 @@ class MonsterAttackHandler {
         }
 
         if ($this->canHitHandler->canHit($attacker, $defender, $isDefenderVoided)) {
-            if ($this->blockedAttack($monsterAttack, $defender, $isDefenderVoided)) {
+            if ($this->blockedAttack($monsterAttack, $defender, $attackType, $isDefenderVoided)) {
                 $message          = 'You blocked the enemies attack!';
-                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-                $this->useItems($attacker, $defender, $isDefenderVoided);
+                $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
 
                 return;
             }
@@ -108,7 +109,7 @@ class MonsterAttackHandler {
 
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
-            $this->useItems($attacker, $defender, $isDefenderVoided);
+            $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
 
              return;
         }
@@ -116,7 +117,7 @@ class MonsterAttackHandler {
         $message          = $attacker->name . ' Missed!';
         $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-        $this->useItems($attacker, $defender, $isDefenderVoided);
+        $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
 
         $this->defenderAttmptToHeal($defender, $attacker, $isDefenderVoided);
 
@@ -163,7 +164,7 @@ class MonsterAttackHandler {
         $this->itemHandler->resetLogs();
     }
 
-    protected function useItems($attacker, $defender, bool $isDefenderVoided = false) {
+    protected function useItems($attacker, $defender, string $attackType, bool $isDefenderVoided = false) {
 
         if (!$this->isMonsterVoided) {
             $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
@@ -178,15 +179,23 @@ class MonsterAttackHandler {
         }
 
         if ($this->canHitHandler->canCast($attacker, $defender, $isDefenderVoided)) {
-            $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth);
+            $itemHandler        = $this->itemHandler->setCharacterHealth($this->characterHealth);
+            $monsterSpellDamage = rand(1, $attacker->max_spell_damage);
 
-            $itemHandler->castSpell($attacker, $defender);
+            if ($this->blockedAttack($monsterSpellDamage, $defender, $attackType, $isDefenderVoided)) {
+                $message = 'You managed to block the enemies spells with your armour!';
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+            } else {
+                $itemHandler->castSpell($attacker, $defender, $monsterSpellDamage);
 
-            $this->characterHealth = $itemHandler->getCharacterHealth();
+                $this->characterHealth = $itemHandler->getCharacterHealth();
 
-            $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
+                $this->battleLogs      = [...$this->battleLogs, ...$itemHandler->getBattleMessages()];
 
-            $itemHandler->resetLogs();
+                $itemHandler->resetLogs();
+            }
+
+
         } else {
             $message = 'The enemy fails to cast their damaging spells!';
             $this->battleLogs = $this->addMessage($message, 'info-battle', $this->battleLogs);
@@ -237,9 +246,30 @@ class MonsterAttackHandler {
         }
     }
 
-    protected function blockedAttack(int $monsterAttack, $defender, bool $isDefenderVoided = false): bool {
+    protected function blockedAttack(int $monsterAttack, $defender, string $attackType, bool $isDefenderVoided = false): bool {
+        $info        = $this->characterInformationBuilder->setCharacter($defender);
+        $isFighter   = $defender->classType()->isFighter();
+        $ac          = $info->buildDefence($isDefenderVoided);
+        $defenderStr = $isDefenderVoided ? $defender->str : $info->statMod('str');
 
-        $ac = $this->characterInformationBuilder->setCharacter($defender)->buildDefence($isDefenderVoided);
+        if ($attackType === AttackTypeValue::DEFEND || $attackType === AttackTypeValue::VOIDED_DEFEND) {
+            if ($isFighter) {
+                $defenderStr += $defenderStr * .15;
+            } else {
+                $defenderStr += $defenderStr * .05;
+            }
+
+            $ac = $ac + $defenderStr;
+
+            if ($monsterAttack < $ac) {
+                 return true;
+            }
+
+            $chance = $ac / $monsterAttack;
+            $dc     = 100 - 100 * $chance;
+
+            return rand(1, 100) > $dc;
+        }
 
         return $monsterAttack < $ac;
     }

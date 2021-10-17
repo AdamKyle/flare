@@ -4,6 +4,7 @@ import MonsterAttack from "../monster/monster-attack";
 import CastAttack from "./attack-types/cast-attack";
 import {random} from "lodash";
 import UseItems from "./attack-types/use-items";
+import Defend from "./attack-types/defend";
 
 export default class Attack {
 
@@ -93,7 +94,7 @@ export default class Attack {
         break;
       case AttackType.DEFEND:
       case AttackType.VOIDED_DEFEND:
-        console.log(attackType);
+        this.state = (new Defend(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth, this.isVoided)).doAttack()
         break;
       default:
         console.log(attackType);

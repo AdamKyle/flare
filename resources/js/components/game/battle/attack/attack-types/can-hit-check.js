@@ -77,7 +77,7 @@ export default class CanHitCheck {
     return this.calculateCanHit(toHitBase);
   }
 
-  canMonsterCast(attacker, defender, isVoided) {
+  canCast(attacker, defender, isVoided) {
     const castingAccuracy = attacker.casting_accuracy;
     let defenderFocus   = defender.focus * 0.05;
 
@@ -93,7 +93,7 @@ export default class CanHitCheck {
 
     return random(1, defenderFocus) > dc;
   }
-  canMonsterCast
+
   calculateCanHit(toHitBase) {
     if (Math.sign(toHitBase) === - 1) {
       toHitBase = Math.abs(toHitBase);

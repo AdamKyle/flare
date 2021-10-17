@@ -4,6 +4,7 @@ namespace App\Flare\Handlers;
 
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
 use App\Flare\Handlers\AttackHandlers\CastHandler;
+use App\Flare\Handlers\AttackHandlers\DefendHandler;
 use App\Flare\Values\AttackTypeValue;
 
 class CharacterAttackHandler {
@@ -18,9 +19,10 @@ class CharacterAttackHandler {
 
     private $monsterCurrentHealth;
 
-    public function __construct(AttackHandler $attackHandler, CastHandler $castHandler) {
+    public function __construct(AttackHandler $attackHandler, CastHandler $castHandler, DefendHandler $defendHandler) {
         $this->attackHandler = $attackHandler;
         $this->castHandler   = $castHandler;
+        $this->defendHandler = $defendHandler;
     }
 
     public function setHealth(int $characterCurrentHealth, int $monsterCurrentHealth): CharacterAttackHandler {
@@ -64,6 +66,7 @@ class CharacterAttackHandler {
                 break;
             case AttackTypeValue::DEFEND:
             case AttackTypeValue::VOIDED_DEFEND:
+                $this->handleDefend($attacker, $defender, $attackType);
                 break;
             default:
                 throw new \Exception('Unexpected value');
@@ -87,10 +90,22 @@ class CharacterAttackHandler {
             ->setCharacterHealth($this->characterCurrentHealth)
             ->doAttack($attacker, $defender, $attackType);
 
-        $this->monsterCurrentHealth   = $this->attackHandler->getMonsterHealth();
-        $this->characterCurrentHealth = $this->attackHandler->getCharacterHealth();
-        $this->battleLogs             = $this->attackHandler->getBattleMessages();
+        $this->monsterCurrentHealth   = $this->castHandler->getMonsterHealth();
+        $this->characterCurrentHealth = $this->castHandler->getCharacterHealth();
+        $this->battleLogs             = $this->castHandler->getBattleMessages();
 
-        $this->attackHandler->resetLogs();
+        $this->castHandler->resetLogs();
+    }
+
+    protected function handleDefend($attacker, $defender, string $attackType) {
+        $this->defendHandler->setMonsterHealth($this->monsterCurrentHealth)
+            ->setCharacterHealth($this->characterCurrentHealth)
+            ->doAttack($attacker, $defender, $attackType);
+
+        $this->monsterCurrentHealth   = $this->defendHandler->getMonsterHealth();
+        $this->characterCurrentHealth = $this->defendHandler->getCharacterHealth();
+        $this->battleLogs             = $this->defendHandler->getBattleMessages();
+
+        $this->defendHandler->resetLogs();
     }
 }

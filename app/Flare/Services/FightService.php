@@ -122,7 +122,7 @@ class FightService {
         if ($attacker instanceof Monster) {
             $this->monsterAttackHandler->setHealth($this->currentMonsterHealth, $this->currentCharacterHealth)
                                        ->setMonsterVoided($this->isMonsterVoided)
-                                       ->doAttack($attacker, $defender, $isDefenderVoided);
+                                       ->doAttack($attacker, $defender, $attackType, $isDefenderVoided);
 
             $this->battleLogs             = [...$this->battleLogs, ...$this->monsterAttackHandler->getBattleLogs()];
 

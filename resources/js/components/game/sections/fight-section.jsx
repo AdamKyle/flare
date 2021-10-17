@@ -36,8 +36,9 @@ const renderAttackAndCastToolTip = (props) => (
 
 const renderDefendToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    Will use your armour class plus 5% of strength and additional 50% of ac to withstand the enemies attack.
-    Will then fire off rings, artifacts and affixes.
+    Will use your armour class plus 5% of your strength. If you're a Fighter, we use 15% of your strength.
+    Only your affixes, rings and artifacts will fire during your round. During the enemies phase you will
+    have a chance to block them assuming you are not entranced.
   </Tooltip>
 );
 

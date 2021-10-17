@@ -8,6 +8,7 @@ use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
 use App\Flare\Handlers\AttackHandlers\CanHitHandler;
 use App\Flare\Handlers\AttackHandlers\CastHandler;
+use App\Flare\Handlers\AttackHandlers\DefendHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
 use App\Flare\Handlers\AttackHandlers\ItemHandler;
 use App\Flare\Handlers\CharacterAttackHandler;
@@ -204,10 +205,20 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(DefendHandler::class, function($app) {
+            return new DefendHandler(
+                $app->make(CharacterAttackBuilder::class),
+                $app->make(EntrancingChanceHandler::class),
+                $app->make(AttackExtraActionHandler::class),
+                $app->make(ItemHandler::class),
+            );
+        });
+
         $this->app->bind(CharacterAttackHandler::class, function($app) {
             return new CharacterAttackHandler(
                 $app->make(AttackHandler::class),
                 $app->make(CastHandler::class),
+                $app->make(DefendHandler::class),
             );
         });
 
