@@ -18,6 +18,7 @@ use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\View\Components\EquipmentButtonForm;
@@ -237,6 +238,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BuildMonsterCacheService(
                 $app->make(Manager::class),
                 $app->make(MonsterTransfromer::class)
+            );
+        });
+
+        $this->app->bind(BuildCharacterAttackTypes::class, function($app) {
+            return new BuildCharacterAttackTypes(
+                $app->make(CharacterAttackBuilder::class),
             );
         });
     }

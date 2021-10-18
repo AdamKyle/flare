@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\SaveEquipmentAsSet;
@@ -32,17 +33,21 @@ class CharacterInventoryController extends Controller {
 
     private $characterTransformer;
 
+    private $buildCharacterAttackTypes;
+
     private $enchantingService;
 
     private $manager;
 
     public function __construct(CharacterInventoryService $characterInventoryService,
                                 CharacterAttackTransformer $characterTransformer,
+                                BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 EnchantingService $enchantingService,
                                 Manager $manager) {
 
         $this->characterInventoryService = $characterInventoryService;
         $this->characterTransformer      = $characterTransformer;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
         $this->enchantingService         = $enchantingService;
         $this->manager                   = $manager;
     }
@@ -437,10 +442,12 @@ class CharacterInventoryController extends Controller {
     }
 
     protected function updateCharacterAttakDataCache(Character $character) {
+        $this->buildCharacterAttackTypes->buildCache($character);
+
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
-        Cache::put('characterData-' . $character->id, $this->manager->createData($characterData)->toArray());
+        $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats(Cache::get('characterData-' . $character->id), $character->user));
+        event(new UpdateAttackStats($characterData, $character->user));
     }
 }

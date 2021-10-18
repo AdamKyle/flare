@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Services\BuildCharacterAttackTypes;
 use Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
@@ -28,13 +29,15 @@ class CharacterInventoryController extends Controller {
 
     private $characterTransformer;
 
+    private $buildCharacterAttackTypes;
+
     private $manager;
 
-
-    public function __construct(EquipItemService $equipItemService, CharacterAttackTransformer $characterTransformer, Manager $manager) {
+    public function __construct(EquipItemService $equipItemService, BuildCharacterAttackTypes $buildCharacterAttackTypes, CharacterAttackTransformer $characterTransformer, Manager $manager) {
 
         $this->equipItemService     = $equipItemService;
         $this->characterTransformer = $characterTransformer;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
         $this->manager              = $manager;
 
         $this->middleware('auth');
@@ -163,10 +166,12 @@ class CharacterInventoryController extends Controller {
     }
 
     protected function updateCharacterAttakDataCache(Character $character) {
+        $this->buildCharacterAttackTypes->buildCache($character);
+
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
-        Cache::put('character-data-' . $character->id, $this->manager->createData($characterData)->toArray());
+        $character = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats(Cache::get('character-data-' . $character->id), $character->user));
+        event(new UpdateAttackStats($character, $character->user));
     }
 }

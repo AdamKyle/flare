@@ -40,11 +40,12 @@ class BattleController extends Controller {
 
     public function index(Request $request) {
         $foundCharacter = User::find($request->user_id)->character;
+        $character      = new Item($foundCharacter, $this->character);
         $monsters       = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
 
         return response()->json([
             'monsters'  => $monsters,
-            'character' => Cache::get('character-data-' . $foundCharacter->id)
+            'character' => $this->manager->createData($character)->toArray(),
         ], 200);
     }
 

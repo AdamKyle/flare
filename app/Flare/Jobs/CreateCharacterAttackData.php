@@ -3,10 +3,7 @@
 namespace App\Flare\Jobs;
 
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -31,15 +28,7 @@ class CreateCharacterAttackData implements ShouldQueue
         $this->characterId = $characterId;
     }
 
-    public function handle() {
-        $this->updateCharacterAttakDataCache(Character::find($this->characterId));
-    }
-
-    protected function updateCharacterAttakDataCache(Character $character) {
-        $characterData = new ResourceItem($character, new CharacterAttackTransformer);
-
-        $manager = new Manager();
-
-        Cache::put('characterData-' . $character->id, $manager->createData($characterData)->toArray());
+    public function handle(BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+        $buildCharacterAttackTypes->buildCache(Character::find($this->characterId));
     }
 }

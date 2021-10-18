@@ -4,6 +4,7 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Values\ClassAttackValue;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -34,10 +35,6 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'voided_dex'          => $character->dex,
             'voided_dur'          => $character->dur,
             'voided_focus'        => $character->focus,
-            'attack'              => $characterInformation->buildAttack(),
-            'voided_attack'       => $characterInformation->buildAttack(true),
-            'ac'                  => $characterInformation->buildDefence(),
-            'voided_ac'           => $characterInformation->buildDefence(true),
             'to_hit_base'         => $this->getToHitBase($character, $characterInformation),
             'voided_to_hit_base'  => $this->getToHitBase($character, $characterInformation, true),
             'base_stat'           => $characterInformation->statMod($character->class->damage_stat),
@@ -64,18 +61,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
-            'attack_types' => [
-                'attack'                 => $characterAttack->buildAttack(),
-                'voided_attack'          => $characterAttack->buildAttack(true),
-                'cast'                   => $characterAttack->buildCastAttack(),
-                'voided_cast'            => $characterAttack->buildCastAttack(true),
-                'cast_and_attack'        => $characterAttack->buildCastAndAttack(),
-                'voided_cast_and_attack' => $characterAttack->buildCastAndAttack(true),
-                'attack_and_cast'        => $characterAttack->buildAttackAndCast(),
-                'voided_attack_and_cast' => $characterAttack->buildAttackAndCast(true),
-                'defend'                 => $characterAttack->buildDefend(),
-                'voided_defend'          => $characterAttack->buildDefend(true),
-            ],
+            'attack_types' => Cache::get('character-attack-data-' . $character->id),
         ];
     }
 
