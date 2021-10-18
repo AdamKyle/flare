@@ -5,6 +5,8 @@ import CastAttack from "./attack-types/cast-attack";
 import {random} from "lodash";
 import UseItems from "./attack-types/use-items";
 import Defend from "./attack-types/defend";
+import CastAndAttack from "./attack-types/cast-and-attack";
+import AttackAndCast from "./attack-types/attack-and-cast";
 
 export default class Attack {
 
@@ -86,11 +88,11 @@ export default class Attack {
         break;
       case AttackType.CAST_AND_ATTACK:
       case AttackType.VOIDED_CAST_AND_ATTACK:
-        console.log(attackType);
+        this.state = (new CastAndAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth, this.isVoided)).doAttack();
         break;
       case AttackType.ATTACK_AND_CAST:
       case AttackType.VOIDED_ATTACK_AND_CAST:
-        console.log(attackType);
+        this.state = (new AttackAndCast(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth, this.isVoided)).doAttack();
         break;
       case AttackType.DEFEND:
       case AttackType.VOIDED_DEFEND:

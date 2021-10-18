@@ -27,7 +27,8 @@ const renderCastAndAttackToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Will attack with spell in spell slot one and weapon in left hand as well as rings, artifacts and affixes.
     Uses Casting Accuracy for the spell and Accuracy for the weapon. If you have a bow equipped, we will use that
-    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat.
+    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat. If you are blocked at any time, both spell and
+    weapon will be blocked.
   </Tooltip>
 );
 
@@ -35,7 +36,8 @@ const renderAttackAndCastToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Will attack with weapon in right hand and spell in spell slot two as well as rings, artifacts and affixes.
     Uses Accuracy for the weapon and then Casting Accuracy for the spell. If you have a bow equipped, we will use that
-    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat.
+    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat. If you are blocked at any time, both spell and
+    weapon will be blocked.
   </Tooltip>
 );
 

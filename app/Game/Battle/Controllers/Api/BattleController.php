@@ -39,7 +39,15 @@ class BattleController extends Controller {
     }
 
     public function index(Request $request) {
-        $foundCharacter = User::find($request->user_id)->character;
+        $user           = User::find($request->user_id);
+
+        if ($user->id !== auth()->user()->id) {
+            return response()->json([
+                'message' => 'You do not have permission to do that.'
+            ], 422);
+        }
+
+        $foundCharacter = $user->character;
         $character      = new Item($foundCharacter, $this->character);
         $monsters       = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
 

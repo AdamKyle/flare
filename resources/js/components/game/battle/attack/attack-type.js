@@ -17,11 +17,11 @@ export default class AttackType {
   }
 
   static get CAST_AND_ATTACK() {
-    return 'cast_an_attack';
+    return 'cast_and_attack';
   }
 
   static get VOIDED_CAST_AND_ATTACK() {
-    return 'voided_cast_an_attack';
+    return 'voided_cast_and_attack';
   }
 
   static get ATTACK_AND_CAST() {
