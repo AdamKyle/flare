@@ -1,15 +1,24 @@
 # Combat
 
-Tlessa at it's core is all about fighting monsters to get better gear to take on harder creatures. There are various [affixes](/information/enchanting)
-that can effect gear and thus your modded stats. When you equip gear that increases a stat by x%, we do not increase your base stat, instead
-we add all the bonuses onto the stat, one at a time:
+As of 1.1.9 combat for Tlessa has changed drastically in relation to how one attacks an enemy.
 
-    $stat = $stat + $stat * $bonus
+Before 1.1.9 you had one attack button, you would select the monster, attack and throw everything you had at the monster. This made for some powerful, broken, out of balance builds.
 
-This done in a loop, thus your stats can get very high very quickly. On top of this is layered things like your skills base damage modifier
-or your armour class modifier.
+As of 1.1.9 you now have five different attack types:
 
-When your character attacks, we break down your attack for you:
+- Attack
+- Cast
+- Cast and Attack
+- Attack and Cast
+- Defend
+
+When you go on adventures, you will also have to select which attack type to use when entering the adventure. This attack type cannot be changed and used for all floors of the adventure.
+
+<div class="mb-4">
+    <a href="/storage/info/combat/images/attack.png" class="glightbox">
+        <img src="/storage/info/combat/images/attack.png" class="img-fluid" />
+    </a>
+</div>
 
 <div class="mb-4">
     <a href="/storage/info/combat/images/attack-info.png" class="glightbox">
@@ -17,84 +26,118 @@ When your character attacks, we break down your attack for you:
     </a>
 </div>
 
-The more types of items you have equipped the more damage you can do. Each item in the shop will increase your stats. 
-Specific affixes that you can only attach via enchanting, can add increased power on top of this.
+It&#39;s important to pay attention to your class to determine which attack is best for you. Of course, Tlessa wants you to experiment. Let&#39;s go over the attack types:
 
-> ### ATTN!
-> 
-> A character fully decked out in shop gear, with no affixes, can make it to the bottom of the surface critter list and most of the way
-> down Labyrinth and Dungeons list. The first [Celestial Entity](/information/celestials) for surface is also able to be
-> taken down by characters with high stats.
-> 
-> Harder creatures will involve you training crafting and enchanting to make even more powerful craft only gear
-> that will help in taking these harder creatures down.
+## Attack
 
-## Core Concept
+Requires you to level Accuracy and your class skill for added damage.
 
-Kill the creature in one hit and be able to attack again as fast as possible. 
+Clicking attack will use your best weapon unless you are a fighter. If you are a fighter, we will use both your weapons. Of course, your class skill for fighters has two ways you could go: Tank (weapon and shield) or Glass Cannon (Two weapons).
 
-This where skills that effect Fight Timout Modifier
-or gear that effect the skill (a combination of both) comes in handy in relation to the damage you can do and avoid taking.
+If you have no weapons equipped, we will use 2% of your primary damage stat. This will allow you with two shields, to attack.
 
-The faster you can kill = the more you kill = more rewards.
+When attacking, your artifacts, affixes and rings will fire.
 
-## Stats and Level matter.
+You can still be resurrected if you have a healing spell equipped, but instead of healing with spells, you will only get 1 health for resurrecting. If you have life stealing affixes attached, these can also fire, however resurrecting and healing will only happen at the end of the enemies turn assuming the enemy is not dead.
 
-Having the best gear is great, but first you will have to work your way there. Every character has two stats to focus on and a class skill
-that increases their damage, healing, ac, fight time out modifiers or a combination of the aforementioned.
+Class skills have a chance to fire (to do damage) once during this attack. Class Skill bonuses are automatically applied assuming you follow its rules.
 
-As you level, you get 1 point in each stat and 2 in your primary damage stat. You can see your damage stat on the [character sheet](/information/character-stats).
+## Cast
 
-This combined with gear, affixes and skill bonuses will power your character up the proverbial ladder.
+Requires you to level Casting Accuracy
 
-## How Does Attack Work?
+This is a Heretics, Prophets and Vampires best attack
 
-The attack formula:
+Clicking cast will fire off both your damage and healing spells. If you have two damage spells, you will use both. Same if you have two healing spells.
 
-    hitChance = ((toHit + toHit * accuracy) / 100);
+Casters get 15% (30% for heretics) of their damage stat added towards their attack.
 
-    return (enemyDex + enemyDex * dodge) - hitChance; // Gives percentage
+When determining if a caster can hit, we use the casters focus (25% of) + their casting accuracy against the enemy&#39;s dodge.
 
-That is to see if you can hit, if you can hit, we then check if your base stat, the damage stat, is greater than their ac or not.
+Prophets get 30% towards their healing spells (a total of 32% if they have no healing spell) and Rangers get 15% (total of 17% of their chr if you have no healing spell) towards their healing spells.
 
-Should you miss, your artifacts and spells as well as rings will then fire. Even if you do not miss, your spells, rings and artifacts will fire. The same thing can happen for enemies, their spells can fire as well.
-Your healing will kick in only if you are in need of healing.
+Casters get 2% of their damage stat as a cast attack if they have no damage spells equipped (and 30% of their int for a total of 32% if you are a heretic). This is the only class(es) that can cast without spells.
 
-Because healing spells have a chance to resurrect you upon death, if you die, that chance, combined from items and class 
-based bonuses is compared to see if you can automatically resurrect and fight again.
+Rangers can use their healing without having a healing spell equipped, but this attack is useless for them.
 
-Prophets have an automatic 5% chance to resurrect.
+Class skills (damage) have a chance to twice here for casters and vampires. Once for the spell damage and once for the healing spell.
 
-If you have two healing spells at 70% chance to resurrect that's an instant resurrect as the percentage chance is now 140%.
+Casters will want two damage spells, whereas vampires will want one of each and two shields for added dur.
 
-## Spells, Artifacts and Rings matter
+When casting it&#39;s your spells then your rings, artifacts and affixes
 
-As mentioned earlier, spells, artifacts and rings can fire independently of weather you miss or not. Rings will increase spell evasion and artifact annulment to
-reduce the enemies spells and artifacts. Normal Critters will not pose an issue, however [Celestial Entities](/information/celestials) will have spell evasion and artifact annulment as well as be able to cast
-spells and use artifacts.
+## Cast and Attack and Attack and Cast
 
-## Spell Evasion and Artifact annulment
+Requires Both Casting Accuracy and Accuracy
 
-These two stats only effect your ability to reduce the enemies spell damage and artifact damage that an enemy can have. While regular critters, that is
-from the drop-down list (unless otherwise specified) do not have spells or artifacts that fire, [Celestial Entities](/information/celestials) do.
+Rangers and thieves might appreciate this attack.
 
-As mentioned, rings will increase this evasion. If you manage to have over 100% then you will take no spell or artifact damage.
+Cast and attack will first cast with the spell in **spell slot one** and the weapon in **the right hand.**
 
-## Bows
+If you have a bow equipped you will use that, regardless of which hand it&#39;s in as bows are duel wield weapons.
 
-Bows are a new weapon type in Tlessa that allow the character to attack faster. These are the only weapons that affect fight time out modifier across all
-skills that have a fight time out modifier bonus.
+If an enemy blocks your cast, it will block both weapon and cast. You will fumble with your weapon and miss with your spell.
 
-Bows also only increase AGI and Dex unlike other weapons that increase all stats except for Focus and Agi. Bows are duel welded and will
-not allow you to have another weapon equipped. Bows are generally for Rangers.
+However, if your spell is a healing spell, even if it states your damage spell missed, and you fumbled with your weapon – your healing spell will still fire.
 
-## Class Skills
+The same holds true if you miss. If you &quot;miss&quot; with your damage spell, you will also miss with your weapon, but your healing spell can still fire. This assumes the healing spell is in slot one.
 
-When it comes to combat, accuracy and you to hit stat, along with your damage stat are the vital aspects of the game - the higher these values, the better the
-chance to hit, however some class skills effect aspects of your character: For example having a shield and weapon equipped as a fighter gives you
-your class skills attack and defence bonus modifiers, however choosing to duel wield two weapons only gets your attack bonus.
+If you do manage to cast, your weapon can then either miss or be blocked.
 
-Class Skills raise a set of bonuses and modifiers over time while fighting creatures. It is suggested that players go for this skill and accuracy, 
-flipping back and forth as they level. However, players are free to level what ever skills they choose, in any order.
+Note: The reason missed is in quotes, is because even if you have a bow and a healing spell, we still must see if you can &quot;cast&quot;, even though healing spells can never miss. This allows us to say you missed with your weapon and spell or (in the case that you were blocked) that you were blocked with your weapon and spell.
 
+For Attack and cast, it&#39;s the same but reversed. Left-hand weapon then spell **slot two** will fire. The same concept applies as it does for cast and attack.
 
+You have a chance for your class skill to fire twice if you are a vampire and once otherwise. For the vampire class skill to have a chance to fire twice, your weapon and damage spell cannot miss else it&#39;s a one-time chance (if you have a healing spell equipped in the appropriate slot)
+
+## Defend
+
+Best for Fighters, require no skill.
+
+Defend will use 15% of the fighter&#39;s strength on top of their armour class or 5% of your strength on top of the armour class if you are not a fighter.
+
+When you use this attack option, you will muster all the strength you have to block not just the enemies attack but potentially their spells as well.
+
+After which your affixes and artifacts will also fire.
+
+No class skills would fire on defend.
+
+## Regarding Voidance
+
+If you are voided at any time during the attack, we will fall back to raw values for stats and items you use in the attack. 
+This means no affixes, no modded stats and no boons.
+
+## Regarding Life Stealing Affixes That Stack
+
+Vampires are the only class who have life stealing skills that can stack:
+
+Vampires life stealing affixes do stack, but its 100% of the first ones damage and then 50% for each additional one divided by
+4 and subtracted for 100 to get your total damage. Here's an example:
+
+```
+    // Assume you have 5 suffixes for life stealing, Vampires are the only class where these affixes stack.
+    // Lets assume all 5 are at 25% of the enemies durability.
+
+    suffixTotal = 0.25 * (0.175 * 0.175 * 0.175) * 100 // => ~13%
+
+    // Assume you have two prefixes at 25% and 2 at 10%:
+    prefixTotal = 0.25 * (0.175 * 0.05 * 0.05) * 100 // => ~1%
+
+    suffix + prefix = 14.49%
+```
+
+The order of your prefixes and suffixes do not matter as we re-arrange the damage values for you and always start with the highest.
+
+## Attacking Skills
+
+When it comes to combat, depending on the attack and your class, you will want to focus on either Accuracy or Casting Accuracy or both.
+
+Criticality is another skill that when leveled, based on its skill bonus, has a chance to let you do twice the damage. Enemies also have this skill a long with accuracy and casting accuracy.
+
+Each class skill for each character now can modify your base damage, so you will also want to focus some time on leveling that skill.
+
+**Which one do I do first**
+
+Focus on either Accuracy or Casting Accuracy for the first 100 or so skill levels to make sure you can hit something.
+
+Then do your class skill followed by your Criticality for a chance to do double damage.
