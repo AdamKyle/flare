@@ -338,7 +338,7 @@ class CharacterInformationBuilder {
 
             if ($hasHealingSpells) {
                 if ($voided) {
-                    $healingAmount += $this->character->{$dmgStat};
+                    $healingAmount += $this->character->{$dmgStat} * 0.30;
                 } else {
                     $healingAmount += $this->statMod($this->character->{$dmgStat}) * 0.30;
                 }

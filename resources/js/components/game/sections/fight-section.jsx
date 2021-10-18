@@ -8,29 +8,34 @@ import Voidance from "../battle/attack/voidance";
 
 const renderAttackToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    Will attack with both weapons, rings, artifacts and affixes.
-    Uses Accuracy for weapons.
+    If you are a fighter, you will attack with both weapons if you have them equipped.
+    If you are not a fighter, you will attack with the best weapon.
+    If you have no weapon equipped, you will attack with 2% of your primary damage stat.
   </Tooltip>
 );
 
 const renderCastingToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    Will attack with both spells, rings, artifacts and affixes.
-    Uses Casting Accuracy for spells.
+    We will attack with both spells. Casters get an additional 15% of your primary damage stat. If you have healing spells,
+    prophets will get 30% towards healing spells and Rangers get 15% towards healing spells. If you have no spells equipped
+    and are a prophet or heretic, you will attack with 2% of your primary damage stat.
+    Prophets and Rangers can heal for 30% and 15% (respectively) of their chr even with no spell equipped.
   </Tooltip>
 );
 
 const renderCastAndAttackToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Will attack with spell in spell slot one and weapon in left hand as well as rings, artifacts and affixes.
-    Uses Casting Accuracy for the spell and Accuracy for the weapon.
+    Uses Casting Accuracy for the spell and Accuracy for the weapon. If you have a bow equipped, we will use that
+    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat.
   </Tooltip>
 );
 
 const renderAttackAndCastToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Will attack with weapon in right hand and spell in spell slot two as well as rings, artifacts and affixes.
-    Uses Accuracy for the weapon and then Casting Accuracy for the spell.
+    Uses Accuracy for the weapon and then Casting Accuracy for the spell. If you have a bow equipped, we will use that
+    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat.
   </Tooltip>
 );
 
@@ -38,7 +43,7 @@ const renderDefendToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Will use your armour class plus 5% of your strength. If you're a Fighter, we use 15% of your strength.
     Only your affixes, rings and artifacts will fire during your round. During the enemies phase you will
-    have a chance to block them assuming you are not entranced.
+    have a chance to block them (including their spells) assuming you are not entranced.
   </Tooltip>
 );
 
