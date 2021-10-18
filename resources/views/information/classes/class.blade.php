@@ -67,6 +67,29 @@
                                 ])}}" class="btn btn-primary mt-2">Edit</a>
                             @endif
                         @endif
+                        @if ($class->type()->isFighter())
+                            @include('information.classes.partials.fighter')
+                        @endif
+
+                        @if ($class->type()->isRanger())
+                            @include('information.classes.partials.ranger')
+                        @endif
+
+                        @if ($class->type()->isThief())
+                            @include('information.classes.partials.thief')
+                        @endif
+
+                        @if ($class->type()->isProphet())
+                            @include('information.classes.partials.prophet')
+                        @endif
+
+                        @if ($class->type()->isHeretic())
+                            @include('information.classes.partials.heretic')
+                        @endif
+
+                        @if ($class->type()->isVampire())
+                            @include('information.classes.partials.vampire')
+                        @endif
                     </div>
                 </div>
             </div>

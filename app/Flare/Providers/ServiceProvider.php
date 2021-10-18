@@ -5,8 +5,10 @@ namespace App\Flare\Providers;
 
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
+use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
 use App\Flare\Handlers\AttackHandlers\CanHitHandler;
+use App\Flare\Handlers\AttackHandlers\CastAndAttackHandler;
 use App\Flare\Handlers\AttackHandlers\CastHandler;
 use App\Flare\Handlers\AttackHandlers\DefendHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
@@ -208,6 +210,28 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CastAndAttackHandler::class, function($app) {
+            return new CastAndAttackHandler(
+                $app->make(CharacterAttackBuilder::class),
+                $app->make(EntrancingChanceHandler::class),
+                $app->make(AttackExtraActionHandler::class),
+                $app->make(HealingExtraActionHandler::class),
+                $app->make(ItemHandler::class),
+                $app->make(CanHitHandler::class),
+            );
+        });
+
+        $this->app->bind(AttackAndCastHandler::class, function($app) {
+            return new AttackAndCastHandler(
+                $app->make(CharacterAttackBuilder::class),
+                $app->make(EntrancingChanceHandler::class),
+                $app->make(AttackExtraActionHandler::class),
+                $app->make(HealingExtraActionHandler::class),
+                $app->make(ItemHandler::class),
+                $app->make(CanHitHandler::class),
+            );
+        });
+
         $this->app->bind(DefendHandler::class, function($app) {
             return new DefendHandler(
                 $app->make(CharacterAttackBuilder::class),
@@ -221,6 +245,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterAttackHandler(
                 $app->make(AttackHandler::class),
                 $app->make(CastHandler::class),
+                $app->make(CastAndAttackHandler::class),
+                $app->make(AttackAndCastHandler::class),
                 $app->make(DefendHandler::class),
             );
         });

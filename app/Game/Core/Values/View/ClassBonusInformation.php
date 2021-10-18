@@ -72,7 +72,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isVampire()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::VAMPIRE_THIRST);
             $details['requires'] = 'N/A';
-            $details['description'] = 'Everytime you attack, you will do an additional 5% of your durability. This will fire automatically.';
+            $details['description'] = 'Everytime you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy as both attack and healing.';
         }
 
         return $details;

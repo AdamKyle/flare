@@ -75,8 +75,7 @@ class FightService {
         if (!is_null($newAttackType)) {
             $attackType = $newAttackType . $attackType;
         } else {
-            $attackType = explode('_', $attackType);
-            $attackType = count($attackType) > 1 ? $attackType[1] : $attackType[0];
+            $attackType = str_replace('voided_' , '', $attackType);
         }
 
         $this->battleLogs = [...$this->battleLogs, ...$this->setupFightHandler->getBattleMessages()];

@@ -163,7 +163,7 @@ class CharacterInformationBuilder {
         });
 
         if ($canStack) {
-            return ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix')) / 2;
+            return ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix'));
         }
 
         $values = [];
@@ -188,9 +188,11 @@ class CharacterInformationBuilder {
             if (empty($values)) {
                 $values[] = $slot->item->{$type}->steal_life_amount;
             } else {
-                $values[] = ($slot->item->{$type}->steal_life_amount / 4);
+                $values[] = ($slot->item->{$type}->steal_life_amount);
             }
         }
+
+        rsort($values);
 
         $totalPercent = 0;
 
@@ -198,11 +200,11 @@ class CharacterInformationBuilder {
             if ($totalPercent === 0) {
                 $totalPercent = $value;
             } else {
-                $totalPercent *= $value;
+                $totalPercent *= ($value / 2);
             }
         }
 
-        return 1 - $totalPercent;
+        return $totalPercent * 100;
     }
 
     public function getEntrancedChance(): float {
@@ -836,9 +838,9 @@ class CharacterInformationBuilder {
 
         if ($this->character->classType()->isHeretic()) {
             if ($voided) {
-                $damage += $damage * ($this->character->int * 0.15);
+                $damage += $damage * ($this->character->int * 0.30);
             } else {
-                $damage += $damage * ($this->statMod('int') * 0.15);
+                $damage += $damage * ($this->statMod('int') * 0.30);
             }
         }
 

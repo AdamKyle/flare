@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\CharacterClassValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameClassFactory;
@@ -55,6 +56,10 @@ class GameClass extends Model
 
     public function gameSkills() {
         return $this->hasMany(GameSkill::class, 'game_class_id', 'id');
+    }
+
+    public function type() {
+        return new CharacterClassValue($this->name);
     }
 
 

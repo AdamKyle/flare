@@ -63,12 +63,12 @@ export default class AttackAndCast {
 
     const canHitCheck      = new CanHitCheck();
 
-    const canHit           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
+    const canHit           = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, $voided);
 
     this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
     if (canHit) {
-      if (this.canBlock()) {
+      if (this.canBlock(attackData.spell_damage + attacker.weapon_damage)) {
         this.addEnemyActionMessage(this.defender.name + ' Blocked both your damage spell and attack!');
 
         if (attackData.heal_for > 0) {
@@ -88,16 +88,15 @@ export default class AttackAndCast {
 
       if (attackData.spell_damage > 0) {
         if (canCast) {
+          if (this.canBlock(attackData.spell_damage)) {
+            this.addEnemyActionMessage('Your damaging spells were blocked!');
+          }
           castAttack.attackWithSpells(attackData);
         }
 
         this.addEnemyActionMessage('Your damage spell missed!');
 
       } else if (attackData.heal_for > 0) {
-        castAttack.healWithSpells(attackData);
-      }
-
-      if (attackData.heal_for > 0) {
         castAttack.healWithSpells(attackData);
       }
 
@@ -152,8 +151,8 @@ export default class AttackAndCast {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  canBlock() {
-    return this.defender.ac > this.attacker.base_stat;
+  canBlock(damage) {
+    return this.defender.ac > damage;
   }
 
   addMessage(message) {

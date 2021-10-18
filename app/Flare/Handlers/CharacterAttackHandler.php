@@ -2,7 +2,9 @@
 
 namespace App\Flare\Handlers;
 
+use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
+use App\Flare\Handlers\AttackHandlers\CastAndAttackHandler;
 use App\Flare\Handlers\AttackHandlers\CastHandler;
 use App\Flare\Handlers\AttackHandlers\DefendHandler;
 use App\Flare\Values\AttackTypeValue;
@@ -13,16 +15,30 @@ class CharacterAttackHandler {
 
     private $castHandler;
 
+    private $castAndAttackHandler;
+
+    private $attackAndCastHandler;
+
+    private $defendHandler;
+
     private $battleLogs = [];
 
     private $characterCurrentHealth;
 
     private $monsterCurrentHealth;
 
-    public function __construct(AttackHandler $attackHandler, CastHandler $castHandler, DefendHandler $defendHandler) {
-        $this->attackHandler = $attackHandler;
-        $this->castHandler   = $castHandler;
-        $this->defendHandler = $defendHandler;
+    public function __construct(
+        AttackHandler $attackHandler,
+        CastHandler $castHandler,
+        CastAndAttackHandler $castAndAttackHandler,
+        AttackAndCastHandler $attackAndCastHandler,
+        DefendHandler $defendHandler
+    ) {
+        $this->attackHandler        = $attackHandler;
+        $this->castHandler          = $castHandler;
+        $this->castAndAttackHandler = $castAndAttackHandler;
+        $this->attackAndCastHandler = $attackAndCastHandler;
+        $this->defendHandler        = $defendHandler;
     }
 
     public function setHealth(int $characterCurrentHealth, int $monsterCurrentHealth): CharacterAttackHandler {
@@ -49,6 +65,7 @@ class CharacterAttackHandler {
     }
 
     public function handleAttack($attacker, $defender, string $attackType) {
+        dump($attackType);
         switch ($attackType) {
             case AttackTypeValue::ATTACK:
             case AttackTypeValue::VOIDED_ATTACK:
@@ -60,9 +77,11 @@ class CharacterAttackHandler {
                 break;
             case AttackTypeValue::CAST_AND_ATTACK:
             case AttackTypeValue::VOIDED_CAST_AND_ATTACK:
+                $this->handleCastAndAttack($attacker, $defender, $attackType);
                 break;
             case AttackTypeValue::ATTACK_AND_CAST:
             case AttackTypeValue::VOIDED_ATTACK_AND_CAST:
+                $this->handleAttackAndCast($attacker, $defender, $attackType);
                 break;
             case AttackTypeValue::DEFEND:
             case AttackTypeValue::VOIDED_DEFEND:
@@ -95,6 +114,30 @@ class CharacterAttackHandler {
         $this->battleLogs             = $this->castHandler->getBattleMessages();
 
         $this->castHandler->resetLogs();
+    }
+
+    protected function handleCastAndAttack($attacker, $defender, string $attackType) {
+        $this->castAndAttackHandler->setMonsterHealth($this->monsterCurrentHealth)
+            ->setCharacterHealth($this->characterCurrentHealth)
+            ->doAttack($attacker, $defender, $attackType);
+
+        $this->monsterCurrentHealth   = $this->castAndAttackHandler->getMonsterHealth();
+        $this->characterCurrentHealth = $this->castAndAttackHandler->getCharacterHealth();
+        $this->battleLogs             = $this->castAndAttackHandler->getBattleMessages();
+
+        $this->castAndAttackHandler->resetLogs();
+    }
+
+    protected function handleAttackAndCast($attacker, $defender, string $attackType) {
+        $this->attackAndCastHandler->setMonsterHealth($this->monsterCurrentHealth)
+            ->setCharacterHealth($this->characterCurrentHealth)
+            ->doAttack($attacker, $defender, $attackType);
+
+        $this->monsterCurrentHealth   = $this->attackAndCastHandler->getMonsterHealth();
+        $this->characterCurrentHealth = $this->attackAndCastHandler->getCharacterHealth();
+        $this->battleLogs             = $this->attackAndCastHandler->getBattleMessages();
+
+        $this->attackAndCastHandler->resetLogs();
     }
 
     protected function handleDefend($attacker, $defender, string $attackType) {

@@ -89,7 +89,7 @@ export default class CanHitCheck {
       defenderFocus = defenderFocus * 0.25;
     }
 
-    const dc = Math.ceil(defenderFocus - defenderFocus * castingAccuracy);
+    const dc = Math.ceil(defenderFocus + defenderFocus * castingAccuracy);
 
     return random(1, defenderFocus) > dc;
   }
