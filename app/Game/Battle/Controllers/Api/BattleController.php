@@ -5,6 +5,7 @@ namespace App\Game\Battle\Controllers\Api;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -39,12 +40,11 @@ class BattleController extends Controller {
 
     public function index(Request $request) {
         $foundCharacter = User::find($request->user_id)->character;
-        $character = new Item($foundCharacter, $this->character);
-        $monsters  = new Collection(Monster::where('published', true)->where('is_celestial_entity', false)->where('game_map_id', $foundCharacter->map->game_map_id)->orderBy('max_level', 'asc')->get(), $this->monster);
+        $monsters       = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
 
         return response()->json([
-            'monsters'  => $this->manager->createData($monsters)->toArray(),
-            'character' => $this->manager->createData($character)->toArray()
+            'monsters'  => $monsters,
+            'character' => Cache::get('character-data-' . $foundCharacter->id)
         ], 200);
     }
 

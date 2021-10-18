@@ -4,6 +4,7 @@ namespace App\Flare\View\Livewire\Admin\Monsters\Partials;
 
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
+use App\Flare\Services\BuildMonsterCacheService;
 use Livewire\Component;
 
 class QuestItem extends Component
@@ -37,6 +38,8 @@ class QuestItem extends Component
             } else {
                 $this->monster->save();
 
+                resolve(BuildMonsterCacheService::class)->buildCache();
+
                 $message = 'Created monster: ' . $this->monster->refresh()->name;
 
                 if ($this->editing) {
@@ -51,7 +54,7 @@ class QuestItem extends Component
         } else {
             $this->monster->save();
 
-            $message = 'Created monster: ' . $this->monster->refresh()->name;
+            $message = 'Created monster: ' . $this->monster->refresh()->name . ' do not forget to publish the monster.';
 
             $this->emitTo('core.form-wizard', $functionName, $index, true, [
                 'type'    => 'success',

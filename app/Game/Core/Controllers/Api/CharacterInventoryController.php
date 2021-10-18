@@ -11,6 +11,7 @@ use App\Game\Core\Requests\UseManyItemsValidation;
 use App\Game\Core\Services\UseItemService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
@@ -200,8 +201,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $characterData = new ResourceItem($character, $this->characterTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -313,8 +313,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -347,8 +346,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $characterData = new ResourceItem($character, $this->characterTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -403,8 +401,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $characterData = new ResourceItem($character, $this->characterTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -437,5 +434,13 @@ class CharacterInventoryController extends Controller {
         UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first()->id);
 
         return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
+    }
+
+    protected function updateCharacterAttakDataCache(Character $character) {
+        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+
+        Cache::put('characterData-' . $character->id, $this->manager->createData($characterData)->toArray());
+
+        event(new UpdateAttackStats(Cache::get('characterData-' . $character->id), $character->user));
     }
 }

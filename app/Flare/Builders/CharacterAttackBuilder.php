@@ -113,28 +113,65 @@ class CharacterAttackBuilder {
             }
         }
 
+        if (is_null($weaponDamage)) {
+            $weaponDamage = 0;
+        }
+
+        $damageStat   = $this->characterInformationBuilder->buildCharacterDamageStat($voided);
+
+        $weaponDamage = $this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided);
+
+        $weaponDamage = round($damageStat + $weaponDamage);
+
         if (!is_null($spellSlotOne)) {
-            if (!$voided) {
-                $spellDamage = $spellSlotOne->item->getTotalDamage();
-            } else {
-                $spellDamage = $spellSlotOne->item->base_damage;
+            if ($spellSlotOne->item->type === 'spell-damage') {
+                if (!$voided) {
+                    $spellDamage = $spellSlotOne->item->getTotalDamage();
+                } else {
+                    $spellDamage = $spellSlotOne->item->base_damage;
+                }
+
+                $bonus = $this->characterInformationBuilder->hereticSpellDamageBonus($this->character);
+
+                $spellDamage = $this->characterInformationBuilder->calculateClassSpellDamage($spellDamage, $voided);
+
+                $spellDamage = $spellDamage + $spellDamage * $bonus;
             }
 
-            $bonus = $this->characterInformationBuilder->hereticSpellDamageBonus($this->character);
+            if ($spellSlotOne->item->type === 'spell-healing') {
+                $spellDamage = $this->characterInformationBuilder->buildHealFor($voided);
+            }
 
-            $spellDamage = $spellDamage + $spellDamage * $bonus;
+            if ($spellSlotOne->item->type === 'spell-damage') {
+                $attack['spell_damage'] = $spellDamage;
+                $attack['heal_for']     = 0;
+            } else {
+                $attack['heal_for']     = $spellDamage;
+                $attack['spell_damage'] = 0;
+            }
+        } else {
+            $attack['spell_damage']  = 0;
+            $attack['heal_for']      = 0;
         }
 
         $attack['weapon_damage'] = $weaponDamage;
-        $attack['spell_damage']  = $spellDamage;
 
         return $attack;
     }
 
     protected function fetchSlot(string $position): InventorySlot|SetSlot|null {
-        return $this->characterInformationBuilder->fetchInventory()->filter(function($slot) use($position) {
+        $slot = $this->characterInformationBuilder->fetchInventory()->filter(function($slot) use($position) {
             return $slot->position === $position && $slot->equipped;
         })->first();
+
+        // Check to see if the user is holding a bow.
+        if (is_null($slot) && ($position === 'left-hand' || $position === 'right-hand')) {
+            $slot = $this->characterInformationBuilder->fetchInventory()->filter(function($slot) use($position) {
+                return $slot->item->type === 'bow';
+            })->first();
+        }
+
+        return $slot;
     }
 
 }

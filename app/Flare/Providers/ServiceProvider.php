@@ -18,6 +18,7 @@ use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\View\Components\EquipmentButtonForm;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -44,6 +45,7 @@ use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
 use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use Blade;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -228,6 +230,13 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterAttackHandler::class),
                 $app->make(MonsterAttackHandler::class),
+            );
+        });
+
+        $this->app->bind(BuildMonsterCacheService::class, function($app) {
+            return new BuildMonsterCacheService(
+                $app->make(Manager::class),
+                $app->make(MonsterTransfromer::class)
             );
         });
     }

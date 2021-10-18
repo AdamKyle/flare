@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Values\MapTileValue;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -187,18 +188,11 @@ class TraverseService {
     protected function updateActions(int $mapId, Character $character) {
         $user      = $character->user;
         $character = new Item($character, $this->characterAttackTransformer);
-        $monsters  = new Collection(
-            Monster::where('published', true)
-                   ->where('game_map_id', $mapId)
-                   ->where('is_celestial_entity', false)
-                   ->orderBy('max_level', 'asc')->get(),
-                   $this->monsterTransformer
-        );
+        $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
 
         $character = $this->manager->createData($character)->toArray();
-        $monster   = $this->manager->createData($monsters)->toArray();
 
-        broadcast(new UpdateActionsBroadcast($character, $monster, $user));
+        broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
     }
 
     /**

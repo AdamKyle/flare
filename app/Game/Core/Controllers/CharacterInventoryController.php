@@ -11,13 +11,9 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\User;
-use App\Flare\Models\InventorySet;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
-use App\Game\Core\Requests\MoveItemRequest;
-use App\Game\Core\Requests\RemoveItemRequest;
-use App\Game\Core\Requests\SaveEquipmentAsSet;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Exceptions\EquipItemException;
@@ -127,6 +123,8 @@ class CharacterInventoryController extends Controller {
                                            ->setCharacter($character)
                                            ->equipItem();
 
+            $this->updateCharacterAttakDataCache($character);
+
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
             return redirect()->to(route('game.character.sheet'))->with('success', $item->affix_name . ' Equipped.');
@@ -159,9 +157,16 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $this->updateCharacterAttakDataCache($character);
 
         return redirect()->back()->with('success', 'Unequipped item.');
+    }
+
+    protected function updateCharacterAttakDataCache(Character $character) {
+        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+
+        Cache::put('character-data-' . $character->id, $this->manager->createData($characterData)->toArray());
+
+        event(new UpdateAttackStats(Cache::get('character-data-' . $character->id), $character->user));
     }
 }

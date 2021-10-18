@@ -131,9 +131,6 @@ class EquipItemService {
 
         event(new UpdateTopBarEvent($character));
 
-        $characterData = new ResourceItem($character, $this->characterTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
-
         return $characterSlot->item;
     }
 

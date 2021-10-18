@@ -3,7 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
@@ -15,10 +17,14 @@ class MonstersController extends Controller {
 
     use MonstersShowInformation;
 
-    public function __construct() {
+    private $monsterCache;
+
+    public function __construct(BuildMonsterCacheService $monsterCache) {
         $this->middleware('is.admin')->except([
             'show'
         ]);
+
+        $this->monsterCache = $monsterCache;
     }
 
     public function index() {
@@ -69,11 +75,19 @@ class MonstersController extends Controller {
     public function importData(MonstersImportRequest $request) {
         Excel::import(new MonstersImport, $request->monsters_import);
 
+        $this->monsterCache->buildCache();
+
+        event(new GlobalMessageEvent('Monsters have been updated (or created), please refresh to see the new list.'));
+
         return redirect()->back()->with('success', 'imported monster data.');
     }
 
     public function publish(Monster $monster) {
         $monster->update(['published' => true]);
+
+        $this->monsterCache->buildCache();
+
+        event(new GlobalMessageEvent('Monsters have been updated (or created), please refresh to see the new list.'));
 
         return redirect()->to(route('monsters.list'))->with('success', 'Monster was published.');
     }

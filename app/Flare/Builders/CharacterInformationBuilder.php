@@ -259,6 +259,14 @@ class CharacterInformationBuilder {
      */
     public function buildAttack(bool $voided = false): int {
 
+        $characterDamageStat = $this->buildCharacterDamageStat($voided);
+
+        $totalAttack = $this->getWeaponDamage($voided);
+
+        return round($characterDamageStat + $totalAttack);
+    }
+
+    public function buildCharacterDamageStat(bool $voided = false): float|int {
         $characterDamageStat = $this->statMod($this->character->damage_stat);
 
         if ($voided) {
@@ -267,15 +275,11 @@ class CharacterInformationBuilder {
 
         $classType = $this->character->classType();
 
-        if ($classType->isFighter() || $classType->isRanger() || $classType->isTheif()) {
-            $characterDamageStat = $characterDamageStat * 0.15;
-        } else {
-            $characterDamageStat = $characterDamageStat * 0.05;
+        if ($classType->isFighter() || $classType->isRanger() || $classType->isThief()) {
+            return $characterDamageStat * 0.15;
         }
 
-        $totalAttack = $this->getWeaponDamage($voided);
-
-        return round($characterDamageStat + $totalAttack);
+        return $characterDamageStat * 0.05;
     }
 
     /**
@@ -765,6 +769,10 @@ class CharacterInformationBuilder {
             $damage = 0;
         }
 
+        return $this->calculateWeaponDamage($damage, $voided);
+    }
+
+    public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
             $damage = $damage * 0.02;
@@ -781,7 +789,7 @@ class CharacterInformationBuilder {
         return $damage;
     }
 
-    protected function getSpellDamage(bool $voided = false): int {
+    public function getSpellDamage(bool $voided = false): int {
         $damage = 0;
 
         $bonus = $this->hereticSpellDamageBonus($this->character);
@@ -796,18 +804,24 @@ class CharacterInformationBuilder {
             }
         }
 
+        $damage = $this->calculateClassSpellDamage($damage, $voided);
+
+        return $damage + $damage * $bonus;
+    }
+
+    public function calculateClassSpellDamage(int|float $damage, bool $voided = false): float|int {
         if ($damage === 0) {
-           $classType = $this->character->classType();
+            $classType = $this->character->classType();
 
-           if ($classType->isHeretic()) {
-               if (!$voided) {
-                   $damage = $this->statMod('int') * 0.2;
-               } else {
-                   $damage += $this->character->int * 0.02;
-               }
+            if ($classType->isHeretic()) {
+                if (!$voided) {
+                    $damage = $this->statMod('int') * 0.2;
+                } else {
+                    $damage += $this->character->int * 0.02;
+                }
 
-               return $damage + $damage * $bonus;
-           }
+                return $damage;
+            }
 
             if ($classType->isProphet()) {
                 if (!$voided) {
@@ -816,7 +830,7 @@ class CharacterInformationBuilder {
                     $damage += $this->character->int * 0.02;
                 }
 
-                return $damage + $damage * $bonus;
+                return $damage;
             }
         }
 
@@ -836,7 +850,7 @@ class CharacterInformationBuilder {
             }
         }
 
-        return $damage + $damage * $bonus;
+        return $damage;
     }
 
     protected function getArtifactDamage(bool $voided = false): int {
