@@ -8,27 +8,40 @@ export default class Damage {
   }
 
   affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth, stacking) {
-    defender          = defender.monster;
+
+    if (monsterCurrentHealth <= 0) {
+      return {
+        characterHealth: characterCurrentHealth,
+        monsterCurrentHealth: monsterCurrentHealth,
+      };
+    }
+
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
     const cantResist  = attacker.cant_be_resisted;
 
     if (stacking) {
-      this.addMessage('The enemy screams in pain as you, again, drain it\'s life!');
+      this.addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!');
+    } else {
+      this.addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!');
     }
 
-    if (totalDamage > 0) {
+    if (totalDamage > 0.0) {
       if (cantResist) {
-        this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(totalDamage));
+        this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
+
+        monsterCurrentHealth -= totalDamage;
+        characterCurrentHealth += totalDamage;
       } else {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
           this.addMessage('The enemy resists your attempt to steal it\'s life.');
         } else {
-          this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(totalDamage));
 
-          monsterCurrentHealth = monsterCurrentHealth - totalDamage;
-          characterCurrentHealth = characterCurrentHealth + totalDamage;
+          this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
+
+          monsterCurrentHealth -= totalDamage;
+          characterCurrentHealth += totalDamage;
         }
       }
     }

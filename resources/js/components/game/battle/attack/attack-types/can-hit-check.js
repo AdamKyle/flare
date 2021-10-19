@@ -36,7 +36,9 @@ export default class CanHitCheck {
   }
 
   canCast(attacker, defender) {
-    const damage        = new Damage();
+    const damage         = new Damage();
+    let attackerAccuracy = null;
+    let dodge            = null;
 
     if (attacker.hasOwnProperty('class')) {
       if (damage.canAutoHit(attacker)) {
@@ -44,19 +46,23 @@ export default class CanHitCheck {
 
         return true;
       }
-    }
 
-    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
-    let defenderDodge    = defender.dodge
-    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, defender.focus, attackerAccuracy, defenderDodge);
+      attackerAccuracy = attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
+      dodge            = defender.dodge;
+    } else {
+      attackerAccuracy = attacker.casting_accuracy;
+      dodge            = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+    }
 
     if (attackerAccuracy > 1.0) {
       return true;
     }
 
-    if (defenderDodge > 1.0) {
+    if (dodge > 1.0) {
       return false;
     }
+
+    let toHitBase = this.toHitCalculation(attacker.to_hit_base, defender.focus, attackerAccuracy, dodge);
 
     return this.calculateCanHit(toHitBase);
   }
@@ -75,23 +81,6 @@ export default class CanHitCheck {
     }
 
     return this.calculateCanHit(toHitBase);
-  }
-
-  canCast(attacker, defender, isVoided) {
-    const castingAccuracy = attacker.casting_accuracy;
-    let defenderFocus   = defender.focus * 0.05;
-
-    if (isVoided) {
-      defenderFocus = defender.voided_focus * 0.05;
-    }
-
-    if (defender.class === 'Prophet' || defender.class === 'Heretic') {
-      defenderFocus = defenderFocus * 0.25;
-    }
-
-    const dc = Math.ceil(defenderFocus + defenderFocus * castingAccuracy);
-
-    return random(1, defenderFocus) > dc;
   }
 
   calculateCanHit(toHitBase) {

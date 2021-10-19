@@ -158,7 +158,7 @@ class CastAndAttackHandler {
         if ($canAutoAttack) {
             $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
         } else if ($this->canHitHandler->canHit($attacker, $defender, $voided)) {
-            if (!$this->isBlocked($attackData['weapon_damage'])) {
+            if (!$this->isBlocked($attackData['weapon_damage'], $defender)) {
                 $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
             } else {
                 $this->battleLogs = $this->addMessage('Your weapon was blocked!', 'enemy-action-fired', $this->battleLogs);

@@ -1,5 +1,6 @@
 import React from 'react';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
+import { v4 as uuidv4 } from 'uuid';
 import Attack from '../battle/attack/attack';
 import Monster from '../battle/monster/monster';
 import {getServerMessage} from '../helpers/server_message';
@@ -113,9 +114,20 @@ export default class FightSection extends React.Component {
   }
 
   componentDidUpdate() {
-
     let stateMonster = this.state.monster;
     let propsMonster = this.props.monster;
+
+    if (this.props.resetBattleAction && stateMonster !== null) {
+      this.setState({
+        monsterCurrentHealth: null,
+        characterCurrentHealth: null,
+        characterMaxHealth: null,
+        monsterMaxHealth: null,
+        monster: null,
+      }, () => {
+        this.props.setMonster(null);
+      });
+    }
 
     if (propsMonster !== null && stateMonster === null) {
       this.setMonsterInfo()
@@ -218,7 +230,7 @@ export default class FightSection extends React.Component {
 
   battleMessages() {
     return this.state.battleMessages.map((message) => {
-      return <div key={message.message}><span className={'battle-message ' + message.class}>{message.message}</span> <br/></div>
+      return <div key={uuidv4()}><span className={'battle-message ' + message.class}>{message.message}</span> <br/></div>
     });
   }
 

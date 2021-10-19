@@ -1,42 +1,30 @@
 <hr />
 <h4>Hints</h4>
 <p class="mt-2">
-  Focus on Durability and Dexterity, followed by Accuracy and Criticality.
+  Focus on Durability followed by Accuracy and Criticality.
 </p>
 <p>It is suggested you do not equip weapons, but instead two shields with additional durability mods on them.</p>
 <p>Load your self up with <a href="/information/enchanting">life stealing affixes</a> and <a href="/information/enchanting">durability affixes</a>,
 along with <a href="/information/enchanting">Class based affix</a> and <a href="/information/enchanting">Damage based affix</a></p>
 <p>
-  For Spells, you want one healing and one damage.
-</p>
-<p>If you gear up this way, you will notice that your class is OP. Your life stealing affixes will fire on your turn and at the end of the enemies turn
-assuming you or the enemy are not dead (or you are not voided).</p>
-<p>The attack you want is cast. This is because with cast, you you have two attempts to fire off your Thirst skill which both damages the enemy and heals you.
-Once during your spell damage, once during your heal spell. If your damage spell misses or is blocked, you only have the one shot - during the healing phase of your turn.</p>
-<p>Vampires can use attack and cast, cast and attack - but to get the two times chance to fire off your thirst attack your weapon and spell both have to hit or you only have
-one time chance to fire it off.</p>
-<p>Vampires can use defend, but it's useless as they have no healing spells that fire, so its all affix damage.</p>
-<p>Vampires can attack, since they have no weapons (best to use two shields) they will attack for 2% of their dur.</p>
-<p>Vampires want either Dark Dwarf or Centaur for the durability boost.</p>
-
-<p>
-  Vampires life stealing affixes do stack, but its 100% of the first ones damage and then 50% for each additional one divided by
-  4 and subtracted for 100 to get your total damage. Here's an example:
+  There are two attack types you could do. One that involves purely attacking or one that involves purely casting. For vampires it is recommended you go with attacking.
+  The reason for this, is because your life stealing affixes will not do enough damage to kill the enemy and, if the damage you do via attacking is strong enough
+  your life stealing affixes will not fire.
 </p>
 <p>
-  <pre>
-    // Assume you have 5 suffixes for life stealing, Vampires are the only class where these affixes stack.
-    // Lets assume all 5 are at 25% of the enemies durability.
-
-    suffixTotal = 0.25 * (0.175 * 0.175 * 0.175) * 100 // => ~13%
-
-    // Assume you have two prefixes at 25% and 2 at 10%:
-    prefixTotal = 0.25 * (0.175 * 0.05 * 0.05) * 100 // => ~1%
-
-    suffix + prefix = 14.49%
-  </pre>
+  The issue with cast, is you do not do enough damage as a pure "caster vamp". Vampires, do not want weapons equipped as weapons do not increase a character durability.
+  Shields do increase the characters durability. The More durability a vampire has, the more damage they do with no weapons equipped and two shields.
 </p>
 <p>
-  The order of the affixes does not matter, as when it comes to calculation of % of damage, we rearrange the damage values on your affixes by highest to lowest.
-  This way we always use the highest as your damage affix.
+  Vampires life stealing affixes will scale with enemy health. The idea is that you want to fight the hardest thing you can kill in one hit that triggers your
+  enchantments to fire. You keep killing that creature until your enchantments no longer fire, and then move on. This allows vampires to take on
+  creatures that are a bit tougher then them.
 </p>
+<p>
+  For example a Vampire decked out in top tier shop gear with Life Stealing
+  Essence for the prefix and Sharp Fang for the suffix will do ~310k Damage from attack.
+  Your Vampire Thirst special attack can fire for: ~1,047,972
+</p>
+<p>Life stealing affixes will scale with the enemy, only doing a specific percentage of their remaining health. In other words, it's impossible for life stealing
+affixes alone to kill the enemy, this is where you could cast or could use attack. recommended approach is cast to be able to fire off Vampire Thirst twice.</p>
+<p>Your damage will scale with your durability over time and the life stealing scales with the enemy, the harder the enemy, the more damage you can do.</p>

@@ -14,7 +14,7 @@ class BuildCharacterAttackTypes {
         $this->characterAttackBuilder = $characterAttackBuilder;
     }
 
-    public function buildCache(Character $character) {
+    public function buildCache(Character $character): array {
 
         $characterAttack = $this->characterAttackBuilder->setCharacter($character);
 
@@ -30,5 +30,7 @@ class BuildCharacterAttackTypes {
             'defend'                 => $characterAttack->buildDefend(),
             'voided_defend'          => $characterAttack->buildDefend(true),
         ]);
+
+        return Cache::get('character-attack-data-' . $character->id);
     }
 }

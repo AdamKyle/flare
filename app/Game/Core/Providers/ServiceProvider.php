@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Providers;
 
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Core\Services\InventorySetService;
@@ -50,7 +51,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(AdventureRewardService::class, function($app) {
-            return new AdventureRewardService(new CharacterService);
+            return new AdventureRewardService($app->make(CharacterService::class), $app->make(BuildCharacterAttackTypes::class));
         });
 
         $this->app->bind(CharacterInventoryService::class, function($app) {

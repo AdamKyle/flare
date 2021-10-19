@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Builders\CharacterAttackBuilder;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\ClassAttackValue;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
@@ -61,8 +62,18 @@ class CharacterAttackTransformer extends TransformerAbstract {
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
-            'attack_types' => Cache::get('character-attack-data-' . $character->id),
+            'attack_types' => $this->fetchAttackTypes($character),
         ];
+    }
+
+    public function fetchAttackTypes(Character $character) {
+        $cache = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($cache)) {
+            return resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+        }
+
+        return $cache;
     }
 
 //    private function isAlchemyLocked(Character $character) {

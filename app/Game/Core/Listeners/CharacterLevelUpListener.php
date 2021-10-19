@@ -5,6 +5,7 @@ namespace App\Game\Core\Listeners;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
@@ -18,14 +19,17 @@ class CharacterLevelUpListener
      */
     private $characterService;
 
+    private $buildCharacterAttackTypes;
+
     /**
      * Constructor
      *
      * @param CharacterService $characterService
      * @return void
      */
-    public function __construct(CharacterService $characterService) {
-        $this->characterService = $characterService;
+    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+        $this->characterService          = $characterService;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
     }
 
     /**
@@ -40,6 +44,8 @@ class CharacterLevelUpListener
             $this->characterService->levelUpCharacter($event->character);
 
             $character = $event->character->refresh();
+
+            $this->buildCharacterAttackTypes->buildCache($character);
 
             event(new ServerMessageEvent($character->user, 'level_up'));
             event(new UpdateTopBarEvent($character));

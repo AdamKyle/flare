@@ -194,17 +194,26 @@ class CharacterInformationBuilder {
 
         rsort($values);
 
-        $totalPercent = 0;
+        $totalPercent     = 0;
+        $additionalValues = [];
 
         foreach ($values as $value) {
             if ($totalPercent === 0) {
                 $totalPercent = $value;
             } else {
-                $totalPercent *= ($value / 2);
+                $additionalValues[] = ($value / 2);
             }
         }
 
-        return $totalPercent * 100;
+        $sumOfValues = array_sum($additionalValues);
+
+        $totalPercent = $totalPercent * ($sumOfValues * 0.75);;
+
+        if ($totalPercent > 1.0) {
+            return 0.99;
+        }
+
+        return $totalPercent;
     }
 
     public function getEntrancedChance(): float {
@@ -777,7 +786,12 @@ class CharacterInformationBuilder {
     public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
-            $damage = $damage * 0.02;
+
+            if ($this->character->classType()->isVampire()) {
+                $damage = $damage * 0.05;
+            } else {
+                $damage = $damage * 0.02;
+            }
         }
 
         $skills = $this->character->skills->filter(function($skill) {

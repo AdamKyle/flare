@@ -5,7 +5,6 @@ namespace App\Flare\Handlers\AttackHandlers;
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
-use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 
 class DefendHandler {

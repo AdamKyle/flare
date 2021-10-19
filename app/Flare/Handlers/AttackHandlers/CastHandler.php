@@ -2,6 +2,7 @@
 
 namespace App\Flare\Handlers\AttackHandlers;
 
+use Cache;
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
@@ -79,7 +80,7 @@ class CastHandler {
         $this->characterAttackBuilder = $this->characterAttackBuilder->setCharacter($attacker);
         $characterInfo                = $this->characterAttackBuilder->getInformationBuilder()->setCharacter($attacker);
 
-        $attackData = $this->getAttackData($attackType);
+        $attackData = $this->getAttackData($attackType, $attacker);
         $voided     = $this->isAttackVoided($attackType);
 
         if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
@@ -188,12 +189,8 @@ class CastHandler {
         return $damage < $defender->ac;
     }
 
-    protected function getAttackData(string $attackType): array {
-        if ($this->isAttackVoided($attackType)) {
-            return $this->characterAttackBuilder->buildAttack(true);
-        }
-
-        return $this->characterAttackBuilder->buildAttack();
+    protected function getAttackData(string $attackType, $attacker): array {
+        return Cache::get('character-attack-data-' . $attacker->id)[$attackType];
     }
 
     protected function isAttackVoided(string $attackType): bool {

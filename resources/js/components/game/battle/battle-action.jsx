@@ -1,6 +1,5 @@
 import React from 'react';
 import {Row, Col} from 'react-bootstrap';
-import Monster from './monster/monster';
 import TimeOutBar from '../timeout/timeout-bar';
 import {isEqual} from 'lodash';
 
@@ -79,6 +78,14 @@ export default class BattleAction extends React.Component {
     if (!isEqual(this.props.monsters, prevProps.monsters)) {
       this.setState({
         monsters: this.props.monsters,
+      })
+    }
+
+    if (this.props.shouldReset) {
+      this.setState({
+        monster: 0,
+      }, () => {
+        this.props.updateResetBattleAction();
       })
     }
   }

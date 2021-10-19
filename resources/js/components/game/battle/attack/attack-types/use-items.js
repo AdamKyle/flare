@@ -12,8 +12,8 @@ export default class UseItems {
   }
 
   useItems(attackData, attackerClass) {
+
     if (attackerClass === 'Vampire') {
-      this.lifeStealingAffixes(attackData, false);
       this.lifeStealingAffixes(attackData, true);
     }
 
@@ -50,7 +50,7 @@ export default class UseItems {
     this.characterCurrentHealth = lifeStealingAffixes.getCharacterHealth();
     this.monsterCurrentHealth   = lifeStealingAffixes.getMonsterHealth();
 
-    this.battleMessages = [...this.battleMessages, lifeStealingAffixes.getBattleMessages()];
+    this.battleMessages = [...this.battleMessages, ...lifeStealingAffixes.getBattleMessages()];
   }
 
   useArtifacts(attacker, defender, type) {
@@ -85,7 +85,7 @@ export default class UseItems {
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
 
-      this.addActionMessage(attacker.name + ' artifacts hit for: ' + this.formatNumber(totalDamage));
+      this.addActionMessage(attacker.name + '\'s artifacts hit for: ' + this.formatNumber(totalDamage));
     }
 
     if (type === 'monster') {
@@ -100,7 +100,7 @@ export default class UseItems {
 
       this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
 
-      this.addEnemyActionMessage(attacker.name + ' artifacts hit for: ' + this.formatNumber(totalDamage));
+      this.addEnemyActionMessage(attacker.name + '\'s artifacts hit for: ' + this.formatNumber(totalDamage));
     }
   }
 

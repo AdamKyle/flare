@@ -107,26 +107,33 @@ No class skills would fire on defend.
 If you are voided at any time during the attack, we will fall back to raw values for stats and items you use in the attack. 
 This means no affixes, no modded stats and no boons.
 
+## Regarding Devoidance
+
+Enemies from the dropdown do not have a way to [devoid](/information/voidance) player. However, Celestials do. There is a quest item you can get
+which, through upgrading over time, will increase your chance to devoid an enemy. Simply put, Devoid will void their attempt to void you.
+
 ## Regarding Life Stealing Affixes That Stack
 
-Vampires are the only class who have life stealing skills that can stack:
+Vampires are the only class where the [life stealing affixes](/information/enchanting) will stack. However, the damage is not 100% of what you would do.
+Instead, the damage is your first most powerful life stealing, multiplied by 75% of the sum of the rest of the affixes. This percentage is the amount of
+life you will steal from the enemy, which will scale with the enemies' health. The harder the enemy the more damage you do.
 
-Vampires life stealing affixes do stack, but its 100% of the first ones damage and then 50% for each additional one divided by
-4 and subtracted for 100 to get your total damage. Here's an example:
+The problem is, Vampires do not do enough damage with life stealing alone, this is where you can either Attack or Cast. Casting will give you two chances, assuming your damage spell hits,
+to fire off Vampire Thirst which can kill an enemy. Using Attack would do 5% of your Durability, with no weapons equipped. The higher the dur, the more damage.
 
-```
-    // Assume you have 5 suffixes for life stealing, Vampires are the only class where these affixes stack.
-    // Lets assume all 5 are at 25% of the enemies durability.
+Another thing to note about life stealing affixes is that they will not fire if the weapon/spell damage you do, before the affixes, rings and artifacts would fire, kills the enemy.
+There would be no point to you stealing a dead enemies' health. Vampires will know if the enemy is too trivial when they're life stealing affixes do not fire.
 
-    suffixTotal = 0.25 * (0.175 * 0.175 * 0.175) * 100 // => ~13%
+You will never do 100% of an enemies' health, regardless of how good the enchantments are. The total Life you can steal at any one time is 99% of the enemies' health from 
+Life Stealing enchantments.
 
-    // Assume you have two prefixes at 25% and 2 at 10%:
-    prefixTotal = 0.25 * (0.175 * 0.05 * 0.05) * 100 // => ~1%
+## Rings can fire even if dead
 
-    suffix + prefix = 14.49%
-```
+Your rings can mitigate the enemies attempt to heal or to use their spells, even if you are dead. The lore around this is simple:
 
-The order of your prefixes and suffixes do not matter as we re-arrange the damage values for you and always start with the highest.
+> Rings are magical items that do not need the character to be alive to fire off their reductions or evasions. 
+> These rings have a mind of their own when it comes to these types of magic. However, a rings damage cannot fire if the character is dead,
+> as the damaging aspect comes from the characters will to live, if they are dead, they have no will.
 
 ## Attacking Skills
 

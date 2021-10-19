@@ -61,12 +61,12 @@ export default class Attack {
       if (this.state.characterCurrentHealth <= 0) {
         this.resurrectCharacter(defender, attackType)
 
-        if (!attackType.includes('voided')) {
+        if (!attackType.includes('voided') && this.state.characterCurrentHealth >= 1) {
           const attackData = defender.attack_types[attackType];
 
           this.lifeSteal(defender, attacker, attackData);
         }
-      } else {
+      } else if (this.state.characterCurrentHealth >= 0) {
         if (!attackType.includes('voided')) {
           const attackData = defender.attack_types[attackType];
 
@@ -138,13 +138,13 @@ export default class Attack {
     const useItems = new UseItems(defender, this.state.monsterCurrentHealth, this.state.characterCurrentHealth);
 
     if (defender.class === 'Vampire') {
-      useItems.lifeStealingAffixes(attackData, false)
       useItems.lifeStealingAffixes(attackData, true)
     } else {
       useItems.lifeStealingAffixes(attackData, false);
     }
 
-    this.state.battleMessages = [...this.state.battleMessages, ...useItems.getBattleMessage()];
+    this.state.battleMessages         = [...this.state.battleMessages, ...useItems.getBattleMessage()];
+
     this.state.characterCurrentHealth = useItems.getCharacterCurrentHealth();
     this.state.monsterCurrentHealth   = useItems.getMonsterCurrentHealth();
   }

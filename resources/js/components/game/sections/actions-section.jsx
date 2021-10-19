@@ -29,6 +29,7 @@ export default class ActionsSection extends React.Component {
       canCraft: true,
       monster: null,
       actionComponent: 'battle-action',
+      resetBattleAction: false
     };
 
     this.updateActions = Echo.private('update-actions-' + this.props.userId);
@@ -63,10 +64,19 @@ export default class ActionsSection extends React.Component {
     });
 
     this.updateActions.listen('Game.Maps.Events.UpdateActionsBroadcast', (event) => {
+      const oldFirstMonsterName = this.state.monsters[0].name;
+      const newFirstMonsterName = event.monsters[0].name;
+
       this.setState({
         character: event.character,
         monsters: event.monsters,
         isDead: event.character.is_dead,
+      }, () => {
+        if (oldFirstMonsterName !== newFirstMonsterName && !this.state.resetBattleAction) {
+          this.setState({
+            resetBattleAction: true,
+          })
+        }
       });
     });
   }
@@ -77,6 +87,12 @@ export default class ActionsSection extends React.Component {
         actionComponent: 'battle-action',
       });
     }
+  }
+
+  updateResetBattleAction() {
+    this.setState({
+      resetBattleAction: false,
+    })
   }
 
   characterIsDead(isDead, callback) {
@@ -223,6 +239,8 @@ export default class ActionsSection extends React.Component {
                   setMonster={this.setMonster.bind(this)}
                   canAttack={this.props.canAttack}
                   isAdventuring={this.state.isAdventuring}
+                  shouldReset={this.state.resetBattleAction}
+                  updateResetBattleAction={this.updateResetBattleAction.bind(this)}
                 />
               : this.props.celestial !== null ?
                   <div className="text-center mb-2">
@@ -287,6 +305,7 @@ export default class ActionsSection extends React.Component {
                   canAttack={this.props.canAttack}
                   isAdventuring={this.state.isAdventuring}
                   openTimeOutModal={this.props.openTimeOutModal}
+                  resetBattleAction={this.state.resetBattleAction}
                 />
               :
                 this.props.celestial !== null ?

@@ -3,6 +3,7 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Models\Skill;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -16,6 +17,8 @@ class AdventureRewardService {
      * @var CharacterService $characterService
      */
     private $characterService;
+
+    private $buildCharacterAttackTypes;
 
     /**
      * @var array $messages
@@ -31,9 +34,10 @@ class AdventureRewardService {
      * @param CharacterService $characterService
      * @return void
      */
-    public function __construct(CharacterService $characterService) {
+    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
 
-        $this->characterService = $characterService;
+        $this->characterService          = $characterService;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
     }
 
     /**
@@ -99,7 +103,11 @@ class AdventureRewardService {
         if ($character->xp >= $character->xp_next) {
             $this->characterService->levelUpCharacter($character);
 
-            $this->messages[] = 'You gained a level! Now level: ' . $character->refresh()->level;
+            $character = $character->refresh();
+
+            $this->buildCharacterAttackTypes->buildCache($character);
+
+            $this->messages[] = 'You gained a level! Now level: ' . $character->level;
         }
     }
 
@@ -108,6 +116,10 @@ class AdventureRewardService {
             $skill = $character->skills->filter(function($skill) use($rewards) {
                 return $skill->name === $rewards['skill']['skill_name'];
             })->first();
+
+            if (is_null($skill)) {
+                return;
+            }
 
             $xp = $rewards['skill']['exp'];
 

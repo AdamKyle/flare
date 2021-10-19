@@ -56,7 +56,7 @@ class FightService {
 
             if ($this->isMonsterDead()) {
                 $this->battleLogs = $this->addMessage(
-                    'The enemy has been slayed!',
+                    'The enemy has been defeated!',
                     'action-fired',
                     $this->battleLogs
                 );
@@ -64,7 +64,6 @@ class FightService {
                 return true;
             }
         }
-
 
         $this->setupFightHandler->setUpFight($attacker, $defender);
 

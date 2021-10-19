@@ -53,6 +53,7 @@
         "react-countdown": "^2.3.1",
         "react-countdown-circle-timer": "^2.5.0",
         "react-draggable": "^4.1.0",
-        "rpg-awesome": "^0.2.0"
+        "rpg-awesome": "^0.2.0",
+        "uuid": "^8.3.2"
     }
 }

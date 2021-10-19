@@ -144,6 +144,7 @@ class AttackExtraActionHandler {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isVampire()) {
+            $attackerInfo = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData();
 
             if (!$this->canUse($attackerInfo['chance'])) {
                 return $monsterCurrentHealth;

@@ -65,7 +65,6 @@ class CharacterAttackHandler {
     }
 
     public function handleAttack($attacker, $defender, string $attackType) {
-        dump($attackType);
         switch ($attackType) {
             case AttackTypeValue::ATTACK:
             case AttackTypeValue::VOIDED_ATTACK:

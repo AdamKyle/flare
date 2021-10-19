@@ -39,8 +39,6 @@ export default class Defend {
       return this.setState();
     }
 
-    this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
-
     this.useItems(attackData, this.attacker.class)
 
     this.fireOffVampThirst();

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Handlers\AttackHandlers;
 
+use Cache;
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Game\Adventures\Traits\CreateBattleMessages;
@@ -73,7 +74,7 @@ class AttackHandler {
         $this->characterAttackBuilder = $this->characterAttackBuilder->setCharacter($attacker);
         $characterInfo                = $this->characterAttackBuilder->getInformationBuilder()->setCharacter($attacker);
 
-        $attackData = $this->getAttackData($attackType);
+        $attackData = $this->getAttackData($attackType, $attacker);
         $voided     = $this->isAttackVoided($attackType);
 
         if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
@@ -81,7 +82,7 @@ class AttackHandler {
 
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
@@ -93,7 +94,7 @@ class AttackHandler {
         }
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, false, $voided)) {
-            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
             $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
@@ -119,7 +120,7 @@ class AttackHandler {
                 return;
             }
 
-            $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
@@ -140,12 +141,8 @@ class AttackHandler {
         return $damage < $defender->ac;
     }
 
-    protected function getAttackData(string $attackType): array {
-        if ($this->isAttackVoided($attackType)) {
-            return $this->characterAttackBuilder->buildAttack(true);
-        }
-
-        return $this->characterAttackBuilder->buildAttack();
+    protected function getAttackData(string $attackType, $attacker): array {
+        return Cache::get('character-attack-data-' . $attacker->id)[$attackType];
     }
 
     protected function isAttackVoided(string $attackType): bool {

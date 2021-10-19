@@ -63,12 +63,12 @@ export default class AttackAndCast {
 
     const canHitCheck      = new CanHitCheck();
 
-    const canHit           = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, $voided);
+    const canHit           = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, this.voided);
 
     this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
     if (canHit) {
-      if (this.canBlock(attackData.spell_damage + attacker.weapon_damage)) {
+      if (this.canBlock(attackData.spell_damage + attackData.weapon_damage)) {
         this.addEnemyActionMessage(this.defender.name + ' Blocked both your damage spell and attack!');
 
         if (attackData.heal_for > 0) {

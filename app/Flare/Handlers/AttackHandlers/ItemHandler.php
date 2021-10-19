@@ -41,8 +41,8 @@ class ItemHandler {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
 
             if ($attacker->classType()->isVampire() && !$voided) {
-                $canResist  = $this->characterInformation->canAffixesBeResisted();
-                $damage     = $this->characterInformation->findLifeStealingAffixes(true);
+                $canResist  = $this->characterInformationBuilder->canAffixesBeResisted();
+                $damage     = $this->characterInformationBuilder->findLifeStealingAffixes(true);
 
                 $this->useLifeStealingAffixes($defender, $damage, $canResist);
             }
