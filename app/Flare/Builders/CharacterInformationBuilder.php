@@ -148,6 +148,10 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function findLifeStealingAffixes(bool $canStack = false): float {
+        if (!$this->character->classType()->isVampire()) {
+            return 0.0;
+        }
+        
         $slots = $this->fetchInventory()->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix))  {
                 if (!is_null($slot->item->itemPrefix->steal_life_amount)) {
@@ -826,6 +830,7 @@ class CharacterInformationBuilder {
     }
 
     public function calculateClassSpellDamage(int|float $damage, bool $voided = false): float|int {
+
         if ($damage === 0) {
             $classType = $this->character->classType();
 
@@ -835,8 +840,6 @@ class CharacterInformationBuilder {
                 } else {
                     $damage += $this->character->int * 0.02;
                 }
-
-                return $damage;
             }
 
             if ($classType->isProphet()) {
@@ -845,24 +848,22 @@ class CharacterInformationBuilder {
                 } else {
                     $damage += $this->character->int * 0.02;
                 }
-
-                return $damage;
             }
         }
 
         if ($this->character->classType()->isHeretic()) {
             if ($voided) {
-                $damage += $damage * ($this->character->int * 0.30);
+                $damage += $this->character->int * 0.30;
             } else {
-                $damage += $damage * ($this->statMod('int') * 0.30);
+                $damage += $this->statMod('int') * 0.30;
             }
         }
 
         if ($this->character->classType()->isProphet()) {
             if ($voided) {
-                $damage += $damage * ($this->character->chr * 0.15);
+                $damage += $this->character->chr * 0.15;
             } else {
-                $damage += $damage * ($this->statMod('chr') * 0.15);
+                $damage += $this->statMod('chr') * 0.15;
             }
         }
 
