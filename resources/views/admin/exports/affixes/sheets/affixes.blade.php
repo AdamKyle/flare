@@ -41,7 +41,8 @@
             <th>irresistible_damage</th>
             <th>cost</th>
             <th>type</th>
-            <th>entranced_chance<th>
+            <th>entranced_chance</th>
+            <th>devouring_light</th>
         </tr>
     </thead>
     <tbody>
@@ -88,6 +89,7 @@
             <td>{{$affix->cost}}</td>
             <td>{{$affix->type}}</td>
             <td>{{$affix->entranced_chance}}</td>
+            <td>{{$affix->devouring_light}}</td>
         </tr>
     @endforeach
     </tbody>

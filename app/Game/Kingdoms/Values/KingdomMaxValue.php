@@ -7,9 +7,9 @@ use App\Flare\Models\KingdomUnit;
 
 class KingdomMaxValue {
 
-    const MAX_TREASURY = 4000000000;
+    const MAX_TREASURY = 2000000000;
 
-    const MAX_UNIT = 100000;
+    const MAX_UNIT = 1000000;
 
     public static function isTreasuryAtMax(Kingdom $kingdom): bool {
         return $kingdom->treasury === self::MAX_TREASURY;

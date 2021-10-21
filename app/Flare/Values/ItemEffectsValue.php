@@ -16,6 +16,7 @@ class ItemEffectsValue {
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
     const CONTNUE_LEVELING      = 'continue-leveling';
+    const GOLD_DUST_RUSH        = 'gold-dust-rush';
 
     /**
      * @var string[] $values
@@ -27,7 +28,8 @@ class ItemEffectsValue {
         self::DUNGEON               => 'dungeon',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
-        self::CONTNUE_LEVELING      => 'continue-leveling'
+        self::CONTNUE_LEVELING      => 'continue-leveling',
+        self::GOLD_DUST_RUSH        => 'gold-dust-rush',
     ];
 
     /**
@@ -90,6 +92,15 @@ class ItemEffectsValue {
      */
     public function areAffixesIrresistible(): bool {
         return $this->value === self::AFFIXES_IRRESISTIBLE;
+    }
+
+    /**
+     * does this item allow for a gold dust rush?
+     *
+     * @return bool
+     */
+    public function isGoldDustRush(): bool {
+        return $this->value === self::GOLD_DUST_RUSH;
     }
 
     /**

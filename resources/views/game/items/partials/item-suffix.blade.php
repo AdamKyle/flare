@@ -98,6 +98,10 @@
         <dt>Entrance Chance:</dt>
         <dd class={{$item->itemSuffix->entranced_chance > 0 ? 'text-success' : ''}}>{{$item->itemSuffix->entranced_chance * 100}}%</dd>
       @endif
+      @if ($item->itemSuffix->devouring_light > 0)
+        <dt>Devouring Light (Voidance Chance):</dt>
+        <dd class={{$item->itemSuffix->devouring_light > 0 ? 'text-success' : ''}}>{{$item->itemSuffix->devouring_light * 100}}%</dd>
+      @endif
     </dl>
   </x-tabs.tab-content-section>
 </x-tabs.tab-content>

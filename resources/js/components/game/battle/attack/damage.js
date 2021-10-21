@@ -53,7 +53,6 @@ export default class Damage {
   }
 
   affixDamage(attacker, defender, monsterCurrentHealth) {
-    defender          = defender.monster;
     let totalDamage   = attacker.stacking_damage;
     const cantResist  = attacker.cant_be_resisted;
 
@@ -115,7 +114,7 @@ export default class Damage {
     return false;
   }
 
-  calculateSpellDamage(attacker, defender, monsterCurrentHealth, increaseDamage) {
+  calculateSpellDamage(attacker, defender, monsterCurrentHealth) {
     if (!defender.hasOwnProperty('spell_evasion')) {
       defender = defender.monster;
     }
@@ -125,7 +124,8 @@ export default class Damage {
 
     if (dc <= 0 || random(1, 100) > dc) {
       this.battleMessages.push({
-        message: 'Your spells failed to do anything.'
+        message: 'Your spells failed to do anything.',
+        class: 'enemy-action-fired'
       });
 
       return monsterCurrentHealth;
@@ -135,12 +135,13 @@ export default class Damage {
 
     this.battleMessages.push({
       message: attacker.name + ' spells hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      class: 'info-damage',
     });
 
     return monsterCurrentHealth;
   }
 
-  calculateHealingTotal(attacker) {
+  calculateHealingTotal(attacker, attackData) {
     const skillBonus = attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
 
     let healFor = attackData.heal_for;
@@ -207,7 +208,7 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  doubleCastChance(attacker, defender, monsterCurrentHealth) {
+  doubleCastChance(attacker, defender, monsterCurrentHealth, attackData) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -218,16 +219,17 @@ export default class Damage {
       if (extraActionChance.type === ExtraActionType.HERETICS_DOUBLE_CAST && extraActionChance.has_item) {
         this.battleMessages.push({
           message: 'Magic crackles through the air as you cast again!',
+          class: 'action-fired'
         });
 
-        monsterCurrentHealth = this.calculateSpellDamage(attacker, defender, monsterCurrentHealth, true);
+        monsterCurrentHealth = this.calculateSpellDamage(attackData, defender, monsterCurrentHealth, true);
       }
     }
 
     return monsterCurrentHealth;
   }
 
-  doubleHeal(attacker, characterCurrentHealth) {
+  doubleHeal(attacker, characterCurrentHealth, attackData) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -235,12 +237,13 @@ export default class Damage {
         return characterCurrentHealth;
       }
 
-      if (extraActionChance.type === ExtraActionType.HERETICS_DOUBLE_CAST && extraActionChance.has_item) {
+      if (extraActionChance.type === ExtraActionType.PROPHET_HEALING && extraActionChance.has_item) {
         this.battleMessages.push({
           message: 'Your prayers are heard by The Creator and he grants you extra life!',
+          class: 'action-fired'
         });
 
-        characterCurrentHealth = this.calculateHealingTotal(attacker, defender, monsterCurrentHealth, true);
+        characterCurrentHealth = this.calculateHealingTotal(attacker, attackData);
       }
     }
 

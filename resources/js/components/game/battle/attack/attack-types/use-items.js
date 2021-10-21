@@ -22,9 +22,9 @@ export default class UseItems {
     damageAffixes.fireDamageAffixes(attackData.affixes, this.defender);
 
     this.characterCurrentHealth = damageAffixes.getCharacterHealth();
-    this.monsterCurrentHealth          = damageAffixes.getMonsterHealth();
+    this.monsterCurrentHealth   = damageAffixes.getMonsterHealth();
 
-    this.battleMessages = [...this.battleMessages, damageAffixes.getBattleMessages()];
+    this.battleMessages = [...this.battleMessages, ...damageAffixes.getBattleMessages()];
 
     this.useArtifacts(attackData, this.defender, 'player');
     this.ringDamage(attackData, this.defender, 'player');

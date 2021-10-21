@@ -19,6 +19,7 @@ class ItemModifiers extends Component
         ItemEffectsValue::TELEPORT_TO_CELESTIAL,
         ItemEffectsValue::AFFIXES_IRRESISTIBLE,
         ItemEffectsValue::CONTNUE_LEVELING,
+        ItemEffectsValue::GOLD_DUST_RUSH,
     ];
 
     public $editing = false;

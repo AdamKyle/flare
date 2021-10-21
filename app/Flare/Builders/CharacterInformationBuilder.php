@@ -151,7 +151,7 @@ class CharacterInformationBuilder {
         if (!$this->character->classType()->isVampire()) {
             return 0.0;
         }
-        
+
         $slots = $this->fetchInventory()->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix))  {
                 if (!is_null($slot->item->itemPrefix->steal_life_amount)) {
@@ -265,22 +265,6 @@ class CharacterInformationBuilder {
         })->pluck('item.itemSuffix')->values();
     }
 
-    /**
-     * Build the attack
-     *
-     * Fetches the damage stat with all modifications and applies all skill bonuses.
-     *
-     * @return int
-     */
-    public function buildAttack(bool $voided = false): int {
-
-        $characterDamageStat = $this->buildCharacterDamageStat($voided);
-
-        $totalAttack = $this->getWeaponDamage($voided);
-
-        return round($characterDamageStat + $totalAttack);
-    }
-
     public function buildCharacterDamageStat(bool $voided = false): float|int {
         $characterDamageStat = $this->statMod($this->character->damage_stat);
 
@@ -304,11 +288,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildTotalAttack(): int {
-        $skillBonus  = $this->fetchSkillAttackMod();
-
-        $totalAttack = $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
-
-        return round($totalAttack + $totalAttack * $skillBonus);
+        return $this->getWeaponDamage() + $this->getSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
     }
 
     /**
@@ -622,16 +602,32 @@ class CharacterInformationBuilder {
     }
 
     protected function fetchVoidanceAmount(string $type): float {
+        $voidance = 0.0;
+
         $slot = $this->character->inventory->slots->filter(function($slot) use($type) {
            return $slot->item->type === 'quest' && $slot->item->{$type} > 0;
         })->first();
 
         if (!is_null($slot)) {
-
-            return $slot->item->{$type};
+            $voidance = $slot->item->{$type};
         }
 
-        return 0.0;
+        return $voidance + $this->fetchVoidanceFromAffixes($type);
+    }
+
+    private function fetchVoidanceFromAffixes(string $type): float {
+        $prefixDevouringLight  = $this->fetchInventory()->pluck('item.itemPrefix.' . $type)->toArray();
+        $sufficDevouringLight  = $this->fetchInventory()->pluck('item.itemSuffix.' . $type)->toArray();
+
+        $amounts = [...$prefixDevouringLight, ...$sufficDevouringLight];
+
+        if (empty($amounts)) {
+            return 0.0;
+        }
+
+        $max = max($amounts);
+
+        return is_null($max) ? 0.0 : $max;
     }
 
     /**

@@ -53,6 +53,14 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
+                <label for="affix-voidance">Devouring Light Chance (Voidance): </label>
+                <input type="number" min="0" steps="0" class="form-control" id="affix-voidance" wire:model="itemAffix.devouring_light">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
                 <label for="affix-damage">Damage</label>
                 <input type="number" min="0" steps="0" class="form-control" id="affix-damage" wire:model="itemAffix.damage">
             </div>

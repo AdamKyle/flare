@@ -52,7 +52,7 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-12">
-                        <strong>Attack</strong>: {{$character->getInformation()->buildAttack()}} / <strong>AC</strong>: {{$character->getInformation()->buildDefence()}} / <strong>Heal For</strong>: {{$character->getInformation()->buildHealFor()}}
+                        <strong>Attack</strong>: {{$character->getInformation()->getTotalWeaponDamage()}} / <strong>AC</strong>: {{$character->getInformation()->buildDefence()}} / <strong>Heal For</strong>: {{$character->getInformation()->buildHealFor()}}
                         <hr />
                     </div>
                 </div>

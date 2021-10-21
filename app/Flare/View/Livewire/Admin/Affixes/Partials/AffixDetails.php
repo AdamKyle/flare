@@ -28,6 +28,7 @@ class AffixDetails extends Component
         'itemAffix.damage'               => 'nullable',
         'itemAffix.irresistible_damage'  => 'nullable',
         'itemAffix.damage_can_stack'     => 'nullable',
+        'itemAffix.devouring_light'      => 'nullable',
     ];
 
     protected $messages = [

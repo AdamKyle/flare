@@ -6,10 +6,9 @@ export default class CanEntranceEnemy {
     this.battleMessages = [];
   }
 
-  canEntranceEnemy(attackType, defender, type) {
+  canEntranceEnemy(attackType, defender) {
     let canEntrance   = false;
     const chance      = attackType.affixes.entrancing_chance;
-    defender          = defender.monster;
 
     if (attackType.affixes.entrancing_chance > 0.0) {
       const cantResist     = attackType.affixes.cant_be_resisted;

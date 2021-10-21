@@ -35,6 +35,8 @@ class SkillTypeValue {
 
     const EFFECTS_ARTIFACT_ANNULMENT      = 12;
 
+    const EFFECTS_KINGDOM_TREASURY        = 13;
+
     /**
      * @var string[] $values
      */
@@ -52,6 +54,7 @@ class SkillTypeValue {
         self::EFFECTS_UNIT_MOVEMENT_TIMER     => 10,
         self::EFFECTS_SPELL_EVASION           => 11,
         self::EFFECTS_ARTIFACT_ANNULMENT      => 12,
+        self::EFFECTS_KINGDOM_TREASURY        => 13,
 
     ];
 
@@ -69,6 +72,7 @@ class SkillTypeValue {
         10 => 'Effects Unit Movement Timers',
         11 => 'Effects Spell Evasion',
         12 => 'Effects Artifact Annulment',
+        13 => 'Effects how much interest a kingdom gets'
 
     ];
 
@@ -204,6 +208,15 @@ class SkillTypeValue {
      */
     public function isArtifactAnnulment(): bool {
         return $this->value === self::EFFECTS_ARTIFACT_ANNULMENT;
+    }
+
+    /**
+     * Does this effect the kingdom treasury?
+     *
+     * @return bool
+     */
+    public function effectsKingdomTreasury(): bool {
+        return $this->value === self::EFFECTS_KINGDOM_TREASURY;
     }
 
     /**

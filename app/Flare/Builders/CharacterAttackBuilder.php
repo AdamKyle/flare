@@ -27,7 +27,7 @@ class CharacterAttackBuilder {
     public function buildAttack(bool $voided = false): array {
         $attack = $this->baseAttack($voided);
 
-        $attack['weapon_damage'] = $this->characterInformationBuilder->buildAttack($voided);
+        $attack['weapon_damage'] = $this->characterInformationBuilder->getTotalWeaponDamage($voided);
 
         return $attack;
     }

@@ -33,7 +33,9 @@ export default class CastAttack {
     if (canEntrance) {
       this.attackWithSpells(attackData);
 
-      this.healWithSpells(attackData);
+      if (attackData.heal_for > 0) {
+        this.healWithSpells(attackData);
+      }
 
       this.useItems(attackData, this.attacker.class);
 
@@ -50,7 +52,9 @@ export default class CastAttack {
       if (this.canBlock()) {
         this.addEnemyActionMessage(this.defender.name + ' Blocked your damaging spell!');
 
-        this.healWithSpells(attackData);
+        if (attackData.heal_for > 0) {
+          this.healWithSpells(attackData);
+        }
 
         this.useItems(attackData, this.attacker.class);
 
@@ -64,7 +68,9 @@ export default class CastAttack {
     } else {
       this.addMessage('Your damage spell missed!');
 
-      this.healWithSpells(attackData);
+      if (attackData.heal_for > 0) {
+        this.healWithSpells(attackData);
+      }
 
       this.useItems(attackData, this.attacker.class);
     }
@@ -114,7 +120,7 @@ export default class CastAttack {
 
     this.monsterHealth -= damage;
 
-    this.extraAttacks();
+    this.extraAttacks(attackData);
 
     this.addActionMessage('Your damage spell hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
   }
@@ -135,7 +141,7 @@ export default class CastAttack {
 
     this.characterCurrentHealth += healFor
 
-    this.extraHealing();
+    this.extraHealing(attackData);
 
     this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
   }
@@ -150,10 +156,10 @@ export default class CastAttack {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  extraAttacks() {
+  extraAttacks(attackData) {
     const damage = new Damage();
 
-    this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth);
+    this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth, attackData);
 
     const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
 
@@ -163,10 +169,10 @@ export default class CastAttack {
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }
 
-  extraHealing() {
+  extraHealing(attackData) {
     const damage = new Damage();
 
-    this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth);
+    this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth, attackData);
 
     const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
 

@@ -16,6 +16,7 @@ use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Skills\Values\SkillTypeValue;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
@@ -362,11 +363,21 @@ class KingdomResourcesService {
         }
 
         if ($this->kingdom->current_morale > 0.50) {
+            $charactersSkill = $this->kingdom->character->skills->filter(function($skill) {
+                return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+            })->first();
+
+            $currentTreasury = $this->kingdom->treasury;
+
             $keep = $this->kingdom->buildings()
                                   ->where('game_building_id', GameBuilding::where('name', 'Keep')->first()->id)
                                   ->first();
 
-            $total = 1000 + (1000 * ($keep->level / 100));
+            $total = $currentTreasury + $currentTreasury * ($characterSkill->skill_bonus + ($keep->level / 100));
+
+            if ($total === 0) {
+                $total = 1;
+            }
 
             return $this->updateTreasury($total);
         }
@@ -433,7 +444,7 @@ class KingdomResourcesService {
 
     private function updateTreasury(int $increase) {
         $this->kingdom->update([
-            'treasury' => $this->kingdom->treasury + $increase,
+            'treasury' => $increase,
         ]);
 
         $this->kingdom = $this->kingdom->refresh();

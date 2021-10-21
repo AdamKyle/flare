@@ -1,6 +1,29 @@
 import React from 'react';
 import Embezzel from './embezzel';
-import {Alert} from 'react-bootstrap';
+import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap';
+
+const renderDeposit = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Deposit Gold into kingdom. This will increase your morale by 15%. The more gold you have the higher your defence.
+    Having 2 billion gold gives defences 100% extra defence. Treasury is increased per hour based on gold, your Lust for Gold skill
+    bonus and the level of your keep. Check help docs, under kingdoms for more info.
+  </Tooltip>
+);
+
+const renderWithdrawl = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    By removing any amount of gold you will loose 15% morale each time you withdrawal. Your kingdom will also loose the added defence
+    bonus by the amount of gold you withdrawal. remember having gold increases defence.
+  </Tooltip>
+);
+
+const renderHelp = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    This comes from the amount of gold in your kingdom divided by the max amount of gold (2 billion) your kingdom can have.
+    This defence is also applied, albeit at half, to your kingdom when items are dropped on your kingdom as a percentage towards
+    damage reduction.
+  </Tooltip>
+);
 
 export default class KingdomInfo extends React.Component {
 
@@ -83,6 +106,27 @@ export default class KingdomInfo extends React.Component {
     });
   }
 
+  showDeposit() {
+    this.setState({
+      showEmbezzel: true,
+    });
+  }
+
+  closeDeposit() {
+    this.setState({
+      showEmbezzel: false,
+    });
+  }
+
+  depositSuccess(amount) {
+    const defence = Math.ceil(amount / 2000000000)
+
+    this.setState({
+      showSuccess: true,
+      successMessage: 'Deposited ' + amount + ' gold from kingdom. The kingdoms morale has increased by 15% and your defence bonus is now: ' + defence + '% .',
+    });
+  }
+
   closeSuccess() {
     this.setState({
       showSuccess: false,
@@ -117,9 +161,32 @@ export default class KingdomInfo extends React.Component {
           </div>
           <div className="col-md-3">
             <dl>
-              <dt><strong>
-                <button className="btn btn-link treasury-btn" onClick={this.showEmbezzel.bind(this)}>Treasury:</button>
-              </strong></dt>
+              <dt>
+                <strong>Treasury: </strong>
+
+                <p>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderDeposit}
+                >
+                  <button className="btn btn-primary btn-sm mr-2" onClick={this.showDeposit.bind(this)}>
+                    <i className="ra ra-overhead"></i>
+                  </button>
+
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderWithdrawl}
+                >
+                  <button className="btn btn-primary btn-sm" onClick={this.showEmbezzel.bind(this)}>
+                    <i className="ra ra-underhand"></i>
+                  </button>
+
+                </OverlayTrigger>
+                </p>
+              </dt>
               <dd>{this.getTreasury()}</dd>
             </dl>
           </div>
@@ -187,22 +254,35 @@ export default class KingdomInfo extends React.Component {
         <hr/>
         <div style={{backgroundColor: 'rgb(174 212 234)', padding: '20px'}}>
           <div className="row">
-            <div className="col-md-4">
+            <div className="col-md-3">
               <dl>
                 <dt><strong>Morale Increase/hr</strong>:</dt>
                 <dd>{this.getTotalMoraleIncreasePerHour()}%</dd>
               </dl>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <dl>
                 <dt><strong>Morale Decrease/hr</strong>:</dt>
                 <dd>{this.getTotalMoraleDecreasePerHour()}%</dd>
               </dl>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <dl>
                 <dt><strong>Population Increase/hr</strong>:</dt>
                 <dd>{this.getResourceIncrease('population_increase')}</dd>
+              </dl>
+            </div>
+            <div className="col-md-3">
+              <dl>
+                <dt><strong>Current Defence Bonus</strong> <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderHelp}
+                >
+                  <i className="far fa-question-circle"></i>
+
+                </OverlayTrigger>:</dt>
+                <dd>{Math.ceil(this.props.kingdom.treasury / 2000000000) * 100}%</dd>
               </dl>
             </div>
           </div>

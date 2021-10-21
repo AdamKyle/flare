@@ -28,7 +28,10 @@
                     @break
                 @case('affixes-irresistible')
                     Enemies cannot resist your affixes (unless they void you first)
-                @break;
+                    @break;
+                @case('continue-leveling')
+                    Lets you continue leveling past level 1000 up to the new Level cap which is increased by 100 levels per month.
+                    @break;
                 @default
                     N/A
             @endswitch

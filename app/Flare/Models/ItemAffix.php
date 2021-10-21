@@ -57,6 +57,7 @@ class ItemAffix extends Model
         'base_ac_mod_bonus',
         'fight_time_out_mod_bonus',
         'move_time_out_mod_bonus',
+        'devouring_light',
         'can_drop',
     ];
 
@@ -94,6 +95,7 @@ class ItemAffix extends Model
         'fight_time_out_mod_bonus'         => 'float',
         'move_time_out_mod_bonus'          => 'float',
         'class_bonus'                      => 'float',
+        'devouring_light'                  => 'float',
         'cost'                             => 'integer',
         'int_required'                     => 'integer',
         'skill_level_required'             => 'integer',

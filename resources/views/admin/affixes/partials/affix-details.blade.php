@@ -43,7 +43,7 @@
               <dt>Agi Modifier:</dt>
               <dd class="{{$itemAffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->agi_mod * 100}}%</dd>
               <dt>Focus Modifier:</dt>
-              <dd class="{{$itemAffix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->focus_nod * 100}}%</dd>
+              <dd class="{{$itemAffix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->focus_mod * 100}}%</dd>
             </dl>
           </x-tabs.tab-content-section>
           <x-tabs.tab-content-section tab="prefix-skills" active="false">
@@ -179,6 +179,23 @@
           <dl>
             <dt>Entrance Chance:</dt>
             <dd>{{$itemAffix->entranced_chance * 100}}%</dd>
+          </dl>
+        </div>
+      </div>
+    @endif
+    @if ($itemAffix->devouring_light > 0)
+      <h2 class="mt-2 mb-2">Devouring Light (Voidance)</h2>
+
+      <div class="card">
+        <div class="card-body">
+          <p>
+            These Affixes do not stack. You have a percentage chance to void the enemy of using their affixes. Some higher level critters
+            have a small chance to void you, while Celestials have a much higher chance. If you are voided, you loose all enchantments, no life stealing,
+            no modded stats and no boons.
+          </p>
+          <dl>
+            <dt>Devouring Light Chance:</dt>
+            <dd>{{$itemAffix->devouring_light * 100}}%</dd>
           </dl>
         </div>
       </div>

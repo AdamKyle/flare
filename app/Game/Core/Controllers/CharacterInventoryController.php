@@ -170,8 +170,8 @@ class CharacterInventoryController extends Controller {
 
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
-        $character = $this->manager->createData($characterData)->toArray();
+        $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($character, $character->user));
+        event(new UpdateAttackStats($characterData, $character->user));
     }
 }
