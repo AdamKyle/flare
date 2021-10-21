@@ -102,7 +102,6 @@ class CharacterInventoryController extends Controller {
             ];
         }
 
-
         Cache::put($character->user->id . '-compareItemDetails' . $itemToEquip->id, $viewData, now()->addMinutes(10));
 
         return redirect()->to(route('game.inventory.compare-items', ['user' => $character->user, 'slot' => $itemToEquip->id]));
