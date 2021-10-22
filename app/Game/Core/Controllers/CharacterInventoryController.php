@@ -3,6 +3,9 @@
 namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Core\Services\ComparisonService;
+use App\Game\Skills\Events\UpdateCharacterEnchantingList;
+use App\Game\Skills\Services\EnchantingService;
 use Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
@@ -33,12 +36,19 @@ class CharacterInventoryController extends Controller {
 
     private $manager;
 
-    public function __construct(EquipItemService $equipItemService, BuildCharacterAttackTypes $buildCharacterAttackTypes, CharacterAttackTransformer $characterTransformer, Manager $manager) {
+    public function __construct(
+        EquipItemService $equipItemService,
+        BuildCharacterAttackTypes $buildCharacterAttackTypes,
+        CharacterAttackTransformer $characterTransformer,
+        EnchantingService $enchantingService,
+        Manager $manager
+    ) {
 
-        $this->equipItemService     = $equipItemService;
-        $this->characterTransformer = $characterTransformer;
+        $this->equipItemService          = $equipItemService;
+        $this->characterTransformer      = $characterTransformer;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
-        $this->manager              = $manager;
+        $this->enchantingService         = $enchantingService;
+        $this->manager                   = $manager;
 
         $this->middleware('auth');
 
@@ -49,8 +59,7 @@ class CharacterInventoryController extends Controller {
 
     public function compare(
         ComparisonValidation $request,
-        ValidEquipPositionsValue $validPositions,
-        CharacterInventoryService $characterInventoryService,
+        ComparisonService $comparisonService,
         Character $character
     ) {
 
@@ -66,43 +75,7 @@ class CharacterInventoryController extends Controller {
             $type = 'spell';
         }
 
-        $service = $characterInventoryService->setCharacter($character)
-                                             ->setInventorySlot($itemToEquip)
-                                             ->setPositions($validPositions->getPositions($itemToEquip->item))
-                                             ->setInventory($type);
-
-        $viewData = [
-            'details'     => [],
-            'itemToEquip' => $itemToEquip->item,
-            'type'        => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $type : null),
-            'slotId'      => $itemToEquip->id,
-            'characterId' => $character->id,
-            'bowEquipped' => false,
-            'setEquipped' => false,
-            'setIndex'    => 0,
-        ];
-
-        if ($service->inventory()->isNotEmpty()) {
-            $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
-
-
-            $hasSet   = !is_null($setEquipped);
-            $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
-
-            $viewData = [
-                'details'      => $this->equipItemService->setRequest($request)->getItemStats($itemToEquip->item, $service->inventory(), $character),
-                'itemToEquip'  => $itemToEquip->item,
-                'type'         => $service->getType($itemToEquip->item, $request->has('item_to_equip_type') ? $type : null),
-                'slotId'       => $itemToEquip->id,
-                'slotPosition' => $itemToEquip->position,
-                'characterId'  => $character->id,
-                'bowEquipped'  => $this->equipItemService->isBowEquipped($itemToEquip->item, $service->inventory()),
-                'setEquipped'  => $hasSet,
-                'setIndex'     => $setIndex,
-            ];
-        }
-
-        Cache::put($character->user->id . '-compareItemDetails' . $itemToEquip->id, $viewData, now()->addMinutes(10));
+        $comparisonService->buildComparisonData($character, $itemToEquip, $type);
 
         return redirect()->to(route('game.inventory.compare-items', ['user' => $character->user, 'slot' => $itemToEquip->id]));
     }
@@ -116,18 +89,29 @@ class CharacterInventoryController extends Controller {
             return redirect()->route('game.character.sheet')->with('error', 'Item comparison expired.');
         }
 
-        return view('game.character.equipment', Cache::get($user->id . '-compareItemDetails' . $request->slot));
+        $cache           = Cache::get($user->id . '-compareItemDetails' . $request->slot);
+        $cache['isShop'] = false;
+
+        return view('game.character.equipment', $cache);
     }
 
     public function equipItem(EquipItemValidation $request, Character $character) {
         try {
             $item = $this->equipItemService->setRequest($request)
                                            ->setCharacter($character)
-                                           ->equipItem();
+                                           ->replaceItem();
 
             $this->updateCharacterAttakDataCache($character);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+            event(new UpdateCharacterEnchantingList(
+                $character->user,
+                $affixData['affixes'],
+                $affixData['character_inventory'],
+            ));
 
             return redirect()->to(route('game.character.sheet'))->with('success', $item->affix_name . ' Equipped.');
 
@@ -160,6 +144,14 @@ class CharacterInventoryController extends Controller {
         event(new UpdateTopBarEvent($character));
 
         $this->updateCharacterAttakDataCache($character);
+
+        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+
+        event(new UpdateCharacterEnchantingList(
+            $character->user,
+            $affixData['affixes'],
+            $affixData['character_inventory'],
+        ));
 
         return redirect()->back()->with('success', 'Unequipped item.');
     }

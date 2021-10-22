@@ -14,8 +14,9 @@
     <hr />
     <x-tabs.pill-tabs-container>
         @foreach($gameMapNames as $index => $gameMapName)
+            @php $name = str_replace(' ', '-', $gameMapName)@endphp
             <x-tabs.tab
-              tab="{{$gameMapName . '-' . $index}}"
+              tab="{{$name . '-' . $index}}"
               selected="{{$index === 0 ? 'true' : 'false'}}"
               active="{{$index === 0 ? 'true' : 'false'}}"
               title="{{$gameMapName}}"
@@ -24,20 +25,21 @@
     </x-tabs.pill-tabs-container>
     <x-tabs.tab-content>
         @foreach($gameMapNames as $index => $gameMapName)
+            @php $name = str_replace(' ', '-', $gameMapName)@endphp
             <x-tabs.tab-content-section
-              tab="{{$gameMapName . '-' . $index}}"
+              tab="{{$name . '-' . $index}}"
               active="{{$index === 0 ? 'true' : 'false'}}"
             >
                 <x-cards.card>
                     <x-tabs.pill-tabs-container>
                         <x-tabs.tab
-                          tab="{{$gameMapName . '-' . $index . '-monsters'}}"
+                          tab="{{$name . '-' . $index . '-monsters'}}"
                           selected="true"
                           active="true"
                           title="Monsters"
                         />
                         <x-tabs.tab
-                          tab="{{$gameMapName . '-' . $index . '-celestials'}}"
+                          tab="{{$name . '-' . $index . '-celestials'}}"
                           selected="false"
                           active="false"
                           title="Celestials"
@@ -45,7 +47,7 @@
                     </x-tabs.pill-tabs-container>
                     <x-tabs.tab-content>
                         <x-tabs.tab-content-section
-                          tab="{{$gameMapName . '-' . $index . '-monsters'}}"
+                          tab="{{$name . '-' . $index . '-monsters'}}"
                           active="true"
                         >
                             @livewire('admin.monsters.data-table', [
@@ -53,7 +55,7 @@
                             ])
                         </x-tabs.tab-content-section>
                         <x-tabs.tab-content-section
-                          tab="{{$gameMapName . '-' . $index . '-celestials'}}"
+                          tab="{{$name . '-' . $index . '-celestials'}}"
                           active="true"
                         >
                             @livewire('admin.monsters.data-table', [

@@ -20,6 +20,9 @@
                     @break
                 @case('dungeon')
                     Access Dungeons Plane
+                @case('shadow-plane')
+                    Access Shadow Plane
+                    @break;
                 @case('walk-on-death-water')
                     Walk on Death Water in Dungeons
                     @break

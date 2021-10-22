@@ -1,5 +1,9 @@
 <input type="hidden" name="slot_id" value={{$slotId}} />
-<input type="hidden" name="equip_type" value={{$type}} />
+<input type="hidden" name="equip_type" value={{$type === 'bow' ? 'weapon' : $type}} />
+
+@if ($isShop)
+    <input type="hidden" name="item_id_to_buy" value={{$item->id}} />
+@endif
 
 @if ($item->type === 'bow')
     <div class="alert alert-info mt-2 mb-3">

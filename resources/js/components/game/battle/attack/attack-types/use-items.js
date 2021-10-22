@@ -11,20 +11,22 @@ export default class UseItems {
     this.battleMessages         = [];
   }
 
-  useItems(attackData, attackerClass) {
+  useItems(attackData, attackerClass, isVoided) {
 
-    if (attackerClass === 'Vampire') {
-      this.lifeStealingAffixes(attackData, true);
+    if (!this.isVoided) {
+      if (attackerClass === 'Vampire') {
+        this.lifeStealingAffixes(attackData, true);
+      }
+
+      const damageAffixes = new DamageAffixes(this.characterCurrentHealth, this.monsterCurrentHealth);
+
+      damageAffixes.fireDamageAffixes(attackData.affixes, this.defender);
+
+      this.characterCurrentHealth = damageAffixes.getCharacterHealth();
+      this.monsterCurrentHealth = damageAffixes.getMonsterHealth();
+
+      this.battleMessages = [...this.battleMessages, ...damageAffixes.getBattleMessages()];
     }
-
-    const damageAffixes = new DamageAffixes(this.characterCurrentHealth, this.monsterCurrentHealth);
-
-    damageAffixes.fireDamageAffixes(attackData.affixes, this.defender);
-
-    this.characterCurrentHealth = damageAffixes.getCharacterHealth();
-    this.monsterCurrentHealth   = damageAffixes.getMonsterHealth();
-
-    this.battleMessages = [...this.battleMessages, ...damageAffixes.getBattleMessages()];
 
     this.useArtifacts(attackData, this.defender, 'player');
     this.ringDamage(attackData, this.defender, 'player');

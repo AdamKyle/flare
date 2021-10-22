@@ -550,7 +550,7 @@ export default class Map extends React.Component {
             >
               <div>
                 <div className="handle game-map"
-                     style={{backgroundImage: `url(${this.state.mapUrl})`, width: 500, height: 500}}>
+                     style={{backgroundImage: `url("${this.state.mapUrl}")`, width: 500, height: 500}}>
                   <Locations locations={this.state.locations}/>
                   <KingdomPin
                     kingdoms={this.state.kingdoms}

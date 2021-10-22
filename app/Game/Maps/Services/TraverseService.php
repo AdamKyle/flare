@@ -5,17 +5,17 @@ namespace App\Game\Maps\Services;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Flare\Events\ServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
-use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\ItemEffectsValue;
@@ -95,6 +95,14 @@ class TraverseService {
             return !empty($hasItem);
         }
 
+        if ($gameMap->name === 'Shadow Plane') {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::SHADOWPLANE;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
         if ($gameMap->name === 'Surface') {
             return true;
         }
@@ -143,6 +151,19 @@ class TraverseService {
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
         event(new ServerMessageEvent($character->user, 'plane-transfer', $message));
+
+        $name = $character->map->gameMap->name;
+
+        if ($name === 'Shadow Plane') {
+            $message = 'As you enter into the Shadow Plane, all you see for miles around are 
+            shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
+            feel the presence of death as it creeps ever closer. 
+            (Characters can walk on water here, monster strength is increased by 25% including Devouring Light. You are reduced by 25% while here.)';
+
+            event(new MessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('The gates have opened for . ' . $character->name . ' they have entered the realm of shadows!'));
+        }
     }
 
     protected function changeLocation(Character $character, array $cache) {

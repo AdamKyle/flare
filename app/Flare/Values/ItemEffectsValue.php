@@ -13,6 +13,7 @@ class ItemEffectsValue {
     const WALK_ON_DEATH_WATER   = 'walk-on-death-water';
     const LABYRINTH             = 'labyrinth';
     const DUNGEON               = 'dungeon';
+    const SHADOWPLANE           = 'shadow-plane';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
     const CONTNUE_LEVELING      = 'continue-leveling';
@@ -83,6 +84,15 @@ class ItemEffectsValue {
      */
     public function dungeon(): bool {
         return $this->value === self::DUNGEON;
+    }
+
+    /**
+     * Can access Shadow plane
+     *
+     * @return bool
+     */
+    public function shadowPlane(): bool {
+        return $this->value === self::SHADOWPLANE;
     }
 
     /**

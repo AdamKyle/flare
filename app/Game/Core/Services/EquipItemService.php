@@ -2,6 +2,9 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\UpdateAttackStats;
 use League\Fractal\Manager;
 
@@ -80,52 +83,42 @@ class EquipItemService {
         return $this;
     }
 
-    /**
-     * Equip the item
-     *
-     * @return Item
-     */
-    public function equipItem(): Item {
-
+    public function replaceItem(): Item {
         $characterSlot = $this->character->inventory->slots->filter(function($slot) {
             return $slot->id === (int) $this->request->slot_id && !$slot->equipped;
         })->first();
 
         if (is_null($characterSlot)) {
-            throw new EquipItemException('Could not equip item because you either do not have it, or it is equipped already.');
+            throw new EquipItemException('The item you are trying to equip as a replacement, does not exist.');
         }
+
 
         $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
         if (!is_null($equippedSet)) {
-            $this->inventorySetService->unEquipInventorySet($equippedSet);
-        }
-
-        if ($characterSlot->item->type === 'bow') {
-            $this->unequipBothHands();
-        } else {
-            $hasBowEquipped = $this->character->inventory->slots->filter(function($slot) {
-                return $slot->item->type === 'bow' && $slot->equipped;
-            })->isNotEmpty();
-
-
-            if ($hasBowEquipped && ($characterSlot->item->type === 'weapon' || $characterSlot->item->type === 'shield')) {
-                $this->unequipBothHands();
-            } else {
-                $itemForPosition = $this->character->inventory->slots->filter(function($slot) {
-                    return $slot->position === $this->request->position && $slot->equipped;
-                })->first();
-
-                if (!is_null($itemForPosition)) {
-                    $itemForPosition->update(['equipped' => false]);
-                }
+            if ($this->character->isInventoryFull()) {
+                throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
             }
-        }
 
-        $characterSlot->update([
-            'equipped' => true,
-            'position' => $this->request->position,
-        ]);
+
+            $this->unequipSlot($characterSlot, $equippedSet);
+
+            $equippedSet->slots()->create([
+                'inventory_set_id' => $equippedSet->id,
+                'item_id'  => $characterSlot->item->id,
+                'equipped' => true,
+                'position' => $this->request->position,
+            ]);
+
+            $characterSlot->delete();
+        } else {
+            $this->unequipSlot($characterSlot, $this->character->inventory);
+
+            $characterSlot->update([
+                'equipped' => true,
+                'position' => $this->request->position,
+            ]);
+        }
 
         $character = $this->character->refresh();
 
@@ -164,14 +157,84 @@ class EquipItemService {
         })->isNotEmpty();
     }
 
+    public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory) {
+        if ($characterSlot->item->type === 'bow') {
+            $this->unequipBothHands();
+        } else {
+            if ($this->hasBowEquipped($inventory)) {
+                $this->unequipBothHands();
+            }
+
+            $itemForPosition = $inventory->slots->filter(function($slot) {
+                return $slot->position === $this->request->position && $slot->equipped;
+            })->first();
+
+            if (!is_null($itemForPosition)) {
+                $itemForPosition->update(['equipped' => false]);
+
+                $this->character->inventory->slots()->create([
+                    'inventory_id' => $this->character->inventory->id,
+                    'item_id'      => $itemForPosition->item->id,
+                ]);
+
+                $itemForPosition->delete();
+            }
+        }
+    }
+
+    /**
+     * Check both hands to see if we have a bow equipped.
+     *
+     * @param Inventory|InventorySet $inventory
+     * @return bool
+     */
+    public function hasBowEquipped(Inventory|InventorySet $inventory): bool {
+        $position  = $this->request->position;
+        $bowInHand = null;
+
+        if ($position === 'left-hand' || $position === 'right-hand') {
+            $bowInHand = $inventory->slots->filter(function($slot) {
+                return $slot->equipped && $slot->item->type === 'bow';
+            })->first();
+        }
+
+        return !is_null($bowInHand);
+    }
+
+    /**
+     * Unequips both hands.
+     */
     public function unequipBothHands() {
         $slots = $this->character->inventory->slots->filter(function($slot) {
             return $slot->equipped;
         });
 
+        $removedFromSet = false;
+
+        if ($slots->isEmpty()) {
+            $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
+
+            if (!is_null($equippedSet)) {
+                $slots = $equippedSet->slots->filter(function($slot) {
+                    return $slot->equipped;
+                });
+
+                $removedFromSet = true;
+            }
+        }
+
         foreach ($slots as $slot) {
             if ($slot->position === 'right-hand' || $slot->position === 'left-hand') {
                 $slot->update(['equipped' => false]);
+
+                if ($removedFromSet) {
+                    $this->character->inventory->slots()->create([
+                        'inventory_id' => $this->character->inventory->id,
+                        'item_id'      => $slot->item->id,
+                    ]);
+
+                    $slot->delete();
+                }
             }
         }
 

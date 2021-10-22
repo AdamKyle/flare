@@ -2,7 +2,15 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Exceptions\EquipItemException;
+use App\Game\Core\Services\EquipItemService;
+use Cache;
 use App\Game\Core\Jobs\PurchaseItemsJob;
+use App\Game\Core\Requests\EquipItemValidation;
+use App\Game\Core\Services\ComparisonService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -13,13 +21,33 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Core\Events\BuyItemEvent;
 use App\Game\Core\Events\SellItemEvent;
 use App\Game\Core\Services\ShopService;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class ShopController extends Controller {
 
-    public function __construct() {
+    private $equipItemService;
+
+    private $buildCharacterAttackTypes;
+
+    private $characterTransformer;
+
+    private $manager;
+
+    public function __construct(
+        EquipItemService $equipItemService,
+        BuildCharacterAttackTypes $buildCharacterAttackTypes,
+        CharacterAttackTransformer $characterTransformer,
+        Manager $manager
+    ) {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
         $this->middleware('is.character.adventuring');
+
+        $this->equipItemService          = $equipItemService;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+        $this->characterTransformer      = $characterTransformer;
+        $this->manager                   = $manager;
     }
 
     public function shopBuy(Character $character) {
@@ -97,6 +125,10 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'You do not have enough gold.');
         }
 
+        if ($character->isInventoryFull()) {
+            return redirect()->back()->with('error', 'Inventory is full. Please make room.');
+        }
+
         event(new BuyItemEvent($item, $character));
 
         return redirect()->back()->with('success', 'Purchased: ' . $item->affix_name . '.');
@@ -135,5 +167,81 @@ class ShopController extends Controller {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
+    }
+
+    public function shopCompare(Request $request, Character $character, ComparisonService $comparisonService) {
+
+        $viewData = $comparisonService->buildShopData($character, Item::find($request->item_id), $request->item_type);
+
+        Cache::put('shop-comparison-character-' . $character->id, $viewData, now()->addMinutes(10));
+
+        return redirect()->to(route('game.shop.view.comparison', ['character' => $character]));
+    }
+
+    public function viewShopCompare(Character $character) {
+        $cache = Cache::get('shop-comparison-character-' . $character->id);
+
+        if (is_null($cache)) {
+            return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('error', 'Comparison cache has expired. Please click compare again. Cache expires after 10 minutes');
+        }
+
+        return view('game.core.shop.comparison', $cache);
+    }
+
+    public function buyAndReplace(EquipItemValidation $request, Character $character) {
+        if (!$request->has('item_id_to_buy')) {
+            return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('error', 'Missing item to buy. Invalid Input.');
+        }
+
+        $item = Item::find($request->item_id_to_buy);
+
+        if (is_null($item)) {
+            return redirect()->back()->with('error', 'Item not found.');
+        }
+
+        if ($item->cost > $character->gold) {
+            return redirect()->back()->with('error', 'You do not have enough gold.');
+        }
+
+        if ($character->isInventoryFull()) {
+            return redirect()->back()->with('error', 'Inventory is full. Please make room.');
+        }
+
+        event(new BuyItemEvent($item, $character));
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+            return $slot->item->id === $item->id && !$slot->equipped;
+        })->first();
+
+        $request->merge([
+            'slot_id' => $slot->id,
+        ]);
+
+        try {
+            $this->equipItemService->setRequest($request)
+                ->setCharacter($character)
+                ->replaceItem();
+
+            $this->updateCharacterAttakDataCache($character);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            return redirect()->to(route('game.character.sheet'))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
+
+        } catch(EquipItemException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    protected function updateCharacterAttakDataCache(Character $character) {
+        $this->buildCharacterAttackTypes->buildCache($character);
+
+        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+
+        $characterData = $this->manager->createData($characterData)->toArray();
+
+        event(new UpdateAttackStats($characterData, $character->user));
     }
 }

@@ -1,6 +1,10 @@
 <input type="hidden" name="slot_id" value={{$slotId}} />
 <input type="hidden" name="equip_type" value={{$itemToEquip->type}} />
 
+@if ($isShop)
+    <input type="hidden" name="item_id_to_buy" value={{$itemToEquip->id}} />
+@endif
+
 <fieldset class="form-group row">
     <legend class="col-sm-2">Which Position</legend>
     <div class="col-sm-10">

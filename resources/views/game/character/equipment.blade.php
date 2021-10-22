@@ -8,10 +8,20 @@
         color="success"
     ></x-core.page-title>
     <hr />
-    @if ($setEquipped)
+    @if ($setEquipped && !$isShop)
         <div class="alert alert-warning mt-2 mb-3">
-            Equipping this item while <strong>Set {{$setIndex}}</strong> is equipped will remove the set and equip this item.
-            You <strong>cannot</strong> mix and match sets nor sets with other equipment.
+            Equipping this item while <strong>Set {{$setIndex}}</strong> is equipped will replace the set item and equip this item.
+            The set item will be placed into your inventory assuming you have the space. If not, you will be redirected back and told make some room.
+        </div>
+    @elseif($setEquipped && $isShop)
+        <div class="alert alert-warning mt-2 mb-3">
+            Replacing this (or one of these) set item with the shop item will <strong>not</strong> unequip the set
+            and instead <strong>replace in the position stated you selected</strong>. The item replaced will be put into your inventory.
+        </div>
+    @elseif($isShop)
+        <div class="alert alert-warning mt-2 mb-3">
+            Replacing this (or one of these) items will replace the item in the position stated.
+            Should you have no item equipped, this will just be equipped.s
         </div>
     @endif
     <div class="row">
@@ -35,6 +45,7 @@
                 'itemToEquip' => $itemToEquip,
                 'type'        => $type,
                 'bowEquipped' => $bowEquipped,
+                'isShop'      => isset($isShop) ? $isShop : false,
             ])
         </div>
     </div>

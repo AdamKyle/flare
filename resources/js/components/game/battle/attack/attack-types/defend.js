@@ -61,7 +61,7 @@ export default class Defend {
   useItems(attackData, attackerClass) {
     const useItems = new UseItems(this.defender, this.monsterHealth, this.characterCurrentHealth);
 
-    useItems.useItems(attackData, attackerClass);
+    useItems.useItems(attackData, attackerClass, this.voided);
 
     this.monsterHealth          = useItems.getMonsterCurrentHealth();
     this.characterCurrentHealth = useItems.getCharacterCurrentHealth();

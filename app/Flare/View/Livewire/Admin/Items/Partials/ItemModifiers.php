@@ -16,6 +16,7 @@ class ItemModifiers extends Component
         ItemEffectsValue::WALK_ON_DEATH_WATER,
         ItemEffectsValue::LABYRINTH,
         ItemEffectsValue::DUNGEON,
+        ItemEffectsValue::SHADOWPLANE,
         ItemEffectsValue::TELEPORT_TO_CELESTIAL,
         ItemEffectsValue::AFFIXES_IRRESISTIBLE,
         ItemEffectsValue::CONTNUE_LEVELING,

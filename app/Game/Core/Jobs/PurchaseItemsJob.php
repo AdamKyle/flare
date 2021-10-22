@@ -43,6 +43,12 @@ class PurchaseItemsJob implements ShouldQueue
         foreach ($this->items as $item) {
             $character = $this->character->refresh();
 
+            if ($character->isInventoryFull()) {
+                event(new ServerMessageEvent($character->user, 'Inventory is full, item not bought. Please make room.'));
+
+                return;
+            }
+
             if ($item->cost > $character->gold) {
                 event(new ServerMessageEvent($character->user, 'You do not have enough gold to buy: ' . $item->name . '. Anything before this item in the list was purchased.'));
 

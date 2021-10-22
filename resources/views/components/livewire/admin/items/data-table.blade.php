@@ -276,6 +276,12 @@
                                         >
                                             <input type="hidden" name="item_id" value={{$item->id}} />
                                         </x-forms.button-with-form>
+
+                                        <a href="{{route('game.shop.compare.item', [
+                                            'character' => $character->id,
+                                            'item_id'   => $item->id,
+                                            'item_type' => $item->type,
+                                        ])}}" class="btn btn-primary btn-sm" target="_blank">Compare</a>
                                     @endif
                                 </td>
                             @endguest

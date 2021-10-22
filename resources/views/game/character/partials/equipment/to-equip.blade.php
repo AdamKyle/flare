@@ -19,8 +19,11 @@
             </p>
         @endif
 
+        @php
+            $route = $isShop ? route('game.shop.buy-and-replace', ['character' => $characterId]) : route('game.equip.item', ['character' => $characterId])
+        @endphp
 
-        <form class="mt-4" action="{{route('game.equip.item', ['character' => $characterId])}}" method="POST">
+        <form class="mt-4" action="{{$route}}" method="POST">
             @csrf
 
             @if ($bowEquipped)
@@ -34,10 +37,16 @@
                 'slotId'      => $slotId,
                 'details'     => $details,
                 'itemToEquip' => $itemToEquip,
-                'type'        => $type,
+                'type'        => $itemToEquip->type,
                 'item'        => $itemToEquip,
+                'isShop'      => $isShop,
             ])
-            <button type="submit" class="btn btn-primary">Equip</button>
+
+            @if ($isShop)
+                <button type="submit" class="btn btn-primary">Buy and Replace</button>
+            @else
+                <button type="submit" class="btn btn-primary">Equip</button>
+            @endif
         </form>
     </div>
 </div>
