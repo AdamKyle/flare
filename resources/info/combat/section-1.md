@@ -105,7 +105,8 @@ No class skills would fire on defend.
 ## Regarding Voidance
 
 If you are voided at any time during the attack, we will fall back to raw values for stats and items you use in the attack. 
-This means no affixes, no modded stats and no boons.
+This means no affixes, no modded stats and no boons. The voidance will last the entire battle, even if you die and revive, youll still be voided.
+This will also apply to your enemy, however they cannot resurrect.
 
 ## Regarding Devoidance
 

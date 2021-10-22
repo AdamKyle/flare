@@ -118,6 +118,7 @@ export default class FightSection extends React.Component {
     let propsMonster = this.props.monster;
 
     if (this.props.resetBattleAction && stateMonster !== null) {
+
       this.setState({
         monsterCurrentHealth: null,
         characterCurrentHealth: null,
@@ -132,6 +133,7 @@ export default class FightSection extends React.Component {
     if (propsMonster !== null && stateMonster === null) {
       this.setMonsterInfo()
     } else if (propsMonster !== null && stateMonster !== null) {
+
       if (!stateMonster.hasOwnProperty('name')) {
         stateMonster = stateMonster.monster;
       }
@@ -192,6 +194,7 @@ export default class FightSection extends React.Component {
       });
 
       isVoided = true;
+
     } else if (!this.state.isCharacterVoided) {
       let messages = monsterInfo.reduceAllStats(character.stat_affixes);
 
@@ -278,9 +281,6 @@ export default class FightSection extends React.Component {
       state.monsterCurrentHealth = this.state.monsterMaxHealth;
     }
 
-    state['isCharacterVoided'] = false;
-    state['isMonsterReduced']  = false;
-
     this.setState(state);
 
     if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
@@ -296,7 +296,7 @@ export default class FightSection extends React.Component {
         if (health >= 0 && state.monsterCurrentHealth >= 0) {
           health = this.state.characterMaxHealth;
         } else {
-          health = null;
+          health = 0;
         }
 
         if (state.monsterCurrentHealth <= 0) {

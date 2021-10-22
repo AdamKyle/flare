@@ -9,7 +9,17 @@ Regular critters won&#39;t void you much, although harder creatures in the list 
 - Your affixes won&#39;t fire.
 - Your stats won&#39;t include any modifications (raw stats)
 - Your artifacts will not fire
-- Your health will be much lower.
+- Your health will be much lower (raw DUR lower)
+
+> ## ATTN!
+> 
+> If you are voided during the fight, which happens at the beginning of the fight, you will be voided for the entire fight,
+> even if you die and resurrect. The critter still holds the power over you.
+> 
+> To get around this, follow the next section.
+> 
+> Character Devouring Light and Darkness will fire before the enemies. If the enemy is devoided or voided or has their stats reduced,
+> that will affect the enemy the entire battle, as it would you.
 
 ## How do I prevent this?
 

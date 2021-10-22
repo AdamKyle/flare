@@ -25,6 +25,8 @@ export default class Monster {
   }
 
   canMonsterVoidPlayer() {
+
+    return true;
     const dc = 100 - 100 * this.monster.devouring_light_chance;
 
     return random(1, 100) > dc;
