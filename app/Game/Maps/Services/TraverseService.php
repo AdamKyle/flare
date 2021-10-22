@@ -2,6 +2,8 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Values\MapTileValue;
@@ -19,6 +21,7 @@ use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\ItemEffectsValue;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class TraverseService {
 
@@ -47,6 +50,8 @@ class TraverseService {
      */
     private $mapTileValue;
 
+    private $buildCharacterAttackTypes;
+
     /**
      * TraverseService constructor.
      *
@@ -58,12 +63,14 @@ class TraverseService {
     public function __construct(
         Manager $manager,
         CharacterAttackTransformer $characterAttackTransformer,
+        BuildCharacterAttackTypes $buildCharacterAttackTypes,
         MonsterTransfromer $monsterTransformer,
         LocationService $locationService,
         MapTileValue $mapTileValue
     ) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->buildCharacterAttackTypes  = $buildCharacterAttackTypes;
         $this->monsterTransformer         = $monsterTransformer;
         $this->locationService            = $locationService;
         $this->mapTileValue               = $mapTileValue;
@@ -208,12 +215,17 @@ class TraverseService {
      */
     protected function updateActions(int $mapId, Character $character) {
         $user      = $character->user;
+
+        $this->buildCharacterAttackTypes->buildCache($character);
+
         $character = new Item($character, $this->characterAttackTransformer);
         $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
 
         $character = $this->manager->createData($character)->toArray();
 
         broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
+
+        event(new UpdateAttackStats($character, $user));
     }
 
     /**

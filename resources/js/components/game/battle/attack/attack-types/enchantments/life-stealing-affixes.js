@@ -9,8 +9,8 @@ export default class LifeStealingAffixes {
     this.monsterCurrentHealth   = monsterCurrentHealth;
   }
 
-  affixesLifeStealing(attacker, defender, stacking) {
-    const details = this.damage.affixLifeSteal(attacker, defender, this.monsterCurrentHealth, this.characterCurrentHealth, stacking);
+  affixesLifeStealing(attacker, defender, stacking, damageDeduction) {
+    const details = this.damage.affixLifeSteal(attacker, defender, this.monsterCurrentHealth, this.characterCurrentHealth, stacking, damageDeduction);
 
     this.monsterCurrentHealth   = details.monsterCurrentHealth;
     this.characterCurrentHealth = details.characterHealth;

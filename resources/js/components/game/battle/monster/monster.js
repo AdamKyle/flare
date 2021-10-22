@@ -17,7 +17,11 @@ export default class Monster {
 
     const healthRange = this.monster.health_range.split('-');
 
-    return parseInt(randomNumber(healthRange[0], healthRange[1]) + this.monster.dur);
+    let health = randomNumber(healthRange[0], healthRange[1]) + this.monster.dur;
+
+    health = health + health * this.monster.increases_damage_by;
+
+    return parseInt(health + this.monster.dur);
   }
 
   canMonsterVoidPlayer() {
@@ -81,7 +85,11 @@ export default class Monster {
 
     const attackRange = this.monster.attack_range.split('-');
 
-    return parseInt(randomNumber(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat] / 2));
+    let attack = randomNumber(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat] / 2);
+
+    attack = attack + attack * this.monster.increases_damage_by;
+
+    return parseInt(attack);
   }
 
   getMonster() {

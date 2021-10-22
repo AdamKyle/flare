@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Providers;
 
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Game\Battle\Services\ConjureService;
@@ -46,6 +47,7 @@ class ServiceProvider extends ApplicationServiceProvider
            return new TraverseService(
                $app->make(Manager::class),
                $app->make(CharacterAttackTransformer::class),
+               $app->make(BuildCharacterAttackTypes::class),
                $app->make(MonsterTransfromer::class),
                $app->make(LocationService::class),
                $app->make(MapTileValue::class)

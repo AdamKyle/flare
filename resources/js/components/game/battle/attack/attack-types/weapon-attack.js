@@ -92,11 +92,13 @@ export default class WeaponAttack {
       damage *= 2;
     }
 
-    this.monsterHealth = this.monsterHealth - damage;
+    const totalDamage = damage - damage * attackData.damage_deduction;
+
+    this.monsterHealth = this.monsterHealth - totalDamage;
 
     this.extraAttacks();
 
-    this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(damage))
+    this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(totalDamage))
   }
 
   useItems(attackData, attackerClass) {

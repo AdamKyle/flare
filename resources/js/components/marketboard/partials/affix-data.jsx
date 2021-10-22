@@ -118,6 +118,16 @@ export default class AffixData extends React.Component {
                 :
                   null
               }
+
+              {
+                item.devouring_light > 0.0 ?
+                  <Fragment>
+                    <dt>Devouring Light Chance:</dt>
+                    <dd>{item.devouring_light * 100}%</dd>
+                  </Fragment>
+                  :
+                  null
+              }
             </dl>
           </Tab>
         </Tabs>

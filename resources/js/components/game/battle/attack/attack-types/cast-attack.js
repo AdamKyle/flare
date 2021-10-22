@@ -118,6 +118,8 @@ export default class CastAttack {
       damage *= 2;
     }
 
+    damage = damage - damage * attackData.damage_deduction;
+
     this.monsterHealth -= damage;
 
     this.extraAttacks(attackData);
@@ -161,7 +163,7 @@ export default class CastAttack {
 
     this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth, attackData);
 
-    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
     this.monsterHealth          = health.monster_hp;
     this.characterCurrentHealth = health.character_hp;

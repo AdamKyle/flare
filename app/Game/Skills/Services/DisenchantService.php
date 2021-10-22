@@ -3,11 +3,13 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\Traits\SkillCheck;
 
@@ -108,8 +110,29 @@ class DisenchantService {
             $goldDust = $goldDust + $goldDust * $skill->bonus;
         }
 
+
+
+        $questSlot = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
+        })->first();
+
+        $characterTotalGoldDust = $character->gold_dust + $goldDust;
+
+        if (!is_null($questSlot) && !$failedCheck) {
+            $dc   = 100 - 100 * 0.25;
+            $roll = rand(1, 100);
+
+            if ($roll > $dc) {
+                $skillBonus            = $skill->skill_bonus;
+
+                $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * $skillBonus;
+
+                event(new MessageEvent($character->user, 'Gold Dust Rush! You gained '.($skillBonus * 100).'% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
+            }
+        }
+
         $character->update([
-            'gold_dust' => $character->gold_dust + $goldDust
+            'gold_dust' => $characterTotalGoldDust
         ]);
 
         $this->goldDust += $goldDust;

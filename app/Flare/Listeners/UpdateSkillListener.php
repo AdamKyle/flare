@@ -4,13 +4,19 @@ namespace App\Flare\Listeners;
 
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\Adventure;
+use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class UpdateSkillListener
 {
@@ -76,11 +82,25 @@ class UpdateSkillListener
                 'xp'                 => 0,
             ]);
 
+            $character = $skill->character->refresh();
+
             event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
 
             if ($skill->can_train) {
-                event(new UpdateCharacterAttackEvent($skill->character->refresh()));
+                event(new UpdateCharacterAttackEvent($character));
             }
+
+            $this->updateCharacterAttakDataCache($character);
         }
+    }
+
+    protected function updateCharacterAttakDataCache(Character $character) {
+        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
+        $characterData = new ResourceItem($character->refresh(), resolve(CharacterAttackTransformer::class));
+
+        $characterData = resolve(Manager::class)->createData($characterData)->toArray();
+
+        event(new UpdateAttackStats($characterData, $character->user));
     }
 }

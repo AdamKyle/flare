@@ -2,7 +2,6 @@
 
 namespace App\Game\Core\Listeners;
 
-use Illuminate\Database\Eloquent\Collection;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -29,14 +28,14 @@ class GoldRushCheckListener
         $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($event->monster, $gameMapBonus, $event->adventure);
 
         if ($hasGoldRush) {
-            $goldRush = rand(0, 10000) + 1000000;
+            $goldRush = ceil($this->character->gold + $this->character->gold * 0.10);
 
-            $event->character->gold += $goldRush;
+            $event->character->gold = $goldRush;
             $event->character->save();
 
             $character = $event->character->refresh();
 
-            event(new ServerMessageEvent($character->user, 'gold_rush', $goldRush));
+            event(new ServerMessageEvent($character->user, 'gold_rush', ceil($this->character->gold * 0.10)));
             event(new UpdateTopBarEvent($character));
         }
     }

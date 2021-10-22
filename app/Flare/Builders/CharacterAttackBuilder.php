@@ -78,14 +78,17 @@ class CharacterAttackBuilder {
     }
 
     protected function baseAttack(bool $voided = false): array {
+        $enemyStatBonus = $this->character->map->gameMap->enemy_stat_bonus;
+
         return [
-            'name'            => $this->character->name,
-            'defence'         => $this->characterInformationBuilder->buildDefence($voided),
-            'ring_damage'     => $this->characterInformationBuilder->getTotalRingDamage($voided),
-            'artifact_damage' => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
-            'heal_for'        => $this->characterInformationBuilder->buildHealFor($voided),
-            'res_chance'      => $this->characterInformationBuilder->fetchResurrectionChance(),
-            'affixes'         => [
+            'name'             => $this->character->name,
+            'defence'          => $this->characterInformationBuilder->buildDefence($voided),
+            'ring_damage'      => $this->characterInformationBuilder->getTotalRingDamage($voided),
+            'artifact_damage'  => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
+            'heal_for'         => $this->characterInformationBuilder->buildHealFor($voided),
+            'res_chance'       => $this->characterInformationBuilder->fetchResurrectionChance(),
+            'damage_deduction' => is_null($enemyStatBonus) ? 0.0 : $enemyStatBonus,
+            'affixes'          => [
                 'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(),
                 'non_stacking_damage'    => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(false),

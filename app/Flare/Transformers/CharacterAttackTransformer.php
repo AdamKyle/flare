@@ -62,7 +62,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
-            'attack_types' => $this->fetchAttackTypes($character),
+            'attack_types'       => $this->fetchAttackTypes($character),
         ];
     }
 

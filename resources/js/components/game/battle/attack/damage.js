@@ -7,7 +7,7 @@ export default class Damage {
     this.battleMessages = [];
   }
 
-  affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth, stacking) {
+  affixLifeSteal(attacker, defender, monsterCurrentHealth, characterCurrentHealth, stacking, damageDeduction) {
 
     if (monsterCurrentHealth <= 0) {
       return {
@@ -27,11 +27,15 @@ export default class Damage {
 
     if (totalDamage > 0.0) {
       if (cantResist) {
+
+        totalDamage = totalDamage - totalDamage * damageDeduction;
         this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
 
         monsterCurrentHealth -= totalDamage;
         characterCurrentHealth += totalDamage;
       } else {
+
+        totalDamage = totalDamage - totalDamage * damageDeduction;
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
@@ -52,14 +56,14 @@ export default class Damage {
     }
   }
 
-  affixDamage(attacker, defender, monsterCurrentHealth) {
-    let totalDamage   = attacker.stacking_damage;
+  affixDamage(attacker, defender, monsterCurrentHealth, damageDeduction) {
+    let totalDamage   = attacker.stacking_damage - attacker.stacking_damage * damageDeduction;
     const cantResist  = attacker.cant_be_resisted;
 
     if (cantResist) {
       this.addMessage('The enemy cannot resist your enchantments! They are so glowy!');
 
-      totalDamage += attacker.non_stacking_damage
+      totalDamage += attacker.non_stacking_damage;
     } else {
       if (attacker.non_stacking_damage > 0) {
         const dc = 100 - (100 * defender.affix_resistance);
@@ -67,7 +71,7 @@ export default class Damage {
         if (dc <= 0 || random(1, 100) > dc) {
           this.addMessage('Your damaging enchantments (resistible) have been resisted.');
         } else {
-          totalDamage += attacker.non_stacking_damage
+          totalDamage += attacker.non_stacking_damage;
         }
       }
     }
@@ -130,6 +134,8 @@ export default class Damage {
 
       return monsterCurrentHealth;
     }
+
+    totalDamage = totalDamage - totalDamage * attacker.damage_deduction;
 
     monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
@@ -250,7 +256,7 @@ export default class Damage {
     return characterCurrentHealth;
   }
 
-  vampireThirstChance(attacker, monsterCurrentHealth, characterCurrentHealth) {
+  vampireThirstChance(attacker, monsterCurrentHealth, characterCurrentHealth, damageDeduction) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -264,7 +270,8 @@ export default class Damage {
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
-        const totalAttack = Math.round(attacker.dur - attacker.dur * 0.15);
+        let totalAttack = Math.round(attacker.dur - attacker.dur * 0.15);
+        totalAttack     = totalAttack - totalAttack * damageDeduction;
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack

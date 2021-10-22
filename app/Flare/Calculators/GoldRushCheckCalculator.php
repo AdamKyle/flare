@@ -24,10 +24,10 @@ class GoldRushCheckCalculator {
 
         $bonus = $adventureBonus + $gameMapBonus;
 
-        $roll = rand(1, 10000);
+        $roll = rand(1, 1000);
         $roll += ceil($roll * ($bonus / 2));
 
-        return $roll > (10000 - (10000 * $monster->drop_check));
+        return $roll > (1000 - (1000 * $monster->drop_check));
     }
 
     protected function getAdventureGoldRushChance(Adventure $adventure = null): float {

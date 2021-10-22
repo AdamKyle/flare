@@ -22,7 +22,7 @@
                     Access Dungeons Plane
                 @case('shadow-plane')
                     Access Shadow Plane
-                    @break;
+                    @break
                 @case('walk-on-death-water')
                     Walk on Death Water in Dungeons
                     @break
@@ -31,10 +31,13 @@
                     @break
                 @case('affixes-irresistible')
                     Enemies cannot resist your affixes (unless they void you first)
-                    @break;
+                    @break
                 @case('continue-leveling')
                     Lets you continue leveling past level 1000 up to the new Level cap which is increased by 100 levels per month.
-                    @break;
+                    @break
+                @case('gold-dust-rush')
+                    Gives you a 25% chance to increase your (current total) gold dust by your disenchanting skill bonus. The more gold dust, the more of a rush you get.
+                    @break
                 @default
                     N/A
             @endswitch

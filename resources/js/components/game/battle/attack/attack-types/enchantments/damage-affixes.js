@@ -9,10 +9,10 @@ export default class DamageAffixes {
     this.monsterCurrentHealth   = monsterCurrentHealth;
   }
 
-  fireDamageAffixes(attacker, defender, type) {
+  fireDamageAffixes(attacker, defender, damageDeduction) {
     const damage = new Damage();
 
-    this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth);
+    this.monsterCurrentHealth = damage.affixDamage(attacker, defender, this.monsterCurrentHealth, damageDeduction);
     this.battleMessages       = damage.getMessages();
   }
 

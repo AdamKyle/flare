@@ -13,14 +13,14 @@ export default class UseItems {
 
   useItems(attackData, attackerClass, isVoided) {
 
-    if (!this.isVoided) {
+    if (!isVoided) {
       if (attackerClass === 'Vampire') {
         this.lifeStealingAffixes(attackData, true);
       }
 
       const damageAffixes = new DamageAffixes(this.characterCurrentHealth, this.monsterCurrentHealth);
 
-      damageAffixes.fireDamageAffixes(attackData.affixes, this.defender);
+      damageAffixes.fireDamageAffixes(attackData.affixes, this.defender, attackData.damage_deduction);
 
       this.characterCurrentHealth = damageAffixes.getCharacterHealth();
       this.monsterCurrentHealth = damageAffixes.getMonsterHealth();
@@ -47,7 +47,7 @@ export default class UseItems {
   lifeStealingAffixes(attackData, stacking) {
     const lifeStealingAffixes = new LifeStealingAffixes(this.characterCurrentHealth, this.monsterCurrentHealth)
 
-    lifeStealingAffixes.affixesLifeStealing(attackData.affixes, this.defender, stacking);
+    lifeStealingAffixes.affixesLifeStealing(attackData.affixes, this.defender, stacking, attackData.damage_deduction);
 
     this.characterCurrentHealth = lifeStealingAffixes.getCharacterHealth();
     this.monsterCurrentHealth   = lifeStealingAffixes.getMonsterHealth();
@@ -77,10 +77,10 @@ export default class UseItems {
     if (type === 'player') {
 
       const dc        = 100 - (100 * defender.artifact_annulment);
-      let totalDamage = attacker.artifact_damage;
+      let totalDamage = attacker.artifact_damage - attacker.artifact_damage * attacker.damage_deduction;
 
       if (dc <= 0 || random(1, 100) > dc) {
-        this.addMessage(attacker.name + '\'s Artifacts are annulled!');
+        this.addMessage(attacker.name + '\'s artifacts are annulled!');
 
         return;
       }
@@ -95,7 +95,7 @@ export default class UseItems {
       let totalDamage = attacker.artifact_damage;
 
       if (dc <= 0 || random(1, 100) > dc) {
-        this.addMessage(attacker.name + '\'s Artifacts are annulled!');
+        this.addMessage(attacker.name + '\'s artifacts are annulled!');
 
         return;
       }
@@ -108,9 +108,11 @@ export default class UseItems {
 
   ringDamage(attacker, defender, type) {
     if (type === 'player' && attacker.ring_damage > 0) {
-      this.monsterCurrentHealth = this.monsterCurrentHealth - attacker.ring_damage;
+      const totalDamage = attacker.ring_damage - attacker.ring_damage * attacker.damage_deduction;
 
-      this.addActionMessage('Your rings hit for: ' + this.formatNumber(attacker.ring_damage));
+      this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
+
+      this.addActionMessage('Your rings hit for: ' + this.formatNumber(totalDamage));
     }
   }
 

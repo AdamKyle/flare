@@ -56,7 +56,7 @@ class MonsterTransfromer extends TransformerAbstract {
         ];
     }
 
-    public function increaseValue($statValue = null, float $increaseBy = null): int|float {
+    public function increaseValue(int|float $statValue = null, float $increaseBy = null): int|float {
         if (is_null($increaseBy)) {
             return $statValue;
         }
