@@ -36,7 +36,7 @@ Trait CanHaveQuestItem {
         if ($hasCompletedQuest) {
             return $doesntHave;
         }
-        dd($doesntHave, $hasCompletedQuest);
+
         return $doesntHave;
     }
 }

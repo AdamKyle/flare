@@ -13,9 +13,11 @@
   @endphp
   <x-core.cards.card css="{{'tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto ' . $cssClass}}">
     <h3 class="tw-font-light">{{$level}}</h3>
-    <p>
-      {!! nl2br($descriptions[$currentCount]) !!}
-    </p>
+    @if (isset($descriptions[$currentCount]))
+      <p>
+        {!! nl2br($descriptions[$currentCount]) !!}
+      </p>
+    @endif
     <hr />
     @if (count($messages) > 1)
       <p class="lg:tw-hidden tw-mt-2 tw-mb-2 tw-text-blue-500">You can scroll to the left and right if need be.</p>

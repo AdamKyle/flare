@@ -169,7 +169,7 @@ class TraverseService {
 
             event(new MessageEvent($character->user,  $message));
 
-            event(new GlobalMessageEvent('The gates have opened for . ' . $character->name . ' they have entered the realm of shadows!'));
+            event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
         }
     }
 

@@ -216,7 +216,7 @@ class AttackExtraActionHandler {
         $classType    = $character->classType();
 
         if ($classType->isProphet() || $classType->isHeretic()) {
-            $castingAccuracyBonus = $character->getInformation()->getSkill('CastingAccuracy');
+            $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
             $maxRole              = ($voided ? $character->focus : $character->getInformation()->statMod('focus')) * (.05 + $castingAccuracyBonus);
             $dc                   = $maxRole - $maxRole * $spellEvasion;
         }
