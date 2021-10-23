@@ -176,7 +176,7 @@ export default class CastAttack {
 
     this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth, attackData);
 
-    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
     this.monsterHealth          = health.monster_hp;
     this.characterCurrentHealth = health.character_hp;

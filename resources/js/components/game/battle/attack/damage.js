@@ -19,7 +19,7 @@ export default class Damage {
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
     const cantResist  = attacker.cant_be_resisted;
 
-    if (totalDamage <= 0.0) {
+    if (totalDamage <= 0 || totalDamage <= 0.0) {
       return {
         characterHealth: characterCurrentHealth,
         monsterCurrentHealth: monsterCurrentHealth,
@@ -266,6 +266,7 @@ export default class Damage {
   }
 
   vampireThirstChance(attacker, monsterCurrentHealth, characterCurrentHealth, damageDeduction) {
+
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -279,7 +280,8 @@ export default class Damage {
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
-        let totalAttack = Math.round(attacker.dur - attacker.dur * 0.15);
+        let totalAttack = Math.round(attacker.dur + attacker.dur * 0.15);
+
         totalAttack     = totalAttack - totalAttack * damageDeduction;
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
@@ -306,6 +308,7 @@ export default class Damage {
   }
 
   formatNumber(number) {
+
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 

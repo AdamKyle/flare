@@ -114,9 +114,9 @@ export default class WeaponAttack {
   extraAttacks(attackData) {
     const damage = new Damage();
 
-    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData);
-    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData);
-    const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData, attackData.damage_deduction);
+    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData, attackData.damage_reduction);
+    const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
     this.monsterHealth          = healthObject.monster_hp;
     this.characterCurrentHealth = healthObject.character_hp;

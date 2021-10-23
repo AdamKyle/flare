@@ -6,7 +6,6 @@ File: js
 */
 $(function () {
     $(".sidebartoggler").on('click', function () {
-        console.log('um ....');
         if ($("body").hasClass("mini-sidebar")) {
             $("body").removeClass("mini-sidebar");
             $("body").addClass("mini-sidebar-expanded");

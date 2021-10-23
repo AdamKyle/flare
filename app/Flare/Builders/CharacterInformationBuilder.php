@@ -772,7 +772,7 @@ class CharacterInformationBuilder {
             }
         }
 
-        if ($this->character->classType()->isFighter()) {
+        if ($this->character->classType()->isFighter() || $this->character->classType()->isThief()) {
             if ($voided) {
                 $statIncrease = $this->character->str * .15;
             } else {
@@ -790,6 +790,7 @@ class CharacterInformationBuilder {
     }
 
     public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
+
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
 

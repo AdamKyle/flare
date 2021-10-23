@@ -80,7 +80,7 @@ class AttackExtraActionHandler {
             $message        = 'A fury takes over you. You notch the arrows thrice at the enemies direction';
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
-            $damage = $characterInformationBuilder->buildAttack($voided) * 0.15;
+            $damage = $characterInformationBuilder->getTotalWeaponDamage($voided) * 0.15;
 
             for ($i = 1; $i <= 3; $i++) {
                 $monsterCurrentHealth -= $damage;
@@ -107,7 +107,7 @@ class AttackExtraActionHandler {
             $message        = 'The strength of your rage courses through your veins!';
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
-            $characterAttack = $characterInformationBuilder->buildAttack($voided);
+            $characterAttack = $characterInformationBuilder->getTotalWeaponDamage($voided);
 
             $totalDamage = ($characterAttack + $characterAttack * 0.15);
 
@@ -230,7 +230,7 @@ class AttackExtraActionHandler {
     }
 
     private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
-        $characterAttack = $characterInformationBuilder->buildAttack($voided);
+        $characterAttack = $characterInformationBuilder->getTotalWeaponDamage($voided);
 
         $dc = 100 - 100 * $characterInformationBuilder->getSkill('Criticality');
 

@@ -135,7 +135,6 @@ export default class KingdomInfo extends React.Component {
   }
 
   render() {
-    console.log(this.props.kingdom.treasury_defence);
     return (
       <>
         {

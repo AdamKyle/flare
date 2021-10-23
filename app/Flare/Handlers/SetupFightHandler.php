@@ -53,7 +53,6 @@ class SetupFightHandler {
         }
 
         if ($defender instanceof Monster && !$this->monsterDevoided) {
-            dump('Do I gert here? Ever?');
             if ($this->voidedEnemy($defender)) {
                 $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
 

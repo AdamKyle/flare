@@ -313,7 +313,7 @@ export default class FightSection extends React.Component {
         if (state.monsterCurrentHealth <= 0) {
           monster = null;
         }
-        console.log(health, monster);
+
         this.setState({
           characterCurrentHealth: health,
           characterMaxHealth: health,
