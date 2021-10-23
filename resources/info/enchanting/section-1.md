@@ -100,4 +100,25 @@ They can be destroyed or sold on the [market]() board. This provides a great way
 > 
 > There is nothing in game you can buy with real world money to gain an advantage on enchanting. No quest items, no gear, no nothing.
 
+
+## Stacking on and non stacking Enchants.
+
+Some high level enchants that can void, do damage, life steal and or raise stats might state they do not stack. What this means is particular aspects will not stack.
+
+Let's take: Mages Golden Demonic Aspiration as an example.
+
+This enchants is a high level enchant that costs 1 billion per enchant. This enchantment is the best there is for Heretics.
+
+For a mage, the life stealing aspect will not stack. The Damage does not already stack. So you might be thinking, why would I want two of these if the 
+Life stealing and the Damage does not stack? Because the stats do. If you search for this item in the enchanting list below, you will see three tabs:
+
+- Base information
+- Stats
+- Skills
+
+These three tabs **WILL** stack. If the damage was stackable, it would also stack.
+
+Make sure to investigate an enchantment that states it won't stack for any stackable information. For example 14 of these Enchantments
+on your gear would bring your modded intelligence 2800% higher. As a caster you would want this to do ungodly damage.
+
 # List Of Enchants

@@ -2,7 +2,8 @@
 
 As of 1.1.9 combat for Tlessa has changed drastically in relation to how one attacks an enemy.
 
-Before 1.1.9 you had one attack button, you would select the monster, attack and throw everything you had at the monster. This made for some powerful, broken, out of balance builds.
+Before 1.1.9 you had one attack button, you would select the monster, attack and throw everything you had at the monster. 
+This made for some powerful, broken, out of balance builds.
 
 As of 1.1.9 you now have five different attack types:
 
@@ -12,13 +13,16 @@ As of 1.1.9 you now have five different attack types:
 - Attack and Cast
 - Defend
 
-When you go on adventures, you will also have to select which attack type to use when entering the adventure. This attack type cannot be changed and used for all floors of the adventure.
+When you go on adventures, you will also have to select which attack type to use when entering the adventure. 
+This attack type cannot be changed and is used for all floors of the adventure.
 
 <div class="mb-4">
     <a href="/storage/info/combat/images/attack.png" class="glightbox">
         <img src="/storage/info/combat/images/attack.png" class="img-fluid" />
     </a>
 </div>
+
+Hovering over these will give you tool tips about whats involved in the attack.
 
 <div class="mb-4">
     <a href="/storage/info/combat/images/attack-info.png" class="glightbox">
@@ -32,7 +36,10 @@ It&#39;s important to pay attention to your class to determine which attack is b
 
 Requires you to level Accuracy and your class skill for added damage.
 
-Clicking attack will use your best weapon unless you are a fighter. If you are a fighter, we will use both your weapons. Of course, your class skill for fighters has two ways you could go: Tank (weapon and shield) or Glass Cannon (Two weapons).
+Clicking attack will use your best weapon unless you are a fighter. If you are a fighter, we will use both your weapons. 
+Of course, your class skill for fighters has two ways you could go: Tank (weapon and shield) or Glass Cannon (Two weapons).
+
+If you are a fighter you can duel wield as we take into account two weapons for fighters. Fighters also use 15% of their strength for attacking.
 
 If you have no weapons equipped, we will use 2% of your primary damage stat. This will allow you with two shields, to attack.
 
@@ -42,15 +49,18 @@ You can still be resurrected if you have a healing spell equipped, but instead o
 
 Class skills have a chance to fire (to do damage) once during this attack. Class Skill bonuses are automatically applied assuming you follow its rules.
 
+Rangers, Thieves and Vampires best attack is some kind of attack option (or defend for fighters with damage dealing enchantment(s)). Fighters should stick to
+Attack or Defend.
+
 ## Cast
 
 Requires you to level Casting Accuracy
 
-This is a Heretics, Prophets and Vampires best attack
+This is a Heretics, Prophets best attack.
 
 Clicking cast will fire off both your damage and healing spells. If you have two damage spells, you will use both. Same if you have two healing spells.
 
-Casters get 15% (30% for heretics) of their damage stat added towards their attack.
+Casters get 15% (30% for heretics - 32% with no spells) of their damage stat added towards their attack.
 
 When determining if a caster can hit, we use the casters focus (25% of) + their casting accuracy against the enemy&#39;s dodge.
 
@@ -62,7 +72,8 @@ Rangers can use their healing without having a healing spell equipped, but this 
 
 Class skills (damage) have a chance to twice here for casters and vampires. Once for the spell damage and once for the healing spell.
 
-Casters will want two damage spells, whereas vampires will want one of each and two shields for added dur.
+Casters will want two damage spells, whereas vampires will want one of each and two shields for added dur. Prophets should use one damage and one healing depending on 
+how hard the enemy is. They could also go the two durability shields (two shields with extra dur enchantments) and two attack spells.
 
 When casting it&#39;s your spells then your rings, artifacts and affixes
 
@@ -70,7 +81,7 @@ When casting it&#39;s your spells then your rings, artifacts and affixes
 
 Requires Both Casting Accuracy and Accuracy
 
-Rangers and thieves might appreciate this attack.
+Rangers, Thieves and Vampires might appreciate this attack.
 
 Cast and attack will first cast with the spell in **spell slot one** and the weapon in **the right hand.**
 
@@ -88,7 +99,7 @@ Note: The reason missed is in quotes, is because even if you have a bow and a he
 
 For Attack and cast, it&#39;s the same but reversed. Left-hand weapon then spell **slot two** will fire. The same concept applies as it does for cast and attack.
 
-You have a chance for your class skill to fire twice if you are a vampire and once otherwise. For the vampire class skill to have a chance to fire twice, your weapon and damage spell cannot miss else it&#39;s a one-time chance (if you have a healing spell equipped in the appropriate slot)
+You have a chance for your class skill to fire twice if you are a vampire and once otherwise. For the vampire class skill to have a chance to fire twice, your weapon and damage spell cannot miss else it&#39;s a one-time chance.
 
 ## Defend
 
@@ -105,13 +116,17 @@ No class skills would fire on defend.
 ## Regarding Voidance
 
 If you are voided at any time during the attack, we will fall back to raw values for stats and items you use in the attack. 
-This means no affixes, no modded stats and no boons. The voidance will last the entire battle, even if you die and revive, youll still be voided.
+This means no affixes, no modded stats and no boons. The [voidance](/information/voidance) will last the entire battle, even if you die and revive, you'll still be voided.
 This will also apply to your enemy, however they cannot resurrect.
+
+This does not hold true for adventures, celestials or planned future pvp.
 
 ## Regarding Devoidance
 
 Enemies from the dropdown do not have a way to [devoid](/information/voidance) player. However, Celestials do. There is a quest item you can get
 which, through upgrading over time, will increase your chance to devoid an enemy. Simply put, Devoid will void their attempt to void you.
+
+If an enemy is devoided, they are devoided for the whole battle - even if you die. Your soul hold their enchants at bay.
 
 ## Regarding Life Stealing Affixes That Stack
 
@@ -122,7 +137,7 @@ life you will steal from the enemy, which will scale with the enemies' health. T
 The problem is, Vampires do not do enough damage with life stealing alone, this is where you can either Attack or Cast. Casting will give you two chances, assuming your damage spell hits,
 to fire off Vampire Thirst which can kill an enemy. Using Attack would do 5% of your Durability, with no weapons equipped. The higher the dur, the more damage.
 
-Another thing to note about life stealing affixes is that they will not fire if the weapon/spell damage you do, before the affixes, rings and artifacts would fire, kills the enemy.
+Another thing to note about life stealing affixes is that they **will not fire if the weapon/spell damage you do, before the affixes, rings and artifacts would fire, kills the enemy**.
 There would be no point to you stealing a dead enemies' health. Vampires will know if the enemy is too trivial when they're life stealing affixes do not fire.
 
 You will never do 100% of an enemies' health, regardless of how good the enchantments are. The total Life you can steal at any one time is 99% of the enemies' health from 

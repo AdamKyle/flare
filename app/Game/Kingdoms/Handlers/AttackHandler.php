@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Handlers;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Database\Eloquent\Collection;
 use App\Game\Kingdoms\Handlers\Traits\DefenderHandler;
 use App\Flare\Models\Kingdom;
@@ -117,9 +118,14 @@ class AttackHandler {
     public function attackTarget(KingdomBuilding $target, array $unitInfo): array {
         $totalAttack = $unitInfo['total_attack'];
 
+        $defence              = $target->current_defence;
+        $totalTreasuryDefence = $target->kingdom->treasury / KingdomMaxValue::MAX_TREASURY;
+
+        $defence = $defence + $defence * $totalTreasuryDefence;
+
         if ($totalAttack > $target->current_defence) {
-            $totalPercentageUnitsLost      = $this->calculatePerentageLost($totalAttack, $target->current_defence, true);
-            $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $target->current_defence);
+            $totalPercentageUnitsLost      = $this->calculatePerentageLost($totalAttack, $defence, true);
+            $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $defence);
 
             $this->updateKingdomBuilding($target, $totalPercentageDurabilityLost);
 
@@ -127,7 +133,7 @@ class AttackHandler {
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         } else {
 
-            $totalPercentageUnitsLost = $this->calculatePerentageLost($totalAttack, $target->current_defence, true);
+            $totalPercentageUnitsLost = $this->calculatePerentageLost($totalAttack, $defence, true);
 
             $this->updateKingdomBuilding($target, 0.01);
 

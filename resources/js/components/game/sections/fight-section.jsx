@@ -114,24 +114,17 @@ export default class FightSection extends React.Component {
   }
 
   componentDidUpdate() {
+
     let stateMonster = this.state.monster;
     let propsMonster = this.props.monster;
 
-    if (this.props.resetBattleAction && stateMonster !== null) {
-
-      this.setState({
-        monsterCurrentHealth: null,
-        characterCurrentHealth: null,
-        characterMaxHealth: null,
-        monsterMaxHealth: null,
-        monster: null,
-      }, () => {
-        this.props.setMonster(null);
-      });
-    }
-
     if (propsMonster !== null && stateMonster === null) {
-      this.setMonsterInfo()
+
+      if (this.state.characterCurrentHealth !== null) {
+        this.setState({characterCurrentHealth: null});
+      }
+
+      this.setMonsterInfo();
     } else if (propsMonster !== null && stateMonster !== null) {
 
       if (!stateMonster.hasOwnProperty('name')) {
@@ -142,13 +135,19 @@ export default class FightSection extends React.Component {
         this.battleMessagesBeforeFight = [];
 
         this.setState({
+          battleMessages: [],
+          monster: null,
           monsterCurrentHealth: null,
           characterCurrentHealth: null,
           characterMaxHealth: null,
           monsterMaxHealth: null,
+          isCharacterVoided: false,
+          isMonsterReduced: false,
+          isMonsterVoided: false,
+          isMonsterDevoided: false,
         }, () => {
           this.setMonsterInfo();
-        });
+        })
       }
     }
   }
@@ -156,6 +155,7 @@ export default class FightSection extends React.Component {
   setMonsterInfo() {
 
     if (this.state.characterCurrentHealth !== null || this.state.monsterCurrentHealth !== null) {
+
       return;
     }
 
@@ -167,8 +167,6 @@ export default class FightSection extends React.Component {
     let monsterVoided   = false;
     let monsterDevoided = false;
 
-    const monsterIsVoided = (monsterVoided || monsterDevoided);
-
     if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !monsterDevoided) {
       this.battleMessagesBeforeFight.push({
         message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
@@ -178,7 +176,7 @@ export default class FightSection extends React.Component {
       monsterDevoided = true;
     }
 
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !monsterIsVoided) {
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !monsterVoided) {
       this.battleMessagesBeforeFight.push({
         message: 'The light of the heavens shines through this darkness. The enemy is voided!',
         class: 'action-fired'
@@ -187,7 +185,7 @@ export default class FightSection extends React.Component {
       monsterVoided = true;
     }
 
-    if (monsterInfo.canMonsterVoidPlayer() && !this.state.isCharacterVoided && !monsterIsVoided) {
+    if (monsterInfo.canMonsterVoidPlayer() && !this.state.isCharacterVoided && !monsterVoided) {
       this.battleMessagesBeforeFight.push({
         message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
         class: 'enemy-action-fired'
@@ -248,15 +246,18 @@ export default class FightSection extends React.Component {
 
     if (this.state.isCharacterVoided) {
       attackType = 'voided_' + attackType;
-    } else if (!this.state.isMonsterReduced && !this.state.isCharacterVoided && !this.state.isMonsterDevoided) {
+    } else if (!this.state.isMonsterDevoided && !this.state.isCharacterVoided) {
 
       if (this.state.monster.canMonsterVoidPlayer()) {
+
         this.battleMessagesBeforeFight.push({
           message: this.state.monster.monster.name + ' has voided your enchantments! You feel much weaker!',
           class: 'enemy-action-fired'
         });
 
         attackType = 'voided_' + attackType;
+
+        this.setState({isCharacterVoided: true});
       }
     }
 
@@ -269,7 +270,15 @@ export default class FightSection extends React.Component {
 
     const state = attack.attack(this.state.character, this.state.monster, true, 'player', attackType).getState()
 
-    state.battleMessages = [...this.battleMessagesBeforeFight, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
+    let messages = this.battleMessagesBeforeFight.filter((tag, index, array) =>
+      array.findIndex(t => t.class == tag.class && t.message == tag.message) == index
+    );
+
+    if (!this.state.isCharacterVoided) {
+      messages = messages.filter((m) => m.class !== 'enemy-action-fired');
+    }
+
+    state.battleMessages = [...messages, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
 
     this.battleMessagesBeforeFight = [];
 
@@ -295,14 +304,16 @@ export default class FightSection extends React.Component {
 
         if (health >= 0 && state.monsterCurrentHealth >= 0) {
           health = this.state.characterMaxHealth;
-        } else {
+        } else if (health <= 0 && state.monsterCurrentHealth >= 0) {
           health = 0;
+        } else {
+          health = null;
         }
 
         if (state.monsterCurrentHealth <= 0) {
           monster = null;
         }
-
+        console.log(health, monster);
         this.setState({
           characterCurrentHealth: health,
           characterMaxHealth: health,

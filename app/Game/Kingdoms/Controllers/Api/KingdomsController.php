@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -233,6 +234,12 @@ class KingdomsController extends Controller {
     public function embezzel(KingdomEmbezzelRequest $request, Kingdom $kingdom) {
         $amountToEmbezzel = $request->embezzel_amount;
 
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => "Invalid Input. Not allowed to do that."
+            ], 422);
+        }
+
         if ($amountToEmbezzel > $kingdom->treasury) {
             return response()->json([
                 'message' => "You don't have the gold in your treasury."
@@ -245,15 +252,67 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
+        $newMorale = $kingdom->current_morale - 0.15;
+
+        if ($newMorale < 0.0) {
+            $newMorale = 0.0;
+        }
+
         $kingdom->update([
             'treasury' => $kingdom->treasury - $amountToEmbezzel,
-            'current_morale' => $kingdom->current_morale - 0.15,
+            'current_morale' => $newMorale,
         ]);
 
         $character = $kingdom->character;
 
         $character->update([
             'gold' => $character->gold + $amountToEmbezzel
+        ]);
+
+        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateKingdom($character->user, $kingdom));
+    }
+
+    public function deposit(KingdomDepositRequest $request, Kingdom $kingdom) {
+        $amountToDeposit = $request->deposit_amount;
+
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => "Invalid Input. Not allowed to do that."
+            ], 422);
+        }
+
+        if ($amountToDeposit > KingdomMaxValue::MAX_TREASURY) {
+            return response()->json([
+                'message' => "You cannot go over the max limit for kingdom treasury."
+            ], 422);
+        }
+
+        if ($amountToDeposit > $kingdom->character->gold) {
+            return response()->json([
+                'message' => "And where are you getting this gold from? You do not have enough."
+            ], 422);
+        }
+
+        $newMorale = $kingdom->current_morale + 0.15;
+
+        if ($newMorale > 1) {
+            $newMorale = 1;
+        }
+
+        $kingdom->update([
+            'treasury' => $kingdom->treasury + $amountToDeposit,
+            'current_morale' => $newMorale,
+        ]);
+
+        $character = $kingdom->character;
+
+        $character->update([
+            'gold' => $character->gold - $amountToDeposit
         ]);
 
         $kingdom  = new Item($kingdom->refresh(), $this->kingdom);

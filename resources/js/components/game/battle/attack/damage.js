@@ -19,6 +19,13 @@ export default class Damage {
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
     const cantResist  = attacker.cant_be_resisted;
 
+    if (totalDamage <= 0.0) {
+      return {
+        characterHealth: characterCurrentHealth,
+        monsterCurrentHealth: monsterCurrentHealth,
+      };
+    }
+
     if (stacking) {
       this.addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!');
     } else {
@@ -165,7 +172,7 @@ export default class Damage {
     this.addActionMessage('Your healing spell(s) heals for: ' + this.formatNumber(healFor.toFixed(0)))
   }
 
-  tripleAttackChance(attacker, monsterCurrentHealth) {
+  tripleAttackChance(attacker, monsterCurrentHealth, attackData) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -177,7 +184,7 @@ export default class Damage {
         this.addMessage('A fury takes over you. You notch the arrows thrice at the enemies direction');
 
         for (let i = 1; i <= 3; i++) {
-          const totalDamage    = (attacker.attack + attacker.attack * .15).toFixed(0);
+          const totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
           this.addActionMessage(attacker.name + ' hit for (weapon - triple attack) ' + this.formatNumber(totalDamage));
@@ -188,7 +195,7 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  doubleDamage(attacker, monsterCurrentHealth) {
+  doubleDamage(attacker, monsterCurrentHealth, attackData) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -199,14 +206,16 @@ export default class Damage {
       if (extraActionChance.type === ExtraActionType.FIGHTERS_DOUBLE_DAMAGE && extraActionChance.has_item) {
         this.battleMessages.push({
           message: 'The strength of your rage courses through your veins!',
+          class: 'action-fired'
         });
 
-        const totalDamage = (attacker.attack + attacker.attack * .15).toFixed(0);
+        const totalDamage = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
 
         monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
         this.battleMessages.push({
           message: attacker.name + ' hit for (weapon - double attack) ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          class: 'action-fired'
         });
       }
     }

@@ -1,43 +1,52 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 
-export default class Embezzel extends React.Component {
+export default class Deposit extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      totalToEmbezzel: 0,
+      toDeposit: 0,
       showError: false,
       errorText: null,
       loading: false,
     }
   }
 
-  embezzel() {
+  deposit() {
     this.setState({
       showError: false,
       errorText: null,
-      loading: true,
+      loading: true
     }, () => {
-      if (this.state.totalToEmbezzel <= 0) {
+      if (this.state.toDeposit <= 0) {
         return this.setState({
           showError: true,
-          errorText: 'Total to embezzle cannot be less then or equal to 0.',
+          errorText: 'Total to deposit cannot be less then or equal to 0.',
           loading: false,
         });
       }
 
-      axios.post('/api/kingdoms/embezel/' + this.props.kingdomId, {
-        embezzel_amount: this.state.totalToEmbezzel
+      const newTotal = parseInt(this.props.treasury) + parseInt(this.state.toDeposit);
+
+      if (newTotal > 2000000000) {
+        return this.setState({
+          showError: true,
+          errorText: 'Total to deposit would cause the kingdom treasury to go over the max.'
+        });
+      }
+
+      axios.post('/api/kingdoms/deposit/' + this.props.kingdomId, {
+        deposit_amount: this.state.toDeposit
       }).then((result) => {
-        const amountEmbzzeled = this.state.totalToEmbezzel;
+        const deposited = this.state.toDeposit;
 
         this.setState({
-          totalToEmbezzel: 0,
-          loading: false,
+          toDeposit: 0,
+          loading: false
         }, () => {
-          this.props.embezzeledSuccess(amountEmbzzeled);
+          this.props.depositSuccess(deposited);
           this.props.close();
         });
       }).catch((err) => {
@@ -56,29 +65,17 @@ export default class Embezzel extends React.Component {
     });
   }
 
-  updateEmbezzel(e) {
+  updateDeposit(e) {
     this.setState({
-      totalToEmbezzel: e.target.value
+      toDeposit: e.target.value
     });
-  }
-
-  disableEmbezel() {
-    if (this.props.morale <= 0.15) {
-      return true;
-    }
-
-    if (this.props.treasury <= 0) {
-      return true;
-    }
-
-    return false;
   }
 
   render() {
     return (
       <Modal onHide={this.props.close} backdrop="static" keyboard={false} show={this.props.show}>
         <Modal.Header closeButton>
-          <Modal.Title>Embezzle</Modal.Title>
+          <Modal.Title>Deposit</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {
@@ -89,29 +86,30 @@ export default class Embezzel extends React.Component {
               : null
           }
 
-          <p>Embezzling from your kingdom will reduce the kingdoms morale by 15% regardless of the amount you
-            embezzle. This will also decrease the defensive bonus to your kingdom of having large amount of gold in your treasury.</p>
-          <p>You cannot embezzle if your kingdoms morale is 15% or lower.</p>
+          <p>Depositing gold will increase your morale by 15% and your defence bonus. This bonus is the total gold you have divided by two billion.</p>
+          <p>Depositing gold will also increase the interest you gain per hour, especially if you train the Lust for Gold Skill and Level the Keep to 30.</p>
+          <p>The Interest calculation is: Gold in treasury + Gold in treas. * (Lust for Gold skill bonus + Keep Level / 30) * 100.</p>
+          <p>Even a few hundred thousand gold can grow quickly over time.</p>
+          <p><strong>You can deposit gold if you have very low morale to increase it at any point, regardless of how low your morale is.</strong></p>
           <div className="mt-2">
             <dl>
               <dt><strong>Total Treasury</strong>:</dt>
-              <dd>{this.props.treasury}</dd>
+              <dd>{this.props.treasury.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
+            </dl>
+            <dl>
+              <dt><strong>Max you can deposit</strong>:</dt>
+              <dd>{(2000000000 - this.props.treasury).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
             </dl>
           </div>
-          {
-            this.props.morale <= 0.15 ?
-              <p className="text-danger mt-3 mb-2">Your morale is too low. You cannot embezzle.</p>
-              : null
-          }
           <div className="mt-2">
             <div className="form-group">
-              <label htmlFor="embezzel-amount">Embezzle Amount</label>
+              <label htmlFor="embezzel-amount">Deposit Amount</label>
               <input
                 type="number"
                 className="form-control"
                 id="embezzel-amount"
-                value={this.state.totalToEmbezzel}
-                onChange={this.updateEmbezzel.bind(this)}
+                value={this.state.toDeposit}
+                onChange={this.updateDeposit.bind(this)}
               />
             </div>
           </div>
@@ -128,8 +126,8 @@ export default class Embezzel extends React.Component {
           <Button variant="danger" onClick={this.props.close}>
             Close
           </Button>
-          <Button variant="primary" onClick={this.embezzel.bind(this)} disabled={this.disableEmbezel()}>
-            Embezzel
+          <Button variant="primary" onClick={this.deposit.bind(this)}>
+            Deposit
           </Button>
         </Modal.Footer>
       </Modal>

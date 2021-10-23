@@ -1,6 +1,7 @@
 import React from 'react';
 import Embezzel from './embezzel';
 import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import Deposit from "./deposit";
 
 const renderDeposit = (props) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -12,8 +13,8 @@ const renderDeposit = (props) => (
 
 const renderWithdrawl = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    By removing any amount of gold you will loose 15% morale each time you withdrawal. Your kingdom will also loose the added defence
-    bonus by the amount of gold you withdrawal. remember having gold increases defence.
+    By removing any amount of gold you will loose 15% morale each time you embezzle. Your kingdom will also loose the added defence
+    bonus by the amount of gold you embezzle. Remember having gold increases defence.
   </Tooltip>
 );
 
@@ -32,6 +33,7 @@ export default class KingdomInfo extends React.Component {
 
     this.state = {
       showEmbezzel: false,
+      showDeposit: false,
       showSuccess: false,
       successMessage: null,
     }
@@ -108,22 +110,20 @@ export default class KingdomInfo extends React.Component {
 
   showDeposit() {
     this.setState({
-      showEmbezzel: true,
+      showDeposit: true,
     });
   }
 
   closeDeposit() {
     this.setState({
-      showEmbezzel: false,
+      showDeposit: false,
     });
   }
 
   depositSuccess(amount) {
-    const defence = Math.ceil(amount / 2000000000)
-
     this.setState({
       showSuccess: true,
-      successMessage: 'Deposited ' + amount + ' gold from kingdom. The kingdoms morale has increased by 15% and your defence bonus is now: ' + defence + '% .',
+      successMessage: 'Deposited ' + amount + ' gold to the kingdom. The kingdoms morale has increased by 15% and your defence bonus has also been increased.',
     });
   }
 
@@ -135,6 +135,7 @@ export default class KingdomInfo extends React.Component {
   }
 
   render() {
+    console.log(this.props.kingdom.treasury_defence);
     return (
       <>
         {
@@ -170,8 +171,8 @@ export default class KingdomInfo extends React.Component {
                   delay={{ show: 250, hide: 400 }}
                   overlay={renderDeposit}
                 >
-                  <button className="btn btn-primary btn-sm mr-2" onClick={this.showDeposit.bind(this)}>
-                    <i className="ra ra-overhead"></i>
+                  <button className="btn btn-success btn-sm mr-2" onClick={this.showDeposit.bind(this)}>
+                    <i className="fas fa-dollar-sign"></i>
                   </button>
 
                 </OverlayTrigger>
@@ -180,8 +181,8 @@ export default class KingdomInfo extends React.Component {
                   delay={{ show: 250, hide: 400 }}
                   overlay={renderWithdrawl}
                 >
-                  <button className="btn btn-primary btn-sm" onClick={this.showEmbezzel.bind(this)}>
-                    <i className="ra ra-underhand"></i>
+                  <button className="btn btn-danger btn-sm" onClick={this.showEmbezzel.bind(this)}>
+                    <i className="fas fa-dollar-sign"></i>
                   </button>
 
                 </OverlayTrigger>
@@ -282,7 +283,7 @@ export default class KingdomInfo extends React.Component {
                   <i className="far fa-question-circle"></i>
 
                 </OverlayTrigger>:</dt>
-                <dd>{Math.ceil(this.props.kingdom.treasury / 2000000000) * 100}%</dd>
+                <dd>{(this.props.kingdom.treasury_defence * 100).toFixed(4)}% </dd>
               </dl>
             </div>
           </div>
@@ -294,6 +295,14 @@ export default class KingdomInfo extends React.Component {
           treasury={this.props.kingdom.treasury}
           kingdomId={this.props.kingdom.id}
           embezzeledSuccess={this.embezzeledSuccess.bind(this)}
+        />
+        <Deposit
+          show={this.state.showDeposit}
+          close={this.closeDeposit.bind(this)}
+          morale={this.props.kingdom.current_morale}
+          treasury={this.props.kingdom.treasury}
+          kingdomId={this.props.kingdom.id}
+          depositSuccess={this.depositSuccess.bind(this)}
         />
       </>
     )

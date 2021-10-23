@@ -8,6 +8,7 @@ use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Requests\UseItemsRequest;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
@@ -85,6 +86,10 @@ class KingdomAttackController extends Controller {
         $oldKingdom = $kingdom->toArray();
         $buildings  = $kingdom->buildings;
         $units      = $kingdom->units;
+
+        $treasuryDefenceFromKingdom = $kingdom->treasury / KingdomMaxValue::MAX_TREASURY;
+
+        $damageToKingdom = $damageToKingdom - $damageToKingdom * $treasuryDefenceFromKingdom;
 
         foreach ($buildings as $building) {
             $newDurability =  round($building->current_durability - ($building->current_durability * $damageToKingdom));

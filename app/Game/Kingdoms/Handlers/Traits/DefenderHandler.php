@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Handlers\Traits;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
@@ -149,8 +150,9 @@ trait DefenderHandler {
             }
         }
 
-        return ($totalDefenders / $totalUnitTypes) + $wallsBonus;
+        $treasuryBonus = $defender->treasury / KingdomMaxValue::MAX_TREASURY;
 
+        return ($totalDefenders / $totalUnitTypes) + $wallsBonus + $treasuryBonus;
     }
 
     /**

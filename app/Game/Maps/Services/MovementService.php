@@ -297,7 +297,7 @@ class MovementService {
      * @param int $timeout
      * @return array
      */
-    public function teleport(Character $character, int $x, int $y, int $cost, int $timeout): array {
+    public function teleport(Character $character, int $x, int $y, int $cost, int $timeout, bool $pctCommand = false): array {
         $canTeleportToWater = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
 
@@ -336,7 +336,7 @@ class MovementService {
 
         $this->processArea($character);
 
-        $this->teleportCharacter($character, $timeout, $cost);
+        $this->teleportCharacter($character, $timeout, $cost, $pctCommand);
 
         return $this->successResult();
     }
@@ -495,7 +495,7 @@ class MovementService {
      * @param int timeout
      * @param int $cost
      */
-    protected function teleportCharacter(Character $character, int $timeout, int $cost) {
+    protected function teleportCharacter(Character $character, int $timeout, int $cost, bool $pctCommand = false) {
         $character->update([
             'can_move'          => $timeout === 0 ? true : false,
             'gold'              => $character->gold - $cost,
@@ -509,7 +509,7 @@ class MovementService {
         }
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdateMapDetailsBroadcast($character->map()->with('gameMap')->first(), $character->user, $this));
+        event(new UpdateMapDetailsBroadcast($character->map()->with('gameMap')->first(), $character->user, $this, false, $pctCommand));
     }
 
     /**

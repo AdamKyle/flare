@@ -5,14 +5,13 @@ namespace App\Game\Battle\Controllers\Api;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Npc;
-use App\Flare\Services\FightService;
 use App\Flare\Values\NpcTypes;
+use App\Game\Battle\Request\CelestialFightRequest;
 use App\Game\Battle\Request\ConjureRequest;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Http\Controllers\Controller;
-use App\Game\Battle\Request\PublicEntityRequest;
 use App\Game\Battle\Services\ConjureService;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
@@ -106,7 +105,7 @@ class CelestialBattleController extends Controller {
         ], 200);
     }
 
-    public function attack(Character $character, CelestialFight $celestialFight) {
+    public function attack(CelestialFightRequest $request, Character $character, CelestialFight $celestialFight) {
         if ($character->is_dead) {
             broadcast(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
 
@@ -125,7 +124,7 @@ class CelestialBattleController extends Controller {
             $characterInCelestialFight = $this->celestialFightService->joinFight($character, $celestialFight);
         }
 
-        $response = $this->celestialFightService->fight($character, $celestialFight, $characterInCelestialFight);
+        $response = $this->celestialFightService->fight($character, $celestialFight, $characterInCelestialFight, $request->attack_type);
         $status   = $response['status'];
 
         unset($response['status']);

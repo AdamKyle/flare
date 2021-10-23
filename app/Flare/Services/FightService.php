@@ -30,6 +30,8 @@ class FightService {
 
     private $battleLogs = [];
 
+    private $attackOnce = false;
+
     public function __construct(
         SetupFightHandler $setupFightHandler,
         CharacterInformationBuilder $characterInformationBuilder,
@@ -40,6 +42,12 @@ class FightService {
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->characterAttackHandler      = $characterAttackHandler;
         $this->monsterAttackHandler        = $monsterAttackHandler;
+    }
+
+    public function setAttackTimes(bool $attackOnce): FightService {
+        $this->attackOnce = $attackOnce;
+
+        return $this;
     }
 
     public function processFight($attacker, $defender, string $attackType) {
@@ -129,6 +137,9 @@ class FightService {
 
             $this->monsterAttackHandler->resetLogs();
 
+            if ($this->attackOnce) {
+                return;
+            }
         }
 
         return $this->processFight($defender, $attacker, $attackType);
@@ -136,6 +147,14 @@ class FightService {
 
     public function getBattleMessages(): array {
         return $this->battleLogs;
+    }
+
+    public function getCharacterHealth(): int {
+        return $this->currentCharacterHealth;
+    }
+
+    public function getMonsterHealth(): int {
+        return $this->currentMonsterHealth;
     }
 
     public function reset() {

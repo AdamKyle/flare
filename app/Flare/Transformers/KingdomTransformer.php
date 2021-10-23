@@ -48,6 +48,7 @@ class KingdomTransformer extends TransformerAbstract {
             'unit_queue'         => $kingdom->unitsQueue,
             'current_units'      => $kingdom->units,
             'unit_movement'      => $kingdom->unitsMovementQueue,
+            'treasury_defence'   => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
         ];
     }
 

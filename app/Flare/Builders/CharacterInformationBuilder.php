@@ -773,7 +773,13 @@ class CharacterInformationBuilder {
         }
 
         if ($this->character->classType()->isFighter()) {
-            $damage = array_sum($damage);
+            if ($voided) {
+                $statIncrease = $this->character->str * .15;
+            } else {
+                $statIncrease = $this->statMod('str') * 0.15;
+            }
+
+            $damage = array_sum($damage) + $statIncrease;
         } else if (!empty($damage)) {
             $damage = max($damage);
         } else {

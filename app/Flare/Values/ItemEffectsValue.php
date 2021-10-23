@@ -27,6 +27,7 @@ class ItemEffectsValue {
         self::WALK_ON_DEATH_WATER   => 'walk-on-death-water',
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
+        self::SHADOWPLANE           => 'shadow-plane',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
         self::CONTNUE_LEVELING      => 'continue-leveling',

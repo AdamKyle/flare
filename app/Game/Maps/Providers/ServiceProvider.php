@@ -8,6 +8,7 @@ use App\Flare\Transformers\MonsterTransfromer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
 use App\Game\Maps\Services\TraverseService;
+use App\Game\Messages\Services\PctService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Cache\CoordinatesCache;
 use App\Game\Maps\Values\MapTileValue;
@@ -37,6 +38,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(PortService::class, function($app) {
             return new PortService($app->make(DistanceCalculation::class), $app->make(MapPositionValue::class));
+        });
+
+        $this->app->bind(PctService::class, function($app) {
+            return new PctService();
         });
 
         $this->app->bind(MapTileValue::class, function($app) {

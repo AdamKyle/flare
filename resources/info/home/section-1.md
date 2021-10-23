@@ -13,6 +13,8 @@ You have come to the right place my friend; you have come to The Planes of Tless
 > 
 > All images in this guide can be clicked on to see a bigger version of the image. All images are taken during the development process. 
 > Numbers may not match what is shown in game and items as well as monsters may be different.
+> 
+> It is suggested new players read the [Tips section](/information/tips) before they jump in.
 
 ## Biggest Selling Points!
 

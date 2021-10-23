@@ -212,7 +212,7 @@ export default class Map extends React.Component {
 
     this.updateMap.listen('Game.Maps.Events.UpdateMapDetailsBroadcast', (event) => {
       console.log(event);
-      if (event.map.game_map.name !== this.state.characterMapName) {
+      if (event.map.game_map.name !== this.state.characterMapName && !event.pctCommand) {
         return;
       }
 
@@ -417,6 +417,7 @@ export default class Map extends React.Component {
   }
 
   updatePlayerPosition(position) {
+    console.log(position);
     const characterX = position.character_position_x;
     const characterY = position.character_position_y;
     const mapX = position.position_x;

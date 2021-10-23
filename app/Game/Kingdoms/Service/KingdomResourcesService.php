@@ -363,7 +363,7 @@ class KingdomResourcesService {
         }
 
         if ($this->kingdom->current_morale > 0.50) {
-            $charactersSkill = $this->kingdom->character->skills->filter(function($skill) {
+            $characterSkill = $this->kingdom->character->skills->filter(function($skill) {
                 return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
             })->first();
 
@@ -375,7 +375,7 @@ class KingdomResourcesService {
 
             $total = $currentTreasury + $currentTreasury * ($characterSkill->skill_bonus + ($keep->level / 100));
 
-            if ($total === 0) {
+            if ($total === 0 || $total === 0.0) {
                 $total = 1;
             }
 

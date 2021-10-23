@@ -6,8 +6,9 @@
             <li><a href="{{route('info.page', ['pageName' => 'home'])}}">Home</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'rules'])}}">Core Rules</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'chat-commands'])}}">Chat Commands</a></li>
-            <li><a href="{{route('info.page', ['pageName' => 'settings'])}}"><i class="fas fa-user-cog"></i> Player Settings</a></li>
-            <li><a href="{{route('info.page', ['pageName' => 'notifications'])}}"><i class="fas fa-bell"></i> Notifications</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'settings'])}}">Player Settings</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'notifications'])}}">Notifications</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'tips'])}}">Tips for New Players</a></li>
         </ul>
     </li>
     <li class="nav-small-cap">Character Information</li>

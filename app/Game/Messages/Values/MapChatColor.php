@@ -7,6 +7,7 @@ class MapChatColor {
     CONST SURFACE   = '#ffffff';
     CONST LABYRINTH = '#ffad47';
     const DUNGEONS  = '#ccb9a5';
+    const SHP       = '#ababab';
 
     /**
      * MapChatColor constructor.
@@ -28,6 +29,8 @@ class MapChatColor {
                 return self::LABYRINTH;
             case 'Dungeons':
                 return self::DUNGEONS;
+            case 'Shadow Plane':
+                return self::SHP;
             case 'Surface':
             default:
                 return self::SURFACE;

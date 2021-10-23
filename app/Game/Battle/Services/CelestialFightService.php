@@ -47,33 +47,39 @@ class CelestialFightService {
         return $characterInCelestialFight;
     }
 
-    public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight): array {
+    public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight, string $attackType): array {
         $fightService = resolve(FightService::class, [
             'character' => $character,
             'monster'   => $celestialFight->monster,
-        ])->overrideMonsterHealth($celestialFight->current_health)
-          ->overrideCharacterHealth($characterInCelestialFight->character_current_health)
-          ->setAttackTimes(1);
+        ])->setAttackTimes(1);
 
-        $fightService->attack($character, $celestialFight->monster);
+        $fightService->processFight($character, $celestialFight->monster, $attackType);
+
+        $logInfo         = $fightService->getBattleMessages();
+        $monsterHealth   = $fightService->getMonsterHealth();
+        $characterHealth = $fightService->getCharacterHealth();
 
         $celestialFight->update([
-            'current_health' => $fightService->getRemainingMonsterHealth()
+            'current_health' => $monsterHealth
         ]);
 
         $characterInCelestialFight->update([
-            'character_current_health' => $fightService->getRemainingCharacterHealth()
+            'character_current_health' => $characterHealth
         ]);
 
-        $logInfo = $fightService->getLogInformation();
 
-        if ($fightService->isCharacterDead()) {
+        if ($characterHealth <= 0) {
             $this->battleEventHandler->processDeadCharacter($character);
 
             $characterInCelestialFight = $characterInCelestialFight->refresh();
             $celestialFight            = $celestialFight->refresh();
 
             event(new UpdateCelestialFight($celestialFight, false));
+
+            $logInfo[] = [
+                'message' => 'You have died during the fight! Death has come for you!',
+                'class'   => 'enemy-action-fired',
+            ];
 
             return $this->successResult([
                 'fight' => [
@@ -86,11 +92,11 @@ class CelestialFightService {
                         'current_health' => $celestialFight->current_health,
                     ]
                 ],
-                'logs' => array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
+                'logs' => $logInfo
             ]);
         }
 
-        if ($fightService->isMonsterDead()) {
+        if ($monsterHealth <= 0) {
             $character->update([
                 'shards' => $character->shards + $celestialFight->monster->shards,
             ]);
@@ -111,7 +117,7 @@ class CelestialFightService {
 
             return $this->successResult([
                 'battle_over' => true,
-                'logs'        => $logInfo[0]['messages'],
+                'logs'        => $logInfo,
             ]);
         }
 
@@ -128,7 +134,7 @@ class CelestialFightService {
                     'current_health' => $celestialFight->current_health,
                 ]
             ],
-            'logs' => empty($logInfo) ? [] : array_merge($logInfo[0]['messages'], $logInfo[1]['messages']),
+            'logs' => $logInfo,
         ]);
     }
 

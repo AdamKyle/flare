@@ -96,7 +96,7 @@ export default class WeaponAttack {
 
     this.monsterHealth = this.monsterHealth - totalDamage;
 
-    this.extraAttacks();
+    this.extraAttacks(attackData);
 
     this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(totalDamage))
   }
@@ -111,11 +111,11 @@ export default class WeaponAttack {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  extraAttacks() {
+  extraAttacks(attackData) {
     const damage = new Damage();
 
-    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth);
-    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth);
+    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData);
+    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData);
     const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
 
     this.monsterHealth          = healthObject.monster_hp;

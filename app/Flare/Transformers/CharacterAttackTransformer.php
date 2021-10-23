@@ -57,6 +57,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'devouring_light'     => $characterInformation->getDevouringLight(),
             'devouring_darkness'  => $characterInformation->getDevouringDarkness(),
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'is_alchemy_locked'   => $this->isAlchemyLocked($character),
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
@@ -76,17 +77,17 @@ class CharacterAttackTransformer extends TransformerAbstract {
         return $cache;
     }
 
-//    private function isAlchemyLocked(Character $character) {
-//        $skill = $character->skills->filter(function($skill) {
-//            return $skill->type()->isAlchemy();
-//        })->first();
-//
-//        if (!is_null($skill)) {
-//            return $skill->is_locked;
-//        }
-//
-//        return true;
-//    }
+    private function isAlchemyLocked(Character $character) {
+        $skill = $character->skills->filter(function($skill) {
+            return $skill->type()->isAlchemy();
+        })->first();
+
+        if (!is_null($skill)) {
+            return $skill->is_locked;
+        }
+
+        return true;
+    }
 
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
 

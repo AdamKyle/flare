@@ -20,6 +20,9 @@ Regular critters won&#39;t void you much, although harder creatures in the list 
 > 
 > Character Devouring Light and Darkness will fire before the enemies. If the enemy is devoided or voided or has their stats reduced,
 > that will affect the enemy the entire battle, as it would you.
+> 
+> The only place this does not hold true (in relation to being voided for a whole fight) is in Celestial Fights and Planned PVP as well as Adventures.
+> Each enemy is considered a new fight, even if it's on the same floor.
 
 ## How do I prevent this?
 

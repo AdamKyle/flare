@@ -55,6 +55,8 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public $charactersOnMap = 0;
 
+    public $pctCommand = false;
+
     /**
      * @var User $user
      */
@@ -69,7 +71,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      * @param MovementService $service
      * @param bool $updateKingdoms
      */
-    public function __construct(Map $map, User $user, MovementService $service, bool $updateKingdoms = false)
+    public function __construct(Map $map, User $user, MovementService $service, bool $updateKingdoms = false, bool $pctCommand = false)
     {
         if ($updateKingdoms) {
             $service->processArea($user->character);
@@ -88,6 +90,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
             $mapId = $user->character->map->game_map_id;
             $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
         })->count();
+        $this->pctCommand      = $pctCommand;
     }
 
     /**

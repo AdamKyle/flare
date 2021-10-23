@@ -52,8 +52,9 @@ class SetupFightHandler {
             }
         }
 
-        if ($attacker instanceof Monster && !$this->monsterDevoided) {
-            if ($this->voidedEnemy($attacker)) {
+        if ($defender instanceof Monster && !$this->monsterDevoided) {
+            dump('Do I gert here? Ever?');
+            if ($this->voidedEnemy($defender)) {
                 $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
 
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
@@ -102,12 +103,14 @@ class SetupFightHandler {
 
     protected function voidedEnemy($defender) {
 
-        $devouringLight = null;
-
         if ($defender instanceof Character) {
             $devouringLight = $this->characterInformationBuilder->setCharacter($defender)->getDevouringLight();
         } else {
             $devouringLight = $defender->devouring_light_chance;
+        }
+
+        if ($devouringLight >= 1) {
+            return true;
         }
 
         $dc = 100 - 100 * $devouringLight;
@@ -116,6 +119,10 @@ class SetupFightHandler {
     }
 
     protected function devoidEnemy($attacker) {
+        if ($attacker->devouring_darkeness >= 1) {
+            return true;
+        }
+
         $dc = 100 - 100 * $attacker->devouring_darkeness;
 
         return rand(1, 100) > $dc;

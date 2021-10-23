@@ -1,6 +1,50 @@
 import React, {Fragment} from 'react';
 import TimeOutBar from "../timeout/timeout-bar";
 import ReviveSection from "./revive-section";
+import {OverlayTrigger, Tooltip} from "react-bootstrap";
+
+const renderAttackToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    If you are a fighter, you will attack with both weapons if you have them equipped.
+    If you are not a fighter, you will attack with the best weapon.
+    If you have no weapon equipped, you will attack with 2% of your primary damage stat.
+  </Tooltip>
+);
+
+const renderCastingToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    We will attack with both spells. Casters get an additional 15% of your primary damage stat. If you have healing spells,
+    prophets will get 30% towards healing spells and Rangers get 15% towards healing spells. If you have no spells equipped
+    and are a prophet or heretic, you will attack with 2% of your primary damage stat.
+    Prophets and Rangers can heal for 30% and 15% (respectively) of their chr even with no spell equipped.
+  </Tooltip>
+);
+
+const renderCastAndAttackToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will attack with spell in spell slot one and weapon in left hand as well as rings, artifacts and affixes.
+    Uses Casting Accuracy for the spell and Accuracy for the weapon. If you have a bow equipped, we will use that
+    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat. If you are blocked at any time, both spell and
+    weapon will be blocked.
+  </Tooltip>
+);
+
+const renderAttackAndCastToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will attack with weapon in right hand and spell in spell slot two as well as rings, artifacts and affixes.
+    Uses Accuracy for the weapon and then Casting Accuracy for the spell. If you have a bow equipped, we will use that
+    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat. If you are blocked at any time, both spell and
+    weapon will be blocked.
+  </Tooltip>
+);
+
+const renderDefendToolTip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Will use your armour class plus 5% of your strength. If you're a Fighter, we use 15% of your strength.
+    Only your affixes, rings and artifacts will fire during your round. During the enemies phase you will
+    have a chance to block them (including their spells) assuming you are not entranced.
+  </Tooltip>
+);
 
 export default class CelestialFightSection extends React.Component {
 
@@ -59,11 +103,13 @@ export default class CelestialFightSection extends React.Component {
     });
   }
 
-  attackCelestial() {
+  attackCelestial(attackType) {
     this.setState({
       canAttack: false,
     }, () => {
-      axios.post('/api/attack-celestial/' + this.props.characterId + '/' + this.props.celestialId).then((result) => {
+      axios.post('/api/attack-celestial/' + this.props.characterId + '/' + this.props.celestialId, {
+        attack_type: attackType
+      }).then((result) => {
         if (result.data.hasOwnProperty('battle_over')) {
           this.setState({
             battleIsOver: true,
@@ -143,7 +189,7 @@ export default class CelestialFightSection extends React.Component {
 
   logs() {
     return this.state.logs.map((log, index) => {
-      return <div key={index}><span className="battle-message">{log[0]}</span> <br/></div>
+      return <div key={index}><span className={log.class}>{log.message}</span> <br/></div>
     });
   }
 
@@ -156,62 +202,115 @@ export default class CelestialFightSection extends React.Component {
               <div className="progress-bar progress-bar-striped indeterminate">
               </div>
             </div>
-            :
-            <>
-              <hr/>
+          :
+            this.props.isDead ?
               <div className="text-center">
-                <div className="clearfix celestial-fight-actions">
-                  {
-                    this.state.battleIsOver ?
-                      <button type="button"
-                              className="btn btn-primary"
-                              onClick={this.close.bind(this)}
-                      >
-                        Close
-                      </button>
-                    :
-                      <Fragment>
-                        <div className="float-left">
-                          <button type="button" className="btn btn-primary" onClick={this.attackCelestial.bind(this)}
-                                  disabled={this.props.isDead || !this.state.canAttack}>Attack!
-                          </button>
-                        </div>
-
-                        <div className="float-right">
-                          <TimeOutBar
-                            cssClass={'character-timeout'}
-                            readyCssClass={'character-ready'}
-                            timeRemaining={0}
-                            channel={'show-timeout-bar-' + this.props.userId}
-                            eventClass={'Game.Core.Events.ShowTimeOutEvent'}
-                            updateCanAttack={this.updateCanAttack.bind(this)}
-                          />
-                        </div>
-                      </Fragment>
-                  }
+                <div className="clearfix container-sm" style={{maxWidth: 400}}>
+                  <div className="float-left">
+                    <ReviveSection
+                      characterId={this.props.characterId}
+                      canAttack={this.state.canAttack}
+                      revive={this.revive.bind(this)}
+                      openTimeOutModal={this.props.openTimeOutModal}
+                      route={'/api/celestial-revive/' + this.props.characterId}
+                    />
+                  </div>
+                  <div className="float-right">
+                    <TimeOutBar
+                      cssClass={'character-timeout'}
+                      readyCssClass={'character-ready'}
+                      timeRemaining={0}
+                      channel={'show-timeout-bar-' + this.props.userId}
+                      eventClass={'Game.Core.Events.ShowTimeOutEvent'}
+                      updateCanAttack={this.updateCanAttack.bind(this)}
+                    />
+                  </div>
                 </div>
-                {
-                  this.props.isDead ?
-                    <>
-                      <hr/>
-                      <ReviveSection
-                        characterId={this.props.characterId}
-                        canAttack={this.state.canAttack}
-                        revive={this.revive.bind(this)}
-                        openTimeOutModal={this.props.openTimeOutModal}
-                        route={'/api/celestial-revive/' + this.props.characterId}
-                      />
-                    </>
-                    : null
-                }
+
+
               </div>
-              {this.healthMeters()}
-              <div className="text-center m-auto">
-                {this.logs()}
-              </div>
-            </>
+            :
+              this.state.battleIsOver ?
+                <div className="text-center">
+                  <button type="button"
+                          className="btn btn-primary"
+                          onClick={this.close.bind(this)}
+                  >
+                    Close
+                  </button>
+                </div>
+              :
+                <>
+                  <div className="text-center container-sm" style={{maxWidth: 400}}>
+                    <OverlayTrigger
+                      placement="right"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={renderAttackToolTip}
+                    >
+                      <button className="btn btn-attack mr-2"
+                              disabled={this.props.isAdventuring}
+                              onClick={() => this.attackCelestial('attack')}
+                      >
+                        <i className="ra ra-sword"></i>
+                      </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="right"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={renderCastingToolTip}
+                    >
+                      <button className="btn btn-cast mr-2"
+                              disabled={this.props.isAdventuring}
+                              onClick={() => this.attackCelestial('cast')}
+                      >
+                        <i className="ra ra-burning-book"></i>
+                      </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="right"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={renderCastAndAttackToolTip}
+                    >
+                      <button className="btn btn-cast-attack mr-2"
+                              disabled={this.props.isAdventuring}
+                              onClick={() => this.attackCelestial('cast_and_attack')}
+                      >
+                        <i className="ra ra-lightning-sword"></i>
+                      </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="right"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={renderAttackAndCastToolTip}
+                    >
+                      <button className="btn btn-attack-cast mr-2"
+                              disabled={this.props.isAdventuring}
+                              onClick={() => this.attackCelestial('attack_and_cast')}
+                      >
+                        <i className="ra ra-lightning-sword"></i>
+                      </button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="right"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={renderDefendToolTip}
+                    >
+                      <button className="btn btn-defend"
+                              disabled={this.props.isAdventuring}
+                              onClick={() => this.attackCelestial('defend')}
+                      >
+                        <i className="ra ra-round-shield"></i>
+                      </button>
+                    </OverlayTrigger>
+                  </div>
+                </>
         }
+        {this.healthMeters()}
+        <hr />
+        <div className="text-center m-auto">
+          {this.logs()}
+        </div>
       </>
-    )
+    );
   }
 }
