@@ -56,42 +56,52 @@ class AdventureManagement {
 
     protected function adventureLog(Adventure $adventure, Item $item, Skill $skill) {
         return [
-                'character_id'         => $this->character->id,
-                'adventure_id'         => $adventure->id,
-                'complete'             => true,
-                'in_progress'          => false,
-                'last_completed_level' => 1,
-                'logs'                 => 
+            'character_id'         => $this->character->id,
+            'adventure_id'         => $adventure->id,
+            'complete'             => true,
+            'in_progress'          => false,
+            'last_completed_level' => 1,
+            'logs'                 =>
+            [
                 [
-                    "vcCBZhAOqy3Dg9V6a1MRWCthCGFNResjhH7ttUsFFpREdVoH9oNqyrjVny3cX8McbjyGHZYeJ8txcTov" => [
-                        [
-                            [
-                            "attacker" => "Kyle Adams",
-                            "defender" => "Goblin",
-                            "messages" => [
-                                "Kyle Adams hit for 30",
-                            ],
-                            "is_monster" => false,
-                            ],
-                        ],
+                    'Level 1' => [
+                        "Goblin-VhaXIEyO7c" => [
+                             [
+                                 "class" => "info-encounter",
+                                "message" => "You encounter a: Goblin"
+                             ],
+                             [
+                                 "class" => "info-damage",
+                                "message" => "TestFighter hit for (weapon): 36"
+                             ],
+                             [
+                                 "class" => "action-fired",
+                                "message" => "The enemy has been defeated!"
+                             ]
+                        ]
                     ]
-                ],
-                'rewards'              => 
-                [
-                    "exp" => 100,
-                    "gold" => 75,
-                    "items" => [
-                        [
-                        "id" => $item->id,
-                        "name" => $item->name,
-                        ],
-                    ],
-                    "skill" => [
-                        "exp"         => 1000,
-                        "skill_name"  => $skill->name,
-                        "exp_towards" => $skill->xp_towards,
-                    ],
                 ]
-            ];
+            ],
+            'rewards' =>
+            [
+                "Level 1" =>[
+                    "Goblin-VhaXIEyO7c" => [
+                        "exp" =>3,
+                        "gold" =>25,
+                        "items" =>[
+                            [
+                                "id" =>66230,
+                                "name" =>"*Warriors Rage* Broken Wooden Shield *Archers Bane*"
+                            ]
+                        ],
+                        "skill" =>[
+                            "exp" =>20,
+                            "skill_name" =>"Looting",
+                            "exp_towards" =>0.1
+                        ]
+                    ]
+               ],
+            ]
+        ];
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\GameClass;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use Str;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameMap;
@@ -152,42 +153,6 @@ class CharacterFactory {
     }
 
     /**
-     * Give the character a snapshot.
-     *
-     * Make sure to call this before leveling the chracter up in situations where
-     * you need to test with character snap shots.
-     *
-     * @return CharacterFactory
-     */
-    public function giveSnapShot(): CharacterFactory {
-        $this->character->snapShots()->create([
-            'character_id' => $this->character->id,
-            'snap_shot'    => $this->character->getAttributes(),
-        ]);
-
-        $this->character = $this->character->refresh();
-
-        return $this;
-    }
-
-    /**
-     * Marks the user as not a test user.
-     *
-     * Useful insituations where you do not want a test user, but an "actual" user.
-     *
-     * @return CharacterFactory
-     */
-    public function userIsNotTest(): CharacterFactory {
-        $this->character->user->update([
-            'is_test' => false
-        ]);
-
-        $this->character = $this->character->refresh();
-
-        return $this;
-    }
-
-    /**
      * Lets you ban a character
      *
      * If the length is not set, then the ban is for ever.
@@ -230,6 +195,8 @@ class CharacterFactory {
             'equipped'     => true,
             'position'     => 'right-hand'
         ]);
+
+        resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
 
         return $this;
     }
@@ -300,8 +267,10 @@ class CharacterFactory {
         for ($i = 0; $i <= $levels; $i++) {
             $characterService->levelUpCharacter($this->character);
 
-            $this->character->refresh();
+            $this->character = $this->character->refresh();
         }
+
+        resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
 
         return $this;
     }
@@ -324,6 +293,8 @@ class CharacterFactory {
 
         $this->character = $this->character->refresh();
 
+        resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
+
         return $this;
     }
 
@@ -345,6 +316,8 @@ class CharacterFactory {
             'xp_max'        => 100,
             'is_locked'     => $locked,
         ], $options));
+
+        resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
 
         return $this;
     }
@@ -373,6 +346,7 @@ class CharacterFactory {
                 ]);
             }
         });
+
 
         return $this;
     }
@@ -430,9 +404,10 @@ class CharacterFactory {
      * Assign Base Skills
      */
     protected function assignBaseSkills() {
-        $accuracy = $this->createGameSkill(['name' => 'Accuracy']);
-        $dodge    = $this->createGameSkill(['name' => 'Dodge']);
-        $looting  = $this->createGameSkill(['name' => 'Looting']);
+        $accuracy        = $this->createGameSkill(['name' => 'Accuracy']);
+        $castingAccuracy = $this->createGameSkill(['name' => 'Casting Accuracy']);
+        $dodge           = $this->createGameSkill(['name' => 'Dodge']);
+        $looting         = $this->createGameSkill(['name' => 'Looting']);
 
         $this->createSkill([
             'character_id'  => $this->character->id,
@@ -447,6 +422,11 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $looting->id,
+        ]);
+
+        $this->createSkill([
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $castingAccuracy->id,
         ]);
     }
 

@@ -23,7 +23,6 @@ class SkillFactory extends Factory
     {
         return [
             'character_id'          => null,
-            'monster_id'            => null,
             'currently_training'    => false,
             'level'                 => 1,
             'xp'                    => 0,

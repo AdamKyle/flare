@@ -4,6 +4,7 @@ namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use Tests\Traits\CreateInventorySets;
 
 class InventorySetManagement
@@ -15,6 +16,8 @@ class InventorySetManagement
 
     private ?CharacterFactory $characterFactory;
 
+    private $buildCharacterAttackData;
+
     private $inventorySetIds = [];
 
     /**
@@ -25,8 +28,9 @@ class InventorySetManagement
      */
     public function __construct(Character $character, CharacterFactory $characterFactory = null)
     {
-        $this->character = $character;
-        $this->characterFactory = $characterFactory;
+        $this->character                = $character;
+        $this->characterFactory         = $characterFactory;
+        $this->buildCharacterAttackData = resolve(BuildCharacterAttackTypes::class);
     }
 
     /**
@@ -80,6 +84,8 @@ class InventorySetManagement
             $this->character->inventorySets()->find($setId)->update(['is_equipped' => true]);
 
             $this->character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
+
+            $this->buildCharacterAttackData->buildCache($ths->character->refresh());
         }
 
         return $this;

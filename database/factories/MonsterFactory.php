@@ -44,6 +44,9 @@ class MonsterFactory extends Factory
             'casting_accuracy' => 0.03,
             'dodge'            => 0.03,
             'criticality'      => 0.03,
+            'accuracy'         => 0.01,
+            'dodge'            => 0.01,
+            'casting_accuracy' => 0.01,
         ];
     }
 }

@@ -5,12 +5,15 @@ namespace Tests\Setup\Character;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Services\BuildCharacterAttackTypes;
 
 class InventoryManagement {
 
     private $character;
 
     private $characterFactory;
+
+    private $buildAttackData;
 
     private $slotIds = [];
     /**
@@ -22,6 +25,8 @@ class InventoryManagement {
     public function __construct(Character $character, CharacterFactory $characterFactory = null) {
         $this->character        = $character;
         $this->characterFactory = $characterFactory;
+
+        $this->buildAttackData  = resolve(BuildCharacterAttackTypes::class);
     }
 
     /**
@@ -39,7 +44,9 @@ class InventoryManagement {
             'position' => 'left-hand',
         ]);
 
-        $this->character->refresh();
+        $this->character = $this->character->refresh();
+
+        $this->buildAttackData->buildCache($this->character);
 
         return $this;
     }
@@ -59,7 +66,9 @@ class InventoryManagement {
             'position' => 'right-hand',
         ]);
 
-        $this->character->refresh();
+        $this->character = $this->character->refresh();
+
+        $this->buildAttackData->buildCache($this->character);
 
         return $this;
     }
@@ -82,7 +91,9 @@ class InventoryManagement {
             'position' => $position,
         ]);
 
-        $this->character->refresh();
+        $this->character = $this->character->refresh();
+
+        $this->buildAttackData->buildCache($this->character);
 
         return $this;
     }
@@ -103,7 +114,9 @@ class InventoryManagement {
             'position' => $position,
         ]);
 
-        $this->character->refresh();
+        $this->character = $this->character->refresh();
+
+        $this->buildAttackData->buildCache($this->character);
 
         return $this;
     }
@@ -124,7 +137,9 @@ class InventoryManagement {
             'position' => $position,
         ]);
 
-        $this->character->refresh();
+        $this->character = $this->character->refresh();
+
+        $this->buildAttackData->buildCache($this->character);
 
         return $this;
     }
@@ -205,6 +220,8 @@ class InventoryManagement {
         });
 
         $this->character = $this->character->refresh();
+
+        $this->buildAttackData($this->character);
 
         return $this;
     }
