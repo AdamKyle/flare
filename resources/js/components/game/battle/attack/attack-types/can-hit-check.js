@@ -7,6 +7,7 @@ export default class CanHitCheck {
 
   constructor() {
     this.battleMessages = [];
+    this.canAutoHit     = false;
   }
 
   canHit (attacker, defender, battleMessages, voided) {
@@ -14,7 +15,9 @@ export default class CanHitCheck {
 
     if (attacker.hasOwnProperty('class')) {
       if (damage.canAutoHit(attacker)) {
-        this.battleMessages = [...battleMessages, ...damage.getMessages()];
+        this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
+
+        this.canAutoHit = true;
 
         return true;
       }
@@ -101,6 +104,10 @@ export default class CanHitCheck {
 
   getBattleMessages () {
     return this.battleMessages;
+  }
+
+  getCanAutoHit() {
+    return this.canAutoHit;
   }
 
   toHitCalculation(toHit, dex, accuracy, dodge) {

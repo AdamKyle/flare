@@ -61,9 +61,27 @@ export default class CastAndAttack {
 
     this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
+    if (canHitCheck.getCanAutoHit()) {
+      if (attackData.spell_damage > 0) {
+        castAttack.attackWithSpells(attackData);
+      } else if (attackData.heal_for > 0) {
+        castAttack.healWithSpells(attackData);
+      }
+
+      this.setStateInfo(castAttack);
+
+      weaponAttack.attackWithWeapon(attackData);
+
+      this.setStateInfo(weaponAttack);
+
+      this.useItems(attackData, this.attacker.class)
+
+      return this.setState();
+    }
+
     if (canHit) {
       if (this.canBlock(attackData.spell_damage + attackData.weapon_damage)) {
-        this.addEnemyActionMessage(this.defender.name + ' Blocked both your damage spell and attack!');
+        this.addEnemyActionMessage(this.defender.name + ' Blocked both your damage spell and you fumble with your weapon!');
 
         if (attackData.heal_for > 0) {
           castAttack.healWithSpells(attackData);
@@ -74,8 +92,6 @@ export default class CastAndAttack {
         return this.setState();
       }
 
-      const canHit = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, this.voided);
-
 
       if (attackData.spell_damage > 0) {
         castAttack.attackWithSpells(attackData);
@@ -84,6 +100,8 @@ export default class CastAndAttack {
       }
 
       this.setStateInfo(castAttack);
+
+      const canHit = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, this.voided);
 
       if (canHit) {
         if (this.canBlock(attackData.weapon_damage)) {

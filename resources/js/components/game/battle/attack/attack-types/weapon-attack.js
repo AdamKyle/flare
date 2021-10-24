@@ -43,7 +43,15 @@ export default class WeaponAttack {
 
     const canHit           = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages);
 
-    this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
+    this.battleMessages    = [...this.battleMessages, ...canHitCheck.getBattleMessages()]
+
+    if (canHitCheck.getCanAutoHit()) {
+      this.attackWithWeapon(attackData);
+
+      this.useItems(attackData, this.attacker.class);
+
+      return this.setState();
+    }
 
     if (canHit) {
       if (this.canBlock()) {
@@ -96,9 +104,10 @@ export default class WeaponAttack {
 
     this.monsterHealth = this.monsterHealth - totalDamage;
 
+    this.addMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(totalDamage))
+
     this.extraAttacks(attackData);
 
-    this.addActionMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(totalDamage))
   }
 
   useItems(attackData, attackerClass) {

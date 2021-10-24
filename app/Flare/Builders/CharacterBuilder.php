@@ -86,6 +86,7 @@ class CharacterBuilder {
             'agi'           => $baseStat->agi(),
             'focus'         => $baseStat->focus(),
             'ac'            => $baseStat->ac(),
+            'gold'          => 1000,
         ]);
 
         $this->character->inventory()->create([

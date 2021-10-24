@@ -108,6 +108,7 @@ export default class Damage {
 
   canAutoHit(attacker) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
+
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -116,7 +117,7 @@ export default class Damage {
 
       if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
 
-        this.addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!');
+        this.addActionMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!');
 
         return true;
       }
@@ -154,7 +155,7 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  calculateHealingTotal(attacker, attackData) {
+  calculateHealingTotal(attacker, attackData, extraHealing) {
     const skillBonus = attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
 
     let healFor = attackData.heal_for;
@@ -165,6 +166,10 @@ export default class Damage {
       this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
 
       healFor *= 2;
+    }
+
+    if (extraHealing) {
+      healFor += healFor * 0.15
     }
 
     this.characterCurrentHealth += healFor
@@ -181,13 +186,13 @@ export default class Damage {
       }
 
       if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
-        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemies direction');
+        this.addActionMessage('A fury takes over you. You notch the arrows thrice at the enemies direction');
 
         for (let i = 1; i <= 3; i++) {
           const totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-          this.addActionMessage(attacker.name + ' hit for (weapon - triple attack) ' + this.formatNumber(totalDamage));
+          this.addMessage(attacker.name + ' hit for (weapon - triple attack) ' + this.formatNumber(totalDamage));
         }
       }
     }
@@ -244,7 +249,7 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  doubleHeal(attacker, characterCurrentHealth, attackData) {
+  doubleHeal(attacker, characterCurrentHealth, attackData, extraHealing) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -258,7 +263,7 @@ export default class Damage {
           class: 'action-fired'
         });
 
-        characterCurrentHealth = this.calculateHealingTotal(attacker, attackData);
+        characterCurrentHealth = this.calculateHealingTotal(attacker, attackData, extraHealing);
       }
     }
 

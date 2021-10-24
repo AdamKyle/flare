@@ -112,7 +112,7 @@ export default class UseItems {
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
 
-      this.addActionMessage('Your rings hit for: ' + this.formatNumber(totalDamage));
+      this.addMessage('Your rings hit for: ' + this.formatNumber(totalDamage));
     }
   }
 

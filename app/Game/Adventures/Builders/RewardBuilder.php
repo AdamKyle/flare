@@ -100,7 +100,7 @@ class RewardBuilder {
         $hasGoldRush = GoldRushCheckCalculator::fetchGoldRushChance($monster, $gameMapBonus, $adventure);
 
         if ($hasGoldRush) {
-            return $monster->gold + (rand(0, 10000) + 1000000);
+            return $monster->gold + ($character->gold * 0.10);
         }
 
         return $monster->gold;

@@ -48,6 +48,15 @@ export default class CastAttack {
 
     this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
+    if (canHitCheck.getCanAutoHit()) {
+      this.attackWithSpells(attackData);
+      this.healWithSpells(attackData);
+
+      this.useItems(attackData, this.attacker.class)
+
+      return this.setState();
+    }
+
     if (canHit) {
       if (this.canBlock()) {
         this.addEnemyActionMessage(this.defender.name + ' Blocked your damaging spell!');
@@ -122,9 +131,10 @@ export default class CastAttack {
 
     this.monsterHealth -= damage;
 
+    this.addMessage('Your damage spell hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
+
     this.extraAttacks(attackData);
 
-    this.addActionMessage('Your damage spell hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
   }
 
   healWithSpells(attackData) {
@@ -143,9 +153,10 @@ export default class CastAttack {
 
     this.characterCurrentHealth += healFor
 
+    this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
+
     this.extraHealing(attackData);
 
-    this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
   }
 
   useItems(attackData, attackerClass) {
@@ -174,7 +185,7 @@ export default class CastAttack {
   extraHealing(attackData) {
     const damage = new Damage();
 
-    this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth, attackData);
+    this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth, attackData, true);
 
     const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 

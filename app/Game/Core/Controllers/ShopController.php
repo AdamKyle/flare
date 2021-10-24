@@ -228,7 +228,7 @@ class ShopController extends Controller {
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-            return redirect()->to(route('game.character.sheet'))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
+            return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
 
         } catch(EquipItemException $e) {
             return redirect()->back()->with('error', $e->getMessage());
