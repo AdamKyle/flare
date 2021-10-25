@@ -81,7 +81,7 @@ class AccountDeletionControllerTest extends TestCase {
         $this->assertEmpty(Character::all());
         $this->assertEmpty(Inventory::all());
         $this->assertEmpty(InventorySet::all());
-        $this->assertEmpty(Skill::whereNull('character_id')->get());
+        $this->assertEmpty(Skill::whereNotNull('character_id')->get());
         $this->assertEmpty(Kingdom::whereNotNull('character_id')->get());
         $this->assertCount(1, User::all());
     }
@@ -100,7 +100,7 @@ class AccountDeletionControllerTest extends TestCase {
         $this->assertNotEmpty(Character::all());
         $this->assertNotEmpty(Inventory::all());
         $this->assertNotEmpty(InventorySet::all());
-        $this->assertNotEmpty(Skill::whereNull('character_id')->get());
+        $this->assertNotEmpty(Skill::whereNOtNull('character_id')->get());
         $this->assertNotEmpty(Kingdom::whereNotNull('character_id')->get());
         $this->assertCount(3, User::all());
     }

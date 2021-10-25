@@ -4,6 +4,8 @@ namespace Tests\Setup\Character;
 
 use App\Flare\Models\GameClass;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Support\Facades\Cache;
 use Str;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameMap;
@@ -379,6 +381,11 @@ class CharacterFactory {
      * @return Character
      */
     public function getCharacter(): Character {
+
+        if (!Cache::has('character-attack-data-' . $this->character->id)) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
+        }
+
         return $this->character->refresh();
     }
 
@@ -406,8 +413,10 @@ class CharacterFactory {
     protected function assignBaseSkills() {
         $accuracy        = $this->createGameSkill(['name' => 'Accuracy']);
         $castingAccuracy = $this->createGameSkill(['name' => 'Casting Accuracy']);
+        $criticality     = $this->createGameSkill(['name' => 'Criticality']);
         $dodge           = $this->createGameSkill(['name' => 'Dodge']);
         $looting         = $this->createGameSkill(['name' => 'Looting']);
+        $lustForGold     = $this->createGameSkill(['name' => 'Lust for Gold', 'type' => SkillTypeValue::EFFECTS_KINGDOM_TREASURY]);
 
         $this->createSkill([
             'character_id'  => $this->character->id,
@@ -427,6 +436,16 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $castingAccuracy->id,
+        ]);
+
+        $this->createSkill([
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $criticality->id,
+        ]);
+
+        $this->createSkill([
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $lustForGold->id,
         ]);
     }
 

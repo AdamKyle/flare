@@ -34,14 +34,19 @@ class RandomItemDropBuilder {
      * From that we check if the affix is the same on the item - if it is, atach it, if not, check if its the same, if it is, delete the
      * duplicate and return the item in question - or attach the new affix and pass that back.
      *
-     * @return Item
+     * @return Item|null
      */
-    public function generateItem(): Item {
+    public function generateItem(): ?Item {
         $item          = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])
                                               ->whereNotIn('type', ['artifact', 'quest', 'alchemy'])
                                               ->where('can_drop', true)
                                               ->get()
                                               ->first();
+
+        if (is_null($item)) {
+            return null;
+        }
+
         $duplicateItem = $this->duplicateItem($item);
         $affix         = $this->fetchRandomItemAffix();
 

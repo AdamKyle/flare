@@ -2,9 +2,8 @@
 
 namespace Tests\Feature\Game\Battle;
 
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Values\MaxLevel;
-use App\Game\Core\Values\LevelUpValue;
-use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
@@ -17,10 +16,8 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateSkill;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\Traits\CreateItemAffix;
-use App\Game\Battle\Controllers\Api\BattleController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
@@ -87,6 +84,8 @@ class BattleControllerApiTest extends TestCase
             'skill_name'           => null,
             'skill_training_bonus' => null,
         ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
     }
 
     public function tearDown(): void {
@@ -111,9 +110,8 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
-        $this->assertNotEmpty($content->monsters[0]->skills);
         $this->assertEquals($character->name, $content->character->name);
-        $this->assertEquals(7, $content->character->attack);
+        $this->assertNotEmpty($content->character->attack_types);
     }
 
     public function testCanGetActionsWithSkills() {
@@ -131,9 +129,8 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertNotEmpty($content->monsters);
-        $this->assertNotEmpty($content->monsters[0]->skills);
         $this->assertEquals($character->name, $content->character->name);
-        $this->assertEquals(7, $content->character->attack);
+        $this->assertNotEmpty($content->character->attack_types);
     }
 
     public function testWhenNotLoggedInCannotGetActions() {
@@ -584,7 +581,7 @@ class BattleControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $this->assertEquals(3.00, $this->character->getCharacter()->xp);
+        $this->assertEquals(1.00, $this->character->getCharacter()->xp);
     }
 
     public function testCharacterSeesErrorForUnknownType() {

@@ -153,6 +153,7 @@ class ClassBasedBonusesTest extends TestCase
         ]);
 
         return (new CharacterFactory())->createBaseCharacter([], $gameClass)
+            ->givePlayerLocation()
             ->assignSkill($skill, 25, false)
             ->inventoryManagement()
             ->giveItemMultipleTimes($item, $amount, true, $position)

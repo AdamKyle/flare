@@ -85,7 +85,7 @@ class InventorySetManagement
 
             $this->character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
 
-            $this->buildCharacterAttackData->buildCache($ths->character->refresh());
+            $this->buildCharacterAttackData->buildCache($this->character->refresh());
         }
 
         return $this;

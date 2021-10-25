@@ -25,7 +25,7 @@ class CharacterInformationBuilderTest extends TestCase {
     public function setUp(): void {
         parent::setup();
 
-        $this->character     = (new CharacterFactory)->createBaseCharacter();
+        $this->character     = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->characterInfo = resolve(CharacterInformationBuilder::class);
     }
 

@@ -216,8 +216,6 @@ class TraverseService {
     protected function updateActions(int $mapId, Character $character) {
         $user      = $character->user;
 
-        $this->buildCharacterAttackTypes->buildCache($character);
-
         $character = new Item($character, $this->characterAttackTransformer);
         $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
 

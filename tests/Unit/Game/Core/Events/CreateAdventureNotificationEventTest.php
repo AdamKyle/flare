@@ -38,6 +38,7 @@ class CreateAdventureNotificationEventTest extends TestCase
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->getCharacter();
 
 

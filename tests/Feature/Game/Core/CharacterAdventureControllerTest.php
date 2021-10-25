@@ -37,6 +37,7 @@ class CharacterAdventureControllerTest extends TestCase
                            ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->updateSkill('Looting', [
                                                      'xp_towards'         => 0.10,
                                                      'level'              => 0,

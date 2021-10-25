@@ -27,10 +27,6 @@ class AdventureSetup {
             }
         }
 
-        $monster->skills()->insert($skills);
-
-        $this->monster->refresh();
-
         return $this;
     }
 

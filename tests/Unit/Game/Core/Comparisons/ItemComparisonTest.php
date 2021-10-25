@@ -52,6 +52,7 @@ class ItemComparisonTest extends TestCase
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                               ->givePlayerLocation()
                                                ->inventoryManagement()
                                                ->giveItem($itemForCharacter)
                                                ->equipLeftHand($itemForCharacter->name)

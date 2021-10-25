@@ -31,6 +31,7 @@ class CharacterSheetControllerApiTest extends TestCase {
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->equipStartingEquipment()
+                                                 ->givePlayerLocation()
                                                  ->inventoryManagement()
                                                  ->giveItem($this->createItem([
                                                     'name' => 'Rusty Dagger',

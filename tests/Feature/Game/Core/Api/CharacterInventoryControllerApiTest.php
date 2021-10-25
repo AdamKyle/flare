@@ -41,6 +41,7 @@ class CharacterInventoryControllerApiTestTest extends TestCase
         ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->equipStartingEquipment();
     }
 

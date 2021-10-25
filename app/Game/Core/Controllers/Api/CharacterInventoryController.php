@@ -384,6 +384,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        $this->updateCharacterAttakDataCache($character);
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json(['message' => 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.'], 200);

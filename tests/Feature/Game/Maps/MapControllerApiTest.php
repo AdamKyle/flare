@@ -2,22 +2,23 @@
 
 namespace Tests\Feature\Game\Maps;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Location;
-use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Services\BuildMonsterCacheService;
+use Cache;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
+use App\Flare\Models\Location;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
-use Cache;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateAdventure;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateMonsterCache;
 
 class MapControllerApiTest extends TestCase
 {
@@ -25,7 +26,8 @@ class MapControllerApiTest extends TestCase
         CreateLocation,
         CreateAdventure,
         CreateItem,
-        CreateGameMap;
+        CreateGameMap,
+        CreateMonsterCache;
 
     private $character;
 
@@ -36,6 +38,8 @@ class MapControllerApiTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation();
+
+        $this->createMonsterCache();
     }
 
     public function tearDown(): void {

@@ -235,7 +235,9 @@ class CelestialBattleControllerApiTest extends TestCase {
         ]);
 
         $response = $this->actingAs($character->user)
-            ->json('GET', '/api/celestial-fight/'.$character->id.'/' . $celestialFight->id)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
             ->response;
 
         $content = json_decode($response->content());
@@ -243,6 +245,7 @@ class CelestialBattleControllerApiTest extends TestCase {
         $this->assertEquals(200, $response->status());
 
         $this->assertObjectHasAttribute('fight', $content);
+        $this->assertObjectHasAttribute('logs', $content);
     }
 
     public function testCannotGetCelestialFightWhenDead() {
@@ -275,7 +278,9 @@ class CelestialBattleControllerApiTest extends TestCase {
         ]);
 
         $response = $this->actingAs($character->user)
-            ->json('GET', '/api/celestial-fight/'.$character->id.'/' . $celestialFight->id)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
             ->response;
 
         $content = json_decode($response->content());
@@ -315,7 +320,9 @@ class CelestialBattleControllerApiTest extends TestCase {
         ]);
 
         $response = $this->actingAs($character->user)
-            ->json('GET', '/api/celestial-fight/'.$character->id.'/' . $celestialFight->id)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
             ->response;
 
         $content = json_decode($response->content());
@@ -353,13 +360,15 @@ class CelestialBattleControllerApiTest extends TestCase {
         ]);
 
         $response = $this->actingAs($character->user)
-            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
             ->response;
 
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertObjectHasAttribute('fight', $content);
+        $this->assertObjectHasAttribute('logs', $content);
     }
 
     public function testCannotAttackCelestialWhenDead() {
@@ -392,7 +401,9 @@ class CelestialBattleControllerApiTest extends TestCase {
         ]);
 
         $response = $this->actingAs($character->user)
-            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
             ->response;
 
         $content = json_decode($response->content());
@@ -432,7 +443,9 @@ class CelestialBattleControllerApiTest extends TestCase {
         ]);
 
         $response = $this->actingAs($character->user)
-            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
             ->response;
 
         $content = json_decode($response->content());

@@ -113,7 +113,6 @@ class FightService {
     public function fight($attacker, $defender, $attackType, bool $isDefenderVoided = false) {
 
         if ($attacker instanceof Character) {
-            dump($this->currentMonsterHealth . ' ' . $defender->name);
             $this->characterAttackHandler->setHealth(
                 $this->currentCharacterHealth,
                 $this->currentMonsterHealth,

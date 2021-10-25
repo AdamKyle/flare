@@ -72,9 +72,11 @@ class CharacterInformationBuilder {
     }
 
     public function getSkill(string $skillName): float {
-        $gameSkillId = GameSkill::where('name', $skillName)->first()->id;
+        $skill = $this->character->skills->filter(function($skill) use ($skillName) {
+            return $skill->name === $skillName;
+        })->first();
 
-        return $this->character->skills()->where('game_skill_id', $gameSkillId)->first()->skill_bonus;
+        return $skill->skill_bonus;
     }
 
     /**

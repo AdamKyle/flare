@@ -23,12 +23,14 @@ class AlchemyServiceTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill($this->createGameSkill([
-            'type' => SkillTypeValue::ALCHEMY
-        ]))->updateCharacter([
-            'gold_dust' => 10000,
-            'shards'    => 100,
-        ])->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
+                                                 ->assignSkill($this->createGameSkill([
+                                                     'type' => SkillTypeValue::ALCHEMY
+                                                 ]))->updateCharacter([
+                                                     'gold_dust' => 10000,
+                                                     'shards'    => 100,
+                                                 ]);
 
         $this->item = $this->createItem([
             'can_craft' => true,

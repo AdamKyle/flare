@@ -20,7 +20,7 @@ class AttackTimeOutJobTest extends TestCase
             ShowTimeOutEvent::class,
         ]);
 
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         JobsAttackTimeOutJob::dispatch($character);
 

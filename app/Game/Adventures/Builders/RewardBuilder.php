@@ -5,6 +5,7 @@ namespace App\Game\Adventures\Builders;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
@@ -44,7 +45,7 @@ class RewardBuilder {
      * @param Adventure $adventure
      * @return mixed Item | null
      */
-    public function fetchDrops(Monster $monster, Character $character, Adventure $adventure, float $gameMapBonus) {
+    public function fetchDrops(Monster $monster, Character $character, Adventure $adventure, float $gameMapBonus): ?Item {
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
 
         $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $gameMapBonus, $adventure);
@@ -52,14 +53,14 @@ class RewardBuilder {
         if ($hasDrop) {
             return resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
-                        ->generateItem($character);
+                        ->generateItem();
         }
 
         return null;
     }
 
     /**
-     * Fetches the quest drop from a monnster.
+     * Fetches the quest drop from a monster.
      *
      * @param Monster $monster
      * @param Character $character

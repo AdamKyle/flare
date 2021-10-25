@@ -16,11 +16,11 @@ class DataTableTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        (new CharacterFactory)->createBaseCharacter()->updateCharacter([
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter([
             'name' => 'Zex'
         ])->getCharacter();
 
-        (new CharacterFactory)->createBaseCharacter()->updateCharacter([
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter([
             'name' => 'trox'
         ])->getCharacter();
     }

@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Maps\Adventure\Services;
 
 use App\Flare\Calculators\DropCheckCalculator;
 use App\Flare\Calculators\GoldRushCheckCalculator;
+use App\Game\Adventures\Services\AdventureFightService;
 use DB;
 use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,38 +49,37 @@ class AdventureServiceTest extends TestCase
         $item      = $this->createItem(['name' => 'Item Name']);
 
         $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-                                        ->updateCharacter(['can_move' => false])
-                                        ->levelCharacterUp(100)
-                                        ->inventoryManagement()
-                                        ->giveItem($item)
-                                        ->getCharacterFactory()
-                                        ->createAdventureLog($adventure)
-                                        ->updateSkill('Accuracy', [
-                                            'level' => 10,
-                                            'xp_towards' => 10,
-                                            'currently_training' => true
-                                        ])
-                                        ->updateSkill('Dodge', [
-                                            'level' => 10
-                                        ])
-                                        ->updateSkill('Looting', [
-                                            'level' => 10
-                                        ])
-                                        ->getCharacter();
+                                           ->givePlayerLocation()
+                                           ->updateCharacter(['can_move' => false])
+                                           ->levelCharacterUp(100)
+                                           ->inventoryManagement()
+                                           ->giveItem($item)
+                                           ->getCharacterFactory()
+                                           ->createAdventureLog($adventure)
+                                           ->updateSkill('Accuracy', [
+                                               'level' => 10,
+                                               'xp_towards' => 10,
+                                               'currently_training' => true
+                                           ])
+                                           ->updateSkill('Dodge', [
+                                               'level' => 10
+                                           ])
+                                           ->updateSkill('Looting', [
+                                               'level' => 10
+                                           ])
+                                           ->getCharacter();
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-            $adventureService->processAdventure($i, $adventure->levels);
-            $character->refresh();
+        $adventureService->processAdventure(1, 1, 'attack');
 
-            $this->assertFalse($character->is_dead);
-            $this->assertTrue($character->adventureLogs->isNotEmpty());
-            $this->assertTrue($character->adventureLogs->first()->complete);
-            $this->assertTrue(!empty($character->adventureLogs->first()->rewards));
-            $this->assertTrue(!empty($character->adventureLogs->first()->logs));
-        }
+        $character = $character->refresh();
+
+        $this->assertFalse($character->is_dead);
+        $this->assertTrue($character->adventureLogs->isNotEmpty());
+        $this->assertTrue($character->adventureLogs->first()->complete);
+        $this->assertTrue(!empty($character->adventureLogs->first()->rewards));
+        $this->assertTrue(!empty($character->adventureLogs->first()->logs));
 
     }
 
@@ -105,19 +105,15 @@ class AdventureServiceTest extends TestCase
                                         ])
                                         ->getCharacter();
 
-         $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService->processAdventure($i, $adventure->levels);
+        for ($i = 1; $i <= 5; $i++) {
+            $adventureService->processAdventure($i, 5, 'attack');
         }
 
         $character = $character->refresh();
 
         $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
-
-        foreach($character->adventureLogs->first()->logs as $key => $value) {
-            $this->assertEquals(5, count($value));
-        }
     }
 
     public function testProcessAdventureWithMultipleLevelsAndGetQuestItem()
@@ -160,21 +156,15 @@ class AdventureServiceTest extends TestCase
 
         $dropCheckCalculator->shouldReceive('fetchQuestItemDropCheck')->andReturn(true);
 
-        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService->processAdventure($i, $adventure->levels);
+        for ($i = 1; $i <= 5; $i++) {
+            $adventureService->processAdventure($i, 5, 'attack');
         }
-
-        $this->assertTrue(true);
 
         $character = $character->refresh();
 
         $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
-
-        foreach($character->adventureLogs->first()->logs as $key => $value) {
-            $this->assertEquals(5, count($value));
-        }
 
         foreach ($character->adventureLogs->first()->rewards as $key => $value) {
             if ($key === 'items') {
@@ -225,19 +215,15 @@ class AdventureServiceTest extends TestCase
 
         $dropCheckCalculator->shouldReceive('fetchQuestItemDropCheck')->andReturn(true);
 
-        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService->processAdventure($i, $adventure->levels);
+        for ($i = 1; $i <= 5; $i++) {
+            $adventureService->processAdventure($i, 5, 'attack');
         }
 
         $character = $character->refresh();
 
         $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
-
-        foreach($character->adventureLogs->first()->logs as $key => $value) {
-            $this->assertEquals(5, count($value));
-        }
 
         foreach ($character->adventureLogs->first()->rewards as $key => $value) {
             if ($key === 'items') {
@@ -274,19 +260,16 @@ class AdventureServiceTest extends TestCase
 
         $goldRushChange->shouldReceive('fetchGoldRushChance')->andReturn(false);
 
-        $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService->processAdventure($i, $adventure->levels);
+        for ($i = 1; $i <= 5; $i++) {
+            $adventureService->processAdventure($i, 5, 'attack');
         }
 
         $character = $character->refresh();
 
         $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
 
-        foreach($character->adventureLogs->first()->logs as $key => $value) {
-            $this->assertEquals(5, count($value));
-        }
     }
 
     public function testProcessAdventureWithMultipleLevelsNotTrainingSkills()
@@ -311,19 +294,16 @@ class AdventureServiceTest extends TestCase
                                         ])
                                         ->getCharacter();
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-            $adventureService->processAdventure($i, $adventure->levels);
+        for ($i = 1; $i <= 5; $i++) {
+            $adventureService->processAdventure($i, 5, 'attack');
         }
 
         $character = $character->refresh();
 
         $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
 
-        foreach($character->adventureLogs->first()->logs as $key => $value) {
-            $this->assertEquals(5, count($value));
-        }
     }
 
     public function testProcessAdventureCharacterDiesLoggedIn()
@@ -375,11 +355,9 @@ class AdventureServiceTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-            $adventureService->processAdventure($i, $adventure->levels);
-        }
+        $adventureService->processAdventure(1, 1, 'attack');
 
         $character = $character->refresh();
 
@@ -412,7 +390,7 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
+                                        ->givePlayerLocation()
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [
@@ -430,11 +408,9 @@ class AdventureServiceTest extends TestCase
 
         Mail::fake();
 
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
+        $adventureService = resolve(AdventureService::class)->setCharacter($character, 'attack')->setAdventure($adventure)->setName('sample');
 
-            $adventureService->processAdventure($i, $adventure->levels);
-        }
+        $adventureService->processAdventure(1, 1, 'attack');
 
         $character = $character->refresh();
 
@@ -444,98 +420,5 @@ class AdventureServiceTest extends TestCase
         $this->assertTrue($character->adventureLogs->isNotEmpty());
         $this->assertFalse($character->adventureLogs->first()->complete);
         $this->assertEquals(1, $character->adventureLogs->first()->last_completed_level);
-    }
-
-    public function testAdventureTookTooLongUserOnline() {
-        $monster = $this->createMonster([
-            'name' => 'Monster',
-            'damage_stat' => 'str',
-            'xp' => 10,
-            'str' => 1,
-            'dur' => 12,
-            'dex' => 23, // This is the same as the character, to make the aadventure take too long.
-            'chr' => 12,
-            'int' => 10,
-            'ac' => 18,
-            'gold' => 1,
-            'max_level' => 10,
-            'health_range' => '10-20',
-            'attack_range' => '1-4',
-            'drop_check' => 0.1,
-        ]);
-
-        $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-                                        ->levelCharacterUp(10)
-                                        ->updateCharacter(['can_move' => false])
-                                        ->createAdventureLog($adventure)
-                                        ->getCharacter();
-
-        $this->actingAs($character->user);
-
-        DB::table('sessions')->insert([[
-            'id'           => '1',
-            'user_id'      => $character->user->id,
-            'ip_address'   => '1',
-            'user_agent'   => '1',
-            'payload'      => '1',
-            'last_activity'=> 1602801731,
-        ]]);
-
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
-
-            $adventureService->processAdventure($i, $adventure->levels);
-        }
-
-        $character = $character->refresh();
-
-        $this->assertTrue($character->can_move);
-    }
-
-    public function testAdventureTookTooLongUserNotOnline() {
-        $monster = $this->createMonster([
-            'name' => 'Monster',
-            'damage_stat' => 'str',
-            'xp' => 10,
-            'str' => 1,
-            'dur' => 12,
-            'dex' => 23, // To match the character dex so the adventure takes too long.
-            'chr' => 12,
-            'int' => 10,
-            'ac' => 18,
-            'gold' => 1,
-            'max_level' => 10,
-            'health_range' => '10-20',
-            'attack_range' => '1-4',
-            'drop_check' => 0.1,
-        ]);
-
-        $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
-
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-                                        ->levelCharacterUp(10)
-                                        ->updateCharacter(['can_move' => false])
-                                        ->createAdventureLog($adventure)
-                                        ->getCharacter();
-
-        Mail::fake();
-
-        for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService = new AdventureService($character, $adventure, new RewardBuilder, 'sample');
-
-            $adventureService->processAdventure($i, $adventure->levels);
-        }
-
-        $character = $character->refresh();
-
-        $this->assertTrue($character->can_move);
-
-        Mail::assertSent(AdventureCompleted::class);
     }
 }

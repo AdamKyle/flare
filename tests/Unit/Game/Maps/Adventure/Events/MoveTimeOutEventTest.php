@@ -17,7 +17,7 @@ class MoveTimeOutEventTest extends TestCase
 
     public function testShowTimeOutEvent()
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         Event::fake([ShowTimeOutEvent::class]);
 

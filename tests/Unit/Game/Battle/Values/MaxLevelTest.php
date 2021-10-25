@@ -14,7 +14,7 @@ class MaxLevelTest extends TestCase {
     }
 
     public function testGetSeventyFivePercent() {
-        $this->assertEquals(75, (new MaxLevel(500, 100))->fetchXP());
+        $this->assertEquals(25, (new MaxLevel(500, 100))->fetchXP());
     }
 
     public function testGetFiftyPercent() {
@@ -22,6 +22,6 @@ class MaxLevelTest extends TestCase {
     }
 
     public function testGetTwentyFivePercent() {
-        $this->assertEquals(25, (new MaxLevel(950, 100))->fetchXP());
+        $this->assertEquals(75, (new MaxLevel(950, 100))->fetchXP());
     }
 }

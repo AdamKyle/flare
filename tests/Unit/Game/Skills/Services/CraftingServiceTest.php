@@ -26,7 +26,7 @@ class CraftingServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->updateCharacter([
             'gold' => 0,
-        ])->assignSkill($this->createGameSkill([
+        ])->givePlayerLocation()->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::CRAFTING,
             'name' => 'Weapon Crafting',
         ]));

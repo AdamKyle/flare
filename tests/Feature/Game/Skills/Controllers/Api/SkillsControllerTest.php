@@ -20,7 +20,7 @@ class SkillsControllerTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
     public function tearDown(): void {

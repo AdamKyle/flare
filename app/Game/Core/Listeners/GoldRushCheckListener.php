@@ -28,14 +28,14 @@ class GoldRushCheckListener
         $hasGoldRush    = GoldRushCheckCalculator::fetchGoldRushChance($event->monster, $gameMapBonus, $event->adventure);
 
         if ($hasGoldRush) {
-            $goldRush = ceil($this->character->gold + $this->character->gold * 0.10);
+            $goldRush = ceil($event->character->gold + $event->character->gold * 0.10);
 
             $event->character->gold = $goldRush;
             $event->character->save();
 
             $character = $event->character->refresh();
 
-            event(new ServerMessageEvent($character->user, 'gold_rush', ceil($this->character->gold * 0.10)));
+            event(new ServerMessageEvent($character->user, 'gold_rush', ceil($character->gold * 0.10)));
             event(new UpdateTopBarEvent($character));
         }
     }
