@@ -10,6 +10,9 @@ use App\Console\Commands\MoveInfoFiles;
 use App\Console\Commands\UpdateKingdom;
 use Spatie\ShortSchedule\ShortSchedule;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Kernel extends ConsoleKernel {
 
     /**

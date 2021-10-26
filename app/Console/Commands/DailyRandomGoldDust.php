@@ -2,19 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Jobs\DailyGoldDustJob;
-use App\Flare\Jobs\UpdateKingdomJob;
 use App\Flare\Models\Character;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use Cache;
-use Mail;
 use Illuminate\Console\Command;
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\User;
-use App\Game\Kingdoms\Mail\KingdomsUpdated;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Facades\App\Flare\Values\UserOnlineValue;
 
 class DailyRandomGoldDust extends Command

@@ -89,7 +89,6 @@ class KingdomResourcesService {
      * @return void
      */
     public function updateKingdom(): void {
-
         if (is_null($this->kingdom->last_walked) && !$this->kingdom->npc_owned) {
             $this->giveNPCKingdoms();
 

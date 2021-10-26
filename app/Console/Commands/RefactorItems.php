@@ -6,6 +6,9 @@ use Illuminate\Console\Command;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 
+/**
+ * @codeCoverageIgnore
+ */
 class RefactorItems extends Command
 {
     /**

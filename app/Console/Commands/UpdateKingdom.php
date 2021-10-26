@@ -55,21 +55,4 @@ class UpdateKingdom extends Command
             }
         });
     }
-
-    protected function getKingdomEmailData(array $kingdoms) {
-        $kingdomData = [];
-
-        foreach ($kingdoms as $kingdomId) {
-            $kingdom = Kingdom::find($kingdomId);
-
-            $kingdomData[] = [
-                'name'       => $kingdom->name,
-                'x_position' => $kingdom->x_position,
-                'y_position' => $kingdom->y_position,
-                'plane'      => $kingdom->gameMap->name,
-            ];
-        }
-
-        return $kingdomData;
-    }
 }

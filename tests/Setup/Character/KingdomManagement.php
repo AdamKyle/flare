@@ -54,6 +54,8 @@ class KingdomManagement {
         $this->kingdom = $this->createKingdom(array_merge([
             'character_id' => $this->character->id,
             'game_map_id'  => $this->character->map->game_map_id,
+            'treasury'     => 0,
+            'last_walked'  => now(),
         ], $options));
 
         $this->addKingdomToCache($this->character, $this->kingdom);
