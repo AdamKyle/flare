@@ -221,7 +221,7 @@ class InventoryManagement {
 
         $this->character = $this->character->refresh();
 
-        $this->buildAttackData($this->character);
+        $this->buildAttackData->buildCache($this->character);
 
         return $this;
     }

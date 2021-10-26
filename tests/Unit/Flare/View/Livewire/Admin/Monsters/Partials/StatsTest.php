@@ -87,7 +87,7 @@ class StatsTest extends TestCase
     }
 
     public function testInitialMonsterIsArray() {
-        $monster = $this->createMonster()->load('skills');
+        $monster = $this->createMonster();
 
         Livewire::test(Stats::class, ['monster' => $monster->toArray()])->assertSet('monster.name', $monster->name);
     }

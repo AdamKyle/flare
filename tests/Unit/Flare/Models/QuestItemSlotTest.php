@@ -16,6 +16,7 @@ class QuestItemSlotTest extends TestCase
     public function testGetItemForQuestSlot()
     {
         $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->givePlayerLocation()
                                            ->getCharacter();
 
         $this->createItem([

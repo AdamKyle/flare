@@ -29,6 +29,7 @@ class DataTableTest extends TestCase
         $adventure = $this->createNewAdventure();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                        ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->inventoryManagement()
                                         ->giveItem($item)

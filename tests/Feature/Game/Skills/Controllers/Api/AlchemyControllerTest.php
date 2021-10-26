@@ -29,7 +29,7 @@ class AlchemyControllerTest extends TestCase
             'can_craft'            => true,
         ]);
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill($this->createGameSkill(['type' => SkillTypeValue::ALCHEMY]))->updateCharacter([
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($this->createGameSkill(['type' => SkillTypeValue::ALCHEMY]))->updateCharacter([
             'gold_dust' => 10000,
             'shards'    => 10000,
         ]);

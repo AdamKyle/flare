@@ -19,12 +19,12 @@ class DataTableTest extends TestCase
     public function testTheComponentSearches() {
         $skill = $this->createGameSkill();
 
-        Livewire::test(DataTable::class)->set('search', 'yes')->assertSee($skill->name);
+        Livewire::test(DataTable::class)->set('search', $skill->name)->assertSee($skill->name);
     }
 
     public function testTheComponentSearchesEmpty() {
         $skill = $this->createGameSkill();
 
-        Livewire::test(DataTable::class)->set('search', 'no')->assertDontSee($skill->name);
+        Livewire::test(DataTable::class)->set('search', 'apples')->assertDontSee($skill->name);
     }
 }

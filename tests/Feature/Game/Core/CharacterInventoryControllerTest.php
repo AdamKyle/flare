@@ -30,6 +30,7 @@ class CharacterInventoryControllerTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->equipStartingEquipment();
     }
 
@@ -84,7 +85,7 @@ class CharacterInventoryControllerTest extends TestCase
             'equip_type' => 'weapon',
         ])->response;
 
-        $response->assertSessionHas('error', 'Could not equip item because you either do not have it, or it is equipped already.');
+        $response->assertSessionHas('error', 'The item you are trying to equip as a replacement, does not exist.');
 
         $character = $this->character->getCharacter();
 

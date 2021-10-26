@@ -16,7 +16,7 @@ class MoveTimeOutJobTest extends TestCase
     public function testMoveTimeOutJob()
     {
 
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         Event::fake();
 

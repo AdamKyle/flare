@@ -21,6 +21,7 @@ class SkillXpCalculatorTest extends TestCase
     {
 
         $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->givePlayerLocation()
                                            ->updateSkill('Looting', [
                                                 'skill_bonus_per_level' => 10
                                            ])

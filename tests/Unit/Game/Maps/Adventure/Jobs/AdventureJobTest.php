@@ -40,7 +40,7 @@ class AdventureJobTest extends TestCase
         Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, $jobName, now()->addMinutes(5));
 
         for ($i = 1; $i <= $adventure->levels; $i++) {
-            AdventureJob::dispatch($character, $adventure, $jobName, $i);
+            AdventureJob::dispatch($character, $adventure, 'attack', $jobName, $i);
 
             $character = $character->refresh();
 
@@ -56,6 +56,7 @@ class AdventureJobTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
                                          ->createAdventureLog($adventure)
+                                         ->givePlayerLocation()
                                          ->getCharacter();
 
         Event::fake();
@@ -65,7 +66,7 @@ class AdventureJobTest extends TestCase
         Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, 'sample', now()->addMinutes(5));
 
         for ($i = 1; $i <= $adventure->levels; $i++) {
-            AdventureJob::dispatch($character, $adventure, $jobName, $i);
+            AdventureJob::dispatch($character, $adventure, 'attack', $jobName, $i);
 
             $character->refresh();
 

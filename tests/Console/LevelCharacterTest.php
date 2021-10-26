@@ -11,7 +11,7 @@ class LevelCharacterTest extends TestCase
     use RefreshDatabase;
 
     public function testLevelCharacter() {
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertEquals(0, $this->artisan('level:character', [
             'id' => $character->id,
@@ -24,7 +24,7 @@ class LevelCharacterTest extends TestCase
     }
 
     public function testCannotLevelCharacter() {
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertEquals(0, $this->artisan('level:character', [
             'id' => 34,
@@ -37,7 +37,7 @@ class LevelCharacterTest extends TestCase
     }
 
     public function testCannotLevelCharacterPastMaxLevel() {
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $this->assertEquals(0, $this->artisan('level:character', [
             'id' => $character->id,

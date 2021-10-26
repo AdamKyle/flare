@@ -30,7 +30,7 @@ class UsersControllerTest extends TestCase
 
         $this->user = $this->createAdmin($role, []);
 
-        $this->character = (new CharacterFactory)->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
     public function tearDown(): void

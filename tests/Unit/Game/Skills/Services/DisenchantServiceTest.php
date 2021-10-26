@@ -27,7 +27,7 @@ class DisenchantServiceTest extends TestCase
             'item_suffix_id' => $this->createItemAffix()->id,
         ]);
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill($this->createGameSkill([
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::DISENCHANTING
         ]))->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::ENCHANTING

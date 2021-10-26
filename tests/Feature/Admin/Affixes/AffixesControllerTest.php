@@ -75,7 +75,7 @@ class AffixesControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
 
         $item = $this->createItem([
             'item_suffix_id' => $this->affix->id

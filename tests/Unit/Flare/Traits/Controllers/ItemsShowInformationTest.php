@@ -77,7 +77,7 @@ class ItemsShowInformationTest extends TestCase
     public function testGetItemShowForUsableItemThatAffectsSkillsLoggedIn() {
         $gameSkill = $this->createGameSkill(['type' => SkillTypeValue::ALCHEMY]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()->assignSkill($gameSkill)->getUser();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->assignSkill($gameSkill)->getUser();
 
         $this->actingAs($character);
 

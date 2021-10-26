@@ -34,7 +34,7 @@ class QuestItemTest extends TestCase
     }
 
     public function testTheComponentCallsUpdate() {
-        $monster = $this->createMonster()->load('skills');
+        $monster = $this->createMonster();
 
         Livewire::test(QuestItem::class)->call('update', $monster->id)->assertSet('monster.name', $monster->name);
     }

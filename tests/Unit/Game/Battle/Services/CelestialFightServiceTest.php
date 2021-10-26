@@ -148,7 +148,7 @@ class CelestialFightServiceTest extends TestCase
 
         $celestialFightService = resolve(CelestialFightService::class);
 
-        $response = $celestialFightService->fight($character, $celestialFight, $characterInCelestialFight);
+        $response = $celestialFightService->fight($character, $celestialFight, $characterInCelestialFight, 'attack');
 
         $this->assertArrayNotHasKey('battle_over', $response);
         $this->assertTrue($character->refresh()->is_dead);
@@ -191,7 +191,7 @@ class CelestialFightServiceTest extends TestCase
 
         $celestialFightService = resolve(CelestialFightService::class);
 
-        $response = $celestialFightService->fight($character, $celestialFight, $characterInCelestialFight);
+        $response = $celestialFightService->fight($character, $celestialFight, $characterInCelestialFight, 'attack');
 
         $this->assertArrayHasKey('battle_over', $response);
         $this->assertFalse($character->refresh()->is_dead);

@@ -56,7 +56,7 @@ class SkillModifiersTest extends TestCase
 
         $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $skill = $this->createGameSkill([
             'base_damage_mod_bonus_per_level' => null,
@@ -84,7 +84,7 @@ class SkillModifiersTest extends TestCase
 
         $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $skill = $this->createGameSkill([
             'base_damage_mod_bonus_per_level' => -1.0,

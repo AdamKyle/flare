@@ -19,7 +19,7 @@ class ItemTest extends TestCase
 
     public function testGetInventorySlot() {
 
-        $character = (new CharacterFactory)->createBaseCharacter()->equipStartingEquipment()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->equipStartingEquipment()->givePlayerLocation()->getCharacter();
 
 
         $this->assertNotNull($character->inventory->slots()->where('equipped', true)->first());

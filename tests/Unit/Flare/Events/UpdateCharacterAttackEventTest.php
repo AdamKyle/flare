@@ -24,6 +24,7 @@ class UpdateCharacterAttackEventTest extends TestCase
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()
+                                         ->givePlayerLocation()
                                          ->updateCharacter([
                                             'can_attack' => false,
                                          ])

@@ -84,6 +84,7 @@ class ItemsControllerTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->givePlayerLocation()
                                            ->inventoryManagement()
                                            ->giveItem($this->item)
                                            ->equipLeftHand($this->item->name)
@@ -109,6 +110,7 @@ class ItemsControllerTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()
+                                           ->givePlayerLocation()
                                            ->inventoryManagement()
                                            ->giveItem($this->item)
                                            ->equipLeftHand($this->item->name)

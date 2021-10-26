@@ -27,6 +27,7 @@ class AdventureLogTest extends TestCase
                                 'in_progress'          => false,
                                 'last_completed_level' => 1,
                             ])
+                            ->givePlayerLocation()
                             ->getCharacter();
     }
 

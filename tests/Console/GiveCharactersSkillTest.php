@@ -13,7 +13,7 @@ class GiveCharactersSkillTest extends TestCase
 
     public function testGiveCharacterSkill() {
         $gameSkill = $this->createGameSkill(['name' => 'Some Skill']);
-        $character = (new CharacterFactory())->createBaseCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
 
         $this->assertEquals(0, $this->artisan('give:skills'));
 
@@ -24,7 +24,7 @@ class GiveCharactersSkillTest extends TestCase
 
     public function testCharacterHasOneSkill() {
         $gameSkill = $this->createGameSkill(['name' => 'Some Skill']);
-        $character = (new CharacterFactory())->createBaseCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
 
         $character->assignSkill($gameSkill, 20);
 
@@ -36,7 +36,7 @@ class GiveCharactersSkillTest extends TestCase
     }
 
     public function testAssignClassSkillToCharacter() {
-        $character = (new CharacterFactory())->createBaseCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
 
         $gameSkill = $this->createGameSkill([
             'game_class_id' => $character->getCharacter()->class->id,
