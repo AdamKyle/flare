@@ -382,11 +382,13 @@ class CharacterFactory {
      */
     public function getCharacter(): Character {
 
-        if (!Cache::has('character-attack-data-' . $this->character->id)) {
-            resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
+        $character = $this->character->refresh();
+
+        if (!Cache::has('character-attack-data-' . $character->id)) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
         }
 
-        return $this->character->refresh();
+        return $character;
     }
 
     /**
