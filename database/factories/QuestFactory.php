@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Values\NpcTypes;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class QuestFactory extends Factory
@@ -24,18 +25,19 @@ class QuestFactory extends Factory
     public function definition()
     {
         return [
-            'name'               => null,
+            'name'               => 'Test',
+            'npc_id'             => null,
             'item_id'            => null,
-            'gold_dust_cost'     => null,
-            'shard_cost'         => null,
-            'gold_cost'          => null,
+            'gold_dust_cost'     => 10,
+            'shard_cost'         => 10,
+            'gold_cost'          => 10,
             'reward_item'        => null,
-            'reward_gold_dust'   => null,
-            'reward_shards'      => null,
-            'reward_gold'        => null,
-            'reward_xp'          => null,
-            'unlocks_skill'      => null,
-            'unlocks_skill_type' => null,
+            'reward_gold_dust'   => 10,
+            'reward_shards'      => 10,
+            'reward_gold'        => 10,
+            'reward_xp'          => 10,
+            'unlocks_skill'      => true,
+            'unlocks_skill_type' => SkillTypeValue::ALCHEMY,
         ];
     }
 }

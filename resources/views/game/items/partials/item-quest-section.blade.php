@@ -121,7 +121,7 @@
                                                 ])}}">{{$quest->name}}</a>
                         @endif
                     @else
-                        <a href="{{route('information.quests.quest', [
+                        <a href="{{route('info.page.quest', [
                                                     'quest' => $quest->id
                                                 ])}}">{{$quest->name}}</a>
                     @endauth

@@ -67,14 +67,6 @@ class InfoPageController extends Controller
                     $before    = config('info.' . $pageName)[$index]['insert_before_table'];
                     $type      = config('info.' . $pageName)[$index]['type'];
                     $craftOnly = config('info.' . $pageName)[$index]['craft_only'];
-
-                    if (isset(config('info.' . $pageName)[$index]['showSkillInfo'])) {
-                        $showSkillInfo = config('info.' . $pageName)[$index]['showSkillInfo'];
-                    }
-
-                    if (isset(config('info.' . $pageName)[$index]['showDropDown'])) {
-                        $showDropDown = config('info.' . $pageName)[$index]['showDropDown'];
-                    }
                 }
 
                 $sections[] = [
@@ -113,15 +105,16 @@ class InfoPageController extends Controller
     public function viewMap(GameMap $map) {
 
         $effects = match ($map->name) {
-            'Labyrinth' => ItemEffectsValue::LABYRINTH,
-            'Dungeons' => ItemEffectsValue::DUNGEON,
-            default => '',
+            'Labyrinth'    => ItemEffectsValue::LABYRINTH,
+            'Dungeons'     => ItemEffectsValue::DUNGEON,
+            'Shadow Plane' => ItemEffectsValue::SHADOWPLANE,
+            default        => '',
         };
 
         return view('information.maps.map', [
-            'map' => $map,
+            'map'        => $map,
             'itemNeeded' => Item::where('effect', $effects)->first(),
-            'mapUrl' => Storage::disk('maps')->url($map->path),
+            'mapUrl'     => Storage::disk('maps')->url($map->path),
         ]);
     }
 
@@ -198,7 +191,9 @@ class InfoPageController extends Controller
 
         foreach ($files as $index => $path) {
             if (explode('.', $path)[1] === 'DS_Store') {
-                unset($files[$index]);
+                // @codeCoverageIgnoreStart
+                unset($files[$index]);  // => We do not need this tested. Test environment would never have a mac specific file.
+                // @codeCoverageIgnoreEnd
             } else {
                 $clean[] = $path;
             }

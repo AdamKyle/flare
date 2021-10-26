@@ -21,7 +21,7 @@
             <span style="font-size: 12px;">
                 <strong>Drop Chance:</strong> {{$monster->quest_item_drop_chance * 100}}%
                 @if(!is_null($quest))
-                    , used in: <a href="{{route('information.quests.quest', ['quest' =>$quest->id])}}">{{$quest->name}}</a>
+                    , used in: <a href="{{route('info.page.quest', ['quest' =>$quest->id])}}">{{$quest->name}}</a>
                 @endif
             </span>
         </div>

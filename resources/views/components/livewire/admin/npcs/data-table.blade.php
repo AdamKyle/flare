@@ -59,7 +59,7 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="{{route('information.npcs.npc', ['npc' => $npc->id])}}">{{$npc->real_name}}
+                                        <a href="{{route('info.page.npc', ['npc' => $npc->id])}}">{{$npc->real_name}}
                                         </a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
@@ -67,7 +67,7 @@
                                                 'npc' => $npc->id
                                             ])}}">{{$npc->real_name}}</a>
                                         @else
-                                            <a href="{{route('information.npcs.npc', ['npc' => $npc->id])}}">{{$npc->real_name}}</a>
+                                            <a href="{{route('info.page.npc', ['npc' => $npc->id])}}">{{$npc->real_name}}</a>
                                         @endif
                                     @endguest
                                 </td>

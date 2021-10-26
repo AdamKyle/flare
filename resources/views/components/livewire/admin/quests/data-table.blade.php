@@ -64,7 +64,7 @@
                             <tr>
                                 <td>
                                     @guest
-                                        <a href="{{route('information.quests.quest', ['quest' => $quest->id])}}">{{$quest->name}}
+                                        <a href="{{route('info.page.quest', ['quest' => $quest->id])}}">{{$quest->name}}
                                         </a>
                                     @else
                                         @if (auth()->user()->hasRole('Admin'))
@@ -72,7 +72,7 @@
                                                 'quest' => $quest->id
                                             ])}}">{{$quest->name}}</a>
                                         @else
-                                            <a href="{{route('information.quests.quest', ['quest' => $quest->id])}}">{{$quest->name}}</a>
+                                            <a href="{{route('info.page.quest', ['quest' => $quest->id])}}">{{$quest->name}}</a>
                                         @endif
                                     @endguest
                                 </td>

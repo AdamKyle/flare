@@ -23,8 +23,8 @@ Route::get('/information/unit/{unit}', ['as' => 'info.page.unit', 'uses' => 'Inf
 Route::get('/information/item/{item}', ['as' => 'info.page.item', 'uses' => 'InfoPageController@viewItem']);
 Route::get('/information/affix/{affix}', ['as' => 'info.page.affix', 'uses' => 'InfoPageController@viewAffix']);
 Route::get('/information/map/{map}', ['as' => 'info.page.map', 'uses' => 'InfoPageController@viewMap']);
-Route::get('/information/npcs/{npc}', ['as' => 'information.npcs.npc', 'uses' => 'InfoPageController@viewNpc']);
-Route::get('/information/quests/{quest}', ['as' => 'information.quests.quest', 'uses' => 'InfoPageController@viewQuest']);
+Route::get('/information/npcs/{npc}', ['as' => 'info.page.npc', 'uses' => 'InfoPageController@viewNpc']);
+Route::get('/information/quests/{quest}', ['as' => 'info.page.quest', 'uses' => 'InfoPageController@viewQuest']);
 
 Route::get('/releases', ['as' => 'releases.list', 'uses' => 'ReleasesController@index']);
 

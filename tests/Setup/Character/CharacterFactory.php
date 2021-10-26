@@ -3,6 +3,8 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\GameClass;
+use App\Flare\Models\Item;
+use App\Flare\Models\MarketBoard;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
@@ -20,6 +22,7 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMap;
+use Tests\Traits\CreateMarketBoardListing;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
@@ -34,7 +37,8 @@ class CharacterFactory {
         CreateMap,
         CreateGameMap,
         CreateGameSkill,
-        CreateSkill;
+        CreateSkill,
+        CreateMarketBoardListing;
 
     private Character $character;
 
@@ -380,15 +384,35 @@ class CharacterFactory {
      *
      * @return Character
      */
-    public function getCharacter(): Character {
+    public function getCharacter(bool $createAttackData = true): Character {
 
         $character = $this->character->refresh();
 
-        if (!Cache::has('character-attack-data-' . $character->id)) {
+        if (!Cache::has('character-attack-data-' . $character->id) && $createAttackData) {
             resolve(BuildCharacterAttackTypes::class)->buildCache($character);
         }
 
         return $character;
+    }
+
+    /**
+     * Creates a market board listing.
+     *
+     * @param Item|null $item
+     * @return $this
+     */
+    public function createMarketListing(?Item $item = null): CharacterFactory {
+        if (is_null($item)) {
+            $item = $this->createItem();
+        }
+
+        $this->createMarketBoardListing([
+            'character_id' => $this->character->id,
+            'item_id'      => $item->id,
+            'listed_price' => 10000,
+        ]);
+
+        return $this;
     }
 
     /**

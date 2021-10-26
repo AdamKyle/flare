@@ -13,6 +13,9 @@ use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Models\User;
 use Password;
 
+/**
+ * @codeCoverageIgnore
+ */
 class ResetPasswordController extends Controller
 {
     /*

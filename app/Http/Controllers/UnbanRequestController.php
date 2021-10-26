@@ -42,21 +42,7 @@ class UnbanRequestController extends Controller
         ]);
     }
 
-    public function requestForm(User $user) {
-        if (!Cache::has('user-temp-' . $user->id)) {
-            return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
-        }
-
-        return view('request.request-unban-form', [
-            'user' => $user
-        ]);
-    }
-
     public function submitRequest(Request $request, User $user) {
-        if (!Cache::has('user-temp-' . $user->id)) {
-            return redirect()->to('/')->with('error', 'Invalid input. Please start the unban request process again.');
-        }
-
         $request->validate([
             'unban_message' => 'required'
         ]);
