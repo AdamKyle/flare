@@ -4,6 +4,9 @@ namespace App\Admin\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @codeCoverageIgnore
+ */
 class SkillsImport extends FormRequest
 {
     /**

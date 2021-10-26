@@ -38,6 +38,7 @@ class GeneratedAdmin extends Mailable
      * Build the message.
      *
      * @return $this
+     * @codeCoverageIgnore
      */
     public function build()
     {

@@ -14,7 +14,7 @@ trait CreateAdventure {
 
     use CreateItem, CreateMonster;
 
-    public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample', bool $published = true): Adventure {
+    public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample', bool $published = true, bool $withFloorDescriptions = false): Adventure {
 
         $adventure = Adventure::factory()->create([
             'name'             => $name,
@@ -39,8 +39,10 @@ trait CreateAdventure {
 
         $adventure->monsters()->attach($monster);
 
-        for ($i = 1; $i <= $levels; $i++) {
-            $this->createFloorDescription($adventure->id, Str::random(10));
+        if ($withFloorDescriptions) {
+            for ($i = 1; $i <= $levels; $i++) {
+                $this->createFloorDescription($adventure->id, Str::random(10));
+            }
         }
 
         return $adventure;

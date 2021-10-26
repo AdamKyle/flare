@@ -85,18 +85,6 @@ class UpdateCharacterStatsService {
         return $character->refresh();
     }
 
-    protected function updateTestCharacterClass(Character $character, GameClass $oldClass, GameClass $newClass) {
-        $character->update(
-            $character->snapShots()->where('snap_shot->level', 1)->first()->snap_shot
-        );
-
-        $character = $this->updateCharacterStatsForClass($character->refresh(), $oldClass, $newClass);
-
-        $character = $this->adjustCharacterDamageStat($character, $oldClass, $newClass);
-
-        LevelTestCharacter::dispatch($character, 1000, auth()->user())->delay(now()->addMinutes(1));
-    }
-
     protected function updateCharacterStatsForClass(Character $character, GameClass $oldClass, GameClass $newClass): Character {
         $character->update([
             'str'           => ($character->str - $oldClass->str_mod) + $newClass->str_mod,
@@ -110,7 +98,7 @@ class UpdateCharacterStatsService {
         return $character->refresh();
     }
 
-    protected function adjustCharacterDamageStat(Character $character, GameClass $oldClass, GameClass $newClass) {
+    protected function adjustCharacterDamageStat(Character $character, GameClass $oldClass, GameClass $newClass): Character {
         if ($oldClass->damage_stat !== $newClass->damage_stat) {
             $totalToAdjust = ($character->level - 1) * 2;
 
@@ -122,20 +110,18 @@ class UpdateCharacterStatsService {
                 $character->{$newClass->damage_stat} += $totalToAdjust;
             }
 
-            if (!$character->user->is_test) {
-                if (UserOnlineValue::isOnline($character->user)) {
-                    event(new UpdateTopBarEvent($character->refresh()));
-                    event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));
-                } else {
-                    $message = 'Your classes damage stat has been changed to: ' . $newClass->damage_stat . '.';
+            $character->save();
 
-                    Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'Damage Stat Change'));
-                }
+            if (UserOnlineValue::isOnline($character->user)) {
+                event(new UpdateTopBarEvent($character->refresh()));
+                event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));
             } else {
-                return $character;
+                $message = 'Your classes damage stat has been changed to: ' . $newClass->damage_stat . '.';
+
+                Mail::to($character->user->email)->send(new GenericMail($character->user, $message, 'Damage Stat Change'));
             }
-        } else {
-            return $character;
         }
+
+        return $character->refresh();
     }
 }

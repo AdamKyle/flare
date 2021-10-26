@@ -5,7 +5,9 @@
       <directory suffix=".php">./app</directory>
     </include>
     <exclude>
-      <directory suffix=".php">./app/Flare/MapGenerator</directory>
+        <directory suffix=".php">./app/Flare/MapGenerator</directory>
+        <directory suffix=".php">./app/Admin/Import</directory>
+        <directory suffix=".php">./app/Admin/Exports</directory>
     </exclude>
   </coverage>
   <testsuites>

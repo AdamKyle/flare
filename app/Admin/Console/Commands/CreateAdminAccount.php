@@ -43,11 +43,6 @@ class CreateAdminAccount extends Command
      */
     public function handle()
     {
-
-        if (is_null($this->argument('email'))) {
-            return $this->error('Email is required.');
-        }
-
         if (!is_null(User::where('email', $this->argument('email'))->first())) {
             return $this->error('User with that email, already exists.');
         }
