@@ -4,6 +4,9 @@ namespace App\Game\Skills\Services\Traits;
 
 use App\Flare\Models\Skill;
 
+/**
+ * @codeCoverageIgnore
+ */
 trait SkillCheck {
 
     /**

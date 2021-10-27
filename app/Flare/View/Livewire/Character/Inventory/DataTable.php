@@ -182,11 +182,6 @@ class DataTable extends Component
         } else {
             $this->character->inventory->slots->filter(function($slot) use ($disenchantService) {
                 if (!$slot->equipped && $slot->item->type !== 'quest') {
-                    if (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id)) {
-                        $disenchantService->disenchantWithOutSkill($this->character, $slot);
-
-                        $this->totalGoldDust = $disenchantService->getGoldDust();
-                    }
 
                     $slot->delete();
                 }

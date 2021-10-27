@@ -66,28 +66,6 @@ class DisenchantService {
     }
 
     /**
-     * Disenchant the item, without giving skill xp.
-     *
-     * @param Character $character
-     * @param InventorySlot $slot
-     */
-    public function disenchantWithOutSkill(Character $character, InventorySlot $slot) {
-        $goldDust = $this->updateGoldDust($character);
-
-        event(new ServerMessageEvent($character->user, 'disenchanted-with-out-skill', $goldDust));
-
-        $slot->delete();
-
-        $affixData = resolve(EnchantingService::class)->fetchAffixes($character->refresh());
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-    }
-
-    /**
      * Return the total gold dust.
      *
      * @return int
@@ -110,8 +88,6 @@ class DisenchantService {
             $goldDust = $goldDust + $goldDust * $skill->bonus;
         }
 
-
-
         $questSlot = $character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
         })->first();
@@ -120,7 +96,7 @@ class DisenchantService {
 
         if (!is_null($questSlot) && !$failedCheck) {
             $dc   = 100 - 100 * 0.25;
-            $roll = rand(1, 100);
+            $roll = $this->fetchDCRoll();
 
             if ($roll > $dc) {
                 $skillBonus            = $skill->skill_bonus;
@@ -140,5 +116,9 @@ class DisenchantService {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return $goldDust;
+    }
+
+    protected function fetchDCRoll(): int {
+        return rand(1, 100);
     }
 }

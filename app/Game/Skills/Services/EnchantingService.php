@@ -108,27 +108,13 @@ class EnchantingService {
 
         $this->updateCharacterGold($character, $params['cost']);
 
-        try {
-            $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
+        $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 
-            $this->enchantItemService->updateSlot($slot);
+        $this->enchantItemService->updateSlot($slot);
 
-            $this->updateCharacterAffixList($character, $characterInfo, $enchantingSkill);
+        $this->updateCharacterAffixList($character, $characterInfo, $enchantingSkill);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-        } catch (Exception $e) {
-            // Something went wrong, give their gold back
-            $this->giveGoldBack($character->refresh(), $params['cost']);
-
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-            $this->updateCharacterAffixList($character, $characterInfo, $enchantingSkill);
-
-            Log::error($e->getMessage());
-
-            event(new GameServerMessageEvent($character->user, 'You should not be seeing this. We have reverted the changes. Alert discord Bugs channel. Screen shot this.'));
-        }
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
     }
 
     public function timeForEnchanting(Item $item) {
@@ -180,10 +166,6 @@ class EnchantingService {
     (array $affixes, InventorySlot $slot, Skill $enchantingSkill, Character $character) {
         foreach ($affixes as $affixId) {
             $affix = ItemAffix::find($affixId);
-
-            if (is_null($affix)) {
-                throw new Exception('Affix not found for: ' . $affixId);
-            }
 
             // Reset.
             $this->wasTooEasy = false;
