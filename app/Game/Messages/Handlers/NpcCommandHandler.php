@@ -131,7 +131,6 @@ class NpcCommandHandler {
                 $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' And has been rewarded with a godly gift!';
                 $messageType = 'quest_complete';
             } else {
-
                 $messageType = 'no_quests';
             };
         }
@@ -227,7 +226,7 @@ class NpcCommandHandler {
                     return false;
                 }
 
-                if ($quest->gold_dust_cost > 0 || $quest->gold_cost > 0 || $quest->shards_cost > 0) {
+                if ($quest->gold_dust_cost > 0 || $quest->gold_cost > 0 || $quest->shard_cost > 0) {
                     if (!$this->canPay($character, $quest, $npc)) {
                         return false;
                     }
@@ -237,7 +236,7 @@ class NpcCommandHandler {
                     $character->update([
                         'gold' => !is_null($quest->gold_cost) ? ($character->gold - $quest->gold_cost) : $character->gold,
                         'gold_dust' => !is_null($quest->gold_dust_cost) ? ($character->gold_dust - $quest->gold_dust_cost) : $character->gold_dust,
-                        'shards' => !is_null($quest->shards_cost) ? ($character->shards - $quest->shards_cost) : $character->shards,
+                        'shards' => !is_null($quest->shards_cost) ? ($character->shards - $quest->shard_cost) : $character->shards,
                     ]);
 
                     event(new UpdateTopBarEvent($character->refresh()));
@@ -321,7 +320,7 @@ class NpcCommandHandler {
             $canPay = $character->gold_dust > $quest->gold_dust_cost;
         }
 
-        if (!is_null($quest->shards_cost)) {
+        if (!is_null($quest->shard_cost)) {
             $canPay = $character->shards > $quest->shards_cost;
         }
 

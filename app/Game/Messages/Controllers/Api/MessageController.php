@@ -224,7 +224,7 @@ class MessageController extends Controller {
                 return response()->json([], 200);
             }
         } else {
-            $success = $pctService->usePCT($user->character, $request->attempt_to_teleport);
+            $success = $pctService->usePCT($user->character, false);
         }
 
         if (!$success) {
