@@ -20,17 +20,19 @@ class PctService {
              return false;
         }
 
+        $map          = $celestialFight->monster->gameMap;
+        $x            = $celestialFight->x_position;
+        $y            = $celestialFight->y_position;
+
         if (!$teleport) {
+
             $message = 'Child! ' . $celestialFight->monster->name  .' is at (X/Y): '. $x .'/'. $y. ' on the: '. $map->name .'Plane.';
 
-            broadcast(new ServerMessageEvent($user, $message));
+            broadcast(new ServerMessageEvent($character->user, $message));
 
             return true;
         }
 
-        $map          = $celestialFight->monster->gameMap;
-        $x            = $celestialFight->x_position;
-        $y            = $celestialFight->y_position;
         $characterMap = $character->map->gameMap;
 
         if ($this->isCharacterOnTheSameMap($map->name, $characterMap->name)) {

@@ -46,6 +46,10 @@ class MoveTimeOutListener
 
             $this->time = 10 - (10 * $this->findMovementTimeReductions($character));
 
+            if ($this->time < 1) {
+                $this->time = 1;
+            }
+
             $timeOut = now()->addSeconds($this->time);
 
             $character->update([

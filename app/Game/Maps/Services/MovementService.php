@@ -122,6 +122,7 @@ class MovementService {
         }
 
         if ($this->mapTile->isDeathWaterTile((int) $mapTileColor)) {
+
             if ($this->mapTile->canWalkOnDeathWater($character, $xPosition, $yPosition)) {
                 return $this->moveCharacter($character, $params);
             } else {
@@ -301,13 +302,13 @@ class MovementService {
         $canTeleportToWater = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
 
-        if (!$canTeleportToWater) {
+        if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
 
             return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
         }
 
-        if (!$canTeleportToDeathWater) {
+        if (!$canTeleportToDeathWater && $this->mapTile->isDeathWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
 
             return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);

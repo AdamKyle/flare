@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Game\Messages;
 
+use App\Flare\Services\BuildMonsterCacheService;
+use App\Game\Maps\Services\TraverseService;
+use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -468,6 +471,352 @@ class MessageControllerApiTest extends TestCase
 
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => true
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCannotTeleportToWaterWithPCT() {
+
+        $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::WALK_ON_WATER,
+        ]);
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->character->getCharacter(false)->map->gameMap->id
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        // We don't have actual maps, so lets fake the water.
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(true);
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => true
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanGetLocationOfCelestial() {
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->character->getCharacter(false)->map->gameMap->id
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => false
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanUseTraverseAndTeleportFromPCT() {
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]))->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::LABYRINTH
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->createGameMap([
+                    'name' => 'Labyrinth'
+                ])
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        // We don't have actual maps, so lets fake the water.
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(false);
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => true
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanUseTraverseAndTeleportFromPCTWhenCannotWalkOnwater() {
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]))->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::LABYRINTH
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->createGameMap([
+                    'name' => 'Labyrinth'
+                ])
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        // We don't have actual maps, so lets fake the water.
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->times(4)->andReturnUsing(function() {
+            static $count = 0;
+
+            return ++$count < 2;
+        });
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => true
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanUseTraverseAndTeleportFromPCTDungeons() {
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]))->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::DUNGEON
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->createGameMap([
+                    'name' => 'Dungeons'
+                ])
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        // We don't have actual maps, so lets fake the water.
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(false);
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => true
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanUseTraverseAndTeleportFromPCTShadowPlane() {
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]))->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::SHADOWPLANE
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->createGameMap([
+                    'name' => 'Shadow Plane'
+                ])
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        // We don't have actual maps, so lets fake the water.
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(false);
+
+        Event::fake();
+
+        $response = $this->json('POST', '/api/public-entity', [
+            'attempt_to_teleport' => true
+        ])->response;
+
+        Event::assertDispatched(ServerMessageEvent::class);
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testFailToTraverseToCelestial() {
+
+        $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::LABYRINTH
+        ]);
+
+        $this->character->inventoryManagement()->giveItem($this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
+        ]));
+
+        $this->actingAs($this->character->getUser());
+
+        $this->createCelestialFight([
+            'monster_id'      => $this->createMonster([
+                'game_map_id' => $this->createGameMap([
+                    'name' => 'Labyrinth'
+                ])
+            ])->id,
+            'character_id'    => $this->character->getCharacter(false)->id,
+            'conjured_at'     => now(),
+            'x_position'      => 16,
+            'y_position'      => 36,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
+            'current_health'  => 1,
+            'max_health'      => 1,
+            'type'            => CelestialConjureType::PRIVATE,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        // We don't have actual maps, so lets fake the water.
+        $water = Mockery::mock(MapTileValue::class)->makePartial();
+
+        $this->app->instance(MapTileValue::class, $water);
+
+        $water->shouldReceive('getTileColor')->andReturn("1");
+        $water->shouldReceive('isWaterTile')->andReturn(false);
 
         Event::fake();
 
