@@ -41,21 +41,15 @@ class MaxLevel {
      */
     public function fetchXP(): int {
         if ($this->currentLevel >= self::HALF && $this->currentLevel < self::THREE_QUARTERS) {
-            $total = $this->xp * self::HALF_PERCENT;
-
-            return ceil($this->xp - $total);
+            return ceil($this->xp * self::HALF_PERCENT);
         }
 
         if ($this->currentLevel >= self::THREE_QUARTERS && $this->currentLevel < self::LAST_LEG) {
-            $total = $this->xp * self::THREE_QUARTERS_PERCENT;
-
-            return ceil($this->xp - $total);
+            return ceil($this->xp * self::THREE_QUARTERS_PERCENT);
         }
 
         if ($this->currentLevel >= self::LAST_LEG && $this->currentLevel < self::MAX_LEVEL) {
-            $total = $this->xp * self::LAST_LEG_PERCENT;
-
-            return ceil($this->xp - $total);
+            return ceil($this->xp * self::LAST_LEG_PERCENT);
         }
 
         if ($this->currentLevel >= self::MAX_LEVEL) {
