@@ -48,6 +48,38 @@ trait CreateAdventure {
         return $adventure;
     }
 
+    public function createNewAdventureWithManyMonsters(int $monsters = 1, int $levels = 1, string $name = 'Sample', bool $published = true, bool $withFloorDescriptions = false): Adventure {
+
+        $adventure = Adventure::factory()->create([
+            'name'             => $name,
+            'description'      => 'Sample description',
+            'reward_item_id'   => $this->createItem([
+                'name'        => 'Item Name',
+                'type'        => 'weapon',
+                'base_damage' => 1,
+                'cost'        => 1,
+            ]),
+            'levels'           => $levels,
+            'time_per_level'   => 1,
+            'gold_rush_chance' => 0.10,
+            'item_find_chance' => 0.10,
+            'skill_exp_bonus'  => 0.10,
+            'published'        => $published,
+        ]);
+
+        for($i = 0; $i <= $monsters; $i++) {
+            $adventure->monsters()->attach($this->createMonsterForAdventure());
+        }
+
+        if ($withFloorDescriptions) {
+            for ($i = 1; $i <= $levels; $i++) {
+                $this->createFloorDescription($adventure->id, Str::random(10));
+            }
+        }
+
+        return $adventure;
+    }
+
     public function createLog(
         Character $character,
         Adventure $adventure,
@@ -66,7 +98,11 @@ trait CreateAdventure {
     }
 
     protected function createMonsterForAdventure(): Monster {
-        return $this->createMonster();
+        return $this->createMonster(
+            [
+                'name' => Str::random(10),
+            ]
+        );
     }
 
     protected function createFloorDescription(int $adventureId, string $description) {

@@ -84,9 +84,16 @@ class AdventureCompletedRewards {
                 $item['can_have'] = true;
             }
 
-            // No duplicates
+
+            /**
+             * only in rare instances I have found by playing the game do we get here,
+             * where there could be duplicates.
+             *
+             */
             if (!isset($item['can_have'])) {
+                // @codeCoverageIgnoreStart
                 continue;
+                // @codeCoverageIgnoreEnd
             }
 
             $item['item'] = $foundItem;
@@ -100,8 +107,14 @@ class AdventureCompletedRewards {
     private static function hasItemInRewards(int $itemId): bool {
         foreach (self::$baseReward['items']  as $item) {
 
+            /**
+             * only in rare instances I have found by playing the game do we get here,
+             * where there could be duplicates.
+             */
             if ($item['id'] === $itemId) {
+                // @codeCoverageIgnoreStart
                 return true;
+                // @codeCoverageIgnoreEnd
             }
         }
 

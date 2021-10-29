@@ -88,12 +88,68 @@ class AdventureServiceTest extends TestCase
 
     }
 
+    public function testProcessAdventureCharacterLivesAndOnline()
+    {
+        $adventure = $this->createNewAdventure();
+        $item      = $this->createItem(['name' => 'Item Name']);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->updateCharacter(['can_move' => false])
+            ->levelCharacterUp(100)
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->createAdventureLog($adventure)
+            ->updateSkill('Accuracy', [
+                'level' => 10,
+                'xp_towards' => 10,
+                'currently_training' => true
+            ])
+            ->updateSkill('Dodge', [
+                'level' => 10
+            ])
+            ->updateSkill('Looting', [
+                'level' => 10
+            ])
+            ->getCharacter(false);
+
+        DB::table('sessions')->insert([[
+            'id'           => '1',
+            'user_id'      => $character->user->id,
+            'ip_address'   => '1',
+            'user_agent'   => '1',
+            'payload'      => '1',
+            'last_activity'=> 1602801731,
+        ]]);
+
+        $adventureService = resolve(AdventureService::class);
+
+        $adventureService->setCharacter($character)->setAdventure($adventure)->setName(Str::random(8));
+
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            $adventureService->processAdventure($i, $adventure->levels, 'attack');
+        }
+
+
+        $character->refresh();
+
+        $this->assertEmpty($adventureService->getLogInformation());
+
+        $this->assertFalse($character->is_dead);
+        $this->assertTrue($character->adventureLogs->isNotEmpty());
+        $this->assertTrue($character->adventureLogs->first()->complete);
+        $this->assertTrue(!empty($character->adventureLogs->first()->rewards));
+        $this->assertTrue(!empty($character->adventureLogs->first()->logs));
+
+    }
+
     public function testProcessAdventureWithMultipleLevels()
     {
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
+                                        ->givePlayerLocation()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -109,6 +165,47 @@ class AdventureServiceTest extends TestCase
                                             'level' => 10
                                         ])
                                         ->getCharacter(false);
+
+        $character->map->gameMap->update([
+            'drop_chance_bonus' => 0.01
+        ]);
+
+        $character = $character->refresh();
+
+        $adventureService = resolve(AdventureService::class);
+
+        $adventureService->setCharacter($character)->setAdventure($adventure)->setName(Str::random(8));
+
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            $adventureService->processAdventure($i, $adventure->levels, 'attack');
+        }
+
+        $character = $character->refresh();
+
+        $this->assertEquals(5, $character->adventureLogs->first()->last_completed_level);
+    }
+
+    public function testProcessAdventureWithMultipleLevelsMultipleEnemies()
+    {
+        $adventure = $this->createNewAdventureWithManyMonsters(5, 5);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->levelCharacterUp(10)
+            ->updateCharacter(['can_move' => false])
+            ->createAdventureLog($adventure)
+            ->updateSkill('Accuracy', [
+                'level' => 10,
+                'xp_towards' => 10,
+                'currently_training' => true
+            ])
+            ->updateSkill('Dodge', [
+                'level' => 10
+            ])
+            ->updateSkill('Looting', [
+                'level' => 10
+            ])
+            ->getCharacter(false);
 
         $adventureService = resolve(AdventureService::class);
 

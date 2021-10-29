@@ -113,6 +113,8 @@ class RewardBuilder {
      * @param int $id
      * @param array $rewardItems
      * @return bool
+     *
+     * @codeCoverageIgnore
      */
     protected function questItemNotInRewards(int $id, array $rewardItems): bool {
         if (empty($rewardItems)) {
