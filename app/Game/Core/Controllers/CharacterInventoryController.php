@@ -120,42 +120,6 @@ class CharacterInventoryController extends Controller {
         }
     }
 
-    public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService) {
-        if ($request->inventory_set_equipped) {
-            $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
-            $inventoryIndex = $character->inventorySets->search(function($set) { return $set->is_equipped; });
-
-            $inventorySetService->unEquipInventorySet($inventorySet);
-
-            return redirect()->back()->with('success', 'Unequipped Set ' . $inventoryIndex + 1 . '.');
-        }
-
-        $foundItem = $character->inventory->slots->find($request->item_to_remove);
-
-        if (is_null($foundItem)) {
-            return redirect()->back()->with('error', 'No item found to be equipped.');
-        }
-
-        $foundItem->update([
-            'equipped' => false,
-            'position' => null,
-        ]);
-
-        event(new UpdateTopBarEvent($character));
-
-        $this->updateCharacterAttakDataCache($character);
-
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        return redirect()->back()->with('success', 'Unequipped item.');
-    }
-
     protected function updateCharacterAttakDataCache(Character $character) {
         $this->buildCharacterAttackTypes->buildCache($character);
 

@@ -31,7 +31,6 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
     Route::get('/current-adventure/', ['as' => 'game.current.adventure', 'uses' => 'CharacterAdventureController@currentAdventure']);
     Route::get('/current-adventures/', ['as' => 'game.completed.adventures', 'uses' => 'CharacterAdventureController@completedAdventures']);
     Route::get('/completed-adventure/{adventureLog}', ['as' => 'game.completed.adventure', 'uses' => 'CharacterAdventureController@completedAdventure']);
-    Route::get('/completed-adventure/{adventureLog}/logs/{name}', ['as' => 'game.completed.adventure.logs', 'uses' => 'CharacterAdventureController@completedAdventureLogs']);
     Route::post('/current-adventures/batch-delete', ['as' => 'game.adventures.batch-delete', 'uses' => 'CharacterAdventureController@batchDelete']);
     Route::post('/current-adventures/delete/{adventureLog}', ['as' => 'game.adventures.delete', 'uses' => 'CharacterAdventureController@delete']);
     Route::post('/current-adventure/{adventureLog}/distribute-rewards', ['as' => 'game.current.adventure.reward', 'uses' => 'CharacterAdventureController@collectReward']);

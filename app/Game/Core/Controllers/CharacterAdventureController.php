@@ -43,17 +43,6 @@ class CharacterAdventureController extends Controller {
         ]);
     }
 
-    public function completedAdventureLogs(AdventureLog $adventureLog, string $name) {
-        if (!isset($adventureLog->logs[$name])) {
-            return redirect()->back()->with('error', 'Invalid input.');
-        }
-
-        return view('game.adventures.current-adventure', [
-            'log'          => $adventureLog->logs[$name],
-            'adventureLog' => $adventureLog
-        ]);
-    }
-
     public function currentAdventure() {
         $character = auth()->user()->character;
 
@@ -72,9 +61,7 @@ class CharacterAdventureController extends Controller {
             ]);
         }
 
-        if (is_null($adventureLog->rewards)) {
-            event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
-        }
+        event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
 
         return view('game.adventures.current-adventure', [
             'log'          => $adventureLog->logs[array_key_last($adventureLog->logs)],
@@ -124,13 +111,7 @@ class CharacterAdventureController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        if (empty($messages)) {
-            $messages = [
-                'You are a ready for your next adventure!'
-            ];
-        } else {
-            $messages[] = 'You are a ready for your next adventure!';
-        }
+        $messages[] = 'You are a ready for your next adventure!';
 
         Cache::put('messages-' . $adventureLog->id, $messages);
 

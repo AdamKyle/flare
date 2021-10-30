@@ -270,7 +270,9 @@ class CharacterInventoryController extends Controller {
                     continue;
                 }
 
+                // @codeCoverageIgnoreStart
                 break;
+                // @codeCoverageIgnoreEnd
             }
         }
 
@@ -429,13 +431,12 @@ class CharacterInventoryController extends Controller {
 
         $jobs = [];
 
-        /**
-         * @codeCoverageIgnore
-         */
         foreach ($slots as $index => $slot) {
+            // @codeCoverageIgnoreStart
             if ($index !== 0) {
                 $jobs[] = new UseMultipleItems($character, $slot->id);
             }
+            // @codeCoverageIgnoreEnd
         }
 
         UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first()->id);

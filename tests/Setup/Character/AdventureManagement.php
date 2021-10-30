@@ -63,21 +63,19 @@ class AdventureManagement {
             'last_completed_level' => 1,
             'logs'                 =>
             [
-                [
-                    'Level 1' => [
-                        "Goblin-VhaXIEyO7c" => [
-                             [
-                                 "class" => "info-encounter",
-                                "message" => "You encounter a: Goblin"
-                             ],
-                             [
-                                 "class" => "info-damage",
-                                "message" => "TestFighter hit for (weapon): 36"
-                             ],
-                             [
-                                 "class" => "action-fired",
-                                "message" => "The enemy has been defeated!"
-                             ]
+                'Level 1' => [
+                    "Goblin-VhaXIEyO7c" => [
+                        [
+                            "class" => "info-encounter",
+                            "message" => "You encounter a: Goblin"
+                        ],
+                        [
+                            "class" => "info-damage",
+                            "message" => "TestFighter hit for (weapon): 36"
+                        ],
+                        [
+                            "class" => "action-fired",
+                            "message" => "The enemy has been defeated!"
                         ]
                     ]
                 ]
@@ -90,8 +88,8 @@ class AdventureManagement {
                         "gold" =>25,
                         "items" =>[
                             [
-                                "id" =>66230,
-                                "name" =>"*Warriors Rage* Broken Wooden Shield *Archers Bane*"
+                                "id" =>$item->id,
+                                "name" =>$item->affix_name
                             ]
                         ],
                         "skill" =>[

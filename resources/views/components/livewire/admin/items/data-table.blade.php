@@ -281,7 +281,7 @@
                                             'character' => $character->id,
                                             'item_id'   => $item->id,
                                             'item_type' => $item->type,
-                                        ])}}" class="btn btn-primary btn-sm" target="_blank">Compare</a>
+                                        ])}}" class="btn btn-primary btn-sm" id="{{'compare-item-' . $item->id}}" target="_blank">Compare</a>
                                     @endif
                                 </td>
                             @endguest

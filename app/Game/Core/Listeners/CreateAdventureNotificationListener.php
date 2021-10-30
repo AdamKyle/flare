@@ -13,7 +13,7 @@ class CreateAdventureNotificationListener
         Notification::create([
             'character_id' => $event->adventureLog->character_id,
             'title'        => $event->adventureLog->adventure->name,
-            'message'      => $event->adventureLog->complete ? 'Adventure Has been completed! Click to collect your rewards!' : 'You have died but have rewards. Please revive before collecting them.',
+            'message'      => $event->adventureLog->complete ? $event->adventureLog->adventure->name . ' Has been completed! Click to collect your rewards!' : 'You have died during the adventure. Please revive and review.',
             'status'       => $event->adventureLog->complete ? 'success' : 'failed',
             'type'         => 'adventure',
             'url'          => route('game.current.adventure'),

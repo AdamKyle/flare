@@ -6,6 +6,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Exceptions\EquipItemException;
+use App\Game\Core\Requests\ShopReplaceItemValidation;
 use App\Game\Core\Services\EquipItemService;
 use Cache;
 use App\Game\Core\Jobs\PurchaseItemsJob;
@@ -188,15 +189,12 @@ class ShopController extends Controller {
         return view('game.core.shop.comparison', $cache);
     }
 
-    public function buyAndReplace(EquipItemValidation $request, Character $character) {
-        if (!$request->has('item_id_to_buy')) {
-            return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('error', 'Missing item to buy. Invalid Input.');
-        }
+    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character) {
 
         $item = Item::find($request->item_id_to_buy);
 
-        if (is_null($item)) {
-            return redirect()->back()->with('error', 'Item not found.');
+        if ($item->craft_only) {
+            return redirect()->back()->with('error', 'You are not capable of affording such luxury child!');
         }
 
         if ($item->cost > $character->gold) {
@@ -219,20 +217,15 @@ class ShopController extends Controller {
             'slot_id' => $slot->id,
         ]);
 
-        try {
-            $this->equipItemService->setRequest($request)
-                ->setCharacter($character)
-                ->replaceItem();
+        $this->equipItemService->setRequest($request)
+            ->setCharacter($character)
+            ->replaceItem();
 
-            $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttakDataCache($character);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-            return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
-
-        } catch(EquipItemException $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
+        return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }
 
     protected function updateCharacterAttakDataCache(Character $character) {
