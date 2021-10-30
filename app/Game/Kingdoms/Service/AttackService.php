@@ -272,9 +272,11 @@ class AttackService {
 
             $timeForDispatch = $timeToReturn;
 
+            // @codeCoverageIgnoreStart
             if ($timeForDispatch > 15) {
                 $timeForDispatch = $timeForDispatch / 10;
             }
+            // @codeCoverageIgnoreStart
 
             $delay = now()->addMinutes($timeForDispatch);
 

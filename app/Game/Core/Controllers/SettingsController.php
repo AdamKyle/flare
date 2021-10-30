@@ -25,11 +25,9 @@ class SettingsController extends Controller {
         $user->update([
             'adventure_email'         => $request->has('adventure_email') ? $request->adventure_email : false,
             'new_building_email'      => $request->has('new_building_email') ? $request->new_building_email : false,
-            'kingdoms_update_email'   => $request->has('kingdoms_update_email') ? $request->new_building_email : false,
             'upgraded_building_email' => $request->has('upgraded_building_email') ? $request->upgraded_building_email : false,
             'rebuilt_building_email'  => $request->has('rebuilt_building_email') ? $request->rebuilt_building_email : false,
             'kingdom_attack_email'    => $request->has('kingdom_attack_email') ? $request->kingdom_attack_email : false,
-            'unit_recruitment_email'  => $request->has('unit_recruitment_email') ? $request->unit_recruitment_email : false,
         ]);
 
         return redirect()->back()->with('success', 'Updated email preferences.');

@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
+
 class KingdomBuildingService {
 
     /**
@@ -104,6 +105,7 @@ class KingdomBuildingService {
      *
      * Can return false if there is not enough time left or the too little resources given back.
      *
+     * @codeCoverageIgnore
      * @param KingdomBuildingInQueue $queue
      * @param Manager $manager
      * @param KingdomTransformer $transformer
@@ -135,6 +137,10 @@ class KingdomBuildingService {
         return true;
     }
 
+    /**
+     * @codeCoverageIgnore
+     * @param BuildingInQueue $queue
+     */
     protected function resourceCalculation(BuildingInQueue $queue) {
         $start   = Carbon::parse($queue->started_at)->timestamp;
         $end     = Carbon::parse($queue->completed_at)->timestamp;
@@ -149,6 +155,12 @@ class KingdomBuildingService {
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     * @param Kingdom $kingdom
+     * @param KingdomBuilding $building
+     * @return Kingdom
+     */
     protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $this->totalResources),

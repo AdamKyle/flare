@@ -3,16 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Flare\Jobs\UpdateKingdomJob;
-use App\Flare\Models\Character;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
-use Cache;
-use Illuminate\Support\Collection;
-use Mail;
 use Illuminate\Console\Command;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\User;
-use App\Game\Kingdoms\Mail\KingdomsUpdated;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Facades\App\Flare\Values\UserOnlineValue;
 

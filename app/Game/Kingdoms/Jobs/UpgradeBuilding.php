@@ -86,11 +86,13 @@ class UpgradeBuilding implements ShouldQueue
         if ($this->building->gives_resources) {
             $type = $this->getResourceType();
 
+            // @codeCoverageIgnoreStart
             if (is_null($type)) {
                 $queue->delete();
 
                 return;
             }
+            // @codeCoverageIgnoreEnd
 
             $this->building->kingdom->{'max_' . $type} += 1000;
         }
@@ -127,10 +129,12 @@ class UpgradeBuilding implements ShouldQueue
         if (!is_null($buildingInQue)) {
             $buildingInQue->delete();
         } else {
+            // @codeCoverageIgnoreStart
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
             $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id;
 
             SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
+            // @codeCoverageIgnoreEnd
         }
 
         if (UserOnlineValue::isOnline($this->user)) {
@@ -145,11 +149,13 @@ class UpgradeBuilding implements ShouldQueue
             $y = $this->building->kingdom->y_position;
 
             if ($this->user->show_building_upgrade_messages) {
+                // @codeCoverageIgnoreStart
                 $message = $this->building->name . ' finished upgrading for kingdom: ' .
                     $this->building->kingdom->name . ' on plane: ' . $plane .
                     ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
 
                 event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));
+                // @codeCoverageIgnoreEnd
             }
         } else if ($this->user->upgraded_building_email) {
             Mail::to($this->user)->send(new UpgradedBuilding(
@@ -166,6 +172,8 @@ class UpgradeBuilding implements ShouldQueue
             }
         }
 
+        // @codeCoverageIgnoreStart
         return null;
+        // @codeCoverageIgnoreEnd
     }
 }

@@ -100,9 +100,11 @@ class KingdomsAttackService {
 
                 $timeForDispatch = $totalTime;
 
+                // @codeCoverageIgnoreStart
                 if ($totalTime > 15) {
                     $timeForDispatch = $totalTime / 10;
                 }
+                // @codeCoverageIgnoreEnd
 
                 MoveUnits::dispatch($unitMovement->id, $defenderId, 'attack', $character, $timeForDispatch)->delay(now()->addMinutes($timeForDispatch));
 

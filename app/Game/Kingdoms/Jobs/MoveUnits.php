@@ -44,6 +44,7 @@ class MoveUnits implements ShouldQueue
         }
 
         if (!$unitMovement->completed_at->lessThanOrEqualTo(now())) {
+            // @codeCoverageIgnoreStart
             MoveUnits::dispatch(
                 $this->movementId,
                 $this->defenderId,
@@ -52,7 +53,9 @@ class MoveUnits implements ShouldQueue
                 $this->timeForDispatch
             )->delay(now()->addMinutes($this->timeForDispatch));
 
+
             return;
+            // @codeCoverageIgnoreEnd
         }
 
         switch ($this->type) {

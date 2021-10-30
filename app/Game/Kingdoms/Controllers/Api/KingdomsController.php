@@ -254,10 +254,6 @@ class KingdomsController extends Controller {
 
         $newMorale = $kingdom->current_morale - 0.15;
 
-        if ($newMorale < 0.0) {
-            $newMorale = 0.0;
-        }
-
         $kingdom->update([
             'treasury' => $kingdom->treasury - $amountToEmbezzel,
             'current_morale' => $newMorale,

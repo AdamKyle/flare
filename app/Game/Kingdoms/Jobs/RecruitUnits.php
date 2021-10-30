@@ -128,13 +128,6 @@ class RecruitUnits implements ShouldQueue
 
                 event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));
             }
-        } else if ($user->unit_recruitment_email) {
-            Mail::to($user)->send(new RecruitedUnits(
-                $user,
-                $this->unit,
-                $this->kingdom,
-                $amount
-            ));
         }
     }
 }

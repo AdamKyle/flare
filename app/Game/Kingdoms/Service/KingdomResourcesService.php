@@ -126,13 +126,6 @@ class KingdomResourcesService {
     }
 
     /**
-     * Gets the details pertaining to the kingdoms that were updated.
-     */
-    public function getKingdomsUpdated(): array {
-        return $this->kingdomsUpdated;
-    }
-
-    /**
      * Increase or decrease the morale.
      *
      * This is based on building durability.
@@ -180,15 +173,11 @@ class KingdomResourcesService {
             $this->addMorale($totalIncrease);
 
             return;
-        } else if ($totalIncrease < $totalDecrease) {
-            $totalDecrease -= $totalIncrease;
-
-            $this->reduceMorale($totalDecrease);
-
-            return;
         }
 
-        $this->adjustMorale($totalIncrease, $totalDecrease);
+        $totalDecrease -= $totalIncrease;
+
+        $this->reduceMorale($totalDecrease);
     }
 
     public function giveNPCKingdoms(bool $notify = true) {
@@ -212,6 +201,14 @@ class KingdomResourcesService {
         broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
     }
 
+    /**
+     * Remove the kingdom from the map.
+     *
+     * We can't actually test this method due to the fact that it breaks the Refresh Database transaction
+     * do the fact that we actively commit the changes.
+     *
+     * @codeCoverageIgnore
+     */
     protected function removeKingdomFromMap() {
         $x     = $this->kingdom->x_position;
         $y     = $this->kingdom->y_position;
@@ -234,6 +231,15 @@ class KingdomResourcesService {
         broadcast(new GlobalMessageEvent('A kingdom at: (X/Y) ' . $x . '/' . $y . ' on ' .$plane .' Plane has crumbled to the earth clearing up space for a new kingdom'));
     }
 
+    /**
+     * Alert the user their kingdom was removed via server message.
+     *
+     * This method is only called in the removeKingdomFromMap function,
+     * and since we cannot test protected methods, nor do I want this public,
+     * we turn off code coverage for it.
+     *
+     * @codeCoverageIgnore
+     */
     protected function alertUsersOfKingdomRemoval() {
         UserOnlineValue::getUsersOnlineQuery()->chunkById(100, function($sessions) {
             foreach ($sessions as $session) {
@@ -253,11 +259,13 @@ class KingdomResourcesService {
         $isNpcOwned = Kingdom::find($this->kingdom->id)->npc_owned;
 
         if ($isNpcOwned) {
+            // @codeCoverageIgnoreStart
             $key = array_search($this->kingdom->id, $cache);
 
             if ($key !== false) {
                 unset($cache[$key]);
             }
+            // @codeCoverageIgnoreEnd
         } else {
             $cache[] = $this->kingdom->id;
         }
@@ -322,10 +330,10 @@ class KingdomResourcesService {
 
         foreach($resources as $resource) {
             $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
-            $morale   = $this->kingdom->morale;
+            $morale   = $this->kingdom->current_morale;
 
             if ($building->current_durability === 0) {
-                if ($morale === 0) {
+                if ($morale === 0.0) {
                     continue;
                 } else {
                     $this->increaseResource($resource, $building);
@@ -429,18 +437,6 @@ class KingdomResourcesService {
         $this->kingdom = $this->kingdom->refresh();
     }
 
-    protected function adjustMorale(float $toAdd, float $toSub): void {
-        $current = $this->kingdom->current_morale;
-
-        $newTotal = ($current + $toAdd) - $toSub;
-
-        $this->kingdom->update([
-            'current_morale' => $newTotal,
-        ]);
-
-        $this->kingdom = $this->kingdom->refresh();
-    }
-
     private function updateTreasury(int $increase) {
         $this->kingdom->update([
             'treasury' => $increase,
@@ -493,9 +489,11 @@ class KingdomResourcesService {
 
     private function updateKingdomCache(User $user, Kingdom $kingdom) {
         if (Cache::has('kingdoms-updated-' . $user->id)) {
+            // @codeCoverageIgnoreStart
             $cache = Cache::get('kingdoms-updated-' . $user->id);
 
             $cache = $this->putUpdatedKingdomIntoCache($cache);
+            // @codeCoverageIgnoreEnd
         } else {
             $cache = $this->putUpdatedKingdomIntoCache();
         }

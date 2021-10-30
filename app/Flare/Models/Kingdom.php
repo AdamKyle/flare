@@ -44,6 +44,7 @@ class Kingdom extends Model implements Auditable
         'published',
         'npc_owned',
         'last_walked',
+        'updated_at'
     ];
 
     /**

@@ -85,10 +85,6 @@ class AttackedKingdomBuilder {
         return $buildingLosses;
     }
 
-    public function lostAttack(): array {
-        return $this->unitAttackInfo();
-    }
-
     protected function unitAttackInfo(): array {
         $unitsSent     = $this->log->units_sent;
         $unitsSurvived = $this->log->units_survived;

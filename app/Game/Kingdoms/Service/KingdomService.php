@@ -136,21 +136,27 @@ class KingdomService {
         $count = $character->refresh()->kingdoms()->count();
 
         if ($count === 100) {
+            // @codeCoverageIgnoreStart
             $message = $character->name . ' Has settled their 100th kingdom. They are becoming unstoppable!';
 
             broadcast(new GlobalMessageEvent($message));
+            // @codeCoverageIgnoreEnd
         }
 
         if ($count === 500) {
+            // @codeCoverageIgnoreStart
             $message = $character->name . ' Has settled their 500th kingdom. The lands choke under their grip.';
 
             broadcast(new GlobalMessageEvent($message));
+            // @codeCoverageIgnoreEnd
         }
 
         if ($count === 1000) {
+            // @codeCoverageIgnoreStart
             $message = $character->name . ' Has settled their 1000th kingdom. Even The Creator trembles in fear.';
 
             broadcast(new GlobalMessageEvent($message));
+            // @codeCoverageIgnoreEnd
         }
 
         return [];
