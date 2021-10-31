@@ -261,16 +261,16 @@ class ShopControllerTest extends TestCase
 
     public function testCanBulkBuy() {
 
+        Queue::fake();
+
         $user = $this->character->updateCharacter(['gold' => 100000000])->getUser();
 
-        $response = $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter(false)->id]),
+        $this->actingAs($user)->post(route('game.shop.buy.bulk', ['character' => $this->character->getCharacter(false)->id]),
         [
             'items' => [$this->item->id]
-        ])->response;
+        ]);
 
-        $response->assertSessionHas('success', 'Your items are being purchased. 
-        You can check your character sheet to see them come in. If you cannot afford the items, the game chat section will update.
-        Once all items are purchased, the chat section will update to inform you.');
+        Queue::assertPushed(PurchaseItemsJob::class);
     }
 
     public function testFailToBulkBuyWhenNoGold() {
