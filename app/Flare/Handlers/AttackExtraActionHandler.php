@@ -104,17 +104,19 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $message        = 'The strength of your rage courses through your veins!';
-            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+            for ($i = 1; $i <= 2; $i++) {
+                $message = 'The strength of your rage courses through your veins!';
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
-            $characterAttack = $characterInformationBuilder->getTotalWeaponDamage($voided);
+                $characterAttack = $characterInformationBuilder->getTotalWeaponDamage($voided);
 
-            $totalDamage = ($characterAttack + $characterAttack * 0.15);
+                $totalDamage = ($characterAttack + $characterAttack * 0.15);
 
-            $monsterCurrentHealth -= $characterAttack;
+                $monsterCurrentHealth -= $characterAttack;
 
-            $message        = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
-            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+                $message = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+            }
         }
 
         return $monsterCurrentHealth;
