@@ -150,10 +150,6 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function findLifeStealingAffixes(bool $canStack = false): float {
-        if (!$this->character->classType()->isVampire()) {
-            return 0.0;
-        }
-
         $slots = $this->fetchInventory()->filter(function($slot) {
             if (!is_null($slot->item->itemPrefix))  {
                 if (!is_null($slot->item->itemPrefix->steal_life_amount)) {
@@ -169,7 +165,13 @@ class CharacterInformationBuilder {
         });
 
         if ($canStack) {
-            return ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix'));
+            $total = ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix'));
+
+            if ($total > 1.0) {
+                return 0.99;
+            }
+
+            return $total;
         }
 
         $values = [];
@@ -184,17 +186,21 @@ class CharacterInformationBuilder {
             }
         }
 
-        return empty($values) ? 0.0 : max($values);
+        $value = empty($values) ? 0.0 : max($values);
+
+        return $value > 1.0 ? .99 : $value;
     }
 
     protected function handleLifeStealingAmount(Collection $slots, string $type): float {
         $values = [];
 
         foreach ($slots as $slot) {
-            if (empty($values)) {
-                $values[] = $slot->item->{$type}->steal_life_amount;
-            } else {
-                $values[] = ($slot->item->{$type}->steal_life_amount);
+            if (!is_null($slot->item->{$type})) {
+                if (empty($values)) {
+                    $values[] = $slot->item->{$type}->steal_life_amount;
+                } else {
+                    $values[] = ($slot->item->{$type}->steal_life_amount);
+                }
             }
         }
 
@@ -212,8 +218,10 @@ class CharacterInformationBuilder {
         }
 
         $sumOfValues = array_sum($additionalValues);
-
-        $totalPercent = $totalPercent * ($sumOfValues * 0.75);;
+        
+        if ($sumOfValues > 0) {
+            $totalPercent = $totalPercent * ($sumOfValues * 0.75);
+        }
 
         if ($totalPercent > 1.0) {
             return 0.99;
