@@ -161,6 +161,42 @@ class CharacterAdventureControllerTest extends TestCase
         $this->assertTrue(Cache::has('messages-'  . AdventureLog::first()->id));
     }
 
+    public function testDistributeRewardsWithMultipleLevelsGained() {
+        $item = $this->createItem([
+            'type' => 'quest'
+        ]);
+
+        $user      = $this->character->adventureManagement()->updateLog([
+            'rewards' =>
+                [
+                    "Level 1" =>[
+                        "Goblin-VhaXIEyO7c" => [
+                            "exp" => 700,
+                            "gold" => 25,
+                            "items" =>[
+                                [
+                                    "id" =>$item->id,
+                                    "name" =>$item->affix_name
+                                ]
+                            ],
+                            "skill" =>[
+                                "exp" => 700,
+                                "skill_name" =>"Looting",
+                                "exp_towards" =>0.1
+                            ]
+                        ]
+                    ],
+                ]
+        ])->getCharacterFactory()->getUser();
+
+        $this->actingAs($user)
+            ->post(route('game.current.adventure.reward', [
+                'adventureLog' => AdventureLog::first()->id,
+            ]));
+
+        $this->assertTrue(Cache::has('messages-'  . AdventureLog::first()->id));
+    }
+
     public function testDistributeRewardsWhenInventoryIsFull() {
         $user      = $this->character->updateCharacter([
             'inventory_max' => 0,

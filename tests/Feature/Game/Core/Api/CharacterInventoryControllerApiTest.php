@@ -328,6 +328,425 @@ class CharacterInventoryControllerApiTestTest extends TestCase
         })->where('set_slots.item_id', $item->id)->get()->isEmpty());
     }
 
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableSpellDamage() {
+        $spellDamage = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'spell-damage',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($spellDamage, 0)
+                                     ->putItemInSet($spellDamage, 0)
+                                     ->getCharacterFactory()
+                                     ->inventoryManagement()
+                                     ->giveItem($spellDamage)
+                                     ->getCharacterFactory()
+                                     ->getCharacter(false);
+
+        $spellDamageSlot = $character->inventory->slots->where('item_id', $spellDamage->id)->first()->id;
+
+        $spellDamageResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $spellDamageSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $spellDamageResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableSpellDamageAndSpellHealing() {
+        $spellDamage = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'spell-damage',
+        ]);
+
+        $spellHealing = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'spell-damage',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($spellDamage, 0)
+            ->putItemInSet($spellDamage, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($spellHealing)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $spellHealingSlot = $character->inventory->slots->where('item_id', $spellHealing->id)->first()->id;
+
+        $spellHealingResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $spellHealingSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $spellHealingResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableSpellHealing() {
+        $spellHealing = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'spell-healing',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($spellHealing, 0)
+                                     ->putItemInSet($spellHealing, 0)
+                                     ->getCharacterFactory()
+                                     ->inventoryManagement()
+                                     ->giveItem($spellHealing)
+                                     ->getCharacterFactory()
+                                     ->getCharacter(false);
+
+        $spellHealingSlot = $character->inventory->slots->where('item_id', $spellHealing->id)->first()->id;
+
+        $spellHealingResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $spellHealingSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $spellHealingResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableSpellHealingAndDamage() {
+        $spellHealing = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'spell-healing',
+        ]);
+
+        $spellDamage = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'spell-healing',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($spellHealing, 0)
+            ->putItemInSet($spellHealing, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($spellDamage)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $spellDamageSlot = $character->inventory->slots->where('item_id', $spellDamage->id)->first()->id;
+
+        $spellDamageResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $spellDamageSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $spellDamageResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableRing() {
+        $ring = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'ring',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($ring, 0)
+                                     ->putItemInSet($ring, 0)
+                                     ->getCharacterFactory()
+                                     ->inventoryManagement()
+                                     ->giveItem($ring)
+                                     ->getCharacterFactory()
+                                     ->getCharacter(false);
+
+        $ringSlot = $character->inventory->slots->where('item_id', $ring->id)->first()->id;
+
+        $responseResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $ringSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $responseResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableArtifact() {
+        $artifact = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'artifact',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($artifact, 0)
+                                     ->putItemInSet($artifact, 0)
+                                     ->getCharacterFactory()
+                                     ->inventoryManagement()
+                                     ->giveItem($artifact)
+                                     ->getCharacterFactory()
+                                     ->getCharacter(false);
+
+        $artifactSlot = $character->inventory->slots->where('item_id', $artifact->id)->first()->id;
+
+        $artifactResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $artifactSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $artifactResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableArmour() {
+        $leggings = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'leggings',
+            'default_position'    => 'leggings',
+            'crafting_type'       => 'armour'
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($leggings, 0)
+                                     ->getCharacterFactory()
+                                     ->inventoryManagement()
+                                     ->giveItem($leggings)
+                                     ->getCharacterFactory()
+                                     ->getCharacter(false);
+
+        $leggingsSlot = $character->inventory->slots->where('item_id', $leggings->id)->first()->id;
+
+        $leggingsResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $leggingsSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $leggingsResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableWeapon() {
+        $weapon = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'weapon',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($weapon, 0)
+                                     ->putItemInSet($weapon, 0)
+                                     ->getCharacterFactory()
+                                     ->inventoryManagement()
+                                     ->giveItem($weapon)
+                                     ->getCharacterFactory()
+                                     ->getCharacter(false);
+
+        $weaponSlot            = $character->inventory->slots->where('item_id', $weapon->id)->first()->id;
+
+        $weaponResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $weaponSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $weaponResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableShieldAndWeapons() {
+        $shield = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'shield',
+        ]);
+
+        $weapon = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'shield',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($shield, 0)
+            ->putItemInSet($weapon, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($weapon)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $weaponSlot            = $character->inventory->slots->where('item_id', $weapon->id)->first()->id;
+
+        $weaponResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $weaponSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $weaponResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableMultipleShieldAndWeapons() {
+        $shield = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'shield',
+        ]);
+
+        $weapon = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'shield',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($shield, 0)
+            ->putItemInSet($weapon, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($shield)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $shieldSlot            = $character->inventory->slots->where('item_id', $shield->id)->first()->id;
+
+        $shieldResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $shieldSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $shieldResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableWeaponAndBow() {
+        $bow = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'bow',
+        ]);
+
+        $weapon = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'weapon',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($weapon, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($bow)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $bowSlot            = $character->inventory->slots->where('item_id', $bow->id)->first()->id;
+
+        $bowResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $bowSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $bowResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableMultipleBows() {
+        $bow = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'bow',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($bow, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($bow)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $bowSlot            = $character->inventory->slots->where('item_id', $bow->id)->first()->id;
+
+        $bowResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $bowSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $bowResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
+    public function testCanMoveItemToSetAndCauseItToBeNotEquippableBowAndShield() {
+        $bow = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'bow',
+        ]);
+
+        $shield = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'bow',
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($shield, 0)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($bow)
+            ->getCharacterFactory()
+            ->getCharacter(false);
+
+        $bowSlot            = $character->inventory->slots->where('item_id', $bow->id)->first()->id;
+
+        $bowResponse = $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory/move-to-set', [
+            'slot_id' => $bowSlot,
+            'move_to_set' => $character->inventorySets()->first()->id,
+        ])->response;
+
+        $this->assertEquals(200, $bowResponse->status());
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventorySets()->where('can_be_equipped', false)->first());
+    }
+
     public function testCannotMoveItemToSet() {
         $character = $this->character->inventorySetManagement()->createInventorySets(10)->getCharacter(false);
 
@@ -357,7 +776,75 @@ class CharacterInventoryControllerApiTestTest extends TestCase
             'resurrection_chance' => 0.0
         ]);
 
-        $character = $this->character->inventorySetManagement()->createInventorySets(10)->putItemInSet($item, 0)->getCharacter(false);
+        $character = $this->character->inventorySetManagement()
+                                     ->createInventorySets(10)
+                                     ->putItemInSet($item, 0)
+                                     ->putItemInSet($this->createItem(['type' => 'ring']), 0)
+                                     ->putItemInSet($this->createItem(['type' => 'spell-healing']), 0)
+                                     ->putItemInSet($this->createItem(['type' => 'artifact']), 0)
+                                     ->putItemInSet($this->createItem(['default_position' => 'leggings', 'type' => 'leggings']), 0)
+                                     ->getCharacter(false);
+
+        $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory-set/equip/'.$character->inventorySets()->first()->id);
+
+        $character = $character->refresh();
+
+        $this->assertTrue($character->inventorySets()->where('is_equipped', true)->get()->isNotEmpty());
+    }
+
+    public function testCanEquipSetWhileAnotherSetIsEquipped() {
+        $item = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'weapon',
+            'base_damage'         => 200,
+            'cost'                => 100,
+            'crafting_type'       => 'weapon',
+            'description'         => 'sample',
+            'can_resurrect'       => false,
+            'resurrection_chance' => 0.0
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($item, 0)
+            ->putItemInSet($this->createItem(['type' => 'shield']), 0)
+            ->putItemInSet($this->createItem(['type' => 'ring']), 0)
+            ->putItemInSet($this->createItem(['type' => 'spell-healing']), 0)
+            ->putItemInSet($this->createItem(['type' => 'artifact']), 0)
+            ->putItemInSet($this->createItem(['default_position' => 'leggings', 'type' => 'leggings']), 0)
+            ->putItemInSet($this->createItem(['type' => 'ring']), 1, 'ring-one', true)
+            ->putItemInSet($this->createItem(['type' => 'spell-healing']), 1, 'spell-one', true)
+            ->putItemInSet($this->createItem(['type' => 'artifact']), 1, 'artifact-one', true)
+            ->putItemInSet($this->createItem(['default_position' => 'leggings', 'type' => 'leggings']), 1, 'leggings', true)
+            ->getCharacter(false);
+
+        $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory-set/equip/'.$character->inventorySets()->first()->id);
+
+        $character = $character->refresh();
+
+        $this->assertTrue($character->inventorySets()->where('is_equipped', true)->get()->isNotEmpty());
+    }
+
+    public function testCanEquipSetWithBow() {
+        $item = $this->createItem([
+            'name'                => 'Sample Item',
+            'type'                => 'bow',
+            'base_damage'         => 200,
+            'cost'                => 100,
+            'crafting_type'       => 'weapon',
+            'description'         => 'sample',
+            'can_resurrect'       => false,
+            'resurrection_chance' => 0.0
+        ]);
+
+        $character = $this->character->inventorySetManagement()
+            ->createInventorySets(10)
+            ->putItemInSet($item, 0)
+            ->putItemInSet($this->createItem(['type' => 'ring']), 0)
+            ->putItemInSet($this->createItem(['type' => 'spell-healing']), 0)
+            ->putItemInSet($this->createItem(['type' => 'artifact']), 0)
+            ->putItemInSet($this->createItem(['default_position' => 'leggings', 'type' => 'leggings']), 0)
+            ->getCharacter(false);
 
         $this->actingAs($character->user)->json('post', '/api/character/'.$character->id.'/inventory-set/equip/'.$character->inventorySets()->first()->id);
 

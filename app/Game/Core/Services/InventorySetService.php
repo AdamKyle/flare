@@ -84,8 +84,6 @@ class InventorySetService {
      * @return Character
      */
     public function equipInventorySet(Character $character, InventorySet $inventorySet): Character {
-        $character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
-
         $equippedInventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
         if (!is_null($equippedInventorySet)) {
@@ -212,27 +210,47 @@ class InventorySetService {
            return $slot->item->type === 'weapon';
         })->all());
 
-        if ($weapons->count() > 2) {
-            return false;
-        }
+        $shields = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'shield';
+        })->all());
+
+        $bows = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'bow';
+        })->all());
 
         $hasBow = $inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'bow';
         })->isNotEmpty();
 
-        if ($hasBow && $weapons->count() > 1) {
-            return false;
-        }
-
         $hasShield = $inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'shield';
         })->isNotEmpty();
+
+        if ($weapons->count() > 2) {
+            return false;
+        }
+
+        if ($hasBow && $weapons->count() > 0) {
+            return false;
+        }
+
+        if ($bows->count() > 1) {
+            return false;
+        }
+
+        if ($hasShield && $hasBow) {
+            return false;
+        }
 
         if ($hasShield && $weapons->count() > 1) {
             return false;
         }
 
-        if ($hasShield && $hasBow) {
+        if ($hasShield && $bows->count() > 0) {
+            return false;
+        }
+
+        if ($shields->count() > 2 && $weapons->count() >= 0) {
             return false;
         }
 
@@ -321,11 +339,11 @@ class InventorySetService {
             return false;
         }
 
-        if ($healingSpells->count() > 2 && $damageSpells->count() > 0) {
+        if ($healingSpells->count() > 1 && $damageSpells->count() >= 1) {
             return false;
         }
 
-        if ($healingSpells->count() > 0 && $damageSpells->count() > 2) {
+        if ($healingSpells->count() >= 1 && $damageSpells->count() > 1) {
             return false;
         }
 

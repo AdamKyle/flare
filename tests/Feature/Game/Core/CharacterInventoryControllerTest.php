@@ -67,6 +67,148 @@ class CharacterInventoryControllerTest extends TestCase
         });
     }
 
+    public function testCanEquipItemWhileBowEquipped() {
+
+        $this->createItemAffix();
+
+        $item = $this->createItem([
+            'type' => 'weapon',
+            'name' => 'Apples',
+        ]);
+
+        $user = $this->character->inventoryManagement()
+                                ->unequipAll()
+                                ->giveItem($this->createItem([
+                                    'type' => 'bow',
+                                    'name' => 'bow',
+                                ]))
+                                ->equipLeftHand('bow')
+                                ->giveItem($item)
+                                ->getCharacterFactory()
+                                ->getUser();
+
+        $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter(false)->id]), [
+            'position'   => 'left-hand',
+            'slot_id'    => $user->character->inventory->slots()->where('item_id', $item->id)->first()->id,
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $character = $user->refresh()->character;
+
+        $this->assertNotNull($character->inventory->slots()->where('equipped', true)->first());
+    }
+
+    public function testCanEquipItemWhileBowEquippedInSet() {
+
+        $this->createItemAffix();
+
+        $item = $this->createItem([
+            'type' => 'weapon',
+            'name' => 'Apples',
+        ]);
+
+        $user = $this->character->inventoryManagement()
+            ->unequipAll()
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets(3)
+            ->putItemInSet($this->createItem([
+                'type' => 'bow',
+                'name' => 'bow',
+            ]), 0, 'left-hand', true)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->getUser();
+
+        $this->actingAs($user)->post(route('game.equip.item', ['character' => $this->character->getCharacter(false)->id]), [
+            'position'   => 'left-hand',
+            'slot_id'    => $user->character->inventory->slots()->where('item_id', $item->id)->first()->id,
+            'equip_type' => 'weapon',
+        ])->response;
+
+        $character = $user->refresh()->character;
+
+        $set = $character->inventorySets()->where('is_equipped', true)->first();
+
+        $this->assertNotNull($set->slots()->where('equipped', true)->first());
+    }
+
+    public function testCanEquipBow() {
+
+        $this->createItemAffix();
+
+        $item = $this->createItem([
+            'type' => 'bow'
+        ]);
+
+        $character = $this->character->inventoryManagement()->unequipAll()->giveItem($item)->getCharacterFactory()->getCharacter(false);
+
+        $this->actingAs($character->user)->post(route('game.equip.item', ['character' => $character->id]), [
+            'position'   => 'left-hand',
+            'slot_id'    => $character->inventory->slots()->where('item_id', $item->id)->first()->id,
+            'equip_type' => 'weapon',
+        ]);
+
+        $character = $character->refresh();
+
+        $this->assertNotNull($character->inventory->slots()->where('equipped', true)->first());
+    }
+
+    public function testCannotReplaceItemInSetWhenNoInventorySpace() {
+
+        $this->createItemAffix();
+
+        $item = $this->createItem();
+
+        $user = $this->character->inventorySetManagement()
+                                ->createInventorySets(3)
+                                ->putItemInSet($this->createItem(), 0, 'left-hand', true)
+                                ->getCharacterFactory()
+                                ->inventoryManagement()
+                                ->giveItem($item)
+                                ->getCharacterFactory()
+                                ->updateCharacter([
+                                    'inventory_max' => 0,
+                                ])
+                                ->getCharacter(false)
+                                ->user;
+
+        $response = $this->actingAs($user)->post(route('game.equip.item', ['character' => $user->character->id]), [
+            'position'   => 'left-hand',
+            'slot_id'    => InventorySlot::where('item_id', $item->id)->first()->id,
+            'equip_type' => $item->type,
+        ])->response;
+
+        $response->assertSessionHas('error', 'Inventory is full. Cannot replace a set item. Please make some room.');
+    }
+
+    public function testCanReplaceItemInSet() {
+
+        $this->createItemAffix();
+
+        $item = $this->createItem();
+
+        $user = $this->character->inventorySetManagement()
+            ->createInventorySets(3)
+            ->putItemInSet($this->createItem(), 0, 'left-hand', true)
+            ->getCharacterFactory()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->getCharacter(false)
+            ->user;
+
+        $response = $this->actingAs($user)->post(route('game.equip.item', ['character' => $user->character->id]), [
+            'position'   => 'left-hand',
+            'slot_id'    => InventorySlot::where('item_id', $item->id)->first()->id,
+            'equip_type' => $item->type,
+        ])->response;
+
+        $response->assertSessionDoesntHaveErrors();
+    }
+
     public function testCannotEquipItemWhenCharacterDead() {
 
         $user = $this->character->updateCharacter(['is_dead' => true])

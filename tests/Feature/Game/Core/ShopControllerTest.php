@@ -490,4 +490,32 @@ class ShopControllerTest extends TestCase
             ])
             ->see('Purchased and equipped: ' . $weapon->affix_name . '.');
     }
+
+    public function testBuyAndReplaceBow() {
+        $weapon = $this->createItem([
+            'name'        => 'Sample Item',
+            'type'        => 'bow',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $user      = $this->character->getUser();
+
+        $character = $this->character->getCharacter(false);
+
+
+        $this->actingAs($user)->visitRoute('game.shop.buy', [
+            'character' => $character
+        ])->click('compare-item-' . $weapon->id)
+            ->see($weapon->name)
+            ->submitForm('Buy and Replace', [
+                'position'       => 'right-hand',
+                'slot_id'        => $character->inventory->slots->filter(function($slot) {
+                    return $slot->equipped;
+                })->first()->id,
+                'equip_type'     => 'weapon',
+                'item_id_to_buy' => $weapon->id,
+            ])
+            ->see('Purchased and equipped: ' . $weapon->affix_name . '.');
+    }
 }

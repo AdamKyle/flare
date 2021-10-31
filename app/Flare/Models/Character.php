@@ -206,7 +206,7 @@ class Character extends Model
      * @return bool
      */
     public function isInventoryFull(): bool {
-        return $this->getInventoryCount() === $this->inventory_max;
+        return $this->getInventoryCount() >= $this->inventory_max;
     }
 
     protected static function newFactory() {

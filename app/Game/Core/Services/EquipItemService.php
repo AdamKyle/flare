@@ -92,11 +92,11 @@ class EquipItemService {
             throw new EquipItemException('The item you are trying to equip as a replacement, does not exist.');
         }
 
-
         $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
         if (!is_null($equippedSet)) {
             if ($this->character->isInventoryFull()) {
+
                 throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
             }
 
@@ -112,6 +112,7 @@ class EquipItemService {
 
             $characterSlot->delete();
         } else {
+
             $this->unequipSlot($characterSlot, $this->character->inventory);
 
             $characterSlot->update([

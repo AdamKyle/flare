@@ -32,10 +32,6 @@ class ComparisonService {
      * @param string|null $type
      */
     public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type = null) {
-        if ($type === 'spell-healing' || $type === 'spell-damage') {
-            $type = 'spell';
-        }
-
         $service = $this->characterInventoryService->setCharacter($character)
             ->setInventorySlot($itemToEquip)
             ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
@@ -76,10 +72,6 @@ class ComparisonService {
     }
 
     public function buildShopData(Character $character, Item $item, string $type = null) {
-        if ($type === 'spell-healing' || $type === 'spell-damage') {
-            $type = 'spell';
-        }
-
         if ($type === 'bow') {
             $type = 'weapon';
         }
