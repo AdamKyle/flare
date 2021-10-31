@@ -75,6 +75,22 @@ spells will increase int/focus or chr/focus.
 There are a variety of [enchantments](/information/enchanting) for you to apply to weapons and armour. You should take a moment to learn how [combat](/information/combat)
 works in game and then choose enchantments based on your preferred attack style.
 
+### With that said - Casters should ...
+
+In the beginning of the game, casters will want at least one good weapon and a good shield. You should then get two good damage spells and a good body slot. if you have enough gold
+left over, try and get either a good ring or a good artifact.
+
+You will then want to try and kill something to at least Moss Covered Skeleton before focusing on your Casting Accuracy skill (I would only go as high as 10% xp).
+
+Once you are reliably hitting with your spells, move over to casting as opposed to either cast and attack, attack and cast or attack.
+
+Casters are the hardest class to get going with early game, but like Vampires they can become glass cannon powerhouses of damage.
+
+> ATTN!
+> 
+> This approach will work for Prophets, but as you go on you might want to one damage spell and one healing spell or a good weapon and two healing spells
+> to use Cast and Attack or Attack and cast.
+
 ## Set goals for your self
 
 The early game is going to be hard, you might only be able to kill one or two creatures. Your first goal should be getting enough gold
@@ -114,4 +130,15 @@ The whole point of this tip section is to tell you to not get flustered. Maybe y
 
 It's all a slow steady grind to the top. What's at the top? Harder creatures and [Celestials](/information/celestials).
 
-Kingdoms also come in handy the higher the level you are, specifically for crafting high-end items that cannot be purchased from the shop and access to high-end damage dealing end game enchantments
+Kingdoms also come in handy the higher the level you are, specifically for crafting high-end items that cannot be purchased from the shop and access to high-end damage dealing end game enchantments.
+
+## Your First Adventure
+
+The best way to get early levels is to first gear your self out with the gold given and once you are able to kill goblins in one hit, head to Smugglers Port at 160/80
+using the directional move buttons. it's the first port you see after you register and the game loads.
+
+Do the first adventure a few times till you can then select Moss Covered Skeleton and kill it in one hit. Then do the second adventure a few times.
+
+After a few times you should have amassed a lot of items, gold, xp and possible skill xp if you decide to train a skill while doing adventures.
+
+learn more about [Adventures](/information/adventures) here.

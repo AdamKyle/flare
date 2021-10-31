@@ -204,24 +204,26 @@ export default class Damage {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
+      // if (!this.canUse(extraActionChance.chance)) {
+      //   return monsterCurrentHealth;
+      // }
 
       if (extraActionChance.type === ExtraActionType.FIGHTERS_DOUBLE_DAMAGE && extraActionChance.has_item) {
-        this.battleMessages.push({
-          message: 'The strength of your rage courses through your veins!',
-          class: 'action-fired'
-        });
+        for (let i = 1; i <= 2; i++) {
+          this.battleMessages.push({
+            message: 'The strength of your rage courses through your veins!',
+            class: 'action-fired'
+          });
 
-        const totalDamage = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
+          const totalDamage = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
 
-        monsterCurrentHealth = monsterCurrentHealth - totalDamage;
+          monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-        this.battleMessages.push({
-          message: attacker.name + ' hit for (weapon - double attack) ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-          class: 'action-fired'
-        });
+          this.battleMessages.push({
+            message: attacker.name + ' hit for (weapon - double attack) ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+            class: 'action-fired'
+          });
+        }
       }
     }
 

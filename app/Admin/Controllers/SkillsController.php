@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\AssignSkillService;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameSkill;
@@ -56,8 +57,10 @@ class SkillsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(SkillsImport $request) {
+    public function importData(SkillsImport $request, AssignSkillService $assignSkillService) {
         Excel::import(new ExcelImportSkills, $request->skills_import, null, \Maatwebsite\Excel\Excel::XLSX);
+
+        $assignSkillService->assignSkills();
 
         return redirect()->back()->with('success', 'imported skills data.');
     }

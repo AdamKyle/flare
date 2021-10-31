@@ -31,6 +31,8 @@ export default class CharacterInfoTopSection extends React.Component {
           if (result.data.sheet.timeout_until !== null) {
             this.props.openTimeOutModal(result.data.sheet.timeout_until)
           }
+
+          this.props.updateCharacterGold(result.data.sheet.gold);
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {
@@ -49,6 +51,8 @@ export default class CharacterInfoTopSection extends React.Component {
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
       this.setState({
         characterSheet: event.characterSheet,
+      }, () => {
+        this.props.updateCharacterGold(event.characterSheet.gold);
       });
     });
 

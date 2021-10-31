@@ -302,6 +302,7 @@ export default class KingdomInfo extends React.Component {
           treasury={this.props.kingdom.treasury}
           kingdomId={this.props.kingdom.id}
           depositSuccess={this.depositSuccess.bind(this)}
+          characterGold={this.props.characterGold}
         />
       </>
     )

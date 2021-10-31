@@ -39,7 +39,7 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gold_rush':
-                $message = 'Gold Rush! You gained: ' . $event->forMessage . ' Gold!';
+                $message = 'Gold Rush! You gained: ' . number_format($event->forMessage) . ' Gold!';
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gained_item':

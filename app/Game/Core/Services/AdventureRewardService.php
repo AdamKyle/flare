@@ -117,6 +117,10 @@ class AdventureRewardService {
                 return $skill->name === $rewards['skill']['skill_name'];
             })->first();
 
+            if (is_null($skill)) {
+                return;
+            }
+
             $xp = $rewards['skill']['exp'];
 
             $totalLevels = floor($xp / $skill->xp_max);

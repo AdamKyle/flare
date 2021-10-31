@@ -227,6 +227,10 @@ class CharacterInformationBuilder {
             return 0.99;
         }
 
+        if (is_null($totalPercent)) {
+            return 0.0;
+        }
+
         return $totalPercent;
     }
 

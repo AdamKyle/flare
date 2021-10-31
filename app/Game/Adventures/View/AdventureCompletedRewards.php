@@ -22,6 +22,7 @@ class AdventureCompletedRewards {
     ];
 
     public static function CombineRewards(array $rewards, Character $character) {
+        //dd($rewards);
         foreach ($rewards as $level => $levelRewards) {
             foreach ($levelRewards as $monster => $monsterRewards) {
 

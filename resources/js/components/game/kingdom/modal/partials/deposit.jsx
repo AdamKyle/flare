@@ -33,7 +33,8 @@ export default class Deposit extends React.Component {
       if (newTotal > 2000000000) {
         return this.setState({
           showError: true,
-          errorText: 'Total to deposit would cause the kingdom treasury to go over the max.'
+          errorText: 'Total to deposit would cause the kingdom treasury to go over the max.',
+          loading: false,
         });
       }
 
@@ -95,10 +96,10 @@ export default class Deposit extends React.Component {
             <dl>
               <dt><strong>Total Treasury</strong>:</dt>
               <dd>{this.props.treasury.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
-            </dl>
-            <dl>
               <dt><strong>Max you can deposit</strong>:</dt>
               <dd>{(2000000000 - this.props.treasury).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
+              <dt><strong className="text-success">Your Total Gold</strong>:</dt>
+              <dd>{this.props.characterGold}</dd>
             </dl>
           </div>
           <div className="mt-2">

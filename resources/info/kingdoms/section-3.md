@@ -101,6 +101,25 @@ kingdom.
 
 If your kingdom is taken, by another player, your treasury will be lost and given to them in their new kingdom.
 
+Players who also withdraw will lose special defence bonus they get by depositing gold into their kingdoms.
+
+## Depositing
+
+Players can choose to deposit gold into their kingdom, doing so - regardless of amount, will increase your morale by 15% each time.
+
+The amount you deposit will also affect how much treasury you get per hour as you only gain interest on the kingdoms treasury based on the kingdoms' treasury amount.
+
+For example the calculation is: `treas. + treas. * ((keep level / 30) + Lust for Gold skill bonus)`. If you have no treasury, your kingdom will get 1 gold and then build
+the interest off that.
+
+Every time you deposit you will see a new defence mod go up. This percentage is calculated based on `treas. / max treasury amount (2 billion) = defence bonus %`
+
+<div class="mb-4">
+    <a href="/storage/info/kingdoms/images/attack-action.png" class="glightbox">
+        <img src="/storage/info/kingdoms/images/attack-action.png" class="img-fluid" />
+    </a>
+</div>
+
 ## Additional Tips
 
 - Settling one kingdom is free, settling additional kingdoms cost 10,000 gold per kingdom you own. For example, if you have 5 kingdoms,

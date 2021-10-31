@@ -198,7 +198,7 @@ export default class KingdomManagementModal extends React.Component {
         <Modal.Body>
           <Tabs defaultActiveKey="manage" id="kingdom-management-tabs">
             <Tab eventKey="manage" title="Manage">
-              <KingdomInfo kingdom={this.state.kingdom}/>
+              <KingdomInfo kingdom={this.state.kingdom} characterGold={this.props.characterGold}/>
               <hr/>
               <Tabs defaultActiveKey="buildings" id="building-unit-management">
                 <Tab eventKey="buildings" title="Buildings">

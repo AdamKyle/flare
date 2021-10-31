@@ -46,6 +46,7 @@ export default class Game extends React.Component {
       canAttack: true,
       current_x: null,
       current_y: null,
+      characterGold: 0,
       kingdomData: {
         my_kingdoms: [],
         can_attack: false,
@@ -64,6 +65,10 @@ export default class Game extends React.Component {
 
   updateDimensions() {
     this.setState({ windowWidth: window.innerWidth});
+  }
+
+  updateCharacterGold(gold) {
+    this.setState({characterGold: gold});
   }
 
   componentDidMount() {
@@ -280,6 +285,7 @@ export default class Game extends React.Component {
               characterId={this.props.characterId}
               userId={this.props.userId}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
+              updateCharacterGold={this.updateCharacterGold.bind(this)}
             />
             <ActionsSection
               userId={this.props.userId}
@@ -398,6 +404,7 @@ export default class Game extends React.Component {
               characterId={this.state.characterId}
               userId={this.props.userId}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
+              characterGold={this.state.characterGold}
             />
             : null
         }

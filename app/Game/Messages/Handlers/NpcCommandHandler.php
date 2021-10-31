@@ -313,15 +313,15 @@ class NpcCommandHandler {
         $canPay = false;
 
         if (!is_null($quest->gold_cost)) {
-            $canPay = $character->gold > $quest->gold_cost;
+            $canPay = $character->gold >= $quest->gold_cost;
         }
 
         if (!is_null($quest->gold_dust_cost)) {
-            $canPay = $character->gold_dust > $quest->gold_dust_cost;
+            $canPay = $character->gold_dust >= $quest->gold_dust_cost;
         }
 
         if (!is_null($quest->shard_cost)) {
-            $canPay = $character->shards > $quest->shards_cost;
+            $canPay = $character->shards >= $quest->shards_cost;
         }
 
         if (!$canPay) {

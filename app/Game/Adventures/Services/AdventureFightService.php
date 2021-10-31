@@ -193,7 +193,7 @@ class AdventureFightService {
 
         $xpReward = $this->rewardBuilder->fetchXPReward($monster, $this->character->level, $xpReduction);
 
-        $this->rewardData['exp'] = $xpReward * $xpBonus;
+        $this->rewardData['exp'] = $xpReward + $xpReward * $xpBonus;
     }
 
     protected function handleRewards(Monster $monster, GameMap $gameMap) {

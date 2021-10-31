@@ -1,6 +1,6 @@
 <div class="row page-titles">
     <div class="col-md-6 align-self-right">
-        <h4 class="mt-2">{{$monster->name}}</h4>
+        <h4 class="mt-2">{{$monster->name}} ({{$monster->gameMap->name}})</h4>
     </div>
     <div class="col-md-6 align-self-right">
         <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
