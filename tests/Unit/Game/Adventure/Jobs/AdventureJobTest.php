@@ -25,7 +25,17 @@ class AdventureJobTest extends TestCase
         $this->createItem();
         $this->createItemAffix();
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->levelCharacterUp(5)->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()
+                ->givePlayerLocation()
+                ->levelCharacterUp(5)
+                ->inventoryManagement()
+                ->giveItem($this->createItem([
+                    'name' => 'Sample Item',
+                    'base_damage' => 11600,
+                ]))
+                ->equipLeftHand('Sample Item')
+                ->getCharacterFactory()
+                ->getCharacter(false);
 
         $adventure = $this->createNewAdventure();
 
