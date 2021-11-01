@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -12,6 +13,7 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\Traits\SkillCheck;
+use Illuminate\Support\Str;
 
 class DisenchantService {
 
@@ -95,16 +97,19 @@ class DisenchantService {
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
 
         if (!is_null($questSlot) && !$failedCheck) {
-            $dc   = 100 - 100 * 0.25;
+            $dc   = 1000 - 1000 * 0.02;
             $roll = $this->fetchDCRoll();
 
-            if ($roll > $dc) {
-                $skillBonus            = $skill->skill_bonus;
+            if ($roll > $dc) {;
 
-                $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * $skillBonus;
+                $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * 0.05;
 
-                event(new MessageEvent($character->user, 'Gold Dust Rush! You gained '.($skillBonus * 100).'% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
+                event(new MessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
             }
+        }
+
+        if ($characterTotalGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
+            $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
         }
 
         $character->update([
@@ -119,6 +124,6 @@ class DisenchantService {
     }
 
     protected function fetchDCRoll(): int {
-        return rand(1, 100);
+        return rand(1, 1000);
     }
 }

@@ -438,6 +438,11 @@ class KingdomResourcesService {
     }
 
     private function updateTreasury(int $increase) {
+
+        if ($increase >= KingdomMaxValue::MAX_TREASURY) {
+            $increase = KingdomMaxValue::MAX_TREASURY;
+        }
+
         $this->kingdom->update([
             'treasury' => $increase,
         ]);

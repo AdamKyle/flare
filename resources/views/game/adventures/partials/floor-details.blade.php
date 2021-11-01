@@ -4,7 +4,9 @@
       <h6>Encounter Data</h6>
       <hr/>
       @foreach ($messages as $message)
-        <span class="{{$message['class']}}">{{$message['message']}}</span><br />
+        @if (isset($message['message']) && isset($message['message']))
+          <span class="{{$message['class']}}">{{$message['message']}}</span><br />
+        @endif
       @endforeach
     </div>
     <div class="lg:tw-hidden">

@@ -133,7 +133,8 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $this->messages[] = ['Magic crackles through the air as you cast again!'];
+            $message        = 'Magic crackles through the air as you cast again!';
+            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
 
             $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 

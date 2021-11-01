@@ -1,3 +1,4 @@
+
 <x-cards.card-with-title title="Details">
     <div class="row">
         <div class="col-md-6">
@@ -9,22 +10,21 @@
                 <dd>{{$quest->name}}</dd>
                 <dt>Npc Name:</dt>
                 <dd>
-                    @auth
-                        @if (auth()->user()->hasRole('Admin'))
-                            <a href="{{route('npcs.show', [
-                                    'npc' => $quest->npc_id
-                                ])}}">{{$quest->npc->real_name}}</a>
-                        @else
-                            <a href="{{route('game.npcs.show', [
-                                    'npc' => $quest->npc_id
-                                ])}}">{{$quest->npc->real_name}}</a>
-                        @endif
+                  @auth
+                    @if (auth()->user()->hasRole('Admin'))
+                      <a href="{{route('npcs.show', [
+                                        'npc' => $quest->npc_id
+                                    ])}}">{{$quest->npc->real_name}}</a>
                     @else
-                        <a href="{{route('info.page.item', [
-                                        'item' => $quest->item->id
-                                    ])}}">{{$quest->item->name}}</a>
-                    @endauth
-
+                      <a href="{{route('game.npcs.show', [
+                                        'npc' => $quest->npc_id
+                                    ])}}">{{$quest->npc->real_name}}</a>
+                    @endif
+                  @else
+                    <a href="{{route('info.page.npc', [
+                                        'npc' => $quest->npc_id
+                                    ])}}">{{$quest->npc->real_name}}</a>
+                  @endauth
                 </dd>
                 @if ($quest->npc->must_be_at_same_location)
                     <dt>Npc X/Y:</dt>

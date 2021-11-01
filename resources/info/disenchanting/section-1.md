@@ -57,3 +57,12 @@ Every day at 12:00pm America/Edmonton Time, there will be a chance for one playe
 Players do not have to do anything for this, if you are logged in you will see this in your top bar as well as in the chat!
 
 The person who wins the lottery, triggers a global message.
+
+## Special Quest Items
+
+There are two quest items that effect the amount of gold dust you get:
+
+- Disenchanters Magnifying Glass: +45% XP and Skill bonus towards Disenchanting
+  - You can get this by speaking to the Soldier and paying 25k Gold Dust
+- Grain of sand has a 2% chance (out of a 1000) to give you 5% of your gold dust as a rush.
+  - Got by killing Astral Hell Gods on Surface with a 0.1% drop chance.

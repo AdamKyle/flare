@@ -41,6 +41,10 @@ class AdventureCompletedRewards {
 
     public static function messagesHasPlayerDeath(array $messages): bool {
         foreach ($messages as $message) {
+            if (!isset($message['message'])) {
+                return false;
+            }
+
             if ($message['message'] === 'You have died during the fight! Death has come for you!') {
                 return true;
             }
