@@ -14,7 +14,7 @@
         "bkwld/cloner": "^3.9",
         "christianessl/landmap-generation": "^1.0",
         "consoletvs/charts": "7.*",
-        "deployer/deployer": "^7.0",
+        "deployer/deployer": "v7.0.0-beta.26",
         "doctrine/dbal": "^3.1",
         "fideloper/proxy": "^4.0",
         "graham-campbell/github": "^10.3",
