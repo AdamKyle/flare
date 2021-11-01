@@ -58,7 +58,6 @@ class DailyGoldDustJob implements ShouldQueue
         $lottoChance = rand(1, 1000000);
 
         if ($lottoChance > $this->lottoChance && !Cache::has('won-lotto')) {
-            dump('if');
             event(new GlobalMessageEvent($this->character->name . 'has won the daily Gold Dust Lottery!'));
 
             $this->character->update([
@@ -71,7 +70,6 @@ class DailyGoldDustJob implements ShouldQueue
 
             Cache::put('won-lotto', now());
         } else {
-            dump('else');
             $amount = rand(1,15);
 
             $this->character->update([

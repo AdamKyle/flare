@@ -47,6 +47,8 @@ class AdventureFightService {
 
     private $characterWon = true;
 
+    private $tookTooLong = false;
+
     private $attackType = null;
 
     private $monsterName = null;
@@ -116,9 +118,10 @@ class AdventureFightService {
 
     public function getLogs(): array {
         return  [
-            'reward_info' => $this->rewardDataLogs,
-            'messages'    => $this->battleMessages,
-            'won_fight'   => $this->characterWon,
+            'reward_info'   => $this->rewardDataLogs,
+            'messages'      => $this->battleMessages,
+            'won_fight'     => $this->characterWon,
+            'took_too_long' => $this->tookTooLong,
         ];
     }
 
@@ -126,7 +129,7 @@ class AdventureFightService {
         $encounters = rand(1, $monsterCount);
 
         for ($i = 1; $i <= $encounters; $i++) {
-            if ($this->characterWon) {
+            if ($this->characterWon && !$this->tookTooLong) {
                 $this->fight();
             }
         }
@@ -148,6 +151,8 @@ class AdventureFightService {
         $this->battleLogs = [];
 
         $this->battleMessages[$this->monsterName] = $logs;
+
+        $this->tookTooLong = $this->fightService->tookTooLong();
 
         $this->fightService->reset();
     }

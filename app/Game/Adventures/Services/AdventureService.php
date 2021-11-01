@@ -158,8 +158,12 @@ class AdventureService {
                 $this->setLogs($logs, $currentLevel, $adventureLog);
 
                 if ($currentLevel >= $maxLevel) {
-                    $this->adventureIsOver($adventureLog, $currentLevel);
+                    $this->adventureIsOver($adventureLog, $currentLevel, false, false);
                 }
+
+            } else if ($logs['took_too_long']) {
+                $this->setLogs($logs, $currentLevel, $adventureLog);
+                $this->adventureIsOver($adventureLog, $currentLevel, false, true);
             } else {
                 $this->characterIsDead($logs, $adventureLog, $currentLevel);
             }
@@ -252,8 +256,8 @@ class AdventureService {
      * @param int $level
      * @param bool $tookTooLong
      */
-    protected function adventureIsOver(AdventureLog $adventureLog, int $level) {
-        $this->updateAdventureLog($adventureLog, $level, false);
+    protected function adventureIsOver(AdventureLog $adventureLog, int $level, bool $isDead, bool $tookTooLong) {
+        $this->updateAdventureLog($adventureLog, $level, $isDead, $tookTooLong);
 
         $this->character->update([
             'can_move'               => true,
@@ -283,12 +287,19 @@ class AdventureService {
      * @param int $level
      * @param bool $isDead
      */
-    protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false) {
+    protected function updateAdventureLog(AdventureLog $adventureLog, int $level, bool $isDead = false, bool $tookTooLong = false) {
         if ($isDead) {
             $adventureLog->update([
                 'in_progress'          => false,
                 'last_completed_level' => $level,
                 'rewards'              => null,
+            ]);
+        } else if ($tookTooLong) {
+            $adventureLog->update([
+                'in_progress'          => false,
+                'last_completed_level' => $level,
+                'rewards'              => null,
+                'took_to_long'         => true,
             ]);
         } else {
             $adventureLog->update([

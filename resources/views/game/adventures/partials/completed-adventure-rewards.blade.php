@@ -101,6 +101,11 @@
       </x-core.tabs.container>
 
     </div>
+  @elseif ($adventureLog->took_to_long)
+    <p class="tw-text-red-600">You're adventure took far too long. Exhaustion made you flee. The battle messages below might offer a clue as to why.</p>
+    <p>When an adventure takes too long it can be a verity of reasons. For example maybe you do just enough to damage to slowly bring them down
+    but they heal too much, or you life stealing affixes do not do enough damage compared with your weapons to kill them. If this is the case
+    it might be best to invest in some better gear with some better enchantments.</p>
   @else
     <p class="tw-text-red-600">You died during the adventure. Check below for more details.</p>
   @endif

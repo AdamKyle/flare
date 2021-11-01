@@ -483,7 +483,7 @@ class AdventureServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-                                        ->updateCharacter(['can_move' => false])
+                                        ->updateCharacter(['can_move' => false, 'dur' => 1])
                                         ->createAdventureLog($adventure)
                                         ->updateSkill('Accuracy', [
                                             'level' => 0,
@@ -518,7 +518,7 @@ class AdventureServiceTest extends TestCase
         }
 
         $character = $character->refresh();
-
+        dump($character->adventureLogs->first());
         $this->assertTrue($character->is_dead);
         $this->assertTrue($character->adventureLogs->isNotEmpty());
         $this->assertFalse($character->adventureLogs->first()->complete);

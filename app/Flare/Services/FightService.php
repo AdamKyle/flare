@@ -32,6 +32,10 @@ class FightService {
 
     private $attackOnce = false;
 
+    private $tookTooLongCounter = 0;
+
+    private $fightTookTooLong = false;
+
     public function __construct(
         SetupFightHandler $setupFightHandler,
         CharacterInformationBuilder $characterInformationBuilder,
@@ -140,6 +144,15 @@ class FightService {
             if ($this->attackOnce) {
                 return;
             }
+
+            if (!$this->attackOnce && !$this->fightTookTooLong) {
+                $this->tookTooLongCounter++;
+            }
+
+            if (!$this->attackOnce && $this->tookTooLongCounter >= 10) {
+                $this->fightTookTooLong = true;
+                return;
+            }
         }
 
         return $this->processFight($defender, $attacker, $attackType);
@@ -157,10 +170,16 @@ class FightService {
         return $this->currentMonsterHealth;
     }
 
+    public function tookTooLong(): bool {
+        return $this->fightTookTooLong;
+    }
+
     public function reset() {
         $this->currentMonsterHealth   = null;
         $this->currentCharacterHealth = null;
         $this->battleLogs             = [];
+        $this->tookTooLongCounter     = 0;
+        $this->fightTookTooLong       = false;
     }
 
     protected function isCharacterDead(): bool {

@@ -21,6 +21,8 @@
 
       <p class="tw-mt-6 tw-text-blue-500">Gold includes any gold rushes and adventure bonuses</p>
       <p class="tw-text-blue-500">Skill XP and XP includes any item bonuses, adventure bonuses and map bonuses</p>
+    @elseif ($adventureLog->took_to_long)
+      <p class="tw-text-center tw-text-red-500">Adventure took far too long. No Rewards.</p>
     @elseif (!$adventureLog->complete)
       <p class="tw-text-center tw-text-red-500">You are dead and got no rewards.</p>
     @else
