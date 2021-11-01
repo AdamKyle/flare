@@ -321,7 +321,7 @@ class NpcCommandHandler {
         }
 
         if (!is_null($quest->shard_cost)) {
-            $canPay = $character->shards >= $quest->shards_cost;
+            $canPay = $character->shards >= $quest->shard_cost;
         }
 
         if (!$canPay) {

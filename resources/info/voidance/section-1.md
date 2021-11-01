@@ -48,11 +48,19 @@ If you have a Devouring Darkness chance (If you have Shadow Plane Grimoire at th
 - Their affixes will not fire.
 - Their artifacts will not fire.
 
-If you do not manage to void them you will still attempt to void the enemy.
+If you do not have devoid or have both then you can:
+
+- Devoid the enemy and then void them 
+  - They cannot void you (devoid) followed by, they cannot use affixes and artifacts.
+- If you manage to void them but not devoid them, they then have a chance to void you
+  - (Assuming you, and they are voided) Both you and the enemy cannot use affixes, you will use raw stats and no boons.
+  - The enemy cannot use artifacts
 
 The enemy cannot then re-void you on their turn, no matter how many rounds a fight lasts, the enemy, nor you, can re-void or re-devoid. It&#39;s a once per battle situation.
 
-The only way, at this time, that you can get Devouring Darkness or Devouring Light is through the quest item upgrade chain. **There are no affixes to handle this.**
+The only way, at this time, that you can get Devouring Darkness is through the quest item upgrade chain. **There are no affixes to handle this.**
+
+There are expensive enchantments that can add a small chance to void enemies (Devouring Light %).
 
 > ### ATTN!!
 > 

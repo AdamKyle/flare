@@ -2,9 +2,34 @@
 
 When you are ready to begin your adventure and you on a location, you can click the Adventure button below the map (assuming that location has an adventure). This will popup another window underneath actions that then allows you to select which adventure, as well as see details about that adventure. 
 
-![adventuring-image](/storage/info/adventure/images/adventuring-modal.png)
+<div class="mb-4">
+    <a href="/storage/info/adventure/images/adventuring-modal.png" class="glightbox">
+        <img src="/storage/info/adventure/images/adventuring-modal.png" class="img-fluid" />
+    </a>
+</div>
 
 The same details you saw from clicking on an adventure above, is the same details you'll see in game.
+
+## Attack Types
+
+You might want to read the [combat docs](/information/combat), however the main important aspect is that the attack you select
+is the attack you will use throughout the entirety of the adventure. Use caution when picking your attack as you cannot change it unless you cancel the adventure.
+
+## Voidance and Devoidance
+
+you may want to brush up on [Voidance and Devoidance](/information/voidance), however the core takeaway is that if an enemy voids you, it's only for
+that battle and not any other battles, even if there are multiple per floor. The same is held true for Devoidance, unlike regular battles where these can carry over even after you
+resurrect, these will not carry over between battles.
+
+### Regarding XP and Skill XP
+
+Skill XP and XP can spill over, meaning if you do an adventure and are rewarded 1000 XP, that's ten levels you have just gained.
+The same is for Skill XP.
+
+## Regarding Gold Rushes
+
+Gold rushes in adventures will use the gold you hve on hand each time you get a gold rush as opposed to doing it based on
+the total gold of the adventure.
 
 ## Information about adventures
 
