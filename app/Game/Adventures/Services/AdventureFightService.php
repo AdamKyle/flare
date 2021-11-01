@@ -142,7 +142,9 @@ class AdventureFightService {
         $this->battleLogs   = $this->addMessage($message, 'info-encounter');
         $this->characterWon = $this->fightService->processFight($this->character, $monster, $this->attackType);
 
-        if ($this->characterWon) {
+        $this->tookTooLong = $this->fightService->tookTooLong();
+
+        if ($this->characterWon && !$this->tookTooLong) {
             $this->processRewards($monster);
         }
 
@@ -152,7 +154,7 @@ class AdventureFightService {
 
         $this->battleMessages[$this->monsterName] = $logs;
 
-        $this->tookTooLong = $this->fightService->tookTooLong();
+
 
         $this->fightService->reset();
     }

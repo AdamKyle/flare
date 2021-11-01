@@ -67,6 +67,10 @@ export default class Damage {
     let totalDamage   = attacker.stacking_damage - attacker.stacking_damage * damageDeduction;
     const cantResist  = attacker.cant_be_resisted;
 
+    if (totalDamage <= 0.0) {
+      return;
+    }
+
     if (cantResist) {
       this.addMessage('The enemy cannot resist your enchantments! They are so glowy!');
 

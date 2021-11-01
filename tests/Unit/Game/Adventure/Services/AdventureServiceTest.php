@@ -88,6 +88,49 @@ class AdventureServiceTest extends TestCase
 
     }
 
+    public function testProcessAdventureTookTooLong()
+    {
+        $adventure = $this->createNewAdventure();
+        $item      = $this->createItem(['name' => 'Item Name']);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->updateCharacter(['can_move' => false, 'dur' => 100000])
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->createAdventureLog($adventure)
+            ->updateSkill('Accuracy', [
+                'level' => 10,
+                'xp_towards' => 10,
+                'currently_training' => true
+            ])
+            ->updateSkill('Dodge', [
+                'level' => 10
+            ])
+            ->updateSkill('Looting', [
+                'level' => 10
+            ])
+            ->getCharacter(false);
+
+        $adventureService = resolve(AdventureService::class);
+
+        $adventureService->setCharacter($character)->setAdventure($adventure)->setName(Str::random(8));
+
+        for ($i = 1; $i <= $adventure->levels; $i++) {
+            $adventureService->processAdventure($i, $adventure->levels, 'attack');
+        }
+
+        $character->refresh();
+
+        $this->assertFalse($character->is_dead);
+        $this->assertTrue($character->adventureLogs->isNotEmpty());
+        $this->assertFalse($character->adventureLogs->first()->complete);
+        $this->assertTrue($character->adventureLogs->first()->took_to_long);
+        $this->assertTrue(empty($character->adventureLogs->first()->rewards));
+        $this->assertTrue(!empty($character->adventureLogs->first()->logs));
+    }
+
     public function testProcessAdventureCharacterLivesAndOnline()
     {
         $adventure = $this->createNewAdventure();

@@ -144,15 +144,15 @@ class FightService {
             if ($this->attackOnce) {
                 return;
             }
+        }
 
-            if (!$this->attackOnce && !$this->fightTookTooLong) {
-                $this->tookTooLongCounter++;
-            }
+        if (!$this->fightTookTooLong) {
+            $this->tookTooLongCounter++;
+        }
 
-            if (!$this->attackOnce && $this->tookTooLongCounter >= 10) {
-                $this->fightTookTooLong = true;
-                return;
-            }
+        if ($this->tookTooLongCounter >= 10) {
+            $this->fightTookTooLong = true;
+            return;
         }
 
         return $this->processFight($defender, $attacker, $attackType);
