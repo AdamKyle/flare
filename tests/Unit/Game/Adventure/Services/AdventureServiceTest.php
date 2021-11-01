@@ -153,6 +153,13 @@ class AdventureServiceTest extends TestCase
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
+                                        ->inventoryManagement()
+                                        ->giveItem($this->createItem([
+                                            'name' => 'Sample Item',
+                                            'base_damage' => 11600,
+                                        ]))
+                                        ->equipLeftHand('Sample Item')
+                                        ->getCharacterFactory()
                                         ->updateSkill('Accuracy', [
                                             'level' => 10,
                                             'xp_towards' => 10,
@@ -194,6 +201,13 @@ class AdventureServiceTest extends TestCase
             ->levelCharacterUp(10)
             ->updateCharacter(['can_move' => false])
             ->createAdventureLog($adventure)
+            ->inventoryManagement()
+            ->giveItem($this->createItem([
+                'name' => 'Sample Item',
+                'base_damage' => 11600,
+            ]))
+            ->equipLeftHand('Sample Item')
+            ->getCharacterFactory()
             ->updateSkill('Accuracy', [
                 'level' => 10,
                 'xp_towards' => 10,
@@ -239,6 +253,13 @@ class AdventureServiceTest extends TestCase
             ->levelCharacterUp(10)
             ->updateCharacter(['can_move' => false])
             ->createAdventureLog($adventure)
+            ->inventoryManagement()
+            ->giveItem($this->createItem([
+                'name' => 'Sample Item',
+                'base_damage' => 11600,
+            ]))
+            ->equipLeftHand('Sample Item')
+            ->getCharacterFactory()
             ->updateSkill('Accuracy', [
                 'level' => 10,
                 'xp_towards' => 10,
@@ -300,6 +321,13 @@ class AdventureServiceTest extends TestCase
             ->levelCharacterUp(10)
             ->updateCharacter(['can_move' => false])
             ->createAdventureLog($adventure)
+            ->inventoryManagement()
+            ->giveItem($this->createItem([
+                'name' => 'Sample Item',
+                'base_damage' => 11600,
+            ]))
+            ->equipLeftHand('Sample Item')
+            ->getCharacterFactory()
             ->updateSkill('Accuracy', [
                 'level' => 10,
                 'xp_towards' => 10,
@@ -347,7 +375,14 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
+                                        ->givePlayerLocation()
+                                        ->inventoryManagement()
+                                        ->giveItem($this->createItem([
+                                            'name' => 'Sample Item',
+                                            'base_damage' => 600,
+                                        ]))
+                                        ->equipLeftHand('Sample Item')
+                                        ->getCharacterFactory()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)
@@ -388,7 +423,14 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, 5);
 
         $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
+                                        ->givePlayerLocation()
+                                        ->inventoryManagement()
+                                        ->giveItem($this->createItem([
+                                            'name' => 'Sample Item',
+                                            'base_damage' => 600,
+                                        ]))
+                                        ->equipLeftHand('Sample Item')
+                                        ->getCharacterFactory()
                                         ->levelCharacterUp(10)
                                         ->updateCharacter(['can_move' => false])
                                         ->createAdventureLog($adventure)

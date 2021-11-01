@@ -153,14 +153,16 @@ class AdventureService {
 
         $logs = $attackService->getLogs();
 
-        if ($logs['won_fight']) {
-            $this->setLogs($logs, $currentLevel, $adventureLog);
+        if (!is_null($adventureLog)) {
+            if ($logs['won_fight']) {
+                $this->setLogs($logs, $currentLevel, $adventureLog);
 
-            if ($currentLevel >= $maxLevel) {
-                $this->adventureIsOver($adventureLog, $currentLevel);
+                if ($currentLevel >= $maxLevel) {
+                    $this->adventureIsOver($adventureLog, $currentLevel);
+                }
+            } else {
+                $this->characterIsDead($logs, $adventureLog, $currentLevel);
             }
-        } else {
-            $this->characterIsDead($logs, $adventureLog, $currentLevel);
         }
     }
 

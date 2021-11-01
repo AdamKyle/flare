@@ -32,6 +32,7 @@ class EntrancingChanceHandler {
     }
 
     public function entrancedEnemy($attacker, $defender, bool $isDefenderVoided = false, bool $isAttackerVoided = false): bool {
+        return true;
         if ($isAttackerVoided) {
             return false;
         }

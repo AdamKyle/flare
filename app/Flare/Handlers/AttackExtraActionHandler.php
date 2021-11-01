@@ -50,6 +50,7 @@ class AttackExtraActionHandler {
     }
 
     public function castSpells(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender, bool $voided = false): int {
+
         $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
         $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter());
@@ -176,6 +177,7 @@ class AttackExtraActionHandler {
     }
 
     protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender, Character $character, bool $voided = false): int {
+
         $totalDamage = $this->calculateSpellDamage($spellDamage, $defender, $character, $voided);
 
         if ($totalDamage > 0) {
@@ -223,11 +225,15 @@ class AttackExtraActionHandler {
             $dc                   = $maxRole - $maxRole * $spellEvasion;
         }
 
-        if ($dc <= 0 || rand(0, $maxRole) > $dc) {
-            return 0;
+        if ($dc === 0) {
+            return $spellDamage;
         }
 
-        return $spellDamage;
+        if (rand(0, $maxRole) > $dc) {
+            return $spellDamage;
+        }
+
+        return 0.0;
 
     }
 

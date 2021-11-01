@@ -9,12 +9,14 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateCelestials;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
 class CelestialBattleControllerApiTest extends TestCase {
 
-    use RefreshDatabase, CreateMonster, CreateNpc, CreateCelestials;
+    use RefreshDatabase, CreateMonster, CreateNpc, CreateCelestials, CreateItem, CreateItemAffix;
 
     private $character = null;
 
@@ -332,6 +334,9 @@ class CelestialBattleControllerApiTest extends TestCase {
     }
 
     public function testCanAttackCelestial() {
+        $this->createItem();
+        $this->createItemAffix();
+
         $this->createNpc([
             'type' => NpcTypes::SUMMONER
         ]);

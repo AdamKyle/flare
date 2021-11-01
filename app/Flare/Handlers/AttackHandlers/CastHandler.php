@@ -106,6 +106,7 @@ class CastHandler {
         }
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, false, $voided)) {
+
             $this->monsterHealth   = $this->attackExtraActionHandler->castSpells($characterInfo, $this->monsterHealth, $defender, $voided);
 
             $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
@@ -129,6 +130,7 @@ class CastHandler {
         }
 
         if ($this->canHitHandler->canCast($attacker, $defender, $voided)) {
+            dump('hello');
             if ($this->isBlocked($attackData['spell_damage'], $defender)) {
                 $message          = $defender->name . ' Blocked your damaging spells!';
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);

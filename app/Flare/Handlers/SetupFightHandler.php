@@ -52,15 +52,15 @@ class SetupFightHandler {
             }
         }
 
-        if ($defender instanceof Monster && !$this->monsterDevoided) {
-            if ($this->voidedEnemy($defender)) {
-                $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
-
-                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
-
-                $this->attackType = 'voided_';
-            }
-        }
+//        if ($defender instanceof Monster && !$this->monsterDevoided) {
+//            if ($this->voidedEnemy($defender)) {
+//                $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
+//
+//                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+//
+//                $this->attackType = 'voided_';
+//            }
+//        }
 
         // Only do this once per fight and if you are not voided.
         if (is_null($this->attackType) && !$this->processed) {
