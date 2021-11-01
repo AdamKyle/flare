@@ -146,23 +146,21 @@
                         />
                     @endif
 
-                    @if ($showSkillInfo)
-                        <x-data-tables.header-row
-                            wire:click.prevent="sortBy('skill_level_required')"
-                            header-text="Skill Level Required"
-                            sort-by="{{$sortBy}}"
-                            sort-field="{{$sortField}}"
-                            field="skill_level_required"
-                        />
+                      <x-data-tables.header-row
+                        wire:click.prevent="sortBy('skill_level_required')"
+                        header-text="Skill Level Required"
+                        sort-by="{{$sortBy}}"
+                        sort-field="{{$sortField}}"
+                        field="skill_level_required"
+                      />
 
-                        <x-data-tables.header-row
-                            wire:click.prevent="sortBy('skill_level_trivial')"
-                            header-text="Skill Level Trivial"
-                            sort-by="{{$sortBy}}"
-                            sort-field="{{$sortField}}"
-                            field="skill_level_trivial"
-                        />
-                    @endif
+                      <x-data-tables.header-row
+                        wire:click.prevent="sortBy('skill_level_trivial')"
+                        header-text="Skill Level Trivial"
+                        sort-by="{{$sortBy}}"
+                        sort-field="{{$sortField}}"
+                        field="skill_level_trivial"
+                      />
 
                     @guest
                     @elseif (auth()->user()->hasRole('Admin'))
@@ -244,10 +242,8 @@
                                 <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
                             @endif
 
-                            @if ($showSkillInfo)
-                                <td>{{$item->skill_level_required}}</td>
-                                <td>{{$item->skill_level_trivial}}</td>
-                            @endif
+                              <td>{{$item->skill_level_required}}</td>
+                              <td>{{$item->skill_level_trivial}}</td>
 
                             @guest
                             @else
