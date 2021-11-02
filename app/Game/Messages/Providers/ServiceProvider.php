@@ -3,6 +3,7 @@
 namespace App\Game\Messages\Providers;
 
 
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -25,6 +26,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new NpcCommandHandler(
                 $app->make(NpcServerMessageBuilder::class),
                 $app->make(CharacterAttackTransformer::class),
+                $app->make(BuildCharacterAttackTypes::class),
                 $app->make(MonsterTransfromer::class),
                 $app->make(Manager::class)
             );

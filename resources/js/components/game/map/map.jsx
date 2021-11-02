@@ -296,6 +296,7 @@ export default class Map extends React.Component {
         },
         charactersOnMap: event.mapDetails.characters_on_map,
         otherKingdoms: event.mapDetails.other_kingdoms,
+        characterMapName: event.mapDetails.map_name,
       }, () => {
         this.props.updateKingdoms({
           my_kingdoms: myKingdoms,

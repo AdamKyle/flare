@@ -2,15 +2,20 @@
 
 namespace App\Game\Messages\Handlers;
 
+use Exception;
+use Illuminate\Broadcasting\PendingBroadcast;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use League\Fractal\Resource\Item as ResourceItem;
 use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Models\User;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\NpcCommandTypes;
@@ -23,15 +28,9 @@ use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
-use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
-use Illuminate\Broadcasting\PendingBroadcast;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 
 class NpcCommandHandler {
 
@@ -46,6 +45,8 @@ class NpcCommandHandler {
      * @var CharacterAttackTransformer $characterAttackTransformer
      */
     private $characterAttackTransformer;
+
+    private $buildCharacterAttackTypes;
 
     /**
      * @var MonsterTransfromer $monsterTransformer
@@ -73,11 +74,13 @@ class NpcCommandHandler {
     public function __construct(
         NpcServerMessageBuilder    $npcServerMessageBuilder,
         CharacterAttackTransformer $characterAttackTransformer,
+        BuildCharacterAttackTypes  $buildCharacterAttackTypes,
         MonsterTransfromer         $monsterTransformer,
         Manager                    $manager,
     ) {
         $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
         $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->buildCharacterAttackTypes  = $buildCharacterAttackTypes;
         $this->monsterTransformer         = $monsterTransformer;
         $this->manager                    = $manager;
     }
@@ -364,7 +367,7 @@ class NpcCommandHandler {
                 $characterData = new Item($character->refresh(), $this->characterAttackTransformer);
                 event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
 
-                $this->updateActions($character->map->game_map_id, $character);
+                $this->updateCharacterAttakDataCache($character->refresh());
 
                 broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('skill_unlocked', $npc), true));
                 broadcast(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
@@ -423,20 +426,13 @@ class NpcCommandHandler {
         return true;
     }
 
-    protected function updateActions(int $mapId, Character $character) {
-        $user      = $character->user;
-        $character = new Item($character->refresh(), $this->characterAttackTransformer);
-        $monsters  = new Collection(
-            Monster::where('published', true)
-                   ->where('game_map_id', $mapId)
-                   ->where('is_celestial_entity', false)
-                   ->orderBy('max_level', 'asc')->get(),
-            $this->monsterTransformer
-        );
+    protected function updateCharacterAttakDataCache(Character $character) {
+        $this->buildCharacterAttackTypes->buildCache($character);
 
-        $character = $this->manager->createData($character)->toArray();
-        $monster   = $this->manager->createData($monsters)->toArray();
+        $characterData = new ResourceItem($character->refresh(), $this->characterAttackTransformer);
 
-        broadcast(new UpdateActionsBroadcast($character, $monster, $user));
+        $characterData = $this->manager->createData($characterData)->toArray();
+
+        event(new UpdateAttackStats($characterData, $character->user));
     }
 }

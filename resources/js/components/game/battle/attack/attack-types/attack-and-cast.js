@@ -90,11 +90,14 @@ export default class AttackAndCast {
         if (canCast) {
           if (this.canBlock(attackData.spell_damage)) {
             this.addEnemyActionMessage('Your damaging spells were blocked!');
+          } else {
+            castAttack.attackWithSpells(attackData);
           }
-          castAttack.attackWithSpells(attackData);
+        } else {
+          this.addEnemyActionMessage('Your damage spell missed!');
         }
 
-        this.addEnemyActionMessage('Your damage spell missed!');
+
 
       } else if (attackData.heal_for > 0) {
         castAttack.healWithSpells(attackData);
