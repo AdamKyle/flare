@@ -220,6 +220,16 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
+        'supervisor-long-running' => [
+            'connection' => 'long_running',
+            'queue' => ['default_long'],
+            'balance' => 'auto',
+            'maxProcesses' => 2,
+            'memory' => 128,
+            'tries' => 2,
+            'timeout' => 900,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -263,6 +273,16 @@ return [
                 'tries' => 1,
                 'nice' => 0,
             ],
+            'supervisor-long-running' => [
+                'connection' => 'long_running',
+                'queue' => ['default_long'],
+                'balance' => 'auto',
+                'maxProcesses' => 2,
+                'memory' => 128,
+                'tries' => 2,
+                'timeout' => 900,
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
@@ -294,6 +314,16 @@ return [
             'supervisor-shop-buying' => [
                 'connection' => 'shop_buying',
                 'maxProcesses' => 3,
+            ],
+            'supervisor-long-running' => [
+                'connection' => 'long_running',
+                'queue' => ['default_long'],
+                'balance' => 'auto',
+                'maxProcesses' => 2,
+                'memory' => 128,
+                'tries' => 2,
+                'timeout' => 900,
+                'nice' => 0,
             ],
         ],
     ],

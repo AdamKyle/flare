@@ -64,6 +64,7 @@ class DropsCheckListener
     }
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
+        dump($event->character->isInventoryFull());
         if (!$event->character->isInventoryFull()) {
 
             if ($this->canHaveItem($event->character, $item)) {

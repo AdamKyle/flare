@@ -9,14 +9,14 @@ class MessagesFormatter {
     public function format(Collection $messages): Collection {
         return $messages->transform(function($message) {
 
-            $character = $message->user->character;
-
-            if ($message->user->hasRole('Admin')) {
+            if (is_null($message->user)) {
+                $characterName = 'Unknown';
+            } else if (is_null($message->user->character)) {
+                $characterName = 'Unknown';
+            } else if ($message->user->hasRole('Admin')) {
                 $characterName = 'Admin';
-            } else if (is_null($character->name)) {
-               $characterName = 'Unknown';
             } else {
-                $characterName = $character->name;
+                $characterName = $message->user->character->name;
             }
 
             $message->character_name     = $characterName;

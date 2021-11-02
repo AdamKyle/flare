@@ -106,6 +106,14 @@ return [
             'block_for' => null,
         ],
 
+        'long_running' => [
+            'driver' => 'redis',
+            'connection' => 'default',
+            'queue' => 'default_long',
+            'retry_after' => 1200, // Run for max 20 minutes
+            'block_for' => null,
+        ],
+
     ],
 
     /*
