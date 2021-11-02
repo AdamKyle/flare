@@ -103,6 +103,7 @@ export default class Attack {
         break;
     }
 
+
     this.characterCurrentHealth = this.state.characterCurrentHealth;
     this.monsterCurrentHealth   = this.state.monsterCurrentHealth;
 

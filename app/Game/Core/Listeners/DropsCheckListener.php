@@ -38,6 +38,9 @@ class DropsCheckListener
         if ($canGetDrop) {
             $drop = resolve(RandomItemDropBuilder::class)
                         ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
+                        ->setMonsterPlane($event->monster->gameMap->name)
+                        ->setCharacterLevel($event->character->level)
+                        ->setMonsterMaxLevel($event->monster->max_level)
                         ->generateItem();
 
             if (!is_null($drop)) {

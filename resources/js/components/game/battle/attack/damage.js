@@ -26,13 +26,13 @@ export default class Damage {
       };
     }
 
-    if (stacking) {
-      this.addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!');
-    } else {
-      this.addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!');
-    }
-
     if (totalDamage > 0.0) {
+      if (stacking) {
+        this.addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!');
+      } else {
+        this.addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!');
+      }
+
       if (cantResist) {
 
         totalDamage = totalDamage - totalDamage * damageDeduction;
@@ -68,7 +68,7 @@ export default class Damage {
     const cantResist  = attacker.cant_be_resisted;
 
     if (totalDamage <= 0.0) {
-      return;
+      return monsterCurrentHealth;
     }
 
     if (cantResist) {

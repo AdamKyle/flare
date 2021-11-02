@@ -13,6 +13,12 @@ class RandomItemDropBuilder {
      */
     private $itemAffixes;
 
+    private $monsterPlane;
+
+    private $characterLevel = 0;
+
+    private $monsterLevel   = 0;
+
     /**
      * Set the item affixes
      *
@@ -26,6 +32,42 @@ class RandomItemDropBuilder {
     }
 
     /**
+     * Set the monster plane.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function setMonsterPlane(string $name): RandomItemDropBuilder {
+        $this->monsterPlane = $name;
+
+        return $this;
+    }
+
+    /**
+     * set the character level.
+     *
+     * @param int $level
+     * @return $this
+     */
+    public function setCharacterLevel(int $level): RandomItemDropBuilder {
+        $this->characterLevel = $level;
+
+        return $this;
+    }
+
+    /**
+     * set the monster level.
+     *
+     * @param int $level
+     * @return $this
+     */
+    public function setMonsterMaxLevel(int $level): RandomItemDropBuilder {
+        $this->monsterLevel = $level;
+
+        return $this;
+    }
+
+    /**
      * Generate an item.
      *
      * This will generate a random item.
@@ -34,14 +76,13 @@ class RandomItemDropBuilder {
      * From that we check if the affix is the same on the item - if it is, attach it, if not, check if its the same, if it is, delete the
      * duplicate and return the item in question - or attach the new affix and pass that back.
      *
+     * Based on the monsters plane, if it is Shadow Plane, then any item of any value and any affix can drop, so long as the
+     * monster is at least 10 levels higher than the player.
+     *
      * @return Item
      */
     public function generateItem(): Item {
-        $item          = Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])
-            ->whereNotIn('type', ['artifact', 'quest', 'alchemy'])
-            ->where('can_drop', true)
-            ->get()
-            ->first();
+        $item          = $this->getItem();
         $duplicateItem = $this->duplicateItem($item);
         $affix         = $this->fetchRandomItemAffix();
 
@@ -60,6 +101,20 @@ class RandomItemDropBuilder {
         ]);
 
         return $duplicateItem->refresh();
+    }
+
+    protected function getItem(): Item {
+        $query =  Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])
+                                    ->whereNotIn('type', ['artifact', 'quest', 'alchemy']);
+
+
+        $totalLevels = $this->monsterLevel - $this->characterLevel;
+
+        if ($this->monsterPlane !== 'Shadow Plane' && !($totalLevels >= 10)) {
+            $query = $query->where('can_drop', true);
+        }
+
+        return $query->get()->first();
     }
 
     protected function attachAffixOrDelete(Item $duplicateItem, ItemAffix $affix) {
@@ -106,7 +161,14 @@ class RandomItemDropBuilder {
         return $item->refresh();
     }
 
-    protected function fetchRandomItemAffix() {
+    protected function fetchRandomItemAffix(): ItemAffix {
+
+        $totalLevels = $this->monsterLevel - $this->characterLevel;
+
+        if ($this->monsterPlane === 'Shadow Plane' && $totalLevels >= 10) {
+            return ItemAffix::inRandomOrder()->first();
+        }
+
         $index = count($this->itemAffixes) - 1;
 
         return $this->itemAffixes[rand(0, $index)];

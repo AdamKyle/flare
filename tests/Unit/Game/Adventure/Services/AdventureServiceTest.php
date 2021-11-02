@@ -561,7 +561,7 @@ class AdventureServiceTest extends TestCase
         }
 
         $character = $character->refresh();
-        
+
         $this->assertTrue($character->is_dead);
         $this->assertTrue($character->adventureLogs->isNotEmpty());
         $this->assertFalse($character->adventureLogs->first()->complete);

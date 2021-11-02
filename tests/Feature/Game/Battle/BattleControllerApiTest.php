@@ -354,6 +354,44 @@ class BattleControllerApiTest extends TestCase
         $this->assertTrue(count($character->inventory->slots) > 1);
     }
 
+    public function testBattleResultsMonsterIsDeadAndCharacterGainedItemFromShadowPlane() {
+        Event::fake([
+            ServerMessageEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+        ]);
+
+        $character   = $this->character->updateSkill('Looting', ['level' => 100])->getCharacter(false);
+        $user        = $this->character->getUser();
+        $monster     = $this->monster->getMonster();
+
+        $monster->update([
+            'max_level' => 40,
+            'game_map_id' => $this->createGameMap([
+                'name' => 'Shadow Plane'
+            ])->id,
+        ]);
+
+        $monster = $monster->refresh();
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type' => 'monster',
+                'monster_id' => $monster->id,
+            ])
+            ->response;
+
+        $character = $this->character->getCharacter(false);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue(count($character->inventory->slots) > 1);
+    }
+
     public function testBattleResultsMonsterIsDeadAndCharacterGainedQuestItem() {
         Event::fake([
             ServerMessageEvent::class,
