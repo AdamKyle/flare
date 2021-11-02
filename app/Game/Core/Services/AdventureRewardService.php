@@ -185,7 +185,7 @@ class AdventureRewardService {
                     if ($character->isInventoryFull()) {
                         $this->messages['error'] = 'Your inventory is full. You must clear some space, come back and finish collecting the remaining items.';
 
-                        $this->itemsLeft = $newItemList;
+                        $this->itemsLeft = array_values($newItemList);
 
                         return;
                     }
