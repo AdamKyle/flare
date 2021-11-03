@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Mail\GenericMail;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcTypes;
@@ -141,14 +143,12 @@ class KingdomsAttackService {
                 throw new \Exception('No unit exists for name: ' . $unitName . ' on this kingdom: ' . $kingdom->name);
             }
 
-            $kingdomUnitInformation = $kingdom->units()->where('game_unit_id', $unit->id)->first();
-
-            $newAmountInKingdom     = $kingdomUnitInformation->amount - $unitInformation['amount_to_send'];
+            $newAmountInKingdom  = $unit->amount - $unitInformation['amount_to_send'];
 
             if ($newAmountInKingdom < 0) {
                 throw new \Exception(
                     'You don\'t have enough units. You have: ' .
-                    $kingdomUnitInformation->amount .
+                    $unit->amount .
                     ' and are trying to send: ' .
                     $unitInformation['amount_to_send'] .
                     ' for: ' . $kingdom->name
@@ -157,12 +157,12 @@ class KingdomsAttackService {
 
             if ($unitInformation['amount_to_send'] > 0) {
                 $unitsToSend[] = [
-                    'unit_id'        => $unit->id,
+                    'unit_id'        => $unit->game_unit_id,
                     'amount'         => $unitInformation['amount_to_send'],
                     'time_to_return' => $unitInformation['total_time'],
                 ];
 
-                $kingdomUnitInformation->update([
+                $unit->update([
                     'amount' => $newAmountInKingdom,
                 ]);
             }
@@ -171,16 +171,25 @@ class KingdomsAttackService {
         return $unitsToSend;
     }
 
-    protected function fetchGameUnit(Kingdom $kingdom, string $unitName) {
-        Log::info($kingdom->units()->select('game_units.*')->join('game_units', function($join) use($unitName) {
-            $join->on('kingdom_units.game_unit_id', 'game_units.id')
-                ->where('game_units.name', $unitName);
-        })->first());
+    /**
+     * Fetches the unit off the kingdom.
+     * @param Kingdom $kingdom
+     * @param string $unitName
+     * @return KingdomUnit|null
+     */
+    protected function fetchGameUnit(Kingdom $kingdom, string $unitName): ?KingdomUnit {
+        $gameUnit = GameUnit::where('name', $unitName)->first();
+
+        if (is_null($gameUnit)) {
+            return null;
+        }
+
+        $unit = $kingdom->units->where('game_unit_id', $gameUnit->id)->first();
+
+        Log::info($unit);
         Log::info($unitName);
-        return $kingdom->units()->select('game_units.*')->join('game_units', function($join) use($unitName) {
-            $join->on('kingdom_units.game_unit_id', 'game_units.id')
-                 ->where('game_units.name', $unitName);
-        })->first();
+
+        return $kingdom->units->where('game_unit_id', $gameUnit->id)->first();
     }
 
     protected function fetchTotalTime(array $unitsToSend): int {

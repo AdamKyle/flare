@@ -121,6 +121,7 @@ class KingdomAttackControllerTest extends TestCase
 
         $content = json_decode($response->content());
 
+
         $this->assertEquals(200, $response->status());
 
         $this->assertEmpty($content);
