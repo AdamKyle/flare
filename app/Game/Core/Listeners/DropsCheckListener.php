@@ -5,10 +5,12 @@ namespace App\Game\Core\Listeners;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Item;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 
 class DropsCheckListener
@@ -16,8 +18,13 @@ class DropsCheckListener
 
     use CanHaveQuestItem;
 
-    public function __construct(RandomItemDropBuilder $randomItemDropBuilder) {
+    private $randomItemDropBuilder;
+
+    private $disenchantService;
+
+    public function __construct(RandomItemDropBuilder $randomItemDropBuilder, DisenchantService $disenchantService) {
         $this->randomItemDropBuilder = $randomItemDropBuilder;
+        $this->disenchantService     = $disenchantService;
     }
 
     /**
@@ -66,22 +73,43 @@ class DropsCheckListener
     }
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
-        if (!$event->character->isInventoryFull()) {
-            if ($this->canHaveItem($event->character, $item)) {
-                $event->character->inventory->slots()->create([
+        $character = $event->character;
+        $user      = $character->user;
+
+        if (!$character->isInventoryFull()) {
+            if ($this->canHaveItem($character, $item)) {
+                $slot = $character->inventory->slots()->create([
                     'item_id' => $item->id,
-                    'inventory_id' => $event->character->inventory->id,
+                    'inventory_id' => $character->inventory->id,
                 ]);
 
                 if ($item->type === 'quest') {
                     $message = $event->character->name . ' has found: ' . $item->affix_name;
 
                     broadcast(new GlobalMessageEvent($message));
+                } else if ($user->auto_disenchant) {
+                    if ($user->auto_disenchant_amount === 'all') {
+                        $this->disenchantService->disenchantWithSkill($character->refresh(), $slot);
+                    }
+
+                    if ($user->auto_disenchant_amount === '1-billion') {
+                        $cost = SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
+
+                        if ($cost >= 1000000000) {
+                            event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name, route('game.items.item', [
+                                'item' => $item
+                            ]), $item->id));
+                        } else {
+                            $this->disenchantService->disenchantWithSkill($character->refresh(), $slot);
+                        }
+                    }
+                } else {
+                    event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name, route('game.items.item', [
+                        'item' => $item
+                    ]), $item->id));
                 }
 
-                event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                    'item' => $item
-                ]), $item->id));
+
             }
         } else {
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));

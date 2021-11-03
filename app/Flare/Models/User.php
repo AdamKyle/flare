@@ -40,6 +40,8 @@ class User extends Authenticatable
         'show_building_upgrade_messages',
         'show_kingdom_update_messages',
         'show_building_rebuilt_messages',
+        'auto_disenchant',
+        'auto_disenchant_amount',
         'timeout_until',
         'is_test',
     ];
@@ -78,6 +80,7 @@ class User extends Authenticatable
         'show_building_upgrade_messages' => 'boolean',
         'show_kingdom_update_messages'   => 'boolean',
         'show_building_rebuilt_messages' => 'boolean',
+        'auto_disenchant'                => 'boolean',
     ];
 
     public function character() {

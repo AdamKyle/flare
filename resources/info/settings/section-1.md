@@ -82,18 +82,29 @@ There are some chat settings that are disabled by default for you. Feel free to 
     </a>
 </div>
 
-These mostly relate to those with large amounts of kingdoms.s
+## Auto Disenchant Settings
 
-Finally, we come to the security questions section at the bottom of the page:
+There are two settings for Auto Disenchant, which will use your disenchanting skill to disenchant items you would pick up.
+
+While your character technically still picks these items up, they are disenchanted for you automatically, so you won't be told
+of item drops.
 
 <div class="mb-4">
-    <a href="/storage/info/settings/images/security.png" class="glightbox">
-        <img src="/storage/info/settings/images/security.png" class="img-fluid" />
+    <a href="/storage/info/settings/images/auto-disenchant-setting.png" class="glightbox">
+        <img src="/storage/info/settings/images/auto-disenchant-setting.png" class="img-fluid" />
     </a>
 </div>
 
-Security questions are used to verify that you are who you say you are. These are used when you reset your password or submit an unban request.
+> ### ATTN New Players
+> 
+> Do not enable this at the start. The low end drops can be useful to you.
 
-Security questions must be unique and so must their answers.
+As you can see you can enable auto disenchant and then select a condition.
 
+- Disenchant All: Disenchants all items you find, no matter the base cost.
+- Keep items With Value of 1 Billion Gold (useful for Shadow Plane): Disenchants all items who's combined item and affix price is less than 1 billion gold.
+  - This is useful for players who make it to the Shadow Plane where drops are 75% more likely. Or those who have high looting chances.
 
+> ### ATTN!
+> 
+> This will auto disenchant items for Celestials and Regular battles. **NOT** adventures.

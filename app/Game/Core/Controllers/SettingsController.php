@@ -45,6 +45,22 @@ class SettingsController extends Controller {
         return redirect()->back()->with('success', 'Updated chat preferences.');
     }
 
+    public function autoDisenchantSettings(request $request, User $user) {
+
+        if ($request->has('auto_disenchant')) {
+            if (is_null($request->auto_disenchant_amount)) {
+                return redirect()->back()->with('error', 'You must select to either disenchant all items that drop or only those under 1 Billion gold.');
+            }
+        }
+
+        $user->update([
+            'auto_disenchant' => $request->has('auto_disenchant') ? $request->auto_disenchant : false,
+            'auto_disenchant_amount' => $request->has('auto_disenchant_amount') ? ($request->auto_disenchant_amount !== "" ? $request->auto_disenchant_amount : null) : null,
+        ]);
+
+        return redirect()->back()->with('success', 'Updated auto disenchant preferences.');
+    }
+
     public function characterSettings(Request $request, User $user) {
         $request->validate([
             'name' => 'required|string|max:15|min:5|unique:characters|regex:/^[a-zA-Z0-9]+$/',

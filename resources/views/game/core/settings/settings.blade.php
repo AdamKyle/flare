@@ -15,6 +15,9 @@
         @include('game.core.settings.partials.account-deletion', [
             'user' => $user,
         ])
+        @include('game.core.settings.partials.auto-disenchant-settings', [
+            'user' => $user,
+        ])
         @include('game.core.settings.partials.email-settings', [
             'user' => $user,
         ])
