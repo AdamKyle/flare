@@ -335,7 +335,7 @@ class CharacterInformationBuilder {
 
         if ($classType->isRanger()) {
             if ($voided) {
-                $healingAmount += $this->character->chr;
+                $healingAmount += $this->character->chr * 0.15;
             } else {
                 $healingAmount += $this->statMod('chr') * 0.15;
             }
@@ -786,11 +786,19 @@ class CharacterInformationBuilder {
             }
         }
 
-        if ($this->character->classType()->isFighter() || $this->character->classType()->isThief()) {
+        if ($this->character->classType()->isFighter()) {
             if ($voided) {
                 $statIncrease = $this->character->str * .15;
             } else {
                 $statIncrease = $this->statMod('str') * 0.15;
+            }
+
+            $damage = array_sum($damage) + $statIncrease;
+        } else if($this->character->classType()->isThief()) {
+            if ($voided) {
+                $statIncrease = $this->character->dex * .15;
+            } else {
+                $statIncrease = $this->statMod('dex') * 0.15;
             }
 
             $damage = array_sum($damage) + $statIncrease;

@@ -2,7 +2,6 @@
 
 namespace App\Game\Battle\Handlers;
 
-use Log;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -44,21 +43,15 @@ class BattleEventHandler {
     }
 
     public function processMonsterDeath(Character $character, int $monsterId) {
-        Log::info('Processing Monster Death: ' . $character->name . ' ' . $monsterId);
         $monster = Monster::find($monsterId);
 
-
         event(new UpdateCharacterEvent($character, $monster));
-        Log::info('UpdateCharacter event was called: ' . $character->name . ' ' . $monsterId);
         event(new DropsCheckEvent($character, $monster));
-        Log::info('Drops Check Event was called: ' . $character->name . ' ' . $monsterId);
         event(new GoldRushCheckEvent($character, $monster));
-        Log::info('Gold Rush Check Event was called: ' . $character->name . ' ' . $monsterId);
 
         $characterData = new Item($character, $this->characterAttackTransformer);
 
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
-        Log::info('UpdateAttackStats was called: ' . $character->name . ' ' . $monsterId);
     }
 
     public function processRevive(Character $character): Character {

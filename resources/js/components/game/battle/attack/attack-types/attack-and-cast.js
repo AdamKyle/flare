@@ -30,8 +30,6 @@ export default class AttackAndCast {
 
     this.battleMessages    = canEntranceEnemy.getBattleMessages();
 
-    const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
-
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
     if (canEntrance) {
@@ -45,6 +43,8 @@ export default class AttackAndCast {
       }
 
       this.setStateInfo(castAttack);
+
+      const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       if (attackData.spell_damage > 0) {
         castAttack.attackWithSpells(attackData);
@@ -71,6 +71,8 @@ export default class AttackAndCast {
       if (this.canBlock(attackData.spell_damage + attackData.weapon_damage)) {
         this.addEnemyActionMessage(this.defender.name + ' Blocked both your damage spell and attack!');
 
+        const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
+
         if (attackData.heal_for > 0) {
           castAttack.healWithSpells(attackData);
         }
@@ -83,6 +85,8 @@ export default class AttackAndCast {
       weaponAttack.attackWithWeapon(attackData);
 
       this.setStateInfo(weaponAttack);
+
+      const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       const canCast = canHitCheck.canCast(this.attacker, this.defender);
 
@@ -97,20 +101,19 @@ export default class AttackAndCast {
           this.addEnemyActionMessage('Your damage spell missed!');
         }
 
-
-
       } else if (attackData.heal_for > 0) {
         castAttack.healWithSpells(attackData);
       }
 
       this.setStateInfo(castAttack);
 
-
       this.useItems(attackData, this.attacker.class);
 
       return this.setState();
     } else {
       this.addMessage('Your damage spell missed and you fumbled with your weapon!');
+
+      const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       if (attackData.heal_for > 0) {
         castAttack.healWithSpells(attackData);
@@ -124,7 +127,6 @@ export default class AttackAndCast {
 
   setStateInfo(attackClass) {
     const state = attackClass.setState();
-
     this.monsterHealth          = state.monsterCurrentHealth;
     this.characterCurrentHealth = state.characterCurrentHealth;
 

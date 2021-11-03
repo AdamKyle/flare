@@ -2,7 +2,6 @@
 
 namespace App\Flare\Builders;
 
-use Log;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 
@@ -67,33 +66,22 @@ class RandomItemDropBuilder {
     public function generateItem(): Item {
 
         $item          = $this->getItem();
-        Log::info('Found item: ' . $item->affix_name);
         $duplicateItem = $this->duplicateItem($item);
-        Log::info('Created duplicate item: ' . $duplicateItem->affix_name);
         $affix         = $this->fetchRandomItemAffix();
-        Log::info('Found affix: ' . $affix->name . ' type: ' . $affix->type);
 
         if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
-            Log::info('Can set for prefix');
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         } else {
-            Log::info('Can set for suffix');
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         }
 
-        Log::info('Duplicate is not null?');
         if (is_null($duplicateItem)) {
-            Log::info('Duplicate is null');
             return $item;
         }
-        Log::info('Duplicate is NOT null');
 
         $duplicateItem->update([
             'market_sellable' => true,
         ]);
-
-        Log::info('Duplicate is market sellable');
-        Log::info('new item: ' . $duplicateItem);
 
         return $duplicateItem->refresh();
     }

@@ -32,8 +32,6 @@ export default class CastAndAttack {
 
     const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
-
     if (canEntrance) {
 
       if (attackData.spell_damage > 0) {
@@ -45,6 +43,8 @@ export default class CastAndAttack {
       }
 
       this.setStateInfo(castAttack);
+
+      const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       weaponAttack.attackWithWeapon(attackData);
 
@@ -69,6 +69,8 @@ export default class CastAndAttack {
       }
 
       this.setStateInfo(castAttack);
+
+      const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       weaponAttack.attackWithWeapon(attackData);
 
@@ -100,6 +102,8 @@ export default class CastAndAttack {
       }
 
       this.setStateInfo(castAttack);
+
+      const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       const canHit = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, this.voided);
 

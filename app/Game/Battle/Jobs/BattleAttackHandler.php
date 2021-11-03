@@ -2,7 +2,6 @@
 
 namespace App\Game\Battle\Jobs;
 
-use Log;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,7 +24,6 @@ class BattleAttackHandler implements ShouldQueue
     }
 
     public function handle(BattleEventHandler $battleEventHandler) {
-        Log::info('Should be here to process for character: ' . $this->character->name);
         $battleEventHandler->processMonsterDeath($this->character, $this->monsterId);
     }
 }
