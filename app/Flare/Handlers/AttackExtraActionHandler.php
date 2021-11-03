@@ -216,21 +216,21 @@ class AttackExtraActionHandler {
 
     private function calculateSpellDamage(int $spellDamage, $defender, Character $character, bool $voided = false): int {
         $spellEvasion = (float) $defender->spell_evasion;
-        $dc           = 100 - 100 * $spellEvasion;
-        $maxRole      = 100;
+        $dc           = 100;
+        $roll         = rand(1, 100);
         $classType    = $character->classType();
 
         if ($classType->isProphet() || $classType->isHeretic()) {
             $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
-            $maxRole              = ($voided ? $character->focus : $character->getInformation()->statMod('focus')) * (.05 + $castingAccuracyBonus);
-            $dc                   = $maxRole - $maxRole * $spellEvasion;
+            $roll                 -= $roll * $spellEvasion;
+            $dc                   -= $dc * $castingAccuracyBonus;
         }
 
         if ($dc === 0) {
             return $spellDamage;
         }
 
-        if (rand(0, $maxRole) > $dc) {
+        if ($roll > $dc) {
             return $spellDamage;
         }
 

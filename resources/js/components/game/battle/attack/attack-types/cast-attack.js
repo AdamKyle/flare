@@ -102,16 +102,17 @@ export default class CastAttack {
   attackWithSpells(attackData) {
 
     const evasion = this.defender.spell_evasion;
-    let dc        = 100 - 100 * evasion;
-    let maxRole   = 100
+    let dc        = 100;
+    let roll      = random(1, 100);
 
     if (this.attacker.class === 'Prophet' || this.attacker.class === 'Heretic') {
       const bonus = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus
-      maxRole     = (this.voided ? this.attacker.voided_focus : this.attacker.focus) * (0.05 + bonus);
-      dc          = maxRole - maxRole * evasion
+
+      dc   -= dc * bonus;
+      roll -= roll * evasion;
     }
 
-    if (random(1, maxRole) > dc) {
+    if (roll > dc && dc > 0) {
       this.addEnemyActionMessage('The enemy evades your magic!')
 
       return;

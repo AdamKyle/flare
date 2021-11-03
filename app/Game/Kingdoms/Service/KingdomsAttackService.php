@@ -8,6 +8,7 @@ use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Illuminate\Support\Facades\Log;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Facades\App\Flare\Values\UserOnlineValue;
@@ -62,7 +63,7 @@ class KingdomsAttackService {
         if (is_null($defender)) {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
         }
-
+        Log::info($params);
         foreach ($params as $kingdomName => $units) {
             $kingdom = Kingdom::where('character_id', $character->id)
                               ->where('name', $kingdomName)
@@ -75,6 +76,9 @@ class KingdomsAttackService {
             $unitsToSend = [];
 
             try {
+                Log::info($kingdomName);
+                Log::info($units);
+                Log::info($kingdom->name);
                 $unitsToSend = $this->fetchUnitsToSend($kingdom, $units);
             } catch (\Exception $e) {
                 return $this->errorResult($e->getMessage());
@@ -129,6 +133,8 @@ class KingdomsAttackService {
         $unitsToSend = [];
 
         foreach ($units as $unitName => $unitInformation) {
+            Log::info('Fetching Game Unit For: ' . $kingdom->name);
+            Log::info('Fetching Game Unit For: ' . $unitName);
             $unit = $this->fetchGameUnit($kingdom, $unitName);
 
             if (is_null($unit)) {
@@ -166,6 +172,11 @@ class KingdomsAttackService {
     }
 
     protected function fetchGameUnit(Kingdom $kingdom, string $unitName) {
+        Log::info($kingdom->units()->select('game_units.*')->join('game_units', function($join) use($unitName) {
+            $join->on('kingdom_units.game_unit_id', 'game_units.id')
+                ->where('game_units.name', $unitName);
+        })->first());
+        Log::info($unitName);
         return $kingdom->units()->select('game_units.*')->join('game_units', function($join) use($unitName) {
             $join->on('kingdom_units.game_unit_id', 'game_units.id')
                  ->where('game_units.name', $unitName);
