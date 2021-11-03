@@ -114,6 +114,7 @@ class CastHandler {
             $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+            dump($this->attackExtraActionHandler->getMessages());
             $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
             $this->attackExtraActionHandler->resetMessages();
@@ -147,6 +148,7 @@ class CastHandler {
 
             $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
 
+            dump($this->attackExtraActionHandler->getMessages());
             $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
             $this->attackExtraActionHandler->resetMessages();

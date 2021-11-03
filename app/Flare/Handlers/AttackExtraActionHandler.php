@@ -70,6 +70,7 @@ class AttackExtraActionHandler {
 
     protected function tripleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
+        $character = $characterInformationBuilder->getCharacter();
 
         if ($classType->isRanger()) {
             $attackerInfo = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData();
@@ -219,14 +220,31 @@ class AttackExtraActionHandler {
         $dc           = 100;
         $roll         = rand(1, 100);
         $classType    = $character->classType();
+        $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
+        $focus                = $character->getInformation()->statMod('focus');
 
-        if ($classType->isProphet() || $classType->isHeretic()) {
-            $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
-            $roll                 -= $roll * $spellEvasion;
-            $dc                   -= $dc * $castingAccuracyBonus;
+        if ($voided) {
+            $focus = $character->focus;
         }
 
-        if ($dc === 0) {
+        if ($classType->isProphet() || $classType->isHeretic()) {
+            $focus                 = $focus * 0.02;
+            $castingAccuracyBonus += $focus;
+        }
+
+        $castingAccuracyBonus = $castingAccuracyBonus - $spellEvasion;
+
+        if ($castingAccuracyBonus < 0.0) {
+            $castingAccuracyBonus = 0.0;
+        }
+
+        $dc -= $dc * $castingAccuracyBonus;
+
+        if ($dc > 100) {
+            $dc = 99;
+        }
+
+        if ($dc <= 0.0) {
             return $spellDamage;
         }
 
