@@ -2,34 +2,17 @@
 
 namespace App\Flare\Builders;
 
-use Illuminate\Database\Eloquent\Collection;
+use Log;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 
 class RandomItemDropBuilder {
-
-    /**
-     * @var Collection $itemAffixes
-     */
-    private $itemAffixes;
 
     private $monsterPlane;
 
     private $characterLevel = 0;
 
     private $monsterLevel   = 0;
-
-    /**
-     * Set the item affixes
-     *
-     * @param Colletion $itemAffixes
-     * @return RandomItemDropBuilder
-     */
-    public function setItemAffixes(Collection $itemAffixes): RandomItemDropBuilder {
-        $this->itemAffixes = $itemAffixes;
-
-        return $this;
-    }
 
     /**
      * Set the monster plane.
@@ -82,30 +65,42 @@ class RandomItemDropBuilder {
      * @return Item
      */
     public function generateItem(): Item {
+
         $item          = $this->getItem();
+        Log::info('Found item: ' . $item->affix_name);
         $duplicateItem = $this->duplicateItem($item);
+        Log::info('Created duplicate item: ' . $duplicateItem->affix_name);
         $affix         = $this->fetchRandomItemAffix();
+        Log::info('Found affix: ' . $affix->name . ' type: ' . $affix->type);
 
         if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
+            Log::info('Can set for prefix');
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         } else {
+            Log::info('Can set for suffix');
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         }
 
+        Log::info('Duplicate is not null?');
         if (is_null($duplicateItem)) {
+            Log::info('Duplicate is null');
             return $item;
         }
+        Log::info('Duplicate is NOT null');
 
         $duplicateItem->update([
             'market_sellable' => true,
         ]);
+
+        Log::info('Duplicate is market sellable');
+        Log::info('new item: ' . $duplicateItem);
 
         return $duplicateItem->refresh();
     }
 
     protected function getItem(): Item {
         $query =  Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])
-                                    ->whereNotIn('type', ['artifact', 'quest', 'alchemy']);
+                                       ->whereNotIn('type', ['artifact', 'quest', 'alchemy']);
 
 
         $totalLevels = $this->monsterLevel - $this->characterLevel;
@@ -114,7 +109,7 @@ class RandomItemDropBuilder {
             $query = $query->where('can_drop', true);
         }
 
-        return $query->get()->first();
+        return $query->first();
     }
 
     protected function attachAffixOrDelete(Item $duplicateItem, ItemAffix $affix) {
@@ -144,33 +139,38 @@ class RandomItemDropBuilder {
 
         if ($itemAffix->type === 'suffix') {
             if (!is_null($item->itemPrefix)) {
-                $affixes = array_values($this->itemAffixes->where('type', 'prefix')->all());
 
-                $item->update(['item_prefix_id' => $affixes[rand(0, count($affixes) - 1)]->id]);
+                $affix = $this->fetchRandomItemAffix('suffix');
+
+                $item->update(['item_prefix_id' => $affix->id]);
             }
         }
 
         if ($itemAffix->type === 'prefix') {
             if (!is_null($item->itemSuffix)) {
-                $affixes = array_values($this->itemAffixes->where('type', 'suffix')->all());
+                $affix = $this->fetchRandomItemAffix('suffix');
 
-                $item->update(['item_suffix_id' => $affixes[rand(0, count($affixes) - 1)]->id]);
+                $item->update(['item_suffix_id' => $affix->id]);
             }
         }
 
         return $item->refresh();
     }
 
-    protected function fetchRandomItemAffix(): ItemAffix {
+    protected function fetchRandomItemAffix(string $type = null): ItemAffix {
 
         $totalLevels = $this->monsterLevel - $this->characterLevel;
 
-        if ($this->monsterPlane === 'Shadow Plane' && $totalLevels >= 10) {
-            return ItemAffix::inRandomOrder()->first();
+        $query = ItemAffix::inRandomOrder();
+
+        if ($this->monsterPlane !== 'Shadow Plane' && !($totalLevels >= 10)) {
+            $query->where('can_drop', true);
         }
 
-        $index = count($this->itemAffixes) - 1;
+        if (!is_null($type)) {
+            $query->where('type', $type);
+        }
 
-        return $this->itemAffixes[rand(0, $index)];
+        return $query->first();
     }
 }

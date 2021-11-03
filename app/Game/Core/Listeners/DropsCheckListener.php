@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
+use Log;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
@@ -16,6 +17,10 @@ class DropsCheckListener
 {
 
     use CanHaveQuestItem;
+
+    public function __construct(RandomItemDropBuilder $randomItemDropBuilder) {
+        $this->randomItemDropBuilder = $randomItemDropBuilder;
+    }
 
     /**
      * Handle the event.
@@ -36,14 +41,15 @@ class DropsCheckListener
         $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
 
         if ($canGetDrop) {
-            $drop = resolve(RandomItemDropBuilder::class)
-                        ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
-                        ->setMonsterPlane($event->monster->gameMap->name)
-                        ->setCharacterLevel($event->character->level)
-                        ->setMonsterMaxLevel($event->monster->max_level)
-                        ->generateItem();
+            Log::info('Attempting to generate item ' . $event->character->name);
+            $drop = $this->randomItemDropBuilder
+                         ->setMonsterPlane($event->monster->gameMap->name)
+                         ->setCharacterLevel($event->character->level)
+                         ->setMonsterMaxLevel($event->monster->max_level)
+                         ->generateItem();
 
             if (!is_null($drop)) {
+                Log::info('Drop Name ' . $event->character->name . ' Name: ' . $drop->affix_name);
                 if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {
                     $this->attemptToPickUpItem($event, $drop);
 
@@ -64,10 +70,11 @@ class DropsCheckListener
     }
 
     protected function attemptToPickUpItem(DropsCheckEvent $event, Item $item) {
-        dump($event->character->isInventoryFull());
+        Log::info('Attempting to pick up item ' . $event->character->name);
         if (!$event->character->isInventoryFull()) {
-
+            Log::info('Can I have the item? ' . $event->character->name);
             if ($this->canHaveItem($event->character, $item)) {
+                Log::info('I Can Has have the item! ' . $event->character->name);
                 $event->character->inventory->slots()->create([
                     'item_id' => $item->id,
                     'inventory_id' => $event->character->inventory->id,
@@ -84,6 +91,7 @@ class DropsCheckListener
                 ]), $item->id));
             }
         } else {
+            \Log::info('No item ' . $event->character->name);
             event(new ServerMessageEvent($event->character->user, 'inventory_full'));
         }
     }

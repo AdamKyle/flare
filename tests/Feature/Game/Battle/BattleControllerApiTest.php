@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Battle;
 
+use App\Flare\Models\Character;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Events\ServerMessageEvent;
@@ -14,6 +15,7 @@ use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -177,6 +179,7 @@ class BattleControllerApiTest extends TestCase
                          ->response;
 
         $this->assertEquals(200, $response->status());
+
     }
 
     public function testBattleResultsMonsterIsDead() {

@@ -37,7 +37,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => ['daily', 'battle_processing'],
             'ignore_exceptions' => false,
         ],
 
@@ -52,6 +52,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => 'debug',
             'days' => 14,
+        ],
+
+        'battle_processing' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/battle_processing.log'),
+            'level' => 'info',
+            'bubble' => false
         ],
 
         'slack' => [

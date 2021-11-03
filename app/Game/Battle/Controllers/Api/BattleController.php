@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use Illuminate\Http\Request;
@@ -49,6 +50,11 @@ class BattleController extends Controller {
 
         $foundCharacter = $user->character;
         $character      = new Item($foundCharacter, $this->character);
+
+        if (!Cache::has('monsters')) {
+            resolve(BuildMonsterCacheService::class)->buildCache();
+        }
+
         $monsters       = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
 
         return response()->json([

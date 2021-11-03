@@ -52,7 +52,6 @@ class RewardBuilder {
 
         if ($hasDrop) {
             return resolve(RandomItemDropBuilder::class)
-                        ->setItemAffixes(ItemAffix::where('can_drop', true)->get())
                         ->generateItem();
         }
 
