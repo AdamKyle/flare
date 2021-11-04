@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Popover, OverlayTrigger} from 'react-bootstrap';
 
 export default class Recruit extends React.Component {
@@ -11,6 +11,8 @@ export default class Recruit extends React.Component {
       value: "",
       canRecruit: true,
       loading: false,
+      recruitmentType: '',
+      totalCost: 0,
     }
   }
 
@@ -40,6 +42,24 @@ export default class Recruit extends React.Component {
     });
   }
 
+  amountChangeWithGold(event) {
+    let value = parseInt(event.target.value) || '';
+
+    if (value !== '') {
+      if (value > this.state.max) {
+        value = this.state.max;
+      }
+    }
+
+    this.setState({
+      value: value,
+      canRecruit: this.canRecruitWithGold(value) && value > 0,
+      totalCost: value * this.props.unit.cost_per_unit,
+    }, () => {
+      this.props.updateAmount(this.state.value);
+    });
+  }
+
   recruitUnits() {
     this.setState({
       canRecruit: false,
@@ -47,6 +67,8 @@ export default class Recruit extends React.Component {
     }, () => {
       axios.post('/api/kingdoms/' + this.props.kingdom.id + '/recruit-units/' + this.props.unit.id, {
         amount: this.state.value,
+        recruitment_type: this.state.recruitmentType,
+        total_cost: this.state.totalCost
       }).then((result) => {
         const amount = this.state.value;
 
@@ -103,6 +125,15 @@ export default class Recruit extends React.Component {
     return notEnoughTypes.length === 0;
   }
 
+  canRecruitWithGold(value) {
+    let cost = this.props.unit.cost_per_unit;
+
+    cost *= value;
+    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+
+    return characterGold >= cost;
+  }
+
   getKingdomAmount(prop) {
     switch (prop) {
       case 'wood_cost':
@@ -118,6 +149,14 @@ export default class Recruit extends React.Component {
       default:
         return 0;
     }
+  }
+
+  handleRecruitmentType(event) {
+    this.setState({
+      recruitmentType: event.target.value,
+      value: 0,
+      canRecruit: false,
+    });
   }
 
   render() {
@@ -142,7 +181,7 @@ export default class Recruit extends React.Component {
             <dl className="mb-3">
               <dt><strong>Current Population</strong>:</dt>
               <dd>
-                {this.state.max}
+                {this.state.max.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <OverlayTrigger
                   trigger="hover"
                   key='right'
@@ -165,7 +204,7 @@ export default class Recruit extends React.Component {
               </dd>
               <dt><strong>Maximum Allowed:</strong>: </dt>
               <dd>
-                {this.props.unit.kd_max}
+                {this.props.unit.kd_max.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <OverlayTrigger
                   trigger="hover"
                   key='right'
@@ -185,18 +224,64 @@ export default class Recruit extends React.Component {
                 </OverlayTrigger>
               </dd>
             </dl>
-            <input
-              className="form-control"
-              type="number"
-              min={0}
-              max={this.state.max}
-              value={this.state.value}
-              onChange={this.amountChange.bind(this)}
-            />
+            <div className="form-group">
+              <label htmlFor="unit-recruitment-type">Recruitment Type</label>
+              <select className="form-control" id="unit-recruitment-type" value={this.state.recruitmentType} onChange={this.handleRecruitmentType.bind(this)}>
+                <option value={''}>Please select</option>
+                <option value={'recruit-normally'}>Recruit Normally (Costs Resources)</option>
+                <option value={'recruit-with-gold'}>Recruit with gold</option>
+              </select>
+            </div>
+            {
+              this.state.recruitmentType === 'recruit-normally' ?
+                <Fragment>
+                  <input
+                    className="form-control"
+                    type="number"
+                    name="recruit-normally-amount"
+                    min={0}
+                    max={this.state.max}
+                    value={this.state.value}
+                    onChange={this.amountChange.bind(this)}
+                  />
+                </Fragment>
+              : null
+            }
+
+            {
+              this.state.recruitmentType === 'recruit-with-gold' ?
+                <Fragment>
+                  <div className="alert alert-info">
+                    <p>You can pay gold instead of resources to recruit units.</p>
+                    <p>You cannot buy more units then your population allows. You also cannot buy
+                    more units then you have gold. Each unit has a cost per unit.</p>
+                    <p>Recruitment time still counts. The more you recruit the more time it takes.</p>
+                  </div>
+                  <dl className="mt-3 mb-3">
+                    <dt>Cost per unit:</dt>
+                    <dd>{this.props.unit.cost_per_unit}</dd>
+                    <dt>Your Gold:</dt>
+                    <dd>{this.props.characterGold}</dd>
+                    <dt>Current Price:</dt>
+                    <dd className={!this.state.canRecruit ? 'text-danger' : 'text-success'}>{this.state.totalCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
+                  </dl>
+                  <input
+                    className="form-control"
+                    name="recruit-normally-amount"
+                    type="number"
+                    min={0}
+                    max={this.state.max}
+                    value={this.state.value}
+                    onChange={this.amountChangeWithGold.bind(this)}
+                  />
+                </Fragment>
+                : null
+            }
+
           </div>
           <div className="col-md-6">
             <button className="btn btn-primary unit-recruit-button"
-                    disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more}
+                    disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
                     onClick={this.recruitUnits.bind(this)}
             >
               Recruit Selected Amount

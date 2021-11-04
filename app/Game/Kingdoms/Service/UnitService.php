@@ -2,12 +2,14 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
+use App\Game\Kingdoms\Values\UnitCosts;
 use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -33,21 +35,32 @@ class UnitService {
      * @param GameUnit $gameUnit
      * @param int $amount
      */
-    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
+    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
+        $totalTime        = $gameUnit->time_to_recruit * $amount;
         $timeTillFinished = $gameUnit->time_to_recruit * $amount;
         $timeTillFinished = now()->addSeconds($timeTillFinished);
+
+        $goldPaid = null;
+
+        if ($paidGold) {
+            $goldPaid = (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
+        }
 
         $queue = UnitInQueue::create([
             'character_id' => $kingdom->character->id,
             'kingdom_id'   => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount'       => $amount,
+            'gold_paid'    => $goldPaid,
             'completed_at' => $timeTillFinished,
             'started_at'   => now(),
         ]);
 
-
-        RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
+        if ($totalTime > 900) {
+            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay(now()->addMinutes(15));
+        } else {
+            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id)->delay($timeTillFinished);
+        }
     }
 
     /**
@@ -73,7 +86,24 @@ class UnitService {
     }
 
     /**
-     * Cancel a recturiment order.
+     * Allows the player to purchase units with gold.
+     *
+     * @param Kingdom $kingdom
+     * @param GameUnit $gameUnit
+     * @param int $amount
+     */
+    public function updateCharacterGold(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
+        $character = $kingdom->character;
+
+        $character->gold -= (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
+
+        $character->save();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+    }
+
+    /**
+     * Cancel a recruitment order.
      *
      * Can return false if resources gained back are too little.
      *
@@ -83,17 +113,31 @@ class UnitService {
      */
     public function cancelRecruit(UnitInQueue $queue, Manager $manager, KingdomTransformer $transfromer): bool {
 
-        $this->resourceCalculation($queue);
-
-        if (!($this->totalResources >= .10)) {
-           return false;
-        }
-
-        $unit    = $queue->unit;
         $kingdom = $queue->kingdom;
         $user    = $kingdom->character->user;
 
-        $kingdom = $this->updateKingdomAfterCancelation($kingdom, $unit, $queue);
+        if (!is_null($queue->gold_paid)) {
+            $character = $queue->character;
+
+            $character->gold += $queue->gold_paid * 0.75;
+
+            $character->save();
+
+            $kingdom->update([
+                'current_population' => $kingdom->current_population + $queue->amount * 0.75
+            ]);
+
+            event(new UpdateTopBarEvent($character->refresh()));
+        } else {
+            $this->resourceCalculation($queue);
+
+            if (!($this->totalResources >= .10)) {
+                return false;
+            }
+
+            $unit    = $queue->unit;
+            $kingdom = $this->updateKingdomAfterCancelation($kingdom, $unit, $queue);
+        }
 
         $queue->delete();
 

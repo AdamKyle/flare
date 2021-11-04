@@ -3,7 +3,9 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
+use App\Game\Kingdoms\Requests\KingdomUnitRecrutmentRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Kingdoms\Values\UnitCosts;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -140,11 +142,7 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function recruitUnits(Request $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service) {
-        $request->validate([
-            'amount' => 'required|integer',
-        ]);
-
+    public function recruitUnits(KingdomUnitRecrutmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service) {
         if ($request->amount > KingdomMaxValue::MAX_UNIT) {
             return response()->json([
                 'message' => 'Too many units'
@@ -171,9 +169,21 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
+        $paidGold = false;
 
-        $service->recruitUnits($kingdom, $gameUnit, $request->amount);
+        if ($request->recruitment_type === 'recruit-normally') {
+            $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
+        } else {
+            $service->updateCharacterGold($kingdom, $gameUnit, $request->amount);
+
+            $kingdom->update([
+                'current_population' => $kingdom->current_population - $request->amount
+            ]);
+
+            $paidGold = true;
+        }
+
+        $service->recruitUnits($kingdom, $gameUnit, $request->amount, $paidGold);
 
         $character = $kingdom->character;
 
@@ -271,6 +281,8 @@ class KingdomsController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
         event(new UpdateKingdom($character->user, $kingdom));
+
+        return response()->json([], 200);
     }
 
     public function deposit(KingdomDepositRequest $request, Kingdom $kingdom) {
@@ -317,5 +329,38 @@ class KingdomsController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
         event(new UpdateKingdom($character->user, $kingdom));
+
+        return response()->json([], 200);
+    }
+
+    public function purchasePeople(Request $request, Kingdom $kingdom) {
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => "Invalid Input. Not allowed to do that."
+            ], 422);
+        }
+
+        $amountToBuy = $request->amount_to_purchase;
+
+        $character = $kingdom->character;
+
+        $character->gold -= (new UnitCosts('Person'))->fetchCost() * $amountToBuy;
+
+        $character->save();
+
+        $character = $character->refresh();
+
+        $kingdom->update([
+            'current_population' => $kingdom->current_population + $amountToBuy,
+        ]);
+
+        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateKingdom($character->user, $kingdom));
+
+        return response()->json([], 200);
     }
 }

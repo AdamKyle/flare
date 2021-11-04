@@ -135,7 +135,7 @@ export default class Damage {
       defender = defender.monster;
     }
 
-    let dc        = 75 + (75 * defender.spell_evasion);
+    let dc          = 75 + (75 * defender.spell_evasion);
     let roll        = random(1, 100);
     let totalDamage = (attacker.spell_damage + attacker.spell_damage * .15).toFixed(0);
 

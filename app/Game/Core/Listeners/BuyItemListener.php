@@ -19,10 +19,10 @@ class BuyItemListener
             'item_id'      => $event->item->id,
         ]);
 
-        $event->character->refresh();
+        $character = $event->character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-        event(new UpdateTopBarEvent($event->character));
+        event(new UpdateTopBarEvent($character));
     }
 }

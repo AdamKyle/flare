@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameBuildingUnit;
+use App\Game\Kingdoms\Values\UnitCosts;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\GameUnit;
 
@@ -38,6 +39,7 @@ class UnitTransformer extends TransformerAbstract {
             'max_amount'           => $unit->kingdom_max_amount,
             'kd_max'               => $unit->max_recruitable,
             'can_recruit_more'     => $unit->can_recruit_more,
+            'cost_per_unit'        => (new UnitCosts($unit->name))->fetchCost(),
             'recruited_from'       => GameBuildingUnit::where('game_unit_id', $unit->id)->first()->gameBuilding,
         ];
     }

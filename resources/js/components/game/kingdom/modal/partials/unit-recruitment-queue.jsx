@@ -28,7 +28,10 @@ export default class UnitRecruitmentQueue extends React.Component {
       {
         key: "amount",
         text: "Recruiting Amount",
-        sortable: true
+        sortable: true,
+        cell: row => <div data-tag="allowRowEvents">
+          <div>{row.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+        </div>,
       },
       {
         name: "completed-at",
@@ -52,11 +55,31 @@ export default class UnitRecruitmentQueue extends React.Component {
 
     let duration = moment.duration(then.diff(now)).asSeconds();
 
+    const isDays = (duration / 86400) > 1;
     const isHours = (duration / 3600) > 1;
     const isMinutes = (duration / 60) > 1;
 
     if (duration > 0) {
-      if (isHours) {
+      if (isDays) {
+        return (
+          <>
+            <div className="float-left">
+              <CountdownCircleTimer
+                isPlaying={true}
+                duration={duration}
+                initialRemainingTime={duration}
+                colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+                size={40}
+                strokeWidth={2}
+                onComplete={() => [false, 0]}
+              >
+                {({remainingTime}) => (remainingTime / 86400).toFixed(0)}
+              </CountdownCircleTimer>
+            </div>
+            <div className="float-left mt-2 ml-3">Days</div>
+          </>
+        )
+      } else if (isHours) {
         return (
           <>
             <div className="float-left">

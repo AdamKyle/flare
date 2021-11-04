@@ -2,6 +2,7 @@ import React from 'react';
 import Embezzel from './embezzel';
 import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import Deposit from "./deposit";
+import Population from "./population";
 
 const renderDeposit = (props) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -23,6 +24,13 @@ const renderHelp = (props) => (
     This comes from the amount of gold in your kingdom divided by the max amount of gold (2 billion) your kingdom can have.
     This defence is also applied, albeit at half, to your kingdom when items are dropped on your kingdom as a percentage towards
     damage reduction.
+  </Tooltip>
+);
+
+const renderPopulation = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    A kingdom can buy more people. These people will show up instantly. How ever, be cautioned. If you have more people then you are allowed at the
+    Hourly reset, your kingdom treasury will loose 10,000 gold PER person over the cap. Buying people is only done to increase your military.
   </Tooltip>
 );
 
@@ -89,6 +97,18 @@ export default class KingdomInfo extends React.Component {
     return (currentMoraleDecrease * 100).toFixed(2);
   }
 
+  showBuyPeople() {
+    this.setState({
+      showBuyPeople: true,
+    });
+  }
+
+  closeBuyPeople() {
+    this.setState({
+      showBuyPeople: false,
+    });
+  }
+
   showEmbezzel() {
     this.setState({
       showEmbezzel: true,
@@ -127,6 +147,13 @@ export default class KingdomInfo extends React.Component {
     });
   }
 
+  peoplePurchasedSuccess(amount) {
+    this.setState({
+      showSuccess: true,
+      successMessage: 'You dirty, dirty animal. I knew it! Purchased: ' + amount + ' People. Do you feel good about what you just did?',
+    })
+  }
+
   closeSuccess() {
     this.setState({
       showSuccess: false,
@@ -149,7 +176,20 @@ export default class KingdomInfo extends React.Component {
         <div className="row mt-3">
           <div className="col-md-3">
             <dl>
-              <dt><strong>Population</strong>:</dt>
+              <dt><strong>Population</strong>:
+                <p>
+                  <OverlayTrigger
+                    placement="bottom"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={renderPopulation}
+                  >
+                    <button className="btn btn-success btn-sm mr-2" onClick={this.showBuyPeople.bind(this)}>
+                      <i className="ra ra-gold-bar"></i>
+                    </button>
+
+                  </OverlayTrigger>
+                </p>
+              </dt>
               <dd>{this.props.kingdom.current_population} / {this.props.kingdom.max_population}</dd>
             </dl>
           </div>
@@ -171,7 +211,7 @@ export default class KingdomInfo extends React.Component {
                   overlay={renderDeposit}
                 >
                   <button className="btn btn-success btn-sm mr-2" onClick={this.showDeposit.bind(this)}>
-                    <i className="fas fa-dollar-sign"></i>
+                    <i className="ra ra-gold-bar"></i>
                   </button>
 
                 </OverlayTrigger>
@@ -181,7 +221,7 @@ export default class KingdomInfo extends React.Component {
                   overlay={renderWithdrawl}
                 >
                   <button className="btn btn-danger btn-sm" onClick={this.showEmbezzel.bind(this)}>
-                    <i className="fas fa-dollar-sign"></i>
+                    <i className="ra ra-gold-bar"></i>
                   </button>
 
                 </OverlayTrigger>
@@ -302,6 +342,13 @@ export default class KingdomInfo extends React.Component {
           treasury={this.props.kingdom.treasury}
           kingdomId={this.props.kingdom.id}
           depositSuccess={this.depositSuccess.bind(this)}
+          characterGold={this.props.characterGold}
+        />
+        <Population
+          show={this.state.showBuyPeople}
+          close={this.closeBuyPeople.bind(this)}
+          kingdomId={this.props.kingdom.id}
+          purchasedSuccess={this.peoplePurchasedSuccess.bind(this)}
           characterGold={this.props.characterGold}
         />
       </>

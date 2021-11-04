@@ -19,6 +19,8 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:120,1
     Route::post('/kingdoms/embezel/{kingdom}', ['as' => 'kingdom.embezzel', 'uses' => 'Api\KingdomsController@embezzel']);
     Route::post('/kingdoms/deposit/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@deposit']);
 
+    Route::post('/kingdoms/purchase-people/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@purchasePeople']);
+
     Route::post('/kingdoms/{character}/attack/selection', ['as' => 'kingdom.attack.selection', 'uses' => 'Api\KingdomAttackController@selectKingdoms']);
     Route::post('/kingdoms/{character}/attack', ['as' => 'kingdom.atack', 'uses' => 'Api\KingdomAttackController@attack']);
     Route::post('/use-items-on-kingdom/{character}', ['as' => 'kingdom.attack-with-items', 'uses' => 'Api\KingdomAttackController@useItems']);

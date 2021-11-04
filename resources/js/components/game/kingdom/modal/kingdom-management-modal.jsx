@@ -271,6 +271,7 @@ export default class KingdomManagementModal extends React.Component {
             characterId={this.props.characterId}
             updateKingdomData={this.props.updateKingdomData}
             openTimeOutModal={this.props.openTimeOutModal.bind(this)}
+            characterGold={this.props.characterGold}
           /> : null
         }
 

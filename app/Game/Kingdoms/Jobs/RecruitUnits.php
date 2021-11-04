@@ -80,6 +80,19 @@ class RecruitUnits implements ShouldQueue
             return;
         }
 
+        if (!$queue->completed_at->lessThanOrEqualTo(now())) {
+            // @codeCoverageIgnoreStart
+            RecruitUnits::dispatch(
+                $this->unit,
+                $this->kingdom,
+                $this->amount,
+                $this->queueId,
+            )->delay(now()->addMinutes(15));
+
+            return;
+            // @codeCoverageIgnoreEnd
+        }
+
         $amount = $this->amount;
 
         if ($this->kingdom->units->isEmpty()) {
@@ -123,7 +136,7 @@ class RecruitUnits implements ShouldQueue
             if ($user->show_unit_recruitment_messages) {
                 $message = $this->unit->name . ' finished recruiting for kingdom: ' .
                     $this->kingdom->name . ' on plane: ' . $plane . ' at: (X/Y) ' . $x . '/' . $y .
-                    '. You have a total of: ' . $amount;
+                    '. You have a total of: ' . number_format($amount);
 
 
                 event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));

@@ -23,6 +23,7 @@ class UnitInQueue extends Model
         'kingdom_id',
         'game_unit_id',
         'amount',
+        'gold_paid',
         'completed_at',
         'started_at',
     ];
@@ -34,6 +35,7 @@ class UnitInQueue extends Model
      */
     protected $casts = [
         'amount'       => 'integer',
+        'gold_paid'    => 'integer',
         'completed_at' => 'datetime',
         'started_at'   => 'datetime',
     ];

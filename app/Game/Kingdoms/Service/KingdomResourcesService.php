@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\KingdomBuilding;
@@ -107,6 +108,11 @@ class KingdomResourcesService {
 
             if ($lastTimeWalked < 30) {
                 $this->updateCurrentPopulation();
+
+                if ($this->kingdom->current_population > $this->kingdom->max_population) {
+                    $this->angryNpc();
+                }
+
                 $this->increaseCurrentResource();
                 $this->increaseTreasury();
             }
@@ -201,6 +207,110 @@ class KingdomResourcesService {
         broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
     }
 
+    protected function angryNpc() {
+        broadcast(new GlobalMessageEvent('The Old Man stomps around! "Why child! Why?! I warned you! time to pay up!"'));
+
+        $currentPop = $this->kingdom->current_population;
+        $maxPop     = $this->kingdom->max_population;
+
+        $currentPop = $currentPop - $maxPop;
+
+        $totalCost  = $currentPop * 10000;
+
+        $kingdomTreasury = $this->kingdom->treasury;
+        $characterGold   = $this->kingdom->character->gold;
+
+        if ($totalCost > $kingdomTreasury && $kingdomTreasury > 0) {
+            $totalCost = $totalCost - $kingdomTreasury;
+
+            $this->kingdom->treasury = 0;
+            $this->kingdom->save();
+
+            $this->kingdom = $this->kingdom->refresh();
+
+            broadcast(new GlobalMessageEvent('The Old Man grumbles! "Now I have to take the rest out of your pockets child!"'));
+        } else if ($totalCost <= $kingdomTreasury) {
+            $kingdomTreasury = $kingdomTreasury - $totalCost;
+
+            $this->kingdom->treasury = $kingdomTreasury;
+            $this->kingdom->save();
+
+            $this->kingdom = $this->kingdom->refresh();
+
+            $totalCost = 0;
+
+            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
+        }
+
+        if ($totalCost > $characterGold && $totalCost > 0) {
+            $totalCost = $totalCost - $characterGold;
+
+            $this->kingdom->character->update([
+                'gold' => 0
+            ]);
+
+            $this->kingdom = $this->kingdom->refresh();
+
+            broadcast(new GlobalMessageEvent('The Old Man smiles! "I told you I would collect whats owed!"'));
+            event(new UpdateTopBarEvent($this->kingdom->character->refresh()));
+        } else if ($totalCost <= $characterGold) {
+            $characterGold = $characterGold - $totalCost;
+
+            $this->kingdom->character->update([
+                'gold' => $characterGold
+            ]);
+
+            $this->kingdom = $this->kingdom->refresh();
+
+            $totalCost = 0;
+
+            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
+        }
+
+        if ($totalCost > 0 && $this->kingdom->character->gold === 0 && $this->kingdom->treasury === 0) {
+            broadcast(new GlobalMessageEvent('The Old Man is enraged "You messed with the wrong person!"'));
+
+            $this->reduceEverything();
+        }
+    }
+
+    protected function reduceEverything() {
+        $this->kingdom->update([
+            'current_stone'      => 0,
+            'current_wood'       => 0,
+            'current_clay'       => 0,
+            'current_iron'       => 0,
+            'current_population' => 0,
+            'current_morale'     => 0,
+            'treasury'           => 0,
+        ]);
+
+        $buildings = $this->kingdom->buildings;
+        $units = $this->kingdom->units;
+
+        foreach ($buildings as $building) {
+            $building->update([
+                'current_defence' => 0,
+                'current_durability' => 0,
+            ]);
+        }
+
+        foreach ($units as $unit) {
+            $unit->update([
+                'amount' => 0,
+            ]);
+        }
+
+        broadcast(new GlobalMessageEvent('The Old Man causes the ground to shake, the units to explode and the buildings to engulf in flames. People are dying left right and center as he Laughs. "I wanted you child!"'));
+
+        $this->kingdom = $this->kingdom->refresh();
+
+        $this->giveNPCKingdoms();
+        $this->removeKingdomFromMap();
+
+        broadcast(new GlobalMessageEvent('The Old Man walks away from the carnage, "I always collect ...."'));
+    }
+
     /**
      * Remove the kingdom from the map.
      *
@@ -216,7 +326,6 @@ class KingdomResourcesService {
 
         KingdomLog::where('from_kingdom_id', $this->kingdom->id)->delete();
         KingdomLog::where('to_kingdom_id', $this->kingdom->id)->delete();
-
 
         $this->kingdom->buildingsQueue()->truncate();
         $this->kingdom->unitsMovementQueue()->truncate();
