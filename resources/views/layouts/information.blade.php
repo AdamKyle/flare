@@ -88,17 +88,6 @@
                 <!-- End Sidebar scroll-->
             </aside>
 
-{{--            <aside class="left-sidebar info-sidebar" id="info-left-sidebar">--}}
-{{--              <!-- Sidebar scroll-->--}}
-{{--              <div class="scroll-sidebar">--}}
-{{--                  <!-- Sidebar navigation-->--}}
-{{--                  <nav class="sidebar-nav info-nav">--}}
-{{--                    @include('layouts.partials.sidebar.informationsidebar')--}}
-{{--                  </nav>--}}
-{{--                  <!-- End Sidebar navigation -->--}}
-{{--              </div>--}}
-{{--          </aside>--}}
-
           <div class="page-wrapper page p-5">
             <div class="container mb-5 info-text">
                 @yield('content')
@@ -114,10 +103,6 @@
     @livewireScripts
 
     <script>
-        // function showSideBar() {
-        //     foundSideBar = document.querySelector('#info-left-sidebar');
-        //     foundSideBar.classList.toggle('showSidebar');
-        // }
 
         var lightbox = GLightbox();
 

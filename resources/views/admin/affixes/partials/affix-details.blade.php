@@ -19,13 +19,15 @@
               <dt>Base Damage Modifier (affects skills):</dt>
               <dd class="{{$itemAffix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_damage_mod_bonus * 100}}%</dd>
               <dt>Base AC Modifier:</dt>
-              <dd class="{{$itemAffix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_ac_mod * 100}}%</dd>
+              <dd class="{{$itemAffix->base_ac_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_ac_mod_bonus * 100}}%</dd>
               <dt>Base Healing Modifier:</dt>
-              <dd class="{{$itemAffix->base_healing_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_healing_mod * 100}}%</dd>
+              <dd class="{{$itemAffix->base_healing_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_healing_mod_bonus * 100}}%</dd>
               <dt>Class Bonus Mod:</dt>
               <dd class="{{$itemAffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->class_bonus * 100}}%</dd>
               <dt>Base Fight Timeout Modifier:</dt>
               <dd class="{{$itemAffix->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->fight_time_out_mod_bonus * 100}}%</dd>
+              <dt>Base Move Timeout Modifier:</dt>
+              <dd class="{{$itemAffix->move_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->move_time_out_mod_bonus * 100}}%</dd>
             </dl>
           </x-tabs.tab-content-section>
           <x-tabs.tab-content-section tab="prefix-stats" active="false">

@@ -11,10 +11,12 @@ class DataTable extends Component
 {
     use WithPagination, WithSorting;
 
-    public $search      = '';
-    public $sortField   = 'skill_level_required';
-    public $perPage     = 10;
-    public $only        = null;
+    public $search       = '';
+    public $sortField    = 'skill_level_required';
+    public $perPage      = 10;
+    public $only         = null;
+    public $type         = null;
+    public $irresistible = false;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -59,6 +61,116 @@ class DataTable extends Component
             ->paginate($this->perPage);
     }
 
+    public function fetchSpecificStat() {
+        return ItemAffix::dataTableSearch($this->search)
+            ->where($this->type, '>', 0)
+            ->orderBy($this->sortField, $this->sortBy)
+            ->paginate($this->perPage);
+    }
+
+    public function fetchSkills() {
+        return ItemAffix::dataTableSearch($this->search)
+            ->where($this->type, '>', 0)
+            ->orderBy($this->sortField, $this->sortBy)
+            ->paginate($this->perPage);
+    }
+
+    public function fetchClassBonus() {
+        return ItemAffix::dataTableSearch($this->search)
+            ->where($this->type, '>', 0)
+            ->orderBy($this->sortField, $this->sortBy)
+            ->paginate($this->perPage);
+    }
+
+    public function fetchModifiers() {
+        if ($this->type === 'base_ac_mod_bonus') {
+            $affixes = ItemAffix::dataTableSearch($this->search)
+                ->whereNotNull($this->type)
+                ->get();
+
+            $affixes = $affixes->filter(function($affix) {
+                if (!is_null($affix->base_ac_mod_bonus)) {
+                    return $affix->base_ac_mod_bonus > 0.0;
+                }
+            });
+
+            if ($this->sortBy === 'asc') {
+                $affixes = $affixes->sortBy($this->sortField);
+            } else {
+                $affixes = $affixes->sortByDesc($this->sortField);
+            }
+
+            return $affixes->paginate($this->perPage);
+        }
+
+        return ItemAffix::dataTableSearch($this->search)
+            ->where($this->type, '>', 0)
+            ->orderBy($this->sortField, $this->sortBy)
+            ->paginate($this->perPage);
+    }
+
+    public function fetchDamage() {
+        if ($this->irresistible) {
+            $affixes = ItemAffix::dataTableSearch($this->search)
+                ->where('irresistible_damage', true)
+                ->get();
+        } else {
+            $affixes = ItemAffix::dataTableSearch($this->search)
+                ->where('irresistible_damage', false)
+                ->where('damage', '>', 0)
+                ->get();
+        }
+
+
+        if ($this->sortBy === 'asc') {
+            $affixes = $affixes->sortBy($this->sortField);
+        } else {
+            $affixes = $affixes->sortByDesc($this->sortField);
+        }
+
+        return $affixes->paginate($this->perPage);
+    }
+
+    public function fetchEntrancing() {
+        $affixes = ItemAffix::dataTableSearch($this->search)
+            ->whereNotNull('entranced_chance')
+            ->get();
+
+        $affixes = $affixes->filter(function($affix) {
+            if (!is_null($affix->base_ac_mod_bonus)) {
+                return $affix->entranced_chance > 0.0;
+            }
+        });
+
+        if ($this->sortBy === 'asc') {
+            $affixes = $affixes->sortBy($this->sortField);
+        } else {
+            $affixes = $affixes->sortByDesc($this->sortField);
+        }
+
+        return $affixes->paginate($this->perPage);
+    }
+
+    public function fetchDevouringLight() {
+        $affixes = ItemAffix::dataTableSearch($this->search)
+            ->whereNotNull('devouring_light')
+            ->get();
+
+        $affixes = $affixes->filter(function($affix) {
+            if (!is_null($affix->base_ac_mod_bonus)) {
+                return $affix->devouring_light > 0.0;
+            }
+        });
+
+        if ($this->sortBy === 'asc') {
+            $affixes = $affixes->sortBy($this->sortField);
+        } else {
+            $affixes = $affixes->sortByDesc($this->sortField);
+        }
+
+        return $affixes->paginate($this->perPage);
+    }
+
     public function render()
     {
         if ($this->search !== '') {
@@ -83,6 +195,27 @@ class DataTable extends Component
                     break;
                 case 'entrancing_chance':
                     $data = $this->fetchEntrancingAffixes();
+                    break;
+                case 'specific_stat':
+                    $data = $this->fetchSpecificStat();
+                    break;
+                case 'skills':
+                    $data = $this->fetchSkills();
+                    break;
+                case 'class_bonus':
+                    $data = $this->fetchSkills();
+                    break;
+                case 'modifiers':
+                    $data = $this->fetchModifiers();
+                    break;
+                case 'damage-dealing':
+                    $data = $this->fetchDamage();
+                    break;
+                case 'entrancing':
+                    $data = $this->fetchEntrancing();
+                    break;
+                case 'devouring_light':
+                    $data = $this->fetchDevouringLight();
                     break;
                 case 'default':
                     $data = $this->fetchAffixes();

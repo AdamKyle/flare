@@ -40,6 +40,7 @@ class MoveInfoFiles extends Command
      */
     public function handle()
     {
+        File::deleteDirectory(storage_path('app/public/info'));
         File::copyDirectory(resource_path('info'), storage_path('app/public/info'));
     }
 }

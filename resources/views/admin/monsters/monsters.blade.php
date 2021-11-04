@@ -56,7 +56,7 @@
                         </x-tabs.tab-content-section>
                         <x-tabs.tab-content-section
                           tab="{{$name . '-' . $index . '-celestials'}}"
-                          active="true"
+                          active="false"
                         >
                             @livewire('admin.monsters.data-table', [
                                 'onlyMapName' => $gameMapName,

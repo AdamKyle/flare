@@ -114,10 +114,11 @@
                                 <td>{{is_null($itemAffix->cost) ? 'N/A' : number_format($itemAffix->cost)}}</td>
                                 <td>{{is_null($itemAffix->skill_level_required) ? 'N/A' : $itemAffix->skill_level_required}}</td>
                                 <td>{{is_null($itemAffix->skill_level_trivial) ? 'N/A' : $itemAffix->skill_level_trivial}}</td>
-                                <td>
-                                    @guest
-                                    @else
-                                        @if(auth()->user()->hasRole('Admin'))
+
+                                @guest
+                                @else
+                                    @if(auth()->user()->hasRole('Admin'))
+                                        <td>
                                             <x-buttons.simple-button
                                                 button-route="{{route('affixes.edit', [
                                                     'affix' => $itemAffix->id
@@ -134,9 +135,10 @@
                                                 button-title="Delete"
                                                 class="btn btn-danger btn-sm"
                                             />
-                                        @endif
-                                    @endguest
-                                </td>
+                                        </td>
+                                    @endif
+                                @endguest
+
                             </tr>
                         @endforeach
                     </x.data-tables.body>
