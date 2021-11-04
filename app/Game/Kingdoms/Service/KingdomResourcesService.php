@@ -383,15 +383,18 @@ class KingdomResourcesService {
     }
 
     protected function updateCurrentPopulation() {
-        $building = $this->kingdom->buildings->where('is_farm', true)->first();
-        $morale   = $this->kingdom->current_morale;
+        $building   = $this->kingdom->buildings->where('is_farm', true)->first();
+        $morale     = $this->kingdom->current_morale;
+        $currentPop = $this->kingdom->current_population;
 
         if ($morale === 0 || $morale === 0.0) {
 
             $newAmount = $this->kingdom->current_population + 30;
 
-            if ($newAmount > $this->kingdom->max_population) {
-                $newAmount = $this->kingdom->max_population;
+            if ($currentPop <= $this->kingdom->max_population) {
+                if ($newAmount > $this->kingdom->max_population) {
+                    $newAmount = $this->kingdom->max_population;
+                }
             }
 
             $this->kingdom->update([
