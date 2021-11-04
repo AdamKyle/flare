@@ -220,6 +220,13 @@ class TraverseService {
      */
     protected function updateActions(int $mapId, Character $character) {
         $user      = $character->user;
+        $gameMap   = GameMap::find($mapId);
+
+        if ($gameMap->name === 'Shadow Plane') {
+            $this->updateAtctionTypeCache($character, $gameMap->enemy_stat_bonus);
+        } else {
+            $this->updateAtctionTypeCache($character, 0.0);
+        }
 
         $character = new Item($character, $this->characterAttackTransformer);
         $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
@@ -229,6 +236,22 @@ class TraverseService {
         broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
 
         event(new UpdateAttackStats($character, $user));
+    }
+
+    protected function updateAtctionTypeCache(Character $character, float $deduction) {
+        $attackData = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($attackData)) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
+            return;
+        }
+
+        foreach ($attackData as $key => $array) {
+            $attackData[$key]['damage_deduction'] = $deduction;
+        }
+
+        Cache::put('character-attack-data-' . $character->id, $attackData);
     }
 
     /**

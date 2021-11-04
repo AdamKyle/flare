@@ -30,8 +30,8 @@
                         'craftOnly'     => $section['craftOnly'],
                     ])
                 </div>
-                @else
-                    false
+                @elseif ($section['view'])
+                    @include($section['view'], $section['view_attributes'])
                 @endif
             @endif
 

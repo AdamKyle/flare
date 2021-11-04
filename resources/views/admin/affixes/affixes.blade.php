@@ -10,5 +10,5 @@
             <a href="{{route('affixes.create')}}" class="btn btn-primary float-right ml-2">Create</a>
         </div>
     </div>
-    @livewire('admin.affixes.data-table')
+    @include('admin.affixes.partials.enchantments.enchantments')
 @endsection

@@ -60,25 +60,29 @@ class InfoPageController extends Controller
                 $type          = null;
                 $craftOnly     = false;
 
+                $viewAttributes = isset(config('info.' . $pageName)[$index]['view_attributes']) ? config('info.' . $pageName)[$index]['view_attributes'] : null;
+
                 if (isset(config('info.' . $pageName)[$index])) {
-                    $view      = config('info.' . $pageName)[$index]['view'];
-                    $livewire  = config('info.' . $pageName)[$index]['livewire'];
-                    $only      = config('info.' . $pageName)[$index]['only'];
-                    $before    = config('info.' . $pageName)[$index]['insert_before_table'];
-                    $type      = config('info.' . $pageName)[$index]['type'];
-                    $craftOnly = config('info.' . $pageName)[$index]['craft_only'];
+                    $view                = config('info.' . $pageName)[$index]['view'];
+                    $viewAttributes      = $viewAttributes;
+                    $livewire            = config('info.' . $pageName)[$index]['livewire'];
+                    $only                = config('info.' . $pageName)[$index]['only'];
+                    $before              = config('info.' . $pageName)[$index]['insert_before_table'];
+                    $type                = config('info.' . $pageName)[$index]['type'];
+                    $craftOnly           = config('info.' . $pageName)[$index]['craft_only'];
                 }
 
                 $sections[] = [
-                    'content'       => Storage::disk('info')->get($files[$i]),
-                    'view'          => $view,
-                    'livewire'      => $livewire,
-                    'only'          => $only,
-                    'type'          => $type,
-                    'craftOnly'     => $craftOnly,
-                    'before'        => $before,
-                    'showSkillInfo' => $showSkillInfo,
-                    'showDropDown'  => $showDropDown,
+                    'content'         => Storage::disk('info')->get($files[$i]),
+                    'view'            => $view,
+                    'view_attributes' => $viewAttributes,
+                    'livewire'        => $livewire,
+                    'only'            => $only,
+                    'type'            => $type,
+                    'craftOnly'       => $craftOnly,
+                    'before'          => $before,
+                    'showSkillInfo'   => $showSkillInfo,
+                    'showDropDown'    => $showDropDown,
                 ];
             }
         }
@@ -128,6 +132,12 @@ class InfoPageController extends Controller
 
         return view('information.adventures.adventure', [
             'adventure' => $adventure,
+        ]);
+    }
+
+    public function viewMonsters() {
+        return view('information.monsters.monsters', [
+            'gameMapNames' => GameMap::all()->pluck('name')->toArray(),
         ]);
     }
 

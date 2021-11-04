@@ -1406,6 +1406,7 @@ class MapControllerApiTest extends TestCase
             ])
             ->response;
 
+
         $this->assertEquals(200, $response->status());
     }
 

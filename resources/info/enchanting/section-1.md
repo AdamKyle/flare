@@ -103,7 +103,8 @@ They can be destroyed or sold on the [market]() board. This provides a great way
 
 ## Stacking on and non stacking Enchants.
 
-Some high level enchants that can void, do damage, life steal and or raise stats might state they do not stack. What this means is particular aspects will not stack.
+Some high level enchants that can void, do damage, life steal and or raise stats - might state they do not stack.
+What this means is particular aspects will not stack and those are documented on the enchantment themselves.
 
 Let's take: Mages Golden Demonic Aspiration as an example.
 
@@ -116,9 +117,58 @@ Life stealing and the Damage does not stack? Because the stats do. If you search
 - Stats
 - Skills
 
-These three tabs **WILL** stack. If the damage was stackable, it would also stack.
+These three tabs **WILL** stack. If the damage was stackable, it would also stack. If you were a caster vampire with a high intelligence gear,
+you would want many of these for the life stacking.
 
 Make sure to investigate an enchantment that states it won't stack for any stackable information. For example 14 of these Enchantments
 on your gear would bring your modded intelligence 2800% higher. As a caster you would want this to do ungodly damage.
 
-# List Of Enchants
+## Enemies can resist damage
+
+Every enemy has a chance to resist your damaging affixes, specifically the ones who state their damage is not irresistible.
+If the damage is not irresistible, but can stack - the enemy has a chance to completely evade this damage.
+
+If the damage is irresistible, regardless of if it can stack or not, the enemy cannot - ever - resist this. Your damage may fluctuate
+if you have both stacking and non stacking damage affixes as the enemy can evade the non-irresistible damage reducing the total damage to that of just 
+stacking.
+
+## Class Bonus Affixes
+
+These do not stack. Having multiple of the same type of affix will not increase your class bonus any higher.
+
+Instead, if you have multiple, we will take the highest % value affix and use that.
+
+
+## Life Stealing Affixes
+
+These affixes steal life from the enemy. There is a trick to these affixes though, they are best suited for vampires.
+
+The reason for that is because, if your character is a vampire these affixes have a chance (that is, they are not voided) to fire during your attack along with your other affixes
+and again after the enemy attacks, assuming you or the enemy are not dead.
+
+For other classes, these affixes will only fire after the enemies turn, assuming you or the enemy are not dead.
+
+## Stat Reduction
+
+These affixes can and cannot stack.
+
+The prefix versions do not stack, and instead of taking the best one, we take the **first one** we find on your gear.
+
+The suffix versions do stack. You can have multiple different types or multiple of the same type.
+
+These Affixes fire before any other affix and before the monster's health is determined and can be voided,
+unless you have the right quest item or an affix that prevents voiding.
+
+## Entrancing
+
+These affixes have a chance to entrance the enemy. They fire after stat reduction affixes and before
+any other attack is done.
+
+These do not stack. We will **take the best** of the many you might have equipped.
+
+If these are successful, your enemy will not be able to dodge OR block. Your attack will land. Other affixes, spells and so
+on can be resisted, but your weapon cannot be blocked or miss.
+
+The enemy can then attack on their turn - the entrancing effect only lasts for your turn.
+
+

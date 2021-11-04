@@ -205,53 +205,19 @@ return [
     ],
     'enchanting' => [
         [
-            'livewire'            => true,
-            'view'                => 'admin.affixes.data-table',
+            'livewire'            => false,
+            'view'                => 'information.enchantments.enchantments',
+            'view_attributes'     => [
+                'str_mod', 'dex_mod', 'int_mod', 'chr_mod', 'dur_mod', 'agi_mod', 'focus_mod',
+                'str_reduction', 'dex_reduction', 'int_reduction', 'chr_reduction', 'dur_reduction', 'agi_reduction', 'focus_reduction',
+                'steal_life_amount', 'entranced_chance', 'irresistible_damage', 'class_bonus', 'base_damage_mod_bonus', 'base_healing_mod_bonus',
+                'base_ac_mod_bonus', 'fight_time_out_mod_bonus', 'move_time_out_mod_bonus', 'devouring_light',
+            ],
             'insert_before_table' => null,
             'only'                => null,
             'type'                => null,
             'craft_only'          => false,
         ],
-        [
-            'livewire'            => true,
-            'view'                => 'admin.affixes.data-table',
-            'insert_before_table' => null,
-            'only'                => 'class_bonus',
-            'type'                => null,
-            'craft_only'          => false,
-        ],
-        [
-            'livewire'            => true,
-            'view'                => 'admin.affixes.data-table',
-            'insert_before_table' => null,
-            'only'                => 'damage',
-            'type'                => null,
-            'craft_only'          => false,
-        ],
-        [
-            'livewire'            => true,
-            'view'                => 'admin.affixes.data-table',
-            'insert_before_table' => null,
-            'only'                => 'life_stealing',
-            'type'                => null,
-            'craft_only'          => false,
-        ],
-        [
-            'livewire'            => true,
-            'view'                => 'admin.affixes.data-table',
-            'insert_before_table' => null,
-            'only'                => 'stat_reduction',
-            'type'                => null,
-            'craft_only'          => false,
-        ],
-        [
-            'livewire'            => true,
-            'view'                => 'admin.affixes.data-table',
-            'insert_before_table' => null,
-            'only'                => 'entrancing_chance',
-            'type'                => null,
-            'craft_only'          => false,
-        ]
     ],
     'monsters' => [
         [

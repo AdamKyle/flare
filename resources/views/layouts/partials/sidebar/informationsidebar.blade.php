@@ -88,7 +88,7 @@
                 <a href="{{route('info.page', ['pageName' => 'celestials'])}}">Celestial List</a>
             </li>
             <li>
-                <a href="{{route('info.page', ['pageName' => 'monsters'])}}">Monsters List</a>
+                <a href="{{route('info.page.monsters-list')}}">Monsters List</a>
             </li>
             <li>
                 <a href="{{route('info.page', ['pageName' => 'quest-items'])}}">Quest Item List</a>
