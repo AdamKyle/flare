@@ -8,6 +8,7 @@ use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\Core\Events\CharacterBoonsUpdateBroadcastEvent;
@@ -71,6 +72,8 @@ class UseItemService {
     }
 
     public function updateCharacter(Character $character, Item $item = null) {
+        resolve(BuildCharacterAttackTypes::class)->buildCache($character->refresh());
+
         $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
 
         event(new UpdateAttackStats($this->manager->createData($characterAttack)->toArray(), $character->user));
@@ -86,7 +89,7 @@ class UseItemService {
             $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
 
             $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
-            $boon['affected_skills'] = implode(',', $skills);
+            $boon['affected_skills'] = implode(', ', $skills);
 
             $boons[$key] = $boon;
         }

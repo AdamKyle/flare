@@ -306,7 +306,7 @@ class AttackService {
 
             $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::TAKEN, $defender, $character);
 
-            $this->notifyHandler->kingdomHasFallenMessage($character);
+            $this->notifyHandler->kingdomHasFallenMessage($character, $defender->gameMap->name);
         } else {
 
             $defender->current_morale -= .10;

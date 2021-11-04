@@ -274,12 +274,10 @@ class NotifyHandler {
     /**
      * Broadcast a public message of the kingdom being taken.
      *
-     * @param $defender
      * @param Character $character
+     * @param string $gameMapName
      */
-    public function kingdomHasFallenMessage(Character $character) {
-        $map          = $character->map->gameMap->name;
-        
+    public function kingdomHasFallenMessage(Character $character, string $gameMapName) {
         if (is_null($this->defendingCharacter)) {
             $defenderName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
         } else {
@@ -287,7 +285,7 @@ class NotifyHandler {
         }
 
         $message = $defenderName. '\'s kingdom on the ' .
-            $map . ' plane, has fallen! ' .
+            $gameMapName . ' plane, has fallen! ' .
             $character->name . ' is now the rightful ruler!';
 
         broadcast(new GlobalMessageEvent($message));

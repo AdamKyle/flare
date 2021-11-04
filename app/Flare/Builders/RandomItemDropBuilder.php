@@ -151,12 +151,16 @@ class RandomItemDropBuilder {
 
         $query = ItemAffix::inRandomOrder();
 
-        if ($this->monsterPlane !== 'Shadow Plane' && !($totalLevels >= 10)) {
-            $query->where('can_drop', true);
+        if ($this->monsterPlane !== 'Shadow Plane') {
+            $query = $query->where('can_drop', true);
+        } else {
+            if (!$totalLevels >= 10) {
+                $query = $query->where('can_drop', true);
+            }
         }
 
         if (!is_null($type)) {
-            $query->where('type', $type);
+            $query = $query->where('type', $type);
         }
 
         return $query->first();
