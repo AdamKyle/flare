@@ -740,7 +740,8 @@ class MessageControllerApiTest extends TestCase
         $this->createCelestialFight([
             'monster_id'      => $this->createMonster([
                 'game_map_id' => $this->createGameMap([
-                    'name' => 'Shadow Plane'
+                    'name'             => 'Shadow Plane',
+                    'enemy_stat_bonus' => 0.25
                 ])
             ])->id,
             'character_id'    => $this->character->getCharacter(false)->id,

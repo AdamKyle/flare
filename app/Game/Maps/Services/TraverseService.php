@@ -241,6 +241,12 @@ class TraverseService {
     protected function updateAtctionTypeCache(Character $character, float $deduction) {
         $attackData = Cache::get('character-attack-data-' . $character->id);
 
+        if (is_null($attackData)) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
+            return;
+        }
+
         foreach ($attackData as $key => $array) {
             $attackData[$key]['damage_deduction'] = $deduction;
         }
