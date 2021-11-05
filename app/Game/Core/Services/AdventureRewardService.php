@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -48,8 +49,15 @@ class AdventureRewardService {
      * @return AdventureRewardService
      */
     public function distributeRewards(array $rewards, Character $character): AdventureRewardService {
-        $character->gold += $rewards['gold'];
-        $character->save();
+
+        $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
+
+        if (!$maxCurrencies->canNotGiveCurrency()) {
+            $character->gold += $rewards['gold'];
+            $character->save();
+        } else {
+            $this->messages[] = 'You are at or near, gold cap and get no gold for this adventure.';
+        }
 
         $this->handleXp($rewards['exp'], $character);
         $this->handleSkillXP($rewards, $character);

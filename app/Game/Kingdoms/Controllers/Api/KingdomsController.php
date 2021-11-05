@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Requests\KingdomUnitRecrutmentRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -243,6 +244,15 @@ class KingdomsController extends Controller {
 
     public function embezzel(KingdomEmbezzelRequest $request, Kingdom $kingdom) {
         $amountToEmbezzel = $request->embezzel_amount;
+        $newAGoldAmount   = $kingdom->character->gold + $amountToEmbezzel;
+
+        $maxCurrencies = new MaxCurrenciesValue($newAGoldAmount, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            return response()->json([
+                'message' => number_format($amountToEmbezzel) . " Would yput you well over the gold cap limit."
+            ], 422);
+        }
 
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([

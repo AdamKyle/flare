@@ -34,7 +34,7 @@
                 </x-cards.card>
 
                 <x-cards.card>
-                    <p><strong>Your Gold</strong>: <span class="color-gold">{{number_format($gold)}}</strong></p>
+                  <p><strong>Your Gold</strong>: <span class="color-gold">{{number_format($gold)}}</span></p>
                 </x-cards.card>
 
                 <h4 class="mb-2">Items</h4>

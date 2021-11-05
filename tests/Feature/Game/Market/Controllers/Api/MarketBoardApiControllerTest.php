@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Market\Controllers\Api;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Values\MaxCurrenciesValue;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -704,6 +705,43 @@ class MarketBoardApiControllerTest extends TestCase {
         ])->response;
 
         $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanPurchaseItemTheOtherCharacterIsGoldCapped() {
+        $this->createLocation([
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+            'game_map_id' => GameMap::first()->id,
+            'name' => Str::random(10),
+            'description' => Str::random(40),
+        ]);
+
+        $otherCharacter = (new CharacterFactory())->createBaseCharacter()->updateCharacter([
+            'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
+        ])->getCharacter(false);
+
+        $otherCharacterGold = $otherCharacter->gold;
+
+        $item = $this->createItem([
+            'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
+            'market_sellable' => true,
+            'type'            => 'weapon',
+        ]);
+
+        $marketBoardListing = $this->createMarketBoardListing([
+            'item_id'      => $item->id,
+            'character_id' => $otherCharacter->id,
+            'listed_price' => 1
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('POST', '/api/market-board/purchase/' . $this->character->getCharacter(false)->id, [
+            'market_board_id' => $marketBoardListing->id,
+        ])->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertEquals($otherCharacterGold, $otherCharacter->gold);
     }
 
     public function testCannotPurchaseItemThatDoesntExist() {

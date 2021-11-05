@@ -5,6 +5,7 @@ namespace App\Game\Market\Controllers\Api;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Item as ItemModel;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -240,17 +241,25 @@ class MarketController extends Controller {
             'sold_for' => $listing->listed_price,
         ]);
 
-        $listing->character->update([
-            'gold' => $listing->character->gold + ($listing->listed_price - ($listing->listed_price * 0.05)),
-        ]);
+        $maxCurrencies = new MaxCurrenciesValue($character->gold, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {;
+            $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax). However, you got no gold as you are capped!';
+
+            event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
+        } else {
+            $listing->character->update([
+                'gold' => $listing->character->gold + ($listing->listed_price - ($listing->listed_price * 0.05)),
+            ]);
+
+            $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax).';
+
+            event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
+        }
 
         event(new UpdateTopBarEvent($listing->character->refresh()));
         event(new UpdateTopBarEvent($character->refresh()));
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax).';
-
-        event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
 
         $listing->delete();
 

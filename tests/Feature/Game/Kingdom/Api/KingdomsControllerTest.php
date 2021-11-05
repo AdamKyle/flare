@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Kingdom\Api;
 
+use App\Flare\Values\MaxCurrenciesValue;
 use DB;
 use Cache;
 use Mockery;
@@ -386,9 +387,33 @@ class KingdomsControllerTest extends TestCase
             'embezzel_amount' => 2000
         ])->response;
 
+
         $this->assertEquals(200, $response->status());
 
         $this->assertEquals(0, Kingdom::first()->treasury);
+    }
+
+    public function testCannotEmbezzelTooMuchGoldOnHand() {
+        $this->createKingdom([
+            'character_id' => Character::first()->id,
+            'game_map_id'  => GameMap::first()->id,
+            'treasury'     => 2000,
+        ]);
+
+        $this->character->updateCharacter([
+            'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
+        ]);
+
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+            'kingdom' => Kingdom::first()->id
+        ]), [
+            'embezzel_amount' => 2000
+        ])->response;
+
+
+        $this->assertEquals(422, $response->status());
+
+        $this->assertEquals(2000, Kingdom::first()->treasury);
     }
 
     public function testCannotEmbezzelFromAnotherKingdom() {

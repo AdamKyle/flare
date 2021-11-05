@@ -22,9 +22,9 @@ class GoldRushCheckCalculator {
     public function fetchGoldRushChance(Monster $monster, float $gameMapBonus = 0.0, Adventure $adventure = null) {
         $adventureBonus = $this->getAdventureGoldRushChance($adventure);
 
-        $bonus = $adventureBonus + $gameMapBonus;
+        $bonus = $adventureBonus + ($gameMapBonus / 2);
 
-        $roll = rand(1, 100);
+        $roll = rand(1, 1000);
         $roll += ceil($roll * ($bonus / 2));
 
         return $roll > 99;

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Battle;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\MaxCurrenciesValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Events\ServerMessageEvent;
@@ -201,6 +202,30 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
 
         $this->assertTrue($currentGold !== $this->character->getCharacter(false)->gold);
+    }
+
+    public function testBattleResultsMonsterIsDeadCharacterGoldCapped() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->updateCharacter([
+           'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
+        ])->getCharacter(false);
+        $monster   = $this->monster->getMonster();
+
+        $currentGold = $character->gold;
+
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $this->assertTrue($currentGold === $this->character->getCharacter(false)->gold);
     }
 
     public function testBattleResultsMonsterIsDeadNoXpMaxLevel() {

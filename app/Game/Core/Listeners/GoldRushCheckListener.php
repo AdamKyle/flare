@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -29,6 +30,15 @@ class GoldRushCheckListener
 
         if ($hasGoldRush) {
             $goldRush = ceil($event->character->gold + $event->character->gold * 0.03);
+            $newGold  = $event->character->gold + $goldRush;
+
+            $maxCurrentices = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
+
+            if ($maxCurrentices->canNotGiveCurrency()) {
+                event(new UpdateTopBarEvent($event->character->refresh()));
+
+                return;
+            }
 
             $event->character->gold = $goldRush;
             $event->character->save();

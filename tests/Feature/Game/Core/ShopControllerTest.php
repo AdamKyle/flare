@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Jobs\PurchaseItemsJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -191,6 +192,23 @@ class ShopControllerTest extends TestCase
         $this->assertTrue($this->character->getCharacter(false)->gold > 0);
     }
 
+    public function testCanSellItemTooMuchGoldOnHand() {
+
+        $user = $this->character->inventoryManagement()
+            ->unequipAll()
+            ->getCharacterFactory()
+            ->updateCharacter([
+                'gold' => MaxCurrenciesValue::MAX_GOLD - 1
+            ])
+            ->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter(false)->id]), [
+            'slot_id' => InventorySlot::first()->id,
+        ])->response;
+
+        $response->assertSessionHas('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+    }
+
 
     public function testCannotSellIteYouDontHave() {
         $user = $this->character->updateCharacter([
@@ -224,6 +242,20 @@ class ShopControllerTest extends TestCase
         $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter(false)->id]))->response;
 
         $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 10 gold.');
+    }
+
+    public function testCannotSellAllItemsWhenNearGoldCap() {
+        $user = $this->character->inventoryManagement()
+            ->unequipAll()
+            ->getCharacterFactory()
+            ->updateCharacter([
+                'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
+            ])
+            ->getUser();
+
+        $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter(false)->id]))->response;
+
+        $response->assertSessionHas('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
     }
 
     public function testSellAllItemsButQuestItems() {
@@ -358,6 +390,41 @@ class ShopControllerTest extends TestCase
         ])->response;
 
         $response->assertSessionHas('success', 'Sold selected items for: 10 gold.');
+    }
+
+    public function testFailToSellInBulkTooMuchGold() {
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'quest',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $weapon = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => 6,
+            'cost'        => 10,
+        ]);
+
+        $user      = $this->character->inventoryManagement()
+            ->giveItem($item)
+            ->giveItem($weapon)
+            ->getCharacterFactory()
+            ->updateCharacter([
+                'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
+            ])
+            ->getUser();
+        $character = $this->character->getCharacter(false);
+
+
+        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', ['character' => $this->character->getCharacter(false)->id]), [
+            'slots' => $character->inventory->slots->filter(function($slot) {
+                return !$slot->equipped && $slot->item->type !== 'quest';
+            })->pluck('id')->toArray(),
+        ])->response;
+
+        $response->assertSessionHas('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
     }
 
     public function testCannotBuyAndReplaceCraftOnly() {
