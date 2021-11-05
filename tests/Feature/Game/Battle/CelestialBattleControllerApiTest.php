@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Battle;
 
 use App\Flare\Models\CelestialFight;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Values\CelestialConjureType;
 use Tests\TestCase;
@@ -466,6 +467,8 @@ class CelestialBattleControllerApiTest extends TestCase {
             'gold_cost'           => 1000,
             'gold_dust_cost'      => 1000,
         ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
 
         $character = $this->character->updateCharacter([
             'is_dead' => true

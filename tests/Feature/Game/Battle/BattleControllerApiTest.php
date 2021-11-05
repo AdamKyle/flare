@@ -740,12 +740,16 @@ class BattleControllerApiTest extends TestCase
     public function testWhenCharacterIsDead() {
         Event::fake([CharacterIsDeadBroadcastEvent::class, UpdateTopBarEvent::class]);
 
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter(false);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
                          ->json('POST', '/api/battle-revive/' . $character->id)
                          ->response;
+
+
 
         $this->assertEquals(200, $response->status());
 

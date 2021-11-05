@@ -27,7 +27,7 @@ class GoldRushCheckCalculator {
         $roll = rand(1, 1000);
         $roll += ceil($roll * ($bonus / 2));
 
-        return $roll > 99;
+        return $roll > 975;
     }
 
     protected function getAdventureGoldRushChance(Adventure $adventure = null): float {

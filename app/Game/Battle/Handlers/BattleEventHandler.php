@@ -2,17 +2,20 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Models\CharacterInCelestialFight;
-use App\Flare\Models\Monster;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterInCelestialFight;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Monster;
+use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Core\Events\DropsCheckEvent;
+use App\Game\Core\Events\GoldRushCheckEvent;
+use App\Game\Core\Events\UpdateCharacterEvent;
+use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
@@ -70,6 +73,17 @@ class BattleEventHandler {
         event(new CharacterIsDeadBroadcastEvent($character->user));
         event(new UpdateTopBarEvent($character));
 
-        return $character->refresh();
+        $character = $character->refresh();
+        $mapId     = $character->map->gameMap->id;
+        $user      = $character->user;
+
+        $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
+
+        $characterData = new Item($character, $this->characterAttackTransformer);
+        $characterData = $this->manager->createData($characterData)->toArray();
+
+        broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
+
+        return $character;
     }
 }

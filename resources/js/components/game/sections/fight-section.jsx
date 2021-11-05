@@ -247,6 +247,14 @@ export default class FightSection extends React.Component {
     });
   }
 
+  setReviveInfo(health) {
+    console.log(health);
+    this.setState({
+      characterMaxHealth: health,
+      characterCurrentHealth: health,
+    });
+  }
+
   attack(attackType) {
     if (this.state.monster === null) {
       return getServerMessage('no_monster');
@@ -405,7 +413,7 @@ export default class FightSection extends React.Component {
         <hr/>
         <div className="battle-section text-center">
           {
-            this.state.monsterCurrentHealth > 0 && !this.state.character.is_dead && this.state.monster !== null ?
+            this.state.monsterCurrentHealth > 0 && this.state.monster !== null ?
               <>
                 <OverlayTrigger
                   placement="right"
@@ -479,6 +487,7 @@ export default class FightSection extends React.Component {
                 revive={this.revive.bind(this)}
                 openTimeOutModal={this.props.openTimeOutModal}
                 route={'/api/battle-revive/' + this.state.character.id}
+                setReviveInfo={this.setReviveInfo.bind(this)}
               />
               : null
           }
