@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Traits;
 
+use App\Flare\Models\GameMap;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Cache;
 use Illuminate\Database\Eloquent\Collection;
@@ -38,6 +39,30 @@ trait KingdomCache {
         Cache::put('character-kingdoms-' . $plane . '-' . $character->id, $this->createKingdomArray($kingdoms));
 
         return Cache::get('character-kingdoms-' . $plane . '-'  . $character->id);
+    }
+
+    /**
+     * Rebuild a characters' kingdom Cache.
+     *
+     * @param Character $character
+     */
+    public function rebuildCharacterKingdomCache(Character $character) {
+
+        foreach(GameMap::all() as $gameMap) {
+            $plane = $gameMap->name;
+
+            $kingdoms = Kingdom::select('id', 'x_position', 'y_position', 'color', 'name')
+                ->where('character_id', $character->id)
+                ->where('game_map_id', $gameMap)
+                ->get();
+
+            if ($kingdoms->isEmpty()) {
+                continue;
+            }
+
+            Cache::put('character-kingdoms-' . $plane . '-' . $character->id, $this->createKingdomArray($kingdoms));
+        }
+
     }
 
     /**

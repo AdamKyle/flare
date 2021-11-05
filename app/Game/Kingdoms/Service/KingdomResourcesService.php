@@ -90,6 +90,8 @@ class KingdomResourcesService {
      * @return void
      */
     public function updateKingdom(): void {
+        $character = $this->kingdom->character;
+
         if (is_null($this->kingdom->last_walked) && !$this->kingdom->npc_owned) {
             $this->giveNPCKingdoms();
 
@@ -109,6 +111,7 @@ class KingdomResourcesService {
             if ($lastTimeWalked < 30) {
                 $this->updateCurrentPopulation();
 
+                dump($this->kingdom->current_population);
                 if ($this->kingdom->current_population > $this->kingdom->max_population) {
                     $this->angryNpc();
                 }
@@ -129,6 +132,8 @@ class KingdomResourcesService {
                 $this->removeKingdomFromMap();
             }
         }
+
+        $this->rebuildCharacterKingdomCache($character->refresh());
     }
 
     /**
@@ -301,7 +306,7 @@ class KingdomResourcesService {
             ]);
         }
 
-        broadcast(new GlobalMessageEvent('The Old Man causes the ground to shake, the units to explode and the buildings to engulf in flames. People are dying left right and center as he Laughs. "I wanted you child!"'));
+        broadcast(new GlobalMessageEvent('The Old Man causes the ground to shake, the units to explode and the buildings to engulf in flames. People are dying left, right and center as he Laughs. "I warned you child!"'));
 
         $this->kingdom = $this->kingdom->refresh();
 
@@ -409,8 +414,10 @@ class KingdomResourcesService {
         if ($building->current_durability === 0) {
             $newAmount = $this->kingdom->current_population + round($building->population_increase/ 2);
 
-            if ($newAmount > $this->kingdom->max_population) {
-                $newAmount = $this->kingdom->max_population;
+            if ($currentPop <= $this->kingdom->max_population) {
+                if ($newAmount > $this->kingdom->max_population) {
+                    $newAmount = $this->kingdom->max_population;
+                }
             }
 
             $this->kingdom->update([
@@ -425,8 +432,10 @@ class KingdomResourcesService {
         if (!is_null($building)) {
             $newCurrent = $this->kingdom->current_population + $building->population_increase;
 
-            if ($newCurrent > $this->kingdom->max_population) {
-                $newCurrent = $this->kingdom->max_population;
+            if ($currentPop <= $this->kingdom->max_population) {
+                if ($newCurrent > $this->kingdom->max_population) {
+                    $newCurrent = $this->kingdom->max_population;
+                }
             }
 
             $this->kingdom->update([

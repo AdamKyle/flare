@@ -1,10 +1,71 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Card, Col, Row, Tabs, Tab} from 'react-bootstrap';
 
 export default class CharacterDetails extends React.Component {
 
   constructor(props) {
     super(props);
+  }
+
+  buildEachTab(attackData, voided) {
+    const tabs = [];
+
+    const attackDataKeys = Object.keys(attackData)
+      .filter(key => voided ? !key.includes('voided') : key.includes('voided'));
+
+    for (const key in attackData) {
+      if (attackDataKeys.includes(key)) {
+        tabs.push(
+          <Tab eventKey={key}
+               title={key.replace(/_/g, " ").replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase())}
+               tabClassName="mt-4"
+          >
+            <div className="mt-4">
+              <Row>
+                <Col xs={12} sm={12} md={12} lg={6}>
+                  <h4>Attack Data</h4>
+                  <hr />
+                  <dl>
+                    {this.renderAttackData(attackData[key])}
+                  </dl>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={6}>
+                  <h4>Affix Attack Data</h4>
+                  <hr />
+                  <dl>
+                    {this.renderAttackData(attackData[key].affixes)}
+                  </dl>
+                </Col>
+              </Row>
+            </div>
+          </Tab>
+        );
+      }
+    }
+
+    return tabs;
+  }
+
+  renderAttackData(attackData) {
+
+    const data = [];
+
+    for (const key in attackData) {
+      if (key !== 'affixes' && key !== 'name') {
+        data.push(
+          <Fragment>
+            <dt>{key.replace(/_/g, " ").replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase())}</dt>
+            <dd>{this.formatNumber(attackData[key])}</dd>
+          </Fragment>
+        )
+      }
+    }
+
+    return data;
+  }
+
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
   render() {
@@ -121,39 +182,56 @@ export default class CharacterDetails extends React.Component {
           </Tabs>
           <hr />
           <Row>
-            <Col xs={12} sm={6}>
+            <Col xs={12}>
               <h5>Attack Break Down</h5>
               <p className="mt-2">
                 These include any attached affixes and skill bonuses:
               </p>
               <hr/>
-              <dl>
-                <dt>Weapon Attack:</dt>
-                <dd>{sheet.weapon_attack}</dd>
-                <dt>Rings Attack:</dt>
-                <dd>{sheet.rings_attack}</dd>
-                <dt>Spell Damage:</dt>
-                <dd>{sheet.spell_damage}</dd>
-                <dt>Artifact Damage:</dt>
-                <dd>{sheet.artifact_damage}</dd>
-                <dt>Heal For:</dt>
-                <dd>{sheet.heal_for}</dd>
-              </dl>
-            </Col>
-            <Col xs={12} sm={6}>
-              <h5>Class Attack Bonus</h5>
-              <p className="mt-2">
-                {sheet.class_bonus.description}
-              </p>
-              <hr/>
-              <dl className="mt-2">
-                <dt>Type:</dt>
-                <dd>{sheet.class_bonus.type}</dd>
-                <dt>Base Chance:</dt>
-                <dd>{sheet.class_bonus.base_chance.toFixed(2) * 100}%</dd>
-                <dt>Requirements:</dt>
-                <dd>{sheet.class_bonus.requires}</dd>
-              </dl>
+              <Tabs defaultActiveKey="class-bonus" id="character-attack-info">
+                <Tab eventKey="class-bonus" title="Class Bonus">
+                  <p className="mt-4">
+                    {sheet.class_bonus.description}
+                  </p>
+
+                  <dl className="mt-2">
+                    <dt>Type:</dt>
+                    <dd>{sheet.class_bonus.type}</dd>
+                    <dt>Base Chance:</dt>
+                    <dd>{sheet.class_bonus.base_chance.toFixed(2) * 100}%</dd>
+                    <dt>Requirements:</dt>
+                    <dd>{sheet.class_bonus.requires}</dd>
+                  </dl>
+                </Tab>
+                <Tab eventKey="basic-attack" title="Basic Attack Info">
+                  <dl className="mt-4">
+                    <dt>Weapon Attack:</dt>
+                    <dd>{sheet.weapon_attack}</dd>
+                    <dt>Rings Attack:</dt>
+                    <dd>{sheet.rings_attack}</dd>
+                    <dt>Spell Damage:</dt>
+                    <dd>{sheet.spell_damage}</dd>
+                    <dt>Artifact Damage:</dt>
+                    <dd>{sheet.artifact_damage}</dd>
+                    <dt>Heal For:</dt>
+                    <dd>{sheet.heal_for}</dd>
+                  </dl>
+                </Tab>
+                <Tab eventKey="attack-break-down" title="Attack Break Down">
+                  <Tabs defaultActiveKey="regular-attack" id="character-attack-break-down">
+                    <Tab eventKey="regular-attack" title="Regular Attacks" tabClassName="mt-4">
+                      <Tabs defaultActiveKey="attack" id="character-regular-attack-break-down">
+                        {this.buildEachTab(sheet.attack_stats, true)}
+                      </Tabs>
+                    </Tab>
+                    <Tab eventKey="voided-attack" title="Voided Attacks" tabClassName="mt-4">
+                      <Tabs defaultActiveKey="voided_attack" id="character-voided-attack-break-down">
+                        {this.buildEachTab(sheet.attack_stats, false)}
+                      </Tabs>
+                    </Tab>
+                  </Tabs>
+                </Tab>
+              </Tabs>
             </Col>
           </Row>
         </Card.Body>

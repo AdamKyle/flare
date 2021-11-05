@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use Cache;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
@@ -76,6 +77,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'is_dead'           => $character->is_dead,
             'devouring_light'   => $characterInformation->getDevouringLight(),
             'devouring_darkness' => $characterInformation->getDevouringDarkness(),
+            'attack_stats'       => Cache::get('character-attack-data-' . $character->id),
         ];
     }
 

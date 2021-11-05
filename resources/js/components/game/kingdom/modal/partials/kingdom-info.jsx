@@ -121,10 +121,14 @@ export default class KingdomInfo extends React.Component {
     });
   }
 
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   embezzeledSuccess(amount) {
     this.setState({
       showSuccess: true,
-      successMessage: 'Embezzled ' + amount + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
+      successMessage: 'Embezzled ' + this.formatNumber(amount) + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
     });
   }
 
@@ -143,14 +147,14 @@ export default class KingdomInfo extends React.Component {
   depositSuccess(amount) {
     this.setState({
       showSuccess: true,
-      successMessage: 'Deposited ' + amount + ' gold to the kingdom. The kingdoms morale has increased by 15% and your defence bonus has also been increased.',
+      successMessage: 'Deposited ' + this.formatNumber(amount) + ' gold to the kingdom. The kingdoms morale has increased by 15% and your defence bonus has also been increased.',
     });
   }
 
   peoplePurchasedSuccess(amount) {
     this.setState({
       showSuccess: true,
-      successMessage: 'You dirty, dirty animal. I knew it! Purchased: ' + amount + ' People. Do you feel good about what you just did?',
+      successMessage: 'You dirty, dirty animal. I knew it! Purchased: ' + this.formatNumber(amount) + ' People. Do you feel good about what you just did?',
     })
   }
 
@@ -190,7 +194,7 @@ export default class KingdomInfo extends React.Component {
                   </OverlayTrigger>
                 </p>
               </dt>
-              <dd>{this.props.kingdom.current_population} / {this.props.kingdom.max_population}</dd>
+              <dd>{this.formatNumber(this.props.kingdom.current_population)} / {this.formatNumber(this.props.kingdom.max_population)}</dd>
             </dl>
           </div>
           <div className="col-md-3">
@@ -242,25 +246,25 @@ export default class KingdomInfo extends React.Component {
           <div className="col-md-3">
             <dl>
               <dt><strong>Wood</strong>:</dt>
-              <dd>{this.props.kingdom.current_wood} / {this.props.kingdom.max_wood}</dd>
+              <dd>{this.formatNumber(this.props.kingdom.current_wood)} / {this.formatNumber(this.props.kingdom.max_wood)}</dd>
             </dl>
           </div>
           <div className="col-md-3">
             <dl>
               <dt><strong>Clay</strong>:</dt>
-              <dd>{this.props.kingdom.current_clay} / {this.props.kingdom.max_clay}</dd>
+              <dd>{this.formatNumber(this.props.kingdom.current_clay)} / {this.formatNumber(this.props.kingdom.max_clay)}</dd>
             </dl>
           </div>
           <div className="col-md-3">
             <dl>
               <dt><strong>Stone</strong>:</dt>
-              <dd>{this.props.kingdom.current_stone} / {this.props.kingdom.max_stone}</dd>
+              <dd>{this.formatNumber(this.props.kingdom.current_stone)} / {this.formatNumber(this.props.kingdom.max_stone)}</dd>
             </dl>
           </div>
           <div className="col-md-3">
             <dl>
               <dt><strong>Iron</strong>:</dt>
-              <dd>{this.props.kingdom.current_iron} / {this.props.kingdom.max_iron}</dd>
+              <dd>{this.formatNumber(this.props.kingdom.current_iron)} / {this.formatNumber(this.props.kingdom.max_iron)}</dd>
             </dl>
           </div>
         </div>

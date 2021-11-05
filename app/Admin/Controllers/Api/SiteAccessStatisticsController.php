@@ -24,10 +24,12 @@ class SiteAccessStatisticsController extends Controller {
     }
 
     public function fetchCharactersGold() {
+        $charactersWithHighGold = Character::where('gold', '>=', 1000000000)->get();
+
         return response()->json([
             'stats' => [
-                'labels' => Character::pluck('name')->toArray(),
-                'data'   => Character::pluck('gold')->toArray(),
+                'labels' => $charactersWithHighGold->pluck('name')->toArray(),
+                'data'   => $charactersWithHighGold->pluck('gold')->toArray(),
             ]
         ]);
     }

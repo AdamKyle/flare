@@ -30,8 +30,12 @@
                     <dd>{{$averageCharacterGold}}</dd>
                     <dt>Richest Character</dt>
                     <dd><a href="{{route('users.user', ['user' => $richestCharacter->user->id])}}">{{$richestCharacter->name}}</a></dd>
+                    <dt>Richest Character Gold:</dt>
+                    <dd>{{number_format($richestCharacter->gold)}}</dd>
                     <dt>Highest Level Character</dt>
                     <dd><a href="{{route('users.user', ['user' => $highestLevelCharacter->user->id])}}">{{$highestLevelCharacter->name}}</a></dd>
+                    <dt>Character Level:</dt>
+                    <dd>{{number_format($highestLevelCharacter->level)}}</dd>
                 </dl>
             </x-cards.card-with-title>
         </div>
@@ -40,6 +44,13 @@
                 <dl>
                     <dt>Kingdom Count (Across All Maps)</dt>
                     <dd>{{$kingdomCount}}</dd>
+                </dl>
+                <hr />
+                <dl>
+                    @foreach($topTenKingdoms as $characterName => $kingdomCount)
+                        <dt>{{$characterName}} Has:</dt>
+                        <dd>{{$kingdomCount}}</dd>
+                    @endforeach
                 </dl>
             </x-cards.card-with-title>
         </div>

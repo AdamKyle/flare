@@ -24,7 +24,7 @@ export default class KingdomBuildings extends React.Component {
         key: "max-amount",
         text: "Max Recuitable Amount",
         cell: row => <div data-tag="allowRowEvents">
-          <div key={row.id}>{this.props.kingdom.current_population}</div>
+          <div key={row.id}>{this.props.kingdom.current_population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
         </div>,
         sortable: true
       },
@@ -95,7 +95,7 @@ export default class KingdomBuildings extends React.Component {
     const units = this.props.kingdom.current_units.filter((cu) => cu.game_unit_id === unitId);
 
     if (units.length > 0) {
-      return units[0].amount;
+      return units[0].amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     return 0;

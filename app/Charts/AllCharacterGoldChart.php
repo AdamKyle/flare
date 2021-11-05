@@ -22,8 +22,13 @@ class AllCharacterGoldChart extends BaseChart
      */
     public function handler(Request $request): Chartisan
     {
+
+        $charactersWithHighGold = Character::where('gold', '>=', 1000000000)->get();
+
+        dump($charactersWithHighGold->count());
+
         return Chartisan::build()
-            ->labels(Character::pluck('name')->toArray())
-            ->dataset('details', Character::pluck('gold')->toArray());
+            ->labels($charactersWithHighGold->pluck('name')->toArray())
+            ->dataset('details', $charactersWithHighGold->pluck('gold')->toArray());
     }
 }

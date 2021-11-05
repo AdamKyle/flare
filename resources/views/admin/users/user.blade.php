@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row page-titles">
             <div class="col-md-6 align-self-left">
-                <h4 class="mt-3">{{$character->name}} (LV: {{$character->level}})</h4>
+                <h4 class="mt-3">{{$character->name}} (LV: {{number_format($character->level)}})</h4>
             </div>
             <div class="col-md-6 align-self-right">
                 <a href="{{route('users.list')}}" class="btn btn-primary float-right ml-2">Back</a>
@@ -44,7 +44,7 @@
 
         <div class="card">
             <div class="card-body">
-                <strong>Current Gold</strong>: {{$character->gold}}
+                <strong>Current Gold</strong>: {{number_format($character->gold)}}
             </div>
         </div>
 
@@ -52,7 +52,7 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-12">
-                        <strong>Attack</strong>: {{$character->getInformation()->getTotalWeaponDamage()}} / <strong>AC</strong>: {{$character->getInformation()->buildDefence()}} / <strong>Heal For</strong>: {{$character->getInformation()->buildHealFor()}}
+                        <strong>Attack</strong>: {{number_format($character->getInformation()->getTotalWeaponDamage())}} / <strong>AC</strong>: {{number_format($character->getInformation()->buildDefence())}} / <strong>Heal For</strong>: {{number_format($character->getInformation()->buildHealFor())}}
                         <hr />
                     </div>
                 </div>
@@ -98,15 +98,15 @@
                         <hr />
                         <dl>
                             <dt>Str:</dt>
-                            <dd>{{$character->getInformation()->statMod('str')}}</dd>
+                            <dd>{{number_format($character->getInformation()->statMod('str'))}}</dd>
                             <dt>Dex:</dt>
-                            <dd>{{$character->getInformation()->statMod('dex')}}</dd>
+                            <dd>{{number_format($character->getInformation()->statMod('dex'))}}</dd>
                             <dt>Dur:</dt>
-                            <dd>{{$character->getInformation()->statMod('dur')}}</dd>
+                            <dd>{{number_format($character->getInformation()->statMod('dur'))}}</dd>
                             <dt>Int:</dt>
-                            <dd>{{$character->getInformation()->statMod('int')}}</dd>
+                            <dd>{{number_format($character->getInformation()->statMod('int'))}}</dd>
                             <dt>Chr:</dt>
-                            <dd>{{$character->getInformation()->statMod('chr')}}</dd>
+                            <dd>{{number_format($character->getInformation()->statMod('chr'))}}</dd>
                         </dl>
                         <hr />
                         <strong>Skills</strong>

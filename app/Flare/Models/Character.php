@@ -131,6 +131,10 @@ class Character extends Model
         return $this->map->gameMap->path;
     }
 
+    public function getKingdomsCountAttribute() {
+        return $this->kingdoms->count();
+    }
+
     public function adventureLogs() {
         return $this->hasMany(AdventureLog::class);
     }
