@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Values\MaxCurrenciesValue;
 use Facades\App\Flare\Calculators\XPCalculator;
 
 class CharacterRewardService {
@@ -58,7 +59,17 @@ class CharacterRewardService {
             $xp = $xp * (1 + $gameMap->xp_bonus);
         }
 
-        $this->character->xp   += $xp;
+        $this->character->xp += $xp;
+        $newGold              = $this->character->gold + $monster->gold;
+
+        $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            $this->character->save();
+
+            return;
+        }
+
         $this->character->gold += $monster->gold;
 
         $this->character->save();

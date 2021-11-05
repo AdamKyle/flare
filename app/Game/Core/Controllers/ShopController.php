@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ShopReplaceItemValidation;
@@ -77,6 +78,12 @@ class ShopController extends Controller {
 
         $totalSoldFor = $service->sellAllItemsInInventory($character);
 
+        $maxCurrencies = new MaxCurrenciesValue($character->gold + $totalSoldFor, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            return redirect()->back()->with('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+        }
+
         $character->update([
             'gold' => $character->gold + $totalSoldFor,
         ]);
@@ -147,9 +154,16 @@ class ShopController extends Controller {
 
         $item = $inventorySlot->item;
 
-        event(new SellItemEvent($inventorySlot, $character));
-
         $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
+        $totalNewGold = $character->gold + $totalSoldFor;
+
+        $maxCurrencies = new MaxCurrenciesValue($totalNewGold, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            return redirect()->back()->with('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+        }
+
+        event(new SellItemEvent($inventorySlot, $character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -164,6 +178,12 @@ class ShopController extends Controller {
         }
 
         $totalSoldFor = $service->fetchTotalSoldFor($inventorySlots, $character);
+
+        $maxCurrencies = new MaxCurrenciesValue($character->gold + $totalSoldFor, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            return redirect()->back()->with('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+        }
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 

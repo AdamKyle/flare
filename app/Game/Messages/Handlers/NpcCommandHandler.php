@@ -225,7 +225,7 @@ class NpcCommandHandler {
                     continue;
                 }
 
-                if (!$this->canHaveReward($character, $npc)) {
+                if (!$this->canHaveReward($character, $npc, $quest)) {
                     return false;
                 }
 
@@ -255,7 +255,7 @@ class NpcCommandHandler {
 
                 return true;
             } else {
-                if (!$this->canHaveReward($character, $npc)) {
+                if (!$this->canHaveReward($character, $npc, $quest)) {
                     return false;
                 }
 
@@ -284,15 +284,19 @@ class NpcCommandHandler {
         return false;
     }
 
-    private function canHaveReward(Character $character, Npc $npc) {
+    private function canHaveReward(Character $character, Npc $npc, Quest $quest) {
         if ($character->isInventoryFull()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
             return false;
         }
 
-        $maxGoldValue     = new MaxCurrenciesValue($character->gold, 0);
-        $maxGoldDustValue = new MaxCurrenciesValue($character->gold_dust, 1);
-        $maxShardsValue   = new MaxCurrenciesValue($character->shards, 2);
+        $newGold          = $character->gold + $quest->reward_gold;
+        $newGoldDust      = $character->gold_dust + $quest->reward_gold_dust;
+        $newShards        = $character->shards + $quest->reward_shards;
+
+        $maxGoldValue     = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
+        $maxGoldDustValue = new MaxCurrenciesValue($newGoldDust, MaxCurrenciesValue::GOLD_DUST);
+        $maxShardsValue   = new MaxCurrenciesValue($newShards, MaxCurrenciesValue::SHARDS);
 
         if ($maxGoldValue->canNotGiveCurrency()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('gold_capped', $npc), true));

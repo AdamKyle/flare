@@ -51,6 +51,14 @@ export default class Embezzel extends React.Component {
           if (response.status === 429) {
             return this.props.openTimeOutModal();
           }
+
+          if (response.status === 422) {
+            return this.setState({
+              showError: true,
+              errorText: response.data.message,
+              loading: false,
+            });
+          }
         }
       });
     });
