@@ -95,10 +95,10 @@ class BattleController extends Controller {
     public function revive(Character $character) {
         $character = $this->battleEventHandler->processRevive($character);
 
-        $character = new Item($character, $this->character);
+        $characterHealth = $character->getInformation()->buildHealth();
 
         return response()->json([
-            'character' => $this->manager->createData($character)->toArray()
+            'character_health' => $characterHealth
         ], 200);
     }
 
