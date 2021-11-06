@@ -70,39 +70,39 @@ class UnitCosts
     }
 
     public function isSpearmen(): bool {
-        return $ths->name === self::SPEARMEN;
+        return $this->name === self::SPEARMEN;
     }
 
     public function isArcher(): bool {
-        return $ths->name === self::ARCHER;
+        return $this->name === self::ARCHER;
     }
 
     public function isSwordsmen(): bool {
-        return $ths->name === self::SWORDSMEN;
+        return $this->name === self::SWORDSMEN;
     }
 
     public function isRam(): bool {
-        return $ths->name === self::RAM;
+        return $this->name === self::RAM;
     }
 
     public function isTrebuchet(): bool {
-        return $ths->name === self::TREBUCHET;
+        return $this->name === self::TREBUCHET;
     }
 
     public function isPriest(): bool {
-        return $ths->name === self::PRIEST;
+        return $this->name === self::PRIEST;
     }
 
     public function isCleric(): bool {
-        return $ths->name === self::CLERIC;
+        return $this->name === self::CLERIC;
     }
 
     public function isPaladin(): bool {
-        return $ths->name === self::PALIDIN;
+        return $this->name === self::PALIDIN;
     }
 
     public function isSettler(): bool {
-        return $ths->name === self::SETTLER;
+        return $this->name === self::SETTLER;
     }
 
     public function isPerson(): bool {

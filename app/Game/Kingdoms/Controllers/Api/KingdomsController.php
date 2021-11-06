@@ -96,23 +96,43 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function upgradeKingdomBuilding(Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
+    public function upgradeKingdomBuilding(Request $request, Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
 
-        if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
-            return response()->json([
-                'message' => "You don't have the resources."
-            ], 422);
+        if ($request->paying_with_gold) {
+            $request->validate([
+                'cost_to_upgrade' => 'required|integer',
+                'to_level'        => 'required|integer',
+                'pop_required'    => 'required|integer',
+                'time'            => 'required|integer',
+            ]);
+
+            $paid = $buildingService->upgradeBuildingWithGold($building, $request->all());
+
+            if (!$paid) {
+                return response()->json([
+                    'message' => "You cannot afford this upgrade."
+                ], 422);
+            }
+
+            $buildingService->processUpgradeWithGold($building, $request->all());
+        } else {
+            if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
+                return response()->json([
+                    'message' => "You don't have the resources."
+                ], 422);
+            }
+
+            if ($building->level + 1 > $building->gameBuilding->max_level) {
+                return response()->json([
+                    'message' => "Building is already max level."
+                ], 422);
+            }
+
+            $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
+
+            $buildingService->upgradeKingdomBuilding($building, $character);
         }
 
-        if ($building->level + 1 > $building->gameBuilding->max_level) {
-            return response()->json([
-                'message' => "Building is already max level."
-            ], 422);
-        }
-
-        $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
-
-        $buildingService->upgradeKingdomBuilding($building, $character);
 
         $kingdom  = new Item($kingdom, $this->kingdom);
 

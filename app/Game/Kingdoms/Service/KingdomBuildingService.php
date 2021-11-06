@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomBuildingInQueue;
@@ -11,6 +12,7 @@ use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
+use App\Game\Kingdoms\Values\UnitCosts;
 use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -53,6 +55,12 @@ class KingdomBuildingService {
         UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay($timeToComplete);
     }
 
+    /**
+     * Rebuild the building.
+     *
+     * @param KingdomBuilding $building
+     * @param Character $character
+     */
     public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
         $timeToComplete = now()->addMinutes($building->rebuild_time);
 
@@ -135,6 +143,72 @@ class KingdomBuildingService {
         event(new UpdateKingdom($user, $kingdom));
 
         return true;
+    }
+
+    /**
+     * Pay for the cost.
+     *
+     * @param KingdomBuilding $building
+     * @param array $params
+     * @return bool
+     */
+    public function upgradeBuildingWithGold(KingdomBuilding $building, array $params): bool {
+        $character = $building->kingdom->character;
+        $kingdom   = $building->kingdom;
+
+        $cost = $this->calculateGoldNeeded($character, $kingdom, $params);
+
+        if ($character->gold < $cost) {
+            return false;
+        }
+
+        if ($cost > $params['cost_to_upgrade']) {
+            $kingdom->update([
+                'current_population' => 0,
+            ]);
+        } else {
+            $kingdom->update([
+                'current_population' => $kingdom->current_population - $params['pop_required'],
+            ]);
+        }
+
+        $characterGold = $character->gold - $cost;
+
+        $character->update([
+            'gold' => $characterGold
+        ]);
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return true;
+    }
+
+    public function processUpgradeWithGold(KingdomBuilding $building, array $params) {
+        $character = $building->kingdom->character;
+        $kingdom   = $building->kingdom;
+
+        $timeToComplete = now()->addMinutes($params['time']);
+
+        $queue = BuildingInQueue::create([
+            'character_id' => $character->id,
+            'kingdom_id'   => $building->kingdom->id,
+            'building_id'  => $building->id,
+            'to_level'     => $building->level,
+            'completed_at' => $timeToComplete,
+            'started_at'   => now(),
+        ]);
+
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay(now()->addMinutes(15));
+    }
+
+    protected function calculateGoldNeeded(Character $character, Kingdom $kingdom, array $params): int {
+        $population = $params['pop_required'];
+
+        if ($kingdom->current_population < $population) {
+            $costForAdditional = ($population - $kingdom->current_population) * UnitCosts::PERSON;
+        }
+
+        return $params['cost_to_upgrade'] + $costForAdditional;
     }
 
     /**

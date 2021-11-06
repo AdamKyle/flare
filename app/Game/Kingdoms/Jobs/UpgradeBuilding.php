@@ -81,6 +81,18 @@ class UpgradeBuilding implements ShouldQueue
             return;
         }
 
+        if (!$queue->completed_at->lessThanOrEqualTo(now())) {
+            // @codeCoverageIgnoreStart
+            UpgradeBuilding::dispatch(
+                $this->building,
+                $this->user,
+                $this->queueId,
+            )->delay(now()->addMinutes(15));
+
+            return;
+            // @codeCoverageIgnoreEnd
+        }
+
         $level = $this->building->level + 1;
 
         if ($this->building->gives_resources) {
