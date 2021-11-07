@@ -17,7 +17,7 @@ export default class Damage {
     }
 
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
-    console.log(monsterCurrentHealth, attacker[stacking ? 'stacking_life_stealing' : 'life_stealing']);
+
     const cantResist  = attacker.cant_be_resisted;
 
     if (totalDamage <= 0 || totalDamage <= 0.0) {
@@ -29,7 +29,6 @@ export default class Damage {
 
     if (totalDamage > 0.0) {
       if (stacking) {
-        console.log('Total Damage', totalDamage);
         this.addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!');
       } else {
         this.addMessage('One of your life stealing enchantments causes the enemy to fall to their knees in agony!');
@@ -38,7 +37,7 @@ export default class Damage {
       if (cantResist) {
 
         totalDamage = totalDamage - totalDamage * damageDeduction;
-        console.log('Total Damage after reduction', totalDamage);
+
         this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
 
         monsterCurrentHealth -= totalDamage;
@@ -46,7 +45,7 @@ export default class Damage {
       } else {
 
         totalDamage = totalDamage - totalDamage * damageDeduction;
-        console.log('Total Damage', totalDamage);
+
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
@@ -134,18 +133,21 @@ export default class Damage {
     return false;
   }
 
-  calculateSpellDamage(attacker, defender, monsterCurrentHealth) {
+  calculateSpellDamage(attacker, defender, monsterCurrentHealth, skillBonus) {
     if (!defender.hasOwnProperty('spell_evasion')) {
       defender = defender.monster;
     }
 
-    let dc          = 75 + (75 * defender.spell_evasion);
+
+    let dc          = 75 + Math.ceil(75 * defender.spell_evasion);
     let roll        = random(1, 100);
     let totalDamage = (attacker.spell_damage + attacker.spell_damage * .15).toFixed(0);
 
     if (dc >= 100) {
       dc = 99;
     }
+
+    dc             -= Math.ceil(dc * skillBonus);
 
     if (roll < dc) {
       this.battleMessages.push({
@@ -243,7 +245,7 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  doubleCastChance(attacker, defender, monsterCurrentHealth, attackData) {
+  doubleCastChance(attacker, defender, monsterCurrentHealth, attackData, skillBonus) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -257,7 +259,7 @@ export default class Damage {
           class: 'action-fired'
         });
 
-        monsterCurrentHealth = this.calculateSpellDamage(attackData, defender, monsterCurrentHealth, true);
+        monsterCurrentHealth = this.calculateSpellDamage(attackData, defender, monsterCurrentHealth, skillBonus);
       }
     }
 
@@ -301,9 +303,9 @@ export default class Damage {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
         let totalAttack = Math.round(attacker.dur + attacker.dur * 0.15);
-        console.log('Total Attack before deduction', totalAttack);
+
         totalAttack     = totalAttack - totalAttack * damageDeduction;
-        console.log('Total Attack after deduction', totalAttack);
+
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import Attack from '../battle/attack/attack';
@@ -78,7 +78,6 @@ export default class FightSection extends React.Component {
       battleMessages: [],
       missCounter: 0,
       isCharacterVoided: false,
-      isMonsterReduced: false,
       isMonsterVoided: false,
       isMonsterDevoided: false,
     }
@@ -154,7 +153,6 @@ export default class FightSection extends React.Component {
           characterMaxHealth: null,
           monsterMaxHealth: null,
           isCharacterVoided: false,
-          isMonsterReduced: false,
           isMonsterVoided: false,
           isMonsterDevoided: false,
         }, () => {
@@ -175,7 +173,6 @@ export default class FightSection extends React.Component {
     const voidance      = new Voidance();
     const character     = this.props.character;
     let isVoided        = false;
-    let statReduced     = false;
     let monsterVoided   = false;
     let monsterDevoided = false;
 
@@ -210,10 +207,18 @@ export default class FightSection extends React.Component {
 
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
+      }
 
-        statReduced = true;
-      } else {
-        statReduced = false;
+      messages = monsterInfo.reduceSkills(character.skill_reduction);
+
+      if (messages.length > 0) {
+        this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
+      }
+
+      messages = monsterInfo.reduceResistances(character.resistance_reduction);
+
+      if (messages.length > 0) {
+        this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
     }
 
@@ -233,7 +238,6 @@ export default class FightSection extends React.Component {
       characterMaxHealth: characterHealth,
       monsterMaxHealth: health,
       isCharacterVoided: isVoided,
-      isMonsterReduced: statReduced,
       isMonsterVoided: monsterVoided,
       isMonsterDevoided: monsterDevoided,
     }, () => {
@@ -248,7 +252,6 @@ export default class FightSection extends React.Component {
   }
 
   setReviveInfo(health) {
-    console.log(health);
     this.setState({
       characterMaxHealth: health,
       characterCurrentHealth: health,
@@ -293,10 +296,6 @@ export default class FightSection extends React.Component {
     let messages = this.battleMessagesBeforeFight.filter((tag, index, array) =>
       array.findIndex(t => t.class == tag.class && t.message == tag.message) == index
     );
-
-    if (!this.state.isCharacterVoided) {
-      messages = messages.filter((m) => m.class !== 'enemy-action-fired');
-    }
 
     state.battleMessages = [...messages, ...state.battleMessages].filter((bm) => !Array.isArray(bm))
 
@@ -415,67 +414,107 @@ export default class FightSection extends React.Component {
           {
             this.state.monsterCurrentHealth > 0 && this.state.monster !== null ?
               <>
-                <OverlayTrigger
-                  placement="right"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={renderAttackToolTip}
-                >
-                  <button className="btn btn-attack mr-2"
-                          disabled={this.props.isAdventuring}
-                          onClick={() => this.attack('attack')}
-                  >
-                    <i className="ra ra-sword"></i>
-                  </button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="right"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={renderCastingToolTip}
-                >
-                  <button className="btn btn-cast mr-2"
-                          disabled={this.props.isAdventuring}
-                          onClick={() => this.attack('cast')}
-                  >
-                    <i className="ra ra-burning-book"></i>
-                  </button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="right"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={renderCastAndAttackToolTip}
-                >
-                  <button className="btn btn-cast-attack mr-2"
-                          disabled={this.props.isAdventuring}
-                          onClick={() => this.attack('cast_and_attack')}
-                  >
-                    <i className="ra ra-lightning-sword"></i>
-                  </button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="right"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={renderAttackAndCastToolTip}
-                >
-                  <button className="btn btn-attack-cast mr-2"
-                          disabled={this.props.isAdventuring}
-                          onClick={() => this.attack('attack_and_cast')}
-                  >
-                    <i className="ra ra-lightning-sword"></i>
-                  </button>
-                </OverlayTrigger>
-                <OverlayTrigger
-                  placement="right"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={renderDefendToolTip}
-                >
-                  <button className="btn btn-defend"
-                          disabled={this.props.isAdventuring}
-                          onClick={() => this.attack('defend')}
-                  >
-                    <i className="ra ra-round-shield"></i>
-                  </button>
-                </OverlayTrigger>
-                {this.healthMeters()}
+                {
+                  !this.state.character.disable_pop_overs ?
+                    <Fragment>
+                      <OverlayTrigger
+                        placement="right"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderAttackToolTip}
+                      >
+                        <button className="btn btn-attack mr-2"
+                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                                onClick={() => this.attack('attack')}
+                        >
+                          <i className="ra ra-sword"></i>
+                        </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        placement="right"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderCastingToolTip}
+                      >
+                        <button className="btn btn-cast mr-2"
+                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                                onClick={() => this.attack('cast')}
+                        >
+                          <i className="ra ra-burning-book"></i>
+                        </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        placement="right"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderCastAndAttackToolTip}
+                      >
+                        <button className="btn btn-cast-attack mr-2"
+                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                                onClick={() => this.attack('cast_and_attack')}
+                        >
+                          <i className="ra ra-lightning-sword"></i>
+                        </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        placement="right"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderAttackAndCastToolTip}
+                      >
+                        <button className="btn btn-attack-cast mr-2"
+                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                                onClick={() => this.attack('attack_and_cast')}
+                        >
+                          <i className="ra ra-lightning-sword"></i>
+                        </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        placement="right"
+                        delay={{ show: 250, hide: 400 }}
+                        overlay={renderDefendToolTip}
+                      >
+                        <button className="btn btn-defend"
+                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                                onClick={() => this.attack('defend')}
+                        >
+                          <i className="ra ra-round-shield"></i>
+                        </button>
+                      </OverlayTrigger>
+                      {this.healthMeters()}
+                    </Fragment>
+                  :
+                    <Fragment>
+                      <button className="btn btn-attack mr-2"
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                              onClick={() => this.attack('attack')}
+                      >
+                        <i className="ra ra-sword"></i>
+                      </button>
+                      <button className="btn btn-cast mr-2"
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                              onClick={() => this.attack('cast')}
+                      >
+                        <i className="ra ra-burning-book"></i>
+                      </button>
+                      <button className="btn btn-cast-attack mr-2"
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                              onClick={() => this.attack('cast_and_attack')}
+                      >
+                        <i className="ra ra-lightning-sword"></i>
+                      </button>
+                      <button className="btn btn-attack-cast mr-2"
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                              onClick={() => this.attack('attack_and_cast')}
+                      >
+                        <i className="ra ra-lightning-sword"></i>
+                      </button>
+                      <button className="btn btn-defend"
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                              onClick={() => this.attack('defend')}
+                      >
+                        <i className="ra ra-round-shield"></i>
+                      </button>
+                      {this.healthMeters()}
+                    </Fragment>
+                }
+
               </>
               : null
           }

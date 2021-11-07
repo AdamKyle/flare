@@ -32,9 +32,13 @@ class FightService {
 
     private $attackOnce = false;
 
+    private $fightSetUp = false;
+
     private $tookTooLongCounter = 0;
 
     private $fightTookTooLong = false;
+
+    private $newAttackType = null;
 
     public function __construct(
         SetupFightHandler $setupFightHandler,
@@ -55,6 +59,7 @@ class FightService {
     }
 
     public function processFight($attacker, $defender, string $attackType) {
+
         if (!is_null($this->currentCharacterHealth) && !is_null($this->currentMonsterHealth)) {
             if ($this->isCharacterDead()) {
                 $this->battleLogs = $this->addMessage(
@@ -77,39 +82,41 @@ class FightService {
             }
         }
 
-        $this->setupFightHandler->setUpFight($attacker, $defender);
-
-        $newAttackType = $this->setupFightHandler->getAttackType();
-
-        $this->isMonsterVoided   = $this->setupFightHandler->getIsMonsterVoided();
-
-        if (!is_null($newAttackType)) {
-            $attackType = $newAttackType . $attackType;
-        } else {
-            $attackType = str_replace('voided_' , '', $attackType);
+        if (!is_null($this->newAttackType)) {
+            $attackType = $this->newAttackType . $attackType;
         }
 
-        $this->battleLogs = [...$this->battleLogs, ...$this->setupFightHandler->getBattleMessages()];
+        if (!$this->fightSetUp) {
+            $this->setupFightHandler->setUpFight($attacker, $defender);
+
+            $this->newAttackType = $this->setupFightHandler->getAttackType();
+
+            $this->isMonsterVoided = $this->setupFightHandler->getIsMonsterVoided();
+
+            if (!is_null($this->newAttackType)) {
+                $attackType = $this->newAttackType . $attackType;
+            } else {
+                $attackType = str_replace('voided_', '', $attackType);
+            }
+
+            $this->battleLogs = [...$this->battleLogs, ...$this->setupFightHandler->getBattleMessages()];
+
+            $this->fightSetUp = true;
+        }
 
         if ($attacker instanceof Character) {
-            $newDefender = $this->setupFightHandler->getModifiedDefender();
-
-            if (!is_null($newDefender)) {
-                $defender = $newDefender;
-            }
+            $defender = $this->setupFightHandler->getModifiedDefender();
         }
 
         if (is_null($this->currentCharacterHealth) && is_null($this->currentMonsterHealth)) {
-            $characterInformation = $this->characterInformationBuilder->setCharacter($attacker);
-            $this->currentCharacterHealth = $characterInformation->buildHealth(!is_null($newAttackType));
+            $characterInformation         = $this->characterInformationBuilder->setCharacter($attacker);
+            $this->currentCharacterHealth = $characterInformation->buildHealth(!is_null($this->newAttackType));
 
-            $healthRange = explode('-', $defender->health_range);
-            $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + $defender->dur;
+            $healthRange                = explode('-', $defender->health_range);
+            $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }
 
-        $isCharacterVoided = $newAttackType === 'voided' ? true : false;
-
-        $this->setupFightHandler->reset();
+        $isCharacterVoided = ($this->newAttackType === 'voided' ? true : false);
 
         return $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
     }
@@ -180,6 +187,10 @@ class FightService {
         $this->battleLogs             = [];
         $this->tookTooLongCounter     = 0;
         $this->fightTookTooLong       = false;
+        $this->fightSetUp             = false;
+        $this->newAttackType          = null;
+
+        $this->setupFightHandler->reset();
     }
 
     protected function isCharacterDead(): bool {

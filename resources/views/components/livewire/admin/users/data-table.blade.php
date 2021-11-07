@@ -65,6 +65,14 @@
                             />
 
                             <x-data-tables.header-row
+                              wire:click.prevent="sortBy('last_logged_in')"
+                              header-text="Logged In At"
+                              sort-by="{{$sortBy}}"
+                              sort-field="{{$sortField}}"
+                              field="last_logged_in"
+                            />
+
+                            <x-data-tables.header-row
                                 header-text="Actions"
                             />
                     </x-data-tables.header>
@@ -83,7 +91,7 @@
                                         @if ($user->is_banned && is_null($user->unbanned_at))
                                             For ever
                                         @elseif($user->is_banned && !is_null($user->unbanned_at))
-                                            {{ $user->unbanned_at->format('l jS \\of F Y h:i:s A') }}
+                                            {{ $user->unbanned_at->setTimeZone(config('app.timezone'))->format('l jS \\of F Y h:i:s A') }}
                                         @else
                                             N/A
                                         @endif
@@ -91,10 +99,17 @@
                                 <td>{{$user->is_silenced ? 'Yes' : 'No'}}</td>
                                 <td>
                                     @if ($user->is_silenced)
-                                        {{ $user->can_speak_again_at->format('l jS \\of F Y h:i:s A') }}
+                                        {{ $user->can_speak_again_at->setTimeZone(config('app.timezone'))->format('l jS \\of F Y h:i:s A') }}
                                     @else
                                         N/A
                                     @endif
+                                </td>
+                                <td>
+                                  @if (!is_null($user->last_logged_in))
+                                    {{ $user->last_logged_in->setTimeZone(config('app.timezone'))->format('l jS \\of F Y h:i:s A') }}
+                                  @else
+                                    Hasn't Logged In
+                                  @endif
                                 </td>
                                 <td class="clearfix">
 

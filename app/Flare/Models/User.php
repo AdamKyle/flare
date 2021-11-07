@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'password',
+        'last_logged_in',
         'message_throttle_count',
         'can_speak_again_at',
         'is_silenced',
@@ -41,6 +42,7 @@ class User extends Authenticatable
         'show_kingdom_update_messages',
         'show_building_rebuilt_messages',
         'auto_disenchant',
+        'disable_attack_type_popover',
         'auto_disenchant_amount',
         'timeout_until',
         'is_test',
@@ -63,6 +65,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at'              => 'datetime',
         'can_speak_again_at'             => 'datetime',
+        'last_logged_in'                 => 'datetime',
         'is_silenced'                    => 'boolean',
         'message_throttle_count'         => 'integer',
         'is_banned'                      => 'boolean',
@@ -81,6 +84,7 @@ class User extends Authenticatable
         'show_kingdom_update_messages'   => 'boolean',
         'show_building_rebuilt_messages' => 'boolean',
         'auto_disenchant'                => 'boolean',
+        'disable_attack_type_popover'    => 'boolean',
     ];
 
     public function character() {

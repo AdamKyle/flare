@@ -40,6 +40,13 @@ class DataTable extends Component
             ->paginate($this->perPage);
     }
 
+    public function fetchResistanceReductionAffixes() {
+        return ItemAffix::dataTableSearch($this->search)
+            ->where('resistance_reduction', '>', 0)
+            ->orderBy($this->sortField, $this->sortBy)
+            ->paginate($this->perPage);
+    }
+
     public function fetchLifeStealingAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->whereNotNull('steal_life_amount')
@@ -202,9 +209,6 @@ class DataTable extends Component
                 case 'skills':
                     $data = $this->fetchSkills();
                     break;
-                case 'class_bonus':
-                    $data = $this->fetchSkills();
-                    break;
                 case 'modifiers':
                     $data = $this->fetchModifiers();
                     break;
@@ -217,7 +221,10 @@ class DataTable extends Component
                 case 'devouring_light':
                     $data = $this->fetchDevouringLight();
                     break;
-                case 'default':
+                case 'resistance_reduction':
+                    $data = $this->fetchResistanceReductionAffixes();
+                    break;
+                default:
                     $data = $this->fetchAffixes();
                     break;
             }

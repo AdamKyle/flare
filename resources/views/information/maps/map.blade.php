@@ -33,6 +33,18 @@
                     <p class="mt-3">
                         These bonuses will apply to adventures as well - thus stacking with the adventure bonuses.
                     </p>
+                    @if ($map->name === 'Shadow Plane')
+                        <hr />
+                        <h3>Tips</h3>
+                        <p>
+                            Do not underestimate enemies down here. The further down the list, the harder they get.
+                            Your character should have a very good stat reduction (that effects all stats), skill reduction
+                            and resistance reduction enchantments.
+                        </p>
+                        <p>
+                            Without these, you may find it harder to hit top end creatures, depending on your level and gear.
+                        </p>
+                    @endif
                 </div>
             </div>
             @if (!is_null($itemNeeded))

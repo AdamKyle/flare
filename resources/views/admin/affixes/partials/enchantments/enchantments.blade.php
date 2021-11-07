@@ -25,6 +25,12 @@
         title="Reduces Enemy Stats"
       />
       <x-tabs.tab
+        tab="reduces-enemy-resistances"
+        selected="false"
+        active="false"
+        title="Reduces Enemy Resistances"
+      />
+      <x-tabs.tab
         tab="life-stealing-amount"
         selected="false"
         active="false"
@@ -80,6 +86,27 @@
     >
       <x-cards.card>
         @include('admin.affixes.partials.enchantments.partials.stats-decrease')
+      </x-cards.card>
+    </x-tabs.tab-content-section>
+    <x-tabs.tab-content-section
+      tab="reduces-enemy-resistances"
+      active="false"
+    >
+      <x-cards.card>
+        <div class="alert alert-info mt-2 mb-3">
+          <p>These affixes do not stack and only effect the enemy. These reduce the following resistances that all enemies have:</p>
+          <ul>
+            <li>Spell Evasion</li>
+            <li>Artifact Annulment</li>
+            <li>Affix Resistance</li>
+          </ul>
+          <p>Should you have many equipped, we will take the best one of them all.</p>
+          <p>Much like skill reduction and stat reduction these are applied only if you are not voided and before the fight begins.</p>
+        </div>
+
+        @livewire('admin.affixes.data-table', [
+            'only' => 'resistance_reduction',
+        ])
       </x-cards.card>
     </x-tabs.tab-content-section>
     <x-tabs.tab-content-section

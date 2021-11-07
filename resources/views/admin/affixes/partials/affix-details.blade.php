@@ -202,5 +202,43 @@
         </div>
       </div>
     @endif
+    @if ($itemAffix->skill_reduction > 0)
+      <h2 class="mt-2 mb-2">Skill Reduction</h2>
+
+      <div class="card">
+        <div class="card-body">
+          <p>
+            These Affixes only affect enemies and can reduce ALL their skills at once by a specified %. These affixes work
+            in the same vein as stat reduction affixes, how ever these do not stack. We take the best one of all you have on.
+          </p>
+          <dl>
+            <dt>Skills Affected:</dt>
+            <dd>Accuracy, Dodge, Casting Accuracy and Criticality</dd>
+            <dt>Skills Reduced By:</dt>
+            <dd>{{$itemAffix->skill_reduction * 100}}%</dd>
+          </dl>
+        </div>
+      </div>
+    @endif
+    @if ($itemAffix->resistance_reduction > 0)
+      <h2 class="mt-2 mb-2">Resistance Reduction</h2>
+
+      <div class="card">
+        <div class="card-body">
+          <p>These affixes do not stack and only effect the enemy. These reduce the following resistances that all enemies have:</p>
+          <ul>
+            <li>Spell Evasion</li>
+            <li>Artifact Annulment</li>
+            <li>Affix Resistance</li>
+          </ul>
+          <p>Should you have many equipped, we will take the best one of them all.</p>
+          <p>Much like skill reduction and stat reduction these are applied only if you are not voided and before the fight begins.</p>
+          <dl>
+            <dt>Resistance Reduction:</dt>
+            <dd>{{$itemAffix->resistance_reduction * 100}}%</dd>
+          </dl>
+        </div>
+      </div>
+    @endif
   </div>
 </div>

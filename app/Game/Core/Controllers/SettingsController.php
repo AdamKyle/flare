@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Events\UpdateCharacterAttackEvent;
 use Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -59,6 +60,17 @@ class SettingsController extends Controller {
         ]);
 
         return redirect()->back()->with('success', 'Updated auto disenchant preferences.');
+    }
+
+    public function disableAttackTypePopOvers(request $request, User $user) {
+
+        $user->update([
+            'disable_attack_type_popover' => $request->has('disable_attack_type_popover') ? $request->disable_attack_type_popover : false,
+        ]);
+
+        event(new UpdateCharacterAttackEvent($user->refresh()->character));
+
+        return redirect()->back()->with('success', 'Updated Attack Popover Preferences');
     }
 
     public function characterSettings(Request $request, User $user) {

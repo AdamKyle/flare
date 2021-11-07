@@ -264,6 +264,66 @@ class CharacterInformationBuilder {
         return empty($values) ? 0.0 : max($values);
     }
 
+    public function getBestSkillReduction() : float {
+        $slots = $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                if ($slot->item->itemPrefix->skill_reduction > 0) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                if ($slot->item->itemSuffix->skill_reduction > 0) {
+                    return $slot;
+                }
+            }
+        });
+
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                $values[] = $slot->item->itemPrefix->skill_reduction;
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                $values[] = $slot->item->itemSuffix->skill_reduction;
+            }
+        }
+
+        return empty($values) ? 0.0 : max($values);
+    }
+
+    public function getBestResistanceReduction() : float {
+        $slots = $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                if ($slot->item->itemPrefix->resistance_reduction > 0) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                if ($slot->item->itemSuffix->resistance_reduction > 0) {
+                    return $slot;
+                }
+            }
+        });
+
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->itemPrefix))  {
+                $values[] = $slot->item->itemPrefix->resistance_reduction;
+            }
+
+            if (!is_null($slot->item->itemSuffix))  {
+                $values[] = $slot->item->itemSuffix->resistance_reduction;
+            }
+        }
+
+        return empty($values) ? 0.0 : max($values);
+    }
+
     /**
      * Returns a collection of single stat reduction affixes.
      *

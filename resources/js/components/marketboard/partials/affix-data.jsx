@@ -1,6 +1,5 @@
 import React, {Fragment} from 'react';
 import {Tabs, Tab} from "react-bootstrap";
-import {random, times} from "lodash/number";
 
 export default class AffixData extends React.Component {
 
@@ -11,10 +10,11 @@ export default class AffixData extends React.Component {
   render() {
     const item = this.props.item['item_' + this.props.type];
 
-    const baseInfoId = Math.random().toString(36).substr(2, 5);
-    const statsId    = Math.random().toString(36).substr(2, 5);
-    const skillsId   = Math.random().toString(36).substr(2, 5);
-    const damageId   = Math.random().toString(36).substr(2, 5);
+    const baseInfoId  = Math.random().toString(36).substr(2, 5);
+    const statsId     = Math.random().toString(36).substr(2, 5);
+    const skillsId    = Math.random().toString(36).substr(2, 5);
+    const damageId    = Math.random().toString(36).substr(2, 5);
+    const reductionId = Math.random().toString(36).substr(2, 5);
 
     return (
       <>
@@ -82,14 +82,31 @@ export default class AffixData extends React.Component {
             </div>
           </Tab>
           <Tab eventKey={'skills-' + skillsId} title="Skills">
-            <dl className="mt-4">
-              <dt>Skill Name:</dt>
-              <dd>{item.skill_name === null ? 'N/A' : item.skill_name}</dd>
-              <dt>Skill XP Bonus (When training):</dt>
-              <dd>{item.skill_name === null ? 0 : item.skill_training_bonus * 100}%</dd>
-              <dt>Skill Bonus (When Using):</dt>
-              <dd>{item.skill_name === null ? 0 : item.skill_bonus * 100}%</dd>
-            </dl>
+            <div className="row">
+              <div className={item.skill_reduction > 0 ? 'col-md-6' : 'col-md-12'}>
+                <dl className="mt-4">
+                  <dt>Skill Name:</dt>
+                  <dd>{item.skill_name === null ? 'N/A' : item.skill_name}</dd>
+                  <dt>Skill XP Bonus (When training):</dt>
+                  <dd>{item.skill_name === null ? 0 : item.skill_training_bonus * 100}%</dd>
+                  <dt>Skill Bonus (When Using):</dt>
+                  <dd>{item.skill_name === null ? 0 : item.skill_bonus * 100}%</dd>
+                </dl>
+              </div>
+              <div className={item.skill_reduction > 0 ? 'col-md-6' : 'hide'}>
+                <dl className="mt-4">
+                  <dt>Skills Affected:</dt>
+                  <dd>Accuracy, Criticality, Casting Accuracy and Dodge</dd>
+                  <dt>Skill Reduction %:</dt>
+                  <dd
+                    className={item.skill_reduction > 0.0 ? 'text-danger' : ''}>{item.skill_reduction * 100}%
+                  </dd>
+                </dl>
+
+                <p className="mt-2 text-info">Affects enemies only.</p>
+              </div>
+            </div>
+
           </Tab>
           <Tab eventKey={'damage-' + damageId} title="Damage">
             <dl className="mt-4">
@@ -128,6 +145,12 @@ export default class AffixData extends React.Component {
                   :
                   null
               }
+            </dl>
+          </Tab>
+          <Tab eventKey={'resistance-reduction' + reductionId} title="Resistance Reduction">
+            <dl className="mt-4">
+              <dt>Resistance Reduction:</dt>
+              <dd className={item.resistance_reduction > 0 ? 'text-danger' : ''}>{item.resistance_reduction * 100}%</dd>
             </dl>
           </Tab>
         </Tabs>

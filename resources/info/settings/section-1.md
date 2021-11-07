@@ -108,3 +108,19 @@ As you can see you can enable auto disenchant and then select a condition.
 > ### ATTN!
 > 
 > This will auto disenchant items for Celestials and Regular battles. **NOT** adventures.
+
+## Disabling The Attack Tool Tips
+
+The attack tool tips can be disabled by flipping the switch:
+
+<div class="mb-4">
+    <a href="/storage/info/settings/images/disable-attack-tool-tips.png" class="glightbox">
+        <img src="/storage/info/settings/images/disable-attack-tool-tips.png" class="img-fluid" />
+    </a>
+</div>
+
+This will prevent tool tips when hovering over the attack types when attacking.
+
+> ### ATTN New Players
+>
+> Do not enable this at the start. Familiarize your self with how combat works first.

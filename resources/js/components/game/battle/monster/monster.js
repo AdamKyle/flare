@@ -21,7 +21,7 @@ export default class Monster {
 
     health = health + health * this.monster.increases_damage_by;
 
-    return parseInt(health + this.monster.dur);
+    return parseInt(health);
   }
 
   canMonsterVoidPlayer() {
@@ -32,7 +32,11 @@ export default class Monster {
 
   reduceAllStats(affixes) {
     let monster = JSON.parse(JSON.stringify(this.monster));
-    const dc    = 100 - monster.affix_resistance;
+    let dc      = 75 + Math.ceil(75 * monster.affix_resistance);
+
+    if (dc > 100) {
+      dc = 99;
+    }
 
     if (affixes.all_stat_reduction === null && affixes.stat_reduction.length === 0) {
       this.monster = monster;
@@ -42,20 +46,20 @@ export default class Monster {
 
     if (affixes.all_stat_reduction !== null || affixes.stat_reduction.length > 0) {
       if (!affixes.can_be_resisted && (dc <= 0 || randomNumber(0, 100) > dc)) {
-        return [{message: 'Your enemy laughs at your attempt to make them week fails.', class: 'info-damage'}]
+        return [{message: 'Your enemy laughs at your attempt to make them week fails.', class: 'enemy-action-fired'}]
       }
     }
 
     const statReducingAffix = affixes.all_stat_reduction;
 
     if (statReducingAffix !== null) {
-      monster.str = monster.str - (monster.str * statReducingAffix.str_reduction);
-      monster.dex = monster.dex - (monster.dex * statReducingAffix.dex_reduction);
-      monster.dur = monster.dur - (monster.dur * statReducingAffix.dur_reduction);
-      monster.chr = monster.chr - (monster.chr * statReducingAffix.chr_reduction);
-      monster.int = monster.int - (monster.int * statReducingAffix.int_reduction);
-      monster.agi = monster.agi - (monster.agi * statReducingAffix.agi_reduction);
-      monster.focus = monster.focus - (monster.focus * statReducingAffix.focus_reduction);
+      monster.str = monster.str - Math.ceil(monster.str * statReducingAffix.str_reduction);
+      monster.dex = monster.dex - Math.ceil(monster.dex * statReducingAffix.dex_reduction);
+      monster.dur = monster.dur - Math.ceil(monster.dur * statReducingAffix.dur_reduction);
+      monster.chr = monster.chr - Math.ceil(monster.chr * statReducingAffix.chr_reduction);
+      monster.int = monster.int - Math.ceil(monster.int * statReducingAffix.int_reduction);
+      monster.agi = monster.agi - Math.ceil(monster.agi * statReducingAffix.agi_reduction);
+      monster.focus = monster.focus - Math.ceil(monster.focus * statReducingAffix.focus_reduction);
     }
 
     const statReducingAffixes = affixes.stat_reduction;
@@ -74,7 +78,72 @@ export default class Monster {
 
     this.monster = monster;
 
-    return [{message: 'Your enemy sinks to their knees in agony as you make them weaker.', class: 'info-damage'}]
+    return [{message: 'Your enemy sinks to their knees in agony as you make them weaker!', class: 'info-damage'}]
+  }
+
+  reduceSkills(skillReduction) {
+    let monster = JSON.parse(JSON.stringify(this.monster));
+
+    if (skillReduction > 0.0) {
+      monster.accuracy         -= skillReduction;
+      monster.casting_accuracy -= skillReduction;
+      monster.criticality      -= skillReduction;
+      monster.dodge            -= skillReduction;
+
+      if (monster.accuracy < 0.0) {
+        monster.accuracy = 0.0;
+      }
+
+      if (monster.casting_accuracy < 0.0) {
+        monster.casting_accuracy = 0.0;
+      }
+
+      if (monster.criticality < 0.0) {
+        monster.criticality = 0.0;
+      }
+
+      if (monster.dodge < 0.0) {
+        monster.dodge = 0.0;
+      }
+
+      this.monster = monster;
+
+      return [{message: 'Your enemy stumbles around confused as you reduce their chances at life!', class: 'info-damage'}]
+    }
+
+    this.monster = monster;
+
+    return [];
+  }
+
+  reduceResistances(reduction) {
+    let monster = JSON.parse(JSON.stringify(this.monster));
+
+    if (reduction > 0.0) {
+      monster.spell_evasion      -= reduction;
+      monster.artifact_annulment -= reduction;
+      monster.affix_resistance   -= reduction;
+
+      if (monster.spell_evasion < 0.0) {
+        monster.spell_evasion = 0.0;
+      }
+
+      if (monster.artifact_annulment < 0.0) {
+        monster.artifact_annulment = 0.0;
+      }
+
+      if (monster.affix_resistance < 0.0) {
+        monster.affix_resistance = 0.0;
+      }
+
+      this.monster = monster;
+
+      return [{message: 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure then before!', class: 'info-damage'}]
+    }
+
+    this.monster = monster;
+
+    return [];
   }
 
   attack() {

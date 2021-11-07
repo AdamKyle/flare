@@ -77,6 +77,12 @@ how hard the enemy is. They could also go the two durability shields (two shield
 
 When casting it&#39;s your spells then your rings, artifacts and affixes
 
+### Regarding Casters
+
+In your few level's avoid these attack types. Instead, focus on Attack. The reason is, you have a higher chance
+to hit something then you do to cast. The exception is for prophets who use healing spells, your healing spells - even if your "damage" spell misses. will never
+miss or be blocked.
+
 ## Cast and Attack and Attack and Cast
 
 Requires Both Casting Accuracy and Accuracy
@@ -100,6 +106,12 @@ Note: The reason missed is in quotes, is because even if you have a bow and a he
 For Attack and cast, it&#39;s the same but reversed. Left-hand weapon then spell **slot two** will fire. The same concept applies as it does for cast and attack.
 
 You have a chance for your class skill to fire twice if you are a vampire and once otherwise. For the vampire class skill to have a chance to fire twice, your weapon and damage spell cannot miss else it&#39;s a one-time chance.
+
+### Regarding Casters
+
+In your few level's avoid these attack types. Instead, focus on Attack. The reason is, you have a higher chance
+to hit something then you do to cast. The exception is for prophets who use healing spells, your healing spells - even if your "damage" spell misses. will never
+miss or be blocked.
 
 ## Defend
 

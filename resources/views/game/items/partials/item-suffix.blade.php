@@ -1,15 +1,17 @@
 @php
-    $baseInfoId  = Str::random(10);
-    $statsId     = Str::random(10);
-    $skillsId    = Str::random(10);
-    $damageId    = Str::random(10);
+    $baseInfoId    = Str::random(10);
+    $statsId       = Str::random(10);
+    $skillsId      = Str::random(10);
+    $damageId      = Str::random(10);
+    $resistanceId  = Str::random(10);
 @endphp
 
 <x-tabs.pill-tabs-container>
-  <x-tabs.tab tab="suffix-base-info-{{$baseInfoId}}" title="Base Information" selected="true" active="true" />
+  <x-tabs.tab tab="suffix-base-info-{{$baseInfoId}}" title="Base" selected="true" active="true" />
   <x-tabs.tab tab="suffix-stats-{{$statsId}}" title="Stats" selected="false" active="false" />
   <x-tabs.tab tab="suffix-skills-{{$skillsId}}" title="Skills" selected="false" active="false" />
   <x-tabs.tab tab="suffix-damage-{{$damageId}}" title="Damage" selected="false" active="false" />
+  <x-tabs.tab tab="suffix-resistance-{{$resistanceId}}" title="Resiatance" selected="false" active="false" />
 </x-tabs.pill-tabs-container>
 <x-tabs.tab-content>
   <x-tabs.tab-content-section tab="suffix-base-info-{{$baseInfoId}}" active="true">
@@ -72,14 +74,30 @@
     </div>
   </x-tabs.tab-content-section>
   <x-tabs.tab-content-section tab="suffix-skills-{{$skillsId}}" active="false">
-    <dl>
-      <dt>Skill Name:</dt>
-      <dd>{{is_null($item->itemSuffix->skill_name) ? 'N/A' : $item->itemSuffix->skill_name}}</dd>
-      <dt>Skill XP Bonus (When Training):</dt>
-      <dd class="{{is_null($item->itemSuffix->skill_name) ? $item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : '' : ''}}">{{is_null($item->itemSuffix->skill_name) ? 0 : $item->itemSuffix->skill_training_bonus * 100}}%</dd>
-      <dt>Skill Bonus (When using)</dt>
-      <dd class="{{is_null($item->itemSuffix->skill_name) ? $item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : '' : ''}}">{{is_null($item->itemSuffix->skill_bonus) ? 0 : $item->itemSuffix->skill_bonus * 100}}%</dd>
-    </dl>
+    <div class="row">
+      <div class="{{$item->itemSuffix->skill_reduction > 0 ? 'col-md-6' : 'col-md-12'}}">
+        <dl>
+          <dt>Skill Name:</dt>
+          <dd>{{is_null($item->itemSuffix->skill_name) ? 'N/A' : $item->itemSuffix->skill_name}}</dd>
+          <dt>Skill XP Bonus (When Training):</dt>
+          <dd class="{{is_null($item->itemSuffix->skill_name) ? $item->itemSuffix->skill_training_bonus > 0.0 ? 'text-success' : '' : ''}}">{{is_null($item->itemSuffix->skill_name) ? 0 : $item->itemSuffix->skill_training_bonus * 100}}%</dd>
+          <dt>Skill Bonus (When using)</dt>
+          <dd class="{{is_null($item->itemSuffix->skill_name) ? $item->itemSuffix->skill_bonus > 0.0 ? 'text-success' : '' : ''}}">{{is_null($item->itemSuffix->skill_bonus) ? 0 : $item->itemSuffix->skill_bonus * 100}}%</dd>
+        </dl>
+      </div>
+
+      <div class="{{$item->itemSuffix->skill_reduction > 0 ? 'col-md-6' : 'hide'}}">
+        <dl>
+          <dt>Skills Affected:</dt>
+          <dd>Accuracy, Criticality, Casting Accuracy and Dodge</dd>
+          <dt>Skill Reduction %:</dt>
+          <dd class="{{$item->itemSuffix->skill_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemSuffix->skill_reduction * 100}}%</dd>
+        </dl>
+
+        <p class="mt-2 text-info">Affects enemies only.</p>
+      </div>
+    </div>
+
   </x-tabs.tab-content-section>
   <x-tabs.tab-content-section tab="suffix-damage-{{$damageId}}" active="false">
     <dl>
@@ -102,6 +120,13 @@
         <dt>Devouring Light (Voidance Chance):</dt>
         <dd class={{$item->itemSuffix->devouring_light > 0 ? 'text-success' : ''}}>{{$item->itemSuffix->devouring_light * 100}}%</dd>
       @endif
+    </dl>
+  </x-tabs.tab-content-section>
+  <x-tabs.tab-content-section tab="suffix-resistance-{{$resistanceId}}" active="false">
+    <dl>
+      <dt>Resistance Reduction:</dt>
+      <dd class="{{$item->itemSuffix->resiatance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemSuffix->resistance_reduction * 100}}%</dd>
+      <p class="mt-2 text-info">Affects enemies only. Affects their: Spell Evasion, Artifact Annulment and Affix Resistance.</p>
     </dl>
   </x-tabs.tab-content-section>
 </x-tabs.tab-content>

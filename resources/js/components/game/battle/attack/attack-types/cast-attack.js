@@ -100,27 +100,33 @@ export default class CastAttack {
   }
 
   attackWithSpells(attackData) {
-
     const evasion = this.defender.spell_evasion;
     let dc        = 100;
     let roll      = random(1, 100);
 
-    if (this.attacker.class === 'Prophet' || this.attacker.class === 'Heretic') {
-      const bonus = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus
-
-      dc   -= dc * bonus;
-      roll -= roll * evasion;
-    }
-
-    if (roll > dc && dc > 0) {
+    if (evasion > 1.0) {
       this.addEnemyActionMessage('The enemy evades your magic!')
 
       return;
     }
 
-    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
-    let damage       = attackData.spell_damage;
-    const critDc     = 100 - 100 * skillBonus;
+    if (this.attacker.class === 'Prophet' || this.attacker.class === 'Heretic') {
+      const bonus = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus
+
+      dc   = roll - Math.ceil(dc * bonus);
+      roll = roll - Math.ceil(roll * evasion);
+    }
+
+    if (roll < dc && dc > 0) {
+      this.addEnemyActionMessage('The enemy evades your magic!')
+
+      return;
+    }
+
+    const skillBonus      = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    const castingAccuracy = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
+    let damage            = attackData.spell_damage;
+    const critDc          = 100 - 100 * skillBonus;
 
     if (random(1, 100) > critDc) {
       this.addActionMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)')
@@ -134,7 +140,7 @@ export default class CastAttack {
 
     this.addMessage('Your damage spell hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
 
-    this.extraAttacks(attackData);
+    this.extraAttacks(attackData, castingAccuracy);
 
   }
 
@@ -170,10 +176,10 @@ export default class CastAttack {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  extraAttacks(attackData) {
+  extraAttacks(attackData, skillBonus) {
     const damage = new Damage();
 
-    this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth, attackData);
+    this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth, attackData, skillBonus);
 
     const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 

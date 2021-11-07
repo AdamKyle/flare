@@ -31,7 +31,6 @@ class SetupFightHandler {
 
     public function setUpFight($attacker, $defender) {
 
-
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
 
@@ -52,20 +51,24 @@ class SetupFightHandler {
             }
         }
 
-//        if ($defender instanceof Monster && !$this->monsterDevoided) {
-//            if ($this->voidedEnemy($defender)) {
-//                $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
-//
-//                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
-//
-//                $this->attackType = 'voided_';
-//            }
-//        }
+        if ($defender instanceof Monster && !$this->monsterDevoided) {
+            if ($this->voidedEnemy($defender)) {
+                $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
+
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+
+                $this->attackType = 'voided_';
+            }
+        }
 
         // Only do this once per fight and if you are not voided.
         if (is_null($this->attackType) && !$this->processed) {
             if ($attacker instanceof Character && is_null($this->attackType)) {
-                $this->defender = $this->reduceEnemyStats($defender);
+                $defender = $this->reduceEnemyStats($defender);
+
+                $defender = $this->reduceEnemySkills($defender);
+
+                $defender = $this->reduceEnemyResistances($defender);
             }
         }
 
@@ -91,9 +94,12 @@ class SetupFightHandler {
     }
 
     public function reset() {
-        $this->battleLogs = [];
-        $this->attackType = null;
-        $this->defender   = null;
+        $this->battleLogs      = [];
+        $this->attackType      = null;
+        $this->defender        = null;
+        $this->processed       = false;
+        $this->monsterDevoided = false;
+        $this->monsterVoided   = false;
     }
 
     public function getModifiedDefender(): Monster {
@@ -118,11 +124,13 @@ class SetupFightHandler {
     }
 
     protected function devoidEnemy($attacker) {
-        if ($attacker->devouring_darkeness >= 1) {
+        $devouringDarknessChance = $this->characterInformationBuilder->setCharacter($attacker)->getDevouringDarkness();
+
+        if ($devouringDarknessChance >= 1) {
             return true;
         }
 
-        $dc = 100 - 100 * $attacker->devouring_darkeness;
+        $dc = 100 - 100 * $devouringDarknessChance;
 
         return rand(1, 100) > $dc;
     }
@@ -136,8 +144,7 @@ class SetupFightHandler {
             if ($dc <= 0 || rand(1, 100) > $dc) {
                 $message = 'Your enemy laughs at your attempt to make them week fails.';
 
-                $battleLogs       = $this->addMessage($message, 'info-damage', $this->battleLogs);
-                $this->battleLogs = [...$this->battleLogs, ...$battleLogs];
+                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
                 return $defender;
             }
@@ -161,8 +168,68 @@ class SetupFightHandler {
 
             $message = 'Your enemy sinks to their knees in agony as you make them weaker.';
 
-            $battleLogs       = $this->addMessage($message, 'info-damage', $this->battleLogs);
-            $this->battleLogs = [...$this->battleLogs, ...$battleLogs];
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+        }
+
+        return $defender;
+    }
+
+    protected function reduceEnemySkills($defender) {
+        $skillReduction = $this->characterInformationBuilder->getBestSkillReduction();
+
+        if ($skillReduction > 0.0) {
+            $defender->accuracy           = $defender->accuracy - $skillReduction;
+            $defender->casting_accuracy   = $defender->casting_accuracy - $skillReduction;
+            $defender->criticality        = $defender->criticality - $skillReduction;
+            $defender->dodge              = $defender->dodge - $skillReduction;
+
+            if ($defender->accuracy < 0.0) {
+                $defender->accuracy = 0.0;
+            }
+
+            if ($defender->casting_accuracy < 0.0) {
+                $defender->casting_accuracy = 0.0;
+            }
+
+            if ($defender->criticality < 0.0) {
+                $defender->criticality = 0.0;
+            }
+
+            if ($defender->dodge < 0.0) {
+                $defender->dodge = 0.0;
+            }
+
+            $message = 'Your enemy stumbles around confused as you reduce their chances at life!';
+
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+        }
+
+        return $defender;
+    }
+
+    protected function reduceEnemyResistances($defender) {
+        $reduction = $this->characterInformationBuilder->getBestResistanceReduction();
+
+        if ($reduction > 0.0) {
+            $defender->spell_evasion        = $defender->spell_evasion - $reduction;
+            $defender->artifact_annulment   = $defender->artifact_annulment - $reduction;
+            $defender->affix_resistance     = $defender->affix_resistance - $reduction;
+
+            if ($defender->spell_evasion < 0.0) {
+                $defender->spell_evasion = 0.0;
+            }
+
+            if ($defender->artifact_annulment < 0.0) {
+                $defender->artifact_annulment = 0.0;
+            }
+
+            if ($defender->affix_resistance < 0.0) {
+                $defender->affix_resistance = 0.0;
+            }
+
+            $message = 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure then before!';
+
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
         }
 
         return $defender;
