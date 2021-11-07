@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'email',
         'password',
+        'last_logged_in',
         'message_throttle_count',
         'can_speak_again_at',
         'is_silenced',
@@ -63,6 +64,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at'              => 'datetime',
         'can_speak_again_at'             => 'datetime',
+        'last_logged_in'                 => 'datetime',
         'is_silenced'                    => 'boolean',
         'message_throttle_count'         => 'integer',
         'is_banned'                      => 'boolean',

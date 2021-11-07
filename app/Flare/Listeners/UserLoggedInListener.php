@@ -17,6 +17,10 @@ class UserLoggedInListener {
      * @param Login $event
      */
     public function handle(Login $event) {
+
+        $event->user->last_logged_in = now();
+        $event->user->save();
+
         if (is_null(UserSiteAccessStatistics::first())) {
 
             UserSiteAccessStatistics::create([

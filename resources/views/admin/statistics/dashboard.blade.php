@@ -20,7 +20,7 @@
     </x-cards.card-with-title>
     <hr />
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <x-cards.card-with-title title="Average Character Information">
                 <div class="alert alert-info mt-2 mb-3">Average of all Characters</div>
                 <dl>
@@ -35,11 +35,21 @@
                 </dl>
             </x-cards.card-with-title>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <x-cards.card-with-title title="Kingdom Data">
                 <dl>
                     <dt>Kingdom Count (Across All Maps)</dt>
                     <dd>{{$kingdomCount}}</dd>
+                </dl>
+            </x-cards.card-with-title>
+        </div>
+        <div class="col-md-4">
+            <x-cards.card-with-title title="Login Info">
+                <dl>
+                    <dt>Count:</dt>
+                    <dd>{{$lastLoggedInCount}}</dd>
+                    <dt>Never Logged In Count:</dt>
+                    <dd>{{$neverLoggedInCount}}</dd>
                 </dl>
             </x-cards.card-with-title>
         </div>

@@ -86,6 +86,7 @@ class RegisterController extends Controller
             'email'            => $data['email'],
             'password'         => Hash::make($data['password']),
             'ip_address'       => $ip,
+            'last_logged_in'   => now(),
         ]);
     }
 
