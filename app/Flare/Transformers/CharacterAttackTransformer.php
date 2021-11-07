@@ -66,6 +66,7 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'skill_reduction'      => $characterInformation->getBestSkillReduction(),
             'resistance_reduction' => $characterInformation->getBestResistanceReduction(),
             'attack_types'         => $this->fetchAttackTypes($character),
+            'disable_pop_overs'    => $character->user->disable_attack_type_popover,
         ];
     }
 

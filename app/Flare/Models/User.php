@@ -42,6 +42,7 @@ class User extends Authenticatable
         'show_kingdom_update_messages',
         'show_building_rebuilt_messages',
         'auto_disenchant',
+        'disable_attack_type_popover',
         'auto_disenchant_amount',
         'timeout_until',
         'is_test',
@@ -83,6 +84,7 @@ class User extends Authenticatable
         'show_kingdom_update_messages'   => 'boolean',
         'show_building_rebuilt_messages' => 'boolean',
         'auto_disenchant'                => 'boolean',
+        'disable_attack_type_popover'    => 'boolean',
     ];
 
     public function character() {

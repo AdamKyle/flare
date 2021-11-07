@@ -37,6 +37,7 @@ Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is
 
     Route::get('/settings/{user}', ['as' => 'user.settings', 'uses' => 'SettingsController@index']);
     Route::post('/settings/{user}/auto-disenchant', ['as' => 'user.settings.auto-disenchant', 'uses' => 'SettingsController@autoDisenchantSettings']);
+    Route::post('/settings/{user}/disable-attack-pop-overs', ['as' => 'user.settings.disable-attack-pop-overs', 'uses' => 'SettingsController@disableAttackTypePopOvers']);
     Route::post('/settings/{user}/chat-settings', ['as' => 'user.settings.chat', 'uses' => 'SettingsController@chatSettings']);
     Route::post('/settings/{user}/email-settings', ['as' => 'user.settings.email', 'uses' => 'SettingsController@emailSettings']);
     Route::post('/settings/{user}/character-name', ['as' => 'user.settings.character', 'uses' => 'SettingsController@characterSettings']);
