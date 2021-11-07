@@ -44,6 +44,7 @@
             <th>entranced_chance</th>
             <th>devouring_light</th>
             <th>skill_reduction</th>
+            <th>resistance_reduction</th>
         </tr>
     </thead>
     <tbody>

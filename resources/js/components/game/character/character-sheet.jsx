@@ -83,7 +83,7 @@ export default class CharacterSheet extends React.Component {
               }
 
               <Row>
-                <Col xs={12} sm={6}>
+                <Col lg={12} xl={6}>
                   <Tabs defaultActiveKey="character-info" id="character-section">
                     <Tab eventKey="character-info" title="Character Info">
                       <CharacterDetails
@@ -101,7 +101,7 @@ export default class CharacterSheet extends React.Component {
                     isDead={this.state.characterSheet.is_dead}
                   />
                 </Col>
-                <Col xs={12} sm={6}>
+                <Col lg={12} xl={6}>
                   <InventoryDetails
                     characterSheet={this.state.characterSheet}
                     characterId={this.props.characterId}
