@@ -1,7 +1,7 @@
 
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <x-cards.card-with-title title="Auto Disenchant Settings">
+        <x-cards.card-with-title title="Disable Attack Tool Tips">
             <div class="row justify-content-center mb-3">
                 <div class="col-md-8">
                     <div class="alert alert-info">
