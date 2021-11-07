@@ -33,7 +33,6 @@ export default class CastAndAttack {
     const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
     if (canEntrance) {
-
       if (attackData.spell_damage > 0) {
         castAttack.attackWithSpells(attackData);
       }
@@ -70,7 +69,7 @@ export default class CastAndAttack {
 
       this.setStateInfo(castAttack);
 
-      const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
+      const weaponAttack = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       weaponAttack.attackWithWeapon(attackData);
 
@@ -82,23 +81,18 @@ export default class CastAndAttack {
     }
 
     if (canHit) {
-      if (this.canBlock(attackData.spell_damage + attackData.weapon_damage)) {
-        this.addEnemyActionMessage(this.defender.name + ' Blocked both your damage spell and you fumble with your weapon!');
+      if (this.canBlock(attackData.spell_damage)) {
+        this.addEnemyActionMessage(this.defender.name + ' Blocked your damage spell!');
 
         if (attackData.heal_for > 0) {
           castAttack.healWithSpells(attackData);
         }
-
-        this.useItems(attackData, this.attacker.class);
-
-        return this.setState();
-      }
-
-
-      if (attackData.spell_damage > 0) {
-        castAttack.attackWithSpells(attackData);
-      } else if (attackData.heal_for > 0) {
-        castAttack.healWithSpells(attackData);
+      } else {
+        if (attackData.spell_damage > 0) {
+          castAttack.attackWithSpells(attackData);
+        } else if (attackData.heal_for > 0) {
+          castAttack.healWithSpells(attackData);
+        }
       }
 
       this.setStateInfo(castAttack);
@@ -167,8 +161,8 @@ export default class CastAndAttack {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  canBlock() {
-    return this.defender.ac > this.attacker.base_stat;
+  canBlock(damage) {
+    return this.defender.ac > damage;
   }
 
   addMessage(message) {

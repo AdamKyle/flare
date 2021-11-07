@@ -171,7 +171,7 @@ class AttackAndCastHandler {
                 }
 
             } else {
-                $this->battleLogs = $this->addMessage('Your damage spells missed!', $this->battleLogs);
+                $this->battleLogs = $this->addMessage('Your damage spells missed!', 'enemy-action-fired', $this->battleLogs);
             }
         } else if ($attackData['heal_for'] > 0) {
             $this->fireOffHealingSpells($characterInfo, $attackData);

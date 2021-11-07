@@ -142,6 +142,14 @@
         <hr />
     </div>
     <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="item-affix-resistance-reduction">% Resistance Reduction: </label>
+                <input type="number" steps="0.01" class="form-control" id="item-affix-resistance-reduction" name="item-affix-resistance-reduction" wire:model="itemAffix.resistance_reduction">
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label for="item-affix-steal-life-amount">Steals % of enemy life: </label>
@@ -156,10 +164,10 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-affix-skill-name">Affects Skill: </label>
-                <select class="form-control required" name="item-affix-skill-name" wire:model="itemAffix.skill_name">
+                <select class="form-control required" name="item-affix-skill-name" wire:model="itemAffix.skill_name" >
                     <option value="">Please select</option>
                     @foreach($skills as $skill)
                         <option value="{{$skill->name}}">{{$skill->name}}</option>
@@ -167,19 +175,27 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-affix-skill-training-bonus">Skill Training Bonus: </label>
-                <input type="number" steps="0.01" class="form-control required" id="item-affix-skill-training-bonus" name="name" wire:model="itemAffix.skill_training_bonus">
+                <input type="number" steps="0.01" class="form-control required" id="item-affix-skill-training-bonus" name="item-affix-skill-training-bonus" wire:model="itemAffix.skill_training_bonus" >
                 <span class="text-muted">Applies an xp bonus to the skill when training.</span><br />
                 @error('skill_training_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-affix-skill-bonus">Skill Bonus: </label>
-                <input type="number" steps="0.01" class="form-control required" id="item-affix-skill-bonus" name="name" wire:model="itemAffix.skill_bonus">
+                <input type="number" steps="0.01" class="form-control required" id="item-affix-skill-bonus" name="item-affix-skill-bonus" wire:model="itemAffix.skill_bonus" >
                 <span class="text-muted">Applies a character roll percentage when using said skill.</span><br />
+                @error('skill_bonus') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="item-affix-skill-reduction">Skill Reduction: </label>
+                <input type="number" steps="0.01" class="form-control required" id="item-affix-skill-reduction" name="item-affix-skill-reduction" wire:model="itemAffix.skill_reduction">
+                <span class="text-muted">Reduces all enemy skills by %.</span><br />
                 @error('skill_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>

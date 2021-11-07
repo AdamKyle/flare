@@ -154,8 +154,6 @@ class AdventureFightService {
 
         $this->battleMessages[$this->monsterName] = $logs;
 
-
-
         $this->fightService->reset();
     }
 

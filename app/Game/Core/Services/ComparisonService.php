@@ -76,6 +76,10 @@ class ComparisonService {
             $type = 'weapon';
         }
 
+        if ($type === 'spell-damage' || $type === 'spell-healing') {
+            $type = 'spell';
+        }
+
         $service = $this->characterInventoryService->setCharacter($character)
             ->setPositions($this->validEquipPositionsValue->getPositions($item))
             ->setInventory($type);

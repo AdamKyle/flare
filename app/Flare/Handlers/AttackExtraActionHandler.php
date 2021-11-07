@@ -53,7 +53,7 @@ class AttackExtraActionHandler {
 
         $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
-        $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter());
+        $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided);
 
         return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided);
     }
@@ -139,7 +139,7 @@ class AttackExtraActionHandler {
 
             $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
-            $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided);
+            $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided, true);
         }
 
         return $monsterCurrentHealth;
@@ -178,7 +178,7 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender, Character $character, bool $voided = false): int {
+    protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender, Character $character, bool $voided = false, bool $isDoubleCast = false): int {
 
         $totalDamage = $this->calculateSpellDamage($spellDamage, $defender, $character, $voided);
 
@@ -192,6 +192,10 @@ class AttackExtraActionHandler {
                 $this->messages =  $this->addMessage($message, 'action-fired', $this->messages);
 
                 $totalDamage *= 2;
+            }
+
+            if ($isDoubleCast) {
+                $totalDamage += $totalDamage * 0.15;
             }
 
             $health = $monsterCurrentHealth - $totalDamage;
@@ -216,10 +220,10 @@ class AttackExtraActionHandler {
     }
 
     private function calculateSpellDamage(int $spellDamage, $defender, Character $character, bool $voided = false): int {
-        $spellEvasion = (float) $defender->spell_evasion;
-        $dc           = 100;
-        $roll         = rand(1, 100);
-        $classType    = $character->classType();
+        $spellEvasion         = (float) $defender->spell_evasion;
+        $dc                   = 100;
+        $roll                 = rand(1, 100);
+        $classType            = $character->classType();
         $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
         $focus                = $character->getInformation()->statMod('focus');
 
@@ -240,10 +244,6 @@ class AttackExtraActionHandler {
 
         $dc -= $dc * $castingAccuracyBonus;
 
-        if ($dc > 100) {
-            $dc = 99;
-        }
-
         if ($dc <= 0.0) {
             return $spellDamage;
         }
@@ -253,7 +253,6 @@ class AttackExtraActionHandler {
         }
 
         return 0.0;
-
     }
 
     private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {

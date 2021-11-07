@@ -43,6 +43,7 @@
             <th>type</th>
             <th>entranced_chance</th>
             <th>devouring_light</th>
+            <th>skill_reduction</th>
         </tr>
     </thead>
     <tbody>
@@ -90,6 +91,8 @@
             <td>{{$affix->type}}</td>
             <td>{{$affix->entranced_chance}}</td>
             <td>{{$affix->devouring_light}}</td>
+            <td>{{$affix->skill_reduction}}</td>
+            <td>{{$affix->resistance_reduction}}</td>
         </tr>
     @endforeach
     </tbody>

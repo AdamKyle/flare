@@ -5,12 +5,18 @@ commitment. With that, lets get into some basic tips:
 
 ## Early Game is going to be slow
 
-Early game will be a bit difficult, not impossible, just a bit harder. You are basically naked wondering around trying to kill things. Later on, below, I have a small 
-leveling tip for you. 
+Early game will be a bit difficult, not impossible, just a bit harder. You are basically naked wondering around trying 
+to kill things. Later on, below, I have a small leveling tip for you. 
 
-As you progress and are able to buy or make better equipment, the game get easier to progress through. Take your time and focus on what you can kill to start.
+As you progress and are able to buy or make better equipment, the game get easier to progress through. 
+Take your time and focus on what you can kill to start.
 
 ## Maximize the gold you start with
+
+> ### ATTN!
+> 
+> Do not use the rusty dagger you are equipped with. Chances are you will not hit anything, or if you can, you won't do enough damage
+> to effectively kill it in one hit.
 
 When you start, you start with one thousand gold. This should be enough for you to equip any class with:
 
@@ -23,6 +29,11 @@ If you are a caster go with the one weapon, one shield as shields will increase 
 
 Next, as you progress - upgrade and add pieces. Don't worry about spells for casters until you train your Casting Accuracy [skill](/information/skills)
 to about level 5. Focus on Armour for upgrading - specifically body since it gives you the most increase.
+
+## Slaughter in on hit!
+
+Are you working your way down the list? Find a creature that takes you two hits? Back up a second. To maximize tour time and efficiency at farming xp and other things,
+make sure you can kill the creature in one hit. The faster it dies, the faster you get to attack again, which means the faster you make gold, find items, train skills and level up.
 
 ## Do not settle a kingdom yet.
 
@@ -77,10 +88,12 @@ works in game and then choose enchantments based on your preferred attack style.
 
 ### With that said - Casters should ...
 
-In the beginning of the game, casters will want at least one good weapon and a good shield. You should then get two good damage spells and a good body slot. if you have enough gold
-left over, try and get either a good ring or a good artifact.
+In the beginning of the game, casters will want at least one good weapon and a good shield. You should then get a good body followed by one or two damage spells. 
+if you have enough gold left over, try and get either a good ring or a good artifact.
 
 You will then want to try and kill something to at least Moss Covered Skeleton before focusing on your Casting Accuracy skill (I would only go as high as 10% xp).
+
+Chances are your spells will always miss to start, specifically damaging spells - the healing spells will never miss. So attack with your weapon for now.
 
 Once you are reliably hitting with your spells, move over to casting as opposed to either cast and attack, attack and cast or attack.
 
@@ -112,7 +125,7 @@ of [Quests](/information/quests) and killing some harder creatures to get the dr
 
 There are two max levels in this game. One is 1000, and the other is (at the time of this writing) 3500 which increases 100 levels per month.
 
-To get the second level cap you have to Kill a Satanic Cult Leader to get a Leather Sash. You then need Labyrinth Access to trade it to the Labyrinth Weaver
+To get the second level cap you have to Kill a Satanic Cult Leader to get a Leather Sash. You then need Labyrinth Access to trade it to the Labyrinth Weaver, 
 and he will give you a new sash that lets you continue leveling. Without you are limited to level 1000 and limited in power.
 
 The idea is to focus on your leveling and maybe one other skill depending on your class (Accuracy or Casting Accuracy) while you level to max level. Along the way you

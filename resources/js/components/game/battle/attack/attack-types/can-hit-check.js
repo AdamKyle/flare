@@ -87,19 +87,11 @@ export default class CanHitCheck {
   }
 
   calculateCanHit(toHitBase) {
-    if (Math.sign(toHitBase) === - 1) {
-      toHitBase = Math.abs(toHitBase);
-    }
+    const needToHit = 100 - 100 * toHitBase;
 
-    if (toHitBase > 1.0) {
-      return true;
-    }
+    const roll      = (Math.random() * (100 - 1) + 1);
 
-    const percentage = Math.floor((100 - toHitBase));
-
-    const needToHit = 100 - percentage;
-
-    return (Math.random() * (100 - 1) + 1) > needToHit;
+    return roll > needToHit;
   }
 
   getBattleMessages () {
@@ -111,10 +103,25 @@ export default class CanHitCheck {
   }
 
   toHitCalculation(toHit, dex, accuracy, dodge) {
-    const enemyDex = (dex / 10000);
-    const hitChance = ((toHit + toHit * accuracy) / 100);
+    if (dex > 2000000000) {
+      return 1.0;
+    }
 
-    return (enemyDex + enemyDex * dodge) - hitChance;
+    if (dodge >= 1.0) {
+      return 0.0
+    }
+
+    const enemyDex  = (dex / 2000000000);
+    toHit           = (toHit / 2000000000);
+    const hitChance = (toHit + accuracy);
+
+    const enemyDodgeChance =  (enemyDex + dodge);
+
+    if (enemyDodgeChance > hitChance) {
+      return enemyDodgeChance - hitChance
+    }
+
+    return 1.0
   }
 }
 

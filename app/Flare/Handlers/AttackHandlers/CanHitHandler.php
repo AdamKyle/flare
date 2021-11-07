@@ -55,8 +55,7 @@ class CanHitHandler {
             return true;
         }
 
-        $percent = floor((100 - $toHit));
-        $needToHit = 100 - $percent;
+        $needToHit = 100 - 100 * $toHit;
 
         return rand(1, 100) > $needToHit;
     }
@@ -98,8 +97,7 @@ class CanHitHandler {
             return true;
         }
 
-        $percent = floor((100 - $toHit));
-        $needToHit = 100 - $percent;
+        $needToHit = 100 - 100 * $toHit;
 
         return rand(1, 100) > $needToHit;
     }
@@ -187,9 +185,24 @@ class CanHitHandler {
      * @return float|int
      */
     protected function toHitCalculation(int $toHit, int $dex, float $accuracy, float $dodge) {
-        $dex   = ($dex / 10000);
-        $toHit = ($toHit + $toHit * $accuracy) / 100;
+        if ($dex > 2000000000) {
+            return 1.0;
+        }
 
-        return ($dex + $dex * $dodge) - $toHit;
+        if ($dodge >= 1.0) {
+            return 1.0;
+        }
+
+        $enemyDex  = $dex / 2000000000;
+        $toHit     = $toHit / 2000000000;
+        $hitChance = ($toHit + $accuracy);
+
+        $enemyDodgeChance = $enemyDex + $dodge;
+
+        if ($enemyDodgeChance > $hitChance) {
+            return $enemyDodgeChance - $hitChance;
+        }
+
+        return 1.0;
     }
 }

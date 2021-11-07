@@ -12,6 +12,12 @@
       active="false"
       title="Skill Training Bonux (XP)"
     />
+    <x-tabs.tab
+      tab="enemy-skill-reduction"
+      selected="false"
+      active="false"
+      title="Skill Reduction (enemies)"
+    />
   </x-tabs.pill-tabs-container>
   <x-tabs.tab-content>
     <x-tabs.tab-content-section
@@ -44,6 +50,22 @@
         @livewire('admin.affixes.data-table', [
             'only' => 'skills',
             'type' => 'skill_training_bonus',
+        ])
+      </x-cards.card>
+    </x-tabs.tab-content-section>
+    <x-tabs.tab-content-section
+      tab="enemy-skill-reduction"
+      active="false"
+    >
+      <x-cards.card>
+        <div class="alert alert-info mt-2 mb-3">
+          These Affixes only affect enemies and can reduce ALL their skills at once by a specified %. These affixes work
+          in the same vein as stat reduction affixes, how ever these do not stack. We take the best one of all you have on.
+        </div>
+
+        @livewire('admin.affixes.data-table', [
+            'only' => 'skills',
+            'type' => 'skill_reduction',
         ])
       </x-cards.card>
     </x-tabs.tab-content-section>
