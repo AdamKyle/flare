@@ -10,10 +10,11 @@ export default class AffixData extends React.Component {
   render() {
     const item = this.props.item['item_' + this.props.type];
 
-    const baseInfoId = Math.random().toString(36).substr(2, 5);
-    const statsId    = Math.random().toString(36).substr(2, 5);
-    const skillsId   = Math.random().toString(36).substr(2, 5);
-    const damageId   = Math.random().toString(36).substr(2, 5);
+    const baseInfoId  = Math.random().toString(36).substr(2, 5);
+    const statsId     = Math.random().toString(36).substr(2, 5);
+    const skillsId    = Math.random().toString(36).substr(2, 5);
+    const damageId    = Math.random().toString(36).substr(2, 5);
+    const reductionId = Math.random().toString(36).substr(2, 5);
 
     return (
       <>
@@ -93,7 +94,7 @@ export default class AffixData extends React.Component {
                 </dl>
               </div>
               <div className={item.skill_reduction > 0 ? 'col-md-6' : 'hide'}>
-                <dl>
+                <dl className="mt-4">
                   <dt>Skills Affected:</dt>
                   <dd>Accuracy, Criticality, Casting Accuracy and Dodge</dd>
                   <dt>Skill Reduction %:</dt>
@@ -144,6 +145,12 @@ export default class AffixData extends React.Component {
                   :
                   null
               }
+            </dl>
+          </Tab>
+          <Tab eventKey={'resistance-reduction' + reductionId} title="Resistance Reduction">
+            <dl className="mt-4">
+              <dt>Resistance Reduction:</dt>
+              <dd className={item.resistance_reduction > 0 ? 'text-danger' : ''}>{item.resistance_reduction * 100}%</dd>
             </dl>
           </Tab>
         </Tabs>

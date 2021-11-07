@@ -1,16 +1,17 @@
 @php
-    $baseInfoId  = Str::random(10);
-    $statsId     = Str::random(10);
-    $skillsId    = Str::random(10);
-    $damageId    = Str::random(10);
+    $baseInfoId    = Str::random(10);
+    $statsId       = Str::random(10);
+    $skillsId      = Str::random(10);
+    $damageId      = Str::random(10);
+    $resistanceId  = Str::random(10);
 @endphp
 
 <x-tabs.pill-tabs-container>
-  <x-tabs.tab tab="suffix-base-info-{{$baseInfoId}}" title="Base Information" selected="true" active="true" />
+  <x-tabs.tab tab="suffix-base-info-{{$baseInfoId}}" title="Base" selected="true" active="true" />
   <x-tabs.tab tab="suffix-stats-{{$statsId}}" title="Stats" selected="false" active="false" />
   <x-tabs.tab tab="suffix-skills-{{$skillsId}}" title="Skills" selected="false" active="false" />
   <x-tabs.tab tab="suffix-damage-{{$damageId}}" title="Damage" selected="false" active="false" />
-  <x-tabs.tab tab="suffix-resiatance-{{$damageId}}" title="Resiatance Reduction" selected="false" active="false" />
+  <x-tabs.tab tab="suffix-resistance-{{$resistanceId}}" title="Resiatance" selected="false" active="false" />
 </x-tabs.pill-tabs-container>
 <x-tabs.tab-content>
   <x-tabs.tab-content-section tab="suffix-base-info-{{$baseInfoId}}" active="true">
@@ -121,10 +122,10 @@
       @endif
     </dl>
   </x-tabs.tab-content-section>
-  <x-tabs.tab-content-section tab="suffix-resistance-{{$damageId}}" active="false">
+  <x-tabs.tab-content-section tab="suffix-resistance-{{$resistanceId}}" active="false">
     <dl>
       <dt>Resistance Reduction:</dt>
-      <dd class="{{$item->itemPrefix->resiatance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemPrefix->resiatance_reduction}}</dd>
+      <dd class="{{$item->itemSuffix->resiatance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemSuffix->resistance_reduction * 100}}%</dd>
       <p class="mt-2 text-info">Affects enemies only. Affects their: Spell Evasion, Artifact Annulment and Affix Resistance.</p>
     </dl>
   </x-tabs.tab-content-section>
