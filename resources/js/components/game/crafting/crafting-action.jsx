@@ -2,7 +2,7 @@ import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
-import moment from 'moment';
+import Select from 'react-select';
 
 export default class CraftingAction extends React.Component {
 
@@ -131,16 +131,20 @@ export default class CraftingAction extends React.Component {
   }
 
   buildCraftableItemsOptions() {
+
     if (this.state.itemsToCraft !== null) {
       return this.state.itemsToCraft.map((item) => {
-        return <option key={item.id} value={item.id}>{item.name} --> Cost to craft: {item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold</option>
+        return {
+          value: item.id,
+          label: item.name + ' --> Cost to craft: ' + item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' Gold'
+        }
       });
     }
   }
 
-  setItemToCraft(event) {
+  setItemToCraft(newValue) {
     this.setState({
-      itemToCraft: parseInt(event.target.value),
+      itemToCraft: newValue.value,
     });
   }
 
@@ -202,12 +206,15 @@ export default class CraftingAction extends React.Component {
       }
 
       return (
-        <select className="form-control mt-2" id="crafting" name="crafting"
-                value={this.state.itemToCraft !== null ? this.state.itemToCraft : 1}
-                onChange={this.setItemToCraft.bind(this)}
-                disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
-          {this.buildCraftableItemsOptions()}
-        </select>
+        <div className="mt-2">
+          <Select
+            isClearable
+            onChange={this.setItemToCraft.bind(this)}
+            onInputChange={this.handleInputChange}
+            options={this.buildCraftableItemsOptions()}
+            isDisabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}
+          />
+        </div>
       );
     }
   }

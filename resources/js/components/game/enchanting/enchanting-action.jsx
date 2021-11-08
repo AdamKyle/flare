@@ -2,6 +2,7 @@ import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from "../helpers/server_message";
+import Select from "react-select";
 
 export default class EnchantingAction extends React.Component {
 
@@ -174,8 +175,8 @@ export default class EnchantingAction extends React.Component {
     this.calculateCost(slot.item_id);
   }
 
-  setItemToEnchant(event) {
-    this.calculateCost(parseInt(event.target.value))
+  setItemToEnchant(newValue) {
+    this.calculateCost(newValue.value)
   }
 
   calculateCost(value) {
@@ -250,8 +251,8 @@ export default class EnchantingAction extends React.Component {
     return cost;
   }
 
-  setPrefixId(event) {
-    const value = parseInt(event.target.value);
+  setPrefixId(newValue) {
+    const value = newValue.value;
     const oldPrefix = this.state.affixList.filter((a) => a.id === this.state.prefixId)[0];
     let foundAffix = null;
     let cost = this.state.cost;
@@ -274,8 +275,8 @@ export default class EnchantingAction extends React.Component {
     });
   }
 
-  setSuffixId(event) {
-    const value     = parseInt(event.target.value);
+  setSuffixId(newValue) {
+    const value     = newValue.value;
     const oldSuffix = this.state.affixList.filter((a) => a.id === this.state.suffixId)[0];
     let foundAffix  = null;
     let cost        = this.state.cost;
@@ -319,7 +320,10 @@ export default class EnchantingAction extends React.Component {
     const inventory = this.state.inventoryList;
 
     return this.reorderInventory(inventory).map((slot) => {
-      return (<option key={'item-' + slot.id} value={slot.item.id}>{slot.item.affix_name}</option>);
+      return {
+        value: slot.item.id,
+        label: slot.item.affix_name,
+      }
     });
   }
 
@@ -340,19 +344,23 @@ export default class EnchantingAction extends React.Component {
   buildSuffixOptions() {
     return this.state.affixList.map((affix) => {
       if (affix.type === 'suffix') {
-        return (
-          <option key={'suffix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</option>);
+        return {
+          value: affix.id,
+          label: affix.name + ' --> Cost in gold: ' + affix.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        }
       }
-    });
+    }).filter((item) => typeof item !== 'undefined');
   }
 
   buildPrefixOptions() {
     return this.state.affixList.map((affix) => {
       if (affix.type === 'prefix') {
-        return (
-          <option key={'prefix-' + affix.id} value={affix.id}>{affix.name} --> Cost in gold: {affix.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</option>);
+        return {
+          value: affix.id,
+          label: affix.name + ' --> Cost in gold: ' + affix.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        }
       }
-    });
+    }).filter((item) => typeof item !== 'undefined');
   }
 
   isButtonDisabled() {
@@ -432,41 +440,34 @@ export default class EnchantingAction extends React.Component {
 
         <Row>
           <Col lg={12} xl={8}>
-            <Row>
-              <Col xs={12} sm={12} md={12} lg={12} xl={4}>
-                <select
-                  className="form-control mt-2" id="crafting" name="crafting"
-                  value={this.state.itemToEnchant}
-                  onChange={this.setItemToEnchant.bind(this)}
-                  disabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
-                >
-                  <option key={'item-0'} value="">Please Select Item</option>
-                  {this.buildInventoryOptions()}
-                </select>
-              </Col>
-              <Col xs={12} sm={12} md={12} lg={12} xl={4}>
-                <select
-                  className="form-control mt-2" id="crafting" name="crafting"
-                  value={this.state.prefixId}
-                  onChange={this.setPrefixId.bind(this)}
-                  disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
-                >
-                  <option key={'prefix-0'} value="">Please Select Prefix</option>
-                  {this.buildPrefixOptions()}
-                </select>
-              </Col>
-              <Col xs={12} sm={12} md={12} lg={12} xl={4}>
-                <select
-                  className="form-control mt-2" id="crafting" name="crafting"
-                  value={this.state.suffixId}
-                  onChange={this.setSuffixId.bind(this)}
-                  disabled={this.state.isDead || !this.state.canCraft || this.state.itemToEnchant === null || this.state.itemToEnchant === 0 || this.state.isAdventuring}
-                >
-                  <option key={'affix-0'} value="">Please Select Suffix</option>
-                  {this.buildSuffixOptions()}
-                </select>
-              </Col>
-            </Row>
+            <div className="mt-2">
+              <Row>
+                <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                  <Select
+                    isClearable
+                    onChange={this.setItemToEnchant.bind(this)}
+                    options={this.buildInventoryOptions()}
+                    isDisabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
+                  />
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                  <Select
+                    isClearable
+                    onChange={this.setPrefixId.bind(this)}
+                    options={this.buildPrefixOptions()}
+                    isDisabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
+                  />
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={12} xl={4}>
+                  <Select
+                    isClearable
+                    onChange={this.setSuffixId.bind(this)}
+                    options={this.buildSuffixOptions()}
+                    isDisabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}
+                  />
+                </Col>
+              </Row>
+            </div>
           </Col>
           <Col lg={12} xl={4}>
             <Row>
