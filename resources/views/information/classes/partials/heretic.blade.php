@@ -10,7 +10,7 @@
     Accuracy.
   </p>
 </x-core.alerts.info-alert>
-<p>Heretics also get 32% of their intelligence added to their spell damage or 2% if they have no damage spells equipped.</p>
+<p>Heretics also get 3% of their intelligence added to their spell damage or 2% if they have no damage spells equipped.</p>
 <p>
   For affixes, focus first on int and focus based, while having at least one <a href="/information/enchanting">life stealing affix</a> and at least
   one <a href="/information/enchanting">damaging affix</a>.

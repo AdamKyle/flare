@@ -916,7 +916,6 @@ class CharacterInformationBuilder {
     }
 
     public function calculateClassSpellDamage(int|float $damage, bool $voided = false): float|int {
-
         if ($damage === 0) {
             $classType = $this->character->classType();
 
@@ -927,29 +926,11 @@ class CharacterInformationBuilder {
                     $damage += $this->character->int * 0.02;
                 }
             }
-
-            if ($classType->isProphet()) {
-                if (!$voided) {
-                    $damage = $this->statMod('int') * 0.2;
-                } else {
-                    $damage += $this->character->int * 0.02;
-                }
-            }
-        }
-
-        if ($this->character->classType()->isHeretic()) {
+        } else if ($this->character->classType()->isHeretic()) {
             if ($voided) {
                 $damage += $this->character->int * 0.30;
             } else {
                 $damage += $this->statMod('int') * 0.30;
-            }
-        }
-
-        if ($this->character->classType()->isProphet()) {
-            if ($voided) {
-                $damage += $this->character->chr * 0.15;
-            } else {
-                $damage += $this->statMod('chr') * 0.15;
             }
         }
 

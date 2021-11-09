@@ -11,11 +11,11 @@ const renderAttackToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Attack.
 
-    If you are a fighter or thief, you will attack with both weapons if you have them equipped.
-    If you are not a fighter, you will attack with the best weapon.
+    If you are a Fighter or Thief, you will attack with both weapons if you have them equipped.
+    If you are not a Fighter or Thief, you will attack with the best weapon.
     If you have no weapon equipped, you will attack with 2% of your primary damage stat.
-    Fighters and Thieves will use 15% of their primary damage stat (str/dex) on top of their combined weapon
-    damage. Other classes will not use any bonuses from their class, unless, they have no weapon equipped.
+    Fighters will use 15% of their strength for weapons, 5% with out weapons. Where as Thieves and Rangers
+    will use 5% of their primary damage stat and only 2% (including other classes) when attacking with no weapons.
   </Tooltip>
 );
 
@@ -23,10 +23,10 @@ const renderCastingToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Cast.
 
-    We will attack with both spells. Heretics get an additional 32% of your primary damage stat while Prophets get 17%. If you have healing spells,
-    prophets will get 30% towards healing spells and Rangers get 15% (of their chr) towards healing spells. If you have no spells equipped
-    and are a prophet or heretic, you will attack with 2% of your primary damage stat.
-    Prophets and Rangers can heal for 30% and 15% (respectively) of their chr even with no spell equipped.
+    We will attack with both spells. Heretics get an additional 30% of their primary damage stat as attack. Heretics can also cast with no
+    spells equipped at 2% of their primary damage attack. Rangers, for healing, get 15% of their Chr while Prophets get 30% of their chr.
+    If a prophet has no healing spell equipped, they still do their % of healing, how ever prophets special Double Heal will not fire
+    with no healing spells equipped. Rangers can also heal for 15% of their chr with no healing spells equipped.
   </Tooltip>
 );
 
@@ -56,9 +56,8 @@ const renderDefendToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Defend.
 
-    Will use your armour class plus 5% of your strength. If you're a Fighter, we use 15% of your strength.
-    Only your affixes, rings and artifacts will fire during your round. During the enemies phase you will
-    have a chance to block them (including their spells) assuming you are not entranced.
+    Will use your armour class plus 5% of your strength. If you are a fighter and have at least one shield equipped
+    you will add your class bonus to your defence. If you are not, we use your combined armour.
   </Tooltip>
 );
 
