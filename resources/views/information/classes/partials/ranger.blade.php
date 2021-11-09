@@ -13,4 +13,4 @@
   as you want to attack with your bow. Defend is useless as you wont equip a shield.
 </p>
 <p>Rangers will want a race that quick and nimble (High Elf or Centaur) or focuses on dexterity, Orc.</p>
-<p>When a ranger heals they get an additional 15% of their chr stat towards their healing added to their spell's total healing or just 15% of their chr.</p>
+<p>When a Ranger heals they get an additional 15% of their chr stat towards their healing added to their spell's total healing or just 15% of their chr.</p>

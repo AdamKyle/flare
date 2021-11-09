@@ -4,6 +4,12 @@
   Focus on your Intelligence and Focus stat while leveling Casting Accuracy followed by your class skill.
 </p>
 <p>Heretics will want two shields, added dur, and two damage spells. This will allow their class skill to fire off the double cast chance.</p>
+<x-core.alerts.info-alert>
+  <p>
+    When you are first starting out, it is best to have a shield and a weapon, till you can hit something, make some XP and then start focusing on Casting
+    Accuracy.
+  </p>
+</x-core.alerts.info-alert>
 <p>Heretics also get 32% of their intelligence added to their spell damage or 2% if they have no damage spells equipped.</p>
 <p>
   For affixes, focus first on int and focus based, while having at least one <a href="/information/enchanting">life stealing affix</a> and at least

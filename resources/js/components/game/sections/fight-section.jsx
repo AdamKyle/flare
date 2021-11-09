@@ -185,8 +185,7 @@ export default class FightSection extends React.Component {
       this.isMonsterDevoided = true;
     }
 
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isMonsterDevoided) {
-      console.log('Are we actually voided?');
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isMonsterVoided) {
       this.battleMessagesBeforeFight.push({
         message: 'The light of the heavens shines through this darkness. The enemy is voided!',
         class: 'action-fired'
@@ -195,8 +194,7 @@ export default class FightSection extends React.Component {
       this.isMonsterVoided = true;
     }
 
-    if (monsterInfo.canMonsterVoidPlayer() && !this.isCharacterVoided && !this.isMonsterVoided) {
-
+    if (monsterInfo.canMonsterVoidPlayer() && !this.isCharacterVoided && !this.isMonsterDevoided) {
       this.battleMessagesBeforeFight.push({
         message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
         class: 'enemy-action-fired'
@@ -269,7 +267,6 @@ export default class FightSection extends React.Component {
     if (this.isCharacterVoided) {
       attackType = 'voided_' + attackType;
     } else if (!this.isMonsterDevoided && !this.isCharacterVoided) {
-
       if (this.state.monster.canMonsterVoidPlayer()) {
         console.log('Am I here?');
         this.battleMessagesBeforeFight.push({
@@ -282,8 +279,6 @@ export default class FightSection extends React.Component {
         this.isCharacterVoided = true;
       }
     }
-
-    console.log(this.state);
 
     const attack = new Attack(
       this.state.characterCurrentHealth,
