@@ -142,7 +142,7 @@ class SetupFightHandler {
             $dc    = 100 - $defender->affix_resistance;
 
             if ($dc <= 0 || rand(1, 100) > $dc) {
-                $message = 'Your enemy laughs at your attempt to make them week fails.';
+                $message = 'Your enemy laughs at your attempt to make them weak fails.';
 
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 

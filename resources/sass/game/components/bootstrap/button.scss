@@ -58,7 +58,7 @@
 
 .btn-cast-attack {
   color: #ffffff;
-  background: -webkit-linear-gradient(#a66262, #62949f);
+  background: -webkit-linear-gradient(#62949f, #a66262);
   border-color: #395e69;
   font-weight: bold;
   letter-spacing: 0.05em;
@@ -70,13 +70,13 @@
 .btn-cast-attack:focus,
 .btn-cast-attack.active {
   color: #ffffff;
-  background: -webkit-linear-gradient(darken(#a66262, 20), darken(#62949f, 20));
+  background: -webkit-linear-gradient(darken(#62949f, 20), darken(#a66262, 20));
   border-color: darken(#395e69, 30);
 }
 
 .btn-attack-cast {
   color: #ffffff;
-  background: -webkit-linear-gradient(#62949f, #a66262);
+  background: -webkit-linear-gradient(#a66262, #62949f);
   border-color: #395e69;
   font-weight: bold;
   letter-spacing: 0.05em;
@@ -88,7 +88,7 @@
 .btn-attack-cast:focus,
 .btn-attack-cast.active {
   color: #ffffff;
-  background: -webkit-linear-gradient(darken(#62949f, 20), darken(#a66262, 20));
+  background: -webkit-linear-gradient(darken(#a66262, 20), darken(#62949f, 20));
   border-color: darken(#395e69, 30);
 }
 

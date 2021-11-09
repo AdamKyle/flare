@@ -10,6 +10,10 @@ export default class CanHitCheck {
     this.canAutoHit     = false;
   }
 
+  canAutomaticallyHit() {
+    return this.canAutoHit
+  }
+
   canHit (attacker, defender, battleMessages, voided) {
     const damage        = new Damage();
 

@@ -46,7 +46,7 @@ export default class Monster {
 
     if (affixes.all_stat_reduction !== null || affixes.stat_reduction.length > 0) {
       if (!affixes.can_be_resisted && (dc <= 0 || randomNumber(0, 100) > dc)) {
-        return [{message: 'Your enemy laughs at your attempt to make them week fails.', class: 'enemy-action-fired'}]
+        return [{message: 'Your enemy laughs at your attempt to make them weak fails.', class: 'enemy-action-fired'}]
       }
     }
 

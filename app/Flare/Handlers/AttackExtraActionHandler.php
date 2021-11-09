@@ -49,13 +49,62 @@ class AttackExtraActionHandler {
         return false;
     }
 
-    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender, bool $voided = false): int {
+    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, $defender, int $monsterCurrentHealth, bool $voided = false): int {
 
         $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
         $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided);
 
         return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided);
+    }
+
+    public function positionalWeaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, int $damage): int {
+
+        $dc = 100 - 100 * $characterInformationBuilder->getSkill('Criticality');
+
+        if (rand(1, 100) > $dc) {
+            $damage *= 2;
+
+            $message = 'You become overpowered with rage! (Critical strike!)';
+
+            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
+        }
+
+        $monsterCurrentHealth -= $damage;
+
+        $character = $characterInformationBuilder->getCharacter();
+
+        $message = $character->name . ' hit for (weapon(s)): ' . number_format($damage);
+
+        $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+        return $this->positionalDoubleAttack($characterInformationBuilder, $monsterCurrentHealth, $damage);
+    }
+
+    public function positionalDoubleAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, int $damage) {
+        $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
+
+        if ($classType->isFighter()) {
+            $attackerInfo = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData();
+
+            if (!($this->canUse($attackerInfo['chance']) && $attackerInfo['has_item'])) {
+                return $monsterCurrentHealth;
+            }
+
+            for ($i = 1; $i <= 2; $i++) {
+                $message = 'The strength of your rage courses through your veins!';
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+                $totalDamage = ($damage + $damage * 0.15);
+
+                $monsterCurrentHealth -= $totalDamage;
+
+                $message = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+            }
+        }
+
+        return $monsterCurrentHealth;
     }
 
     public function getMessages(): array {
@@ -114,7 +163,7 @@ class AttackExtraActionHandler {
 
                 $totalDamage = ($characterAttack + $characterAttack * 0.15);
 
-                $monsterCurrentHealth -= $characterAttack;
+                $monsterCurrentHealth -= $totalDamage;
 
                 $message = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
                 $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
@@ -134,12 +183,15 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $message        = 'Magic crackles through the air as you cast again!';
-            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
+            $message               = 'Magic crackles through the air as you cast again!';
+            $this->messages        = $this->addMessage($message, 'action-fired', $this->messages);
 
-            $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
+            $spellDamage           = $characterInformationBuilder->getTotalSpellDamage($voided);
+            $spellDamage           = $spellDamage + $spellDamage * 0.15;
+            $monsterCurrentHealth -= $spellDamage;
 
-            $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided, true);
+            $message               = 'Your spell(s) hit for: ' . number_format($spellDamage);
+            $this->messages        = $this->addMessage($message, 'info-damage', $this->messages);
         }
 
         return $monsterCurrentHealth;

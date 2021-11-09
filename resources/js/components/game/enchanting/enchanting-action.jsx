@@ -270,7 +270,7 @@ export default class EnchantingAction extends React.Component {
     }
 
     this.setState({
-      prefixId: parseInt(event.target.value),
+      prefixId: value,
       cost: cost
     });
   }
@@ -311,7 +311,7 @@ export default class EnchantingAction extends React.Component {
     }
 
     this.setState({
-      suffixId: parseInt(event.target.value),
+      suffixId: value,
       cost: cost
     });
   }
@@ -325,6 +325,17 @@ export default class EnchantingAction extends React.Component {
         label: slot.item.affix_name,
       }
     });
+  }
+
+  selectInventoryValue(value) {
+
+    if (value === null) {
+      return [];
+    }
+
+    const inventory = this.buildInventoryOptions();
+
+    return inventory.filter((i) => i.value === value)
   }
 
   reorderInventory(inventory) {
@@ -445,6 +456,7 @@ export default class EnchantingAction extends React.Component {
                 <Col xs={12} sm={12} md={12} lg={12} xl={4}>
                   <Select
                     isClearable
+                    value={this.selectInventoryValue(this.state.itemToEnchant)}
                     onChange={this.setItemToEnchant.bind(this)}
                     options={this.buildInventoryOptions()}
                     isDisabled={this.state.isDead || !this.state.canCraft || this.state.isAdventuring || _.isEmpty(this.state.inventoryList)}

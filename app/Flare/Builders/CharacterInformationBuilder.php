@@ -846,37 +846,38 @@ class CharacterInformationBuilder {
             }
         }
 
-        if ($this->character->classType()->isFighter()) {
-            if ($voided) {
-                $statIncrease = $this->character->str * .15;
-            } else {
-                $statIncrease = $this->statMod('str') * 0.15;
-            }
-
-            $damage = array_sum($damage) + $statIncrease;
-        } else if($this->character->classType()->isThief()) {
-            if ($voided) {
-                $statIncrease = $this->character->dex * .15;
-            } else {
-                $statIncrease = $this->statMod('dex') * 0.15;
-            }
-
-            $damage = array_sum($damage) + $statIncrease;
-        } else if (!empty($damage)) {
-            $damage = max($damage);
-        } else {
-            $damage = 0;
-        }
+        $damage = $this->damageModifiers(array_sum($damage), $voided);
 
         return $this->calculateWeaponDamage($damage, $voided);
     }
 
-    public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
+    public function damageModifiers(int $damage, bool $voided): int {
+        if ($this->character->classType()->isFighter()) {
+            if ($voided) {
+                $statIncrease = $this->character->str * .10;
+            } else {
+                $statIncrease = $this->statMod('str') * 0.10;
+            }
 
+            $damage += $statIncrease;
+        } else if($this->character->classType()->isThief() || $this->character->classType()->isRanger()) {
+            if ($voided) {
+                $statIncrease = $this->character->dex * .05;
+            } else {
+                $statIncrease = $this->statMod('dex') * 0.05;
+            }
+
+            $damage += $statIncrease;
+        }
+
+        return ceil($damage);
+    }
+
+    public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
 
-            if ($this->character->classType()->isVampire()) {
+            if ($this->character->classType()->isFighter()) {
                 $damage = $damage * 0.05;
             } else {
                 $damage = $damage * 0.02;
@@ -891,7 +892,7 @@ class CharacterInformationBuilder {
             $damage += $damage * $skill->base_damage_mod;
         }
 
-        return $damage;
+        return ceil($damage);
     }
 
     public function getSpellDamage(bool $voided = false): int {

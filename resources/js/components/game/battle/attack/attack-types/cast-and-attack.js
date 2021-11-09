@@ -54,77 +54,17 @@ export default class CastAndAttack {
       return this.setState();
     }
 
-    const canHitCheck      = new CanHitCheck();
+    this.castAttack(attackData, castAttack);
 
-    const canHit           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
+    this.setStateInfo(castAttack);
 
-    this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
+    const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    if (canHitCheck.getCanAutoHit()) {
-      if (attackData.spell_damage > 0) {
-        castAttack.attackWithSpells(attackData);
-      } else if (attackData.heal_for > 0) {
-        castAttack.healWithSpells(attackData);
-      }
+    this.weaponAttack(attackData, weaponAttack);
 
-      this.setStateInfo(castAttack);
+    this.setStateInfo(weaponAttack);
 
-      const weaponAttack = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
-
-      weaponAttack.attackWithWeapon(attackData);
-
-      this.setStateInfo(weaponAttack);
-
-      this.useItems(attackData, this.attacker.class)
-
-      return this.setState();
-    }
-
-    if (canHit) {
-      if (this.canBlock(attackData.spell_damage)) {
-        this.addEnemyActionMessage(this.defender.name + ' Blocked your damage spell!');
-
-        if (attackData.heal_for > 0) {
-          castAttack.healWithSpells(attackData);
-        }
-      } else {
-        if (attackData.spell_damage > 0) {
-          castAttack.attackWithSpells(attackData);
-        } else if (attackData.heal_for > 0) {
-          castAttack.healWithSpells(attackData);
-        }
-      }
-
-      this.setStateInfo(castAttack);
-
-      const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
-
-      const canHit = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, this.voided);
-
-      if (canHit) {
-        if (this.canBlock(attackData.weapon_damage)) {
-          this.addEnemyActionMessage('Your weapon was blocked!')
-        } else {
-          weaponAttack.attackWithWeapon(attackData);
-        }
-      } else {
-        this.addEnemyActionMessage('Your weapon missed!');
-      }
-
-      this.setStateInfo(weaponAttack);
-
-      this.useItems(attackData, this.attacker.class);
-
-      return this.setState();
-    } else {
-      this.addMessage('Your damage spell missed and you fumbled with your weapon!');
-
-      if (attackData.heal_for > 0) {
-        castAttack.healWithSpells(attackData);
-      }
-
-      this.useItems(attackData, this.attacker.class);
-    }
+    this.useItems(attackData, this.attacker.class);
 
     return this.setState();
   }
@@ -148,6 +88,64 @@ export default class CastAndAttack {
     this.battleMessages = [];
 
     return state;
+  }
+
+  castAttack(attackData, castAttack) {
+    const spellDamage = attackData.spell_damage;
+
+    if (spellDamage > 0) {
+
+      const canHitCheck      = new CanHitCheck();
+
+      const canCast           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
+
+      if (canHitCheck.canAutomaticallyHit()) {
+        castAttack.attackWithSpells(attackData);
+
+        if (attackData.heal_for > 0) {
+          castAttack.healWithSpells(attackData);
+        }
+      } else if (canCast) {
+        if (this.canBlock(attackData.spell_damage)) {
+          this.addEnemyActionMessage(this.defender.name + ' Blocked your damage spell!');
+
+          if (attackData.heal_for > 0) {
+            castAttack.healWithSpells(attackData);
+          }
+        } else {
+          if (attackData.spell_damage > 0) {
+            castAttack.attackWithSpells(attackData);
+          } else if (attackData.heal_for > 0) {
+            castAttack.healWithSpells(attackData);
+          }
+        }
+      } else {
+        this.addEnemyActionMessage('Your damage spell missed');
+      }
+
+      this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
+    } else {
+      castAttack.healWithSpells(attackData);
+    }
+  }
+
+  weaponAttack(attackData, weaponAttack) {
+    const canHitCheck = new CanHitCheck();
+    const canHit      = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages, this.voided);
+
+    if (canHitCheck.canAutomaticallyHit()) {
+      weaponAttack.attackWithWeapon(attackData);
+    } else if (canHit) {
+      if (this.canBlock(attackData.weapon_damage)) {
+        this.addEnemyActionMessage('Your weapon was blocked!')
+      } else {
+        weaponAttack.attackWithWeapon(attackData);
+      }
+    } else {
+      this.addEnemyActionMessage('Your weapon missed!');
+    }
+
+    this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
   }
 
 

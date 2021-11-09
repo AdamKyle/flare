@@ -5,6 +5,7 @@ namespace App\Flare\Builders;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
+use function GuzzleHttp\Promise\queue;
 
 class CharacterAttackBuilder {
 
@@ -77,6 +78,20 @@ class CharacterAttackBuilder {
         return $this->characterInformationBuilder;
     }
 
+    public function getPositionalWeaponDamage(string $hand, bool $voided = false) {
+        $weaponSlotOne = $this->fetchSlot($hand);
+
+        if (!is_null($weaponSlotOne)) {
+            if (!$voided) {
+                $weaponDamage = $weaponSlotOne->item->getTotalDamage();
+            } else {
+                $weaponDamage = $weaponSlotOne->item->base_damage;
+            }
+        }
+
+        return ceil($this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided));
+    }
+
     protected function baseAttack(bool $voided = false): array {
         $enemyStatBonus = $this->character->map->gameMap->enemy_stat_bonus;
 
@@ -118,13 +133,11 @@ class CharacterAttackBuilder {
 
         if (is_null($weaponDamage)) {
             $weaponDamage = 0;
+        } else {
+            $weaponDamage = $this->characterInformationBuilder->damageModifiers($weaponDamage, $voided);
         }
 
-        $damageStat   = $this->characterInformationBuilder->buildCharacterDamageStat($voided);
-
         $weaponDamage = $this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided);
-
-        $weaponDamage = round($damageStat + $weaponDamage);
 
         if (!is_null($spellSlotOne)) {
             if ($spellSlotOne->item->type === 'spell-damage') {

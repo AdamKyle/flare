@@ -57,31 +57,37 @@ export default class CastAttack {
       return this.setState();
     }
 
-    if (canHit) {
-      if (this.canBlock()) {
-        this.addEnemyActionMessage(this.defender.name + ' Blocked your damaging spell!');
+    if (attackData.spell_damage > 0) {
+      if (canHit) {
+        if (this.canBlock()) {
+          this.addEnemyActionMessage(this.defender.name + ' Blocked your damaging spell!');
+
+          if (attackData.heal_for > 0) {
+            this.healWithSpells(attackData);
+          }
+
+          this.useItems(attackData, this.attacker.class);
+
+          return this.setState();
+        }
+
+        this.attackWithSpells(attackData);
+        this.healWithSpells(attackData);
+
+        this.useItems(attackData, this.attacker.class)
+      } else {
+        this.addMessage('Your damage spell missed!');
 
         if (attackData.heal_for > 0) {
           this.healWithSpells(attackData);
         }
 
         this.useItems(attackData, this.attacker.class);
-
-        return this.setState();
       }
-
-      this.attackWithSpells(attackData);
+    } else {
       this.healWithSpells(attackData);
 
       this.useItems(attackData, this.attacker.class)
-    } else {
-      this.addMessage('Your damage spell missed!');
-
-      if (attackData.heal_for > 0) {
-        this.healWithSpells(attackData);
-      }
-
-      this.useItems(attackData, this.attacker.class);
     }
 
     return this.setState();
@@ -138,9 +144,9 @@ export default class CastAttack {
 
     this.monsterHealth -= damage;
 
-    this.addMessage('Your damage spell hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
+    this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
 
-    this.extraAttacks(attackData, castingAccuracy);
+    this.extraAttacks(attackData);
 
   }
 
@@ -176,10 +182,10 @@ export default class CastAttack {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  extraAttacks(attackData, skillBonus) {
+  extraAttacks(attackData) {
     const damage = new Damage();
 
-    this.monsterHealth = damage.doubleCastChance(this.attacker, this.defender, this.monsterHealth, attackData, skillBonus);
+    this.monsterHealth = damage.doubleCastChance(this.attacker, attackData, this.monsterHealth);
 
     const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
