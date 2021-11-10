@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Controllers\Api;
 
+use App\Flare\Models\Location;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Core\Events\AttackTimeOutEvent;
@@ -48,14 +49,25 @@ class BattleController extends Controller {
             ], 422);
         }
 
-        $foundCharacter = $user->character;
-        $character      = new Item($foundCharacter, $this->character);
+        $foundCharacter       = $user->character;
+        $characterMap         = $foundCharacter->map;
+        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
+                                         ->where('x', $characterMap->character_position_x)
+                                         ->where('y', $characterMap->character_position_y)
+                                         ->where('game_map_id', $characterMap->game_map_id)
+                                         ->first();
+
+        $character             = new Item($foundCharacter, $this->character);
 
         if (!Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
 
-        $monsters       = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
+        if (!is_null($locationWithEffect)) {
+            $monsters = Cache::get('monsters')[$locationWithEffect->name];
+        } else {
+            $monsters = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
+        }
 
         return response()->json([
             'monsters'  => $monsters,

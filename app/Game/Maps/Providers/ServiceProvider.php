@@ -63,10 +63,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MovementService(
                 $app->make(PortService::class),
                 $app->make(MapTileValue::class),
+                $app->make(CharacterAttackTransformer::class),
                 $app->make(CoordinatesCache::class),
                 $app->make(MapPositionValue::class),
                 $app->make(TraverseService::class),
                 $app->make(ConjureService::class),
+                $app->make(Manager::class),
             );
         });
 

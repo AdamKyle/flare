@@ -202,7 +202,8 @@ export default class FightSection extends React.Component {
       this.isCharacterVoided = true;
 
     } else if (!this.isCharacterVoided) {
-      let messages = monsterInfo.reduceAllStats(character.stat_affixes);
+
+      let messages = monsterInfo.reduceResistances(character.resistance_reduction);
 
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
@@ -214,11 +215,12 @@ export default class FightSection extends React.Component {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
 
-      messages = monsterInfo.reduceResistances(character.resistance_reduction);
+      messages = monsterInfo.reduceAllStats(character.stat_affixes);
 
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
+
     }
 
     const health = monsterInfo.health();
@@ -267,7 +269,6 @@ export default class FightSection extends React.Component {
       attackType = 'voided_' + attackType;
     } else if (!this.isMonsterDevoided && !this.isCharacterVoided) {
       if (this.state.monster.canMonsterVoidPlayer()) {
-        console.log('Am I here?');
         this.battleMessagesBeforeFight.push({
           message: this.state.monster.monster.name + ' has voided your enchantments! You feel much weaker!',
           class: 'enemy-action-fired'

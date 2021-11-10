@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Locations\Partials;
 
+use App\Flare\Values\LocationEffectValue;
 use Livewire\Component;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
@@ -15,13 +16,16 @@ class Details extends Component
 
     public $coordinates;
 
+    public $locationEffects;
+
     protected $rules = [
-        'location.name'        => 'required',
-        'location.description' => 'required',
-        'location.x'           => 'required',
-        'location.y'           => 'required',
-        'location.game_map_id' => 'required',
-        'location.is_port'     => 'nullable'
+        'location.name'                => 'required',
+        'location.description'         => 'required',
+        'location.x'                   => 'required',
+        'location.y'                   => 'required',
+        'location.game_map_id'         => 'required',
+        'location.is_port'             => 'nullable',
+        'location.enemy_strength_type' => 'nullable',
     ];
 
     protected $messages = [
@@ -31,8 +35,9 @@ class Details extends Component
     protected $listeners = ['validateInput'];
 
     public function mount(CoordinatesCache $coordinatesCache) {
-        $this->maps        = GameMap::all()->pluck('name', 'id')->toArray();
-        $this->coordinates = $coordinatesCache->getFromCache();
+        $this->maps            = GameMap::all()->pluck('name', 'id')->toArray();
+        $this->coordinates     = $coordinatesCache->getFromCache();
+        $this->locationEffects = LocationEffectValue::getNamedValues();
 
         if (is_null($this->location)) {
             $this->location = new Location;
@@ -46,6 +51,10 @@ class Details extends Component
 
         if (is_null($this->location->is_port)) {
             $this->location->is_port = false;
+        }
+
+        if ($this->location->enemy_strength_type === '') {
+            $this->location->enemy_strength_type = null;
         }
 
         $this->location->save();

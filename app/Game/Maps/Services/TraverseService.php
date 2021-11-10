@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\Location;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Maps\Events\MoveTimeOutEvent;
@@ -219,8 +220,15 @@ class TraverseService {
      * @param Character $character
      */
     protected function updateActions(int $mapId, Character $character) {
-        $user      = $character->user;
-        $gameMap   = GameMap::find($mapId);
+        $user         = $character->user;
+        $gameMap      = GameMap::find($mapId);
+        $characterMap = $character->map;
+
+        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
+                                        ->where('x', $characterMap->character_position_x)
+                                        ->where('y', $characterMap->character_position_y)
+                                        ->where('game_map_id', $characterMap->game_map_id)
+                                        ->first();
 
         if ($gameMap->name === 'Shadow Plane') {
             $this->updateAtctionTypeCache($character, $gameMap->enemy_stat_bonus);
@@ -229,7 +237,12 @@ class TraverseService {
         }
 
         $character = new Item($character, $this->characterAttackTransformer);
-        $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
+
+        if (!is_null($locationWithEffect)) {
+            $monsters  = Cache::get('monsters')[$locationWithEffect->name];
+        } else {
+            $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
+        }
 
         $character = $this->manager->createData($character)->toArray();
 

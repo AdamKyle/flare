@@ -65,6 +65,20 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="effect">Strength Addition: <span class="danger">*</span> </label>
+                <select class="custom-select form-control required" id="x-position" name="effect" wire:model="location.enemy_strength_type">
+                    <option value="">Select Strength Type</option>
+                    @foreach($locationEffects as $index => $locationEffect)
+                        <option value="{{$index}}">{{$locationEffect}}</option>
+                    @endforeach
+                </select>
+                @error('location.enemy_strength_type') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
 
 </div>
 

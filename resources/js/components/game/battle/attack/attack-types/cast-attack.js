@@ -57,8 +57,6 @@ export default class CastAttack {
       return this.setState();
     }
 
-    console.log(attackData);
-
     if (attackData.spell_damage > 0) {
       if (canHit) {
         if (this.canBlock()) {
@@ -182,6 +180,7 @@ export default class CastAttack {
     this.monsterHealth          = useItems.getMonsterCurrentHealth();
     this.characterCurrentHealth = useItems.getCharacterCurrentHealth();
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
+
   }
 
   extraAttacks(attackData) {

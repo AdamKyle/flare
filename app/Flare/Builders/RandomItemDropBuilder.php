@@ -4,14 +4,29 @@ namespace App\Flare\Builders;
 
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\Location;
 
 class RandomItemDropBuilder {
 
-    private $monsterPlane;
+    /**
+     * @var string $monsterPlane
+     */
+    private string $monsterPlane;
 
-    private $characterLevel = 0;
+    /**
+     * @var int $characterLevel
+     */
+    private int $characterLevel = 0;
 
-    private $monsterLevel   = 0;
+    /**
+     * @var int $monsterLevel
+     */
+    private int $monsterLevel   = 0;
+
+    /**
+     * @var Location|null $location
+     */
+    private ?Location $location;
 
     /**
      * Set the monster plane.
@@ -45,6 +60,18 @@ class RandomItemDropBuilder {
      */
     public function setMonsterMaxLevel(int $level): RandomItemDropBuilder {
         $this->monsterLevel = $level;
+
+        return $this;
+    }
+
+    /**
+     * Set the location.
+     *
+     * @param Location|null $location
+     * @return RandomItemDropBuilder
+     */
+    public function setLocation(Location $location = null): RandomItemDropBuilder {
+        $this->location = $location;
 
         return $this;
     }
@@ -93,7 +120,8 @@ class RandomItemDropBuilder {
 
         $totalLevels = $this->monsterLevel - $this->characterLevel;
 
-        if ($this->monsterPlane !== 'Shadow Plane' && !($totalLevels >= 10)) {
+
+        if (($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) && !($totalLevels >= 10)) {
             $query = $query->where('can_drop', true);
         }
 
@@ -151,7 +179,7 @@ class RandomItemDropBuilder {
 
         $query = ItemAffix::inRandomOrder();
 
-        if ($this->monsterPlane !== 'Shadow Plane') {
+        if ($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) {
             $query = $query->where('can_drop', true);
         } else {
             if (!$totalLevels >= 10) {

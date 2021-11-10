@@ -67,15 +67,27 @@ export default class ActionsSection extends React.Component {
       const oldFirstMonsterName = this.state.monsters[0].name;
       const newFirstMonsterName = event.monsters[0].name;
 
+      const oldMonster = this.state.monsters[0];
+      const newMonster = event.monsters[0];
+
       this.setState({
         character: event.character,
         monsters: event.monsters,
         isDead: event.character.is_dead,
       }, () => {
+
+        // We are on a new plane.
         if (oldFirstMonsterName !== newFirstMonsterName && !this.state.resetBattleAction) {
           this.setState({
             resetBattleAction: true,
           })
+        }
+
+        // We are at a location that increases the enemy stats.
+        if (oldMonster.str !== newMonster.str) {
+          this.setState({
+            resetBattleAction: true,
+          });
         }
       });
     });
