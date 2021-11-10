@@ -78,13 +78,13 @@ class DataTable extends Component
                     $items = $items->where('type', $this->type);
                 }
 
-                return $items->orderBy($this->sortField, $this->sortBy);
+                return $items->whereNull('item_prefix_id')->whereNull('item_suffix_id')->whereNotNull('type')->orderBy($this->sortField, $this->sortBy);
             }
         }
 
         $items = $items->where('item_suffix_id', null)
-                       ->where('item_prefix_id', null)
-                       ->where('craft_only', $this->craftOnly);
+            ->where('item_prefix_id', null)
+            ->where('craft_only', $this->craftOnly);
 
         if (!is_null($this->type)) {
             $items = $items->where('type', $this->type);
@@ -97,6 +97,8 @@ class DataTable extends Component
         $this->showAlchemy = false;
 
         return $items->orderBy($this->sortField, $this->sortBy);
+
+
     }
 
     public function setType($type) {

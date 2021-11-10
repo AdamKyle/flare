@@ -4,6 +4,8 @@ export default class Voidance {
 
   canPlayerDevoidEnemy(devoidChance) {
 
+    return true;
+
     if (devoidChance >= 1) {
       return true;
     }

@@ -115,7 +115,7 @@ class ItemHandler {
                 $cantResistMessage = 'cowers: ';
             }
 
-            $message = 'Your enchantments glow with rage. Your enemy ' . $cantResistMessage . $totalDamage;
+            $message = 'Your enchantments glow with rage. Your enemy ' . $cantResistMessage . number_format($totalDamage);
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
         }
     }
@@ -291,7 +291,7 @@ class ItemHandler {
 
                 $this->currentMonsterHealth = $health;
 
-                $message = 'Your artifacts hit the enemy for: ' . $artifactDamage;
+                $message = 'Your artifacts hit the enemy for: ' . number_format($artifactDamage);
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
             }
         }

@@ -60,7 +60,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isHeretic()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::HERETICS_DOUBLE_CAST);
             $details['requires'] = 'Damage spell equipped';
-            $details['description'] = 'With a damage spell equipped you have a small chance to cast another spell. Spell evasion does count.';
+            $details['description'] = 'With a damage spell equipped you have a small chance to cast another spell. Enemies cannot avoid this.';
         }
 
         if ($classAttackValue->isProphet()) {

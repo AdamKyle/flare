@@ -13,37 +13,32 @@ class HealingExtraActionHandler {
 
     private $messages = [];
 
-    public function healSpells(CharacterInformationBuilder $characterInformationBuilder, int $characterHealth, array $attackData): int {
+    public function healSpells(CharacterInformationBuilder $characterInformationBuilder, int $characterHealth, bool $voided = false): int {
 
-        if ($attackData['heal_for'] > 0) {
-            $healFor = $attackData['heal_for'];
+        $critcialChance = $characterInformationBuilder->getSkill('Criticality');
+        $healFor        = $characterInformationBuilder->buildHealFor($voided);
 
-            $critcialChance = $characterInformationBuilder->getSkill('Criticality');
+        $dc = 100 - 100 * $critcialChance;
 
-            $dc = 100 - 100 * $critcialChance;
+        if (rand(1, 100) > $dc) {
+            $message = 'The heavens open and your wounds start to heal over (Critical heal!)';
+            $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
 
-            if (rand(1, 100) > $dc) {
-                $message = 'The heavens open and your wounds start to heal over (Critical heal!)';
-                $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
-
-                $healFor *= 2;
-            }
-
-            $message          = 'Your healing spell(s) heals for: ' . number_format($healFor);
-
-            $this->messages   = $this->addMessage($message, 'action-fired', $this->messages);
-
-            $characterHealth += $healFor;
-
-            $characterHealth  = $this->extraHealing($characterInformationBuilder, $characterHealth, $attackData);
+            $healFor *= 2;
         }
 
+        $message          = 'Your healing spell(s) heals for: ' . number_format($healFor);
 
+        $this->messages   = $this->addMessage($message, 'action-fired', $this->messages);
+
+        $characterHealth += $healFor;
+
+        $characterHealth  = $this->extraHealing($characterInformationBuilder, $characterHealth);
 
         return $characterHealth;
     }
 
-    public function extraHealing(CharacterInformationBuilder $characterInformationBuilder, int $characterHealth, array $attackData): int {
+    public function extraHealing(CharacterInformationBuilder $characterInformationBuilder, int $characterHealth): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isProphet()) {
@@ -57,7 +52,7 @@ class HealingExtraActionHandler {
 
             $this->messages   = $this->addMessage($message, 'enemy-action-fired', $this->messages);
 
-            $healFor          = $attackData['heal_for'];
+            $healFor          = $characterInformationBuilder->buildHealFor();
 
             $critcialChance   = $characterInformationBuilder->getSkill('Criticality');
 

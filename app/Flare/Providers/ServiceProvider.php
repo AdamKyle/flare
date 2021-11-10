@@ -215,7 +215,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterAttackBuilder::class),
                 $app->make(EntrancingChanceHandler::class),
                 $app->make(AttackExtraActionHandler::class),
-                $app->make(HealingExtraActionHandler::class),
+                $app->make(CastHandler::class),
                 $app->make(ItemHandler::class),
                 $app->make(CanHitHandler::class),
             );
@@ -226,7 +226,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterAttackBuilder::class),
                 $app->make(EntrancingChanceHandler::class),
                 $app->make(AttackExtraActionHandler::class),
-                $app->make(HealingExtraActionHandler::class),
+                $app->make(CastHandler::class),
                 $app->make(ItemHandler::class),
                 $app->make(CanHitHandler::class),
             );

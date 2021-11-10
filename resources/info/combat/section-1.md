@@ -32,6 +32,10 @@ Hovering over these will give you tool tips about whats involved in the attack.
 
 It&#39;s important to pay attention to your class to determine which attack is best for you. Of course, Tlessa wants you to experiment. Let&#39;s go over the attack types:
 
+> ### ATTN!!
+> 
+> The info below will go left to right based on the first image above.
+
 ## Attack
 
 Requires you to level Accuracy and your class skill for added damage.
@@ -39,87 +43,70 @@ Requires you to level Accuracy and your class skill for added damage.
 Clicking attack will use your best weapon unless you are a fighter. If you are a fighter, we will use both your weapons. 
 Of course, your class skill for fighters has two ways you could go: Tank (weapon and shield) or Glass Cannon (Two weapons).
 
-If you are a fighter you can duel wield as we take into account two weapons for fighters. Fighters also use 15% of their strength for attacking.
+Fighters with weapons will use 15% of their str, while thieves and rangers will use 5% with weapons equipped, of their primary damage stat.
 
-If you have no weapons equipped, we will use 2% of your primary damage stat. This will allow you with two shields, to attack.
+If you have no weapons equipped, we will use 2% of your primary damage stat, whereas Fighters will use 5%. This will allow you with two shields, to attack.
 
 When attacking, your artifacts, affixes and rings will fire.
 
-You can still be resurrected if you have a healing spell equipped, but instead of healing with spells, you will only get 1 health for resurrecting. If you have life stealing affixes attached, these can also fire, however resurrecting and healing will only happen at the end of the enemies turn assuming the enemy is not dead.
+You can still be resurrected if you have a healing spell equipped, but instead of healing with spells, you will only get 1 health for resurrecting. If you have life stealing affixes attached, these can also fire, 
+however resurrecting and healing will only happen at the end of the enemies turn assuming the enemy is not dead.
 
 Class skills have a chance to fire (to do damage) once during this attack. Class Skill bonuses are automatically applied assuming you follow its rules.
 
-Rangers, Thieves and Vampires best attack is some kind of attack option (or defend for fighters with damage dealing enchantment(s)). Fighters should stick to
-Attack or Defend.
+The only class skills that will not fire is the Heretics Double Cast and the Prophets Double heal, these require you to use one of the cast options.
+
+**Best for:** Fighters, Thieves and Vampires.
 
 ## Cast
 
 Requires you to level Casting Accuracy
 
-This is a Heretics, Prophets best attack.
+This is a Heretic's best attack.
 
 Clicking cast will fire off both your damage and healing spells. If you have two damage spells, you will use both. Same if you have two healing spells.
 
-Casters get 15% (30% for heretics - 32% with no spells) of their damage stat added towards their attack.
+Heretics get 30% of their int applied to spell damage, whereas they only get 2% for no spells equipped.
+
+Prophets will get 30% of their chr for healing and rangers get 15% of their chr for healing. Even if there are no healing spells equipped.
+
+In theory, Prophets could go glass cannon and use damage spells, but you would need to balance the CHR with the INT to not only do enough damage but also
+heal enough.
 
 When determining if a caster can hit, we use the casters focus (25% of) + their casting accuracy against the enemy&#39;s dodge.
 
-Prophets get 30% towards their healing spells (a total of 32% if they have no healing spell) and Rangers get 15% (total of 17% of their chr if you have no healing spell) towards their healing spells.
-
-Casters get 2% of their damage stat as a cast attack if they have no damage spells equipped (and 30% of their int for a total of 32% if you are a heretic). This is the only class(es) that can cast without spells.
-
-Rangers can use their healing without having a healing spell equipped, but this attack is useless for them.
-
 Class skills (damage) have a chance to twice here for casters and vampires. Once for the spell damage and once for the healing spell.
 
-Casters will want two damage spells, whereas vampires will want one of each and two shields for added dur. Prophets should use one damage and one healing depending on 
-how hard the enemy is. They could also go the two durability shields (two shields with extra dur enchantments) and two attack spells.
+Prophets Double Heal and Heretics Double Cast can both fire assuming you follow the class skill rules, when using this attack.
 
-When casting it&#39;s your spells then your rings, artifacts and affixes
+When casting it&#39;s your spells, we also fire off affixes, rings and artifacts.
 
-### Regarding Casters
-
-In your few level's avoid these attack types. Instead, focus on Attack. The reason is, you have a higher chance
-to hit something then you do to cast. The exception is for prophets who use healing spells, your healing spells - even if your "damage" spell misses. will never
-miss or be blocked.
+**Best For:** Heretics
 
 ## Cast and Attack and Attack and Cast
 
 Requires Both Casting Accuracy and Accuracy
 
-Rangers, Thieves and Vampires might appreciate this attack.
+Cast and Attack will first cast with the spell in **spell slot one** and the weapon in **the right hand.**
 
-Cast and attack will first cast with the spell in **spell slot one** and the weapon in **the right hand.**
+Attack and Cast will first use the weapon in **the left hand** and the spell in **spell slot two.**
 
-If you have a bow equipped you will use that, regardless of which hand it&#39;s in as bows are duel wield weapons.
+If you have a bow equipped you will use that, regardless of which hand it&#39;s in, as bows are duel wield weapons.
 
-If an enemy blocks your cast, it will block both weapon and cast. You will fumble with your weapon and miss with your spell.
+Enemies can block both attacks: Cast and then Attack (or Attack and Cast). They can also dodge both attacks.
 
-However, if your spell is a healing spell, even if it states your damage spell missed, and you fumbled with your weapon – your healing spell will still fire.
+Healing spells, will never miss. So if you have a Healing spell a bow equipped and the bow misses, the healing spell will still fire (before the bow).
 
-The same holds true if you miss. If you &quot;miss&quot; with your damage spell, you will also miss with your weapon, but your healing spell can still fire. This assumes the healing spell is in slot one.
+Vampires with a damage or healing spell can trigger their Vampire Thirst Skill three times as they get their weapon, Spell and Affixes. Technically four
+if they survive the enemy.
 
-If you do manage to cast, your weapon can then either miss or be blocked.
-
-Note: The reason missed is in quotes, is because even if you have a bow and a healing spell, we still must see if you can &quot;cast&quot;, even though healing spells can never miss. This allows us to say you missed with your weapon and spell or (in the case that you were blocked) that you were blocked with your weapon and spell.
-
-For Attack and cast, it&#39;s the same but reversed. Left-hand weapon then spell **slot two** will fire. The same concept applies as it does for cast and attack.
-
-You have a chance for your class skill to fire twice if you are a vampire and once otherwise. For the vampire class skill to have a chance to fire twice, your weapon and damage spell cannot miss else it&#39;s a one-time chance.
-
-### Regarding Casters
-
-In your few level's avoid these attack types. Instead, focus on Attack. The reason is, you have a higher chance
-to hit something then you do to cast. The exception is for prophets who use healing spells, your healing spells - even if your "damage" spell misses. will never
-miss or be blocked.
+**Best For:** Prophets, Rangers, Vampires
 
 ## Defend
 
-Best for Fighters, require no skill.
+Fighters will apply their class bonus to their defence.
 
-Defend will use 15% of the fighter&#39;s strength on top of their armour class or 5% of your strength on top of the armour class if you are not a fighter.
-
-When you use this attack option, you will muster all the strength you have to block not just the enemies attack but potentially their spells as well.
+When you use this option, you will muster all the strength you have to block not just the enemies attack but potentially their spells as well.
 
 After which your affixes and artifacts will also fire.
 

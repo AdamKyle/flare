@@ -35,6 +35,12 @@ class AdventureJobTest extends TestCase
                 ]))
                 ->equipLeftHand('Sample Item')
                 ->getCharacterFactory()
+                ->updateSkill('Accuracy', [
+                    'level' => 999
+                ])
+                ->updateSkill('Casting Accuracy', [
+                    'level' => 999
+                ])
                 ->getCharacter(false);
 
         $adventure = $this->createNewAdventure();

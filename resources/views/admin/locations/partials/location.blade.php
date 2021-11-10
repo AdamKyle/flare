@@ -18,6 +18,10 @@
                         <dd>{{$location->y}}</dd>
                         <dt>Is Port:</dt>
                         <dd>{{$location->is_port ? 'Yes' : 'No'}}</dd>
+                        <dt>Increases Enemy Strength By:</dt>
+                        <dd>{{!is_null($increasesEnemyStrengthBy) ? $increasesEnemyStrengthBy : 'None.'}}</dd>
+                        <dt>Increases Drop Rate By:</dt>
+                        <dd>{{$increasesDropChanceBy * 100}}%</dd>
                     </dl>
                     <hr />
                     @if (auth()->user())

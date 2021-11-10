@@ -9,8 +9,7 @@
   one <a href="/information/enchanting">damaging affix</a>.
 </p>
 <p>
-  Rangers can use either attack, attack and cast or cast and attack, they can get away with out having a healing spell equipped so the cast based attacks will be good for them, but not pure cast
-  as you want to attack with your bow. Defend is useless as you wont equip a shield.
+  Rangers who use Cast and Attack or Attack and cast can heal with out spells, at 15% of their CHR. If a ranger has a healing spell equipped they still get the
+  additional 15% chr added to their healing output.
 </p>
 <p>Rangers will want a race that quick and nimble (High Elf or Centaur) or focuses on dexterity, Orc.</p>
-<p>When a ranger heals they get an additional 15% of their chr stat towards their healing added to their spell's total healing or just 15% of their chr.</p>

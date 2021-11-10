@@ -186,18 +186,10 @@ class Item extends Model
         $damage     = $baseDamage;
 
         if (!is_null($this->itemPrefix)) {
-            if ($damage === 0 && !is_null($this->itemPrefix->base_damage_mod)) {
-                $damage = 1;
-            }
-
             $damage += ($damage * $this->itemPrefix->base_damage_mod);
         }
 
         if (!is_null($this->itemSuffix)) {
-            if ($damage === 0 && !is_null($this->itemSuffix->base_damage_mod)) {
-                $damage = 1;
-            }
-
             $damage += ($damage * $this->itemSuffix->base_damage_mod);
         }
 
@@ -227,18 +219,10 @@ class Item extends Model
         $ac     = $baseAc;
 
         if (!is_null($this->itemPrefix)) {
-            if ($ac === 0 && !is_null($this->itemPrefix->base_ac_mod)) {
-                $ac = 1;
-            }
-
             $ac = ($ac * (1 + $this->itemPrefix->base_ac_mod));
         }
 
         if (!is_null($this->itemSuffix)) {
-            if ($ac === 0 && !is_null($this->itemSuffix->base_ac_mod)) {
-                $ac = 1;
-            }
-
             $ac = ($ac * (1 + $this->itemSuffix->base_ac_mod));
         }
 
@@ -264,18 +248,10 @@ class Item extends Model
         $healFor     = $baseHealing;
 
         if (!is_null($this->itemPrefix)) {
-            if ($healFor === 0 && !is_null($this->itemPrefix->base_healing_mod)) {
-                $healFor = 1;
-            }
-
             $healFor += ($healFor * $this->itemPrefix->base_healing_mod);
         }
 
         if (!is_null($this->itemSuffix)) {
-            if ($healFor === 0 && !is_null($this->itemSuffix->base_healing_mod)) {
-                $healFor = 1;
-            }
-
             $healFor += ($healFor * $this->itemSuffix->base_healing_mod);
         }
 

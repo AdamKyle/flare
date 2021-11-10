@@ -11,11 +11,11 @@ const renderAttackToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Attack.
 
-    If you are a fighter or thief, you will attack with both weapons if you have them equipped.
-    If you are not a fighter, you will attack with the best weapon.
+    If you are a Fighter or Thief, you will attack with both weapons if you have them equipped.
+    If you are not a Fighter or Thief, you will attack with the best weapon.
     If you have no weapon equipped, you will attack with 2% of your primary damage stat.
-    Fighters and Thieves will use 15% of their primary damage stat (str/dex) on top of their combined weapon
-    damage. Other classes will not use any bonuses from their class, unless, they have no weapon equipped.
+    Fighters will use 15% of their strength for weapons, 5% with out weapons. Where as Thieves and Rangers
+    will use 5% of their primary damage stat and only 2% (including other classes) when attacking with no weapons.
   </Tooltip>
 );
 
@@ -23,10 +23,10 @@ const renderCastingToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Cast.
 
-    We will attack with both spells. Heretics get an additional 32% of your primary damage stat while Prophets get 17%. If you have healing spells,
-    prophets will get 30% towards healing spells and Rangers get 15% (of their chr) towards healing spells. If you have no spells equipped
-    and are a prophet or heretic, you will attack with 2% of your primary damage stat.
-    Prophets and Rangers can heal for 30% and 15% (respectively) of their chr even with no spell equipped.
+    We will attack with both spells. Heretics get an additional 30% of their primary damage stat as attack. Heretics can also cast with no
+    spells equipped at 2% of their primary damage attack. Rangers, for healing, get 15% of their Chr while Prophets get 30% of their chr.
+    If a prophet has no healing spell equipped, they still do their % of healing, how ever prophets special Double Heal will not fire
+    with no healing spells equipped. Rangers can also heal for 15% of their chr with no healing spells equipped.
   </Tooltip>
 );
 
@@ -56,9 +56,8 @@ const renderDefendToolTip = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     Defend.
 
-    Will use your armour class plus 5% of your strength. If you're a Fighter, we use 15% of your strength.
-    Only your affixes, rings and artifacts will fire during your round. During the enemies phase you will
-    have a chance to block them (including their spells) assuming you are not entranced.
+    Will use your armour class plus 5% of your strength. If you are a fighter and have at least one shield equipped
+    you will add your class bonus to your defence. If you are not, we use your combined armour.
   </Tooltip>
 );
 
@@ -88,6 +87,9 @@ export default class FightSection extends React.Component {
     this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
 
     this.battleMessagesBeforeFight = [];
+    this.isMonsterVoided           = false;
+    this.isMonsterDevoided         = false;
+    this.isCharacterVoided         = false;
   }
 
   componentDidMount() {
@@ -144,6 +146,9 @@ export default class FightSection extends React.Component {
 
       if (propsMonster.name !== stateMonster.name) {
         this.battleMessagesBeforeFight = [];
+        this.isMonsterVoided           = false;
+        this.isMonsterDevoided         = false;
+        this.isCharacterVoided         = false;
 
         this.setState({
           battleMessages: [],
@@ -152,9 +157,6 @@ export default class FightSection extends React.Component {
           characterCurrentHealth: null,
           characterMaxHealth: null,
           monsterMaxHealth: null,
-          isCharacterVoided: false,
-          isMonsterVoided: false,
-          isMonsterDevoided: false,
         }, () => {
           this.setMonsterInfo();
         })
@@ -172,38 +174,36 @@ export default class FightSection extends React.Component {
     const monsterInfo   = new Monster(this.props.monster);
     const voidance      = new Voidance();
     const character     = this.props.character;
-    let isVoided        = false;
-    let monsterVoided   = false;
-    let monsterDevoided = false;
 
-    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !monsterDevoided) {
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isMonsterDevoided) {
       this.battleMessagesBeforeFight.push({
         message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
         class: 'action-fired'
       });
 
-      monsterDevoided = true;
+      this.isMonsterDevoided = true;
     }
 
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !monsterVoided) {
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isMonsterVoided) {
       this.battleMessagesBeforeFight.push({
         message: 'The light of the heavens shines through this darkness. The enemy is voided!',
         class: 'action-fired'
       });
 
-      monsterVoided = true;
+      this.isMonsterVoided = true;
     }
 
-    if (monsterInfo.canMonsterVoidPlayer() && !this.state.isCharacterVoided && !monsterVoided) {
+    if (monsterInfo.canMonsterVoidPlayer() && !this.isCharacterVoided && !this.isMonsterDevoided) {
       this.battleMessagesBeforeFight.push({
         message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
         class: 'enemy-action-fired'
       });
 
-      isVoided = true;
+      this.isCharacterVoided = true;
 
-    } else if (!this.state.isCharacterVoided) {
-      let messages = monsterInfo.reduceAllStats(character.stat_affixes);
+    } else if (!this.isCharacterVoided) {
+
+      let messages = monsterInfo.reduceResistances(character.resistance_reduction);
 
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
@@ -215,17 +215,18 @@ export default class FightSection extends React.Component {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
 
-      messages = monsterInfo.reduceResistances(character.resistance_reduction);
+      messages = monsterInfo.reduceAllStats(character.stat_affixes);
 
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
+
     }
 
     const health = monsterInfo.health();
     let characterHealth = this.props.character.health;
 
-    if (isVoided) {
+    if (this.isCharacterVoided) {
       characterHealth = this.props.character.voided_dur
     }
 
@@ -237,9 +238,6 @@ export default class FightSection extends React.Component {
       characterCurrentHealth: characterHealth,
       characterMaxHealth: characterHealth,
       monsterMaxHealth: health,
-      isCharacterVoided: isVoided,
-      isMonsterVoided: monsterVoided,
-      isMonsterDevoided: monsterDevoided,
     }, () => {
       this.props.setMonster(null)
     });
@@ -267,12 +265,10 @@ export default class FightSection extends React.Component {
       return getServerMessage('cant_attack');
     }
 
-    if (this.state.isCharacterVoided) {
+    if (this.isCharacterVoided) {
       attackType = 'voided_' + attackType;
-    } else if (!this.state.isMonsterDevoided && !this.state.isCharacterVoided) {
-
+    } else if (!this.isMonsterDevoided && !this.isCharacterVoided) {
       if (this.state.monster.canMonsterVoidPlayer()) {
-
         this.battleMessagesBeforeFight.push({
           message: this.state.monster.monster.name + ' has voided your enchantments! You feel much weaker!',
           class: 'enemy-action-fired'
@@ -280,15 +276,15 @@ export default class FightSection extends React.Component {
 
         attackType = 'voided_' + attackType;
 
-        this.setState({isCharacterVoided: true});
+        this.isCharacterVoided = true;
       }
     }
 
     const attack = new Attack(
       this.state.characterCurrentHealth,
       this.state.monsterCurrentHealth,
-      this.state.isCharacterVoided,
-      this.state.isMonsterVoided,
+      this.isCharacterVoided,
+      this.isMonsterVoided,
     );
 
     const state = attack.attack(this.state.character, this.state.monster, true, 'player', attackType).getState()
@@ -335,6 +331,10 @@ export default class FightSection extends React.Component {
 
         if (state.monsterCurrentHealth <= 0) {
           monster = null;
+
+          this.isMonsterDevoided = false;
+          this.isMonsterVoided   = false;
+          this.isCharacterVoided = false;
         }
 
         this.setState({
@@ -364,7 +364,7 @@ export default class FightSection extends React.Component {
 
   revive(data, callback) {
 
-    const isVoided = this.state.isCharacterVoided;
+    const isVoided = this.isCharacterVoided;
 
     this.setState({
       character: data.character,

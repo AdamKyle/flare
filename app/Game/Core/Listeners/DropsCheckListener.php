@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Flare\Models\Location;
+use App\Flare\Values\LocationEffectValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
@@ -38,15 +40,30 @@ class DropsCheckListener
         $lootingChance  = $event->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
         $gameMap        = $event->character->map->gameMap;
         $gameMapBonus   = 0.0;
+        $characterMap   = $event->character->map;
 
         if (!is_null($gameMap->drop_chance_bonus)) {
             $gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $canGetDrop     = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
+        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
+            ->where('x', $characterMap->character_position_x)
+            ->where('y', $characterMap->character_position_y)
+            ->where('game_map_id', $characterMap->game_map_id)
+            ->first();
+
+        if ($locationWithEffect) {
+            $dropRate   = new LocationEffectValue($locationWithEffect->enemy_strength_type);
+
+            $canGetDrop = DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate());
+        } else {
+            $canGetDrop = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
+        }
+
 
         if ($canGetDrop) {
             $drop = $this->randomItemDropBuilder
+                         ->setLocation($locationWithEffect)
                          ->setMonsterPlane($event->monster->gameMap->name)
                          ->setCharacterLevel($event->character->level)
                          ->setMonsterMaxLevel($event->monster->max_level)

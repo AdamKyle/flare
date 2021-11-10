@@ -63,6 +63,29 @@ export default class CharacterInfoTopSection extends React.Component {
     });
   }
 
+  abbreviateNumber(number) {
+
+    number = parseInt(number.replace(/,/g, ''))
+
+    const symbol = ["", "k", "M", "B", "T", "Quad.", "Qunit."];
+
+    // what tier? (determines SI symbol)
+    var tier = Math.log10(Math.abs(number)) / 3 | 0;
+
+    // if zero, we don't need a suffix
+    if(tier == 0) return number;
+
+    // get suffix and determine scale
+    var suffix = symbol[tier];
+    var scale = Math.pow(10, tier * 3);
+
+    // scale the number
+    var scaled = number / scale;
+
+    // format number and add suffix
+    return scaled.toFixed(1) + suffix;
+  }
+
   render() {
     if (this.state.isLoading) {
       return (
@@ -134,19 +157,19 @@ export default class CharacterInfoTopSection extends React.Component {
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>AC</strong>:</dt>
-              <dd>{sheet.ac}</dd>
+              <dd>{this.abbreviateNumber(sheet.ac)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Health</strong>:</dt>
-              <dd>{sheet.health}</dd>
+              <dd>{this.abbreviateNumber(sheet.health)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Attack</strong>:</dt>
-              <dd>{sheet.attack}</dd>
+              <dd>{this.abbreviateNumber(sheet.attack)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={4}>
@@ -170,31 +193,31 @@ export default class CharacterInfoTopSection extends React.Component {
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Strength</strong>:</dt>
-              <dd>{sheet.str_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.str_modded)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Durability</strong>:</dt>
-              <dd>{sheet.dur_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.dur_modded)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Dexterity</strong>:</dt>
-              <dd>{sheet.dex_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.dex_modded)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Intelligence</strong>:</dt>
-              <dd>{sheet.int_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.int_modded)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={4}>
             <dl>
               <dt><strong>Charisma</strong>:</dt>
-              <dd>{sheet.chr_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.chr_modded)}</dd>
             </dl>
           </Col>
         </Row>
@@ -202,13 +225,13 @@ export default class CharacterInfoTopSection extends React.Component {
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Agi</strong>:</dt>
-              <dd>{sheet.agi_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.agi_modded)}</dd>
             </dl>
           </Col>
           <Col md={12} lg={12} xl={2}>
             <dl>
               <dt><strong>Focus</strong>:</dt>
-              <dd>{sheet.focus_modded}</dd>
+              <dd>{this.abbreviateNumber(sheet.focus_modded)}</dd>
             </dl>
           </Col>
         </Row>

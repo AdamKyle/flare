@@ -2,6 +2,7 @@
 
 namespace App\Flare\Handlers\AttackHandlers;
 
+use App\Flare\Builders\CharacterInformationBuilder;
 use Cache;
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
@@ -82,11 +83,7 @@ class AttackHandler {
 
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
-
-            $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
-
-            $this->attackExtraActionHandler->resetMessages();
+            $this->weaponAttack($characterInfo, $voided);
 
             $this->useItems($attacker, $defender, $voided);
 
@@ -94,13 +91,10 @@ class AttackHandler {
         }
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, false, $voided)) {
-            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
-            $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
-            $this->attackExtraActionHandler->resetMessages();
-            $this->entrancingChanceHandler->resetLogs();
+            $this->weaponAttack($characterInfo, $voided);
 
             $this->useItems($attacker, $defender, $voided);
 
@@ -113,28 +107,32 @@ class AttackHandler {
         if ($this->canHitHandler->canHit($attacker, $defender, $voided)) {
             if ($this->isBlocked($attackData['weapon_damage'], $defender)) {
                 $message          = $defender->name . ' Blocked your attack!';
-                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
                 $this->useItems($attacker, $defender, $voided);
 
                 return;
             }
 
-            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
-
-            $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
-
-            $this->attackExtraActionHandler->resetMessages();
+            $this->weaponAttack($characterInfo, $voided);
 
             $this->useItems($attacker, $defender, $voided);
 
             return;
         }
 
-        $message          = 'Missed!';
-        $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+        $message          = 'You missed with your weapon(s)!';
+        $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
         $this->useItems($attacker, $defender, $voided);
+    }
+
+    public function weaponAttack(CharacterInformationBuilder $characterInfo, bool $voided) {
+        $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+
+        $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+
+        $this->attackExtraActionHandler->resetMessages();
     }
 
     protected function isBlocked($damage, $defender): bool {

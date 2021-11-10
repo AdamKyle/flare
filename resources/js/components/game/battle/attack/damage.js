@@ -110,7 +110,7 @@ export default class Damage {
   spellDamage(attacker, defender, monsterCurrentHealth) {
     monsterCurrentHealth = this.calculateSpellDamage(attacker, defender, monsterCurrentHealth);
 
-    return this.doubleCastChance(attacker, defender, monsterCurrentHealth, true);
+    return this.doubleCastChance(attacker, defender, monsterCurrentHealth);
   }
 
   canAutoHit(attacker) {
@@ -141,7 +141,7 @@ export default class Damage {
 
     let dc          = 75 + Math.ceil(75 * defender.spell_evasion);
     let roll        = random(1, 100);
-    let totalDamage = (attacker.spell_damage + attacker.spell_damage * .15).toFixed(0);
+    let totalDamage = attacker.spell_damag;
 
     if (dc >= 100) {
       dc = 99;
@@ -151,7 +151,7 @@ export default class Damage {
 
     if (roll < dc) {
       this.battleMessages.push({
-        message: 'Your spells failed to do anything.',
+        message: 'The enemy evades your magic',
         class: 'enemy-action-fired'
       });
 
@@ -245,7 +245,7 @@ export default class Damage {
     return monsterCurrentHealth;
   }
 
-  doubleCastChance(attacker, defender, monsterCurrentHealth, attackData, skillBonus) {
+  doubleCastChance(attacker, attackData, monsterCurrentHealth) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -259,7 +259,15 @@ export default class Damage {
           class: 'action-fired'
         });
 
-        monsterCurrentHealth = this.calculateSpellDamage(attackData, defender, monsterCurrentHealth, skillBonus);
+        const totalDamage     = attackData.spell_damage + attackData.spell_damage * 0.15;
+
+        monsterCurrentHealth -= totalDamage;
+
+        this.battleMessages.push({
+          message: 'Your spell(s) hit for: ' + totalDamage.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          class: 'info-damage',
+        });
+
       }
     }
 

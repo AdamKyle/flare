@@ -127,7 +127,7 @@ class MonsterAttackHandler {
         if ($this->characterHealth <= 0) {
             $this->attemptToRessurect($defender, $attacker, $isDefenderVoided);
         } else if (!$isDefenderVoided){
-            $this->useLifestealingAffixes($attacker);
+            $this->useLifestealingAffixes($attacker, $defender);
         }
     }
 
@@ -140,23 +140,24 @@ class MonsterAttackHandler {
             $this->characterHealth = 1;
 
             $message = 'You are pulled back from the void and given one health!';
-            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
             if (!$isDefenderVoided) {
-                $this->useLifestealingAffixes($attacker);
+                $this->useLifestealingAffixes($attacker, $defender);
             }
         }
     }
 
-    private function useLifestealingAffixes($attacker) {
+    private function useLifestealingAffixes($attacker, $defender) {
         $handler = $this->itemHandler->setCharacterHealth($this->characterHealth)->setMonsterHealth($this->monsterHealth);
+        $info    = $this->characterInformationBuilder->setCharacter($defender);
 
-        $canResist  = $this->characterInformation->canAffixesBeResisted();
-        $damage     = $this->characterInformation->findLifeStealingAffixes(true);
+        $canResist  = $info->canAffixesBeResisted();
+        $damage     = $info->findLifeStealingAffixes(true);
 
         $handler->useLifeStealingAffixes($attacker, $damage, $canResist);
 
-        $this->monsterHealth = $handler->getMonsterHealth();
+        $this->monsterHealth   = $handler->getMonsterHealth();
         $this->characterHealth = $handler->getCharacterHealth();
 
         $this->battleLogs = [...$this->battleLogs, ...$handler->getBattleMessages()];
@@ -184,7 +185,7 @@ class MonsterAttackHandler {
 
             if ($this->blockedAttack($monsterSpellDamage, $defender, $attackType, $isDefenderVoided)) {
                 $message = 'You managed to block the enemies spells with your armour!';
-                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
             } else {
                 $itemHandler->castSpell($attacker, $defender, $monsterSpellDamage);
 
@@ -198,7 +199,7 @@ class MonsterAttackHandler {
 
         } else {
             $message = 'The enemy fails to cast their damaging spells!';
-            $this->battleLogs = $this->addMessage($message, 'info-battle', $this->battleLogs);
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
         }
 
         $this->heal($attacker, $defender);
@@ -213,7 +214,7 @@ class MonsterAttackHandler {
 
             if ($defenderReduction > 0) {
                 $message = 'Your rings negate some of the enemies enchantment damage.';
-                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
                 $damage -= ceil($damage * $defenderReduction);
             }
@@ -234,7 +235,7 @@ class MonsterAttackHandler {
 
             if ($defenderReduction > 0) {
                 $message = 'Your rings negate some of the enemies healing power.';
-                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
                 $healing -= ceil($healing * $defenderReduction);
             }

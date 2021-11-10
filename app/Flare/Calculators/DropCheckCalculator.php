@@ -45,6 +45,19 @@ class DropCheckCalculator {
     }
 
     /**
+     * Can we get a location drop?
+     *
+     * @param float $locationChance
+     * @return bool
+     */
+    public function fetchLocationDropChance(float $locationChance): bool {
+        $roll = rand(1, 1000);
+        $dc   = round((1000 - (1000 * $locationChance)));
+
+        return $roll > $dc;
+    }
+
+    /**
      * Determines if the player can get a quest item from the monster.
      *
      * Fetches the adventure bonues, if applies and applies it to the looting bonus against the monster quest_item_drop_chance.

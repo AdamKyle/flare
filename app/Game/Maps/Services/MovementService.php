@@ -7,21 +7,26 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
+use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
+use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
 
 class MovementService {
 
@@ -57,6 +62,11 @@ class MovementService {
     private $mapTile;
 
     /**
+     * @var CharacterAttackTransformer $characterAttackTransformer
+     */
+    private $characterAttackTransformer;
+
+    /**
      * @var CoordinatesCache $coordinatesCache
      */
     private $coordinatesCache;
@@ -76,6 +86,11 @@ class MovementService {
      */
     private $conjureService;
 
+    /**
+     * @var Manager $manager
+     */
+    private $manager;
+
     private const CHANCE_FOR_CELESTIAL_TO_SPAWN = 1000000;
 
     /**
@@ -86,17 +101,21 @@ class MovementService {
      */
     public function __construct(PortService $portService,
                                 MapTileValue $mapTile,
+                                CharacterAttackTransformer $characterAttackTransformer,
                                 CoordinatesCache $coordinatesCache,
                                 MapPositionValue $mapPositionValue,
                                 TraverseService $traverseService,
-                                ConjureService $conjureService)
+                                ConjureService $conjureService,
+                                Manager $manager)
     {
-        $this->portService      = $portService;
-        $this->mapTile          = $mapTile;
-        $this->coordinatesCache = $coordinatesCache;
-        $this->mapPositionValue = $mapPositionValue;
-        $this->traverseService  = $traverseService;
-        $this->conjureService   = $conjureService;
+        $this->portService                = $portService;
+        $this->mapTile                    = $mapTile;
+        $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->coordinatesCache           = $coordinatesCache;
+        $this->mapPositionValue           = $mapPositionValue;
+        $this->traverseService            = $traverseService;
+        $this->conjureService             = $conjureService;
+        $this->manager                    = $manager;
     }
 
     /**
@@ -151,7 +170,7 @@ class MovementService {
     }
 
     /**
-     * Porcess the area.
+     * Process the area.
      *
      * sets the kingdom data for a specific area.
      *
@@ -168,6 +187,12 @@ class MovementService {
 
         if (!is_null($location)) {
             $this->processLocation($location, $character);
+
+            if (!is_null($location->enemy_strength_type)) {
+                $this->updateActions($character, $location->name);
+            }
+        } else {
+            $this->updateActions($character, null, $character->map->gameMap->name);
         }
 
         $this->npcKingdoms       = Kingdom::select('x_position', 'y_position', 'npc_owned')
@@ -447,6 +472,30 @@ class MovementService {
         }
 
         return rand(1, self::CHANCE_FOR_CELESTIAL_TO_SPAWN) > $needed;
+    }
+
+    /**
+     * Update character actions.
+     *
+     * @param int $mapId
+     * @param Character $character
+     */
+    protected function updateActions(Character $character, string $locationName = null, string $gameMapName = null ) {
+        $user      = $character->user;
+
+        $character = new \League\Fractal\Resource\Item($character, $this->characterAttackTransformer);
+
+        if (!is_null($gameMapName)) {
+            $monsters  = Cache::get('monsters')[$gameMapName];
+        } else {
+            $monsters  = Cache::get('monsters')[$locationName];
+        }
+
+        $character = $this->manager->createData($character)->toArray();
+
+        broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
+
+        event(new UpdateAttackStats($character, $user));
     }
 
     /**

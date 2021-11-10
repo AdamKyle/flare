@@ -2,7 +2,7 @@ import React from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
-import moment from 'moment';
+import Select from "react-select";
 
 export default class AlchemyAction extends React.Component {
 
@@ -120,31 +120,38 @@ export default class AlchemyAction extends React.Component {
   }
 
   buildCraftableItemsOptions() {
+
     if (this.state.itemsToCraft !== null) {
       return this.state.itemsToCraft.map((item) => {
         const goldDust = item.gold_dust_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         const shards   = item.shards_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-        return <option key={item.id} value={item.id}>{item.name} --> Cost to craft: {goldDust} Gold Dust, {shards} Shards</option>
+        return {
+          value: item.id,
+          label: item.name + ' --> Cost to craft: ' + goldDust + ' Gold Dust and ' + shards + ' Shards'
+        }
       });
     }
   }
 
-  setItemToCraft(event) {
+  setItemToCraft(newValue) {
     this.setState({
-      itemToCraft: parseInt(event.target.value),
+      itemToCraft: newValue.value,
     });
   }
 
   renderCraftingDropDowns() {
     if (this.state.showAlchemy) {
       return (
-        <select className="form-control mt-2" id="crafting" name="crafting"
-                value={this.state.itemToCraft !== null ? this.state.itemToCraft : 1}
-                onChange={this.setItemToCraft.bind(this)}
-                disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
-          {this.buildCraftableItemsOptions()}
-        </select>
+        <div className="mt-2">
+          <Select
+            isClearable
+            onChange={this.setItemToCraft.bind(this)}
+            onInputChange={this.handleInputChange}
+            options={this.buildCraftableItemsOptions()}
+            isDisabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}
+          />
+        </div>
       );
     }
   }

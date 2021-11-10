@@ -147,9 +147,9 @@ export default class MonsterAttack {
       this.currentCharacterHealth = useItems.getCharacterCurrentHealth();
 
       this.fireOffAffixes(attacker);
-    }
 
-    this.fireOffSpells(attacker, this.defender, isCharacterVoided, previousAttackType);
+      this.fireOffSpells(attacker, this.defender, isCharacterVoided, previousAttackType);
+    }
   }
 
   fireOffAffixes(attacker) {

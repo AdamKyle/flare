@@ -19,7 +19,7 @@ class CastAndAttackHandler {
 
     private $attackExtraActionHandler;
 
-    private $healingExtraActionHandler;
+    private $castHandler;
 
     private $itemHandler;
 
@@ -35,14 +35,14 @@ class CastAndAttackHandler {
         CharacterAttackBuilder $characterAttackBuilder,
         EntrancingChanceHandler $entrancingChanceHandler,
         AttackExtraActionHandler $attackExtraActionHandler,
-        HealingExtraActionHandler $healingExtraActionHandler,
+        CastHandler $castHandler,
         ItemHandler $itemHandler,
         CanHitHandler $canHitHandler,
     ) {
         $this->characterAttackBuilder    = $characterAttackBuilder;
         $this->entrancingChanceHandler   = $entrancingChanceHandler;
         $this->attackExtraActionHandler  = $attackExtraActionHandler;
-        $this->healingExtraActionHandler = $healingExtraActionHandler;
+        $this->castHandler               = $castHandler;
         $this->itemHandler               = $itemHandler;
         $this->canHitHandler             = $canHitHandler;
     }
@@ -79,117 +79,84 @@ class CastAndAttackHandler {
 
         $this->characterAttackBuilder = $this->characterAttackBuilder->setCharacter($attacker);
         $characterInfo                = $this->characterAttackBuilder->getInformationBuilder()->setCharacter($attacker);
+        $voided                       = $this->isAttackVoided($attackType);
+        $totalSpellDamage             = $characterInfo->getTotalSpellDamage($voided);
+        $totalHealing                 = $characterInfo->buildHealFor($voided);
 
-        $attackData = $this->getAttackData($attackType, $attacker);
-        $voided     = $this->isAttackVoided($attackType);
-
-        if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
-            $message = 'You dance through out the shadows, weaving a web of deadly magics. The enemy is blind to you. (Auto Hit)';
-
-            $this->battleLogs      = $this->addMessage($message, 'info-damage', $this->battleLogs);
-
-            $this->completeAttack($attacker, $defender, $characterInfo, $attackData, $voided, true);
-
-            return;
-        }
-
-        if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, false, $voided)) {
-            $this->completeAttack($attacker, $defender, $characterInfo, $attackData, $voided, true);
-
-            return;
-        } else {
-            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
-            $this->entrancingChanceHandler->resetLogs();
-        }
-
-        if ($this->canHitHandler->canCast($attacker, $defender, $voided)) {
-            $damage = $attackData['spell_damage'] + $attackData['weapon_damage'];
-            if ($this->isBlocked($damage, $defender)) {
-                $message          = $defender->name . ' Blocked your damaging spells and you fumbled with your weapon!';
-                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
-
-                if ($attackData['heal_for'] > 0) {
-                    $this->fireOffHealingSpells($characterInfo, $attackData, $voided);
-                }
-
-                $this->useItems($attacker, $defender, $voided);
-
-                return;
-            }
-
-            $this->completeAttack($attacker, $defender, $characterInfo, $attackData, $voided);
-
-            return;
-        }
-
-        $message          = 'Your damage spells fizzeled and failed and your weapon fell out of your hand!';
-        $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
-
-        if ($attackData['heal_for'] > 0) {
-            $this->fireOffHealingSpells($characterInfo, $attackData);
-        }
-
-        $this->useItems($attacker, $defender, $voided);
+        $this->castSpells($attacker, $defender, $characterInfo, $totalSpellDamage, $totalHealing, $voided);
+        $this->weaponAttack($attacker, $defender, $characterInfo, $voided);
 
     }
 
-    public function fireOffHealingSpells(CharacterInformationBuilder $characterInfo, array $attackData, bool $voided = false) {
-        $this->characterHealth = $this->healingExtraActionHandler->healSpells($characterInfo, $this->characterHealth, $attackData);
+    public function weaponAttack($attacker, $defender, CharacterInformationBuilder $characterInformationBuilder, bool $voided) {
+        $canHit      = $this->canHitHandler->canHit($attacker, $defender, $voided);
+        $totalDamage = $this->characterAttackBuilder->getPositionalWeaponDamage('left-hand', $voided);
 
-        $this->battleLogs = [...$this->battleLogs, ...$this->healingExtraActionHandler->getMessages()];
-
-        $this->healingExtraActionHandler->resetMessages();
-
-        $this->fireOffVampireThirst($characterInfo, $voided);
-    }
-
-    protected function completeAttack($attacker, $defender, CharacterInformationBuilder $characterInfo, array $attackData, bool $voided = false, bool $canAutoAttack = false) {
-        if ($attackData['spell_damage'] > 0) {
-            $this->monsterHealth   = $this->attackExtraActionHandler->castSpells($characterInfo, $this->monsterHealth, $defender, $voided);
-            $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
-            $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
-            $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
-
-            $this->attackExtraActionHandler->resetMessages();
-        } else if ($attackData['heal_for'] > 0) {
-            $this->fireOffHealingSpells($characterInfo, $attackData);
-        }
-
-        if ($canAutoAttack) {
-            $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
-        } else if ($this->canHitHandler->canHit($attacker, $defender, $voided)) {
-            if (!$this->isBlocked($attackData['weapon_damage'], $defender)) {
-                $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+        if ($canHit) {
+            if (!$this->isBlocked($defender, $totalDamage)) {
+                $this->doWeaponAttack($characterInformationBuilder, $totalDamage);
             } else {
-                $this->battleLogs = $this->addMessage('Your weapon was blocked!', 'enemy-action-fired', $this->battleLogs);
+                $message          = $defender->name . ' Blocked your attack!';
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
             }
         } else {
-            $this->battleLogs = $this->addMessage('Your weapon missed!', 'enemy-action-fired', $this->battleLogs);
+            $message          = 'You missed with your weapon(s)!';
+            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
         }
-
-        $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
-
-        $this->attackExtraActionHandler->resetMessages();
-
-        $this->useItems($attacker, $defender, $voided);
     }
 
-    protected function fireOffVampireThirst(CharacterInformationBuilder $characterInfo, bool $voided = false) {
-        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
+    public function castSpells($attacker, $defender, CharacterInformationBuilder $characterInfo, int $totalSpellDamage, int $totalHealing, bool $voided) {
+        if ($totalSpellDamage > 0) {
+            $canHit = $this->canHitHandler->canCast($attacker, $defender, $voided);
 
-        $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
+            if ($canHit) {
+                if (!$this->isBlocked($defender, $totalSpellDamage)) {
+                    $this->castHandler->setMonsterHealth($this->monsterHealth)
+                                      ->setCharacterHealth($this->characterHealth)
+                                      ->castDamageSpells($characterInfo, $defender, $voided);
 
-        $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+                    $this->monsterHealth   = $this->castHandler->getMonsterHealth();
+                    $this->characterHealth = $this->castHandler->getCharacterHealth();
+
+                    $logs = $this->castHandler->getBattleMessages();
+
+                    $this->battleLogs = [...$this->battleLogs, ...$logs];
+
+                    $this->castHandler->resetLogs();
+                } else {
+                    $message          = $defender->name . ' Blocked your damaging spell!';
+                    $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+                }
+            } else {
+                $message          = 'Your damage spell missed!';
+                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+            }
+        } else if ($totalHealing > 0) {
+            $this->characterHealth = $this->castHandler->setMonsterHealth($this->monsterHealth)
+                                                       ->fireOffHealingSpells($characterInfo, $this->characterHealth, $voided);
+
+            $this->monsterHealth   = $this->castHandler->getMonsterHealth();
+
+            $logs = $this->castHandler->getBattleMessages();
+
+            $this->battleLogs = [...$this->battleLogs, ...$logs];
+
+            $this->castHandler->resetLogs();
+        }
+    }
+
+    protected function doWeaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $damage) {
+        $this->monsterHealth = $this->attackExtraActionHandler->positionalWeaponAttack($characterInformationBuilder, $this->monsterHealth, $damage);
+
+        $logs = $this->attackExtraActionHandler->getMessages();
+
+        $this->battleLogs = [...$this->battleLogs, ...$logs];
 
         $this->attackExtraActionHandler->resetMessages();
     }
 
-    protected function isBlocked($damage, $defender): bool {
+    protected function isBlocked($defender, $damage): bool {
         return $damage < $defender->ac;
-    }
-
-    protected function getAttackData(string $attackType, $attacker): array {
-       return Cache::get('character-attack-data-' . $attacker->id)[$attackType];
     }
 
     protected function isAttackVoided(string $attackType): bool {

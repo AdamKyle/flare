@@ -54,8 +54,8 @@ export default class WeaponAttack {
     }
 
     if (canHit) {
-      if (this.canBlock()) {
-        this.addMessage(this.defender.name + ' Blocked your attack!');
+      if (this.canBlock(attackData.weapon_damage)) {
+        this.addEnemyActionMessage('Your weapon was blocked!')
 
         this.useItems(attackData, this.attacker.class);
 
@@ -133,8 +133,8 @@ export default class WeaponAttack {
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }
 
-  canBlock() {
-    return this.defender.ac > this.attacker.base_stat;
+  canBlock(damage) {
+    return this.defender.ac > damage;
   }
 
   formatNumber(number) {
@@ -147,5 +147,9 @@ export default class WeaponAttack {
 
   addActionMessage(message) {
     this.battleMessages.push({message: message, class: 'action-fired'});
+  }
+
+  addEnemyActionMessage(message) {
+    this.battleMessages.push({message: message, class: 'enemy-action-fired'});
   }
 }
