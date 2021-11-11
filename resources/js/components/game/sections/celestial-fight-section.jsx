@@ -157,7 +157,7 @@ export default class CelestialFightSection extends React.Component {
   revive(data) {
     this.setState({
       characterCurrentHealth: data.fight.character.current_health,
-      monsterCurrentHealth: data.fight.monster.current_health,
+      monsterCurrentHealth: data.fight.monster.current_healthl,
     });
   }
 
