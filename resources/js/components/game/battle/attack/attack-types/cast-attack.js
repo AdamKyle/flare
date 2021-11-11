@@ -57,8 +57,6 @@ export default class CastAttack {
       return this.setState();
     }
 
-    console.log(attackData);
-
     if (attackData.spell_damage > 0) {
       if (canHit) {
         if (this.canBlock()) {
