@@ -81,12 +81,18 @@ class CharacterAttackBuilder {
     public function getPositionalWeaponDamage(string $hand, bool $voided = false) {
         $weaponSlotOne = $this->fetchSlot($hand);
 
+        $weaponDamage = 0;
+
         if (!is_null($weaponSlotOne)) {
             if (!$voided) {
                 $weaponDamage = $weaponSlotOne->item->getTotalDamage();
             } else {
                 $weaponDamage = $weaponSlotOne->item->base_damage;
             }
+        }
+
+        if (is_null($weaponDamage)) {
+            $weaponDamage = 0;
         }
 
         return ceil($this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided));

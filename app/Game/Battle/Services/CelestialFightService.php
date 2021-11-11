@@ -8,6 +8,7 @@ use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Services\FightService;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -101,11 +102,13 @@ class CelestialFightService {
                 'shards' => $character->shards + $celestialFight->monster->shards,
             ]);
 
-            $this->battleEventHandler->processMonsterDeath($character->refresh(), $celestialFight->monster_id);
+            BattleAttackHandler::dispatch($character->refresh(), $celestialFight->monster_id)->onQueue('default_long');
 
             event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
 
             event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
+
+            event(new ServerMessageEvent($character->user, 'You\'re additional rewards (XP and so on ...) are processing and will be with you shortly.'));
 
             CharacterInCelestialFight::where('celestial_fight_id', $celestialFight->id)->delete();
 
