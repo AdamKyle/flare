@@ -259,7 +259,7 @@ export default class CelestialFightSection extends React.Component {
                       overlay={renderAttackToolTip}
                     >
                       <button className="btn btn-attack mr-2"
-                              disabled={this.props.isAdventuring}
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth <= 0}
                               onClick={() => this.attackCelestial('attack')}
                       >
                         <i className="ra ra-sword"></i>
@@ -271,7 +271,7 @@ export default class CelestialFightSection extends React.Component {
                       overlay={renderCastingToolTip}
                     >
                       <button className="btn btn-cast mr-2"
-                              disabled={this.props.isAdventuring}
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth <= 0}
                               onClick={() => this.attackCelestial('cast')}
                       >
                         <i className="ra ra-burning-book"></i>
@@ -283,7 +283,7 @@ export default class CelestialFightSection extends React.Component {
                       overlay={renderCastAndAttackToolTip}
                     >
                       <button className="btn btn-cast-attack mr-2"
-                              disabled={this.props.isAdventuring}
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth <= 0}
                               onClick={() => this.attackCelestial('cast_and_attack')}
                       >
                         <i className="ra ra-lightning-sword"></i>
@@ -295,7 +295,7 @@ export default class CelestialFightSection extends React.Component {
                       overlay={renderAttackAndCastToolTip}
                     >
                       <button className="btn btn-attack-cast mr-2"
-                              disabled={this.props.isAdventuring}
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth <= 0}
                               onClick={() => this.attackCelestial('attack_and_cast')}
                       >
                         <i className="ra ra-lightning-sword"></i>
@@ -307,7 +307,7 @@ export default class CelestialFightSection extends React.Component {
                       overlay={renderDefendToolTip}
                     >
                       <button className="btn btn-defend"
-                              disabled={this.props.isAdventuring}
+                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth <= 0}
                               onClick={() => this.attackCelestial('defend')}
                       >
                         <i className="ra ra-round-shield"></i>
