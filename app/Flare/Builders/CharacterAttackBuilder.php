@@ -91,6 +91,10 @@ class CharacterAttackBuilder {
             }
         }
 
+        if (is_null($weaponDamage)) {
+            $weaponDamage = 0;
+        }
+
         return ceil($this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided));
     }
 
