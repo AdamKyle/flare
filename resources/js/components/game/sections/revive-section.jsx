@@ -19,6 +19,7 @@ export default class ReviveSection extends React.Component {
     this.setState({isLoading: true});
 
     axios.post(this.props.route).then((result) => {
+      console.log(result.data);
       this.props.setReviveInfo(result.data);
       this.setState({isLoading: false});
     }).catch((err) => {

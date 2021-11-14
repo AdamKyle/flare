@@ -118,7 +118,7 @@ class AdventureServiceTest extends TestCase
         $adventureService->setCharacter($character)->setAdventure($adventure)->setName(Str::random(8));
 
         for ($i = 1; $i <= $adventure->levels; $i++) {
-            $adventureService->processAdventure($i, $adventure->levels, 'attack');
+            $adventureService->processAdventure($i, $adventure->levels, 'defend');
         }
 
         $character->refresh();

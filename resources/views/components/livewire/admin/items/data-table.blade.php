@@ -22,6 +22,12 @@
                                 <a class="dropdown-item" href="#" wire:click="setType('spell-damage')">Spells Damage</a>
                                 <a class="dropdown-item" href="#" wire:click="setType('ring')">Ring</a>
                                 <a class="dropdown-item" href="#" wire:click="setType('artifact')">Artifact</a>
+                                @auth
+                                  @if (auth()->user()->hasRole('Admin'))
+                                    <a class="dropdown-item" href="#" wire:click="setType('alchemy')">Alchemy</a>
+                                  <a class="dropdown-item" href="#" wire:click="setType('quest')">Quest</a>
+                                  @endif
+                                @endauth
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" href="#" wire:click="setType('reset')">Reset</a>
                             </div>

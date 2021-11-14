@@ -249,10 +249,10 @@ export default class FightSection extends React.Component {
     });
   }
 
-  setReviveInfo(health) {
+  setReviveInfo(data) {
     this.setState({
-      characterMaxHealth: health,
-      characterCurrentHealth: health,
+      characterMaxHealth: data.character_health,
+      characterCurrentHealth: data.character_health,
     });
   }
 
