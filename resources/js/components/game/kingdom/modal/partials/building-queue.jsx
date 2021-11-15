@@ -148,10 +148,6 @@ export default class BuildingQueue extends React.Component {
     );
   }
 
-  calculatePercentageOfTimeLeft() {
-
-  }
-
   modelPaidWithGoldContent() {
     return (
       <Fragment>
