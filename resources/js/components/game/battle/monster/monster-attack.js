@@ -218,6 +218,10 @@ export default class MonsterAttack {
       const defenderHealingReduction = this.defender.healing_reduction;
       let healFor                    = Math.ceil(attacker.dur * attacker.max_healing);
 
+      if (healFor < 0) {
+        return;
+      }
+
       if (this.canDoCritical(attacker)) {
         this.addMessage(attacker.name + ' Glows with renewed life! (Critical Healing!)')
 
