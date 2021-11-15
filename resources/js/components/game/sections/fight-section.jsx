@@ -267,7 +267,6 @@ export default class FightSection extends React.Component {
       attackType = 'voided_' + attackType;
     } else if (!this.isMonsterDevoided && !this.isCharacterVoided) {
       if (this.state.monster.canMonsterVoidPlayer()) {
-        console.log('Am I here?');
         this.battleMessagesBeforeFight.push({
           message: this.state.monster.monster.name + ' has voided your enchantments! You feel much weaker!',
           class: 'enemy-action-fired'

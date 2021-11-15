@@ -96,7 +96,7 @@ export default class AttackAndCast {
 
   castAttack(attackData, castAttack) {
     const spellDamage = attackData.spell_damage;
-    console.log(spellDamage);
+
     if (spellDamage > 0) {
 
       const canHitCheck      = new CanHitCheck();

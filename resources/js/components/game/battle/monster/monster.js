@@ -63,20 +63,21 @@ export default class Monster {
     }
 
     const statReducingAffixes = affixes.stat_reduction;
+    const stats               = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
 
     if (statReducingAffixes.length > 0) {
-      const stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
-
       for (let i = 0; i < stats.length; i++) {
         const iteratee = stats[i] + '_reduction';
 
         const sumOfReductions = sumBy(statReducingAffixes, iteratee);
 
         monster[stats[i]] = monster[stats[i]] - (monster[stats[i]] * sumOfReductions);
+      }
+    }
 
-        if (monster[stats[i]] < 0.0) {
-          monster[stats[i]] = 0
-        }
+    for (let i = 0; i < stats.length; i++) {
+      if (monster[stats[i]] < 0) {
+        monster[stats[i]] = 0;
       }
     }
 
