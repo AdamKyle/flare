@@ -247,6 +247,7 @@ export default class KingdomManagementModal extends React.Component {
             updateKingdomData={this.props.updateKingdomData}
             queue={this.state.kingdom.building_queue}
             openTimeOutModal={this.props.openTimeOutModal.bind(this)}
+            characterGold={this.props.characterGold}
           /> : null}
 
         {this.state.openQueueData ?

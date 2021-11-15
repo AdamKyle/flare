@@ -60,7 +60,7 @@ export default class KingdomBuildingQueue extends React.Component {
           <div className="float-left">
             {isHours ?
               <CountdownCircleTimer
-                isPlaying={truncate}
+                isPlaying={true}
                 duration={duration}
                 initialRemainingTime={duration}
                 colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}

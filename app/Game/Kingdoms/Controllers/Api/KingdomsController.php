@@ -128,15 +128,14 @@ class KingdomsController extends Controller {
                 ], 422);
             }
 
-            $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
+            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
             $buildingService->upgradeKingdomBuilding($building, $character);
         }
 
-
-        $kingdom  = new Item($kingdom, $this->kingdom);
-
-        $kingdom  = $this->manager->createData($kingdom)->toArray();
+        $kingdom = $building->kingdom;
+        $kingdom = new Item($kingdom->refresh(), $this->kingdom);
+        $kingdom = $this->manager->createData($kingdom)->toArray();
 
         event(new UpdateKingdom($character->user, $kingdom));
 

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Modal, ModalDialog} from 'react-bootstrap';
 import Draggable from 'react-draggable';
+import moment from "moment";
 
 class DraggableModalDialog extends React.Component {
   render() {
@@ -22,6 +23,7 @@ export default class BuildingQueue extends React.Component {
     this.state = {
       building: null,
       queue: null,
+      percentageOfTimeElapsed: 0,
     }
   }
 
@@ -30,6 +32,25 @@ export default class BuildingQueue extends React.Component {
       building: this.fetchBuilding(),
       queue: this.props.queueData,
     });
+
+    this.interval = setInterval(() => {
+      const now         = moment();
+      const completedAt = moment(this.state.queue.completed_at);
+      const startedAt   = moment(this.state.queue.started_at);
+
+      const totalTime   = completedAt.diff(startedAt, 'minutes');
+      const timeElapsed = now.diff(startedAt, 'minutes');
+
+      this.setState({
+        percentageOfTimeElapsed: Math.ceil(timeElapsed/totalTime * 100)
+      })
+
+      return ;
+    }, 1000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   fetchBuilding() {
@@ -127,6 +148,39 @@ export default class BuildingQueue extends React.Component {
     );
   }
 
+  calculatePercentageOfTimeLeft() {
+
+  }
+
+  modelPaidWithGoldContent() {
+    return (
+      <Fragment>
+        <p>{this.state.building.description}</p>
+        <hr/>
+        <p>
+          Depending on time left, you'll get a percentage of the money spent back. Ie, if there is 50% of the time left, you will get 50%
+          of the money back. <strong>HOWEVER, you will not get any population back</strong>. The amount of gold you get back is a
+          percentage of the building level BEFORE any additional population was purchased. If money as used to purchase additional people,
+          consider it gone.
+        </p>
+        <p>
+          If the time elapsed is greater then 85% then you cannot cancel the process and must allow it to finish. This would be too wasteful
+          of both gold and people.
+        </p>
+        <p>
+          These values below will update in real time, the longer you leave this modal open the small your amount to get back will be.
+        </p>
+        <dl className="mt-2">
+          <dt>Percentage of time elapsed</dt>
+          <dd>{this.state.percentageOfTimeElapsed}%</dd>
+          <dt>Percentage of gold to be given back<sup>*</sup></dt>
+          <dd>{100 - this.state.percentageOfTimeElapsed}%</dd>
+        </dl>
+        <p className="mt-3"><sup>*</sup> Remember you get <strong>no</strong> population back. Just gold.</p>
+      </Fragment>
+    )
+  }
+
   render() {
     return (
       <Modal
@@ -144,7 +198,7 @@ export default class BuildingQueue extends React.Component {
         </Modal.Header>
         <Modal.Body>
           {
-            this.state.building === null ? 'One second' : this.modalContent()
+            this.state.building === null ? 'One second' : this.state.queue.paid_with_gold ? this.modelPaidWithGoldContent() : this.modalContent()
           }
         </Modal.Body>
         <Modal.Footer>

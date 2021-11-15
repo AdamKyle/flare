@@ -81,13 +81,21 @@ class RecruitUnits implements ShouldQueue
         }
 
         if (!$queue->completed_at->lessThanOrEqualTo(now())) {
+            $timeLeft = $queue->completed_at->diffInMinutes(now());
+
+            if ($timeLeft <= 15) {
+                $time = now()->addMinutes($timeLeft);
+            } else {
+                $time = now()->addMinutes(15);
+            }
+
             // @codeCoverageIgnoreStart
             RecruitUnits::dispatch(
                 $this->unit,
                 $this->kingdom,
                 $this->amount,
                 $this->queueId,
-            )->delay(now()->addMinutes(15));
+            )->delay($time);
 
             return;
             // @codeCoverageIgnoreEnd

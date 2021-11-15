@@ -12,6 +12,7 @@ use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
+use App\Game\Kingdoms\Jobs\UpgradeBuildingWithGold;
 use App\Game\Kingdoms\Values\UnitCosts;
 use Carbon\Carbon;
 use League\Fractal\Manager;
@@ -156,12 +157,14 @@ class KingdomBuildingService {
         $character = $building->kingdom->character;
         $kingdom   = $building->kingdom;
 
+        // Add population cost to the total cost if we need it.
         $cost = $this->calculateGoldNeeded($character, $kingdom, $params);
 
         if ($character->gold < $cost) {
             return false;
         }
 
+        // If the new cost is greater than the request cost, we paid for population.
         if ($cost > $params['cost_to_upgrade']) {
             $kingdom->update([
                 'current_population' => 0,
@@ -185,27 +188,29 @@ class KingdomBuildingService {
 
     public function processUpgradeWithGold(KingdomBuilding $building, array $params) {
         $character = $building->kingdom->character;
-        $kingdom   = $building->kingdom;
 
         $timeToComplete = now()->addMinutes($params['time']);
 
+        $toLevel = $params['to_level'] - $building->level;
+
         $queue = BuildingInQueue::create([
-            'character_id' => $character->id,
-            'kingdom_id'   => $building->kingdom->id,
-            'building_id'  => $building->id,
-            'to_level'     => $building->level,
-            'completed_at' => $timeToComplete,
-            'started_at'   => now(),
+            'character_id'   => $character->id,
+            'kingdom_id'     => $building->kingdom->id,
+            'building_id'    => $building->id,
+            'to_level'       => $toLevel,
+            'completed_at'   => $timeToComplete,
+            'started_at'     => now(),
+            'paid_with_gold' => true,
         ]);
 
-        UpgradeBuilding::dispatch($building, $character->user, $queue->id)->delay(now()->addMinutes(15));
+        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay(now()->addMinutes(15));
     }
 
     protected function calculateGoldNeeded(Character $character, Kingdom $kingdom, array $params): int {
         $population = $params['pop_required'];
 
         if ($kingdom->current_population < $population) {
-            $costForAdditional = ($population - $kingdom->current_population) * UnitCosts::PERSON;
+            $costForAdditional = ($population - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
         }
 
         return $params['cost_to_upgrade'] + $costForAdditional;

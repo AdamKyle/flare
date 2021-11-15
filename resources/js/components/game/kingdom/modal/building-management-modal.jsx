@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {Modal, ModalDialog, Tabs, Tab} from 'react-bootstrap';
+import {Modal, ModalDialog, Tabs, Tab, Col, Row} from 'react-bootstrap';
 import Draggable from 'react-draggable';
 import UpgradeSection from './partials/building-management/upgrade-section';
 import BuildingCostSection from './partials/building-management/building-cost-section';
@@ -28,6 +28,8 @@ export default class BuildingManagementModal extends React.Component {
       level: 0,
       populationRequired: 0,
       timeNeeded: this.props.building.time_increase,
+      hasGold: true,
+      level_to_low: false,
     }
   }
 
@@ -35,30 +37,40 @@ export default class BuildingManagementModal extends React.Component {
     const kingdom = this.props.kingdom;
     const building = this.props.building;
 
+    if (this.state.level > 0) {
+      return true;
+    }
+
     if (building.level >= building.max_level) {
+      console.log('level')
       return false
     }
 
     if (building.wood_cost > kingdom.current_wood) {
+      console.log('wood')
       return false;
     }
 
     if (building.clay_cost > kingdom.current_clay) {
+      console.log('clay')
       return false;
     }
 
     if (building.stone_cost > kingdom.current_stone) {
+      console.log('stone')
       return false;
     }
 
     if (building.iron_cost > kingdom.current_iron) {
+      console.log('iron')
       return false;
     }
 
     if (building.population_required > kingdom.current_population) {
+      console.log('pop')
       return false;
     }
-
+    console.log('you should see me.');
     return true;
   }
 
@@ -94,6 +106,7 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   isCurrentlyInQueue() {
+    console.log('Should be empty', _.isEmpty(this.props.queue.filter((q) => q.building_id === this.props.building.id)))
     return _.isEmpty(this.props.queue.filter((q) => q.building_id === this.props.building.id));
   }
 
@@ -183,27 +196,36 @@ export default class BuildingManagementModal extends React.Component {
 
     this.setState({
       level_increase_to: value,
+      level_to_low: value < this.props.building.level
     }, () => {
       this.processLevel(value);
     });
   }
 
   processLevel(level) {
-    let goldCost        = level * this.props.building.upgrade_cost;
-    const characterGold = this.props.characterGold;
+    if (level < this.props.building.level) {
+      return;
+    }
 
-    const kingdom = this.props.kingdom;
+    let levelForGoldCost = level - this.props.building.level;
+
+    if (levelForGoldCost <= 0) {
+      return;
+    }
+
+    let goldCost        = levelForGoldCost * this.props.building.upgrade_cost;
+    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+
     const building = this.props.building;
-
-    let hasPopulation = building.population_required > kingdom.current_population;
-    let hasGold       = goldCost > characterGold;
+    let hasGold    = characterGold >= goldCost;
 
     this.setState({
-      disabledButtons: !(hasPopulation && hasGold),
+      disabledButtons: !hasGold,
       costToUpgrade: goldCost,
+      hasGold: hasGold,
       level: level,
-      populationRequired: level * this.props.building.population_required,
-      timeNeeded: building.time_increase * level,
+      populationRequired: levelForGoldCost * this.props.building.population_required,
+      timeNeeded: building.time_increase * levelForGoldCost,
     })
   }
 
@@ -343,18 +365,39 @@ export default class BuildingManagementModal extends React.Component {
             </Tab>
             <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.buildingNeedsToBeRebuilt() || (this.props.building.level >= this.props.building.max_level)}>
               <div className="mt-4">
-                <dl>
-                  <dt>Max Level</dt>
-                  <dd>{this.formatNumber(this.props.building.max_level)}</dd>
-                  <dt>Population Required</dt>
-                  <dd>{this.formatNumber(this.state.populationRequired)}</dd>
-                  <dt>Cost per Level</dt>
-                  <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
-                  <dt>Time Needed (Minutes)</dt>
-                  <dd>{this.formatNumber(this.state.timeNeeded)}</dd>
-                  <dt>Total Gold</dt>
-                  <dd>{this.formatNumber(this.state.costToUpgrade)}</dd>
-                </dl>
+                <Row>
+                  <Col lg={12} xl={6}>
+                    <dl>
+                      <dt>Max Level</dt>
+                      <dd>{this.formatNumber(this.props.building.max_level)}</dd>
+                      <dt>Population Required</dt>
+                      <dd>{this.formatNumber(this.state.populationRequired)}</dd>
+                      <dt>Cost per Level</dt>
+                      <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
+                      <dt>Time Needed (Minutes)</dt>
+                      <dd>{this.formatNumber(this.state.timeNeeded)}</dd>
+                      <dt>Total Gold</dt>
+                      <dd>{this.formatNumber(this.state.costToUpgrade)}</dd>
+                      <dt>Will Upgrade To Level:</dt>
+                      <dd>{this.state.level}</dd>
+                    </dl>
+                  </Col>
+                  <Col lg={12} xl={6}>
+                    <p>
+                      Upgrading with gold will let you choose a number of levels to upgrade from 0 to the max building level. If the building already has levels,
+                      that will be taken into account for the cost and time calculation.
+                    </p>
+                    <p>
+                      If you do not have the population, you can still purchase the building upgrade and we will only purchase the people needed on top of the cost
+                      of the building upgrade. For example, if you have 100 people and the upgrade costs 500 people, we will only purchase 400 people (10 x 400 = 4000 gold)
+                      on top of the cost of the upgrade.
+                    </p>
+                    <p>
+                      New players are discourage from purchasing upgrades in the beginning when gold is scare for them.
+                    </p>
+                  </Col>
+                </Row>
+
                 {
                   this.props.kingdom.current_population < this.state.populationRequired && this.state.populationRequired !== 0 ?
                     <div className="alert alert-warning mt-2 mt-3">
@@ -363,8 +406,24 @@ export default class BuildingManagementModal extends React.Component {
                     </div>
                   : null
                 }
+
+                {
+                  this.state.level_to_low ?
+                    <div className="alert alert-warning mt-2 mt-3">
+                      Levels Cannot be lower then current level: {this.props.building.level}.
+                    </div>
+                  : null
+                }
+
+                {
+                  !this.state.hasGold ?
+                    <div className="alert alert-danger mt-2 mt-3">
+                      You do not have the gold to purchase the upgrade.
+                    </div>
+                  : null
+                }
                 <div className="form-group mt-3">
-                  <label htmlFor="gold-amount">Level</label>
+                  <label htmlFor="gold-amount">How many levels?</label>
                   <input
                     className="form-control"
                     name="gold-amount"

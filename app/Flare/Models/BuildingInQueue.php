@@ -23,6 +23,7 @@ class BuildingInQueue extends Model
         'kingdom_id',
         'building_id',
         'to_level',
+        'paid_with_gold',
         'completed_at',
         'started_at',
     ];
@@ -33,9 +34,10 @@ class BuildingInQueue extends Model
      * @var array
      */
     protected $casts = [
-        'to_level'     => 'integer',
-        'completed_at' => 'datetime',
-        'started_at'   => 'datetime',
+        'to_level'       => 'integer',
+        'completed_at'   => 'datetime',
+        'started_at'     => 'datetime',
+        'paid_with_gold' => 'boolean',
     ];
 
     public function character() {

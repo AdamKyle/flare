@@ -22,7 +22,7 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Mail;
 
-class UpgradeBuilding implements ShouldQueue
+class UpgradeBuildingWithGold implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -42,6 +42,11 @@ class UpgradeBuilding implements ShouldQueue
     protected $queueId;
 
     /**
+     * @var int $levels
+     */
+    protected $levels;
+
+    /**
      * @var array $resourceType
      */
     protected $resourceTypes = [
@@ -54,15 +59,17 @@ class UpgradeBuilding implements ShouldQueue
      * @param KingdomBuilding $building
      * @param User $user
      * @param int $queueId
-     * @return void
+     * @param int $levels
      */
-    public function __construct(KingdomBuilding $building, User $user, int $queueId)
+    public function __construct(KingdomBuilding $building, User $user, int $queueId, int $levels)
     {
         $this->user     = $user;
 
         $this->building = $building;
 
         $this->queueId  = $queueId;
+
+        $this->levels   = $levels;
     }
 
     /**
@@ -101,6 +108,32 @@ class UpgradeBuilding implements ShouldQueue
             // @codeCoverageIgnoreEnd
         }
 
+        // Upgrade the building as many times as we need.
+        for ($i = 1; $i <= $this->levels; $i++) {
+            $this->upgradeBuilding($manager, $kingdomTransformer, $queue);
+        }
+
+        $characterId   = $this->building->kingdom->character_id;
+
+        $buildingInQue = BuildingInQueue::where('building_id', $this->building->id)
+                                        ->where('kingdom_id', $this->building->kingdom_id)
+                                        ->where('character_id', $characterId)
+                                        ->first();
+
+        if (!is_null($buildingInQue)) {
+            $buildingInQue->delete();
+        } else {
+            // @codeCoverageIgnoreStart
+            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
+            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id;
+
+            SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
+            // @codeCoverageIgnoreEnd
+        }
+
+    }
+
+    protected function upgradeBuilding(Manager $manager, KingdomTransformer $kingdomTransformer, BuildingInQueue $queue) {
         $level = $this->building->level + 1;
 
         if ($this->building->gives_resources) {
@@ -142,20 +175,6 @@ class UpgradeBuilding implements ShouldQueue
             ]);
         }
 
-        $characterId = $this->building->kingdom->character_id;
-
-        $buildingInQue = BuildingInQueue::where('building_id', $this->building->id)->where('kingdom_id', $this->building->kingdom_id)->where('character_id', $characterId)->first();
-
-        if (!is_null($buildingInQue)) {
-            $buildingInQue->delete();
-        } else {
-            // @codeCoverageIgnoreStart
-            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
-            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id;
-
-            SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
-            // @codeCoverageIgnoreEnd
-        }
 
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
