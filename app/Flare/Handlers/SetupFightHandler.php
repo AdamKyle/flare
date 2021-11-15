@@ -164,6 +164,10 @@ class SetupFightHandler {
                 $sumOfReductions = $this->characterInformationBuilder->findSuffixStatReductionAffixes()->sum($iteratee);
 
                 $defender->{$stats[$i]} = $defender->{$stats[$i]} - ($defender->{$stats[$i]} * $sumOfReductions);
+
+                if ($defender->{$stats[$i]} < 0.0) {
+                    $defender->{$stats[$i]} = 0;
+                }
             }
 
             $message = 'Your enemy sinks to their knees in agony as you make them weaker.';

@@ -73,6 +73,10 @@ export default class Monster {
         const sumOfReductions = sumBy(statReducingAffixes, iteratee);
 
         monster[stats[i]] = monster[stats[i]] - (monster[stats[i]] * sumOfReductions);
+
+        if (monster[stats[i]] < 0.0) {
+          monster[stats[i]] = 0
+        }
       }
     }
 
