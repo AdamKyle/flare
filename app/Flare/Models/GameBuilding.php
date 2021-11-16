@@ -42,6 +42,8 @@ class GameBuilding extends Model
         'increase_iron_amount',
         'increase_durability_amount',
         'increase_defence_amount',
+        'time_to_build',
+        'time_increase_amount',
         'units_per_level',
         'only_at_level',
     ];

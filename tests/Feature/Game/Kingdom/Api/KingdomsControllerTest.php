@@ -503,7 +503,11 @@ class KingdomsControllerTest extends TestCase
             'game_map_id'  => GameMap::first()->id,
         ]);
 
-        $gameBuilding = $this->createGameBuilding();
+        $gameBuilding = $this->createGameBuilding([
+            'name'                 => 'Keep',
+            'time_to_build'        => 0.0,
+            'time_increase_amount' => 0.0,
+        ]);
 
         DB::table('sessions')->insert([[
             'id'           => '1',
@@ -540,7 +544,11 @@ class KingdomsControllerTest extends TestCase
             'game_map_id'  => GameMap::first()->id,
         ]);
 
-        $gameBuilding = $this->createGameBuilding();
+        $gameBuilding = $this->createGameBuilding([
+            'name'                 => 'Keep',
+            'time_to_build'        => 0.0,
+            'time_increase_amount' => 0.0,
+        ]);
 
         $this->createKingdomBuilding([
             'game_building_id'   => $gameBuilding->id,
@@ -569,6 +577,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $gameBuilding = $this->createGameBuilding([
+            'name'                 => 'Keep',
+            'time_to_build'        => 0.0,
+            'time_increase_amount' => 0.0,
             'is_resource_building' => true,
         ]);
 
@@ -604,6 +615,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $gameBuilding = $this->createGameBuilding([
+            'name'                 => 'Keep',
+            'time_to_build'        => 0.0,
+            'time_increase_amount' => 0.0,
             'is_resource_building' => true,
         ]);
 
@@ -635,6 +649,9 @@ class KingdomsControllerTest extends TestCase
         ]);
 
         $gameBuilding = $this->createGameBuilding([
+            'name'                 => 'Keep',
+            'time_to_build'        => 0.0,
+            'time_increase_amount' => 0.0,
             'is_resource_building' => true,
             'max_level' => 1
         ]);
