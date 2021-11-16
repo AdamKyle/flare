@@ -186,10 +186,10 @@ export default class AutoAttackSection extends React.Component {
                 <h3>Why can't I just leave this running for ever?</h3>
                 <p>
                   Planes of Tlessa is an active game. To keep you coming back, we limit the time frame this feature can run in.
-                  Your session also expires after 60 minutes of inactivity. Most players will come back before the session expires
+                  Your session also expires after 90 minutes of inactivity. Most players will come back before the session expires
                   to refresh the page.
                 </p>
-                <h3>So I can just refresh every 45 minutes or so and go for ever?</h3>
+                <h3>So I can just refresh every 85 minutes or so and go for ever?</h3>
                 <p>
                   Yes and no. If the auto attack has run for longer then 8 hours<sup>*</sup> it will cut out and you wont be able to
                   set up auto attack for the rest of the day. Tlessa wants you engaged with the game and the community, this is just an
