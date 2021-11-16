@@ -29,7 +29,6 @@ export default class BuildingManagementModal extends React.Component {
       populationRequired: 0,
       timeNeeded: this.props.building.time_increase,
       hasGold: true,
-      level_to_low: false,
     }
   }
 
@@ -42,35 +41,29 @@ export default class BuildingManagementModal extends React.Component {
     }
 
     if (building.level >= building.max_level) {
-      console.log('level')
       return false
     }
 
     if (building.wood_cost > kingdom.current_wood) {
-      console.log('wood')
       return false;
     }
 
     if (building.clay_cost > kingdom.current_clay) {
-      console.log('clay')
       return false;
     }
 
     if (building.stone_cost > kingdom.current_stone) {
-      console.log('stone')
       return false;
     }
 
     if (building.iron_cost > kingdom.current_iron) {
-      console.log('iron')
       return false;
     }
 
     if (building.population_required > kingdom.current_population) {
-      console.log('pop')
       return false;
     }
-    console.log('you should see me.');
+
     return true;
   }
 
@@ -186,31 +179,24 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   changeLevel(event) {
-    let value = parseInt(event.target.value) || '';
-
-    if (value !== '') {
-      if (value > this.props.building.max_level) {
-        value = this.props.building.max_level;
-      }
+    let value = parseInt(event.target.value) || 0;
+    console.log(value, this.props.building.max_level);
+    if (value > this.props.building.max_level) {
+      value = this.props.building.max_level - this.props.building.level;
     }
 
     this.setState({
       level_increase_to: value,
-      level_to_low: value < this.props.building.level
     }, () => {
       this.processLevel(value);
     });
   }
 
   processLevel(level) {
-    if (level < this.props.building.level) {
-      return;
-    }
-
     let levelForGoldCost = level - this.props.building.level;
 
     if (levelForGoldCost <= 0) {
-      return;
+      levelForGoldCost = level;
     }
 
     let goldCost        = levelForGoldCost * this.props.building.upgrade_cost;
@@ -379,7 +365,7 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Total Gold</dt>
                       <dd>{this.formatNumber(this.state.costToUpgrade)}</dd>
                       <dt>Will Upgrade To Level:</dt>
-                      <dd>{this.state.level}</dd>
+                      <dd>{this.state.level + this.props.building.level}</dd>
                     </dl>
                   </Col>
                   <Col lg={12} xl={6}>
@@ -402,15 +388,9 @@ export default class BuildingManagementModal extends React.Component {
                   this.props.kingdom.current_population < this.state.populationRequired && this.state.populationRequired !== 0 ?
                     <div className="alert alert-warning mt-2 mt-3">
                       You're population requirement is greater then amount of population you have. You can continue, but
-                      it will cost an additional: {this.populationCost()} Gold on top of the Cost to upgrade.
-                    </div>
-                  : null
-                }
-
-                {
-                  this.state.level_to_low ?
-                    <div className="alert alert-warning mt-2 mt-3">
-                      Levels Cannot be lower then current level: {this.props.building.level}.
+                      it will cost an additional: {this.populationCost()} Gold on top of the cost to upgrade. Canceling the upgrade will <strong>
+                      not give you the gold for the population or the population back.
+                    </strong>
                     </div>
                   : null
                 }

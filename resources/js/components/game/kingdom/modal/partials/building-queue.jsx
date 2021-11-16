@@ -199,7 +199,7 @@ export default class BuildingQueue extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-danger" onClick={this.props.close}>close</button>
-          <button className="btn btn-success" onClick={this.cancelUpgrade.bind(this)}>Cacnel Upgrade</button>
+          <button className="btn btn-success" onClick={this.cancelUpgrade.bind(this)} disabled={this.state.percentageOfTimeElapsed >= 85 && this.state.queue.paid_with_gold}>Cancel Upgrade</button>
         </Modal.Footer>
       </Modal>
     );

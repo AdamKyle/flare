@@ -9,6 +9,7 @@ use App\Flare\Models\KingdomBuildingInQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
@@ -121,19 +122,43 @@ class KingdomBuildingService {
      * @return bool
      */
     public function cancelKingdomBuildingUpgrade(BuildingInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
-
-        $this->resourceCalculation($queue);
-
-        if ($this->completed === 0 || !$this->totalResources >= .10) {
-           return false;
-        }
-
         $building = $queue->building;
         $kingdom  = $building->kingdom;
 
-        $queue->delete();
+        if ($queue->paid_with_gold) {
+            $percentage = $this->calculatePercentageOfGold($queue);
 
-        $kingdom = $this->updateKingdomAfterCancelation($kingdom, $building);
+            if ($percentage <= 15) {
+                return false;
+            }
+
+            $character = $queue->building->kingdom->character;
+
+            $gold = ceil($queue->paid_amount - $queue->paid_amount * ($percentage / 100));
+            $gold = $character->gold + $gold;
+
+            if ($gold > MaxCurrenciesValue::MAX_GOLD) {
+                $gold = MaxCurrenciesValue::MAX_GOLD;
+            }
+
+            $character->update([
+                'gold' => $gold
+            ]);
+
+            event(new UpdateTopBarEvent($character->refresh()));
+
+            $kingdom = $queue->building->kingdom;
+        } else {
+            $this->resourceCalculation($queue);
+
+            if ($this->completed === 0 || !$this->totalResources >= .10) {
+                return false;
+            }
+
+            $kingdom = $this->updateKingdomAfterCancelation($kingdom, $building);
+        }
+
+        $queue->delete();
 
         $user    = $kingdom->character->user;
 
@@ -191,7 +216,11 @@ class KingdomBuildingService {
 
         $timeToComplete = now()->addMinutes($params['time']);
 
-        $toLevel = $params['to_level'] - $building->level;
+        $toLevel = $params['to_level'] + $building->level;
+
+        if ($toLevel > $building->max_level) {
+            $toLevel = $building->gameBuilding->max_level;
+        }
 
         $queue = BuildingInQueue::create([
             'character_id'   => $character->id,
@@ -201,9 +230,21 @@ class KingdomBuildingService {
             'completed_at'   => $timeToComplete,
             'started_at'     => now(),
             'paid_with_gold' => true,
+            'paid_amount'    => $params['cost_to_upgrade'],
         ]);
 
         UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay(now()->addMinutes(15));
+    }
+
+    protected function calculatePercentageOfGold(BuildingInQueue $queue) {
+        $startedAt   = Carbon::parse($queue->started_at);
+        $completedAt = Carbon::parse($queue->completed_at);
+        $now         = now();
+
+        $elapsedTime = $now->diffInMinutes($startedAt);
+        $totalTime   = $completedAt->diffInMinutes($startedAt);
+
+        return 100 - ceil($elapsedTime/$totalTime);
     }
 
     protected function calculateGoldNeeded(Character $character, Kingdom $kingdom, array $params): int {

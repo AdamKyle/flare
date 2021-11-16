@@ -15,6 +15,7 @@ class AddPaidWithGoldToBuildingsInQueue extends Migration
     {
         Schema::table('buildings_in_queue', function (Blueprint $table) {
             $table->boolean('paid_with_gold')->default(false);
+            $table->bigInteger('paid_amount')->nullable()->default(0);
         });
     }
 
@@ -27,6 +28,7 @@ class AddPaidWithGoldToBuildingsInQueue extends Migration
     {
         Schema::table('buildings_in_queue', function (Blueprint $table) {
             $table->dropColumn('paid_with_gold');
+            $table->dropColumn('paid_amount');
         });
     }
 }

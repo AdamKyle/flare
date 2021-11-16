@@ -301,6 +301,7 @@ export default class Game extends React.Component {
               character_x={this.state.current_x}
               character_y={this.state.current_y}
             />
+
             {
               this.state.openPortDetails ?
                 <PortSection

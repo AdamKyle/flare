@@ -24,6 +24,7 @@ class BuildingInQueue extends Model
         'building_id',
         'to_level',
         'paid_with_gold',
+        'paid_amount',
         'completed_at',
         'started_at',
     ];
@@ -35,6 +36,7 @@ class BuildingInQueue extends Model
      */
     protected $casts = [
         'to_level'       => 'integer',
+        'paid_amount'    => 'integer',
         'completed_at'   => 'datetime',
         'started_at'     => 'datetime',
         'paid_with_gold' => 'boolean',
