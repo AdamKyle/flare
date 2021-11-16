@@ -154,7 +154,7 @@ export default class KingdomInfo extends React.Component {
   peoplePurchasedSuccess(amount) {
     this.setState({
       showSuccess: true,
-      successMessage: 'You dirty, dirty animal. I knew it! Purchased: ' + this.formatNumber(amount) + ' People. Do you feel good about what you just did?',
+      successMessage: 'Purchased: ' + this.formatNumber(amount) + ' People.',
     })
   }
 
@@ -354,6 +354,7 @@ export default class KingdomInfo extends React.Component {
           kingdomId={this.props.kingdom.id}
           purchasedSuccess={this.peoplePurchasedSuccess.bind(this)}
           characterGold={this.props.characterGold}
+          currentPopulation={this.props.kingdom.current_population}
         />
       </>
     )

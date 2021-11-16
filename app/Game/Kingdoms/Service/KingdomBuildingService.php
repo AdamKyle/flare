@@ -248,7 +248,8 @@ class KingdomBuildingService {
     }
 
     protected function calculateGoldNeeded(Character $character, Kingdom $kingdom, array $params): int {
-        $population = $params['pop_required'];
+        $population        = $params['pop_required'];
+        $costForAdditional = 0;
 
         if ($kingdom->current_population < $population) {
             $costForAdditional = ($population - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();

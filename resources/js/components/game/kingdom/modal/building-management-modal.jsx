@@ -179,10 +179,11 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   changeLevel(event) {
-    let value = parseInt(event.target.value) || 0;
-    console.log(value, this.props.building.max_level);
-    if (value > this.props.building.max_level) {
-      value = this.props.building.max_level - this.props.building.level;
+    let value      = parseInt(event.target.value) || 0;
+    const maxLevel = this.props.building.max_level - this.props.building.level;
+
+    if (value > maxLevel) {
+      value = maxLevel;
     }
 
     this.setState({
@@ -314,7 +315,7 @@ export default class BuildingManagementModal extends React.Component {
                       Cannot upgrade building. Currently in queue. Please wait till it's finished.
                     </div>
                   </div>
-                  : !this.canUpgrade() && !(this.props.building.level >= this.props.building.max_level) ?
+                  : !this.buildingNeedsToBeRebuilt() && !this.canUpgrade() && !(this.props.building.level >= this.props.building.max_level) ?
                     <div className="col-md-6">
                       <div className="alert alert-warning mb-2 mt-2">
                         You don't seem to have the resources to upgrade this building. You can move this modal
@@ -343,10 +344,16 @@ export default class BuildingManagementModal extends React.Component {
                           <div className="col-md-6">
                             <div className="alert alert-info mt-2">
                               Rebuilding the building will require the amount of resources to upgrade to the current level.
-                              You can see this in the Cost section above.
+                              You can see this in the Cost section below.
                             </div>
-                          </div>
-                          <div className="col-md-6">
+                            {!this.canUpgrade() ?
+                              <div className="alert alert-warning mb-2 mt-2">
+                                You don't seem to have the resources to upgrade this building. You can move this modal
+                                by clicking and dragging on the title, to compare the required resources with what you currently have.
+                              </div>
+                              : null
+                            }
+
                             <h5 className="mt-1">Cost</h5>
                             <hr />
                             <BuildingCostSection

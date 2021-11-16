@@ -45,6 +45,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
             'population_increase'         => $building->population_increase,
             'future_population_increase'  => $building->future_population_increase,
             'time_increase'               => $building->time_increase,
+            'raw_time_increase'           => $building->gameBuilding->time_increase_amount,
             'rebuild_time'                => $building->rebuild_time,
             'morale_increase'             => $building->morale_increase,
             'morale_decrease'             => $building->morale_decrease,

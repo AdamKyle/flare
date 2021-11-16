@@ -132,6 +132,34 @@ export default class AutoAttackSection extends React.Component {
                   <option>8 hours</option>
                 </select>
               </div>
+              <div className="form-check">
+                <input type="checkbox" className="form-check-input" id="manage-skills" />
+                <label className="form-check-label" htmlFor="manage-skills">Enable moving down the list.</label>
+                <small id="manage-skills-help" className="form-text text-muted">
+                  Should you enable this, you can select how many leveles before we attempt to move to the next monster.
+                </small>
+              </div>
+              <hr />
+              <div className="form-group">
+                <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
+                  <p>
+                    Should you choose to move down the list and a monster kills you, the auto battle will stop.
+                    New players are suggested to pick higher values to give more time between leveling.
+                  </p>
+                  <p>
+                    If you have selected the final or close to the final monster in the list and we cannot
+                    move any further, we will just stay where we are.
+                  </p>
+                </AlertWarning>
+                <label htmlFor="exampleFormControlSelect3">Move down the list every</label>
+                <select className="form-control" id="exampleFormControlSelect3">
+                  <option>1 level</option>
+                  <option>5 levels</option>
+                  <option>10 levels</option>
+                  <option>15 levels</option>
+                  <option>20 levels</option>
+                </select>
+              </div>
             </div>
           </Tab>
           <Tab eventKey="help" title="Help">

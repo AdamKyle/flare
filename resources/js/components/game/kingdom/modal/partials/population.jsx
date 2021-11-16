@@ -1,5 +1,6 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
+import AlertWarning from "../../../components/base/alert-warning";
 
 export default class Population extends React.Component {
 
@@ -68,9 +69,19 @@ export default class Population extends React.Component {
   }
 
   updateToBuy(e) {
+    let value = parseInt(e.target.value);
+
+    if (value = 2000000000) {
+      value = 2000000000
+    }
+
     this.setState({
-      toPurchase: e.target.value
+      toPurchase: value
     });
+  }
+
+  getPeopleAllowed() {
+    return 2000000000 - this.props.currentPopulation;
   }
 
   render() {
@@ -90,29 +101,22 @@ export default class Population extends React.Component {
 
           <p>
             <em>
-              It's best if you not ask questions, the morale implications and such. You understand correct? no? You're outraged? Where did you think these
-              people were going to come from child! The moon! It doesn't work like that, not here. Not in this time. But be warned child! Be warned!
-              <strong> For every additional person you have in your kingdom when the day (hour) is up, you will loose 10,000 gold from your treasury, PER PERSON!</strong>
+              One should never ask where the people come from. It's a contentious subject even among the scholars of the land. I can see that look of skepticism in your eyes
+              child, alas you are here for a reason. Lets do business.
             </em>
           </p>
 
-          <p>
-            <em>
-              Oh you think ... "I will just empty my treasury." Don't be foolish child, I will take it out of your gold! Don't got any? Kingdoms mine! Don't mess with me.
-              If you can't pay, one way or the other, the kingdom is mine.
-            </em>
-          </p>
-
-          <p>
-            <em>
-              Don't look at me like that, you already started your "purchase order" you savage animal. You're just like the rest of the blood thirsty kings and queens.
-            </em>
-          </p>
-
-          <div className="alert alert-warning">
-            The Old Man (Kingdom NPC) is not joking. If you purchase a ton of people and do not use them and cannot pay for the additional people, he <strong>WILL</strong>
-            take your kingdom. And not just take your kingdom, reduce everything about it to nothing. You have been warned.
-          </div>
+          <AlertWarning icon={'fas fa-exclamation-triangle'} title={'ATTN!'}>
+            <p>
+              You may only buy a maximum of 2 billion people at a time. Your current population can never go over 2 billion.
+            </p>
+            <p>Should you have more people in your kingdom, come the hourly reset, then the maximum you're allowed to have (ie, 1000/100 = 900 more people), The Old Man (Kingdom Holder NPC) will be angry. You
+            will see a global message of him stomping around. First he will take gold from your kingdom per person over the max population. If you have 500 people and can only hold 100
+            that's 4000 gold. He will first take from the treasury of the afflicted kingdom. If there is not enough gold, he will take it or the rest of the owed amount
+            out of your pockets. If you and your kingdom do not have enough gold to pay, you will loose the kingdom.</p>
+            <p>He will reduce all the buildings, units, everything, to 0. He will then Take the kingdom and finally he will destroy the kingdom, clearing up
+            space for a new kingdom. You will see all this as global messages.</p>
+          </AlertWarning>
 
           <dl>
             <dt>Cost Per Person:</dt>
@@ -121,6 +125,10 @@ export default class Population extends React.Component {
             <dd>{this.props.characterGold}</dd>
             <dt>Total Cost:</dt>
             <dd>{(this.state.toPurchase * 5).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
+            <dt>Current Population:</dt>
+            <dd>{this.props.currentPopulation}</dd>
+            <dt>Max Can Buy:</dt>
+            <dd>{this.getPeopleAllowed()}</dd>
           </dl>
 
           <div className="mt-2">
@@ -132,6 +140,8 @@ export default class Population extends React.Component {
                 id="embezzel-amount"
                 value={this.state.toPurchase}
                 onChange={this.updateToBuy.bind(this)}
+                max={this.getPeopleAllowed()}
+                disabled={this.getPeopleAllowed() <= 0}
               />
             </div>
           </div>
