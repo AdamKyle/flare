@@ -98,10 +98,11 @@ class UpgradeBuildingWithGold implements ShouldQueue
             }
 
             // @codeCoverageIgnoreStart
-            UpgradeBuilding::dispatch(
+            UpgradeBuildingWithGold::dispatch(
                 $this->building,
                 $this->user,
                 $this->queueId,
+                $this->levels
             )->delay($time);
 
             return;

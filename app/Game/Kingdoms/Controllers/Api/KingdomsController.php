@@ -101,7 +101,7 @@ class KingdomsController extends Controller {
         if ($request->paying_with_gold) {
             $request->validate([
                 'cost_to_upgrade' => 'required|integer',
-                'to_level'        => 'required|integer',
+                'how_many_levels' => 'required|integer',
                 'pop_required'    => 'required|integer',
                 'time'            => 'required|integer',
             ]);

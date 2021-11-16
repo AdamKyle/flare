@@ -216,7 +216,7 @@ class KingdomBuildingService {
 
         $timeToComplete = now()->addMinutes($params['time']);
 
-        $toLevel = $params['to_level'] + $building->level;
+        $toLevel = $params['how_many_levels'] + $building->level;
 
         if ($toLevel > $building->max_level) {
             $toLevel = $building->gameBuilding->max_level;
@@ -233,7 +233,7 @@ class KingdomBuildingService {
             'paid_amount'    => $params['cost_to_upgrade'],
         ]);
 
-        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay(now()->addMinutes(15));
+        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $params['how_many_levels'])->delay(now()->addMinutes(15));
     }
 
     protected function calculatePercentageOfGold(BuildingInQueue $queue) {

@@ -110,7 +110,7 @@ export default class BuildingManagementModal extends React.Component {
     }, () => {
       axios.post('/api/kingdoms/' + this.props.characterId + '/upgrade-building/' + this.props.building.id, {
         cost_to_upgrade: this.state.costToUpgrade,
-        to_level: this.state.level,
+        how_many_levels: this.state.level,
         pop_required: this.state.populationRequired,
         time: this.state.timeNeeded,
         paying_with_gold: this.state.level > 0,
@@ -190,6 +190,16 @@ export default class BuildingManagementModal extends React.Component {
     }, () => {
       this.processLevel(value);
     });
+  }
+
+  getNewLevel() {
+    const value = this.state.level + this.props.building.level;
+
+    if (value > this.props.building.max_level) {
+      return this.props.building.max_level;
+    }
+
+    return value;
   }
 
   processLevel(level) {
@@ -365,7 +375,7 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Total Gold</dt>
                       <dd>{this.formatNumber(this.state.costToUpgrade)}</dd>
                       <dt>Will Upgrade To Level:</dt>
-                      <dd>{this.state.level + this.props.building.level}</dd>
+                      <dd>{this.getNewLevel()}</dd>
                     </dl>
                   </Col>
                   <Col lg={12} xl={6}>
