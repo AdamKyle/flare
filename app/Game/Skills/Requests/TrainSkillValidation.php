@@ -25,7 +25,7 @@ class TrainSkillValidation extends FormRequest
     public function rules()
     {
         return [
-            'skill_id'           => 'required',
+            'skill_id'           => 'integer|required',
             'xp_percentage'      => ['required', new SkillXPPercentage],
         ];
     }

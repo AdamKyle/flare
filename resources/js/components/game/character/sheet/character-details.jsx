@@ -65,7 +65,7 @@ export default class CharacterDetails extends React.Component {
   }
 
   formatNumber(number) {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parseFloat(number).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
   render() {
@@ -198,7 +198,7 @@ export default class CharacterDetails extends React.Component {
                     <dt>Type:</dt>
                     <dd>{sheet.class_bonus.type}</dd>
                     <dt>Base Chance:</dt>
-                    <dd>{sheet.class_bonus.base_chance.toFixed(2) * 100}%</dd>
+                    <dd>{(sheet.class_bonus.base_chance * 100).toFixed(2)}%</dd>
                     <dt>Requirements:</dt>
                     <dd>{sheet.class_bonus.requires}</dd>
                   </dl>

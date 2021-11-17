@@ -5,42 +5,18 @@ namespace App\Game\Skills\Controllers\Api;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
+use App\Game\Skills\Services\SkillService;
 use App\Http\Controllers\Controller;
 use App\Game\Skills\Requests\TrainSkillValidation;
 
 class SkillsController extends Controller {
 
-    public function train(TrainSkillValidation $request, Character $character) {
-        // Find the skill we want to train.
-        $skill = $character->skills->filter(function ($skill) use($request) {
-            return $skill->id === (int) $request->skill_id;
-        })->first();
+    public function train(TrainSkillValidation $request, Character $character, SkillService $skillService) {
+        $result = $skillService->trainSkill($character, $request->skill_id, $request->xp_percentage);
 
-        if (is_null($skill)) {
-            return response()->json(['message' => 'Invalid Input.'], 422);
-        }
-
-        $skillCurrentlyTraining = $character->skills->filter(function($skill) {
-            return $skill->currently_training;
-        })->first();
-
-        if (!is_null($skillCurrentlyTraining)) {
-            $skillCurrentlyTraining->update([
-                'currently_training' => false,
-                'xp_twoards'         => 0.0,
-            ]);
-        }
-
-        // Begin training
-        $skill->update([
-            'currently_training' => true,
-            'xp_towards'         => $request->xp_percentage,
-            'xp_max'             => is_null($skill->xp_max) ? rand(100, 150) : $skill->xp_max,
-        ]);
-
-        event(new UpdateTopBarEvent($character));
-
-        return response()->json(['message' => 'You are now training ' . $skill->name], 200);
+        return response()->json([
+            'message' => $result['message']
+        ], $result['status']);
     }
 
     public function cancelTrain(Character $character, Skill $skill) {

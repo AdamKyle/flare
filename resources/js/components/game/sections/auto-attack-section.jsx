@@ -3,30 +3,33 @@ import {Col, Tab, Tabs} from "react-bootstrap";
 import AlertWarning from "../components/base/alert-warning";
 import AlertInfo from "../components/base/alert-info";
 import TimeOutBar from "../timeout/timeout-bar";
+import AlertError from "../components/base/alert-error";
 
 export default class AutoAttackSection extends React.Component {
 
   constructor(props) {
     super(props);
 
+    const skillInTraining = this.props.character.skills.filter((skill) => skill.is_training);
+
     this.state = {
       character: this.props.character,
       monsters: this.props.monsters,
       isDead: this.props.character.is_dead,
+      errorMessage: null,
+      isLoading: false,
       timeRemaining: null,
       showSkillSection: false,
       showMoveDownTheList: false,
+      trainableSkills: this.props.character.skills.filter((skill) => skill.can_train),
       params: {
-        skill_id: null,
-        xp_towards: null,
+        skill_id: skillInTraining.length > 0 ? skillInTraining[0].id : null,
+        xp_towards: skillInTraining.length > 0 ? skillInTraining[0].xp_towards : null,
         auto_attack_length: null,
         move_down_the_list_every: null,
-        selected_monster_id: 0,
+        selected_monster_id: null,
       }
     }
-  }
-
-  componentDidMount() {
   }
 
   updateSelectedMonster(event) {
@@ -39,25 +42,116 @@ export default class AutoAttackSection extends React.Component {
     });
   }
 
-  showSkillChangeSection(event) {
+  updateSelectedSkill(event) {
+    const params = _.cloneDeep(this.state.params);
+
+    params.skill_id = parseInt(event.target.value) || 0;
+
     this.setState({
-      showSkillSection: event.target.checked
+      params: params,
+    });
+  }
+
+  showSkillChangeSection(event) {
+    const value  = event.target.checked;
+    const params = _.cloneDeep(this.state.params);
+
+    if (!value) {
+      const skillInTraining = this.props.character.skills.filter((skill) => skill.is_training);
+
+      params.skill_id   = skillInTraining.length > 0 ? skillInTraining[0].id : null;
+      params.xp_towards = skillInTraining.length > 0 ? skillInTraining[0].xp_towards : null;
+    }
+
+    this.setState({
+      showSkillSection: event.target.checked,
+      params: params
     });
   }
 
   showMoveDownTheList(event) {
+    const value  = event.target.checked;
+    const params = _.cloneDeep(this.state.params);
+
+    if (!value) {
+      params.move_down_the_list_every = null;
+    }
+
     this.setState({
-      showMoveDownTheList: event.target.checked
+      showMoveDownTheList: value,
+      params: params,
     });
   }
 
-  monsterSelectDisabled() {
-    return false;
+  updateSelectedXPForSkill(event) {
+    const params = _.cloneDeep(this.state.params);
+
+    params.xp_towards = parseFloat(event.target.value) || 0.0;
+
+    this.setState({
+      params: params,
+    });
+  }
+
+  updateMoveDownListEvery(event) {
+    const params = _.cloneDeep(this.state.params);
+
+    params.move_down_the_list_every = parseInt(event.target.value) || 0;
+
+    this.setState({
+      params: params,
+    });
+  }
+
+  updateAutoAttackLength(event) {
+    const params = _.cloneDeep(this.state.params);
+
+    params.auto_attack_length = parseInt(event.target.value) || 0;
+
+    this.setState({
+      params: params,
+    });
+  }
+
+  disabledInput() {
+    return this.state.isDead;
   }
 
   monsterOptions() {
     return this.state.monsters.map((monster) => {
       return <option value={monster.id} key={monster.id}>{monster.name}</option>
+    });
+  }
+
+  skillOptions() {
+    return this.state.trainableSkills.map((skill) => {
+      return <option value={skill.id} key={skill.id}>{skill.name}</option>
+    });
+  }
+
+  beginFight() {
+
+    if (this.state.params.selected_monster_id === null) {
+      this.setState({
+        errorMessage: 'You must select a monster'
+      });
+
+      return;
+    }
+
+    if (this.state.params.auto_attack_length === null) {
+      this.setState({
+        errorMessage: 'How long should this auto attack go for? Check Advanced tab and configure a length.'
+      });
+
+      return;
+    }
+
+    this.setState({
+      errorMessage: null,
+      isLoading: true,
+    }, () => {
+      console.log('ajax here ...');
     });
   }
 
@@ -68,17 +162,28 @@ export default class AutoAttackSection extends React.Component {
           <Tab eventKey="general" title="General">
             <div className="row mt-4">
               <Col lg={12} xl={6}>
+                {
+                  this.state.errorMessage !== null ?
+                    <AlertError icon={"fas fa-exclamation-circle"} title={'Oops!'}>
+                      <p>
+                        {this.state.errorMessage}
+                      </p>
+                    </AlertError>
+                  : null
+                }
                 <div className="form-group">
                   <label htmlFor="monsters-auto-attack">Select Monster</label>
                   <select className="form-control monster-select" id="monsters-auto-attack" name="monsters-auto-attack"
                           value={this.state.params.selected_monster_id}
                           onChange={this.updateSelectedMonster.bind(this)}
-                          disabled={this.monsterSelectDisabled()}>
+                          disabled={this.disabledInput()}>
                     <option value="0" key="-1">Please select a monster</option>
                     {this.monsterOptions()}
                   </select>
                 </div>
-                <div className="btn btn-primary mt-3">Begin!</div>
+                <button className="btn btn-primary mt-3" onClick={this.beginFight.bind(this)} disabled={this.state.isLoading || this.disabledInput()}>
+                  {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
+                </button>
               </Col>
 
               <Col lg={12} xl={6}>
@@ -111,28 +216,35 @@ export default class AutoAttackSection extends React.Component {
               </div>
               <div className={this.state.showSkillSection ? '' : 'hide'}>
                 <div className="form-group mt-3">
-                  <label htmlFor="exampleFormControlSelect1">Select Skill</label>
-                  <select className="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
+                  <label htmlFor="skill-selection">Select Skill</label>
+                  <select className="form-control" id="skill-selection" name="skill-selection"
+                          value={this.state.params.skill_id}
+                          onChange={this.updateSelectedSkill.bind(this)}
+                          disabled={this.disabledInput()}>
+                    <option value="0" key="-1">Please select a skill</option>
+                    {this.skillOptions()}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="exampleFormControlSelect2">Select XP Sacrificial %</label>
-                  <select className="form-control" id="exampleFormControlSelect2">
-                    <option>10%</option>
-                    <option>20%</option>
-                    <option>30%</option>
-                    <option>40%</option>
-                    <option>50%</option>
-                    <option>60%</option>
-                    <option>70%</option>
-                    <option>80%</option>
-                    <option>90%</option>
-                    <option>100%</option>
+                  <label htmlFor="skill-xp-sacrifice">Select XP Sacrificial %</label>
+                  <select className="form-control"
+                          id="skill-xp-sacrifice"
+                          name="skill-xp-sacrifice"
+                          value={this.state.params.xp_towards}
+                          onChange={this.updateSelectedXPForSkill.bind(this)}
+                          disabled={this.disabledInput()}
+                  >
+                    <option value="0" key="-1">Please select a percentage</option>
+                    <option value={0.10} key="0.10">10%</option>
+                    <option value={0.20} key="0.20">20%</option>
+                    <option value={0.30} key="0.30">30%</option>
+                    <option value={0.40} key="0.40">40%</option>
+                    <option value={0.50} key="0.50">50%</option>
+                    <option value={0.60} key="0.60">60%</option>
+                    <option value={0.70} key="0.70">70%</option>
+                    <option value={0.80} key="0.80">80%</option>
+                    <option value={0.90} key="0.90">90%</option>
+                    <option value={1.00} key="1.00">100%</option>
                   </select>
                 </div>
                 <hr />
@@ -148,13 +260,19 @@ export default class AutoAttackSection extends React.Component {
                   <p>The eight hour limit only applies if your auto attack is 8 full complete uninterrupted hours. If you do 2 here, 4 there and 6 over here
                   that will not count towards your total, it must be 8 continuous uninterrupted hours.</p>
                 </AlertWarning>
-                <label htmlFor="exampleFormControlSelect3">Select Length of Auto Attack</label>
-                <select className="form-control" id="exampleFormControlSelect3">
-                  <option>1 hour</option>
-                  <option>2 hours</option>
-                  <option>4 hours</option>
-                  <option>6 hours</option>
-                  <option>8 hours</option>
+                <label htmlFor="how-long">Select Length of Auto Attack</label>
+                <select className="form-control"
+                        id="how-long"
+                        name="how-long"
+                        value={this.state.params.auto_attack_length}
+                        onChange={this.updateAutoAttackLength.bind(this)}
+                        disabled={this.disabledInput()}>
+                  <option value="0" key="-1">Please select a length</option>
+                  <option value="1" key="1">1 hour</option>
+                  <option value="2" key="2">2 hours</option>
+                  <option value="4" key="4">4 hours</option>
+                  <option value="6" key="6">6 hours</option>
+                  <option value="8" key="8">8 hours</option>
                 </select>
               </div>
               <div className="form-check">
@@ -177,8 +295,14 @@ export default class AutoAttackSection extends React.Component {
                       move any further, we will just stay where we are.
                     </p>
                   </AlertWarning>
-                  <label htmlFor="exampleFormControlSelect3">Move down the list every</label>
-                  <select className="form-control" id="exampleFormControlSelect3">
+                  <label htmlFor="move-down-list">Move down the list every</label>
+                  <select className="form-control"
+                          id="move-down-list"
+                          name="move-down-list"
+                          value={this.state.params.move_down_list_every}
+                          onChange={this.updateMoveDownListEvery.bind(this)}
+                          disabled={this.disabledInput()}
+                  >
                     <option>1 level</option>
                     <option>5 levels</option>
                     <option>10 levels</option>
