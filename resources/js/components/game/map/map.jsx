@@ -283,7 +283,7 @@ export default class Map extends React.Component {
         locations: event.mapDetails.locations,
         kingdoms: event.mapDetails.my_kingdoms,
         npcKingdoms: event.mapDetails.npc_kingdoms,
-        portList: event.mapDetails.port_details,
+        portList: event.mapDetails.port_details !== null ? event.mapDetails.port_details.port_list : [],
         adventures: event.mapDetails.adventure_details,
         currentPort: event.mapDetails.port_details !== null ? event.mapDetails.port_details.current_port : null,
         controlledPosition: {
