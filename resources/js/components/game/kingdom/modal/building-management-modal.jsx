@@ -212,17 +212,27 @@ export default class BuildingManagementModal extends React.Component {
 
     let goldCost        = levelForGoldCost * this.props.building.upgrade_cost;
     const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    let hasGold         = characterGold >= goldCost;
 
-    const building = this.props.building;
-    let hasGold    = characterGold >= goldCost;
+    let time = 0;
+
+    for (let i = 1; i <= levelForGoldCost; i++) {
+      let newTime = (this.props.building.level + 1) * this.props.building.raw_time_to_build;
+
+      newTime += newTime * this.props.building.raw_time_increase;
+
+      time += newTime;
+    }
+
+    time += this.props.building.time_increase;
 
     this.setState({
       disabledButtons: !hasGold,
       costToUpgrade: goldCost,
       hasGold: hasGold,
       level: level,
-      populationRequired: levelForGoldCost * this.props.building.population_required,
-      timeNeeded: building.time_increase * levelForGoldCost,
+      populationRequired: (levelForGoldCost * this.props.building.raw_required_population) + this.props.building.population_required,
+      timeNeeded: Math.ceil(time),
     })
   }
 

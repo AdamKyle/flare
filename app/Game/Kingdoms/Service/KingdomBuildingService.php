@@ -15,6 +15,7 @@ use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuildingWithGold;
 use App\Game\Kingdoms\Values\UnitCosts;
+use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -43,7 +44,7 @@ class KingdomBuildingService {
      * @return void
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character): void {
-        $timeToComplete = now()->addMinutes($building->time_increase);
+        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building->time_increase));
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
@@ -214,7 +215,7 @@ class KingdomBuildingService {
     public function processUpgradeWithGold(KingdomBuilding $building, array $params) {
         $character = $building->kingdom->character;
 
-        $timeToComplete = now()->addMinutes($params['time']);
+        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building, $params['time']));
 
         $toLevel = $params['how_many_levels'] + $building->level;
 
@@ -234,6 +235,18 @@ class KingdomBuildingService {
         ]);
 
         UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $params['how_many_levels'])->delay(now()->addMinutes(15));
+    }
+
+    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $time = 0)  {
+        $skillBonus = $building->kingdom->character->skills->filter(function($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+        })->first()->skill_bonus;
+
+        if ($time > 0) {
+            return floor($time - $time * $skillBonus);
+        }
+
+        return floor($building->time_increase - $building->time_increase * $skillBonus);
     }
 
     protected function calculatePercentageOfGold(BuildingInQueue $queue) {

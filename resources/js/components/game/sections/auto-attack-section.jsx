@@ -13,8 +13,16 @@ export default class AutoAttackSection extends React.Component {
       character: this.props.character,
       monsters: this.props.monsters,
       isDead: this.props.character.is_dead,
-      selectedMonster: 0,
       timeRemaining: null,
+      showSkillSection: false,
+      showMoveDownTheList: false,
+      params: {
+        skill_id: null,
+        xp_towards: null,
+        auto_attack_length: null,
+        move_down_the_list_every: null,
+        selected_monster_id: 0,
+      }
     }
   }
 
@@ -22,9 +30,24 @@ export default class AutoAttackSection extends React.Component {
   }
 
   updateSelectedMonster(event) {
+    const params = _.cloneDeep(this.state.params);
+
+    params.selected_monster_id = parseInt(event.target.value) || 0;
 
     this.setState({
-      selectedMonster: parseInt(event.target.value),
+      params: params,
+    });
+  }
+
+  showSkillChangeSection(event) {
+    this.setState({
+      showSkillSection: event.target.checked
+    });
+  }
+
+  showMoveDownTheList(event) {
+    this.setState({
+      showMoveDownTheList: event.target.checked
     });
   }
 
@@ -48,7 +71,7 @@ export default class AutoAttackSection extends React.Component {
                 <div className="form-group">
                   <label htmlFor="monsters-auto-attack">Select Monster</label>
                   <select className="form-control monster-select" id="monsters-auto-attack" name="monsters-auto-attack"
-                          value={this.state.selectedMonster}
+                          value={this.state.params.selected_monster_id}
                           onChange={this.updateSelectedMonster.bind(this)}
                           disabled={this.monsterSelectDisabled()}>
                     <option value="0" key="-1">Please select a monster</option>
@@ -79,39 +102,41 @@ export default class AutoAttackSection extends React.Component {
               <h4>Advanced options</h4>
               <hr />
               <div className="form-check">
-                <input type="checkbox" className="form-check-input" id="manage-skills" />
+                <input type="checkbox" className="form-check-input" id="manage-skills" onChange={this.showSkillChangeSection.bind(this)}/>
                 <label className="form-check-label" htmlFor="manage-skills">Change Active Training Skill?</label>
                 <small id="manage-skills-help" className="form-text text-muted">
                   Should you enable this, you are saying you want to train a different skill during this auto fight.
                   Make sure to change it back, when you are done, should you wish to.
                 </small>
               </div>
-              <div className="form-group mt-3">
-                <label htmlFor="exampleFormControlSelect1">Select Skill</label>
-                <select className="form-control" id="exampleFormControlSelect1">
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                </select>
+              <div className={this.state.showSkillSection ? '' : 'hide'}>
+                <div className="form-group mt-3">
+                  <label htmlFor="exampleFormControlSelect1">Select Skill</label>
+                  <select className="form-control" id="exampleFormControlSelect1">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="exampleFormControlSelect2">Select XP Sacrificial %</label>
+                  <select className="form-control" id="exampleFormControlSelect2">
+                    <option>10%</option>
+                    <option>20%</option>
+                    <option>30%</option>
+                    <option>40%</option>
+                    <option>50%</option>
+                    <option>60%</option>
+                    <option>70%</option>
+                    <option>80%</option>
+                    <option>90%</option>
+                    <option>100%</option>
+                  </select>
+                </div>
+                <hr />
               </div>
-              <div className="form-group">
-                <label htmlFor="exampleFormControlSelect2">Select XP Sacrificial %</label>
-                <select className="form-control" id="exampleFormControlSelect2">
-                  <option>10%</option>
-                  <option>20%</option>
-                  <option>30%</option>
-                  <option>40%</option>
-                  <option>50%</option>
-                  <option>60%</option>
-                  <option>70%</option>
-                  <option>80%</option>
-                  <option>90%</option>
-                  <option>100%</option>
-                </select>
-              </div>
-              <hr />
               <div className="form-group">
                 <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
                   <p>
@@ -133,32 +158,34 @@ export default class AutoAttackSection extends React.Component {
                 </select>
               </div>
               <div className="form-check">
-                <input type="checkbox" className="form-check-input" id="manage-skills" />
-                <label className="form-check-label" htmlFor="manage-skills">Enable moving down the list.</label>
+                <input type="checkbox" className="form-check-input" id="move-down-list" onChange={this.showMoveDownTheList.bind(this)}/>
+                <label className="form-check-label" htmlFor="move-down-list">Enable moving down the list.</label>
                 <small id="manage-skills-help" className="form-text text-muted">
-                  Should you enable this, you can select how many leveles before we attempt to move to the next monster.
+                  Should you enable this, you can select how many levels before we attempt to move to the next monster.
                 </small>
               </div>
-              <hr />
-              <div className="form-group">
-                <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
-                  <p>
-                    Should you choose to move down the list and a monster kills you, the auto battle will stop.
-                    New players are suggested to pick higher values to give more time between leveling.
-                  </p>
-                  <p>
-                    If you have selected the final or close to the final monster in the list and we cannot
-                    move any further, we will just stay where we are.
-                  </p>
-                </AlertWarning>
-                <label htmlFor="exampleFormControlSelect3">Move down the list every</label>
-                <select className="form-control" id="exampleFormControlSelect3">
-                  <option>1 level</option>
-                  <option>5 levels</option>
-                  <option>10 levels</option>
-                  <option>15 levels</option>
-                  <option>20 levels</option>
-                </select>
+              <div className={this.state.showMoveDownTheList ? '' : 'hide'}>
+                <hr />
+                <div className="form-group">
+                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
+                    <p>
+                      Should you choose to move down the list and a monster kills you, the auto battle will stop.
+                      New players are suggested to pick higher values to give more time between leveling.
+                    </p>
+                    <p>
+                      If you have selected the final or close to the final monster in the list and we cannot
+                      move any further, we will just stay where we are.
+                    </p>
+                  </AlertWarning>
+                  <label htmlFor="exampleFormControlSelect3">Move down the list every</label>
+                  <select className="form-control" id="exampleFormControlSelect3">
+                    <option>1 level</option>
+                    <option>5 levels</option>
+                    <option>10 levels</option>
+                    <option>15 levels</option>
+                    <option>20 levels</option>
+                  </select>
+                </div>
               </div>
             </div>
           </Tab>

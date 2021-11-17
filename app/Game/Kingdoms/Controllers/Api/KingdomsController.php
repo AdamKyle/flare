@@ -371,16 +371,26 @@ class KingdomsController extends Controller {
 
         $amountToBuy = $request->amount_to_purchase;
 
+        if ($amountToBuy > KingdomMaxValue::MAX_CURRENT_POPULATION) {
+            $amountToBuy = KingdomMaxValue::MAX_CURRENT_POPULATION;
+        }
+
+        $newAmount = $kingdom->current_population + $amountToBuy;
+
+        if ($newAmount > KingdomMaxValue::MAX_CURRENT_POPULATION) {
+            $newAmount = KingdomMaxValue::MAX_CURRENT_POPULATION;
+        }
+
         $character = $kingdom->character;
 
-        $character->gold -= (new UnitCosts('Person'))->fetchCost() * $amountToBuy;
+        $character->gold -= (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $amountToBuy;
 
         $character->save();
 
         $character = $character->refresh();
 
         $kingdom->update([
-            'current_population' => $kingdom->current_population + $amountToBuy,
+            'current_population' => $newAmount,
         ]);
 
         $kingdom  = new Item($kingdom->refresh(), $this->kingdom);

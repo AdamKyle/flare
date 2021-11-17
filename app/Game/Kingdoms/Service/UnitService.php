@@ -10,6 +10,7 @@ use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
 use App\Game\Kingdoms\Values\UnitCosts;
+use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -37,8 +38,7 @@ class UnitService {
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
         $totalTime        = $gameUnit->time_to_recruit * $amount;
-        $timeTillFinished = $gameUnit->time_to_recruit * $amount;
-        $timeTillFinished = now()->addSeconds($timeTillFinished);
+        $timeTillFinished = now()->addSeconds($this->calculateBuildingTimeReduction($totalTime));
 
         $goldPaid = null;
 
@@ -117,6 +117,11 @@ class UnitService {
         $user    = $kingdom->character->user;
 
         if (!is_null($queue->gold_paid)) {
+
+            if ($this->calculateElapsedTimePercent($queue) >= 85) {
+                 return false;
+            }
+
             $character = $queue->character;
 
             $character->gold += $queue->gold_paid * 0.75;
@@ -148,6 +153,26 @@ class UnitService {
         event(new UpdateKingdom($user, $kingdom));
 
         return true;
+    }
+
+    protected function calculateBuildingTimeReduction(UnitInQueue $queue, int $time)  {
+        $kingdom    = $queue->kingdom;
+        $skillBonus = $kingdom->character->skills->filter(function($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+        })->first()->skill_bonus;
+
+        return floor($time - $time * $skillBonus);
+    }
+
+    protected function calculateElapsedTimePercent(UnitInQueue $queue): int {
+        $startedAt   = Carbon::parse($queue->started_at);
+        $completedAt = Carbon::parse($queue->completed_at);
+        $now         = now();
+
+        $elapsedTime = $now->diffInMinutes($startedAt);
+        $totalTime   = $completedAt->diffInMinutes($startedAt);
+
+        return 100 - ceil($elapsedTime/$totalTime);
     }
 
     protected function resourceCalculation(UnitInQueue $queue) {
