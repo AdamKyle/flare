@@ -10,6 +10,7 @@ use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateCelestials;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
@@ -17,7 +18,7 @@ class CelestialFightServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    use RefreshDatabase, CreateMonster, CreateNpc, CreateCelestials, CreateItem;
+    use RefreshDatabase, CreateMonster, CreateNpc, CreateCelestials, CreateItem, CreateItemAffix;
 
     private $character = null;
 
@@ -123,6 +124,8 @@ class CelestialFightServiceTest extends TestCase
             'damage_stat'         => 'str',
             'attack_range'        => '10000-100000'
         ]);
+
+        $this->createItemAffix();
 
         $character = $this->character->getCharacter(true);
 
