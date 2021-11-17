@@ -38,6 +38,12 @@ class MapControllerApiTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation();
+
+        $this->createMonster([
+            'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
     }
 
     public function tearDown(): void {
@@ -142,8 +148,11 @@ class MapControllerApiTest extends TestCase
         ]);
 
         $this->createMonster([
-            'is_celestial_entity' => true
+            'is_celestial_entity' => true,
+            'game_map_id'         => $this->character->getCharacter(false)->map->gameMap->id,
         ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
 
         Cache::put('celestial-spawn-rate', 0.80);
 
@@ -1380,15 +1389,15 @@ class MapControllerApiTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem(['effect' => ItemEffectsValue::LABYRINTH])
-        )->getCharacter(false);
+        )->getCharacter();
 
         $gameMap = $this->createGameMap([
-            'name' => 'Labyrinth'
+            'name' => 'Surface'
         ]);
 
         $this->createMonster([
-            'game_map_id' => $gameMap,
-            'published' => true,
+            'game_map_id' => $gameMap->id,
+            'published'   => true,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
@@ -1436,13 +1445,14 @@ class MapControllerApiTest extends TestCase
         $user      = $this->character->getUser();
         $character = $this->character->getCharacter(false);
 
+
         $gameMap = $this->createGameMap([
             'name' => 'Surface'
         ]);
 
         $this->createMonster([
-            'game_map_id' => $gameMap,
-            'published' => true,
+            'game_map_id' => $gameMap->id,
+            'published'   => true,
         ]);
 
         resolve(BuildMonsterCacheService::class)->buildCache();
