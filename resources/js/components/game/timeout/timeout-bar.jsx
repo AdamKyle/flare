@@ -88,51 +88,57 @@ export default class TimeOutBar extends React.Component {
     if (isHours) {
       return (
         <div className={this.props.cssClass}>
-          <CountdownCircleTimer
-            isPlaying={this.state.active}
-            duration={maxTimeOut}
-            initialRemainingTime={maxTimeOut}
-            colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
-            size={40}
-            strokeWidth={2}
-            onComplete={() => [false, 0]}
-          >
-            {({remainingTime}) => (remainingTime / 3600).toFixed(0)}
-          </CountdownCircleTimer>
+          <div className={this.props.innerTimerCss}>
+            <CountdownCircleTimer
+              isPlaying={this.state.active}
+              duration={maxTimeOut}
+              initialRemainingTime={maxTimeOut}
+              colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+              size={40}
+              strokeWidth={2}
+              onComplete={() => [false, 0]}
+            >
+              {({remainingTime}) => (remainingTime / 3600).toFixed(0)}
+            </CountdownCircleTimer>
+          </div>
           <div>Hours</div>
         </div>
       );
     } else if (isMinutes) {
       return (
         <div className={this.props.cssClass}>
-          <CountdownCircleTimer
-            isPlaying={this.state.active}
-            duration={maxTimeOut}
-            initialRemainingTime={maxTimeOut}
-            colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
-            size={40}
-            strokeWidth={2}
-            onComplete={() => [false, 0]}
-          >
-            {({remainingTime}) => (remainingTime / 60).toFixed(0)}
-          </CountdownCircleTimer>
+          <div className={this.props.innerTimerCss}>
+            <CountdownCircleTimer
+              isPlaying={this.state.active}
+              duration={maxTimeOut}
+              initialRemainingTime={maxTimeOut}
+              colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+              size={40}
+              strokeWidth={2}
+              onComplete={() => [false, 0]}
+            >
+              {({remainingTime}) => (remainingTime / 60).toFixed(0)}
+            </CountdownCircleTimer>
+          </div>
           <div>Minutes</div>
         </div>
       );
     } else {
       return (
         <div className={this.props.cssClass}>
-          <CountdownCircleTimer
-            isPlaying={this.state.active}
-            duration={maxTimeOut}
-            initialRemainingTime={maxTimeOut}
-            colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
-            size={40}
-            strokeWidth={2}
-            onComplete={() => [false, 0]}
-          >
-            {({remainingTime}) => remainingTime}
-          </CountdownCircleTimer>
+          <div className={this.props.innerTimerCss}>
+            <CountdownCircleTimer
+              isPlaying={this.state.active}
+              duration={maxTimeOut}
+              initialRemainingTime={maxTimeOut}
+              colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+              size={40}
+              strokeWidth={2}
+              onComplete={() => [false, 0]}
+            >
+              {({remainingTime}) => remainingTime}
+            </CountdownCircleTimer>
+          </div>
           <div>Seconds</div>
         </div>
       );

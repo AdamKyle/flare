@@ -37,6 +37,35 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
+                <label for="unit_time_reduction">Unit Recruitment Time Reduction</label>
+                <input type="number" steps="0.0001" class="form-control required" id="unit_time_reduction"
+                       name="unit_time_reduction"
+                       wire:model="skill.unit_time_reduction">
+                @error('skill.unit_time_reduction') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="building_time_reduction">Building Time Reduction: </label>
+                <input type="number" steps="0.0001" class="form-control required" id="building_time_reduction"
+                       name="building_time_reduction"
+                       wire:model="skill.building_time_reduction" {{$disabledSelection ? 'disabled' : ''}}>
+                @error('skill.building_time_reduction') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="unit_movement_time_reduction">Unit Movement Time Reduction: </label>
+                <input type="number" steps="0.0001" class="form-control required" id="unit_movement_time_reduction"
+                       name="unit_movement_time_reduction"
+                       wire:model="skill.unit_movement_time_reduction" {{$disabledSelection ? 'disabled' : ''}}>
+                @error('skill.unit_movement_time_reduction') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
                 <label for="skill-fight-time-out-mod-bonus-per-level">Fight Timeout Modifier Per Level: </label>
                 <input type="number" steps="0.0001" class="form-control required"
                        id="skill-fight-time-out-mod-bonus-per-level" name="fight_time_out_mod_bonus_per_level"

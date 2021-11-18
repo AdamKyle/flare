@@ -193,6 +193,7 @@ return [
         /**
         * Game Related
         */
+        App\Game\Automation\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
         App\Game\Core\Providers\EventsProvider::class,
         App\Game\Battle\Providers\ServiceProvider::class,

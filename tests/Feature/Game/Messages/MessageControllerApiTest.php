@@ -40,6 +40,12 @@ class MessageControllerApiTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
+        $this->createMonster([
+            'game_map_id' => $this->character->getCharacter(false)->map->game_map_id
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
         Event::fake();
     }
 

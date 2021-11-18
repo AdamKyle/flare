@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class AlertError extends React.Component {
+export default class AlertSuccess extends React.Component {
 
   constructor(props) {
     super(props);
@@ -8,8 +8,8 @@ export default class AlertError extends React.Component {
 
   render() {
     return (
-      <div className="tw-px-4 tw-py-3 tw-leading-normal tw-bg-red-100 tw-rounded-md tw-drop-shadow-sm tw-mb-3">
-        <p className="font-bold tw-mb-2 tw-text-red-700"><i className={this.props.icon}></i> {this.props.title}</p>
+      <div className="tw-px-4 tw-py-3 tw-leading-normal tw-bg-green-100 tw-rounded-md tw-drop-shadow-sm tw-mb-3">
+        <p className="tw-font-bold tw-mb-2 tw-text-green-700"><i className={this.props.icon}></i> {this.props.title}</p>
         {this.props.children}
         {
           this.props.showClose ?
@@ -17,7 +17,7 @@ export default class AlertError extends React.Component {
                   onClick={this.props.closeAlert}>
               <i className="fas fa-times"></i>
             </span>
-            : null
+          : null
         }
       </div>
     )

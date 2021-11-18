@@ -34,6 +34,7 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
         }
 
         $character = $request->route('character');
+
         $user      = $request->route('user');
         $canAccess = true;
 

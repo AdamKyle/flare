@@ -345,6 +345,8 @@ export default class ActionsSection extends React.Component {
             <AutoAttackSection
               character={this.state.character}
               monsters={this.state.monsters}
+              userId={this.props.userId}
+              openTimeOutModal={this.props.openTimeOutModal}
             />
           </Tab>
         </Tabs>

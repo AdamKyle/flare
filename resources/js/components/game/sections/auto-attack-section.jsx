@@ -4,6 +4,8 @@ import AlertWarning from "../components/base/alert-warning";
 import AlertInfo from "../components/base/alert-info";
 import TimeOutBar from "../timeout/timeout-bar";
 import AlertError from "../components/base/alert-error";
+import AttackType from "../battle/attack/attack-type";
+import AlertSuccess from "../components/base/alert-success";
 
 export default class AutoAttackSection extends React.Component {
 
@@ -17,6 +19,7 @@ export default class AutoAttackSection extends React.Component {
       monsters: this.props.monsters,
       isDead: this.props.character.is_dead,
       errorMessage: null,
+      successMessage: null,
       isLoading: false,
       timeRemaining: null,
       showSkillSection: false,
@@ -28,14 +31,35 @@ export default class AutoAttackSection extends React.Component {
         auto_attack_length: null,
         move_down_the_list_every: null,
         selected_monster_id: null,
+        attack_type: AttackType.ATTACK,
       }
     }
+
+    this.automation = Echo.private('automation-attack-timeout-' + this.props.userId);
+  }
+
+  componentDidMount() {
+    this.automation.listen('Game.Automation.Events.AutomationAttackTimeOut', (event) => {
+      this.setState({
+        timeRemaining: event.forLength,
+      })
+    });
   }
 
   updateSelectedMonster(event) {
     const params = _.cloneDeep(this.state.params);
 
     params.selected_monster_id = parseInt(event.target.value) || 0;
+
+    this.setState({
+      params: params,
+    });
+  }
+
+  selectAttackType(event) {
+    const params = _.cloneDeep(this.state.params);
+
+    params.attack_type = event.target.value;
 
     this.setState({
       params: params,
@@ -129,6 +153,12 @@ export default class AutoAttackSection extends React.Component {
     });
   }
 
+  closeSuccess() {
+    this.setState({
+      successMessage: null,
+    });
+  }
+
   beginFight() {
 
     if (this.state.params.selected_monster_id === null) {
@@ -147,11 +177,37 @@ export default class AutoAttackSection extends React.Component {
       return;
     }
 
+    if (this.state.params.attack_type === null) {
+      this.setState({
+        errorMessage: 'Please select an attack type.'
+      });
+
+      return;
+    }
+
     this.setState({
       errorMessage: null,
+      successMessage: null,
       isLoading: true,
     }, () => {
-      console.log('ajax here ...');
+      axios.post('/api/attack-automation/'+this.props.character.id+'/start', this.state.params).then((result) => {
+        this.setState({
+          isLoading: false,
+          successMessage: result.data.message,
+        });
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            return location.reload();
+          }
+
+          if (response.status === 429) {
+            return this.props.openTimeOutModal();
+          }
+        }
+      });
     });
   }
 
@@ -171,6 +227,19 @@ export default class AutoAttackSection extends React.Component {
                     </AlertError>
                   : null
                 }
+                {
+                  this.state.successMessage !== null ?
+                    <AlertSuccess icon={"fas fa-check-circle"}
+                                  title={'It has begun!'}
+                                  showClose={true}
+                                  closeAlert={this.closeSuccess.bind(this)}
+                    >
+                      <p>
+                        {this.state.successMessage}
+                      </p>
+                    </AlertSuccess>
+                  : null
+                }
                 <div className="form-group">
                   <label htmlFor="monsters-auto-attack">Select Monster</label>
                   <select className="form-control monster-select" id="monsters-auto-attack" name="monsters-auto-attack"
@@ -181,6 +250,19 @@ export default class AutoAttackSection extends React.Component {
                     {this.monsterOptions()}
                   </select>
                 </div>
+                <div className="form-group">
+                  <label htmlFor="attack-type">Attack Type</label>
+                  <select className="form-control" id="attack-type" value={this.state.params.attack_type} onChange={this.selectAttackType.bind(this)}>
+                    <option value={AttackType.ATTACK}>Attack</option>
+                    <option value={AttackType.CAST}>Cast</option>
+                    <option value={AttackType.CAST_AND_ATTACK}>Cast then Attack</option>
+                    <option value={AttackType.ATTACK_AND_CAST}>Attack then Cast</option>
+                    <option value={AttackType.DEFEND}>Defend</option>
+                  </select>
+                  <small id="attack-type-help" className="form-text text-muted">
+                    Each attack type corresponds to the attack button from drop down critters.
+                  </small>
+                </div>
                 <button className="btn btn-primary mt-3" onClick={this.beginFight.bind(this)} disabled={this.state.isLoading || this.disabledInput()}>
                   {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
                 </button>
@@ -189,11 +271,11 @@ export default class AutoAttackSection extends React.Component {
               <Col lg={12} xl={6}>
                 <div className="tw-text-center">
                   <TimeOutBar
-                    cssClass={'character-timeout'}
+                    innerTimerCss={'auto-attack'}
                     readyCssClass={'character-ready'}
                     timeRemaining={this.state.timeRemaining}
-                    channel={'show-timeout-bar-' + this.props.userId}
-                    eventClass={'Game.Core.Events.ShowTimeOutEvent'}
+                    channel={'automation-attack-timeout-' + this.props.userId}
+                    eventClass={'Game.Automation.Events.AutomationAttackTimeOut'}
                   />
                   <div className="tw-mt-2">
                     Attack Output.

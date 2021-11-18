@@ -38,6 +38,7 @@ class Character extends Model
         'force_name_change',
         'spell_evasion',
         'artifact_annulment',
+        'is_attack_automation_locked',
         'is_npc',
         'is_test',
         'level',
@@ -62,33 +63,34 @@ class Character extends Model
      * @var array
      */
     protected $casts = [
-        'inventory_max'          => 'integer',
-        'can_attack'             => 'boolean',
-        'can_move'               => 'boolean',
-        'can_craft'              => 'boolean',
-        'can_adventure'          => 'boolean',
-        'is_dead'                => 'boolean',
-        'force_name_change'      => 'boolean',
-        'is_npc'                 => 'boolean',
-        'is_test'                => 'boolean',
-        'can_move_again_at'      => 'datetime',
-        'can_attack_again_at'    => 'datetime',
-        'can_craft_again_at'     => 'datetime',
-        'can_adventure_again_at' => 'datetime',
-        'level'                  => 'integer',
-        'xp'                     => 'float',
-        'xp_next'                => 'integer',
-        'str'                    => 'integer',
-        'dur'                    => 'integer',
-        'dex'                    => 'integer',
-        'chr'                    => 'integer',
-        'int'                    => 'integer',
-        'agi'                    => 'integer',
-        'focus'                  => 'integer',
-        'ac'                     => 'integer',
-        'gold'                   => 'integer',
-        'gold_dust'              => 'integer',
-        'shards'                 => 'integer',
+        'inventory_max'               => 'integer',
+        'can_attack'                  => 'boolean',
+        'can_move'                    => 'boolean',
+        'can_craft'                   => 'boolean',
+        'can_adventure'               => 'boolean',
+        'is_dead'                     => 'boolean',
+        'force_name_change'           => 'boolean',
+        'is_npc'                      => 'boolean',
+        'is_test'                     => 'boolean',
+        'is_attack_automation_locked' => 'boolean',
+        'can_move_again_at'           => 'datetime',
+        'can_attack_again_at'         => 'datetime',
+        'can_craft_again_at'          => 'datetime',
+        'can_adventure_again_at'      => 'datetime',
+        'level'                       => 'integer',
+        'xp'                          => 'float',
+        'xp_next'                     => 'integer',
+        'str'                         => 'integer',
+        'dur'                         => 'integer',
+        'dex'                         => 'integer',
+        'chr'                         => 'integer',
+        'int'                         => 'integer',
+        'agi'                         => 'integer',
+        'focus'                       => 'integer',
+        'ac'                          => 'integer',
+        'gold'                        => 'integer',
+        'gold_dust'                   => 'integer',
+        'shards'                      => 'integer',
     ];
 
     public function race() {
@@ -161,6 +163,10 @@ class Character extends Model
 
     public function questsCompleted() {
         return $this->hasMany(QuestsCompleted::class);
+    }
+
+    public function currentAutoMations() {
+        return $this->hasMany(CharacterAutomation::class);
     }
 
     public function getXpAttribute($value) {

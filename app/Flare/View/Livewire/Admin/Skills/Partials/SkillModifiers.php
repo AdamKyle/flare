@@ -36,6 +36,9 @@ class SkillModifiers extends Component
         'skill.base_ac_mod_bonus_per_level'        => 'nullable',
         'skill.fight_time_out_mod_bonus_per_level' => 'nullable',
         'skill.move_time_out_mod_bonus_per_level'  => 'nullable',
+        'skill.unit_time_reduction'                => 'nullable',
+        'skill.building_time_reduction'            => 'nullable',
+        'skill.unit_movement_time_reduction'       => 'nullable',
         'skill.can_train'                          => 'nullable',
         'skill.skill_bonus_per_level'              => 'nullable',
         'skill.game_class_id'                      => 'nullable'

@@ -106,7 +106,7 @@ export default class AdventureEmbark extends React.Component {
             </div>
             <hr />
             <div className="form-group">
-              <label htmlFor="attack-type">Please select an Attack Type</label>
+              <label htmlFor="attack-type">Attack Type</label>
               <select className="form-control" id="attack-type" value={this.state.attackType} onChange={this.selectAttackType.bind(this)}>
                 <option value={AttackType.ATTACK}>Attack</option>
                 <option value={AttackType.CAST}>Cast</option>

@@ -7,6 +7,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\LocationEffectValue;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use Storage;
 use Illuminate\Http\Request;
@@ -146,8 +147,18 @@ class InfoPageController extends Controller
     }
 
     public function viewLocation(Request $request, Location $location) {
+        $increasesEnemyStrengthBy = null;
+        $increasesDropChanceBy    = 0.0;
+
+        if (!is_null($location->enemy_strength_type)) {
+            $increasesEnemyStrengthBy = LocationEffectValue::getIncreaseName($location->enemy_strength_type);
+            $increasesDropChanceBy    = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
+        }
+
         return view('information.locations.location', [
-            'location' => $location
+            'location'                 => $location,
+            'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
+            'increasesDropChanceBy'    => $increasesDropChanceBy,
         ]);
     }
 

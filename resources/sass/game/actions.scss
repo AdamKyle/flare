@@ -83,6 +83,11 @@
   }
 }
 
+.auto-attack {
+  display: flex;
+  justify-content: center;
+}
+
 .adventure-timeout-bar {
   position: relative;
   left: -20px;
