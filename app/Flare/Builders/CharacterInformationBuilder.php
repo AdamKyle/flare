@@ -163,15 +163,18 @@ class CharacterInformationBuilder {
      * @return Collection
      */
     public function findSuffixStatReductionAffixes(): Collection {
-        return $this->fetchInventory()->filter(function($slot) {
-            if (!is_null($slot->item->itemSuffix))  {
-                if ($slot->item->itemSuffix->reduces_enemy_stats) {
-                    return $slot;
-                }
-            }
-        })->pluck('item.itemSuffix')->values();
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->findSuffixStatReductionAffixes();
     }
 
+    /**
+     * Build the characters damage stat.
+     *
+     * @param bool $voided
+     * @return float|int
+     * @throws \Exception
+     */
     public function buildCharacterDamageStat(bool $voided = false): float|int {
         $characterDamageStat = $this->statMod($this->character->damage_stat);
 
@@ -219,35 +222,9 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildHealFor(bool $voided = false): int {
-        $classBonus    = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
-
-        $classType     = new CharacterClassValue($this->character->class->name);
-
-        $healingAmount = $this->fetchHealingAmount($voided);
-        $dmgStat       = $this->character->class->damage_stat;
-
-        if ($classType->isRanger()) {
-            if ($voided) {
-                $healingAmount += $this->character->chr * 0.15;
-            } else {
-                $healingAmount += $this->statMod('chr') * 0.15;
-            }
-
-        }
-
-        if ($classType->isProphet()) {
-            $hasHealingSpells = $this->prophetHasHealingSpells($this->character);
-
-            if ($hasHealingSpells) {
-                if ($voided) {
-                    $healingAmount += $this->character->{$dmgStat} * 0.30;
-                } else {
-                    $healingAmount += $this->statMod($this->character->{$dmgStat}) * 0.30;
-                }
-            }
-        }
-
-        return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->buildHealFor($voided);
     }
 
     /**
@@ -344,26 +321,13 @@ class CharacterInformationBuilder {
         })->isNotEmpty();
     }
 
+    /**
+     * Do we have any affixes that are considered irresistible?
+     *
+     * @return bool
+     */
     public function hasIrresistibleAffix(): bool {
-        return $this->fetchInventory()->filter(function ($slot) {
-            if (!is_null($slot->item->itemPrefix) && !is_null($slot->item->itemSuffix) && $slot->equipped) {
-                if ($slot->item->itemPrefix->irresistible_damage) {
-                    return $slot;
-                }
-
-                if ($slot->item->itemSuffix->irresistible_damage) {
-                    return $slot;
-                }
-            }
-
-            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
-                return $slot->item->itemPrefix->irresistible_damage;
-            }
-
-            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
-                return $slot->item->itemSuffix->irresistible_damage;
-            }
-        })->isNotEmpty();
+        return $this->characterAttackInformation->setCharacter($this->character)->hasAffixesWithType('irresistible_damage');
     }
 
     /**
@@ -379,61 +343,9 @@ class CharacterInformationBuilder {
      * @return int
      */
     public function getTotalAffixDamage(bool $canStack = true): int {
-        $slots = $this->fetchInventory()->filter(function ($slot) use ($canStack) {
-
-            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
-
-                if ($canStack) {
-                    if ($slot->item->itemPrefix->damage > 0 && $slot->item->itemPrefix->damage_can_stack) {
-                        return $slot;
-                    }
-                } else {
-                    if ($slot->item->itemPrefix->damage > 0 && !$slot->item->itemPrefix->damage_can_stack) {
-                        return $slot;
-                    }
-                }
-
-            }
-
-            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
-                if ($canStack) {
-                    if ($slot->item->itemSuffix->damage > 0 && $slot->item->itemSuffix->damage_can_stack) {
-                        return $slot;
-                    }
-                } else {
-                    if ($slot->item->itemSuffix->damage > 0 && !$slot->item->itemSuffix->damage_can_stack) {
-                        return $slot;
-                    }
-                }
-            }
-        });
-
-        $totalResistibleDamage = 0;
-
-        if ($canStack) {
-            foreach ($slots as $slot) {
-                if (!is_null($slot->item->itemPrefix)) {
-                    $totalResistibleDamage += $slot->item->itemPrefix->damage;
-                }
-
-                if (!is_null($slot->item->itemSuffix)) {
-                    $totalResistibleDamage += $slot->item->itemSuffix->damage;
-                }
-            }
-        } else {
-            $totalHighestPrefix = $this->getHighestDamageValueFromAffixes($slots, 'itemPrefix');
-            $totalHighestSuffix = $this->getHighestDamageValueFromAffixes($slots, 'itemSuffix');
-
-            if ($totalHighestPrefix > $totalHighestSuffix) {
-                return $totalHighestPrefix;
-            }
-
-            $totalResistibleDamage = $totalHighestSuffix;
-        }
-
-
-
-        return $totalResistibleDamage;
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->getTotalAffixDamage($canStack);
     }
 
     /**

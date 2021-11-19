@@ -3,10 +3,16 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\SetSlot;
+use App\Flare\Traits\ClassBasedBonuses;
+use App\Flare\Values\CharacterClassValue;
 use Illuminate\Support\Collection;
 
 class CharacterAttackInformation {
+
+    use ClassBasedBonuses;
 
     /**
      * @var Character $character
@@ -155,6 +161,176 @@ class CharacterAttackInformation {
         $value = max($values);
 
         return $value > 1.0 ? .99 : $value;
+    }
+
+    /**
+     * Fetch all suffix items  that reduce an enemies stats.
+     *
+     * @return Collection
+     */
+    public function findSuffixStatReductionAffixes(): Collection {
+        return $this->fetchInventory()->filter(function($slot) {
+            if (!is_null($slot->item->itemSuffix))  {
+                if ($slot->item->itemSuffix->reduces_enemy_stats) {
+                    return $slot;
+                }
+            }
+        })->pluck('item.itemSuffix')->values();
+    }
+
+    /**
+     * Build the amount a character can heal for.
+     *
+     * @param bool $voided
+     * @return int
+     * @throws \Exception
+     */
+    public function buildHealFor(bool $voided = false): int {
+        $classBonus    = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
+
+        $classType     = new CharacterClassValue($this->character->class->name);
+
+        $healingAmount = $this->fetchHealingAmount($voided);
+        $dmgStat       = $this->character->class->damage_stat;
+
+        if ($classType->isRanger()) {
+            if ($voided) {
+                $healingAmount += $this->character->chr * 0.15;
+            } else {
+                $healingAmount += $this->statMod('chr') * 0.15;
+            }
+
+        }
+
+        if ($classType->isProphet()) {
+            $hasHealingSpells = $this->prophetHasHealingSpells($this->character);
+
+            if ($hasHealingSpells) {
+                if ($voided) {
+                    $healingAmount += $this->character->{$dmgStat} * 0.30;
+                } else {
+                    $healingAmount += $this->statMod($this->character->{$dmgStat}) * 0.30;
+                }
+            }
+        }
+
+        return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+    }
+
+    /**
+     * Do we have any affixes of the applied attribute type?
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function hasAffixesWithType(string $type): bool {
+        return $this->fetchInventory()->filter(function ($slot) use($type) {
+            if (!is_null($slot->item->itemPrefix) && !is_null($slot->item->itemSuffix) && $slot->equipped) {
+                if ($slot->item->itemPrefix->{$type}) {
+                    return $slot;
+                }
+
+                if ($slot->item->itemSuffix->{$type}) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
+                return $slot->item->itemPrefix->{$type};
+            }
+
+            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
+                return $slot->item->itemSuffix->{$type};
+            }
+        })->isNotEmpty();
+    }
+
+    /**
+     * Get total affix damage.
+     *
+     * @param bool $canStack
+     * @return int
+     */
+    public function getTotalAffixDamage(bool $canStack = true): int {
+        $slots = $this->fetchInventory()->filter(function ($slot) use ($canStack) {
+
+            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
+                return $this->getDamageAffixSlot($slot, 'itemPrefix', $canStack);
+
+            }
+
+            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
+                return $this->getDamageAffixSlot($slot, 'itemSuffix', $canStack);
+            }
+        });
+
+        return $this->calculateTotalStackingAffixDamage($slots, $canStack);
+    }
+
+    /**
+     * @param InventorySlot|SetSlot $slot
+     * @param string $prefixType
+     * @param bool $canStack
+     * @return InventorySlot|SetSlot
+     */
+    protected function getDamageAffixSlot(InventorySlot|SetSlot $slot, string $prefixType, bool $canStack = false): InventorySlot|SetSlot|null {
+        if ($canStack) {
+            if ($slot->item->{$prefixType}->damage > 0 && $slot->item->{$prefixType}->damage_can_stack) {
+                return $slot;
+            }
+        }
+
+        if ($slot->item->{$prefixType}->damage > 0 && !$slot->item->{$prefixType}->damage_can_stack) {
+            return $slot;
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate the total affix damage.
+     *
+     * @param Collection $slots
+     * @param bool $canStack
+     * @return int
+     */
+    protected function calculateTotalStackingAffixDamage(Collection $slots, bool $canStack = false) {
+        if ($canStack) {
+            $totalResistibleDamage = $this->calculateStackingAffixDamage($slots);
+        } else {
+            $totalHighestPrefix = $this->getHighestDamageValueFromAffixes($slots, 'itemPrefix');
+            $totalHighestSuffix = $this->getHighestDamageValueFromAffixes($slots, 'itemSuffix');
+
+            if ($totalHighestPrefix > $totalHighestSuffix) {
+                return $totalHighestPrefix;
+            }
+
+            $totalResistibleDamage = $totalHighestSuffix;
+        }
+
+        return $totalResistibleDamage;
+    }
+
+    /**
+     * Calculate stacking affix damage.
+     *
+     * @param Collection $slots
+     * @return int
+     */
+    protected function calculateStackingAffixDamage(Collection $slots): int {
+        $totalResistibleDamage = 0;
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->itemPrefix)) {
+                $totalResistibleDamage += $slot->item->itemPrefix->damage;
+            }
+
+            if (!is_null($slot->item->itemSuffix)) {
+                $totalResistibleDamage += $slot->item->itemSuffix->damage;
+            }
+        }
+
+        return $totalResistibleDamage;
     }
 
     /**
