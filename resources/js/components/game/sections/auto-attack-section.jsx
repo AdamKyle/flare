@@ -25,7 +25,9 @@ export default class AutoAttackSection extends React.Component {
       showSkillSection: false,
       showMoveDownTheList: false,
       trainableSkills: this.props.character.skills.filter((skill) => skill.can_train),
+      attackMessages: [],
       params: {
+        id: 0,
         skill_id: skillInTraining.length > 0 ? skillInTraining[0].id : null,
         xp_towards: skillInTraining.length > 0 ? skillInTraining[0].xp_towards : null,
         auto_attack_length: null,
@@ -35,13 +37,43 @@ export default class AutoAttackSection extends React.Component {
       }
     }
 
-    this.automation = Echo.private('automation-attack-timeout-' + this.props.userId);
+    this.automation               = Echo.private('automation-attack-timeout-' + this.props.userId);
+    this.automationAttackMessages = Echo.private('automation-attack-messages-' + this.props.userId);
   }
 
   componentDidMount() {
+    axios.get('/api/attack-automation/' + this.props.character.id).then((result) => {
+
+      const automation = result.data.automation;
+
+      if (automation.hasOwnProperty('skill_id')) {
+        this.setState({
+          params: result.data.automation
+        });
+      }
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal();
+        }
+      }
+    });
+
     this.automation.listen('Game.Automation.Events.AutomationAttackTimeOut', (event) => {
       this.setState({
         timeRemaining: event.forLength,
+      })
+    });
+
+    this.automationAttackMessages.listen('Game.Automation.Events.AutomatedAttackMessage', (event) => {
+      this.setState({
+        attackMessages: event.messages,
       })
     });
   }
@@ -159,6 +191,12 @@ export default class AutoAttackSection extends React.Component {
     });
   }
 
+  displayAttackMessages() {
+    return this.state.attackMessages.map((message) => {
+      return <div className={message.class}>{message.message}</div>
+    });
+  }
+
   beginFight() {
 
     if (this.state.params.selected_monster_id === null) {
@@ -211,6 +249,33 @@ export default class AutoAttackSection extends React.Component {
     });
   }
 
+  stopAutomation() {
+    this.setState({
+      errorMessage: null,
+      successMessage: null,
+      isLoading: true,
+    }, () => {
+      axios.post('/api/attack-automation/'+this.state.params.id+'/'+this.props.character.id+'/stop').then((result) => {
+        this.setState({
+          isLoading: false,
+          successMessage: result.data.message,
+        });
+      }).catch((err) => {
+        if (err.hasOwnProperty('response')) {
+          const response = err.response;
+
+          if (response.status === 401) {
+            return location.reload();
+          }
+
+          if (response.status === 429) {
+            return this.props.openTimeOutModal();
+          }
+        }
+      });
+    });
+  }
+
   render() {
     return (
       <div className="mt-4">
@@ -230,7 +295,7 @@ export default class AutoAttackSection extends React.Component {
                 {
                   this.state.successMessage !== null ?
                     <AlertSuccess icon={"fas fa-check-circle"}
-                                  title={'It has begun!'}
+                                  title={this.props.attackAutomationIsRunning ? 'It has begun!' : 'Stopping ...'}
                                   showClose={true}
                                   closeAlert={this.closeSuccess.bind(this)}
                     >
@@ -245,14 +310,19 @@ export default class AutoAttackSection extends React.Component {
                   <select className="form-control monster-select" id="monsters-auto-attack" name="monsters-auto-attack"
                           value={this.state.params.selected_monster_id}
                           onChange={this.updateSelectedMonster.bind(this)}
-                          disabled={this.disabledInput()}>
+                          disabled={this.disabledInput() || this.props.attackAutomationIsRunning}>
                     <option value="0" key="-1">Please select a monster</option>
                     {this.monsterOptions()}
                   </select>
                 </div>
                 <div className="form-group">
                   <label htmlFor="attack-type">Attack Type</label>
-                  <select className="form-control" id="attack-type" value={this.state.params.attack_type} onChange={this.selectAttackType.bind(this)}>
+                  <select className="form-control"
+                          id="attack-type"
+                          value={this.state.params.attack_type}
+                          onChange={this.selectAttackType.bind(this)}
+                          disabled={this.props.attackAutomationIsRunning}
+                  >
                     <option value={AttackType.ATTACK}>Attack</option>
                     <option value={AttackType.CAST}>Cast</option>
                     <option value={AttackType.CAST_AND_ATTACK}>Cast then Attack</option>
@@ -263,9 +333,22 @@ export default class AutoAttackSection extends React.Component {
                     Each attack type corresponds to the attack button from drop down critters.
                   </small>
                 </div>
-                <button className="btn btn-primary mt-3" onClick={this.beginFight.bind(this)} disabled={this.state.isLoading || this.disabledInput()}>
+                <button className="btn btn-primary mt-3"
+                        onClick={this.beginFight.bind(this)}
+                        disabled={this.state.isLoading || this.props.attackAutomationIsRunning}
+                >
                   {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
                 </button>
+                {
+                  this.props.attackAutomationIsRunning ?
+                    <button className="btn btn-danger ml-2 mt-3"
+                            onClick={this.stopAutomation.bind(this)}
+                            disabled={this.state.isLoading}
+                    >
+                      {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Stop!
+                    </button>
+                  : null
+                }
               </Col>
 
               <Col lg={12} xl={6}>
@@ -278,17 +361,19 @@ export default class AutoAttackSection extends React.Component {
                     eventClass={'Game.Automation.Events.AutomationAttackTimeOut'}
                   />
                   <div className="tw-mt-2">
-                    Attack Output.
+                    {
+                      this.state.attackMessages.length > 0 ? this.displayAttackMessages() : null
+                    }
                   </div>
                 </div>
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="advanced" title="Advanced Options">
+          <Tab eventKey="advanced" title="Advanced Options" disabled={this.props.attackAutomationIsRunning}>
             <div className="mt-4">
               <h4>Advanced options</h4>
               <hr />
-              <div className="form-check">
+              <div className="form-check mb-3">
                 <input type="checkbox" className="form-check-input" id="manage-skills" onChange={this.showSkillChangeSection.bind(this)}/>
                 <label className="form-check-label" htmlFor="manage-skills">Change Active Training Skill?</label>
                 <small id="manage-skills-help" className="form-text text-muted">

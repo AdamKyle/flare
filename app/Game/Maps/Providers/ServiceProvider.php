@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Providers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Game\Battle\Services\ConjureService;
@@ -68,6 +69,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MapPositionValue::class),
                 $app->make(TraverseService::class),
                 $app->make(ConjureService::class),
+                $app->make(BuildMonsterCacheService::class),
                 $app->make(Manager::class),
             );
         });

@@ -30,29 +30,10 @@ class DataTableTest extends TestCase
         ]);
 
         Livewire::test(DataTable::class)
-            ->assertSee('Sample Unit')
-            ->set('search', 'Sample Unit')
-            ->assertSee('Sample Unit')
+            ->assertSee('Spearmen')
+            ->set('search', 'Spearmen')
+            ->assertSee('Spearmen')
             ->set('search', 'Sample 8nit')
-            ->assertDontSee('Sample Unit');
-    }
-
-    public function testTheComponentLoadsWithKingdomBuilding() {
-        $gameBuilding = $this->createGameBuilding();
-
-        $gameBuilding->units()->create([
-            'game_building_id' => $gameBuilding->id,
-            'game_unit_id'     => $this->createGameUnit()->id,
-            'required_level'   => 1,
-        ]);
-
-        Livewire::test(DataTable::class, [
-            'building' => $gameBuilding->refresh(),
-        ])
-        ->assertSee('Sample Unit')
-        ->set('search', 'Sample Unit')
-        ->assertSee('Sample Unit')
-        ->set('search', 'Sample 8nit')
-        ->assertDontSee('Sample Unit');
+            ->assertDontSee('Spearmen');
     }
 }

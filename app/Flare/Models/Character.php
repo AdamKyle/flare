@@ -165,7 +165,7 @@ class Character extends Model
         return $this->hasMany(QuestsCompleted::class);
     }
 
-    public function currentAutoMations() {
+    public function currentAutomations() {
         return $this->hasMany(CharacterAutomation::class);
     }
 

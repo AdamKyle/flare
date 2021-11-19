@@ -111,7 +111,6 @@ class KingdomResourcesService {
             if ($lastTimeWalked < 30) {
                 $this->updateCurrentPopulation();
 
-                dump($this->kingdom->current_population);
                 if ($this->kingdom->current_population > $this->kingdom->max_population) {
                     $this->angryNpc();
                 }
@@ -133,7 +132,9 @@ class KingdomResourcesService {
             }
         }
 
-        $this->rebuildCharacterKingdomCache($character->refresh());
+        if (!is_null($character)) {
+            $this->rebuildCharacterKingdomCache($character->refresh());
+        }
     }
 
     /**
@@ -191,7 +192,7 @@ class KingdomResourcesService {
         $this->reduceMorale($totalDecrease);
     }
 
-    public function giveNPCKingdoms(bool $notify = true) {
+    public function giveNPCKingdoms(bool $notify = true, bool $deletingAccount = false) {
         $character = $this->kingdom->character;
 
         if (!$notify) {
@@ -209,7 +210,10 @@ class KingdomResourcesService {
 
         broadcast(new UpdateNPCKingdoms($this->kingdom->gameMap));
         broadcast(new UpdateGlobalMap($character));
-        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+
+        if (!$deletingAccount) {
+            broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+        }
     }
 
     protected function angryNpc() {

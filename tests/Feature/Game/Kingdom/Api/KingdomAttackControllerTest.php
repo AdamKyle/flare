@@ -50,7 +50,7 @@ class KingdomAttackControllerTest extends TestCase
         $this->assertNotEmpty($content);
         $this->assertEquals('Sample', $content[0]->kingdom_name);
         $this->assertNotEmpty($content[0]->units);
-        $this->assertEquals('Sample Unit', $content[0]->units[0]->name);
+        $this->assertEquals('Spearmen', $content[0]->units[0]->name);
     }
 
     public function testFailToSelectKingdomsToAttackWhenYouDontOwnTheKingdom() {
@@ -110,7 +110,7 @@ class KingdomAttackControllerTest extends TestCase
             'defender_id' => $this->createEnemyKingdom()->id,
             'units_to_send' => [
                 'Sample' => [
-                    'Sample Unit' => [
+                    'Spearmen' => [
                         'amount_to_send' => 500,
                         'max_amount'     => 500,
                         'total_time'     => 1,
@@ -120,7 +120,6 @@ class KingdomAttackControllerTest extends TestCase
         ])->response;
 
         $content = json_decode($response->content());
-
 
         $this->assertEquals(200, $response->status());
 
@@ -167,7 +166,7 @@ class KingdomAttackControllerTest extends TestCase
             'defender_id' => 27,
             'units_to_send' => [
                 'Sample' => [
-                    'Sample Unit' => [
+                    'Spearmen' => [
                         'amount_to_send' => 500,
                         'max_amount'     => 500,
                         'total_time'     => 1,
@@ -192,7 +191,7 @@ class KingdomAttackControllerTest extends TestCase
             'defender_id' => $this->createEnemyKingdom()->id,
             'units_to_send' => [
                 'bananas' => [
-                    'Sample Unit' => [
+                    'Spearmen' => [
                         'amount_to_send' => 500,
                         'max_amount'     => 500,
                         'total_time'     => 1,
@@ -242,7 +241,7 @@ class KingdomAttackControllerTest extends TestCase
             'defender_id' => $this->createEnemyKingdom()->id,
             'units_to_send' => [
                 'Sample' => [
-                    'Sample Unit' => [
+                    'Spearmen' => [
                         'amount_to_send' => 1500,
                         'max_amount'     => 500,
                         'total_time'     => 1,

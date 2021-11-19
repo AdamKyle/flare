@@ -23,6 +23,8 @@ class CreateCharacterAutomations extends Migration
                   ->references('id')->on('monsters');
             $table->integer('type');
             $table->dateTime('started_at');
+            $table->dateTime('completed_at');
+            $table->string('attack_type')->nullable();
             $table->integer('move_down_monster_list_every')->nullable()->default(0);
             $table->integer('previous_level')->nullable()->default(0);
             $table->integer('current_level')->nullable()->default(0);

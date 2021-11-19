@@ -51,7 +51,7 @@ export default class MapMovementActions extends React.Component {
                   disabled={this.props.disableMapButtons()} onClick={this.move.bind(this)}>East
           </button>
           <button type="button" className="float-left btn btn-primary btn-sm mr-2 " data-direction="traverse"
-                  disabled={this.props.disableMapButtons()} onClick={this.props.openTraverse}>Traverse
+                  disabled={this.props.disableMapButtons() || this.props.attackAutomationIsRunning} onClick={this.props.openTraverse}>Traverse
           </button>
           <TimeOutBar
             eventClass={'Game.Maps.Events.ShowTimeOutEvent'}

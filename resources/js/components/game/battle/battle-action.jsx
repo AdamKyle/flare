@@ -124,6 +124,10 @@ export default class BattleAction extends React.Component {
       return true;
     }
 
+    if (this.props.attackAutomationIsRunning) {
+      return true;
+    }
+
     return false;
   }
 
@@ -141,6 +145,10 @@ export default class BattleAction extends React.Component {
     }
 
     if (!this.state.canAttack) {
+      return true;
+    }
+
+    if (this.props.attackAutomationIsRunning) {
       return true;
     }
 

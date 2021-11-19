@@ -49,7 +49,7 @@ class UnitsControllerTest extends TestCase
             'required_level'   => 3,
         ]);
 
-        $this->actingAs($this->user)->visitRoute('units.list')->see('Units')->see('Sample Unit');
+        $this->actingAs($this->user)->visitRoute('units.list')->see('Units')->see('Spearmen');
     }
 
     public function testCanSeeCreate() {
@@ -59,7 +59,7 @@ class UnitsControllerTest extends TestCase
     public function testCanSeeEdit() {
         $this->actingAs($this->user)->visitRoute('units.edit', [
             'gameUnit' => GameUnit::first()->id
-        ])->see('Edit Unit: Sample Unit')->see('Unit Details');
+        ])->see('Edit Unit: Spearmen')->see('Unit Details');
     }
 
     public function testCanSeeShow() {
@@ -73,7 +73,7 @@ class UnitsControllerTest extends TestCase
 
         $this->actingAs($this->user)->visitRoute('units.unit', [
             'gameUnit' => GameUnit::first()->id
-        ])->see('Sample Unit')->see('Attributes');
+        ])->see('Spearmen');
     }
 
     public function testCanSeeShowWithKingdomBuildingAssociation() {
@@ -87,6 +87,6 @@ class UnitsControllerTest extends TestCase
 
         $this->actingAs($this->user)->visitRoute('units.unit', [
             'gameUnit' => GameUnit::first()->id
-        ])->see('Sample Unit')->see('Attributes')->see($building->name);
+        ])->see('Spearmen')->see($building->name);
     }
 }

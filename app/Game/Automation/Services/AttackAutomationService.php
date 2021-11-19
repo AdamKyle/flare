@@ -4,6 +4,7 @@ namespace App\Game\Automation\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Events\AutomationAttackTimeOut;
 use App\Game\Automation\Jobs\AttackAutomation;
 use App\Game\Automation\Values\AutomationType;
@@ -44,16 +45,19 @@ class AttackAutomationService {
             'monster_id'                    => $params['selected_monster_id'],
             'type'                          => AutomationType::ATTACK,
             'started_at'                    => now(),
+            'completed_at'                  => now()->addHours($params['auto_attack_length']),
             'move_down_monster_list_every'  => $params['move_down_the_list_every'],
             'previous_level'                => $character->level,
             'current_level'                 => $character->level,
+            'attack_type'                   => $params['attack_type'],
         ]);
 
         $delay = now()->addSeconds(30);
 
         event(new AutomationAttackTimeOut($character->user, 30));
+        event (new AutomatedAttackStatus($character->user, true));
 
-        AttackAutomation::dispatch($character, $automation->id, $params['attack_type'])->delay($delay);
+        AttackAutomation::dispatch($character, $automation->id, $automation->attack_type)->delay($delay);
 
         return $this->successResult([
             'message' => 'Automation has begun! You will not be able to fight celestials, teleport, set sail, manage your equipped items or training skills.

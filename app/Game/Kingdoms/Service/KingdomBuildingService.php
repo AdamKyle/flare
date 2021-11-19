@@ -44,7 +44,7 @@ class KingdomBuildingService {
      * @return void
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character): void {
-        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building->time_increase));
+        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building));
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,

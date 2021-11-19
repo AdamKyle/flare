@@ -22,10 +22,10 @@ class DataTableTest extends TestCase
     {
         
         Livewire::test(DataTable::class)
-            ->assertSee('Test Building')
-            ->set('search', 'Test Building')
-            ->assertSee('Test Building')
-            ->set('search', 'Test cuilding')
-            ->assertDontSee('Test Building');
+            ->assertSee('Keep')
+            ->set('search', 'Keep')
+            ->assertSee('Keep')
+            ->set('search', 'Keet')
+            ->assertDontSee('Keep');
     }
 }

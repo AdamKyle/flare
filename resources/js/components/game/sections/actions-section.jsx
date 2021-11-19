@@ -170,6 +170,20 @@ export default class ActionsSection extends React.Component {
     });
   }
 
+  buildAutomationAttackTabTitle() {
+    if (this.props.attackAutomationIsRunning) {
+      return (
+        <span className="tw-text-green-600">
+          <i className="ra ra-muscle-fat"></i> Auto Attack
+        </span>
+      )
+    }
+
+    return (
+      <span>Auto Attack</span>
+    )
+  }
+
   render() {
     if (this.state.isLoading) {
       return (
@@ -256,6 +270,7 @@ export default class ActionsSection extends React.Component {
                       isAdventuring={this.state.isAdventuring}
                       shouldReset={this.state.resetBattleAction}
                       updateResetBattleAction={this.updateResetBattleAction.bind(this)}
+                      attackAutomationIsRunning={this.props.attackAutomationIsRunning}
                     />
                     : this.props.celestial !== null ?
                       <div className="text-center mb-2">
@@ -341,12 +356,13 @@ export default class ActionsSection extends React.Component {
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="auto-attack" title="Auto Attack">
+          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()}>
             <AutoAttackSection
               character={this.state.character}
               monsters={this.state.monsters}
               userId={this.props.userId}
               openTimeOutModal={this.props.openTimeOutModal}
+              attackAutomationIsRunning={this.props.attackAutomationIsRunning}
             />
           </Tab>
         </Tabs>

@@ -40,7 +40,7 @@ class BuildingsControllerTest extends TestCase
     }
 
     public function testCanSeeIndex() {
-        $this->actingAs($this->user)->visitRoute('buildings.list')->see('Buildings')->see('Test Building');
+        $this->actingAs($this->user)->visitRoute('buildings.list')->see('Buildings')->see('Keep');
     }
 
     public function testCanSeeCreate() {
@@ -50,12 +50,12 @@ class BuildingsControllerTest extends TestCase
     public function testCanSeeEdit() {
         $this->actingAs($this->user)->visitRoute('buildings.edit', [
             'building' => GameBuilding::first()->id,
-        ])->see('Edit Building: Test Building')->see('Building Details');
+        ])->see('Edit Building: Keep')->see('Building Details');
     }
 
     public function testCanSeeShow() {
         $this->actingAs($this->user)->visitRoute('buildings.building', [
             'building' => GameBuilding::first()->id,
-        ])->see('Test Building')->see('Base Details');
+        ])->see('Keep')->see('Base Details');
     }
 }

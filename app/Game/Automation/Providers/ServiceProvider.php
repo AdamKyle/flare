@@ -7,8 +7,10 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\FightService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
+use App\Game\Automation\Console\Commands\ClearAutoAttackTimeOuts;
 use App\Game\Automation\Services\AttackAutomationService;
 use App\Game\Automation\Services\ProcessAttackAutomation;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Messages\Console\Commands\CleanChat;
@@ -33,9 +35,12 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ProcessAttackAutomation::class, function($app) {
             return new ProcessAttackAutomation(
-                $app->make(FightService::class)
+                $app->make(FightService::class),
+                $app->make(BattleEventHandler::class),
             );
         });
+
+        $this->commands([ClearAutoAttackTimeOuts::class]);
     }
 
     /**

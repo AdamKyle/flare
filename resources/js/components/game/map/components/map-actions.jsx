@@ -28,7 +28,8 @@ export default class MapActions extends React.Component {
                 {
                   !_.isEmpty(this.props.adventures) ?
                     <button type="button" className=" btn btn-success mr-2 btn-sm "
-                            onClick={this.props.openAdventureDetails}>
+                            onClick={this.props.openAdventureDetails}
+                            disabled={this.props.attackAutomationIsRunning}>
                       Adventure
                     </button>
                     : null
@@ -37,14 +38,14 @@ export default class MapActions extends React.Component {
                 {
                   this.props.currentPort !== null ?
                     <button type="button" className=" btn btn-success mr-2 btn-sm "
-                            disabled={this.props.disableMapButtons()} onClick={this.props.openPortDetails}>
+                            disabled={this.props.disableMapButtons() || this.props.attackAutomationIsRunning} onClick={this.props.openPortDetails}>
                       Set Sail
                     </button>
                     : null
                 }
 
                 <button type="button" className="btn btn-primary btn-sm mr-2 " data-direction="teleport"
-                        disabled={this.props.disableMapButtons()} onClick={this.props.openTeleport}>
+                        disabled={this.props.disableMapButtons() || this.props.attackAutomationIsRunning} onClick={this.props.openTeleport}>
                   Teleport
                 </button>
               </div>

@@ -696,7 +696,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => 5
+            'amount' => 5,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -741,7 +743,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => 5
+            'amount' => 5,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -777,7 +781,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => 5
+            'amount' => 5,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -813,7 +819,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => $this->createGameUnit(['name' => 'Axemen']),
         ]), [
-            'amount' => 5
+            'amount' => 5,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -843,7 +851,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => 0
+            'amount' => 0,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -874,7 +884,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => KingdomMaxValue::MAX_UNIT + 1000
+            'amount' => KingdomMaxValue::MAX_UNIT + 1000,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -909,7 +921,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => 10
+            'amount' => 10,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -938,7 +952,9 @@ class KingdomsControllerTest extends TestCase
             'kingdom'  => Kingdom::first()->id,
             'gameUnit' => GameUnit::first()->id,
         ]), [
-            'amount' => 150
+            'amount' => 150,
+            'recruitment_type' => 'recruit-normally',
+            'total_cost'       => 0
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -1163,106 +1179,5 @@ class KingdomsControllerTest extends TestCase
         ])->response;
 
         $this->assertEquals(422, $response->status());
-    }
-
-    public function testCanDeposit() {
-
-        $this->character->updateCharacter([
-            'gold' => 2000000000
-        ]);
-
-        $kingdom = $this->createKingdom([
-            'character_id' => Character::first()->id,
-            'game_map_id'  => GameMap::first()->id,
-            'treasury'     => 0,
-        ]);
-
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.deposit', [
-            'kingdom' => $kingdom->id
-        ]), [
-            'deposit_amount' => 2000
-        ])->response;
-
-        $this->assertEquals(200, $response->status());
-
-        $kingdom = $kingdom->refresh();
-
-        $this->assertEquals(.65, $kingdom->current_morale);
-        $this->assertEquals(2000, $kingdom->treasury);
-    }
-
-    public function testCanDepositMoraleDoesNotExceede1() {
-
-        $this->character->updateCharacter([
-            'gold' => 2000000000
-        ]);
-
-        $kingdom = $this->createKingdom([
-            'character_id' => Character::first()->id,
-            'game_map_id'  => GameMap::first()->id,
-            'treasury'     => 0,
-            'current_morale' => .99,
-        ]);
-
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.deposit', [
-            'kingdom' => $kingdom->id
-        ]), [
-            'deposit_amount' => 2000
-        ])->response;
-
-        $this->assertEquals(200, $response->status());
-
-        $kingdom = $kingdom->refresh();
-
-        $this->assertEquals(1.0, $kingdom->current_morale);
-        $this->assertEquals(2000, $kingdom->treasury);
-    }
-
-    public function testCannotDepositOverMaxLimit() {
-
-        $this->character->updateCharacter([
-            'gold' => 4000000000
-        ]);
-
-        $kingdom = $this->createKingdom([
-            'character_id' => Character::first()->id,
-            'game_map_id'  => GameMap::first()->id,
-            'treasury'     => 0,
-        ]);
-
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.deposit', [
-            'kingdom' => $kingdom->id
-        ]), [
-            'deposit_amount' => 4000000000
-        ])->response;
-
-        $this->assertEquals(422, $response->status());
-
-        $kingdom = $kingdom->refresh();
-
-        $this->assertEquals(.50, $kingdom->current_morale);
-        $this->assertEquals(0, $kingdom->treasury);
-    }
-
-    public function testCannotDepositNoCharacterGold() {
-
-        $kingdom = $this->createKingdom([
-            'character_id' => $this->character->getCharacter(false)->id,
-            'game_map_id'  => GameMap::first()->id,
-            'treasury'     => 0,
-        ]);
-
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.deposit', [
-            'kingdom' => $kingdom->id
-        ]), [
-            'deposit_amount' => 1000000000
-        ])->response;
-
-        $this->assertEquals(422, $response->status());
-
-        $kingdom = $kingdom->refresh();
-
-        $this->assertEquals(.50, $kingdom->current_morale);
-        $this->assertEquals(0, $kingdom->treasury);
     }
 }

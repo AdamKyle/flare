@@ -22,7 +22,7 @@ class GameUnitFactory extends Factory
     public function definition()
     {
         return [
-            'name'                   => 'Sample Unit',
+            'name'                   => 'Spearmen',
             'description'            => 'Test unit',
             'attack'                 => 1,
             'defence'                => 1,

@@ -9,9 +9,9 @@ use App\Flare\Models\Location;
 class RandomItemDropBuilder {
 
     /**
-     * @var string $monsterPlane
+     * @var ?string $monsterPlane
      */
-    private string $monsterPlane;
+    private ?string $monsterPlane;
 
     /**
      * @var int $characterLevel

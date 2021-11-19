@@ -57,10 +57,12 @@ export default class Game extends React.Component {
       kingdom: null,
       isDead: false,
       windowWidth: window.innerWidth,
+      attackAutomationIsRunning: false,
     }
 
-    this.isDead = Echo.private('character-is-dead-' + this.props.userId);
-    this.npcComponent = Echo.private('component-show-' + this.props.userId);
+    this.isDead           = Echo.private('character-is-dead-' + this.props.userId);
+    this.npcComponent     = Echo.private('component-show-' + this.props.userId);
+    this.attackAutomation = Echo.private('attack-automation-status-' + this.props.userId);
   }
 
   updateDimensions() {
@@ -80,6 +82,12 @@ export default class Game extends React.Component {
 
     this.npcComponent.listen('Flare.Events.NpcComponentShowEvent', (event) => {
       this.openNpcComponent(event.componentName);
+    });
+
+    this.attackAutomation.listen('Game.Automation.Events.AutomatedAttackStatus', (event) => {
+      this.setState({
+        attackAutomationIsRunning: event.isRunning
+      });
     });
 
     window.addEventListener('resize', this.updateDimensions.bind(this));
@@ -300,6 +308,7 @@ export default class Game extends React.Component {
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}
               character_y={this.state.current_y}
+              attackAutomationIsRunning={this.state.attackAutomationIsRunning}
             />
 
             {
@@ -386,6 +395,7 @@ export default class Game extends React.Component {
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               updateKingdoms={this.updateKingdoms.bind(this)}
               updateCelestial={this.updateCelestial.bind(this)}
+              attackAutomationIsRunning={this.state.attackAutomationIsRunning}
             />
           </div>
         </div>

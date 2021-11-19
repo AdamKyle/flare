@@ -12,6 +12,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
@@ -87,6 +88,11 @@ class MovementService {
     private $conjureService;
 
     /**
+     * @var BuildMonsterCacheService $buildMonsterCacheService
+     */
+    private $buildMonsterCacheService;
+
+    /**
      * @var Manager $manager
      */
     private $manager;
@@ -106,6 +112,7 @@ class MovementService {
                                 MapPositionValue $mapPositionValue,
                                 TraverseService $traverseService,
                                 ConjureService $conjureService,
+                                BuildMonsterCacheService $buildMonsterCacheService,
                                 Manager $manager)
     {
         $this->portService                = $portService;
@@ -115,6 +122,7 @@ class MovementService {
         $this->mapPositionValue           = $mapPositionValue;
         $this->traverseService            = $traverseService;
         $this->conjureService             = $conjureService;
+        $this->buildMonsterCacheService   = $buildMonsterCacheService;
         $this->manager                    = $manager;
     }
 
@@ -486,9 +494,9 @@ class MovementService {
         $character = new \League\Fractal\Resource\Item($character, $this->characterAttackTransformer);
 
         if (!is_null($gameMapName)) {
-            $monsters  = Cache::get('monsters')[$gameMapName];
+            $monsters  = $this->buildMonsterCacheService->fetchMonsterCache($gameMapName);
         } else {
-            $monsters  = Cache::get('monsters')[$locationName];
+            $monsters  = $this->buildMonsterCacheService->fetchMonsterCache($locationName);
         }
 
         $character = $this->manager->createData($character)->toArray();

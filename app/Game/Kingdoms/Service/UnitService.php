@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\Character;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
@@ -37,8 +38,9 @@ class UnitService {
      * @param int $amount
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
+        $character        = $kingdom->character;
         $totalTime        = $gameUnit->time_to_recruit * $amount;
-        $timeTillFinished = now()->addSeconds($this->calculateBuildingTimeReduction($totalTime));
+        $timeTillFinished = now()->addSeconds($this->calculatueUnitRecrutmentTime($character, $totalTime));
 
         $goldPaid = null;
 
@@ -155,9 +157,8 @@ class UnitService {
         return true;
     }
 
-    protected function calculateBuildingTimeReduction(UnitInQueue $queue, int $time)  {
-        $kingdom    = $queue->kingdom;
-        $skillBonus = $kingdom->character->skills->filter(function($skill) {
+    protected function calculatueUnitRecrutmentTime(Character $character, int $time)  {
+        $skillBonus = $character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
         })->first()->skill_bonus;
 

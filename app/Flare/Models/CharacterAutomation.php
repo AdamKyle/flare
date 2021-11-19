@@ -18,9 +18,11 @@ class CharacterAutomation extends Model
         'monster_id',
         'type',
         'started_at',
+        'completed_at',
         'move_down_monster_list_every',
         'previous_level',
         'current_level',
+        'attack_type',
     ];
 
     /**
@@ -31,6 +33,7 @@ class CharacterAutomation extends Model
     protected $casts = [
         'type'                         => 'integer',
         'started_at'                   => 'datetime',
+        'completed_at'                 => 'datetime',
         'move_down_monster_list_every' => 'integer',
         'previous_level'               => 'integer',
         'current_level'                => 'integer',

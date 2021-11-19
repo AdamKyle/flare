@@ -2,6 +2,9 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Game\Automation\Events\AutomatedAttackStatus;
+use App\Game\Automation\Events\AutomationAttackTimeOut;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -29,16 +32,33 @@ class AttackAutomation implements ShouldQueue
     }
 
     public function handle(ProcessAttackAutomation $processAttackAutomation) {
+
+        event(new AutomationAttackTimeOut($this->character->user));
+
         $automation = CharacterAutomation::find($this->automationId);
 
         if ($this->shouldBail($automation)) {
+            if (!is_null($automation)) {
+                $automation->delete();
+            }
+
+            event (new AutomatedAttackStatus($this->character->user, false));
+
             return;
         }
 
-        $processAttackAutomation->processFight($automation, $this->character, $this->attackType);
+        $timeTillNext = $processAttackAutomation->processFight($automation, $this->character, $this->attackType);
+
+        if ($timeTillNext <= 0) {
+            event (new AutomatedAttackStatus($this->character->user, false));
+
+            return;
+        }
+
+        AttackAutomation::dispatch($this->character, $automation->id, $this->attackType)->delay($timeTillNext);
     }
 
-    protected function shouldBail(CharacterAutomation $automation): bool {
+    protected function shouldBail(CharacterAutomation $automation = null): bool {
 
         if (is_null($automation)) {
             return true;
@@ -50,7 +70,17 @@ class AttackAutomation implements ShouldQueue
             return true;
         }
 
+        if (now()->greaterThanOrEqualTo($automation->completed_at)) {
+            return true;
+        }
+
         if (now()->diffInHours($automation->started_at) >= 8) {
+            $automation->character->update([
+                'is_attack_automation_locked' => true,
+            ]);
+
+            event(new ServerMessageEvent($automation->character->user, 'Attack Automation Suspended until tomorrow. You have reached the max time limit for today.'));
+
             return true;
         }
 

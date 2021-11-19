@@ -582,6 +582,7 @@ export default class Map extends React.Component {
                 openPortDetails={this.openPortDetails.bind(this)}
                 openTeleport={this.openTeleport.bind(this)}
                 charactersOnMap={this.state.charactersOnMap}
+                attackAutomationIsRunning={this.props.attackAutomationIsRunning}
               />
             </div>
           </div>
@@ -595,6 +596,7 @@ export default class Map extends React.Component {
             timeRemaining={this.state.timeRemaining}
             move={this.move.bind(this)}
             userId={this.props.userId}
+            attackAutomationIsRunning={this.props.attackAutomationIsRunning}
           />
         </div>
       </div>

@@ -45,37 +45,43 @@ class AccountDeletionJob implements ShouldQueue
     }
 
     public function handle(KingdomResourcesService $kingdomResourcesService) {
-        $user = $this->user;
-        $characterName = $user->character->name;
+        try {
+            $user = $this->user;
+            $characterName = $user->character->name;
 
-        $this->emptyCharacterInventory($user->character->inventory);
-        $this->emptyCharacterInventorysets($user->character->inventorySets);
-        $this->deleteCharacterMarketListings($user->character);
+            $this->emptyCharacterInventory($user->character->inventory);
+            $this->emptyCharacterInventorysets($user->character->inventorySets);
+            $this->deleteCharacterMarketListings($user->character);
 
-        foreach ($user->character->kingdoms as $kingdom) {
-            $kingdomResourcesService->setKingdom($kingdom)->giveNPCKingdoms(false);
+            foreach ($user->character->kingdoms as $kingdom) {
+                $kingdomResourcesService->setKingdom($kingdom)->giveNPCKingdoms(false, true);
+            }
+
+            $user->character->skills()->delete();
+
+            $this->deleteCharacter($user->character);
+
+            $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
+
+            UserSiteAccessStatistics::create([
+                'amount_signed_in' => $siteAccessStatistic->ammount_signed_in - 1,
+                'amount_registered' => $siteAccessStatistic->ammount_registered - 1,
+            ]);
+
+            $adminUser = User::with('roles')->whereHas('roles', function ($q) {
+                $q->where('name', 'Admin');
+            })->first();
+
+            broadcast(new UpdateSiteStatisticsChart($adminUser));
+
+            Mail::to($user)->send(new GenericMail($user, 'You requested your account to be deleted. We have done so, this is your final confirmation email.', 'Account Deletion', true));
+
+            $user->delete();
+
+            event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
+        } catch (\Exception $e) {
+            dd($e);
         }
-
-        $user->character->skills()->delete();
-
-        $this->deleteCharacter($user->character);
-
-        $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
-
-        UserSiteAccessStatistics::create([
-            'amount_signed_in'  => $siteAccessStatistic->ammount_signed_in - 1,
-            'amount_registered' => $siteAccessStatistic->ammount_registered - 1,
-        ]);
-
-        $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
-
-        broadcast(new UpdateSiteStatisticsChart($adminUser));
-
-        Mail::to($user)->send(new GenericMail($user, 'You requested your account to be deleted. We have done so, this is your final confirmation email.', 'Account Deletion', true));
-
-        $user->delete();
-
-        event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
     }
 
     protected function deleteCharacterMarketListings(Character $character) {
@@ -121,6 +127,8 @@ class AccountDeletionJob implements ShouldQueue
         $character->questsCompleted()->delete();
 
         $character->notifications()->delete();
+
+        $character->currentAutoMations()->delete();
 
         $character->map()->delete();
 

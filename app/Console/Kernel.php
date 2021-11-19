@@ -64,6 +64,9 @@ class Kernel extends ConsoleKernel {
 
         // clean the adventure logs every week on monday at 2 am.
         $schedule->command('clean:adventure-logs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
+
+        // Clears the auto attack time out on locked out players.
+        $schedule->command('clear:locked-auto-attack')->dailyAt('12:00')->timezone(config('app.timezone'));
     }
 
     /**
