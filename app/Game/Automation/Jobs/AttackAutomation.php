@@ -2,8 +2,11 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Flare\Models\Monster;
+use App\Game\Automation\Events\AutomatedAttackDetails;
 use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Events\AutomationAttackTimeOut;
+use App\Game\Automation\Services\AttackAutomationService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,7 +34,7 @@ class AttackAutomation implements ShouldQueue
         $this->attackType   = $attackType;
     }
 
-    public function handle(ProcessAttackAutomation $processAttackAutomation) {
+    public function handle(ProcessAttackAutomation $processAttackAutomation, AttackAutomationService $attackAutomationService) {
 
         event(new AutomationAttackTimeOut($this->character->user));
 
@@ -45,6 +48,34 @@ class AttackAutomation implements ShouldQueue
             event (new AutomatedAttackStatus($this->character->user, false));
 
             return;
+        }
+
+        if (!is_null($automation->move_down_monster_list_every)) {
+            $characterLevel = $this->character->refresh()->level;
+
+            $automation->update([
+                'current_level' => $characterLevel,
+            ]);
+
+            $automation = $automation->refresh();
+
+
+            if (($automation->current_level - $automation->previous_level) >= $automation->move_down_monster_list_every) {
+                $monster = Monster::find($automation->monster_id);
+
+                $nextMonster = Monster::where('id', '>', $monster->id)->orderBy('id','asc')->first();
+
+                if (!is_null($nextMonster)) {
+                    $automation->update([
+                        'monster_id'     => $nextMonster->id,
+                        'previous_level' => $characterLevel,
+                    ]);
+
+                    $data = $attackAutomationService->fetchData($this->character, $automation->refresh());
+
+                    event(new AutomatedAttackDetails($this->character->user, $data));
+                }
+            }
         }
 
         $timeTillNext = $processAttackAutomation->processFight($automation, $this->character, $this->attackType);

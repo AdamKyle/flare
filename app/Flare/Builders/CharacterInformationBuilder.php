@@ -49,6 +49,8 @@ class CharacterInformationBuilder {
 
         $this->inventory = $character->inventory->slots->where('equipped', true);
 
+        $this->characterAttackInformation = $this->characterAttackInformation->setCharacterInformationBuilder($this);
+
         return $this;
     }
 
@@ -139,18 +141,33 @@ class CharacterInformationBuilder {
                     ->findLifeStealingAffixes($canStack);
     }
 
+    /**
+     * Get the entrancing chance.
+     *
+     * @return float
+     */
     public function getEntrancedChance(): float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
                     ->calulateAttributeValue('entranced_chance');
     }
 
+    /**
+     * Get the best skill reduction amount.
+     *
+     * @return float
+     */
     public function getBestSkillReduction() : float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
                     ->calulateAttributeValue('skill_reduction');
     }
 
+    /**
+     * Get the best resistance reduction amount.
+     *
+     * @return float
+     */
     public function getBestResistanceReduction() : float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
@@ -166,29 +183,6 @@ class CharacterInformationBuilder {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
                     ->findSuffixStatReductionAffixes();
-    }
-
-    /**
-     * Build the characters damage stat.
-     *
-     * @param bool $voided
-     * @return float|int
-     * @throws \Exception
-     */
-    public function buildCharacterDamageStat(bool $voided = false): float|int {
-        $characterDamageStat = $this->statMod($this->character->damage_stat);
-
-        if ($voided) {
-            $characterDamageStat = $this->character->{$this->character->damage_stat};
-        }
-
-        $classType = $this->character->classType();
-
-        if ($classType->isFighter() || $classType->isRanger() || $classType->isThief()) {
-            return $characterDamageStat * 0.15;
-        }
-
-        return $characterDamageStat * 0.05;
     }
 
     /**
@@ -214,6 +208,30 @@ class CharacterInformationBuilder {
     }
 
     /**
+     * Build the characters damage stat.
+     *
+     * @param bool $voided
+     * @return float|int
+     * @throws \Exception
+     */
+    public function buildCharacterDamageStat(bool $voided = false): float|int {
+        $characterDamageStat = $this->statMod($this->character->damage_stat);
+
+        if ($voided) {
+            $characterDamageStat = $this->character->{$this->character->damage_stat};
+        }
+
+        $classType = $this->character->classType();
+
+        if ($classType->isFighter() || $classType->isRanger() || $classType->isThief()) {
+            return $characterDamageStat * 0.15;
+        }
+
+        return $characterDamageStat * 0.05;
+    }
+
+
+    /**
      * Build heal for
      *
      * Fetches the total healing amount based on skills and equipment.
@@ -223,66 +241,8 @@ class CharacterInformationBuilder {
      */
     public function buildHealFor(bool $voided = false): int {
         return $this->characterAttackInformation
-                    ->setCharacter($this->character)
-                    ->buildHealFor($voided);
-    }
-
-    /**
-     * Fetch the resurrection chance;
-     *
-     * @return float
-     * @throws \Exception
-     */
-    public function fetchResurrectionChance(): float {
-        $resurrectionItems = $this->fetchInventory()->filter(function($slot) {
-            return $slot->item->can_resurrect;
-        });
-
-        $chance    = 0.0;
-        $classType = new CharacterClassValue($this->character->class->name);
-
-        if ($classType->isProphet()) {
-            $chance += 0.05;
-        }
-
-        if ($resurrectionItems->isEmpty()) {
-             return $chance;
-        }
-
-        $chance += $resurrectionItems->sum('item.resurrection_chance');
-
-        return $chance;
-    }
-
-    /**
-     * Build total health
-     *
-     * Build the characters health based off equipment, plus the characters health and
-     * a base of 10.
-     *
-     * @return int
-     */
-    public function buildHealth(bool $voided = false): int {
-
-        if ($this->character->is_dead) {
-            return 0;
-        }
-
-        $baseHealth = $this->character->dur + 10;
-
-        if ($voided) {
-            return $baseHealth;
-        }
-
-        foreach ($this->fetchInventory() as $slot) {
-            if ($slot->equipped) {
-                $percentage = $slot->item->getTotalPercentageForStat('dur');
-
-                $baseHealth += $baseHealth * $percentage;
-            }
-        }
-
-        return $baseHealth;
+            ->setCharacter($this->character)
+            ->buildHealFor($voided);
     }
 
     /**
@@ -344,19 +304,8 @@ class CharacterInformationBuilder {
      */
     public function getTotalAffixDamage(bool $canStack = true): int {
         return $this->characterAttackInformation
-                    ->setCharacter($this->character)
-                    ->getTotalAffixDamage($canStack);
-    }
-
-    /**
-     * Does the character have any damage spells
-     *
-     * @return bool
-     */
-    public function hasDamageSpells(): bool {
-        return $this->fetchInventory()->filter(function ($slot) {
-            return $slot->item->type === 'spell-damage' && $slot->equipped;
-        })->isNotEmpty();
+            ->setCharacter($this->character)
+            ->getTotalAffixDamage($canStack);
     }
 
     public function getTotalWeaponDamage(bool $voided = false): int {
@@ -390,16 +339,36 @@ class CharacterInformationBuilder {
         return $this->getRingDamage($voided);
     }
 
+    /**
+     * Get the total deduction for the type.
+     *
+     * @param string $type
+     * @return float
+     */
     public function getTotalDeduction(string $type): float {
         return $this->getDeduction($type);
     }
 
+    /**
+     * Get the total devouring light amount.
+     *
+     * @return float
+     */
     public function getDevouringLight(): float {
-        return $this->fetchVoidanceAmount('devouring_light');
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->fetchVoidanceAmount('devouring_light');
     }
 
+    /**
+     * Get the total devouring darkness amount.
+     *
+     * @return float
+     */
     public function getDevouringDarkness(): float {
-        return $this->fetchVoidanceAmount('devouring_darkness');
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->fetchVoidanceAmount('devouring_darkness');
     }
 
     /**
@@ -420,33 +389,75 @@ class CharacterInformationBuilder {
         return  $this->getSpellEvasion();
     }
 
-    protected function fetchVoidanceAmount(string $type): float {
-        $voidance = 0.0;
-
-        $slot = $this->character->inventory->slots->filter(function($slot) use($type) {
-           return $slot->item->type === 'quest' && $slot->item->{$type} > 0;
-        })->first();
-
-        if (!is_null($slot)) {
-            $voidance = $slot->item->{$type};
-        }
-
-        return $voidance + $this->fetchVoidanceFromAffixes($type);
+    /**
+     * Fetch the resurrection chance;
+     *
+     * @return float
+     * @throws \Exception
+     */
+    public function fetchResurrectionChance(): float {
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->fetchResurrectionChance();
     }
 
-    private function fetchVoidanceFromAffixes(string $type): float {
-        $prefixDevouringLight  = $this->fetchInventory()->pluck('item.itemPrefix.' . $type)->toArray();
-        $sufficDevouringLight  = $this->fetchInventory()->pluck('item.itemSuffix.' . $type)->toArray();
+    /**
+     * Build total health
+     *
+     * Build the characters health based off equipment, plus the characters health and
+     * a base of 10.
+     *
+     * @return int
+     */
+    public function buildHealth(bool $voided = false): int {
 
-        $amounts = [...$prefixDevouringLight, ...$sufficDevouringLight];
-
-        if (empty($amounts)) {
-            return 0.0;
+        if ($this->character->is_dead) {
+            return 0;
         }
 
-        $max = max($amounts);
+        $baseHealth = $this->character->dur + 10;
 
-        return is_null($max) ? 0.0 : $max;
+        if ($voided) {
+            return $baseHealth;
+        }
+
+        foreach ($this->fetchInventory() as $slot) {
+            if ($slot->equipped) {
+                $percentage = $slot->item->getTotalPercentageForStat('dur');
+
+                $baseHealth += $baseHealth * $percentage;
+            }
+        }
+
+        return $baseHealth;
+    }
+
+    /**
+     * Does the character have any damage spells
+     *
+     * @return bool
+     */
+    public function hasDamageSpells(): bool {
+        return $this->fetchInventory()->filter(function ($slot) {
+            return $slot->item->type === 'spell-damage' && $slot->equipped;
+        })->isNotEmpty();
+    }
+
+    /**
+     * Fetch the appropriate inventory.
+     *
+     * Either return the current inventory, by default, if not empty or
+     * return the inventory set that is currently equipped.
+     *
+     * Players cannot have both equipped at the same time.
+     *
+     * @return Collection
+     */
+    public function fetchInventory(): Collection
+    {
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->fetchInventory();
     }
 
     /**
@@ -466,24 +477,6 @@ class CharacterInformationBuilder {
         }
 
         return $base;
-    }
-
-    protected function getHighestDamageValueFromAffixes(Collection $slots, string $suffixType): int {
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->{$suffixType})) {
-                if ($slot->item->{$suffixType}->damage > 0) {
-                    $values[] = $slot->item->{$suffixType}->damage;
-                }
-            }
-        }
-
-        if (empty($values)) {
-            return 0;
-        }
-
-        return max($values);
     }
 
     protected function getDeduction(string $type): float {
@@ -539,20 +532,6 @@ class CharacterInformationBuilder {
 
         foreach ($skills as $skill) {
             $percentageBonus += $skill->base_damage_mod;
-        }
-
-        return $percentageBonus;
-    }
-
-    protected function fetchSkillHealingMod(): float {
-        $percentageBonus = 0.0;
-
-        $skills = $this->character->skills->filter(function($skill) {
-            return is_null($skill->baseSkill->game_class_id);
-        })->all();
-
-        foreach ($skills as $skill) {
-            $percentageBonus += $skill->base_healing_mod;
         }
 
         return $percentageBonus;
@@ -734,45 +713,6 @@ class CharacterInformationBuilder {
         }
 
         return $defence;
-    }
-
-    protected function fetchHealingAmount(bool $voided = false): int {
-        $healFor = 0;
-
-        foreach ($this->fetchInventory() as $slot) {
-            if (!$voided) {
-                $healFor += $slot->item->getTotalHealing();
-            } else {
-                $healFor += $slot->item->base_healing;
-            }
-        }
-
-        return $healFor;
-    }
-
-    /**
-     * Fetch the appropriate inventory.
-     *
-     * Either return the current inventory, by default, if not empty or
-     * return the inventory set that is currently equipped.
-     *
-     * Players cannot have both equipped at the same time.
-     *
-     * @return Collection
-     */
-    public function fetchInventory(): Collection
-    {
-        if ($this->inventory->isNotEmpty()) {
-            return $this->inventory;
-        }
-
-        $inventorySet = $this->character->inventorySets()->where('is_equipped', true)->first();
-
-        if (!is_null($inventorySet)) {
-            return $inventorySet->slots;
-        }
-
-        return $this->inventory;
     }
 
     protected function fetchModdedStat(string $stat, Item $item): float {

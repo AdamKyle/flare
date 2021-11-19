@@ -20,6 +20,11 @@ class CharacterAttackInformation {
     private $character;
 
     /**
+     * @var CharacterInformationBuilder $characterInformationBuilder;
+     */
+    private $characterInformationBuilder;
+
+    /**
      * @var Collection $inventory
      */
     private $inventory;
@@ -32,6 +37,18 @@ class CharacterAttackInformation {
         $this->character = $character;
 
         $this->inventory = $character->inventory->slots->where('equipped', true);
+
+        return $this;
+    }
+
+    /**
+     * Sets the character information builder.
+     *
+     * @param CharacterInformationBuilder $characterInformationBuilder
+     * @return CharacterAttackInformation
+     */
+    public function setCharacterInformationBuilder(CharacterInformationBuilder $characterInformationBuilder): CharacterAttackInformation {
+        $this->characterInformationBuilder = $characterInformationBuilder;
 
         return $this;
     }
@@ -197,7 +214,7 @@ class CharacterAttackInformation {
             if ($voided) {
                 $healingAmount += $this->character->chr * 0.15;
             } else {
-                $healingAmount += $this->statMod('chr') * 0.15;
+                $healingAmount += $this->characterInformationBuilder->statMod('chr') * 0.15;
             }
 
         }
@@ -209,12 +226,33 @@ class CharacterAttackInformation {
                 if ($voided) {
                     $healingAmount += $this->character->{$dmgStat} * 0.30;
                 } else {
-                    $healingAmount += $this->statMod($this->character->{$dmgStat}) * 0.30;
+                    $healingAmount += $this->characterInformationBuilder->statMod($this->character->{$dmgStat}) * 0.30;
                 }
             }
         }
 
         return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+    }
+
+    public function fetchResurrectionChance(): float {
+        $resurrectionItems = $this->fetchInventory()->filter(function($slot) {
+            return $slot->item->can_resurrect;
+        });
+
+        $chance    = 0.0;
+        $classType = new CharacterClassValue($this->character->class->name);
+
+        if ($classType->isProphet()) {
+            $chance += 0.05;
+        }
+
+        if ($resurrectionItems->isEmpty()) {
+            return $chance;
+        }
+
+        $chance += $resurrectionItems->sum('item.resurrection_chance');
+
+        return $chance;
     }
 
     /**
@@ -265,6 +303,26 @@ class CharacterAttackInformation {
         });
 
         return $this->calculateTotalStackingAffixDamage($slots, $canStack);
+    }
+
+    /**
+     * Fetch Voidance amount.
+     *
+     * @param string $type
+     * @return float
+     */
+    public function fetchVoidanceAmount(string $type): float {
+        $voidance = 0.0;
+
+        $slot = $this->character->inventory->slots->filter(function($slot) use($type) {
+            return $slot->item->type === 'quest' && $slot->item->{$type} > 0;
+        })->first();
+
+        if (!is_null($slot)) {
+            $voidance = $slot->item->{$type};
+        }
+
+        return $voidance + $this->fetchVoidanceFromAffixes($type);
     }
 
     /**
@@ -398,5 +456,84 @@ class CharacterAttackInformation {
         }
 
         return $totalPercent;
+    }
+
+    /**
+     * Get the highest damage value from all affixes.
+     *
+     * @param Collection $slots
+     * @param string $suffixType
+     * @return int
+     */
+    protected function getHighestDamageValueFromAffixes(Collection $slots, string $suffixType): int {
+        $values = [];
+
+        foreach ($slots as $slot) {
+            if (!is_null($slot->item->{$suffixType})) {
+                if ($slot->item->{$suffixType}->damage > 0) {
+                    $values[] = $slot->item->{$suffixType}->damage;
+                }
+            }
+        }
+
+        if (empty($values)) {
+            return 0;
+        }
+
+        return max($values);
+    }
+
+    /**
+     * Fetch the healing amount.
+     *
+     * @param bool $voided
+     * @return int
+     */
+    protected function fetchHealingAmount(bool $voided = false): int {
+        $healFor = 0;
+
+        foreach ($this->fetchInventory() as $slot) {
+            if (!$voided) {
+                $healFor += $slot->item->getTotalHealing();
+            } else {
+                $healFor += $slot->item->base_healing;
+            }
+        }
+
+        return $healFor;
+    }
+
+    /**
+     * Fetch the skill healing amount modifier
+     *
+     * @return float
+     */
+    protected function fetchSkillHealingMod(): float {
+        $percentageBonus = 0.0;
+
+        $skills = $this->character->skills->filter(function($skill) {
+            return is_null($skill->baseSkill->game_class_id);
+        })->all();
+
+        foreach ($skills as $skill) {
+            $percentageBonus += $skill->base_healing_mod;
+        }
+
+        return $percentageBonus;
+    }
+
+    private function fetchVoidanceFromAffixes(string $type): float {
+        $prefixDevouringLight  = $this->fetchInventory()->pluck('item.itemPrefix.' . $type)->toArray();
+        $sufficDevouringLight  = $this->fetchInventory()->pluck('item.itemSuffix.' . $type)->toArray();
+
+        $amounts = [...$prefixDevouringLight, ...$sufficDevouringLight];
+
+        if (empty($amounts)) {
+            return 0.0;
+        }
+
+        $max = max($amounts);
+
+        return is_null($max) ? 0.0 : $max;
     }
 }

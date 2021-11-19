@@ -20,6 +20,7 @@ export default class AutoAttackSection extends React.Component {
       isDead: this.props.character.is_dead,
       errorMessage: null,
       successMessage: null,
+      successTitle: null,
       isLoading: false,
       timeRemaining: null,
       showSkillSection: false,
@@ -39,6 +40,7 @@ export default class AutoAttackSection extends React.Component {
 
     this.automation               = Echo.private('automation-attack-timeout-' + this.props.userId);
     this.automationAttackMessages = Echo.private('automation-attack-messages-' + this.props.userId);
+    this.automationAttackDetails  = Echo.private('automation-attack-details-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -76,6 +78,12 @@ export default class AutoAttackSection extends React.Component {
         attackMessages: event.messages,
       })
     });
+    
+    this.automationAttackDetails.listen('Game.Automation.Events.AutomatedAttackDetails', (event) => {
+      this.setState({
+        params: event.details,
+      })
+    })
   }
 
   updateSelectedMonster(event) {
@@ -152,11 +160,15 @@ export default class AutoAttackSection extends React.Component {
   updateMoveDownListEvery(event) {
     const params = _.cloneDeep(this.state.params);
 
-    params.move_down_the_list_every = parseInt(event.target.value) || 0;
+    const value = parseInt(event.target.value) || 0;
 
-    this.setState({
-      params: params,
-    });
+    if (value > 0) {
+      params.move_down_the_list_every = value;
+
+      this.setState({
+        params: params,
+      });
+    }
   }
 
   updateAutoAttackLength(event) {
@@ -232,6 +244,7 @@ export default class AutoAttackSection extends React.Component {
         this.setState({
           isLoading: false,
           successMessage: result.data.message,
+          successTitle: 'It has begun!'
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {
@@ -259,6 +272,7 @@ export default class AutoAttackSection extends React.Component {
         this.setState({
           isLoading: false,
           successMessage: result.data.message,
+          successTitle: 'Stopping ...'
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {
@@ -295,7 +309,7 @@ export default class AutoAttackSection extends React.Component {
                 {
                   this.state.successMessage !== null ?
                     <AlertSuccess icon={"fas fa-check-circle"}
-                                  title={this.props.attackAutomationIsRunning ? 'It has begun!' : 'Stopping ...'}
+                                  title={this.state.successTitle}
                                   showClose={true}
                                   closeAlert={this.closeSuccess.bind(this)}
                     >
@@ -470,11 +484,12 @@ export default class AutoAttackSection extends React.Component {
                           onChange={this.updateMoveDownListEvery.bind(this)}
                           disabled={this.disabledInput()}
                   >
-                    <option>1 level</option>
-                    <option>5 levels</option>
-                    <option>10 levels</option>
-                    <option>15 levels</option>
-                    <option>20 levels</option>
+                    <option value="0" key="-1">Please select a monster</option>
+                    <option value={1} key={1}>1 level</option>
+                    <option value={5} key={5}>5 levels</option>
+                    <option value={10} key={10}>10 levels</option>
+                    <option value={15} key={15}>15 levels</option>
+                    <option value={20} key={20}>20 levels</option>
                   </select>
                 </div>
               </div>

@@ -12,31 +12,10 @@ use App\Game\Automation\Request\AttackAutomationStartRequest;
 
 class AttackAutomationController extends Controller {
 
-    public function index(Character $character) {
+    public function index(Character $character, AttackAutomationService $attackAutomationService) {
         $automation = $character->currentAutomations()->where('type', AutomationType::ATTACK)->first();
 
-        $skillCurrentlyTraining = $character->skills->filter(function ($skill) {
-            return $skill->currently_training;
-        })->first();
-
-        $data = [];
-
-        if (!is_null($automation)) {
-            $data = [
-                'id'                       => $automation->id,
-                'skill_id'                 => !is_null($skillCurrentlyTraining) ? $skillCurrentlyTraining->id : null,
-                'xp_towards'               => !is_null($skillCurrentlyTraining) ? $skillCurrentlyTraining->xp_towards : null,
-                'auto_attack_length'       => $automation->completed_at->diffInHours($automation->started_at),
-                'move_down_the_list_every' => $automation->move_down_monster_list_every,
-                'selected_monster_id'      => $automation->monster_id,
-                'attack_type'              => $automation->attack_type,
-            ];
-
-            event(new AutomatedAttackStatus($character->user, true));
-        } else {
-            event(new AutomatedAttackStatus($character->user, false));
-        }
-
+        $data = $attackAutomationService->fetchData($character, $automation);
 
         return response()->json([
             'automation' => $data,
