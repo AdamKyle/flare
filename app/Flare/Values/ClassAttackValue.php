@@ -28,7 +28,7 @@ class ClassAttackValue {
 
     public function __construct(Character $character) {
         $this->classType     = new CharacterClassValue($character->class->name);
-        $this->characterInfo = (new CharacterInformationBuilder())->setCharacter($character);
+        $this->characterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
         $this->character     = $character;
     }
 

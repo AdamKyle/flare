@@ -17,6 +17,11 @@ class CharacterInformationBuilder {
     use ClassBasedBonuses;
 
     /**
+     * @var CharacterAttackInformation $characterAttackInformation
+     */
+    private $characterAttackInformation;
+
+    /**
      * @var Character $character
      */
     private $character;
@@ -25,6 +30,13 @@ class CharacterInformationBuilder {
      * @var Illuminate\Support\Collection $inventory
      */
     private $inventory;
+
+    /**
+     * @param CharacterAttackInformation $characterAttackInformation
+     */
+    public function __construct(CharacterAttackInformation $characterAttackInformation) {
+        $this->characterAttackInformation = $characterAttackInformation;
+    }
 
     /**
      * Set the character and fetch its inventory.
@@ -71,6 +83,12 @@ class CharacterInformationBuilder {
         return $this->characterBoons($base);
     }
 
+    /**
+     * Gets a specific skill based on name.
+     *
+     * @param string $skillName
+     * @return float
+     */
     public function getSkill(string $skillName): float {
         $skill = $this->character->skills->filter(function($skill) use ($skillName) {
             return $skill->name === $skillName;
@@ -88,33 +106,9 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function classBonus(): float {
-        $slots = $this->fetchInventory()->filter(function($slot) {
-           if (!is_null($slot->item->itemPrefix))  {
-               if ($slot->item->itemPrefix->class_bonus > 0) {
-                   return $slot;
-               }
-           }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                if ($slot->item->itemSuffix->class_bonus > 0) {
-                    return $slot;
-                }
-            }
-        });
-
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                $values[] = $slot->item->itemPrefix->class_bonus;
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                $values[] = $slot->item->itemSuffix->class_bonus;
-            }
-        }
-
-        return empty($values) ? 0.0 : max($values);
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->calulateAttributeValue('class_bonus');
     }
 
     /**
@@ -128,19 +122,9 @@ class CharacterInformationBuilder {
      * @return ItemAffix|null
      */
     public function findPrefixStatReductionAffix(): ?ItemAffix {
-        $slot = $this->fetchInventory()->filter(function($slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                if ($slot->item->itemPrefix->reduces_enemy_stats) {
-                    return $slot;
-                }
-            }
-        })->first();
-
-        if (!is_null($slot)) {
-            return $slot->item->itemPrefix;
-        }
-
-        return null;
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->findPrefixStatReductionAffix();
     }
 
     /**
@@ -150,178 +134,27 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function findLifeStealingAffixes(bool $canStack = false): float {
-        $slots = $this->fetchInventory()->filter(function($slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                if (!is_null($slot->item->itemPrefix->steal_life_amount)) {
-                    return $slot;
-                }
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                if (!is_null($slot->item->itemSuffix->steal_life_amount)) {
-                    return $slot;
-                }
-            }
-        });
-
-        if ($canStack) {
-            $total = ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix'));
-
-            if ($total > 1.0) {
-                return 0.99;
-            }
-
-            return $total;
-        }
-
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                $values[] = $slot->item->itemPrefix->steal_life_amount;
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                $values[] = $slot->item->itemSuffix->steal_life_amount;
-            }
-        }
-
-        $value = empty($values) ? 0.0 : max($values);
-
-        return $value > 1.0 ? .99 : $value;
-    }
-
-    protected function handleLifeStealingAmount(Collection $slots, string $type): float {
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->{$type})) {
-                if (empty($values)) {
-                    $values[] = $slot->item->{$type}->steal_life_amount;
-                } else {
-                    $values[] = ($slot->item->{$type}->steal_life_amount);
-                }
-            }
-        }
-
-        rsort($values);
-
-        $totalPercent     = 0;
-        $additionalValues = [];
-
-        foreach ($values as $value) {
-            if ($totalPercent === 0) {
-                $totalPercent = $value;
-            } else {
-                $additionalValues[] = ($value / 2);
-            }
-        }
-
-        $sumOfValues = array_sum($additionalValues);
-        
-        if ($sumOfValues > 0) {
-            $totalPercent = $totalPercent * ($sumOfValues * 0.75);
-        }
-
-        if ($totalPercent > 1.0) {
-            return 0.99;
-        }
-
-        if (is_null($totalPercent)) {
-            return 0.0;
-        }
-
-        return $totalPercent;
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->findLifeStealingAffixes($canStack);
     }
 
     public function getEntrancedChance(): float {
-        $slots = $this->fetchInventory()->filter(function($slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                if ($slot->item->itemPrefix->entranced_chance > 0) {
-                    return $slot;
-                }
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                if ($slot->item->itemSuffix->entranced_chance > 0) {
-                    return $slot;
-                }
-            }
-        });
-
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                $values[] = $slot->item->itemPrefix->entranced_chance;
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                $values[] = $slot->item->itemSuffix->entranced_chance;
-            }
-        }
-
-        return empty($values) ? 0.0 : max($values);
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->calulateAttributeValue('entranced_chance');
     }
 
     public function getBestSkillReduction() : float {
-        $slots = $this->fetchInventory()->filter(function($slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                if ($slot->item->itemPrefix->skill_reduction > 0) {
-                    return $slot;
-                }
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                if ($slot->item->itemSuffix->skill_reduction > 0) {
-                    return $slot;
-                }
-            }
-        });
-
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                $values[] = $slot->item->itemPrefix->skill_reduction;
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                $values[] = $slot->item->itemSuffix->skill_reduction;
-            }
-        }
-
-        return empty($values) ? 0.0 : max($values);
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->calulateAttributeValue('skill_reduction');
     }
 
     public function getBestResistanceReduction() : float {
-        $slots = $this->fetchInventory()->filter(function($slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                if ($slot->item->itemPrefix->resistance_reduction > 0) {
-                    return $slot;
-                }
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                if ($slot->item->itemSuffix->resistance_reduction > 0) {
-                    return $slot;
-                }
-            }
-        });
-
-        $values = [];
-
-        foreach ($slots as $slot) {
-            if (!is_null($slot->item->itemPrefix))  {
-                $values[] = $slot->item->itemPrefix->resistance_reduction;
-            }
-
-            if (!is_null($slot->item->itemSuffix))  {
-                $values[] = $slot->item->itemSuffix->resistance_reduction;
-            }
-        }
-
-        return empty($values) ? 0.0 : max($values);
+        return $this->characterAttackInformation
+                    ->setCharacter($this->character)
+                    ->calulateAttributeValue('resistance_reduction');
     }
 
     /**

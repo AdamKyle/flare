@@ -4,6 +4,7 @@ namespace App\Flare\Providers;
 
 
 use App\Flare\Builders\CharacterAttackBuilder;
+use App\Flare\Builders\CharacterAttackInformation;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
@@ -67,8 +68,14 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterBuilder();
         });
 
+        $this->app->bind(CharacterAttackInformation::class, function() {
+            return new CharacterAttackInformation();
+        });
+
         $this->app->bind(CharacterInformationBuilder::class, function($app) {
-            return new CharacterInformationBuilder();
+            return new CharacterInformationBuilder(
+                $app->make(CharacterAttackInformation::class)
+            );
         });
 
         $this->app->bind(CharacterAttackBuilder::class, function($app) {
