@@ -30,9 +30,8 @@ class GoldRushCheckListener
 
         if ($hasGoldRush) {
             $goldRush = ceil($event->character->gold + $event->character->gold * 0.03);
-            $newGold  = $event->character->gold + $goldRush;
 
-            $maxCurrentices = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
+            $maxCurrentices = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
             if ($maxCurrentices->canNotGiveCurrency()) {
                 event(new UpdateTopBarEvent($event->character->refresh()));
