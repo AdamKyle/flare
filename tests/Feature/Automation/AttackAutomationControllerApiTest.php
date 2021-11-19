@@ -32,7 +32,7 @@ class AttackAutomationControllerApiTest extends TestCase
     public function testCanGetAttackAutomation() {
         $character = $this->character->getCharacter(false);
 
-        $automation = $this->createAttackAutomation([
+        $this->createAttackAutomation([
             'character_id' => $character->id,
             'monster_id'   => $this->monster->id,
             'started_at'   => now(),
@@ -41,11 +41,21 @@ class AttackAutomationControllerApiTest extends TestCase
         ]);
 
         $response = $this->actingAs($character->user)->getJson(route('attack.automation.index', [
-            'characterAutomation' => $automation->id,
             'character'           => $character->id
         ]))->response;
 
         $this->assertEquals(200, $response->status());
+    }
+
+    public function testHasNoAutomation() {
+        $character = $this->character->getCharacter(false);
+
+        $response = $this->actingAs($character->user)->getJson(route('attack.automation.index', [
+            'character'           => $character->id
+        ]))->response;
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEmpty(json_decode($response->content())->automation);
     }
 
     public function testCanDoAutoAttack() {

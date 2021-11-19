@@ -4,7 +4,6 @@ namespace App\Game\Automation\Middleware;
 
 use App\Game\Automation\Values\AutomationType;
 use Closure;
-use Illuminate\Support\Facades\Auth;
 
 class IsCharacterInAttackAutomation
 {
@@ -18,11 +17,6 @@ class IsCharacterInAttackAutomation
      */
     public function handle($request, Closure $next, $guard = null)
     {
-
-        if (auth()->user()->hasRole('Admin')) {
-            return $next($request);
-        }
-        
         $isTooBusy = auth()->user()->character->currentAutomations->where('type', AutomationType::ATTACK)->isNotEmpty();
 
         if ($request->wantsJson()) {

@@ -207,6 +207,38 @@ class CharacterFactory {
         return $this;
     }
 
+    public function equipStrongGear() {
+        $item = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => '1000000'
+        ]);
+
+        $itemTwo = $this->createItem([
+            'name'        => 'Rusty Dagger',
+            'type'        => 'weapon',
+            'base_damage' => '1000000'
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $item->id,
+            'equipped'     => true,
+            'position'     => 'right-hand'
+        ]);
+
+        $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id'      => $itemTwo->id,
+            'equipped'     => true,
+            'position'     => 'left-hand'
+        ]);
+
+        resolve(BuildCharacterAttackTypes::class)->buildCache($this->character->refresh());
+
+        return $this;
+    }
+
     /**
      * Creates a location for the player.
      *

@@ -35,7 +35,9 @@ class AttackAutomationService {
         $result = $this->switchSkills($character, $params['skill_id'], $params['xp_towards']);
 
         if (!$result instanceof Character) {
+            // @codeCoverageIgnoreStart
             return $result;
+            // @codeCoverageIgnoreEnd
         }
 
         $character = $result;
@@ -70,7 +72,9 @@ class AttackAutomationService {
         $result = $this->skillService->trainSkill($character, $skillId, $xp);
 
         if ($result['status'] !== 200) {
+            // @codeCoverageIgnoreStart
             return $result;
+            // @codeCoverageIgnoreEnd
         }
 
         return $character->refresh();

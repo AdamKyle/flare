@@ -24,7 +24,7 @@ class AutomationType {
      * @param string $value
      * @throws \Exception
      */
-    public function __construct(string $value)
+    public function __construct(int $value)
     {
         if (!in_array($value, self::$values)) {
             throw new \Exception($value . ' does not exist.');
