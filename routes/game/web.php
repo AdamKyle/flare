@@ -4,27 +4,36 @@ Route::get('/items/{item}', ['as' => 'game.items.item', 'uses' => 'ItemsControll
 Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'MonstersController@show']);
 Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 
-Route::middleware(['is.player.banned', 'is.character.who.they.say.they.are', 'is.globally.timed.out'])->group(function() {
+Route::middleware([
+    'is.player.banned',
+    'is.character.who.they.say.they.are',
+    'is.globally.timed.out',
+])->group(function() {
 
     // Core routes for the game related stuff:
     Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);
 
-    Route::get('/shop/buy/{character}', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
-    Route::get('/shop/sell/{character}', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
-    Route::get('/shop/compare/item/{character}', ['as' => 'game.shop.compare.item', 'uses' => 'ShopController@shopCompare']);
-    Route::get('/shop/view/comparison/{character}', ['as' => 'game.shop.view.comparison', 'uses' => 'ShopController@viewShopCompare']);
-    Route::post('/shop/sell-all/{character}', ['as' => 'game.shop.sell.all', 'uses' => 'ShopController@shopSellAll']);
-    Route::post('/shop/buy-bulk/{character}', ['as' => 'game.shop.buy.bulk', 'uses' => 'ShopController@shopBuyBulk']);
-    Route::post('/shop/buy/item/{character}', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
-    Route::post('/shop/sell-bulk/{character}', ['as' => 'game.shop.sell.bulk', 'uses' => 'ShopController@shopSellBulk']);
-    Route::post('/shop/sell/item/{character}', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
-    Route::post('/shop/buy-and-replace/{character}', ['as' => 'game.shop.buy-and-replace', 'uses' => 'ShopController@buyAndReplace']);
+    Route::middleware(['character.attack.automation'])->group(function() {
+        Route::get('/shop/buy/{character}', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
+        Route::get('/shop/sell/{character}', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
+        Route::get('/shop/compare/item/{character}', ['as' => 'game.shop.compare.item', 'uses' => 'ShopController@shopCompare']);
+        Route::get('/shop/view/comparison/{character}', ['as' => 'game.shop.view.comparison', 'uses' => 'ShopController@viewShopCompare']);
+        Route::post('/shop/sell-all/{character}', ['as' => 'game.shop.sell.all', 'uses' => 'ShopController@shopSellAll']);
+        Route::post('/shop/buy-bulk/{character}', ['as' => 'game.shop.buy.bulk', 'uses' => 'ShopController@shopBuyBulk']);
+        Route::post('/shop/buy/item/{character}', ['as' => 'game.shop.buy.item', 'uses' => 'ShopController@buy']);
+        Route::post('/shop/sell-bulk/{character}', ['as' => 'game.shop.sell.bulk', 'uses' => 'ShopController@shopSellBulk']);
+        Route::post('/shop/sell/item/{character}', ['as' => 'game.shop.sell.item', 'uses' => 'ShopController@sell']);
+        Route::post('/shop/buy-and-replace/{character}', ['as' => 'game.shop.buy-and-replace', 'uses' => 'ShopController@buyAndReplace']);
+    });
+
 
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
 
-    Route::get('/game/character/inventory/compare/{character}', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
-    Route::get('/game/character/inventory/compare-items/{user}', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
-    Route::post('/game/equip/item/{character}', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
+    Route::middleware(['character.attack.automation'])->group(function() {
+        Route::get('/game/character/inventory/compare/{character}', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
+        Route::get('/game/character/inventory/compare-items/{user}', ['as' => 'game.inventory.compare-items', 'uses' => 'CharacterInventoryController@compareItem']);
+        Route::post('/game/equip/item/{character}', ['as' => 'game.equip.item', 'uses' => 'CharacterInventoryController@equipItem']);
+    });
 
     Route::get('/skill/{skill}', ['as' => 'skill.character.info', 'uses' => 'CharacterSkillController@show']);
 

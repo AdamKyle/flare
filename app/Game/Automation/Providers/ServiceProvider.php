@@ -8,6 +8,7 @@ use App\Flare\Services\FightService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Game\Automation\Console\Commands\ClearAutoAttackTimeOuts;
+use App\Game\Automation\Middleware\IsCharacterInAttackAutomation;
 use App\Game\Automation\Services\AttackAutomationService;
 use App\Game\Automation\Services\ProcessAttackAutomation;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -50,6 +51,8 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function boot()
     {
-        //
+        $router = $this->app['router'];
+
+        $router->aliasMiddleware('character.attack.automation', IsCharacterInAttackAutomation::class);
     }
 }

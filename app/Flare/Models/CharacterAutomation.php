@@ -3,10 +3,15 @@
 namespace App\Flare\Models;
 
 use App\Game\Automation\Values\AutomationType;
+use Database\Factories\CelestialFightFactory;
+use Database\Factories\CharacterAutomationFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CharacterAutomation extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -49,5 +54,9 @@ class CharacterAutomation extends Model
 
     public function type(): AutomationType {
         return (new AutomationType($this->type));
+    }
+
+    protected static function newFactory() {
+        return CharacterAutomationFactory::new();
     }
 }
