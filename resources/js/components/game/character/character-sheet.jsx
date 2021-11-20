@@ -4,6 +4,7 @@ import CharacterDetails from "./sheet/character-details";
 import Boons from "./boons";
 import InventoryDetails from "./sheet/Inventory-details";
 import SkillDetails from "./sheet/skill-details";
+import Automations from "./automations";
 
 export default class CharacterSheet extends React.Component {
 
@@ -51,6 +52,18 @@ export default class CharacterSheet extends React.Component {
     });
   }
 
+  automationsTitle() {
+    const automations = this.state.characterSheet.automations;
+
+    if (automations.length > 0) {
+      return <span className="tw-text-green-600">
+        <i className="fas fa-cog fa-spin"></i> Current Automations
+      </span>
+    }
+
+    return <span>Current Automations</span>
+  }
+
   render() {
     return (
       <>
@@ -92,6 +105,9 @@ export default class CharacterSheet extends React.Component {
                     </Tab>
                     <Tab eventKey="character-boons" title="Active Boons">
                       <Boons characterId={this.props.characterId} userId={this.props.userId} />
+                    </Tab>
+                    <Tab eventKey="character-automation" title={this.automationsTitle()}>
+                      <Automations automations={this.state.characterSheet.automations} />
                     </Tab>
                   </Tabs>
                   <SkillDetails

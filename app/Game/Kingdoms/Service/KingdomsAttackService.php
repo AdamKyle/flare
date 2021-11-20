@@ -65,7 +65,7 @@ class KingdomsAttackService {
         if (is_null($defender)) {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
         }
-        Log::info($params);
+
         foreach ($params as $kingdomName => $units) {
             $kingdom = Kingdom::where('character_id', $character->id)
                               ->where('name', $kingdomName)
@@ -78,9 +78,6 @@ class KingdomsAttackService {
             $unitsToSend = [];
 
             try {
-                Log::info($kingdomName);
-                Log::info($units);
-                Log::info($kingdom->name);
                 $unitsToSend = $this->fetchUnitsToSend($kingdom, $units);
             } catch (\Exception $e) {
                 return $this->errorResult($e->getMessage());

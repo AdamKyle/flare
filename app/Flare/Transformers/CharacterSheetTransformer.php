@@ -2,11 +2,13 @@
 
 namespace App\Flare\Transformers;
 
+use App\Game\Automation\Values\AutomationType;
 use Cache;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Values\View\ClassBonusInformation;
+use Illuminate\Support\Collection;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -78,6 +80,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'devouring_light'   => $characterInformation->getDevouringLight(),
             'devouring_darkness' => $characterInformation->getDevouringDarkness(),
             'attack_stats'       => Cache::get('character-attack-data-' . $character->id),
+            'automations'        => $this->getAutomations($character),
         ];
     }
 
@@ -91,5 +94,13 @@ class CharacterSheetTransformer extends TransformerAbstract {
         }
 
         return MaxLevel::MAX_LEVEL;
+    }
+
+    protected function getAutomations(Character $character): Collection {
+        return $character->currentAutomations->transform(function($automation) {
+            $automation->type = (new AutomationType($automation->type))->isAttack() ? 'attack' : 'Unknown';
+
+            return $automation;
+        });
     }
 }

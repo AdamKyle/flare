@@ -51,7 +51,10 @@ class CreateMap extends Command
         // $land = new Color(94, 74, 73);
 
         // Shadow Plane:
-        $land = new Color(128, 127, 126);
+        // $land = new Color(128, 127, 126);
+
+        // Hell:
+        $land = new Color(130, 118, 104);
 
         // Surface & Labyrinth:
         // $water = new Color(66, 129, 178);
@@ -60,9 +63,10 @@ class CreateMap extends Command
         //$water = new Color(162, 219, 118);
 
         // Shadow Plane Water:
-        $water = new Color(100, 227, 250);
+        // $water = new Color(100, 227, 250);
 
-
+        // Hell Magma:
+        $water = new Color(110, 71, 84);
 
         ini_set('memory_limit','3G');
 

@@ -4,7 +4,9 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Notification as Notification;
 use App\Flare\Values\KingdomLogStatusValue;
+use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Requests\UseItemsRequest;
@@ -120,7 +122,7 @@ class KingdomAttackController extends Controller {
                                   ->getKingdom();
 
         if (!is_null($defender)) {
-            KingdomLog::create([
+            $log = KingdomLog::create([
                 'character_id'    => $defender->id,
                 'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
                 'old_defender'    => $oldKingdom,
@@ -128,6 +130,20 @@ class KingdomAttackController extends Controller {
                 'to_kingdom_id'   => $kingdom->id,
                 'published'       => true,
             ]);
+
+            Notification::create([
+                'character_id' => $defender->id,
+                'title'        => 'Items dropped!',
+                'message'      => 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position . ' Had items dropped on it!',
+                'status'       => 'failed',
+                'type'         => 'kingdom',
+                'url'          => route('game.kingdom.attack-log', [
+                    'character'  => $defender->id,
+                    'kingdomLog' => $log->id,
+                ]),
+            ]);
+
+            event(new UpdateNotificationsBroadcastEvent($defender->refresh()->notifications()->where('read', false)->get(), $defender->user));
 
             $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position .
                 '/' . $kingdom->y_position . ' on the ' .

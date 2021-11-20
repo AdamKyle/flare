@@ -251,7 +251,8 @@ export default class AutoAttackSection extends React.Component {
         this.setState({
           isLoading: false,
           successMessage: result.data.message,
-          successTitle: 'It has begun!'
+          successTitle: 'It has begun!',
+          params: {...this.state.params, ...{id: result.data.id}},
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {

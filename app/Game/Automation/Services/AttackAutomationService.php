@@ -2,6 +2,7 @@
 
 namespace App\Game\Automation\Services;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Game\Automation\Events\AutomatedAttackStatus;
@@ -58,6 +59,7 @@ class AttackAutomationService {
 
         event(new AutomationAttackTimeOut($character->user, 30));
         event (new AutomatedAttackStatus($character->user, true));
+        event(new UpdateTopBarEvent($character->refresh()));
 
         AttackAutomation::dispatch($character, $automation->id, $automation->attack_type)->delay($delay);
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Events\AutomatedAttackDetails;
 use App\Game\Automation\Events\AutomatedAttackStatus;
@@ -46,6 +47,7 @@ class AttackAutomation implements ShouldQueue
             }
 
             event (new AutomatedAttackStatus($this->character->user, false));
+            event(new UpdateTopBarEvent($this->character->refresh()));
 
             return;
         }
@@ -83,6 +85,7 @@ class AttackAutomation implements ShouldQueue
         if ($timeTillNext <= 0) {
             event (new AutomatedAttackStatus($this->character->user, false));
 
+            event(new UpdateTopBarEvent($this->character->refresh()));
             return;
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Automation\Controllers\Api;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
 use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Services\AttackAutomationService;
@@ -26,7 +27,8 @@ class AttackAutomationController extends Controller {
         $response = $attackAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([
-            'message' => $response['message']
+            'message' => $response['message'],
+            'id'      => $character->refresh()->currentAutomations()->where('type', AutomationType::ATTACK)->first()->id,
         ], $response['status']);
     }
 
@@ -40,8 +42,10 @@ class AttackAutomationController extends Controller {
 
         $characterAutomation->delete();
 
+        event(new UpdateTopBarEvent($character->refresh()));
+
         return response()->json([
-            'message' => 'Attack Automation Stopped.'
+            'message' => 'Attack Automation is stopping. Please wait for the timer to finish.'
         ]);
     }
 }

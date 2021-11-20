@@ -2,7 +2,6 @@ import React, {Fragment} from 'react';
 import ItemName from "../../../../marketboard/components/item-name";
 import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
-import EquippedSectionDropDowns from "./equipped-section-button";
 import UseManyItemsModal from "../modals/use-many-items-modal";
 
 export default class UsableItemsSection extends React.Component {
@@ -38,7 +37,7 @@ export default class UsableItemsSection extends React.Component {
         name: "actions",
         text: "Actions",
         cell: row => <Fragment>
-          <button className="btn btn-primary" onClick={() => this.manageUseItem(row)} disabled={this.state.loading}>Use</button>
+          <button className="btn btn-primary" onClick={() => this.manageUseItem(row)} disabled={this.state.loading || this.canUseItem(row)}>Use</button>
         </Fragment>
       },
     ];
@@ -83,6 +82,10 @@ export default class UsableItemsSection extends React.Component {
     this.setState({
       showUseMany: !this.state.showUseMany,
     })
+  }
+
+  canUseItem(item) {
+    return item.damages_kingdoms;
   }
 
   manageUseItem(item) {

@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Users;
 
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\User;
@@ -39,6 +40,10 @@ class DataTable extends Component
             })->orderBy($this->sortField, $this->sortBy)->select('users.*')->get();
         } else {
             $users = $users->orderBy('un_ban_request', $this->sortBy)->orderBy($this->sortField, $this->sortBy)->get();
+        }
+
+        if ($users instanceof  Builder) {
+            $users = $users->get();
         }
 
         $users = $users->filter(function($user) {

@@ -204,7 +204,8 @@ export default class SkillDetails extends React.Component {
       && s.skill_type !== 'Enchanting'
       && s.skill_type !== 'Alchemy'
       && s.skill_type !== 'Effects Directional Move Timer'
-      && s.skill_type !== 'Effects Battle Timer'?
+      && s.skill_type !== 'Effects Battle Timer'
+      && !s.can_train ?
       <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
         <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
