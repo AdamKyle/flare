@@ -50,6 +50,8 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
 
     public $celestials = [];
 
+    public $canMassEmbezzle = true;
+
     /**
      * @var int $charactersOnMap
      */
@@ -91,6 +93,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
             $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
         })->count();
         $this->pctCommand      = $pctCommand;
+        $this->canMassEmbezzle = true;
     }
 
     /**

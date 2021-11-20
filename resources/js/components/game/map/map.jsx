@@ -243,7 +243,8 @@ export default class Map extends React.Component {
           can_attack: event.kingdomDetails.hasOwnProperty('can_attack') ? event.kingdomDetails.can_attack : false,
           can_settle: event.kingdomDetails.hasOwnProperty('can_settle') ? event.kingdomDetails.can_settle : false,
           is_mine: this.isMyKingdom(myKingdoms, this.state.characterPosition),
-          kingdom_to_attack: event.kingdomDetails.kingdom_to_attack
+          kingdom_to_attack: event.kingdomDetails.kingdom_to_attack,
+          can_mass_embezzle: event.canMassEmbezzle,
         });
 
         if (_.isEmpty(event.portDetails)) {
