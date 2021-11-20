@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
-      <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-3/4 tw-m-auto">
+      <x-core.cards.card css="tw-mt-5 tw-w-full tw-m-auto">
         <div class="row pb-2">
             <x-data-tables.per-page wire:model="perPage">
                 @if ($this->type !== 'alchemy')
@@ -274,7 +274,7 @@
                                         form-route="{{route('game.shop.buy.item', ['character' => $character->id])}}"
                                         form-id="{{'shop-buy-form-item-'.$item->id}}"
                                         button-title="Buy"
-                                        class="btn btn-primary btn-sm mb-2"
+                                        class="btn btn-primary btn-sm"
                                     >
                                         <input type="hidden" name="item_id" value={{$item->id}} />
                                     </x-forms.button-with-form>

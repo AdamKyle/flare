@@ -9,14 +9,14 @@
 <div class="row {{$showUnitInformation && $showBuildingInformation ? '' : 'justify-content-md-center'}}">
 
     @if (!$showBuildingInformation && !$showUnitInformation)
-        <x-cards.card>
+        <x-core.cards.card>
             Your kingdom and the units survived the attack.
-        </x-cards.card>
+        </x-core.cards.card>
     @endif
 
     @if ($showBuildingInformation)
         <div class="col-xs-12 col-sm-12 col-md-6">
-            <x-cards.card>
+            <x-core.cards.card>
                 <h3>Buildings</h3>
                 <hr />
                 @foreach($log['buildings'] as $key => $buildingInfo)
@@ -46,13 +46,13 @@
                     </dl>
                     <hr />
                 @endforeach
-            </x-cards.card>
+            </x-core.cards.card>
         </div>
     @endif
 
     @if ($showUnitInformation)
         <div class="col-xs-12 col-sm-12 col-md-6">
-            <x-cards.card>
+            <x-core.cards.card>
                 <h3>Units</h3>
                 <hr />
                 @foreach($log['units'] as $key => $unitInfo)
@@ -73,7 +73,7 @@
                     </dl>
                     <hr />
                 @endforeach
-            </x-cards.card>
+            </x-core.cards.card>
         </div>
     @endif
 

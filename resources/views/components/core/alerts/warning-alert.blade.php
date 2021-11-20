@@ -1,6 +1,6 @@
 
 @props([
-    'title' => 'Info',
+    'title' => 'Warning',
     'icon'  => 'far fa-question-circle',
 ])
 

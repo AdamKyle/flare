@@ -1,5 +1,5 @@
 <div class="row mb-3 justify-content-md-center">
-    <x-cards.card>
+    <x-core.cards.card>
         <div class="col-12">
             <h3>Kingdom Changes</h3>
             <hr />
@@ -55,5 +55,5 @@
                 <span class="text-danger">Your kingdom is in danger of falling or losing morale per hour.</span><br />
             </p>
         </div>
-    </x-cards.card>
+    </x-core.cards.card>
 </div>

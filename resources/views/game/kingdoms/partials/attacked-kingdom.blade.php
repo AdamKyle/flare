@@ -2,16 +2,16 @@
     <div class="col-6">
         @if (empty($log['units']))
             @if ($lost)
-                <x-cards.card>
+                <x-core.cards.card>
                     You lost all your units in the attack. Check the enemy data tab for more info.
-                </x-cards.card>
+                </x-core.cards.card>
             @else
-                <x-cards.card>
+                <x-core.cards.card>
                     None of your units were lost in this attack. Check the enemy data tab for more info.
-                </x-cards.card>
+                </x-core.cards.card>
             @endif
         @else
-            <x-cards.card>
+            <x-core.cards.card>
                 @foreach($log['units'] as $key => $unitInfo)
                     @php
                         $class = $unitInfo['old_amount'] !== $unitInfo['new_amount'] ? 'text-danger' : 'text-success';
@@ -66,7 +66,7 @@
                     @endif
                     <hr />
                 @endforeach
-            </x-cards.card>
+            </x-core.cards.card>
         @endif
     </div>
 </div>

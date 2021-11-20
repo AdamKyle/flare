@@ -2,7 +2,7 @@
 
 <div class="row justify-content-md-center">
     <div class="col-6">
-        <x-cards.card>
+        <x-core.cards.card>
             @foreach($log['units'] as $name => $unitInfo)
                 <dl>
                     <dt><strong>Name</strong>:</dt>
@@ -16,6 +16,6 @@
                 </dl>
                 <hr />
             @endforeach
-        </x-cards.card>
+        </x-core.cards.card>
     </div>
 </div>
