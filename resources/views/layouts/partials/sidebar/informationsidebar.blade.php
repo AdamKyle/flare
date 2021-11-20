@@ -23,6 +23,7 @@
             <li><a href="{{route('info.page', ['pageName' => 'currencies'])}}">Currencies</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'combat'])}}">Combat</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'voidance'])}}">Voidance / Devoidance</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'automation'])}}">Automation</a></li>
         </ul>
     </li>
     <li class="nav-small-cap">Map</li>

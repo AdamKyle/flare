@@ -11,7 +11,7 @@
     <h2 class="tw-font-light">{{$title}}</h2>
   @endif
 
-  <div class="tw-bg-white tw-rounded-sm tw-drop-shadow-sm tw-p-6">
+  <div class="tw-bg-white tw-rounded-sm tw-drop-shadow-sm tw-p-6 tw-overflow-x-auto">
     {{$slot}}
   </div>
 </div>

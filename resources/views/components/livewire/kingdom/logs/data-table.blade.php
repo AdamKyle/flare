@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <x-cards.card additionalClasses="overflow-table">
+        <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-3/4 tw-m-auto">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage" />
                 <x-data-tables.search wire:model="search" />
@@ -94,6 +94,6 @@
                     @endforelse
                 </x-data-tables.body>
             </x-data-tables.table>
-        </x-cards.card>
+        </x-core.cards.card>>
     </div>
 </div>

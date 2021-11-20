@@ -88,11 +88,9 @@
                 <!-- End Sidebar scroll-->
             </aside>
 
-          <div class="page-wrapper page p-5">
-            <div class="container mb-5 info-text">
+            <div class="page-wrapper page tw-p-2">
                 @yield('content')
             </div>
-        </div>
 
             <footer class="footer"></footer>
         </div>

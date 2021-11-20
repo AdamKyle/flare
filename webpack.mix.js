@@ -42,7 +42,6 @@ mix.webpackConfig({
   .js('resources/js/helpers/character-inventory.js', 'public/js').react().extract()
   .js('resources/js/helpers/character-sheet.js', 'public/js').react().extract()
   .sass('resources/sass/app.scss', 'public/css')
-  .copy('resources/vendor/theme/css/style.css', 'public/css/theme-style.css')
   .postCss('resources/css/tailwind.css', 'public/css', [
     postCssImport(),
     require('tailwindcss/nesting')(require('postcss-nesting')),
