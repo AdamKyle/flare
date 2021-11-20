@@ -4,11 +4,11 @@
     'link'  => ''
 ])
 
-<div class="row page-titles">
-    <div class="col-md-6 align-self-right">
+<x-core.grids.two-column>
+    <x-slot name="columnOne">
         <h4 class="mt-2">{{$slot}}</h4>
-    </div>
-    <div class="col-md-6 align-self-right">
+    </x-slot>
+    <x-slot name="columnTwo">
         <a href="{{$route}}" class="btn btn-{{$color}} float-right ml-2">{{$link}}</a>
-    </div>
-</div>
+    </x-slot>
+</x-core.grids.two-column>

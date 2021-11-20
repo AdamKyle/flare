@@ -274,7 +274,7 @@
                                         form-route="{{route('game.shop.buy.item', ['character' => $character->id])}}"
                                         form-id="{{'shop-buy-form-item-'.$item->id}}"
                                         button-title="Buy"
-                                        class="btn btn-primary btn-sm"
+                                        class="btn btn-primary btn-sm mb-2"
                                     >
                                         <input type="hidden" name="item_id" value={{$item->id}} />
                                     </x-forms.button-with-form>

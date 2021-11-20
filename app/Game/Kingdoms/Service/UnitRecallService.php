@@ -30,7 +30,7 @@ class UnitRecallService {
      * @param array $unitMovement
      * @param Character $character
      */
-    public function recall(array $unitMovement, Character $character) {
+    public function recall(array $unitMovement, Character $character, float $timeLeft) {
         unset($unitMovement['id']);
         unset($unitMovement['created_at']);
         unset($unitMovement['updated_at']);
@@ -44,6 +44,8 @@ class UnitRecallService {
         foreach ($unitsMoving as $unitInfo) {
             $timeToRecall += $unitInfo->time_to_return;
         }
+
+        $timeToRecall = floor($timeToRecall * $timeLeft);
 
         $unitMovement['units_moving'] = $unitsMoving;
         $unitMovement['completed_at'] = now()->addMinutes($timeToRecall);

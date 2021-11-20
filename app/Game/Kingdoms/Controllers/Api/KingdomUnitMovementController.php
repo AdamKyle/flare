@@ -41,7 +41,7 @@ class KingdomUnitMovementController extends Controller {
 
         UpdateUnitMovementLogs::dispatch($character);
 
-        $this->unitRecall->recall($unitMovementData, $character);
+        $this->unitRecall->recall($unitMovementData, $character, $timeLeft);
 
         return response()->json([], 200);
     }
