@@ -18,6 +18,7 @@ class ItemEffectsValue {
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
     const CONTNUE_LEVELING      = 'continue-leveling';
     const GOLD_DUST_RUSH        = 'gold-dust-rush';
+    const MASS_EMBEZZLE         = 'mass-embezzle';
 
     /**
      * @var string[] $values
@@ -32,6 +33,7 @@ class ItemEffectsValue {
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
         self::CONTNUE_LEVELING      => 'continue-leveling',
         self::GOLD_DUST_RUSH        => 'gold-dust-rush',
+        self:: MASS_EMBEZZLE        => 'mass-embezzle',
     ];
 
     /**
@@ -121,5 +123,14 @@ class ItemEffectsValue {
      */
     public function teleportToCelestial(): bool {
         return $this->value === self::TELEPORT_TO_CELESTIAL;
+    }
+
+    /**
+     * Can mass embezzle?
+     *
+     * @return bool
+     */
+    public function canMassEmbezzle(): bool {
+        return $this->value === self::MASS_EMBEZZLE;
     }
 }

@@ -8,6 +8,7 @@ export default class KingdomsMenu extends React.Component {
 
     this.state = {
       logs: [],
+      characterId: 0,
       open: false,
     }
 
@@ -17,9 +18,10 @@ export default class KingdomsMenu extends React.Component {
 
   componentDidMount() {
 
-    axios.get('/api/character/kingdoms/logs').then((result) => {
+    axios.get('/api/kingdoms/'+this.props.userId+'/attack-logs').then((result) => {
       this.setState({
-        logs: result.data,
+        logs: result.data.logs,
+        characterId: result.data.character_id,
       });
     }).catch(function (error) {
       if (error.hasOwnProperty('response')) {
@@ -37,48 +39,26 @@ export default class KingdomsMenu extends React.Component {
       return getServerMessage('something_went_wrong');
     });
 
-    this.kingdomLogs.listen('Game.Kingdoms.Events.UpdateKingdomsLogs', (event) => {
+    this.kingdomLogs.listen('Game.Kingdoms.Events.UpdateKingdomLogs', (event) => {
+      console.log(event);
       this.setState({
-        logs: event.kingdomLogs,
+        logs: event.logs,
       });
     });
   }
 
   open() {
     this.setState({
-      open: this.state.open ? false : true
+      open: this.state.opened ? false : true
     });
   }
 
-  hasRewardsToCollect() {
+  hasUnOpenedLogs() {
     if (!_.isEmpty(this.state.logs)) {
-
-      if (this.state.logs.filter((l) => l.in_progress).length > 0) {
-        return false;
-      }
-
-      let hasUnCollectedReward = false;
-
-      this.state.logs.forEach((log) => {
-        if (log.rewards !== null) {
-          hasUnCollectedReward = true;
-          return;
-        }
-      });
-
-      return hasUnCollectedReward;
+      return this.state.logs.filter((l) => !l.opened).length > 0;
     }
 
     return false;
-  }
-
-  renderCurrentAdventureLink() {
-    if (this.hasRewardsToCollect()) {
-      return <><a href="/current-adventure/" className="text-success">Rewards <i
-        className="ml-3 text-success fas fa-check-double fa-bounce"></i></a></>
-    }
-
-    return null;
   }
 
   render() {
@@ -87,17 +67,18 @@ export default class KingdomsMenu extends React.Component {
       <>
         <a className="has-arrow"
            href="#" onClick={this.open.bind(this)}
-           aria-expanded={open} aria-controls="adventure-links">
-          <i className={'ra ra-trail ' + (this.hasRewardsToCollect() ? 'text-success fa-bounce' : null)}></i>
+           aria-expanded={open} aria-controls="kingdom-links">
+          <i className={'ra ra-guarded-tower ' + (this.hasUnOpenedLogs() ? 'text-warning fa-bounce' : null)}></i>
           <span className="hide-menu">
-              Adventure Logs
-            </span>
+              Kingdoms
+          </span>
         </a>
         <Collapse in={this.state.open}>
           <ul id="adventure-links">
-            <li>{this.renderCurrentAdventureLink()}</li>
-            <li><a href="/current-adventures/">Completed Adventures</a></li>
-            <li><a href={"/game/completed-quests/" + this.props.userId}>Completed Quests</a></li>
+            <li><a href={'/kingdom/'+this.state.characterId+'/attack-logs'} className={this.hasUnOpenedLogs() ? 'text-warning' : ''}>
+              {this.hasUnOpenedLogs() ? <span><i className="fas fa-exclamation mr-2"></i> Attack Logs</span> : 'Attack Logs'}
+            </a></li>
+            <li><a href={'/kingdom/'+this.state.characterId+'/unit-movement'}>Unit Movement</a></li>
           </ul>
         </Collapse>
       </>

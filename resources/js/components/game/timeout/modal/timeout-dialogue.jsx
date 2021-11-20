@@ -96,6 +96,13 @@ export default class TimeoutDialogue extends React.Component {
           <p>
             You have been a very busy bee. Time to slow down a bit. The page will refresh when this timer is done.
           </p>
+          <p>
+            If you refresh you will reset the timer. Just let it play out. This can happen for a variety of reasons including,
+            clicking too fast before the request is fully processed, triggering an alert in the system that causes this.
+          </p>
+          <p>
+            If you encounter many of these, you need to slow down.
+          </p>
           {this.fetchTime(this.state.timeOutFor)}
         </Modal.Body>
       </Modal>

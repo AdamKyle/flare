@@ -51,7 +51,7 @@
                     @endif
 
                     @forelse($logs as $log)
-                        <tr wire:key="attack-logs-table-{{$log->id}}">
+                        <tr wire:key="attack-logs-table-{{$log->id}}" class="{{$log->opened ? '' : 'tw-bg-yellow-300 tw-bg-opacity-50'}}">
                             <td>
                                 <input type="checkbox" wire:model="selected" value="{{$log->id}}"/>
                             </td>
@@ -59,7 +59,7 @@
                                 @if (!KingdomLogStatus::statusType($log->status)->lostKingdom())
                                     <a href="{{
                                         route('game.kingdom.attack-log', ['character' => $character, 'kingdomLog' => $log])
-                                    }}">
+                                    }}" class="tw-text-blue-800 hover:tw-text-blue-900 active:tw-text-blue-800">
                                         {{$log->status}}
                                     </a>
                                 @else

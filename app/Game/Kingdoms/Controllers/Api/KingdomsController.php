@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Models\User;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Requests\KingdomUnitRecrutmentRequest;
@@ -35,7 +36,7 @@ class KingdomsController extends Controller {
     private $kingdom;
 
     public function __construct(Manager $manager, KingdomTransformer $kingdom) {
-        $this->middleware('is.character.dead');;
+        $this->middleware('is.character.dead')->except('getAttackLogs');
 
         $this->manager = $manager;
         $this->kingdom = $kingdom;
@@ -48,6 +49,15 @@ class KingdomsController extends Controller {
             $this->manager->createData($kingdom)->toArray(),
             200
         );
+    }
+
+    public function getAttackLogs(User $user) {
+        $logs = $user->character->kingdomAttackLogs()->where('published', true)->get();
+
+        return response()->json([
+            'logs'         => $logs,
+            'character_id' => $user->character->id
+        ], 200);
     }
 
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {

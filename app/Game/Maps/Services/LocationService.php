@@ -111,6 +111,7 @@ class LocationService {
             'npc_kingdoms'           => Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
             'other_kingdoms'         => $this->getEnemyKingdoms($character),
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
+            'can_mass_embezzle'      => true,
         ];
     }
 
@@ -173,7 +174,7 @@ class LocationService {
         if (!is_null($kingdom)) {
             if (!is_null($kingdom->character_id)) {
                 if ($character->id !== $kingdom->character->id) {
-                    $this->canAttack = $units->isNotEmpty();
+                    $this->canAttack = true;
 
                     $this->kingdomToAttack = [
                         'id' => $kingdom->id,

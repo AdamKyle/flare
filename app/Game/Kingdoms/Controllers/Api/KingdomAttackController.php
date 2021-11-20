@@ -7,6 +7,7 @@ use App\Flare\Models\KingdomLog;
 use App\Flare\Models\Notification as Notification;
 use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
+use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Requests\UseItemsRequest;
@@ -134,7 +135,7 @@ class KingdomAttackController extends Controller {
             Notification::create([
                 'character_id' => $defender->id,
                 'title'        => 'Items dropped!',
-                'message'      => 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position . ' Had items dropped on it!',
+                'message'      => 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position . ' Had items dropped on it!',
                 'status'       => 'failed',
                 'type'         => 'kingdom',
                 'url'          => route('game.kingdom.attack-log', [
@@ -144,6 +145,8 @@ class KingdomAttackController extends Controller {
             ]);
 
             event(new UpdateNotificationsBroadcastEvent($defender->refresh()->notifications()->where('read', false)->get(), $defender->user));
+
+            event(new UpdateKingdomLogs($defender->refresh()));
 
             $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position .
                 '/' . $kingdom->y_position . ' on the ' .

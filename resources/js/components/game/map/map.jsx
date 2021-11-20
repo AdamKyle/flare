@@ -117,6 +117,7 @@ export default class Map extends React.Component {
           can_settle: result.data.can_settle_kingdom,
           is_mine: this.isMyKingdom(this.state.kingdoms, this.state.characterPosition),
           kingdom_to_attack: result.data.kingdom_to_attack,
+          can_mass_embezzle: result.data.can_mass_embezzle
         });
 
         if (result.data.celestials.length > 0) {
@@ -481,6 +482,7 @@ export default class Map extends React.Component {
           can_settle: result.data.kingdom_details.can_settle,
           is_mine: result.data.kingdom_details.can_manage,
           kingdom_to_attack: result.data.kingdom_details.kingdom_to_attack,
+          can_mass_embezzle: result.data.can_mass_embezzle,
         });
 
         this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);

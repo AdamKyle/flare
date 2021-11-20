@@ -531,6 +531,7 @@ class MovementService {
             'kingdom_details'   => $this->kingdomDetails(),
             'celestials'        => $this->celestialEntities(),
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
+            'can_mass_embezzle' => true,
         ]);
     }
 

@@ -22,6 +22,7 @@ class BroadcastServiceProvider extends ServiceProvider
         require base_path('routes/game/automation/channels.php');
         require base_path('routes/game/messages/channels.php');
         require base_path('routes/game/battle/channels.php');
+        require base_path('routes/game/kingdoms/channels.php');
         require base_path('routes/game/adventures/channels.php');
         require base_path('routes/game/maps/channels.php');
         require base_path('routes/game/skills/channels.php');

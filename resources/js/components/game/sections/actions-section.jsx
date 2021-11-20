@@ -242,6 +242,15 @@ export default class ActionsSection extends React.Component {
                     </div>
                     : null
                 }
+
+                {
+                  this.props.kingdomData.can_mass_embezzle && !_.isEmpty(this.props.kingdomData.my_kingdoms) ?
+                    <div className="mb-1">
+                      <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring || this.props.attackAutomationIsRunning}
+                              >Mass Embezzle</button>
+                    </div>
+                    : null
+                }
                 {
                   this.props.celestial !== null ?
                     <div className="mb-1">

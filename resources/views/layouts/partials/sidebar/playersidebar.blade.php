@@ -10,12 +10,8 @@
         </ul>
     </li>
     <li class="nav-small-cap">Manage Kingdoms</li>
-    <li>
-        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-guarded-tower"></i><span class="hide-menu">Kingdoms</span></a>
-        <ul aria-expanded="false" class="collapse">
-            <li><a href="{{route('game.kingdom.attack-logs', ['character' => auth()->user()->character->id])}}">Attack Logs</a></li>
-            <li><a href="{{route('game.kingdom.unit-movement', ['character' => auth()->user()->character->id])}}">Unit Movement</a></li>
-        </ul>
+    <li id="kingdom-menu">
+        {{-- the kingdoms menu is rendered via react component.--}}
     </li>
     <li class="nav-small-cap">Manage Adventures</li>
     <li id="adventure-menu">

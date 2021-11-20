@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Controllers;
 
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Notification;
 use App\Game\Kingdoms\Service\KingdomLogService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -27,6 +28,8 @@ class KingdomsController extends Controller {
     public function attackLogs(Character $character) {
         $logs = $character->kingdomAttackLogs()->where('published', true)->get();
 
+        Notification::where('type', 'kingdom')->delete();
+
         return view('game.kingdoms.attack-logs', [
             'logs'      => $logs,
             'character' => $character,
@@ -34,6 +37,14 @@ class KingdomsController extends Controller {
     }
 
     public function attackLog(Character $character, KingdomLog $kingdomLog) {
+        $kingdomLog->update([
+            'opened' => true,
+        ]);
+
+        $kingdomLog = $kingdomLog->refresh();
+
+        Notification::where('type', 'kingdom')->delete();
+
         return view('game.kingdoms.attack-log', [
             'log'       => $this->kingdomLogService->setLog($kingdomLog)->attackReport(),
             'type'      => $kingdomLog->status,

@@ -21,6 +21,7 @@ require('../vendor/monster/theme/js/custom.js');
 require('./components/game');
 require('./components/admin-chat');
 require('./components/adventure-menue');
+require('./components/kingdom-menue');
 require('./components/notification-center');
 require('./components/refresh');
 require('./components/marketboard/board');
