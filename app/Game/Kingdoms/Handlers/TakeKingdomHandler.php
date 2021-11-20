@@ -158,7 +158,7 @@ class TakeKingdomHandler {
         foreach ($unitMovements as $unitMovement) {
             $unitMovementAttributes = $unitMovement->getAttributes();
 
-            $this->unitRecallService->recall($unitMovementAttributes, $attacker);
+            $this->unitRecallService->recall($unitMovementAttributes, $attacker, 0.0);
 
             $unitMovement->delete();
         }

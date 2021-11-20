@@ -45,7 +45,9 @@ class UnitRecallService {
             $timeToRecall += $unitInfo->time_to_return;
         }
 
-        $timeToRecall = floor($timeToRecall * $timeLeft);
+        if ($timeLeft > 0.0) {
+            $timeToRecall = floor($timeToRecall * $timeLeft);
+        }
 
         $unitMovement['units_moving'] = $unitsMoving;
         $unitMovement['completed_at'] = now()->addMinutes($timeToRecall);

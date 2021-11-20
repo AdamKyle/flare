@@ -77,7 +77,7 @@ class UnitReturnServiceTest extends TestCase {
 
         $unitReturnService = resolve(UnitReturnService::class);
 
-        $unitReturnService->recallUnits($unitMovementQueue, $defender->character);
+        $unitReturnService->recallUnits($unitMovementQueue, $defender->character, 0.0);
 
         $this->assertTrue(true);
     }
