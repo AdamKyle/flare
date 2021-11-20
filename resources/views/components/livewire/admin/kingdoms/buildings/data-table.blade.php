@@ -111,6 +111,6 @@
                     @endforelse
                 </x-data-tables.body>
             </x-data-tables.table>
-        </x-core.cards.card>>
+        </x-core.cards.card>
     </div>
 </div>

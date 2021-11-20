@@ -51,6 +51,6 @@
                 </x-data-tables.body>
             </x-data-tables.table>
             <p class="text-muted mt-3">This table is not live and may not reflect the markets.</p>
-        </x-core.cards.card>>
+        </x-core.cards.card>
     </div>
 </div>

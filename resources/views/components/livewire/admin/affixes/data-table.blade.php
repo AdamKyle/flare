@@ -145,6 +145,6 @@
             <div class="mb-2 mt-2 text-muted">
                 <sup>*</sup> <em><strong>Cost</strong>: refers to enchanting cost.</em>
             </div>
-        </x-core.cards.card>>
+        </x-core.cards.card>
     </div>
 </div>
