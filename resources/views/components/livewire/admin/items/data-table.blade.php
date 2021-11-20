@@ -257,7 +257,7 @@
                                 @if(auth()->user()->hasRole('Admin'))
                                     <a href="{{route('items.edit', [
                                             'item' => $item->id
-                                        ])}}" class="btn btn-sm btn-primary">
+                                        ])}}" class="btn btn-sm btn-primary mb-2">
                                         Edit
                                     </a>
 

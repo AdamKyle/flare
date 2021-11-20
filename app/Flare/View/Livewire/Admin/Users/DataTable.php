@@ -28,18 +28,22 @@ class DataTable extends Component
             $users = $users->join('characters', function($join) {
                 $join->on('users.id', 'characters.user_id')
                      ->where('characters.name', 'like', '%'.$this->search.'%');
-            })->orderBy($this->sortField, $this->sortBy)->select('users.*');
+            })->orderBy($this->sortField, $this->sortBy)->select('users.*')->get();
         } else if ($this->sortField == 'characters.name') {
             $users->join('characters', function($join) {
                 $join->on('users.id', 'characters.user_id');
-            })->orderBy($this->sortField, $this->sortBy)->select('users.*');
+            })->orderBy($this->sortField, $this->sortBy)->select('users.*')->get();
         } else if ($this->sortField == 'characters.level') {
             $users->join('characters', function ($join) {
                 $join->on('users.id', 'characters.user_id');
-            })->orderBy($this->sortField, $this->sortBy)->select('users.*');
+            })->orderBy($this->sortField, $this->sortBy)->select('users.*')->get();
         } else {
-            $users = $users->orderBy('un_ban_request', $this->sortBy)->orderBy($this->sortField, $this->sortBy);
+            $users = $users->orderBy('un_ban_request', $this->sortBy)->orderBy($this->sortField, $this->sortBy)->get();
         }
+
+        $users = $users->filter(function($user) {
+            return !is_null($user->character);
+        });
 
         return $users->paginate($this->perPage);
     }

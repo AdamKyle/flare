@@ -41,6 +41,7 @@ export default class AutoAttackSection extends React.Component {
     this.automation               = Echo.private('automation-attack-timeout-' + this.props.userId);
     this.automationAttackMessages = Echo.private('automation-attack-messages-' + this.props.userId);
     this.automationAttackDetails  = Echo.private('automation-attack-details-' + this.props.userId);
+    this.isDead                   = Echo.private('character-is-dead-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -83,7 +84,13 @@ export default class AutoAttackSection extends React.Component {
       this.setState({
         params: event.details,
       })
-    })
+    });
+
+    this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
+      this.setState({
+        isDead: event.isDead,
+      });
+    });
   }
 
   updateSelectedMonster(event) {
@@ -307,6 +314,15 @@ export default class AutoAttackSection extends React.Component {
                   : null
                 }
                 {
+                  this.state.isDead ?
+                    <AlertError icon={"fas fa-skull-crossbones"} title={'Uh... You died!'}>
+                      <p>
+                        Automated attack has ended. Please revive.
+                      </p>
+                    </AlertError>
+                    : null
+                }
+                {
                   this.state.successMessage !== null ?
                     <AlertSuccess icon={"fas fa-check-circle"}
                                   title={this.state.successTitle}
@@ -335,7 +351,7 @@ export default class AutoAttackSection extends React.Component {
                           id="attack-type"
                           value={this.state.params.attack_type}
                           onChange={this.selectAttackType.bind(this)}
-                          disabled={this.props.attackAutomationIsRunning}
+                          disabled={this.props.attackAutomationIsRunning|| this.disabledInput()}
                   >
                     <option value={AttackType.ATTACK}>Attack</option>
                     <option value={AttackType.CAST}>Cast</option>
@@ -349,7 +365,7 @@ export default class AutoAttackSection extends React.Component {
                 </div>
                 <button className="btn btn-primary mt-3"
                         onClick={this.beginFight.bind(this)}
-                        disabled={this.state.isLoading || this.props.attackAutomationIsRunning}
+                        disabled={this.state.isLoading || this.props.attackAutomationIsRunning || this.props.character.isDead}
                 >
                   {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
                 </button>
@@ -357,7 +373,7 @@ export default class AutoAttackSection extends React.Component {
                   this.props.attackAutomationIsRunning ?
                     <button className="btn btn-danger ml-2 mt-3"
                             onClick={this.stopAutomation.bind(this)}
-                            disabled={this.state.isLoading}
+                            disabled={this.state.isLoading || this.props.character.isDead}
                     >
                       {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Stop!
                     </button>
@@ -383,7 +399,7 @@ export default class AutoAttackSection extends React.Component {
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="advanced" title="Advanced Options" disabled={this.props.attackAutomationIsRunning}>
+          <Tab eventKey="advanced" title="Advanced Options" disabled={this.props.attackAutomationIsRunning || this.state.isDead}>
             <div className="mt-4">
               <h4>Advanced options</h4>
               <hr />

@@ -19,6 +19,7 @@ export default class ActionsSection extends React.Component {
     this.state = {
       isDead: false,
       isAdventuring: false,
+      cannotAutoAttack: false,
       changeCraftingType: false,
       showCrafting: false,
       showEnchanting: false,
@@ -47,6 +48,7 @@ export default class ActionsSection extends React.Component {
         monsters: result.data.monsters,
         isLoading: false,
         isDead: result.data.character.is_dead,
+        cannotAutoAttack: result.data.character.is_attack_automation_locked,
       }, () => {
         this.props.setCharacterId(this.state.character.id);
       });
@@ -356,7 +358,7 @@ export default class ActionsSection extends React.Component {
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()}>
+          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack}>
             <AutoAttackSection
               character={this.state.character}
               monsters={this.state.monsters}
