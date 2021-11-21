@@ -4,10 +4,12 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\User;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Kingdoms\Jobs\MassEmbezzle;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Requests\KingdomUnitRecrutmentRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -271,7 +273,7 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function embezzel(KingdomEmbezzelRequest $request, Kingdom $kingdom) {
+    public function embezzel(KingdomEmbezzelRequest $request, Kingdom $kingdom, KingdomService $kingdomService) {
         $amountToEmbezzel = $request->embezzel_amount;
         $newAGoldAmount   = $kingdom->character->gold + $amountToEmbezzel;
 
@@ -301,25 +303,29 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $newMorale = $kingdom->current_morale - 0.15;
+        $kingdomService->embezzleFromKingdom($kingdom, $amountToEmbezzel);
 
-        $kingdom->update([
-            'treasury' => $kingdom->treasury - $amountToEmbezzel,
-            'current_morale' => $newMorale,
-        ]);
+        return response()->json([], 200);
+    }
 
-        $character = $kingdom->character;
+    public function massEmbezzle(KingdomEmbezzelRequest $request, Character $character) {
+        $mapId          = $character->map->game_map_id;
+        $kingdomsForMap = $character->kingdoms()->where('game_map_id', $mapId)->get();
+
+        foreach ($kingdomsForMap as $kingdom) {
+
+            if ($kingdomsForMap->last() === $kingdom) {
+                MassEmbezzle::dispatch($kingdom, $request->embezzel_amount, true)->delay(now()->addSecond());
+            } else {
+                MassEmbezzle::dispatch($kingdom, $request->embezzel_amount)->delay(now()->addSecond());
+            }
+        }
 
         $character->update([
-            'gold' => $character->gold + $amountToEmbezzel
+            'is_mass_embezzling' => true
         ]);
 
-        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
-
-        $kingdom  = $this->manager->createData($kingdom)->toArray();
-
-        event(new UpdateTopBarEvent($character->refresh()));
-        event(new UpdateKingdom($character->user, $kingdom));
+        event(new ServerMessageEvent($character->user, 'Mass Embezzling underway.'));
 
         return response()->json([], 200);
     }

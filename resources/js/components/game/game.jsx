@@ -13,6 +13,7 @@ import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
+import MassEmbezzle from "./sections/modals/mass-embezzle";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -40,6 +41,7 @@ export default class Game extends React.Component {
       openKingdomModal: false,
       openKingdomAttackModal: false,
       openTimeOutModal: false,
+      openMassEmbezzlement: false,
       npcComponentName: null,
       characterId: null,
       canAdventureAgainAt: null,
@@ -173,6 +175,12 @@ export default class Game extends React.Component {
     }
   }
 
+  openMassEmbezzleModal() {
+    this.setState({
+      openMassEmbezzlement: !this.state.openMassEmbezzlement,
+    });
+  }
+
   closeKingdomManagement() {
     this.setState({
       openKingdomManagement: false,
@@ -303,6 +311,7 @@ export default class Game extends React.Component {
               openKingdomModal={this.openKingdomModal.bind(this)}
               openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
+              openMassEmbezzleModal={this.openMassEmbezzleModal.bind(this)}
               updateCelestial={this.updateCelestial.bind(this)}
               celestial={this.state.celestial}
               kingdomData={this.state.kingdomData}
@@ -446,6 +455,15 @@ export default class Game extends React.Component {
               openTimeOutModal={this.openTimeOutModal.bind(this)}
             />
             : null
+        }
+        {
+          this.state.openMassEmbezzlement ?
+            <MassEmbezzle
+              characterId={this.state.characterId}
+              show={this.state.openMassEmbezzlement}
+              close={this.openMassEmbezzleModal.bind(this)}
+            />
+          : null
         }
         {
           this.state.openTimeOutModal ?

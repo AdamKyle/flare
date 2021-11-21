@@ -2,9 +2,6 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Models\CelestialFight;
-use App\Game\Maps\Services\Common\LiveCharacterCount;
-use Illuminate\Support\Facades\Log;
 use Storage;
 use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
@@ -12,11 +9,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Flare\Models\CelestialFight;
+use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
+use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Core\Traits\KingdomCache;
 
 class LocationService {
 
-    use KingdomCache, LiveCharacterCount;
+    use KingdomCache, LiveCharacterCount, CanPlayerMassEmbezzle;
 
     /**
      * @var PortSevice $portService
@@ -111,7 +111,7 @@ class LocationService {
             'npc_kingdoms'           => Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
             'other_kingdoms'         => $this->getEnemyKingdoms($character),
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle'      => true,
+            'can_mass_embezzle'      => $this->canMassEmbezzle($character, $this->canManage),
         ];
     }
 

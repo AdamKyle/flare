@@ -49,7 +49,7 @@ class ProcessAttackAutomation {
             $automation->delete();
 
             $battleMessages[] = [
-                'message' => 'You have died during the fight! Death has come for you! The Automation has been stopped',
+                'message' => 'The Automation has been stopped! Revive to try again.',
                 'class'   => 'enemy-action-fired',
             ];
 

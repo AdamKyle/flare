@@ -2,6 +2,7 @@
 
 namespace App\Flare\Middleware;
 
+use App\Flare\Models\Character;
 use Closure;
 
 class IsCharacterWhoTheySayTheyAreMiddleware {

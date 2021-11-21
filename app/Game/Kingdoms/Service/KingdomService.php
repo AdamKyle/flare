@@ -2,7 +2,9 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Models\KingdomBuilding;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
@@ -12,9 +14,9 @@ use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
+
 
 class KingdomService {
 
@@ -25,14 +27,20 @@ class KingdomService {
      */
     private $builder;
 
+    private $kingdomTransformer;
+
+    private $manager;
+
     /**
      * constructor
      *
      * @param KingdomBuilder $builder
      * @return void
      */
-    public function __construct(KingdomBuilder $builder) {
-        $this->builder = $builder;
+    public function __construct(KingdomBuilder $builder, KingdomTransformer $kingdomTransformer, Manager $manager) {
+        $this->builder            = $builder;
+        $this->kingdomTransformer = $kingdomTransformer;
+        $this->manager            = $manager;
     }
 
     /**
@@ -160,6 +168,34 @@ class KingdomService {
         }
 
         return [];
+    }
+
+    /**
+     * Embezzle from kingdom.
+     *
+     * @param Kingdom $kingdom
+     * @param $amountToEmbezzle
+     */
+    public function embezzleFromKingdom(Kingdom $kingdom, $amountToEmbezzle) {
+        $newMorale = $kingdom->current_morale - 0.15;
+
+        $kingdom->update([
+            'treasury' => $kingdom->treasury - $amountToEmbezzle,
+            'current_morale' => $newMorale,
+        ]);
+
+        $character = $kingdom->character;
+
+        $character->update([
+            'gold' => $character->gold + $amountToEmbezzle
+        ]);
+
+        $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransformer);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateKingdom($character->user, $kingdom));
     }
 
     protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {

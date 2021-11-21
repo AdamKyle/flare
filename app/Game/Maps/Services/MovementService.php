@@ -22,6 +22,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
@@ -31,7 +32,7 @@ use League\Fractal\Manager;
 
 class MovementService {
 
-    use ResponseBuilder, LiveCharacterCount;
+    use ResponseBuilder, LiveCharacterCount, CanPlayerMassEmbezzle;
 
     /**
      * @var array $portDetails
@@ -525,13 +526,20 @@ class MovementService {
 
         $this->updateCharacterMovementTimeOut($character);
 
+        $kingdomDetails = $this->kingdomDetails();
+        $canEmbezzle    = false;
+
+        if (isset($kingdomDetails['can_manage'])) {
+            $canEmbezzle = $this->canMassEmbezzle($character, $kingdomDetails['can_manage']);
+        }
+
         return $this->successResult([
             'port_details'      => $this->portDetails(),
             'adventure_details' => $this->adventureDetails(),
-            'kingdom_details'   => $this->kingdomDetails(),
+            'kingdom_details'   => $kingdomDetails,
             'celestials'        => $this->celestialEntities(),
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle' => true,
+            'can_mass_embezzle' => $canEmbezzle,
         ]);
     }
 

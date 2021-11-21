@@ -30,7 +30,7 @@
               tab="{{$name . '-' . $index}}"
               active="{{$index === 0 ? 'true' : 'false'}}"
             >
-                <x-cards.card>
+                <x-core.cards.card>
                     <x-tabs.pill-tabs-container>
                         <x-tabs.tab
                           tab="{{$name . '-' . $index . '-monsters'}}"
@@ -64,7 +64,7 @@
                             ])
                         </x-tabs.tab-content-section>
                     </x-tabs.tab-content>
-                </x-cards.card>
+                </x-core.cards.card>
             </x-tabs.tab-content-section>
         @endforeach
     </x-tabs.tab-content>

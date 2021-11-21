@@ -4,6 +4,7 @@ namespace App\Game\Maps\Events;
 
 use App\Flare\Models\Character;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -16,7 +17,7 @@ use App\Game\Maps\Services\MovementService;
 
 class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
+    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache, CanPlayerMassEmbezzle;
 
     /**
      * @var Map $map
@@ -93,7 +94,14 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
             $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
         })->count();
         $this->pctCommand      = $pctCommand;
-        $this->canMassEmbezzle = true;
+
+        $canEmbezzle    = false;
+
+        if (isset($this->kingdomDetails['can_manage'])) {
+            $canEmbezzle = $this->canMassEmbezzle($this->user->character, $this->kingdomDetails['can_manage']);
+        }
+
+        $this->canMassEmbezzle = $canEmbezzle;
     }
 
     /**

@@ -246,7 +246,9 @@ export default class ActionsSection extends React.Component {
                 {
                   this.props.kingdomData.can_mass_embezzle && !_.isEmpty(this.props.kingdomData.my_kingdoms) ?
                     <div className="mb-1">
-                      <button className="btn btn-success btn-sm mb-2" disabled={this.state.isDead || this.state.isAdventuring || this.props.attackAutomationIsRunning}
+                      <button className="btn btn-success btn-sm mb-2"
+                              disabled={this.state.isDead || this.state.isAdventuring || this.props.attackAutomationIsRunning}
+                              onClick={() => this.props.openMassEmbezzleModal(true)}
                               >Mass Embezzle</button>
                     </div>
                     : null
