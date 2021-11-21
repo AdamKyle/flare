@@ -23,9 +23,7 @@ class ItemsController extends Controller {
     use ItemsShowInformation;
 
     public function index() {
-        return view('admin.items.items', [
-            'items' => Item::all(),
-        ]);
+        return view('admin.items.items');
     }
 
     public function create() {
