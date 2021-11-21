@@ -4,7 +4,7 @@ namespace App\Game\Kingdoms\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class KingdomEmbezzelRequest extends FormRequest
+class KingdomEmbezzleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,13 @@ class KingdomEmbezzelRequest extends FormRequest
     public function rules()
     {
         return [
-            'embezzel_amount' => 'required|int',
+            'embezzle_amount' => 'required|int',
         ];
     }
 
     public function messages() {
         return [
-            'embezzel_amount.required' => 'Amount to embezzel is required.',
+            'embezzle_amount.required' => 'Amount to embezzle is required.',
         ];
     }
 }

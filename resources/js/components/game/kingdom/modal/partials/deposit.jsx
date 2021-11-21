@@ -104,11 +104,11 @@ export default class Deposit extends React.Component {
           </div>
           <div className="mt-2">
             <div className="form-group">
-              <label htmlFor="embezzel-amount">Deposit Amount</label>
+              <label htmlFor="embezzle-amount">Deposit Amount</label>
               <input
                 type="number"
                 className="form-control"
-                id="embezzel-amount"
+                id="embezzle-amount"
                 value={this.state.toDeposit}
                 onChange={this.updateDeposit.bind(this)}
               />

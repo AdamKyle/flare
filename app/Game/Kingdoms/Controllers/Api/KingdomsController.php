@@ -29,7 +29,7 @@ use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\Kingdoms\Requests\KingdomEmbezzelRequest;
+use App\Game\Kingdoms\Requests\KingdomEmbezzleRequest;
 
 class KingdomsController extends Controller {
 
@@ -273,15 +273,15 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function embezzel(KingdomEmbezzelRequest $request, Kingdom $kingdom, KingdomService $kingdomService) {
-        $amountToEmbezzel = $request->embezzel_amount;
-        $newAGoldAmount   = $kingdom->character->gold + $amountToEmbezzel;
+    public function embezzle(KingdomEmbezzleRequest $request, Kingdom $kingdom, KingdomService $kingdomService) {
+        $amountToEmbezzle = $request->embezzle_amount;
+        $newAGoldAmount   = $kingdom->character->gold + $amountToEmbezzle;
 
         $maxCurrencies = new MaxCurrenciesValue($newAGoldAmount, MaxCurrenciesValue::GOLD);
 
         if ($maxCurrencies->canNotGiveCurrency()) {
             return response()->json([
-                'message' => number_format($amountToEmbezzel) . " Would yput you well over the gold cap limit."
+                'message' => number_format($amountToEmbezzle) . " Would yput you well over the gold cap limit."
             ], 422);
         }
 
@@ -291,7 +291,7 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        if ($amountToEmbezzel > $kingdom->treasury) {
+        if ($amountToEmbezzle > $kingdom->treasury) {
             return response()->json([
                 'message' => "You don't have the gold in your treasury."
             ], 422);
@@ -303,21 +303,21 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $kingdomService->embezzleFromKingdom($kingdom, $amountToEmbezzel);
+        $kingdomService->embezzleFromKingdom($kingdom, $amountToEmbezzle);
 
         return response()->json([], 200);
     }
 
-    public function massEmbezzle(KingdomEmbezzelRequest $request, Character $character) {
+    public function massEmbezzle(KingdomEmbezzleRequest $request, Character $character) {
         $mapId          = $character->map->game_map_id;
         $kingdomsForMap = $character->kingdoms()->where('game_map_id', $mapId)->get();
 
         foreach ($kingdomsForMap as $kingdom) {
 
             if ($kingdomsForMap->last() === $kingdom) {
-                MassEmbezzle::dispatch($kingdom, $request->embezzel_amount, true)->delay(now()->addSecond());
+                MassEmbezzle::dispatch($kingdom, $request->embezzle_amount, true)->delay(now()->addSecond());
             } else {
-                MassEmbezzle::dispatch($kingdom, $request->embezzel_amount)->delay(now()->addSecond());
+                MassEmbezzle::dispatch($kingdom, $request->embezzle_amount)->delay(now()->addSecond());
             }
         }
 

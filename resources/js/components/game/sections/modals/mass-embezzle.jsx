@@ -45,7 +45,7 @@ export default class MassEmbezzle extends React.Component {
     });
 
     axios.post('/api/kingdoms/mass-embezzle/' + this.props.characterId, {
-      embezzel_amount: this.state.embezzleAmount
+      embezzle_amount: this.state.embezzleAmount
     }).then((result) => {
       this.props.close();
     }).catch((error) => {

@@ -374,26 +374,25 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals(0, $building->current_durability);
     }
 
-    public function testCanEmbezzel() {
+    public function testCanEmbezzle() {
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
             'treasury'     => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzle', [
             'kingdom' => Kingdom::first()->id
         ]), [
-            'embezzel_amount' => 2000
+            'embezzle_amount' => 2000
         ])->response;
-
 
         $this->assertEquals(200, $response->status());
 
         $this->assertEquals(0, Kingdom::first()->treasury);
     }
 
-    public function testCannotEmbezzelTooMuchGoldOnHand() {
+    public function testCannotEmbezzleTooMuchGoldOnHand() {
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
@@ -404,10 +403,10 @@ class KingdomsControllerTest extends TestCase
             'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
         ]);
 
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzle', [
             'kingdom' => Kingdom::first()->id
         ]), [
-            'embezzel_amount' => 2000
+            'embezzle_amount' => 2000
         ])->response;
 
 
@@ -416,7 +415,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals(2000, Kingdom::first()->treasury);
     }
 
-    public function testCannotEmbezzelFromAnotherKingdom() {
+    public function testCannotEmbezzleFromAnotherKingdom() {
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
@@ -429,23 +428,23 @@ class KingdomsControllerTest extends TestCase
             'treasury'     => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzle', [
             'kingdom' => $otherKingdom->id
         ]), [
-            'embezzel_amount' => 2000
+            'embezzle_amount' => 2000
         ])->response;
 
         $this->assertEquals(422, $response->status());
     }
 
-    public function testCannotEmbezzelMissingParam() {
+    public function testCannotEmbezzleMissingParam() {
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
             'treasury'     => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzle', [
             'kingdom' => Kingdom::first()->id
         ]))->response;
 
@@ -453,20 +452,20 @@ class KingdomsControllerTest extends TestCase
 
         $content = json_decode($response->content());
 
-        $this->assertEquals('Amount to embezzel is required.', $content->errors->embezzel_amount[0]);
+        $this->assertEquals('Amount to embezzle is required.', $content->errors->embezzle_amount[0]);
     }
 
-    public function testCannotEmbezzelHaveNoTreasury() {
+    public function testCannotEmbezzleHaveNoTreasury() {
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
             'treasury'     => 0,
         ]);
 
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzle', [
             'kingdom' => Kingdom::first()->id
         ]), [
-            'embezzel_amount' => 2000
+            'embezzle_amount' => 2000
         ])->response;
 
         $this->assertEquals(422, $response->status());
@@ -476,7 +475,7 @@ class KingdomsControllerTest extends TestCase
         $this->assertEquals('You don\'t have the gold in your treasury.', $content->message);
     }
 
-    public function testCannotEmbezzelMoraleTooLow() {
+    public function testCannotEmbezzleMoraleTooLow() {
         $this->createKingdom([
             'character_id'   => Character::first()->id,
             'game_map_id'    => GameMap::first()->id,
@@ -484,10 +483,10 @@ class KingdomsControllerTest extends TestCase
             'treasury'       => 2000,
         ]);
 
-        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzel', [
+        $response = $this->actingAs($this->character->getUser())->json('POST', route('kingdom.embezzle', [
             'kingdom' => Kingdom::first()->id
         ]), [
-            'embezzel_amount' => 2000
+            'embezzle_amount' => 2000
         ])->response;
 
         $this->assertEquals(422, $response->status());

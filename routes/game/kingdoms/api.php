@@ -20,7 +20,7 @@ Route::middleware(['auth'])->group(function() {
         Route::post('/kingdoms/{kingdom}/recruit-units/{gameUnit}', ['as' => 'kingdoms.recruit.units', 'uses' => 'Api\KingdomsController@recruitUnits']);
         Route::post('/kingdoms/recruit-units/cancel', ['as' => 'kingdoms.recruit.units.cancel', 'uses' => 'Api\KingdomsController@cancelRecruit']);
 
-        Route::post('/kingdoms/embezel/{kingdom}', ['as' => 'kingdom.embezzel', 'uses' => 'Api\KingdomsController@embezzel']);
+        Route::post('/kingdoms/embezel/{kingdom}', ['as' => 'kingdom.embezzle', 'uses' => 'Api\KingdomsController@embezzle']);
         Route::post('/kingdoms/mass-embezzle/{character}', ['as' => 'kingdom.mass.embezzle', 'uses' => 'Api\KingdomsController@massEmbezzle']);
         Route::post('/kingdoms/deposit/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@deposit']);
 

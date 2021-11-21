@@ -1,26 +1,26 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
 
-export default class Embezzel extends React.Component {
+export default class Embezzle extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      totalToEmbezzel: 0,
+      totalToEmbezzle: 0,
       showError: false,
       errorText: null,
       loading: false,
     }
   }
 
-  embezzel() {
+  embezzle() {
     this.setState({
       showError: false,
       errorText: null,
       loading: true,
     }, () => {
-      if (this.state.totalToEmbezzel <= 0) {
+      if (this.state.totalToEmbezzle <= 0) {
         return this.setState({
           showError: true,
           errorText: 'Total to embezzle cannot be less then or equal to 0.',
@@ -29,15 +29,15 @@ export default class Embezzel extends React.Component {
       }
 
       axios.post('/api/kingdoms/embezel/' + this.props.kingdomId, {
-        embezzel_amount: this.state.totalToEmbezzel
+        embezzle_amount: this.state.totalToEmbezzle
       }).then((result) => {
-        const amountEmbzzeled = this.state.totalToEmbezzel;
+        const amountEmbzzeled = this.state.totalToEmbezzle;
 
         this.setState({
-          totalToEmbezzel: 0,
+          totalToEmbezzle: 0,
           loading: false,
         }, () => {
-          this.props.embezzeledSuccess(amountEmbzzeled);
+          this.props.embezzleedSuccess(amountEmbzzeled);
           this.props.close();
         });
       }).catch((err) => {
@@ -64,9 +64,9 @@ export default class Embezzel extends React.Component {
     });
   }
 
-  updateEmbezzel(e) {
+  updateEmbezzle(e) {
     this.setState({
-      totalToEmbezzel: e.target.value
+      totalToEmbezzle: e.target.value
     });
   }
 
@@ -113,13 +113,13 @@ export default class Embezzel extends React.Component {
           }
           <div className="mt-2">
             <div className="form-group">
-              <label htmlFor="embezzel-amount">Embezzle Amount</label>
+              <label htmlFor="embezzle-amount">Embezzle Amount</label>
               <input
                 type="number"
                 className="form-control"
-                id="embezzel-amount"
-                value={this.state.totalToEmbezzel}
-                onChange={this.updateEmbezzel.bind(this)}
+                id="embezzle-amount"
+                value={this.state.totalToEmbezzle}
+                onChange={this.updateEmbezzle.bind(this)}
               />
             </div>
           </div>
@@ -136,8 +136,8 @@ export default class Embezzel extends React.Component {
           <Button variant="danger" onClick={this.props.close}>
             Close
           </Button>
-          <Button variant="primary" onClick={this.embezzel.bind(this)} disabled={this.disableEmbezel()}>
-            Embezzel
+          <Button variant="primary" onClick={this.embezzle.bind(this)} disabled={this.disableEmbezel()}>
+            Embezzle
           </Button>
         </Modal.Footer>
       </Modal>

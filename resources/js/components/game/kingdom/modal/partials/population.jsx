@@ -133,11 +133,11 @@ export default class Population extends React.Component {
 
           <div className="mt-2">
             <div className="form-group">
-              <label htmlFor="embezzel-amount">People to buy</label>
+              <label htmlFor="embezzle-amount">People to buy</label>
               <input
                 type="number"
                 className="form-control"
-                id="embezzel-amount"
+                id="embezzle-amount"
                 value={this.state.toPurchase}
                 onChange={this.updateToBuy.bind(this)}
                 max={this.getPeopleAllowed()}

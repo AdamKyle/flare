@@ -1,5 +1,5 @@
 import React from 'react';
-import Embezzel from './embezzel';
+import Embezzle from './embezzle';
 import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import Deposit from "./deposit";
 import Population from "./population";
@@ -40,7 +40,7 @@ export default class KingdomInfo extends React.Component {
     super(props);
 
     this.state = {
-      showEmbezzel: false,
+      showEmbezzle: false,
       showDeposit: false,
       showSuccess: false,
       successMessage: null,
@@ -109,15 +109,15 @@ export default class KingdomInfo extends React.Component {
     });
   }
 
-  showEmbezzel() {
+  showEmbezzle() {
     this.setState({
-      showEmbezzel: true,
+      showEmbezzle: true,
     });
   }
 
-  closeEmbezzel() {
+  closeEmbezzle() {
     this.setState({
-      showEmbezzel: false,
+      showEmbezzle: false,
     });
   }
 
@@ -125,7 +125,7 @@ export default class KingdomInfo extends React.Component {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  embezzeledSuccess(amount) {
+  embezzleedSuccess(amount) {
     this.setState({
       showSuccess: true,
       successMessage: 'Embezzled ' + this.formatNumber(amount) + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
@@ -224,7 +224,7 @@ export default class KingdomInfo extends React.Component {
                   delay={{ show: 250, hide: 400 }}
                   overlay={renderWithdrawl}
                 >
-                  <button className="btn btn-danger btn-sm" onClick={this.showEmbezzel.bind(this)}>
+                  <button className="btn btn-danger btn-sm" onClick={this.showEmbezzle.bind(this)}>
                     <i className="ra ra-gold-bar"></i>
                   </button>
 
@@ -331,13 +331,13 @@ export default class KingdomInfo extends React.Component {
             </div>
           </div>
         </div>
-        <Embezzel
-          show={this.state.showEmbezzel}
-          close={this.closeEmbezzel.bind(this)}
+        <Embezzle
+          show={this.state.showEmbezzle}
+          close={this.closeEmbezzle.bind(this)}
           morale={this.props.kingdom.current_morale}
           treasury={this.props.kingdom.treasury}
           kingdomId={this.props.kingdom.id}
-          embezzeledSuccess={this.embezzeledSuccess.bind(this)}
+          embezzleedSuccess={this.embezzleedSuccess.bind(this)}
         />
         <Deposit
           show={this.state.showDeposit}
