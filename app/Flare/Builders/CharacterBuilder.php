@@ -11,8 +11,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
-use App\Flare\Values\FactionLevel;
-use Illuminate\Support\Facades\DB;
+use App\Game\Core\Values\FactionLevel;
 
 class CharacterBuilder {
 

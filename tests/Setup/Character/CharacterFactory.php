@@ -6,6 +6,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Core\Values\FactionLevel;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 use Str;
@@ -83,6 +84,32 @@ class CharacterFactory {
         $this->createInventory();
 
         $this->assignBaseSkills();
+
+        return $this;
+    }
+
+    /**
+     * Assign Faction system.
+     *
+     * @return CharacterFactory
+     */
+    public function assignFactionSystem(): CharacterFactory {
+
+        // In case it's called again, we don't want duplicates.
+        // If the monster updates its plane or a monster is created
+        // with a different plane then the character, we need to make sure their
+        // faction system is always up-to-date.
+        $this->character->factions()->delete();
+
+        $gameMaps = GameMap::all();
+
+        foreach ($gameMaps as $map) {
+            $this->character->factions()->create([
+                'character_id'  => $this->character->id,
+                'game_map_id'   => $map->id,
+                'points_needed' => FactionLevel::getPointsNeeded(0),
+            ]);
+        }
 
         return $this;
     }

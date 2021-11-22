@@ -34,7 +34,7 @@ class ProcessAttackAutomationTest extends TestCase
     public function testProcessAndLive() {
         $character = $this->character->equipStrongGear()->updateSkill('Accuracy', [
             'level' => 999
-        ])->getCharacter();
+        ])->assignFactionSystem()->getCharacter();
 
         $monster   = $this->createMonster([
             'health_range' => '1-1',

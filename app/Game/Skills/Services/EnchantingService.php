@@ -158,6 +158,7 @@ class EnchantingService {
         return ItemAffix::select('name', 'cost', 'id', 'type')
                         ->where('int_required', '<=', $builder->statMod('int'))
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
+                        ->where('randomly_generated', false)
                         ->orderBy('cost', 'asc')
                         ->get();
     }

@@ -2,9 +2,14 @@
 
 namespace App\Game\Battle\Handlers;
 
+use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Models\Faction;
 use App\Flare\Values\FactionType;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -14,6 +19,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
+use App\Flare\Models\Item as ItemModel;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
@@ -29,9 +35,16 @@ class BattleEventHandler {
 
     private $characterAttackTransformer;
 
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterAttackTransformer) {
+    private $randomAffixGenerator;
+
+    public function __construct(
+        Manager $manager,
+        CharacterAttackTransformer $characterAttackTransformer,
+        RandomAffixGenerator $randomAffixGenerator,
+    ) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->randomAffixGenerator       = $randomAffixGenerator;
     }
 
     public function processDeadCharacter(Character $character) {
@@ -95,7 +108,7 @@ class BattleEventHandler {
     }
 
     protected function handleFactionPoints(Character $character, Monster $monster) {
-        $mapId = $monster->gameMap->id;
+        $mapId   = $monster->gameMap->id;
         $mapName = $monster->gameMap->name;
 
         $faction = $character->factions()->where('game_map_id', $mapId)->first();
@@ -110,19 +123,61 @@ class BattleEventHandler {
 
             event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
 
-            $title = FactionType::getTitle($faction->level);
+            $faction = $this->updateFaction($faction);
 
-            $faction->current_points = 0;
-            $faction->level         += 1;
-            $faction->points_needed  = FactionLevel::getPointsNeeded($faction->level);
-            $fatction->title         = $title;
+            $this->rewardPlayer($character, $faction);
 
-            $this->giveCharacterGold($character, $faction->refresh()->level);
+            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->level) . ' of ' . $mapName));
 
-            event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
+            return;
+
+        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
+            event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
+            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
+
+            $this->rewardPlayer($character, $faction);
+
+            return;
         }
 
         $faction->save();
+    }
+
+    protected function updateFaction(Faction $faction): Faction {
+        $faction->current_points = 0;
+        $faction->level         += 1;
+
+        $factions->save();
+
+        $faction = $faction->refresh();
+
+        $faction->points_needed  = FactionLevel::getPointsNeeded($faction->level);
+        $fatction->title         = FactionType::getTitle($faction->level);
+
+        $factions->save();
+
+        return $faction->refresh();
+    }
+
+    protected function rewardPlayer(Character $character, Faction $faction) {
+        $this->giveCharacterGold($character, $faction->level);
+
+        $item = $this->giveCharacterRandomItem($character);
+
+        event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
+
+        if ($character->isInventoryFull()) {
+            event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for the next time!'));
+        } else {
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id'      => $item->id,
+            ]);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->refresh()->user));
+
+            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix): ' . $item->affix_name));
+        }
     }
 
     protected function giveCharacterGold(Character $character, int $factionLevel) {
@@ -145,5 +200,30 @@ class BattleEventHandler {
         $character->save();
 
         return $character;
+    }
+
+    protected function giveCharacterRandomItem(Character $character) {
+        $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
+                         ->whereNull('item_prefix_id')
+                         ->whereNull('item_suffix_id')
+                         ->inRandomOrder()
+                         ->first();
+
+
+        $randomAffix = $this->randomAffixGenerator
+                            ->setCharacter($character)
+                            ->setPaidAmount(RandomAffixDetails::BASIC);
+
+        $item->update([
+            'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
+        ]);
+
+        if (rand(1, 100) > 50) {
+            $item->update([
+                'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
+            ]);
+        }
+
+        return $item;
     }
 }

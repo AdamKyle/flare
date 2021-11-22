@@ -61,6 +61,7 @@ class ItemAffix extends Model
         'move_time_out_mod_bonus',
         'devouring_light',
         'can_drop',
+        'randomly_generated',
     ];
 
     /**
@@ -108,6 +109,7 @@ class ItemAffix extends Model
         'can_drop'                         => 'boolean',
         'irresistible_damage'              => 'boolean',
         'damage_can_stack'                 => 'boolean',
+        'randomly_generated'               => 'boolean',
     ];
 
     protected static function newFactory() {

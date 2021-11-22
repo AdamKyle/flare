@@ -22,6 +22,7 @@ class DataTable extends Component
 
     public function fetchAffixes() {
         return ItemAffix::dataTableSearch($this->search)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -29,6 +30,7 @@ class DataTable extends Component
     public function fetchClassBonusAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->where('class_bonus', '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -36,6 +38,7 @@ class DataTable extends Component
     public function fetchDamageBonusAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->where('damage', '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -43,6 +46,7 @@ class DataTable extends Component
     public function fetchResistanceReductionAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->where('resistance_reduction', '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -50,6 +54,7 @@ class DataTable extends Component
     public function fetchLifeStealingAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->whereNotNull('steal_life_amount')
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -57,6 +62,7 @@ class DataTable extends Component
     public function fetchStatReductionAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->where('reduces_enemy_stats', true)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -64,6 +70,7 @@ class DataTable extends Component
     public function fetchEntrancingAffixes() {
         return ItemAffix::dataTableSearch($this->search)
             ->where('entranced_chance', '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -71,6 +78,7 @@ class DataTable extends Component
     public function fetchSpecificStat() {
         return ItemAffix::dataTableSearch($this->search)
             ->where($this->type, '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -78,6 +86,7 @@ class DataTable extends Component
     public function fetchSkills() {
         return ItemAffix::dataTableSearch($this->search)
             ->where($this->type, '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -85,6 +94,7 @@ class DataTable extends Component
     public function fetchClassBonus() {
         return ItemAffix::dataTableSearch($this->search)
             ->where($this->type, '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -93,6 +103,7 @@ class DataTable extends Component
         if ($this->type === 'base_ac_mod_bonus') {
             $affixes = ItemAffix::dataTableSearch($this->search)
                 ->whereNotNull($this->type)
+                ->where('randomly_generated', false)
                 ->get();
 
             $affixes = $affixes->filter(function($affix) {
@@ -112,6 +123,7 @@ class DataTable extends Component
 
         return ItemAffix::dataTableSearch($this->search)
             ->where($this->type, '>', 0)
+            ->where('randomly_generated', false)
             ->orderBy($this->sortField, $this->sortBy)
             ->paginate($this->perPage);
     }
@@ -120,10 +132,12 @@ class DataTable extends Component
         if ($this->irresistible) {
             $affixes = ItemAffix::dataTableSearch($this->search)
                 ->where('irresistible_damage', true)
+                ->where('randomly_generated', false)
                 ->get();
         } else {
             $affixes = ItemAffix::dataTableSearch($this->search)
                 ->where('irresistible_damage', false)
+                ->where('randomly_generated', false)
                 ->where('damage', '>', 0)
                 ->get();
         }
@@ -141,6 +155,7 @@ class DataTable extends Component
     public function fetchEntrancing() {
         $affixes = ItemAffix::dataTableSearch($this->search)
             ->whereNotNull('entranced_chance')
+            ->where('randomly_generated', false)
             ->get();
 
         $affixes = $affixes->filter(function($affix) {
@@ -161,6 +176,7 @@ class DataTable extends Component
     public function fetchDevouringLight() {
         $affixes = ItemAffix::dataTableSearch($this->search)
             ->whereNotNull('devouring_light')
+            ->where('randomly_generated', false)
             ->get();
 
         $affixes = $affixes->filter(function($affix) {

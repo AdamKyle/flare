@@ -54,7 +54,8 @@ class BattleControllerApiTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation()
-                                                 ->equipStartingEquipment();
+                                                 ->equipStartingEquipment()
+                                                 ->assignFactionSystem();
 
         $this->monster   = (new MonsterFactory)->buildMonster();
 
@@ -400,6 +401,8 @@ class BattleControllerApiTest extends TestCase
                 'name' => 'Shadow Plane'
             ])->id,
         ]);
+
+        $this->character->assignFactionSystem();
 
         $monster = $monster->refresh();
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -34,7 +35,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
                 $app->make(Manager::class),
-                $app->make(CharacterAttackTransformer::class)
+                $app->make(CharacterAttackTransformer::class),
+                $app->make(RandomAffixGenerator::class),
             );
         });
 

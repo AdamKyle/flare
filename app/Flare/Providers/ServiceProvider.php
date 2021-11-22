@@ -3,8 +3,10 @@
 namespace App\Flare\Providers;
 
 
+use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Builders\CharacterAttackInformation;
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
@@ -70,6 +72,16 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterAttackInformation::class, function() {
             return new CharacterAttackInformation();
+        });
+
+        $this->app->bind(AffixAttributeBuilder::class, function() {
+            return new AffixAttributeBuilder();
+        });
+
+        $this->app->bind(RandomAffixGenerator::class, function($app) {
+            return new RandomAffixGenerator(
+                $app->make(AffixAttributeBuilder::class)
+            );
         });
 
         $this->app->bind(CharacterInformationBuilder::class, function($app) {
