@@ -2,6 +2,9 @@
 
 namespace App\Game\Battle\Handlers;
 
+use App\Flare\Values\FactionType;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Values\FactionLevel;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -48,6 +51,10 @@ class BattleEventHandler {
     public function processMonsterDeath(Character $character, int $monsterId) {
         $monster = Monster::find($monsterId);
 
+        $this->handleFactionPoints($character, $monster);
+
+        $character = $character->refresh();
+
         event(new UpdateCharacterEvent($character, $monster));
         event(new DropsCheckEvent($character, $monster));
         event(new GoldRushCheckEvent($character, $monster));
@@ -83,6 +90,59 @@ class BattleEventHandler {
         $characterData = $this->manager->createData($characterData)->toArray();
 
         broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
+
+        return $character;
+    }
+
+    protected function handleFactionPoints(Character $character, Monster $monster) {
+        $mapId = $monster->gameMap->id;
+        $mapName = $monster->gameMap->name;
+
+        $faction = $character->factions()->where('game_map_id', $mapId)->first();
+
+        $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
+
+        if ($faction->current_points > $faction->points_needed) {
+            $faction->current_points = $faction->points_needed;
+        }
+
+        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
+
+            event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
+
+            $title = FactionType::getTitle($faction->level);
+
+            $faction->current_points = 0;
+            $faction->level         += 1;
+            $faction->points_needed  = FactionLevel::getPointsNeeded($faction->level);
+            $fatction->title         = $title;
+
+            $this->giveCharacterGold($character, $faction->refresh()->level);
+
+            event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
+        }
+
+        $faction->save();
+    }
+
+    protected function giveCharacterGold(Character $character, int $factionLevel) {
+        $gold = FactionLevel::getGoldReward($factionLevel);
+
+        $characterNewGold = $character->gold + $gold;
+
+        $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
+
+        if ($cannotHave) {
+            event(new ServerMessageEvent($character->user, 'Failed to reward the gold as you are, or are too close to gold cap to receive: ' . number_format($gold) . ' gold.'));
+
+            return $character;
+        }
+
+        $character->gold += $gold;
+
+        event(new ServerMessageEvent($character->user, 'Received Faction Gold Reward: ' . number_format($gold) . ' gold.'));
+
+        $character->save();
 
         return $character;
     }

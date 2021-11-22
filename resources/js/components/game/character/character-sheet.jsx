@@ -5,6 +5,7 @@ import Boons from "./boons";
 import InventoryDetails from "./sheet/Inventory-details";
 import SkillDetails from "./sheet/skill-details";
 import Automations from "./automations";
+import Factions from "./factions";
 
 export default class CharacterSheet extends React.Component {
 
@@ -108,6 +109,9 @@ export default class CharacterSheet extends React.Component {
                     </Tab>
                     <Tab eventKey="character-automation" title={this.automationsTitle()}>
                       <Automations automations={this.state.characterSheet.automations} />
+                    </Tab>
+                    <Tab eventKey="character-faction" title='Factions'>
+                      <Factions factions={this.state.characterSheet.factions} />
                     </Tab>
                   </Tabs>
                   <SkillDetails

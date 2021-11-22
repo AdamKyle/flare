@@ -81,6 +81,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'devouring_darkness' => $characterInformation->getDevouringDarkness(),
             'attack_stats'       => Cache::get('character-attack-data-' . $character->id),
             'automations'        => $this->getAutomations($character),
+            'factions'           => $this->getFactions($character),
         ];
     }
 
@@ -101,6 +102,18 @@ class CharacterSheetTransformer extends TransformerAbstract {
             $automation->type = (new AutomationType($automation->type))->isAttack() ? 'attack' : 'Unknown';
 
             return $automation;
+        });
+    }
+
+    protected function getFactions(Character $character): Collection {
+        return $character->factions->transform(function($faction) {
+           $faction->map_name = $faction->gameMap->name;
+
+           if (!is_null($faction->title)) {
+               $faction->title = $faction->title . ' of ' . $faction->gameMap->name;
+           }
+
+           return $faction;
         });
     }
 }

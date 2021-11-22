@@ -119,6 +119,10 @@ class Character extends Model
         return $this->hasMany(InventorySet::class, 'character_id', 'id');
     }
 
+    public function factions() {
+        return $this->hasMany(Faction::class, 'character_id', 'id');
+    }
+
     public function map() {
         return $this->hasOne(Map::class);
     }

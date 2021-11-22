@@ -11,6 +11,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
+use App\Flare\Values\FactionLevel;
 use Illuminate\Support\Facades\DB;
 
 class CharacterBuilder {
@@ -112,6 +113,8 @@ class CharacterBuilder {
             'game_map_id'  => $map->id,
         ]);
 
+        $this->assignFactions();
+
         return $this;
     }
 
@@ -190,6 +193,27 @@ class CharacterBuilder {
                 resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Assign the factions to the character, one for each map.
+     *
+     * @return CharacterBuilder
+     */
+    public function assignFactions(): CharacterBuilder {
+        $gameMaps = GameMap::all();
+
+        foreach ($gameMaps as $gameMap) {
+            $this->character->factions()->create([
+                'character_id'  => $this->character->id,
+                'game_map_id'   => $gameMap->id,
+                'points_needed' => FactionLevel::getPointsNeeded(0),
+            ]);
+        }
+
+        $this->character = $this->character->refresh();
 
         return $this;
     }
