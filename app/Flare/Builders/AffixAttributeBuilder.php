@@ -113,7 +113,7 @@ class AffixAttributeBuilder {
             'description'          => 'This is a randomly generated affix. By speaking with the Queen of Hearts in Hell, you can re-roll specific stats for it\'s cost plus the appropriate shard cost. 
                 All attributes are randomly rolled each time you get an item via completing faction achievements or from purchasing from the Queen of Hearts. These affixes cannot be crafted. But can be sold on the market. 
                 The Queen of Hearts will also let you switch the affix to another item, for the affix and shard cost. For more info, see help docs under NPC\'s for more details.
-                You can also checkout the help docs, the last section in the side bar (with the monsters lists) also has info on randomly generated help affixes.',
+                You can also check out the help docs under crafting/enchanting to read more about randomly generated affixes.',
             'cost'                 => $amountPaid,
             'int_required'         => '0',
             'skill_level_required' => '999',
@@ -201,8 +201,8 @@ class AffixAttributeBuilder {
 
     protected function setReductions(): array {
         return [
-            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
+            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
+            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
         ];
     }
 

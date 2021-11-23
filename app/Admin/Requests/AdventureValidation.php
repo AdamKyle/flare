@@ -26,7 +26,7 @@ class AdventureValidation extends FormRequest
         return [
             'name'             => 'required',
             'description'      => 'required',
-            'location_ids'     => 'required',
+            'location_id'      => 'required',
             'monster_ids'      => 'required',
             'levels'           => 'required',
             'time_per_level'   => 'required',
@@ -41,7 +41,7 @@ class AdventureValidation extends FormRequest
     public function messages() {
         return [
             'name.required'             => 'Adventure name is required.',
-            'location_ids.required'     => 'Adventure needs at least one location.',
+            'location_id.required'      => 'Adventure needs at least one location.',
             'monster_ids.required'      => 'Adventure needs at least one monster.',
             'levels.required'           => 'Adventure levels is required.',
             'time_per_level.required'   => 'Adventure time per level is required.',

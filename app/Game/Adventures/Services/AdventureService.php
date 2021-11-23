@@ -51,9 +51,10 @@ class AdventureService {
      * @var array $rewards
      */
     private $rewards = [
-        'gold'  => 0,
-        'exp'   => 0,
-        'items' => [],
+        'gold'           => 0,
+        'exp'            => 0,
+        'faction_points' => 0,
+        'items'          => [],
     ];
 
     /**

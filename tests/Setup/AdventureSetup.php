@@ -17,16 +17,6 @@ class AdventureSetup {
     public function setMonster(Monster $monster, int $bonusIncrease = 0): AdventureSetup {
         $this->monster = $monster;
 
-        foreach(GameSkill::all() as $gameSkill) {
-            $skills[] = resolve(BaseSkillValue::class)->getBaseMonsterSkillValue($this->monster, $gameSkill);
-        }
-        
-        if ($bonusIncrease !== 0) {
-            foreach ($skills as $skill) {
-                $skill['skill_bonus'] = $bonusIncrease;
-            }
-        }
-
         return $this;
     }
 

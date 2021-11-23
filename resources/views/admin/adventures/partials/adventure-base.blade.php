@@ -1,5 +1,5 @@
-<div class="card">
-    <div class="card-body">
+<div class="md:tw-w-3/4 tw-w-full tw-m-auto">
+    <x-core.cards.card css="tw-mt-5 tw-mb-5 tw-w-full tw-m-auto">
         <p>{{$adventure->description}}</p>
         <hr />
         <dl>
@@ -34,37 +34,38 @@
                 @endif
             @endif
         @endguest
-    </div>
-</div>
-<h4>Found At:</h4>
-@livewire('admin.locations.data-table', [
-    'adventureId' => $adventure->id,
-])
-<h4>With Monsters:</h4>
-<p class="text-muted mb-2" style="font-size: 12px;"><em>Monsters are selected at random for each adventure level.</em></p>
-@livewire('admin.monsters.data-table', [
-    'adventureId' => $adventure->id
-])
-@if (!is_null($adventure->itemReward))
-    <h4>Rewards: {{$adventure->itemReward->name}}</h4>
-    <em class="text-muted" style="font-size: 12px;">All quest items are rewarded once for completing the adventure the first time only.</em>
-    <div class="card mt-2">
-        <div class="card-body">
-            <div class="mt-2">
-                @if (!is_null($adventure->itemReward))
-                    @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
-                    @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
-                @else
-                    @guest
+    </x-core.cards.card>
+    <h2 class="tw-font-light">Found At</h2>
+    @livewire('admin.locations.data-table', [
+        'adventureId' => $adventure->id,
+    ])
+    <x-core.cards.card-with-title title="With Monsters" css="tw-mt-5 tw-w-full tw-m-auto">
+    <p class="text-muted mb-2" style="font-size: 12px;"><em>Monsters are selected at random for each adventure level.</em></p>
+    @livewire('admin.monsters.data-table', [
+        'adventureId' => $adventure->id
+    ])
+    </x-core.cards.card-with-title>
+    @if (!is_null($adventure->itemReward))
+        <h4>Rewards: {{$adventure->itemReward->name}}</h4>
+        <em class="text-muted" style="font-size: 12px;">All quest items are rewarded once for completing the adventure the first time only.</em>
+        <div class="card mt-2">
+            <div class="card-body">
+                <div class="mt-2">
+                    @if (!is_null($adventure->itemReward))
+                        @include('game.items.partials.item-details', ['item' => $adventure->itemReward])
+                        @include('game.core.partials.equip.details.item-stat-details', ['item' => $adventure->itemReward])
                     @else
-                        @if (auth()->user->hasRole('Admin'))
-                            <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
-                                'adventure' => $adventure->id,
-                            ])}}">Assign one.</a> </div>
+                        @guest
+                        @else
+                            @if (auth()->user->hasRole('Admin'))
+                                <div class="alert alert-info"> This adventure has no quest item rewards. <a href="{{route('adventure.edit', [
+                                    'adventure' => $adventure->id,
+                                ])}}">Assign one.</a> </div>
+                            @endif
                         @endif
                     @endif
-                @endif
+                </div>
             </div>
         </div>
-    </div>
-@endif
+    @endif
+</div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Values;
+namespace App\Game\Core\Values;
 
 class FactionType {
 

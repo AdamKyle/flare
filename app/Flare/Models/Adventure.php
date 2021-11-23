@@ -28,6 +28,7 @@ class Adventure extends Model
         'skill_exp_bonus',
         'exp_bonus',
         'published',
+        'location_id',
     ];
 
     /**
@@ -49,8 +50,8 @@ class Adventure extends Model
         return $this->belongsToMany(Monster::class);
     }
 
-    public function locations() {
-        return $this->belongsToMany(Location::class);
+    public function location() {
+        return $this->hasOne(Location::class, 'id', 'location_id');
     }
 
     public function itemReward() {

@@ -6,6 +6,8 @@
 <dl>
   <dt>Total XP:</dt>
   <dd>{{number_format($rewards['exp'])}}</dd>
+  <dt>Total Faction Points:</dt>
+  <dd>{{number_format($rewards['faction_points'])}}</dd>
   <dt>Total Gold:</dt>
   <dd>{{number_format($rewards['gold'])}}</dd>
   @if (isset($rewards['skill']))

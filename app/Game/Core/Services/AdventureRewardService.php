@@ -2,13 +2,21 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Models\Adventure;
+use App\Flare\Models\Faction;
+use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Game\Core\Values\FactionLevel;
+use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class AdventureRewardService {
 
@@ -48,7 +56,7 @@ class AdventureRewardService {
      * @param Character $character
      * @return AdventureRewardService
      */
-    public function distributeRewards(array $rewards, Character $character): AdventureRewardService {
+    public function distributeRewards(array $rewards, Character $character, Adventure $adventure): AdventureRewardService {
 
         $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
 
@@ -80,6 +88,36 @@ class AdventureRewardService {
 
     public function getItemsLeft(): array {
         return $this->itemsLeft;
+    }
+
+    protected function handleFactionPoints(Character $character, Adventure $adventure, int $factionPoints) {
+        $faction   = $character->factions()->where('game_map_id', $adventure->location->map->id);
+
+        $points    = $faction->current_points + $factionPoints;
+
+        $spillOver = 0;
+
+        if ($points > $faction->points_needed) {
+            $spillOver = $points - $factionPoints->points_needed;
+            $points    = $factionPoints->points_needed;
+        }
+
+        if ($points >= $factionPoints->needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
+            $newLevel = $faction->current_level + 1;
+
+            $faction->update([
+                'current_level'  => $newLevel,
+                'current_points' => 0,
+                'points_needed'  => FactionLevel::gatPointsPerLevel($newLevel),
+                'title'          => FactionType::getTitle($newLevel),
+            ]);
+
+            $faction = $faction->refresh();
+
+            $this->messages[] = [$faction->gameMap->name . ' faction has gained a new level!'];
+
+            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
+        }
     }
 
     protected function handleXp(int $xp, Character $character): void {
@@ -229,5 +267,75 @@ class AdventureRewardService {
                 $character = $character->refresh();
             }
         }
+    }
+
+    protected function factionReward(Character $character, Faction $faction, string $mapName, ?string $title = null) {
+        $character = $this->giveCharacterFactionGold($character, $faction->current_level);
+        $item      = $this->giveCharacterFactionRandomItem($character);
+
+        $this->messages[] = ['Achieved title: ' . $title . ' of ' . $mapName];
+
+        if ($character->isInventoryFull()) {
+            $this->messages[] = ['You got no faction item as your inventory is full. Clear space for the next time!'];
+        } else {
+
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id'      => $item->id,
+            ]);
+
+            $character = $character->refresh();
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            $this->messages[] = ['Faction rewarded with (item with randomly generated affix(es)): ' . $item->affix_name];
+        }
+    }
+
+    protected function giveCharacterFactionGold(Character $character, int $factionLevel) {
+        $gold = FactionLevel::getGoldReward($factionLevel);
+
+        $characterNewGold = $character->gold + $gold;
+
+        $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
+
+        if ($cannotHave) {
+            $this->messages[] = ['Failed to reward the faction gold as you are, or are too close to gold cap to receive: ' . number_format($gold) . ' gold.'];
+
+            return $character;
+        }
+
+        $character->gold += $gold;
+
+        $this->messages[] = ['Received faction gold reward: ' . number_format($gold) . ' gold.'];
+
+        $character->save();
+
+        return $character->refresh();
+    }
+
+    protected function giveCharacterFactionRandomItem(Character $character) {
+        $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
+            ->inRandomOrder()
+            ->first();
+
+
+        $randomAffix = $this->randomAffixGenerator
+            ->setCharacter($character)
+            ->setPaidAmount(RandomAffixDetails::BASIC);
+
+        $item->update([
+            'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
+        ]);
+
+        if (rand(1, 100) > 50) {
+            $item->update([
+                'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
+            ]);
+        }
+
+        return $item;
     }
 }

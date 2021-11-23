@@ -16,9 +16,9 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="adventure-location"> Loctations : <span class="danger">*</span> </label>
-            <select class="custom-select form-control required" id="adventure-location" name="location_ids[]" multiple>
+            <select class="custom-select form-control required" id="adventure-location" name="location_id">
                 @foreach($locations as $id => $name)
-                    <option {{!is_null($adventure) ? (!is_null($adventure->locations->where('id', $id)->first()) ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
+                    <option {{!is_null($adventure) ? ($adventure->location->id === $id ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
                 @endforeach
             </select>
         </div>
@@ -28,7 +28,7 @@
             <label for="adventure-location"> Monster : <span class="danger">*</span> </label>
             <select class="custom-select form-control required" id="adventure-location" name="monster_ids[]" multiple>
                 @foreach($monsters as $id => $name)
-                    <option {{!is_null($adventure) ? (!is_null($adventure->monsters->where('id', $id)->first()) ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
+                    <option {{!is_null($adventure) ? ($adventure->location->id === $id ? 'selected' : '') : ''}} value="{{$id}}">{{$name}}</option>
                 @endforeach
             </select>
         </div>

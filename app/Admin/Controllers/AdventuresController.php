@@ -65,8 +65,6 @@ class AdventuresController extends Controller {
 
         $adventure = Adventure::create(array_merge($requestForModel, ['published' => false]));
 
-        $adventure->locations()->attach($request->location_ids);
-
         $adventure->monsters()->attach($request->monster_ids);
 
         return redirect()->route('adventure.floor_descriptions', [

@@ -11,14 +11,15 @@ class AdventureCompletedRewards {
     use CanHaveQuestItem;
 
     private static $baseReward = [
-        'exp'   => 0,
-        'gold'  => 0,
-        'skill' => [
+        'exp'            => 0,
+        'gold'           => 0,
+        'faction_points' => 0,
+        'skill'          => [
             'exp'         => 0,
             'skill_name'  => 'None in training.',
             'exp_towards' => '0.0',
         ],
-        'items' => [],
+        'items'           => [],
     ];
 
     public static function CombineRewards(array $rewards, Character $character) {
@@ -26,8 +27,9 @@ class AdventureCompletedRewards {
         foreach ($rewards as $level => $levelRewards) {
             foreach ($levelRewards as $monster => $monsterRewards) {
 
-                self::$baseReward['exp']   += $monsterRewards['exp'];
-                self::$baseReward['gold']  += $monsterRewards['gold'];
+                self::$baseReward['exp']             += $monsterRewards['exp'];
+                self::$baseReward['gold']            += $monsterRewards['gold'];
+                self::$baseReward['faction_points']  += $monsterRewards['faction_points'];
 
 
                 self::updateSkillRewards($monsterRewards);

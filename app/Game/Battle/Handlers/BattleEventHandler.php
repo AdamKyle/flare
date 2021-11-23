@@ -4,7 +4,7 @@ namespace App\Game\Battle\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Faction;
-use App\Flare\Values\FactionType;
+use App\Game\Core\Values\FactionType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
@@ -13,7 +13,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
-use App\Flare\Events\ServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
@@ -125,7 +125,7 @@ class BattleEventHandler {
 
             $faction = $this->updateFaction($faction);
 
-            $this->rewardPlayer($character, $faction);
+            $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
             event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->level) . ' of ' . $mapName));
 
@@ -135,7 +135,7 @@ class BattleEventHandler {
             event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
             event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
 
-            $this->rewardPlayer($character, $faction);
+            $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
             return;
         }
@@ -144,39 +144,40 @@ class BattleEventHandler {
     }
 
     protected function updateFaction(Faction $faction): Faction {
-        $faction->current_points = 0;
-        $faction->level         += 1;
 
-        $factions->save();
+        $newLevel = $faction->current_level + 1;
 
-        $faction = $faction->refresh();
-
-        $faction->points_needed  = FactionLevel::getPointsNeeded($faction->level);
-        $fatction->title         = FactionType::getTitle($faction->level);
-
-        $factions->save();
+        $faction->update([
+            'current_points' => 0,
+            'current_level'  => $newLevel,
+            'points_needed'  => FactionLevel::getPointsNeeded($newLevel),
+            'title'          => FactionType::getTitle($newLevel)
+        ]);
 
         return $faction->refresh();
     }
 
-    protected function rewardPlayer(Character $character, Faction $faction) {
-        $this->giveCharacterGold($character, $faction->level);
-
-        $item = $this->giveCharacterRandomItem($character);
+    protected function rewardPlayer(Character $character, Faction $faction, string $mapName, ?string $title = null) {
+        $character = $this->giveCharacterGold($character, $faction->current_level);
+        $item      = $this->giveCharacterRandomItem($character);
 
         event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
 
         if ($character->isInventoryFull()) {
+
             event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for the next time!'));
         } else {
+
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
                 'item_id'      => $item->id,
             ]);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->refresh()->user));
+            $character = $character->refresh();
 
-            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix): ' . $item->affix_name));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
         }
     }
 
@@ -195,11 +196,11 @@ class BattleEventHandler {
 
         $character->gold += $gold;
 
-        event(new ServerMessageEvent($character->user, 'Received Faction Gold Reward: ' . number_format($gold) . ' gold.'));
+        event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold.'));
 
         $character->save();
 
-        return $character;
+        return $character->refresh();
     }
 
     protected function giveCharacterRandomItem(Character $character) {

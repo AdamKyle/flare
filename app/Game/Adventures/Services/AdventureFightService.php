@@ -226,7 +226,8 @@ class AdventureFightService {
             ];
         }
 
-        $this->rewardData['gold'] = $gold;
+        $this->rewardData['gold']           = $gold;
+        $this->rewardData['faction_points'] = 1;
     }
 
 }
