@@ -131,11 +131,15 @@ class BattleEventHandler {
 
             return;
 
-        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
+        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points) && !$faction->maxed) {
             event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
             event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
 
             $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
+
+            $faction->update([
+                'maxed' => true,
+            ]);
 
             return;
         }

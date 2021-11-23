@@ -69,6 +69,7 @@ class AdventureRewardService {
 
         $this->handleXp($rewards['exp'], $character);
         $this->handleSkillXP($rewards, $character);
+        $this->handleFactionPoints($character, $adventure, $rewards['faction_points']);
 
         if (!empty($rewards['items'])) {
             $this->handleItems($rewards['items'], $character);
@@ -117,6 +118,20 @@ class AdventureRewardService {
             $this->messages[] = [$faction->gameMap->name . ' faction has gained a new level!'];
 
             $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
+        } else if ($points >= $factionPoints->needed && FactionLevel::isMaxLevel($faction->current_level, $points) && !$faction->maxed) {
+            $this->messages[] = [$faction->gameMap->name . ' faction has become maxed out!'];
+
+            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
+
+            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
+
+            $faction->update([
+                'maxed' => true,
+            ]);
+        }
+
+        if ($spillOver > 0) {
+            $this->handleFactionPoints($character->refresh(), $adventure, $spillOver);
         }
     }
 

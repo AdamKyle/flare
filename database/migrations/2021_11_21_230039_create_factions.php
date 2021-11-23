@@ -25,6 +25,7 @@ class CreateFactions extends Migration
             $table->integer('current_points')->nullable()->default(0);
             $table->integer('points_needed')->nullable()->default(0);
             $table->string('title')->nullable();
+            $table->boolean('maxed')->default(false);
             $table->timestamps();
         });
     }

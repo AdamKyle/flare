@@ -19,6 +19,7 @@ class Faction extends Model
         'current_level',
         'current_points',
         'points_needed',
+        'maxed',
         'title',
     ];
 
@@ -31,6 +32,7 @@ class Faction extends Model
         'current_level'  => 'integer',
         'current_points' => 'integer',
         'points_needed'  => 'integer',
+        'maxed'          => 'boolean',
     ];
 
     public function character() {

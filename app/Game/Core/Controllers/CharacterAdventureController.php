@@ -80,7 +80,7 @@ class CharacterAdventureController extends Controller {
 
         $rewards = AdventureCompletedRewards::CombineRewards($rewards, $character);
 
-        $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character);
+        $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character, $adventureLog->adventure);
         $messages               = $adventureRewardService->getMessages();
 
         if (array_key_exists('error', $messages)) {
