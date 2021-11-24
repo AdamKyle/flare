@@ -26,11 +26,11 @@ class AttackExtraActionHandler {
         return $this->characterHealth;
     }
 
-    public function doAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+    public function doAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
 
-        $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth, $voided);
-        $monsterCurrentHealth = $this->tripleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided);
-        $monsterCurrentHealth = $this->doubleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided);
+        $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
+        $monsterCurrentHealth = $this->tripleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
+        $monsterCurrentHealth = $this->doubleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
 
         return $this->vampireThirst($characterInformationBuilder, $monsterCurrentHealth, $voided);
     }
@@ -49,13 +49,13 @@ class AttackExtraActionHandler {
         return false;
     }
 
-    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, $defender, int $monsterCurrentHealth, bool $voided = false): int {
+    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, $defender, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
 
         $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
-        $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided);
+        $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided, false, $dmgReduction);
 
-        return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided);
+        return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided, $dmgReduction);
     }
 
     public function positionalWeaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, int $damage): int {
@@ -117,7 +117,7 @@ class AttackExtraActionHandler {
     }
 
 
-    protected function tripleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+    protected function tripleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
         $character = $characterInformationBuilder->getCharacter();
 
@@ -133,6 +133,8 @@ class AttackExtraActionHandler {
 
             $damage = $characterInformationBuilder->getTotalWeaponDamage($voided) * 0.15;
 
+            $damage -= $damage * $dmgReduction;
+
             for ($i = 1; $i <= 3; $i++) {
                 $monsterCurrentHealth -= $damage;
 
@@ -145,7 +147,7 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    protected function doubleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+    protected function doubleAttackChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isFighter()) {
@@ -163,6 +165,8 @@ class AttackExtraActionHandler {
 
                 $totalDamage = ($characterAttack + $characterAttack * 0.15);
 
+                $totalDamage -= $totalDamage * $dmgReduction;
+
                 $monsterCurrentHealth -= $totalDamage;
 
                 $message = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
@@ -173,7 +177,11 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    protected function doubleCastChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender, bool $voided = false): int {
+    protected function doubleCastChance(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, $defender, bool $voided = false, float $dmgReduction): int {
+        if ($defender->spell_evasion > 1.0) {
+            return $monsterCurrentHealth;
+        }
+
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isHeretic()) {
@@ -188,6 +196,7 @@ class AttackExtraActionHandler {
 
             $spellDamage           = $characterInformationBuilder->getTotalSpellDamage($voided);
             $spellDamage           = $spellDamage + $spellDamage * 0.15;
+            $spellDamage          -= $spellDamage * $dmgReduction;
             $monsterCurrentHealth -= $spellDamage;
 
             $message               = 'Your spell(s) hit for: ' . number_format($spellDamage);
@@ -197,7 +206,7 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    public function vampireThirst(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+    public function vampireThirst(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
         $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
 
         if ($classType->isVampire()) {
@@ -218,7 +227,8 @@ class AttackExtraActionHandler {
 
             $character = $characterInformationBuilder->getCharacter();
 
-            $totalAttack = round($dur - $dur * 0.15);
+            $totalAttack  = round($dur - $dur * 0.15);
+            $totalAttack -= $totalAttack * $dmgReduction;
 
             $monsterCurrentHealth -= $totalAttack;
             $this->characterHealth += $totalAttack;
@@ -230,7 +240,7 @@ class AttackExtraActionHandler {
         return $monsterCurrentHealth;
     }
 
-    protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender, Character $character, bool $voided = false, bool $isDoubleCast = false): int {
+    protected function spellDamage(int $spellDamage, int $monsterCurrentHealth, $defender, Character $character, bool $voided = false, bool $isDoubleCast = false, float $dmgReduction = 0.0): int {
 
         $totalDamage = $this->calculateSpellDamage($spellDamage, $defender, $character, $voided);
 
@@ -249,6 +259,8 @@ class AttackExtraActionHandler {
             if ($isDoubleCast) {
                 $totalDamage += $totalDamage * 0.15;
             }
+
+            $totalDamage -= $totalDamage * $dmgReduction;
 
             $health = $monsterCurrentHealth - $totalDamage;
 
@@ -279,6 +291,12 @@ class AttackExtraActionHandler {
         $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
         $focus                = $character->getInformation()->statMod('focus');
 
+        if ($spellEvasion > 1.0) {
+            $this->messages = $this->addMessage('The enemy evades your spells', 'enemy-action-fired', $this->messages);
+
+            return 0.0;
+        }
+
         if ($voided) {
             $focus = $character->focus;
         }
@@ -307,7 +325,7 @@ class AttackExtraActionHandler {
         return 0.0;
     }
 
-    private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false): int {
+    private function weaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
         $characterAttack = $characterInformationBuilder->getTotalWeaponDamage($voided);
 
         $dc = 100 - 100 * $characterInformationBuilder->getSkill('Criticality');
@@ -319,6 +337,8 @@ class AttackExtraActionHandler {
 
             $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
         }
+
+        $characterAttack -= $characterAttack * $dmgReduction;
 
         $monsterCurrentHealth -= $characterAttack;
 

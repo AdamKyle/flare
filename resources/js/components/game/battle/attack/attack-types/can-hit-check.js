@@ -43,6 +43,7 @@ export default class CanHitCheck {
   }
 
   canCast(attacker, defender) {
+    console.log('Fucking be here!');
     const damage         = new Damage();
     let attackerAccuracy = null;
     let dodge            = null;

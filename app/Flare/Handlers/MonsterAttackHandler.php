@@ -181,12 +181,39 @@ class MonsterAttackHandler {
 
         if ($this->canHitHandler->canCast($attacker, $defender, $isDefenderVoided)) {
             $itemHandler        = $this->itemHandler->setCharacterHealth($this->characterHealth);
+            $defenderReduction  = $this->characterInformationBuilder
+                                       ->setCharacter($defender)
+                                       ->getTotalDeduction('spell_evasion');
+
             $monsterSpellDamage = rand(1, $attacker->max_spell_damage);
+
 
             if ($this->blockedAttack($monsterSpellDamage, $defender, $attackType, $isDefenderVoided)) {
                 $message = 'You managed to block the enemies spells with your armour!';
-                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
             } else {
+                if ($defenderReduction > 1.0) {
+                    $message = 'You evaded the enemies spells!';
+                    $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+                    return;
+                } else {
+                    $attackerFocus = $attacker->focus / 2000000000;
+
+                    if (!$attackerFocus >= 1.0) {
+                        $dc                = 50 + 50 * $attackerFocus;
+                        $roll              = rand(1, 100);
+                        $roll             += $roll * $defenderReduction;
+
+                        if ($roll > $dc) {
+                            $message = 'You evaded the enemies spells!';
+                            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+                            return;
+                        }
+                    }
+                }
+
                 $itemHandler->castSpell($attacker, $defender, $monsterSpellDamage);
 
                 $this->characterHealth = $itemHandler->getCharacterHealth();

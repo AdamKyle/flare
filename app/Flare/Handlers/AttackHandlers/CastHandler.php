@@ -151,8 +151,8 @@ class CastHandler {
     }
 
     public function castDamageSpells(CharacterInformationBuilder $characterInfo, $defender, bool $voided = false) {
-        $this->monsterHealth   = $this->attackExtraActionHandler->castSpells($characterInfo, $defender, $this->monsterHealth, $voided);
-        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
+        $this->monsterHealth   = $this->attackExtraActionHandler->castSpells($characterInfo, $defender, $this->monsterHealth, $voided, $this->dmgReduction);
+        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
         $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
 
         $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
@@ -163,7 +163,7 @@ class CastHandler {
     protected function fireOffVampireThirst(CharacterInformationBuilder $characterInfo, int $characterHealth = null, bool $voided = false) {
         $health = is_null($characterHealth) ? $this->characterHealth : $characterHealth;
 
-        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($health)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
+        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($health)->vampireThirst($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
 
         if (!is_null($characterHealth)) {
             $health           = $this->attackExtraActionHandler->getCharacterHealth();
@@ -198,7 +198,7 @@ class CastHandler {
         $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
             ->setMonsterHealth($this->monsterHealth);
 
-        $itemHandler->useItems($attacker, $defender, $voided);
+        $itemHandler->useItems($attacker, $defender, $voided, $this->dmgReduction);
 
         $this->characterHealth = $itemHandler->getCharacterHealth();
         $this->monsterHealth   = $itemHandler->getMonsterHealth();

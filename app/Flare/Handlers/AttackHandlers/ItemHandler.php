@@ -36,7 +36,7 @@ class ItemHandler {
         return $this;
     }
 
-    public function useItems($attacker, $defender, bool $voided = false) {
+    public function useItems($attacker, $defender, bool $voided = false, float $dmgReduction = 0.0) {
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
 
@@ -44,13 +44,15 @@ class ItemHandler {
                 $canResist  = $this->characterInformationBuilder->canAffixesBeResisted();
                 $damage     = $this->characterInformationBuilder->findLifeStealingAffixes(true);
 
+                $damage     -= $damage * $dmgReduction;
+
                 $this->useLifeStealingAffixes($defender, $damage, $canResist);
             }
         }
 
-        $this->useAffixes($attacker, $defender, $voided);
-        $this->useArtifacts($attacker, $defender, $voided);
-        $this->useRings($attacker, $voided);
+        $this->useAffixes($attacker, $defender, $voided, $dmgReduction);
+        $this->useArtifacts($attacker, $defender, $voided, $dmgReduction);
+        $this->useRings($attacker, $voided, $dmgReduction);
     }
 
     public function getMonsterHealth(): int {
@@ -75,7 +77,7 @@ class ItemHandler {
      * @param $attacker
      * @param $defender
      */
-    protected function useAffixes($attacker, $defender, bool $voided = false) {
+    protected function useAffixes($attacker, $defender, bool $voided = false, float $dmgReduction = 0.0) {
 
         if ($attacker instanceof Character && !$voided) {
             $totalDamage = $this->characterInformationBuilder->getTotalAffixDamage();
@@ -100,6 +102,8 @@ class ItemHandler {
                     $totalDamage += $this->characterInformationBuilder->getTotalAffixDamage($voided);
                 }
             }
+
+            $totalDamage -= $totalDamage * $dmgReduction;
 
             $monsterNewHealth = $this->currentMonsterHealth - $totalDamage;
 
@@ -211,11 +215,13 @@ class ItemHandler {
      * @param bool $isVoided
      * @return array
      */
-    protected function useRings($attacker, bool $isVoided = false): array {
+    protected function useRings($attacker, bool $isVoided = false, float $dmgReduction = 0.0): array {
         $messages = [];
 
         if ($attacker instanceof Character) {
             $ringDamage = $this->characterInformationBuilder->getTotalRingDamage($isVoided);
+
+            $ringDamage -= $ringDamage * $dmgReduction;
 
             if ($ringDamage > 0) {
                 $message = 'Your rings begin to shimmer in the presence of the enemy';
@@ -238,14 +244,14 @@ class ItemHandler {
      * @param $defender
      * @param bool $voided
      */
-    public function useArtifacts($attacker, $defender, bool $voided = false) {
+    public function useArtifacts($attacker, $defender, bool $voided = false, float $dmgReduction = 0.0) {
 
         if ($attacker instanceOf Character) {
             if ($this->characterInformationBuilder->hasArtifacts()) {
                 $message = 'Your artifacts glow before the enemy!';
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
-                $this->artifactDamage($attacker, $defender, $voided);
+                $this->artifactDamage($attacker, $defender, $voided, $dmgReduction);
             }
         }
 
@@ -267,13 +273,14 @@ class ItemHandler {
      * @param $attacker
      * @param $defender
      */
-    protected function artifactDamage($attacker, $defender, bool $voided = false) {
+    protected function artifactDamage($attacker, $defender, bool $voided = false, $dmgReduction = 0.0) {
 
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
             $defenderArtifactAnnulment = $this->characterInformationBuilder->getTotalAnnulment();
             $dc                        = 100 - $defenderArtifactAnnulment;
             $artifactDamage            = $this->characterInformationBuilder->getTotalArtifactDamage($voided);
+            $artifactDamage            -= $artifactDamage * $dmgReduction;
 
             if ($dc <= 0 || rand(1, 100) > $dc) {
                 $message = 'Your artifacts were annulled ...';
@@ -368,7 +375,7 @@ class ItemHandler {
 
                 $this->currentCharacterHealth = $health;
 
-                $message = 'The enemies spells burst towards you, slamming into you for: ' . $spellDamage;
+                $message = 'The enemies spells burst towards you, slamming into you for: ' . number_format($spellDamage);
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
             }
         }

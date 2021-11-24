@@ -136,7 +136,7 @@ class AttackHandler {
     }
 
     public function weaponAttack(CharacterInformationBuilder $characterInfo, bool $voided) {
-        $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided);
+        $this->monsterHealth = $this->attackExtraActionHandler->doAttack($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
 
         $this->battleLogs = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
@@ -159,7 +159,7 @@ class AttackHandler {
         $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
                                          ->setMonsterHealth($this->monsterHealth);
 
-        $itemHandler->useItems($attacker, $defender, $voided);
+        $itemHandler->useItems($attacker, $defender, $voided, $this->dmgReduction);
 
         $this->characterHealth = $itemHandler->getCharacterHealth();
         $this->monsterHealth   = $itemHandler->getMonsterHealth();

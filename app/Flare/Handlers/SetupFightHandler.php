@@ -40,14 +40,17 @@ class SetupFightHandler {
 
         $reduction = $attacker->map->gameMap->enemy_stat_bonus;
 
+        dump('Before Anything: ', $defender);
+
         $defender  = $this->getDefenderFromSpecialLocation($attacker, $defender);
         $defender  = $this->applyEnemyStatIncrease($defender, $reduction);
+        dump('After Stat Increase: ', $defender);
 
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
 
             if (!is_null($reduction)) {
-                $this->characterDmgDeductio = $reduction;
+                $this->characterDmgDeduction = $reduction;
             }
 
             if ($this->devoidEnemy($attacker)) {
@@ -81,6 +84,8 @@ class SetupFightHandler {
         if (is_null($this->attackType) && !$this->processed) {
             if ($attacker instanceof Character && is_null($this->attackType)) {
                 $defender = $this->reduceEnemyStats($defender);
+
+                dump('After Stat Reduction: ', $defender);
 
                 $defender = $this->reduceEnemySkills($defender);
 

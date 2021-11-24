@@ -96,9 +96,9 @@ class CharacterAttackTransformer extends TransformerAbstract {
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
 
         if (!$voided) {
-            return (int) number_format($characterInformation->statMod($character->class->to_hit_stat), 0);
+            return $characterInformation->statMod($character->class->to_hit_stat);
         }
 
-        return (int) number_format($character->{$character->class->to_hit_stat});
+        return $character->{$character->class->to_hit_stat};
     }
 }
