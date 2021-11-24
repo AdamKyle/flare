@@ -147,9 +147,9 @@ export default class MonsterAttack {
       this.currentCharacterHealth = useItems.getCharacterCurrentHealth();
 
       this.fireOffAffixes(attacker);
-
-      this.fireOffSpells(attacker, this.defender, isCharacterVoided, previousAttackType);
     }
+
+    this.fireOffSpells(attacker, this.defender, isCharacterVoided, previousAttackType);
   }
 
   fireOffAffixes(attacker) {
@@ -177,9 +177,27 @@ export default class MonsterAttack {
     }
 
     if (attacker.spell_damage > 0) {
-      const evasionChance = 100 - (100 * this.defender.spell_evasion)
-      const roll          = random(1, 100);
+      const attackerFocus = attacker.focus / 2000000000;
+      const evasionChance = this.defender.spell_evasion;
+      let roll          = random(1, 100);
       let damage          = attacker.spell_damage;
+
+      if (attackerFocus >= 1.0) {
+        if (this.canDoCritical(attacker)) {
+          this.addMessage(attacker.name + ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)')
+
+          damage = damage * 2;
+        }
+
+        this.currentCharacterHealth = this.currentCharacterHealth - damage
+
+        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(damage));
+
+        return;
+      }
+
+      const chance = Math.abs(evasionChance - attackerFocus);
+      roll         = roll + roll * chance;
 
       if (this.isBlocked(previousAttackType, defender, damage, isCharacterVoided)) {
         this.addHealingMessage('You managed to block the enemies spells with your armour!');
@@ -198,7 +216,7 @@ export default class MonsterAttack {
 
         this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(damage));
       } else {
-        this.addMessage(attacker.name + '\'s spells fizzle and fail before your eyes. The enemy looks confused!');
+        this.addHealingMessage('You evade the enemies spells!');
       }
     }
   }

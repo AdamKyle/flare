@@ -201,8 +201,8 @@ class AffixAttributeBuilder {
 
     protected function setReductions(): array {
         return [
-            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
-            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
+            'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
+            'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
         ];
     }
 

@@ -40,11 +40,8 @@ class SetupFightHandler {
 
         $reduction = $attacker->map->gameMap->enemy_stat_bonus;
 
-        dump('Before Anything: ', $defender);
-
         $defender  = $this->getDefenderFromSpecialLocation($attacker, $defender);
         $defender  = $this->applyEnemyStatIncrease($defender, $reduction);
-        dump('After Stat Increase: ', $defender);
 
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
@@ -84,8 +81,6 @@ class SetupFightHandler {
         if (is_null($this->attackType) && !$this->processed) {
             if ($attacker instanceof Character && is_null($this->attackType)) {
                 $defender = $this->reduceEnemyStats($defender);
-
-                dump('After Stat Reduction: ', $defender);
 
                 $defender = $this->reduceEnemySkills($defender);
 
@@ -202,7 +197,6 @@ class SetupFightHandler {
             for ($i = 0; $i < count($stats); $i++) {
                 $iteratee = $stats[$i] . '_reduction';
                 $sumOfReductions = $this->characterInformationBuilder->findSuffixStatReductionAffixes()->sum($iteratee);
-
                 $defender->{$stats[$i]} = $defender->{$stats[$i]} - ($defender->{$stats[$i]} * $sumOfReductions);
 
                 if ($defender->{$stats[$i]} < 0.0) {
@@ -280,14 +274,14 @@ class SetupFightHandler {
     }
 
     protected function applyEnemyStatIncrease($defender, ?float $increaseBy = null) {
-        if (!is_null($increaseBy)) {
+        if (is_null($increaseBy)) {
             return $defender;
         }
 
         $stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
 
         for ($i = 0; $i < count($stats); $i++) {
-            $defender->{$stats[$i]} += $defender->{$stats[$i]} * $increaseBy;
+            $defender->{$stats[$i]} = $defender->{$stats[$i]} + $defender->{$stats[$i]} * $increaseBy;
         }
 
         return $defender;

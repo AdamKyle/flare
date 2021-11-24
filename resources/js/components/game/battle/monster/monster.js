@@ -124,10 +124,9 @@ export default class Monster {
   reduceResistances(reduction) {
     let monster = JSON.parse(JSON.stringify(this.monster));
 
-    console.log('monster before', monster);
-
     if (reduction > 0.0) {
       monster.spell_evasion      = monster.spell_evasion - reduction;
+
       monster.artifact_annulment = monster.artifact_annulment - reduction;
       monster.affix_resistance   = monster.affix_resistance - reduction;
 
