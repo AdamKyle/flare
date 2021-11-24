@@ -40,10 +40,11 @@ class AdventureJobTest extends TestCase
                 ])
                 ->updateSkill('Casting Accuracy', [
                     'level' => 999
-                ])
-                ->getCharacter(false);
+                ]);
 
         $adventure = $this->createNewAdventure();
+
+        $character = $character->assignFactionSystem()->getCharacter(false);
 
         $character->adventureLogs()->create([
             'character_id'         => $character->id,

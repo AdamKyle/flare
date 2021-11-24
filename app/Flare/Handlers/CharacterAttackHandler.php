@@ -64,36 +64,37 @@ class CharacterAttackHandler {
         $this->battleLogs = [];
     }
 
-    public function handleAttack($attacker, $defender, string $attackType) {
+    public function handleAttack($attacker, $defender, string $attackType, float $damageReduction) {
         switch ($attackType) {
             case AttackTypeValue::ATTACK:
             case AttackTypeValue::VOIDED_ATTACK:
-                $this->handleWeaponAttack($attacker, $defender, $attackType);
+                $this->handleWeaponAttack($attacker, $defender, $attackType, $damageReduction);
                 break;
             case AttackTypeValue::CAST:
             case AttackTypeValue::VOIDED_CAST:
-                $this->handleCastAttack($attacker, $defender, $attackType);
+                $this->handleCastAttack($attacker, $defender, $attackType, $damageReduction);
                 break;
             case AttackTypeValue::CAST_AND_ATTACK:
             case AttackTypeValue::VOIDED_CAST_AND_ATTACK:
-                $this->handleCastAndAttack($attacker, $defender, $attackType);
+                $this->handleCastAndAttack($attacker, $defender, $attackType, $damageReduction);
                 break;
             case AttackTypeValue::ATTACK_AND_CAST:
             case AttackTypeValue::VOIDED_ATTACK_AND_CAST:
-                $this->handleAttackAndCast($attacker, $defender, $attackType);
+                $this->handleAttackAndCast($attacker, $defender, $attackType, $damageReduction);
                 break;
             case AttackTypeValue::DEFEND:
             case AttackTypeValue::VOIDED_DEFEND:
-                $this->handleDefend($attacker, $defender, $attackType);
+                $this->handleDefend($attacker, $defender, $attackType, $damageReduction);
                 break;
             default:
                 throw new \Exception('Unexpected value');
         }
     }
 
-    protected function handleWeaponAttack($attacker, $defender, string $attackType) {
+    protected function handleWeaponAttack($attacker, $defender, string $attackType, float $dmgReduction) {
         $this->attackHandler->setMonsterHealth($this->monsterCurrentHealth)
                             ->setCharacterHealth($this->characterCurrentHealth)
+                            ->setDmgReduction($dmgReduction)
                             ->doAttack($attacker, $defender, $attackType);
 
         $this->monsterCurrentHealth   = $this->attackHandler->getMonsterHealth();
@@ -103,9 +104,10 @@ class CharacterAttackHandler {
         $this->attackHandler->resetLogs();
     }
 
-    protected function handleCastAttack($attacker, $defender, string $attackType) {
+    protected function handleCastAttack($attacker, $defender, string $attackType, float $dmgReduction) {
         $this->castHandler->setMonsterHealth($this->monsterCurrentHealth)
             ->setCharacterHealth($this->characterCurrentHealth)
+            ->setDmgReduction($dmgReduction)
             ->doAttack($attacker, $defender, $attackType);
 
         $this->monsterCurrentHealth   = $this->castHandler->getMonsterHealth();
@@ -115,9 +117,10 @@ class CharacterAttackHandler {
         $this->castHandler->resetLogs();
     }
 
-    protected function handleCastAndAttack($attacker, $defender, string $attackType) {
+    protected function handleCastAndAttack($attacker, $defender, string $attackType, float $dmgReduction) {
         $this->castAndAttackHandler->setMonsterHealth($this->monsterCurrentHealth)
             ->setCharacterHealth($this->characterCurrentHealth)
+            ->setDmgReduction($dmgReduction)
             ->doAttack($attacker, $defender, $attackType);
 
         $this->monsterCurrentHealth   = $this->castAndAttackHandler->getMonsterHealth();
@@ -127,9 +130,10 @@ class CharacterAttackHandler {
         $this->castAndAttackHandler->resetLogs();
     }
 
-    protected function handleAttackAndCast($attacker, $defender, string $attackType) {
+    protected function handleAttackAndCast($attacker, $defender, string $attackType, float $dmgReduction) {
         $this->attackAndCastHandler->setMonsterHealth($this->monsterCurrentHealth)
             ->setCharacterHealth($this->characterCurrentHealth)
+            ->setDmgReduction($dmgReduction)
             ->doAttack($attacker, $defender, $attackType);
 
         $this->monsterCurrentHealth   = $this->attackAndCastHandler->getMonsterHealth();
@@ -139,9 +143,10 @@ class CharacterAttackHandler {
         $this->attackAndCastHandler->resetLogs();
     }
 
-    protected function handleDefend($attacker, $defender, string $attackType) {
+    protected function handleDefend($attacker, $defender, string $attackType, float $dmgReduction) {
         $this->defendHandler->setMonsterHealth($this->monsterCurrentHealth)
             ->setCharacterHealth($this->characterCurrentHealth)
+            ->setDmgReduction($dmgReduction)
             ->doAttack($attacker, $defender, $attackType);
 
         $this->monsterCurrentHealth   = $this->defendHandler->getMonsterHealth();

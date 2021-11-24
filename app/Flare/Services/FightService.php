@@ -36,6 +36,8 @@ class FightService {
 
     private $tookTooLongCounter = 0;
 
+    private $chrDmgReduction    = 0.0;
+
     private $fightTookTooLong = false;
 
     private $newAttackType = null;
@@ -93,6 +95,8 @@ class FightService {
 
             $this->isMonsterVoided = $this->setupFightHandler->getIsMonsterVoided();
 
+            $this->chrDmgReduction = $this->setupFightHandler->getCharacterDamageReduction();
+
             if (!is_null($this->newAttackType)) {
                 $attackType = $this->newAttackType . $attackType;
             } else {
@@ -127,7 +131,7 @@ class FightService {
             $this->characterAttackHandler->setHealth(
                 $this->currentCharacterHealth,
                 $this->currentMonsterHealth,
-            )->handleAttack($attacker, $defender, $attackType);
+            )->handleAttack($attacker, $defender, $attackType, $this->chrDmgReduction);
 
             $this->battleLogs             = [...$this->battleLogs, ...$this->characterAttackHandler->getBattleLogs()];
             $this->currentMonsterHealth   = $this->characterAttackHandler->getMonsterHealth();

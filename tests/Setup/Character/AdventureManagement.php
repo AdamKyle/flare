@@ -86,6 +86,7 @@ class AdventureManagement {
                     "Goblin-VhaXIEyO7c" => [
                         "exp" =>3,
                         "gold" =>25,
+                        "faction_points" => 25,
                         "items" =>[
                             [
                                 "id" =>$item->id,

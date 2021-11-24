@@ -25,7 +25,7 @@ class CelestialFightServiceTest extends TestCase
     public function setUp(): void {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter([
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->updateCharacter([
             'gold'      => 999999999,
             'gold_dust' => 999999999,
         ]);

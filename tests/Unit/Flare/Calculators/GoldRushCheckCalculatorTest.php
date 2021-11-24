@@ -25,7 +25,7 @@ class GoldRushCheckCalculatorTest extends TestCase
         ]);
 
         $chance = GoldRushCheckCalculator::fetchGoldRushChance(
-            $this->createMonster(), 100, $adventure->refresh()
+            $this->createMonster(), 999999999, $adventure->refresh()
         );
 
         $this->assertTrue($chance);

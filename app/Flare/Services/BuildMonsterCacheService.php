@@ -83,6 +83,16 @@ class BuildMonsterCacheService {
         return Cache::get('monsters')[$planeName];
     }
 
+    public function fetchMonsterFromCache(string $planeName, string $monsterName) {
+        $cache = Cache::get('monsters');
+
+        if (is_null($cache)) {
+            $this->buildCache();
+        }
+
+        return collect(Cache::get('monsters')[$planeName])->where('name', $monsterName)->first();
+    }
+
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection {
         return $monsters->transform(function($monster) use ($increaseStatsBy, $increasePercentageBy) {
             $monster->str                    += $increaseStatsBy;

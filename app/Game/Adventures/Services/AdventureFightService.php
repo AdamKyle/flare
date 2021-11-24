@@ -226,7 +226,9 @@ class AdventureFightService {
             ];
         }
 
+
         $faction = $this->character->factions()->where('game_map_id', $monster->gameMap->id)->first();
+
 
         $this->rewardData['gold']           = $gold;
         $this->rewardData['faction_points'] = $faction->current_level > 0 ? 2 : 1;

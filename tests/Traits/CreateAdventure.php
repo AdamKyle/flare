@@ -6,15 +6,22 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\AdventureFloorDescriptions;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use Database\Factories\AdventureFloorDescriptionFactory;
 use Illuminate\Support\Str;
 
 trait CreateAdventure {
 
-    use CreateItem, CreateMonster;
+    use CreateItem, CreateMonster, CreateLocation, CreateGameMap;
 
     public function createNewAdventure(Monster $monster = null, int $levels = 1, string $name = 'Sample', bool $published = true, bool $withFloorDescriptions = false): Adventure {
+
+        $gameMap = GameMap::first();
+
+        if (is_null($gameMap)) {
+            $gameMap = $this->createGameMap();
+        }
 
         $adventure = Adventure::factory()->create([
             'name'             => $name,
@@ -31,6 +38,16 @@ trait CreateAdventure {
             'item_find_chance' => 0.10,
             'skill_exp_bonus'  => 0.10,
             'published'        => $published,
+            'location_id'      => $this->createLocation([
+                'name'                  => 'Sample',
+                'game_map_id'           => $gameMap->id,
+                'quest_reward_item_id'  => null,
+                'description'           => 'bla',
+                'is_port'               => false,
+                'enemy_strength_type'   => null,
+                'x'                     => 16,
+                'y'                     => 16,
+            ])->id,
         ]);
 
         if (is_null($monster)) {

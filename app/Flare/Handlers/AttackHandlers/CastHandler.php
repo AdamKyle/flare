@@ -29,6 +29,8 @@ class CastHandler {
 
     private $monsterHealth;
 
+    private $dmgReduction = 0.0;
+
     private $battleLogs = [];
 
     public function __construct(
@@ -55,6 +57,12 @@ class CastHandler {
 
     public function setMonsterHealth(int $monsterHealth): CastHandler {
         $this->monsterHealth = $monsterHealth;
+
+        return $this;
+    }
+
+    public function setDmgReduction(float $reduction): CastHandler {
+        $this->dmgReduction = $reduction;
 
         return $this;
     }

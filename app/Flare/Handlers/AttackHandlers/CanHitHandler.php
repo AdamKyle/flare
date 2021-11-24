@@ -110,7 +110,7 @@ class CanHitHandler {
      */
     protected function fetchAccuracyBonus($attacker): float {
 
-        if ($attacker instanceof  Monster) {
+        if ($attacker instanceof  Monster  || $attacker instanceof \stdClass) {
             return $attacker->accuracy;
         }
 
@@ -136,7 +136,7 @@ class CanHitHandler {
      */
     protected function fetchDodgeBonus($defender): float {
 
-        if ($defender instanceof Monster) {
+        if ($defender instanceof Monster || $defender instanceof \stdClass) {
             return $defender->dodge;
         }
 
@@ -155,7 +155,7 @@ class CanHitHandler {
     }
 
     protected function fetchCastingAccuracyBonus($defender) {
-        if ($defender instanceof Monster) {
+        if ($defender instanceof Monster || $defender instanceof \stdClass) {
             return $defender->casting_accuracy;
         }
 

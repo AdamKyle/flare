@@ -88,7 +88,7 @@ class AdventuresControllerTest extends TestCase
         $this->actingAs($this->user)->visit(route('adventures.create'))->see('Create Adventure')->submitForm('Create Adventure', [
             'name'             => 'Sample Adventure',
             'description'      => 'sample',
-            'location_ids'     => [Location::first()->id],
+            'location_id'      => Location::first()->id,
             'monster_ids'      => [Monster::first()->id],
             'reward_item_id'   => $this->item->id,
             'levels'           => 1,
@@ -137,7 +137,7 @@ class AdventuresControllerTest extends TestCase
         ]))->see('Edit Adventure: ' . $adventure->name)->submitForm('Update Adventure', [
             'name'             => 'New Adventure Name',
             'description'      => 'New Description',
-            'location_ids'     => [Location::first()->id],
+            'location_id'      => Location::first()->id,
             'monster_ids'      => [Monster::first()->id],
             'reward_item_id'   => Item::first()->id,
             'levels'           => 1,
@@ -154,10 +154,13 @@ class AdventuresControllerTest extends TestCase
     public function testCannotUpdateAdventure() {
         $adventure = $this->createNewAdventure();
 
+
         $this->actingAs($this->user)->visit(route('adventure.edit', [
             'adventure' => $adventure->id
         ]))->see('Edit Adventure: ' . $adventure->name)
-           ->submitForm('Update Adventure')
+           ->submitForm('Update Adventure', [
+               'location_id' => '',
+           ])
            ->see('Adventure needs at least one location.');
     }
 

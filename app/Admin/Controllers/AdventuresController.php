@@ -52,7 +52,6 @@ class AdventuresController extends Controller {
 
         $adventure->update($requestForModel);
 
-        $adventure->locations()->sync($request->location_ids);
         $adventure->monsters()->sync($request->monster_ids);
 
         return redirect()->route('adventure.floor_descriptions', [
@@ -61,7 +60,7 @@ class AdventuresController extends Controller {
     }
 
     public function store(AdventureValidation $request) {
-        $requestForModel = $request->except(['_token', 'location_ids', 'monster_ids']);
+        $requestForModel = $request->except(['_token', 'monster_ids']);
 
         $adventure = Adventure::create(array_merge($requestForModel, ['published' => false]));
 

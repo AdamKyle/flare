@@ -44,6 +44,7 @@ class AdventureCompletedRewardsTest extends TestCase
                         [
                             'exp' => 3,
                             'gold' => 25,
+                            'faction_points' => '1',
                             'items' =>
                                 [
                                     0 =>
@@ -63,6 +64,7 @@ class AdventureCompletedRewardsTest extends TestCase
                         [
                             'exp' => 3,
                             'gold' => 50,
+                            'faction_points' => '1',
                             'items' =>
                                 [
                                     0 =>
@@ -146,6 +148,7 @@ class AdventureCompletedRewardsTest extends TestCase
                         [
                             'exp' => 3,
                             'gold' => 25,
+                            'faction_points' => 1,
                             'items' =>
                                 [
                                     0 =>
@@ -159,6 +162,7 @@ class AdventureCompletedRewardsTest extends TestCase
                         [
                             'exp' => 3,
                             'gold' => 50,
+                            'faction_points' => 1,
                             'items' =>
                                 [
                                     0 =>

@@ -28,7 +28,7 @@ class CharacterAdventureControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->adventure = $this->createNewAdventure();
+
 
         $item            = $this->createItem([
                                'name' => 'Spear',
@@ -39,18 +39,23 @@ class CharacterAdventureControllerTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation()
+                                                 ->assignFactionSystem()
                                                  ->updateSkill('Looting', [
                                                      'xp_towards'         => 0.10,
                                                      'level'              => 0,
                                                      'currently_training' => true,
-                                                 ])
-                                                 ->adventureManagement()
-                                                 ->assignLog(
-                                                     $this->adventure,
-                                                     $item,
-                                                     'Looting'
-                                                 )
-                                                 ->getCharacterFactory();
+                                                 ]);
+
+        $this->adventure = $this->createNewAdventure();
+
+        $this->character = $this->character
+                                ->adventureManagement()
+                                ->assignLog(
+                                    $this->adventure,
+                                    $item,
+                                    'Looting'
+                                )
+                                ->getCharacterFactory();
     }
 
     public function tearDown(): void
@@ -102,6 +107,7 @@ class CharacterAdventureControllerTest extends TestCase
                                                  "Goblin-VhaXIEyO7c" => [
                                                      "exp" =>3,
                                                      "gold" =>25,
+                                                     "faction_points" => 25,
                                                      "items" =>[
                                                      ],
                                                  ]
@@ -156,7 +162,7 @@ class CharacterAdventureControllerTest extends TestCase
         $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => AdventureLog::first()->id,
-             ]));
+             ]))->response;
 
         $this->assertTrue(Cache::has('messages-'  . AdventureLog::first()->id));
     }
@@ -173,6 +179,7 @@ class CharacterAdventureControllerTest extends TestCase
                         "Goblin-VhaXIEyO7c" => [
                             "exp" => 700,
                             "gold" => 25,
+                            "faction_points" => 1,
                             "items" =>[
                                 [
                                     "id" =>$item->id,
@@ -231,6 +238,7 @@ class CharacterAdventureControllerTest extends TestCase
                         "Goblin-N0Km0lwpDy" => [
                             "exp" => 3,
                             "gold" => 25,
+                            "faction_points" => 1,
                             "items" => [],
                         ]
                     ]

@@ -29,6 +29,8 @@ class AttackAndCastHandler {
 
     private $monsterHealth;
 
+    private $dmgReduction = 0.0;
+
     private $battleLogs = [];
 
     public function __construct(
@@ -49,6 +51,14 @@ class AttackAndCastHandler {
 
     public function setCharacterHealth(int $characterHealth): AttackAndCastHandler {
         $this->characterHealth = $characterHealth;
+
+        return $this;
+    }
+
+    public function setDmgReduction(float $reduction): CastAndAttackHandler {
+        $this->dmgReduction = $reduction;
+
+        $this->castHandler  = $this->castHandler->setDmgReduction($reduction);
 
         return $this;
     }

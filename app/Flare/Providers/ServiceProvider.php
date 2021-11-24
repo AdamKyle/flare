@@ -159,6 +159,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(SetupFightHandler::class, function($app) {
             return new SetupFightHandler(
                 $app->make(CharacterInformationBuilder::class),
+                $app->make(BuildMonsterCacheService::class)
             );
         });
 

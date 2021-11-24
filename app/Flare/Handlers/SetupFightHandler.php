@@ -4,7 +4,9 @@ namespace App\Flare\Handlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 
 class SetupFightHandler {
@@ -23,16 +25,30 @@ class SetupFightHandler {
 
     private $monsterVoided   = false;
 
+    private $characterDmgDeduction = 0.0;
+
     private $characterInformationBuilder;
 
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder) {
+    private $buildMonsterCacheService;
+
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder, BuildMonsterCacheService $buildMonsterCacheService) {
         $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->buildMonsterCacheService    = $buildMonsterCacheService;
     }
 
     public function setUpFight($attacker, $defender) {
 
+        $reduction = $attacker->map->gameMap->enemy_stat_bonus;
+
+        $defender  = $this->getDefenderFromSpecialLocation($attacker, $defender);
+        $defender  = $this->applyEnemyStatIncrease($defender, $reduction);
+
         if ($attacker instanceof Character) {
             $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
+
+            if (!is_null($reduction)) {
+                $this->characterDmgDeductio = $reduction;
+            }
 
             if ($this->devoidEnemy($attacker)) {
                 $message = 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!';
@@ -93,6 +109,10 @@ class SetupFightHandler {
         return $this->battleLogs;
     }
 
+    public function getCharacterDamageReduction(): float {
+        return $this->characterDmgDeduction;
+    }
+
     public function reset() {
         $this->battleLogs      = [];
         $this->attackType      = null;
@@ -102,7 +122,7 @@ class SetupFightHandler {
         $this->monsterVoided   = false;
     }
 
-    public function getModifiedDefender(): Monster {
+    public function getModifiedDefender(): Monster|\stdClass {
         return $this->defender;
     }
 
@@ -121,6 +141,21 @@ class SetupFightHandler {
         $dc = 100 - 100 * $devouringLight;
 
         return rand(1, 100) > $dc;
+    }
+
+    protected function getDefenderFromSpecialLocation($attacker, $defender) {
+        $location = Location::where('x', $attacker->x_position)
+                            ->where('y', $attacker->y_position)
+                            ->where('game_map_id', $attacker->map->game_map_id)
+                            ->first();
+
+        if (!is_null($location)) {
+            if (!is_null($location->enemy_strength_type)) {
+                $defender = json_decode(json_encode($this->buildMonsterCacheService->fetchMonsterFromCache($location->name, $defender->name)));
+            }
+        }
+
+        return $defender;
     }
 
     protected function devoidEnemy($attacker) {
@@ -234,6 +269,20 @@ class SetupFightHandler {
             $message = 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure then before!';
 
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+        }
+
+        return $defender;
+    }
+
+    protected function applyEnemyStatIncrease($defender, ?float $increaseBy = null) {
+        if (!is_null($increaseBy)) {
+            return $defender;
+        }
+
+        $stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
+
+        for ($i = 0; $i < count($stats); $i++) {
+            $defender->{$stats[$i]} += $defender->{$stats[$i]} * $increaseBy;
         }
 
         return $defender;
