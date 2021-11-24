@@ -5,6 +5,7 @@ namespace App\Game\Messages\Controllers\Api;
 
 use App\Flare\Models\CelestialFight;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Messages\Request\PublicEntityRequest;
@@ -182,6 +183,13 @@ class MessageController extends Controller {
         $npc = Npc::where('name', $request->user_name)->first();
 
         if (!is_null($npc)) {
+
+            if (auth()->user()->character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotempty()) {
+                broadcast(new ServerMessageEvent($user, 'Child listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ child!', true));
+
+                return response()->json([], 200);
+            }
+
             $command = $npc->commands->where('command', $request->message)->first();
 
             if (!is_null($command)) {

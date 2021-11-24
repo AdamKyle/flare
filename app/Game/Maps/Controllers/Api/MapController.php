@@ -2,7 +2,9 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Requests\TraverseRequest;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
 use App\Flare\Models\Character;
@@ -42,6 +44,21 @@ class MapController extends Controller {
     public function move(MoveRequest $request, Character $character, MovementService $movementSevice) {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
+        }
+
+        $xPosition    = $request->character_position_x;
+        $yPosition    = $request->character_position_y;
+
+        $location = Location::where('x', $xPosition)
+                            ->where('y', $yPosition)
+                            ->where('game_map_id', $character->map->game_map_id)
+                            ->first();
+
+        if (!is_null($location)) {
+            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotEmpty()) {
+                event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
+                return response()->json(['message' => 'You\'re too busy.'], 422);
+            }
         }
 
         $response = $movementSevice->updateCharacterPosition($character, $request->all());

@@ -22,6 +22,7 @@
             <li><a href="{{route('info.page', ['pageName' => 'equipment-sets'])}}">Equipment Sets</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'currencies'])}}">Currencies</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'combat'])}}">Combat</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'factions'])}}">Factions</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'voidance'])}}">Voidance / Devoidance</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'automation'])}}">Automation</a></li>
         </ul>
@@ -79,6 +80,9 @@
             </li>
             <li>
                 <a href="{{route('info.page', ['pageName' => 'usable-items'])}}">Usable Items (Alchemy)</a>
+            </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">Random Enchanted Items (Uniques)</a>
             </li>
         </ul>
     </li>

@@ -369,7 +369,7 @@ export default class ActionsSection extends React.Component {
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack}>
+          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack || this.state.isAdventuring || this.state.isDead}>
             <AutoAttackSection
               character={this.state.character}
               monsters={this.state.monsters}

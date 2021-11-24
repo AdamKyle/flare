@@ -93,6 +93,14 @@ export default class AutoAttackSection extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.state.monsters[0].name !== this.props.monsters[0].name) {
+      this.setState({
+        monsters: this.props.monsters,
+      });
+    }
+  }
+
   updateSelectedMonster(event) {
     const params = _.cloneDeep(this.state.params);
 

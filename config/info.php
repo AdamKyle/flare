@@ -20,6 +20,8 @@ return [
     'voidance'          => [],
     'tips'              => [],
     'automation'        => [],
+    'factions'          => [],
+    'random-enchants'   => [],
     'planes'            => [
         [
             'livewire'            => true,

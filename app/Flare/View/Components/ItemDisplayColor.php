@@ -35,18 +35,36 @@ class ItemDisplayColor extends Component
      */
     public function render()
     {
-        if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
-            $this->color = 'two-enchant';
-        } else if (!is_null($this->item->itemSuffix) || !is_null($this->item->itemPrefix)) {
-            $this->color = 'one-enchant';
-        } elseif ($this->item->type === 'quest') {
-            $this->color = 'quest-item';
-        } elseif ($this->item->usable) {
-            $this->color = 'usable-item';
+        $isEitherRandomlyGenerated = $this->isEitherEnchantRandomlyGenerated();
+
+        if ($isEitherRandomlyGenerated) {
+            $this->color = 'unique-item';
         } else {
-            $this->color = 'normal-item';
+            if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
+                $this->color = 'two-enchant';
+            } else if (!is_null($this->item->itemSuffix) || !is_null($this->item->itemPrefix)) {
+                $this->color = 'one-enchant';
+            } elseif ($this->item->type === 'quest') {
+                $this->color = 'quest-item';
+            } elseif ($this->item->usable) {
+                $this->color = 'usable-item';
+            } else {
+                $this->color = 'normal-item';
+            }
         }
 
         return view('components.item-display-color');
+    }
+
+    protected function isEitherEnchantRandomlyGenerated(): bool {
+        if (!is_null($this->item->itemSuffix)) {
+            return $this->item->itemSuffix->randomly_generated;
+        }
+
+        if (!is_null($this->item->itemPrefix)) {
+            return $this->item->itemPrefix->randomly_generated;
+        }
+
+        return false;
     }
 }

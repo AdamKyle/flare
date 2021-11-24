@@ -35,6 +35,7 @@ There are some things you cannot do:
 - You won't be able to shop or visit the [market board](/information/market-board).
 - You won't be able to manage [equipment](/information/equipment) or [sets](/information/equipment-sets).
 - You won't be able to use /PCT to instantly Teleport to [Celestials](/information/celestials).
+- You won't be able to visit [special location](/information/special-locations).
 
 Your character can select the maximum amount of time which is 8 hours. Should you manage to do a full eight hours of auto attacking,
 without dying or loosing your session (that is being kicked after 90 minutes of no activity) you will be locked out of doing 
@@ -45,8 +46,10 @@ At the end of the day the auto attack lock on your account will be removed.
 > ## ATTN!
 > 
 > This only applies if you do a full continuous, uninterrupted 8 hours. Doing 1 hour here, 4 hours there and 6 hours later in the day
-> does **NOT** apply to your 8 hour limit cap.
+> does **NOT** apply to your 8-hour limit cap.
 
 Auto attack is the only automation with said restriction around length.
 
 Should you die, this will stop, Should you log out, or your session die after 90 minutes of inactivity, this will stop.
+
+You will want to use Auto battle for [Factions](/information/factions) to get rare and unique enchanted items.

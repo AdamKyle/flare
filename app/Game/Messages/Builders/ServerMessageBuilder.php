@@ -30,6 +30,8 @@ class ServerMessageBuilder {
                 return 'Please wait for the timer (beside Again!) to state: Ready!';
             case 'cant_move':
                 return 'Please wait for the timer (beside movement options) to state: Ready!';
+            case 'cannot_enter_location':
+                return 'You are too busy to enter this location. (Are you auto battling? If so, stop. Then enter - then begin again)';
             case 'cannot_move_right':
             case 'cannot_move_down':
             case 'cannot_move_left':

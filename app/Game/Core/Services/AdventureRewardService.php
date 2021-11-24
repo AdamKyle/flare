@@ -92,7 +92,7 @@ class AdventureRewardService {
     }
 
     protected function handleFactionPoints(Character $character, Adventure $adventure, int $factionPoints) {
-        $faction   = $character->factions()->where('game_map_id', $adventure->location->map->id);
+        $faction   = $character->factions()->where('game_map_id', $adventure->location->map->id)->first();
 
         $points    = $faction->current_points + $factionPoints;
 
@@ -103,7 +103,7 @@ class AdventureRewardService {
             $points    = $factionPoints->points_needed;
         }
 
-        if ($points >= $factionPoints->needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
+        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
             $newLevel = $faction->current_level + 1;
 
             $faction->update([
@@ -115,19 +115,25 @@ class AdventureRewardService {
 
             $faction = $faction->refresh();
 
-            $this->messages[] = [$faction->gameMap->name . ' faction has gained a new level!'];
+            $this->messages[] = $faction->gameMap->name . ' faction has gained a new level!';
 
             $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
-        } else if ($points >= $factionPoints->needed && FactionLevel::isMaxLevel($faction->current_level, $points) && !$faction->maxed) {
-            $this->messages[] = [$faction->gameMap->name . ' faction has become maxed out!'];
+        } else if ($points >= $faction->points_needed && FactionLevel::isMaxLevel($faction->current_level, $points) && !$faction->maxed) {
+            $this->messages[] = $faction->gameMap->name . ' faction has become maxed out!';
 
-            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
+            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $faction->gameMap->name . ' They are considered legendary among the people of this land.'));
 
             $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
 
             $faction->update([
                 'maxed' => true,
             ]);
+        } else {
+            $faction->update([
+                'current_points' => $factionPoints,
+            ]);
+
+            $this->messages[] = 'Gained: ' . $factionPoints . ' Faction Points for: ' . $faction->gameMap->name;
         }
 
         if ($spillOver > 0) {
@@ -288,10 +294,10 @@ class AdventureRewardService {
         $character = $this->giveCharacterFactionGold($character, $faction->current_level);
         $item      = $this->giveCharacterFactionRandomItem($character);
 
-        $this->messages[] = ['Achieved title: ' . $title . ' of ' . $mapName];
+        $this->messages[] = 'Achieved title: ' . $title . ' of ' . $mapName;
 
         if ($character->isInventoryFull()) {
-            $this->messages[] = ['You got no faction item as your inventory is full. Clear space for the next time!'];
+            $this->messages[] = 'You got no faction item as your inventory is full. Clear space for the next time!';
         } else {
 
             $character->inventory->slots()->create([
@@ -303,7 +309,7 @@ class AdventureRewardService {
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-            $this->messages[] = ['Faction rewarded with (item with randomly generated affix(es)): ' . $item->affix_name];
+            $this->messages[] = 'Faction rewarded with (item with randomly generated affix(es)): ' . $item->affix_name;
         }
     }
 
@@ -315,14 +321,14 @@ class AdventureRewardService {
         $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
 
         if ($cannotHave) {
-            $this->messages[] = ['Failed to reward the faction gold as you are, or are too close to gold cap to receive: ' . number_format($gold) . ' gold.'];
+            $this->messages[] = 'Failed to reward the faction gold as you are, or are too close to gold cap to receive: ' . number_format($gold) . ' gold.';
 
             return $character;
         }
 
         $character->gold += $gold;
 
-        $this->messages[] = ['Received faction gold reward: ' . number_format($gold) . ' gold.'];
+        $this->messages[] = 'Received faction gold reward: ' . number_format($gold) . ' gold.';
 
         $character->save();
 

@@ -22,6 +22,14 @@
   }
 }
 
+.unique-item {
+  color: #1a7a0f;
+
+  &:hover, &:visited, &:focus {
+    color: #1a7a0f;
+  }
+}
+
 .artifact-item {
   color: #5b689a;
 

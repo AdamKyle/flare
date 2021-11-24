@@ -7,6 +7,13 @@ export default class ItemName extends React.Component {
   }
 
   getClass() {
+
+    const isUnique = this.isUnique();
+
+    if (isUnique) {
+      return 'unique-item';
+    }
+
     if (this.props.item.item_prefix_id !== null && this.props.item.item_suffix_id !== null) {
       return 'two-enchant';
     }
@@ -24,6 +31,18 @@ export default class ItemName extends React.Component {
     }
 
     return 'normal-item';
+  }
+
+  isUnique() {
+    if (this.props.item.item_prefix_id !== null) {
+      return this.props.item.item_prefix.randomly_generated;
+    }
+
+    if (this.props.item.item_suffix_id !== null) {
+      return this.props.item.item_suffix.randomly_generated;
+    }
+
+    return false;
   }
 
   render() {
