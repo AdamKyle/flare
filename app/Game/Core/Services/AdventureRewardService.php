@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Models\Character;
@@ -21,6 +22,8 @@ class AdventureRewardService {
 
     private $buildCharacterAttackTypes;
 
+    private $characterXPService;
+
     /**
      * @var array $messages
      */
@@ -35,10 +38,11 @@ class AdventureRewardService {
      * @param CharacterService $characterService
      * @return void
      */
-    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes, CharacterXPService $characterXPService) {
 
         $this->characterService          = $characterService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+        $this->characterXPService        = $characterXPService;
     }
 
     /**
@@ -105,6 +109,9 @@ class AdventureRewardService {
     }
 
     protected function giveXP(int $xp, Character $character) {
+
+        $xp = $this->characterXPService->determineXPToAward($character, $xp);
+
         $character->xp += $xp;
         $character->save();
 

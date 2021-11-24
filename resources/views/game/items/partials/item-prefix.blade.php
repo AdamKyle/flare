@@ -100,7 +100,7 @@
   <x-tabs.tab-content-section tab="prefix-damage-{{$damageId}}" active="false">
     <dl>
       <dt>Damage:</dt>
-      <dd>{{$item->itemPrefix->damage}}</dd>
+      <dd class={{$item->itemPrefix->damage > 0 ? 'text-success' : ''}}>{{number_format($item->itemPrefix->damage)}}</dd>
       <dt>Is Damage Irresistible?:</dt>
       <dd>{{$item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
       <dt>Can Stack:</dt>
@@ -114,12 +114,16 @@
       </dl>
     @endif
     @if ($item->itemPrefix->entranced_chance > 0)
-      <dt>Entrance Chance:</dt>
-      <dd class={{$item->itemPrefix->entranced_chance > 0 ? 'text-success' : ''}}>{{$item->itemPrefix->entranced_chance * 100}}%</dd>
+      <dl>
+        <dt>Entrance Chance:</dt>
+        <dd class={{$item->itemPrefix->entranced_chance > 0 ? 'text-success' : ''}}>{{$item->itemPrefix->entranced_chance * 100}}%</dd>
+      </dl>
     @endif
     @if ($item->itemPrefix->devouring_light > 0)
-      <dt>Devouring Light (Voidance Chance):</dt>
-      <dd class={{$item->itemPrefix->devouring_light > 0 ? 'text-success' : ''}}>{{$item->itemPrefix->devouring_light * 100}}%</dd>
+      <dl>
+        <dt>Devouring Light (Voidance Chance):</dt>
+        <dd class={{$item->itemPrefix->devouring_light > 0 ? 'text-success' : ''}}>{{$item->itemPrefix->devouring_light * 100}}%</dd>
+      </dl>
     @endif
   </x-tabs.tab-content-section>
   <x-tabs.tab-content-section tab="prefix-resistance-{{$resiatnceId}}" active="false">

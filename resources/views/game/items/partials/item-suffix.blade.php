@@ -102,7 +102,7 @@
   <x-tabs.tab-content-section tab="suffix-damage-{{$damageId}}" active="false">
     <dl>
       <dt>Damage:</dt>
-      <dd class={{$item->itemSuffix->damage > 0 ? 'text-success' : ''}}>{{$item->itemSuffix->damage}}</dd>
+      <dd class={{$item->itemSuffix->damage > 0 ? 'text-success' : ''}}>{{number_format($item->itemSuffix->damage)}}</dd>
       <dt>Is Damage Irresistible?:</dt>
       <dd>{{$item->itemSuffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
       <dt>Can Stack:</dt>
