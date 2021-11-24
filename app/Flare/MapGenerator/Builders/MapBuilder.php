@@ -129,12 +129,12 @@ class MapBuilder {
      * @param string $mapName
      * @return void
      */
-    public function BuildMap(string $mapName): void {
+    public function BuildMap(string $mapName, int $waterLevel = 30): void {
         $settings = $this->mapSettings
             ->setColorScheme(new MapColorSheme(new DetailShader(), $this->land, $this->water))
             ->setWidth($this->width)
             ->setHeight($this->height)
-            ->setWaterLevel(30);
+            ->setWaterLevel($waterLevel);
 
         $landMapGenerator = new LandMapGenerator($settings, $this->seed);
         $map              = $landMapGenerator->generateMap();

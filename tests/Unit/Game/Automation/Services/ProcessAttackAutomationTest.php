@@ -23,7 +23,8 @@ class ProcessAttackAutomationTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory())->createBaseCharacter()
-                                                   ->givePlayerLocation();
+                                                   ->givePlayerLocation()
+                                                   ->assignFactionSystem();
 
 
         $this->processAttackAutomation = resolve(ProcessAttackAutomation::class);

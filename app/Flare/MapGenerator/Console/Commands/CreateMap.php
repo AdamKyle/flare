@@ -54,7 +54,7 @@ class CreateMap extends Command
         // $land = new Color(128, 127, 126);
 
         // Hell:
-        $land = new Color(130, 118, 104);
+        $land = new Color(59, 46, 23);
 
         // Surface & Labyrinth:
         // $water = new Color(66, 129, 178);
@@ -66,7 +66,13 @@ class CreateMap extends Command
         // $water = new Color(100, 227, 250);
 
         // Hell Magma:
-        $water = new Color(110, 71, 84);
+        $water = new Color(153, 125, 137);
+
+        // Regular Water Level
+        // $waterLevel = 30;
+
+        //  Hell Water Level
+        $waterLevel = 75;
 
         ini_set('memory_limit','3G');
 
@@ -74,7 +80,7 @@ class CreateMap extends Command
                                   ->setWaterColor($water)
                                   ->setMapHeight($this->argument('height'))
                                   ->setMapWidth($this->argument('width'))
-                                  ->setMapSeed(Str::random($this->argument('randomness')))
-                                  ->buildMap($this->argument('name'));
+                                  ->setMapSeed($this->argument('randomness'))
+                                  ->buildMap($this->argument('name'), $waterLevel);
     }
 }
