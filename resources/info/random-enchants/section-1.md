@@ -23,11 +23,41 @@ These can appear as Prefixes, Suffixes **OR BOTH**. The stats, everything about 
 
 For example, lets look at the cost to percentage range:
 
-| Amount in Gold / Hell Shards | Percentage Range<sup>*</sup> | Damage |
-| ----------- | ----------- |------| 
-| 1 Billion Gold  / 10 Hell Shards     | 75% - 125% | 550K - 5 Million |
-| 10 Billion Gold / 25 hell Shards   | 150% - 300%  | 10 Million - 25 Million |
-| 50 Billion Gold / 50 Hell Shards | 325% - 750% | 50 Million - 125 Million |
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Gold Cost</th>
+            <th>Hell Shard Cost</th>
+            <th>Percentage Range</th>
+            <th>Damage Range</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1 Billion</td>
+            <td>10</td>
+            <td>75% - 125%</td>
+            <td>500k - 5 Million</td>
+        </tr>
+        <tr>
+            <td>10 Billion</td>
+            <td>25</td>
+            <td>150% - 300%</td>
+            <td>10 Million - 25 Million</td>
+        </tr>
+        <tr>
+            <td>50 Billion</td>
+            <td>50</td>
+            <td>325% - 750%</td>
+            <td>10 Million - 25 Million</td>
+        </tr>
+    </tbody>
+</table>
+
+- Cost in Gold and Hell shards is only applicable when purchasing, not re-rolling stats. Only the gold cost is used.
+- Percentage Range refers to all percentage based aspects, such as stats, resistances and so on with some % based stats only taking 10% of the random generated percentage,
+  ie, some aspects may only take 75% if you manage a perfect 750% for the percentage range.
+- Damage Range - the range in damage, the stacking or irresistible aspect is random.
 
 When doing [Factions](/infromation/factions) you will get and item, could be any item in the whole game, with one or two of these affixes attached.
 
