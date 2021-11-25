@@ -88,7 +88,7 @@
                 <!-- End Sidebar scroll-->
             </aside>
 
-            <div class="page-wrapper page tw-p-2">
+            <div class="page-wrapper page tw-p-2 tw-text-lg">
                 @yield('content')
             </div>
 

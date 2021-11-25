@@ -102,7 +102,7 @@ Here you can see the **Stat to focus on for max damage** and the **To focus on f
 however later, we will learn about [enchantments](/information/enchanting) and [random enchants (uniques)](/information/random-enchants) that turn your items green!
 
 These can further raise the states, even specialize in specific stats, skills, damage types and so on. Later when you are not weak and pathetic and
-can hold your own, you can invest in these items. we will even do some later on! How fun!
+can hold your own, you can invest in these items. We will even do some later on! How fun!
 
 Come now child, back to the task at hand ...
 
@@ -113,7 +113,7 @@ Now, on the character sheet at the very top, look for a tab called [Factions](/i
 You should see a table of map names, and factions. We're going to do the first one together, Surface. When we are done you will be the Mercenary of Surface
 and have a very powerful unique item, that will grow with you as you level. But more on that later.
 
-To get started, which we already sort of have, we just have to kill anything. So yes we could kill sewer rats, so - actully do that - go kill on the game tab and come back here.
+To get started, which we already sort of have, we just have to kill anything. So yes we could kill sewer rats, so - actually do that - go kill on the game tab and come back here.
 
 ....
 
@@ -152,17 +152,19 @@ We are saying, for one hour we want to attack this creature, the one we selected
 
 While we do so, we want to sacrifice 10% of the xp we would gain, to train the skill (in my case accuracy, one second) we have selected.
 
-I want you, the player, to think for second what skill you would need to train - I'll give a hint, non casters should focus on Accuracy, While Casters should focus on Casting Accuracy. Except prophets.
+I want you, the player, to think for second what skill you would need to train - I'll give a hint, non casters should focus on Accuracy, While Casters should focus on Casting Accuracy. Except Prophets.
 
 Prophets are mostly healing based class, who would benefit from going the Attack and Cast or Cast and Attack route. So for them, I would suggest 
-you train Accuracy.
+you train Accuracy. This way you can buy a healing spell, equip it and use either Cast and Attack or Attack and cast and heal your self as you attack.
 
-Don't focus on the other skills right now. 
+Prophets healing spells can never miss and healing spells have a chance to resurrect you and heal you again!
+
+Don't focus on the other [skills](/information/skills) right now, we shall detail some of those a bit later
 
 > ### ATTN!!
 > 
 > If you picked casting accuracy, once this hour of auto battle is up, you should be able to select cast as your preferred attack
-> style - assuming you have a damage spell equipped, which you cn get from the shop.
+> style - assuming you have a damage spell equipped, which you can get from the shop. This really only applies to Heretics.
 
 The reason we are doing this is because of that factions tab. To get the 500 kills we need an automatic way to farm the kills. There is no downside to doing this, there is but
 one rule: **YOU MUST STAY LOGGED IN**. Put the game into another tab or browser, I don't care. But if your session dies or you log out - your attack automation will stop.
@@ -198,11 +200,22 @@ prophets and rangers.
 
 If you are a ranger, go buy a bow and equip it.
 
+Now before you continue with automation, look at your accuracy skill on the character sheet, it might be level 20, 30, 40 or even higher.
+
+Let's switch that your class skill - which is documented on the [classes](/information/races-and-clases) page. Just click on the class that is yours and it will tell you
+the class skill. Every class has a chance to fire off their special attack assuming their first one did not miss.
+
+For example, Rangers have a chance to fire off their class skill which lets them fire three arrows at once! How exciting! However, all class skills have rules about
+their usage, such as needing specific gear equipped to attain their bonuses or fire off their special attack.
+
 Once you spent some of that hard-earned gold, repeat the auto battle, by just licking Begin, again. We will do this until you reach: Mercenary of Surface.
 
 What about all your items you have accumulated from your auto battle? You can, before beginning the next one, go through them and investigate if any are good enough
-for you at your level, but based on the gold you might have gotten, the "started drops" may just be useless trash to you now. So f you would like, you could
+for you at your level, but based on the gold you might have gotten, the "started drops" may just be useless trash to you now. If you would like, you could
 [disenchant](/information/disenchanting) them all, which will raise the skill - making it easier to disenchant over time.
+
+As you disenchant more items, you will level the disenchanting skill which makes t easier to disenchant items over time as well as level the enchanting skill
+which will also make it easier to enchant items.
 
 You also see the enchanted drops on the market, but you would have to be at a port [location](/information/location) to access the market. You can travel to the closest one
 to you at 160/80 - Smugglers Port.
@@ -215,7 +228,7 @@ and continue down - remember, you want to one shot kill the enemy. Once you have
 Let's talk about this unique item, an item you are holding could be worth trillions of gold. Tlessa has two types of enchantments. Ones you have been seeing drop on random 
 items, up to a specific price range, and ones that you can craft as well as these: uniques.
 
-You can find this item in your character sheet, in the inventory section. Your character sheet is live and will update in real time, no need to ever refresh unless
+You can find this item in your character sheet, in the inventory section (it will be green). Your character sheet is live and will update in real time, no need to ever refresh unless
 it is to keep your session alive, with that said, if you ever refresh the game tab, refresh the character sheet to keep them in sync.
 
 What you are holding, NO ONE ELSE HAS. Or if they do, It's extremely rare. No I did not just hand you a way to be god, you have to earn that. Through leveling.

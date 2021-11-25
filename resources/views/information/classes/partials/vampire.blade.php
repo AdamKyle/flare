@@ -1,5 +1,5 @@
+<h2 class="tw-font-light">Hints</h2>
 <hr />
-<h4>Hints</h4>
 <p class="mt-2">
   Focus on Durability followed by Accuracy and Criticality.
 </p>

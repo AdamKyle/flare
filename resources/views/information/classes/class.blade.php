@@ -1,9 +1,7 @@
-@extends('layouts.information', [
-    'pageTitle' => 'Class'
-])
+@extends('layouts.information')
 
 @section('content')
-    <x-core.cards.card-with-title title="{{$class->name}}" css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto">
+    <x-core.cards.card-with-title title="{{$class->name}}" css="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-1/2 tw-m-auto">
         <div class="tw-flex tw-flex-wrap tw--mx-2 tw-mb-8">
             <div class="tw-w-full md:tw-w-1/2 tw-px-2 tw-mb-4">
                 <dl>
@@ -60,7 +58,7 @@
             </div>
         </div>
     </x-core.cards.card-with-title>
-    <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto">
+    <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto tw-mb-10">
         @if ($class->type()->isFighter())
             @include('information.classes.partials.fighter')
         @endif

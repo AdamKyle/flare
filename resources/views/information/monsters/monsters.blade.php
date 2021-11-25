@@ -1,12 +1,13 @@
 @extends('layouts.information')
 
 @section('content')
-  <div class="container-fluid">
-    <div class="row page-titles">
-      <div class="col-md-6 align-self-left">
-        <h4 class="mt-3">Monsters</h4>
-      </div>
-    </div>
+  <div class="tw-w-full lg:tw-w-3/5 tw-m-auto tw-mt-20 tw-mb-10">
+    <x-core.page-title
+      title="Monsters"
+      route="{{url()->previous()}}"
+      link="Back"
+      color="primary"
+    ></x-core.page-title>
     <hr />
     <x-tabs.pill-tabs-container>
       @foreach($gameMapNames as $index => $gameMapName)

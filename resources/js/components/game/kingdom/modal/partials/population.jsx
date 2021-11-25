@@ -71,8 +71,12 @@ export default class Population extends React.Component {
   updateToBuy(e) {
     let value = parseInt(e.target.value);
 
-    if (value = 2000000000) {
+    if (value > 2000000000) {
       value = 2000000000
+    }
+
+    if (value < 0) {
+      value = 0;
     }
 
     this.setState({

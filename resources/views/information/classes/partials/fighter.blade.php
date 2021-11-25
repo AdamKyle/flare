@@ -1,5 +1,5 @@
+<h2 class="tw-font-light">Hints</h2>
 <hr />
-<h4>Hints</h4>
 <p class="mt-2">
   Focus on raising your Strength and Dexterity. Train your Accuracy skill to make sure you can hit something, then based on your
   preferred attack style (duel wield or single with shield) level your class skill to get the added benefits.

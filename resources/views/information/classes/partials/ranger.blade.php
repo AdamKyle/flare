@@ -1,5 +1,5 @@
+<h2 class="tw-font-light">Hints</h2>
 <hr />
-<h4>Hints</h4>
 <p class="mt-2">
   Focus on raising your Agility and Dexterity. Train your Accuracy skill to make sure you can hit something, then your class skill.
 </p>
