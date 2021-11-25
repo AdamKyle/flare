@@ -1,9 +1,9 @@
 @extends('layouts.information')
 
 @section('content')
-  <div class="tw-mt-20 tw-mb-10">
+  <div class="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
     @foreach($sections as $section)
-      <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-3/4 tw-m-auto">
+      <x-core.cards.card css="tw-mt-5 tw-m-auto">
         @markdown($section['content'])
       </x-core.cards.card>
 

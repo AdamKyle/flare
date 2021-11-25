@@ -155,11 +155,17 @@ class InfoPageController extends Controller
             $increasesDropChanceBy    = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
         }
 
-        return view('information.locations.location', [
+        $questItemDetails = [];
+
+        if (!is_null($location->questRewardItem)) {
+            $questItemDetails = $this->itemShowDetails($location->questRewardItem);
+        }
+
+        return view('information.locations.location', array_merge([
             'location'                 => $location,
             'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
             'increasesDropChanceBy'    => $increasesDropChanceBy,
-        ]);
+        ], $questItemDetails));
     }
 
     public function viewUnit(Request $request, GameUnit $unit) {

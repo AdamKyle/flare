@@ -21,9 +21,23 @@ while keeping you engaged and taking away some "tedious" aspects.
 Characters will be able to select a monster, a length of time, if we should move down the list and what skill to train
 while the fight process is happening.
 
-[Image of the primary tab]
+<div class="mb-4">
+    <a href="/storage/info/automation/images/attack-automation.png" class="glightbox">
+        <img src="/storage/info/automation/images/attack-automation.png" class="img-fluid" />
+    </a>
+</div>
 
-[Image of the advanced tab]
+Here you can see that you can select the monster and the attack type, but before you can begin we have some
+questions on the advanced tab, only one is required: Length.
+
+<div class="mb-4">
+    <a href="/storage/info/automation/images/advanced-attack-automation.png" class="glightbox">
+        <img src="/storage/info/automation/images/advanced-attack-automation.png" class="img-fluid" />
+    </a>
+</div>
+
+Here you can select the skill to train while auto attacking, the length of the auto attack in hours and weather or not the auto attack should move
+down the monster list every x levels.
 
 Once satisfied, you can begin the fight.
 

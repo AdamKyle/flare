@@ -76,15 +76,20 @@ Email is only sent for:
 - Being Able To talk Again After Being Silenced. <em>(can be turned off)</em>
 - Kingdom Management such as building upgrades, unit queues finishing and being attacked. <em>(can be turned off)</em>
 - If an item, affix or character class core stat changes.
+- Account Deletion, triggered by you or the system.
 
 Emails are only sent if you are not online at the time of this happening. Some of these you can turn off in the [settings](/information/settings) section.
 
 ## A Word On Sessions
 
-When your session times out, that is - you have been gone for 15 minutes or longer, your screen may look frozen, timer's might have stopped, adventures might have completed but
-show no notices. Your session has timed out, and you can fix this by refreshing.
+When you log in, you may sit there for a total of 90 minutes without doing anything before your session is killed. That is, we log you out behind the scenes.
 
-I also kill your session when you close the browser or tab.
+This is useful information to know if you plan to auto attack for longer then one hour. Most players will play with the character sheet in one tab and the game, what you see
+when you log in, in another. This way they can refresh the character tab without loosing chat logs on the game tab.
+
+Attack [automation](/information/automation) can run for a total of 8 hours, however, due to the nature of Tlessa being an active game, you have to be logged in
+for the automation to keep running. This is why it's useful to have a second tab, character sheet, open, so you can refresh every so often to keep the attack
+automation running.
 
 ## FAQ
 
@@ -109,6 +114,8 @@ I also kill your session when you close the browser or tab.
 - **Leaderboards?**: Nope. There is no way for you to see if another player is doing better or worse than you.
 
 - **What's the max level?**: 1000. This is subject to change with future updates. At level 500, you will gain 75% of the xp, at level 750 you will gain 50%, at level 950 you will gain 25% and finally at level 1000 you will gain none.
+  There is hpw ever a [quest](/information/quests) item, called the Sash of Heavens  that will allow you to level to the new Max (at the time of this writing its 3600), which changes
+  every month (adding 100 levels to the cap).
 
 - **Can I play on mobile?**: Of course! How ever note a couple of things:
     - For iPad Pro users Please play in portrait mode. The map is too squished in landscape mode.

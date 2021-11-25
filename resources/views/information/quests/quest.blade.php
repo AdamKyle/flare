@@ -1,14 +1,26 @@
 @extends('layouts.information')
 
 @section('content')
-    <div class="row page-titles mt-3">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">{{$quest->name}}</h4>
+    <div class="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
+        <div class="tw-m-auto">
+            <x-core.page-title
+              title="{{$quest->name}}"
+              route="{{url()->previous()}}"
+              link="Back"
+              color="primary"
+            ></x-core.page-title>
         </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
+        <hr />
+        <x-core.alerts.warning-alert title="Caution!">
+            <p>Should an <a href="/information/npcs">NPC</a> offer any currency based quests, the currency quests will be done in order of currency from smallest to largest!</p>
+            <p>The exception is if you have the specific item and the currency, although not if another currency quest (with no item) precedes it.</p>
+            <p>You cannot select the quest to complete from the npc, they pick based on what you have on hand. It is suggested that players try and do
+                quests as early on or they could regret it later. For example, for The Soldier, if you wanted The Creepy Baby Doll, you would have to do:
+                Hunting Expedition followed by The Key to Disenchanting, before being able to get The Creepy Baby Doll.</p>
+            <p>That's a total of 55k <a href="/information/currencies">Gold Dust</a> you need.</p>
+        </x-core.alerts.warning-alert>
+        <div class="tw-m-auto">
+            @include('admin.quests.partials.show', ['quest' => $quest, 'lockedSkill' => $lockedSkill])
         </div>
     </div>
-    <hr />
-    @include('admin.quests.partials.show', ['quest' => $quest, 'lockedSkill' => $lockedSkill])
 @endsection

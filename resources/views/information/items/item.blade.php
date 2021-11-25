@@ -1,7 +1,7 @@
 @extends('layouts.information')
 
 @section('content')
-    <div class="mt-3">
+    <div class="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
         <x-core.page-title-slot
             route="{{url()->previous()}}"
             link="Back"
@@ -11,7 +11,7 @@
         </x-core.page-title-slot>
         <hr />
         @if ($item->market_sellable)
-            <div class="alert alert-info mt-1 mb-2">This item can be sold on the market.</div>
+            <x-core.alerts.info-alert title="Market Info">This item can be sold on the market.</x-core.alerts.info-alert>
         @endif
         @include('game.items.partials.item', [
             'item' => $item

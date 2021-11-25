@@ -2,9 +2,7 @@
     <div class="col-md-12">
         <div class="row">
             <div class="col-md-6">
-                <h4>Item Details</h4>
-                <div class="card">
-                    <div class="card-body">
+                <x-core.cards.card-with-title title="Item Details">
                         <p>{!! nl2br(e($item->description)) !!}</p>
                         <hr />
                         @include('game.items.partials.item-details', ['item' => $item])
@@ -16,8 +14,7 @@
                         ])}}" class="btn btn-primary mt-3">Edit Item</a>
                             @endif
                         @endguest
-                    </div>
-                </div>
+                </x-core.cards.card-with-title>
             </div>
 
             @if ($item->type == 'quest')
@@ -39,13 +36,10 @@
                 </div>
             @else
                 <div class="col-md-6">
-                    <h4>Base Equip Stats</h4>
-                    <div class="card">
-                        <div class="card-body">
-                            <p>Values include any attached affixes</p>
-                            @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
-                        </div>
-                    </div>
+                    <x-core.cards.card-with-title title="Base Equip Stats">
+                        <p>Values include any attached affixes</p>
+                        @include('game.core.partials.equip.details.item-stat-details', ['item' => $item])
+                    </x-core.cards.card-with-title>
                 </div>
             @endif
 
