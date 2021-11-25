@@ -194,7 +194,7 @@ class CharacterAttackBuilder {
      * @throws \Exception
      */
     protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition, bool $voided = false): array {
-        $attack = $this->baseAttack();
+        $attack = $this->baseAttack($voided);
 
         $spellSlotOne  = $this->fetchSlot($spellPosition);
         $weaponSlotOne = $this->fetchSlot($weaponPosition);

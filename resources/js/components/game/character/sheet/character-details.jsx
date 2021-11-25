@@ -55,7 +55,7 @@ export default class CharacterDetails extends React.Component {
         data.push(
           <Fragment>
             <dt>{key.replace(/_/g, " ").replace(/(^\w{1})|(\s{1}\w{1})/g, match => match.toUpperCase())}</dt>
-            <dd>{this.formatNumber(attackData[key])}</dd>
+            <dd>{typeof attackData[key] === 'boolean' ? (attackData[key] ? 'Yes' : 'No') : this.formatNumber(attackData[key])}</dd>
           </Fragment>
         )
       }

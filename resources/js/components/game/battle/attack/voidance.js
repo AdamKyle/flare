@@ -4,10 +4,13 @@ export default class Voidance {
 
   canPlayerDevoidEnemy(devoidChance) {
 
-    return true;
 
     if (devoidChance >= 1) {
       return true;
+    }
+
+    if (devoidChance <= 0.0) {
+      return false;
     }
 
     return  random(1, 100) > (100 - 100 * devoidChance);
@@ -17,6 +20,10 @@ export default class Voidance {
 
     if (voidChance >= 1) {
       return true;
+    }
+
+    if (voidChance <= 0.0) {
+      return false;
     }
 
     return  random(1, 100) > (100 - 100 * voidChance);

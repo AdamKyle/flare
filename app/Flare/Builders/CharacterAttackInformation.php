@@ -455,6 +455,10 @@ class CharacterAttackInformation {
             $totalPercent = $totalPercent * ($sumOfValues * 0.75);
         }
 
+        if (is_null($totalPercent)) {
+            return 0.0;
+        }
+
         return $totalPercent;
     }
 

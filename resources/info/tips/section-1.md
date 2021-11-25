@@ -1,157 +1,265 @@
-# Tips for New Players
+## Tips for new players
 
-The first tip I can give you is to **Take your time**. You are not going to get anywhere fast in this game. It takes time, dedication and 
-commitment. With that, lets get into some basic tips:
+I could list out things you should focus on, things you should and should not do. That's fun and all, but instead let me
+walk you through the couple of hours of the game for you. I'll provide screenshots so you can follow along.
 
-## Early Game is going to be slow
+What I pick for race and class will be different from you. But that's ok. 
+You can still follow along and adjust accordingly for your own class.
 
-Early game will be a bit difficult, not impossible, just a bit harder. You are basically naked wondering around trying 
-to kill things. Later on, below, I have a small leveling tip for you. 
+First, let's check our [race and class](/information/races-and-classes) and pick one we want to play as. You can't change this, 
+but you can delete your account and create a new one, should you want something else.
 
-As you progress and are able to buy or make better equipment, the game get easier to progress through. 
-Take your time and focus on what you can kill to start.
+Got a race and class picked out? Great, so now that you have registered, you will be greeted wth this:
 
-## Maximize the gold you start with
+<div class="mb-4">
+    <a href="/storage/info/tips/images/game-section.png" class="glightbox">
+        <img src="/storage/info/tips/images/game-section.png" class="img-fluid" />
+    </a>
+</div>
 
-> ### ATTN!
+*This is ... Intense.* Don't worry, I am about to make it slightly worse. Do me a favour and right click, open in a new tab the 
+character sheet from the menu:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/character-sheet-menu.png" class="glightbox">
+        <img src="/storage/info/tips/images/character-sheet-menu.png" class="img-fluid" />
+    </a>
+</div>
+
+*Oh christ! that got even more terrifying*. Relax. Don't try and digest it all, we don't care about the info on the character sheet section yet.
+
+It is more beneficial to play with these two tabs open, this way you can refresh the character sheet and not loose focus of chat. Where's chat?
+In the first image it's the black box at the bottom. That's where things like server messages (that only you can see), other player messages, global messages, admin messages
+and npc messages will appear. It's imperative you pay attention to the information in the chat section. Drops, new levels, gold rushes, quest messages, celestial spawn messages - so much happens in chat.
+
+So what now? Head back to the game tab, and first select Sewer Rat from the dropdown list in the Action Section, like so:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/first-battle.png" class="glightbox">
+        <img src="/storage/info/tips/images/first-battle.png" class="img-fluid" />
+    </a>
+</div>
+
+You should see what I see, now hover over those. You can read the [combat docs](/information/combat) for further info, but based on your class you should use the correct
+attack type or experiment with different attack types.
+
+There is also a [setting](/information/settings) that you can turn on, once you are more comfortable to disable the popovers for the attack buttons.
+
+**But for now** Just click attack. Just do it. Don't ask questions, click the red button child! click it!!!!
+
+Great:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/first-attack.png" class="glightbox">
+        <img src="/storage/info/tips/images/first-attack.png" class="img-fluid" />
+    </a>
+</div>
+
+You may see death. You may have died. You may see this, you may have killed it after a couple attacks. You may see nothing because you never did I told you and click the button!
+
+Either way this is no good, and we need better gear. Right now, it doesn't matter what your class is, you have 1000 Gold. You can see this in the top section of the game window
+where it states your name, class and gold.
+
+So lets go shopping. Let's open the shop window - which will open in a new tab, here's where to find in the menu:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/shopping.png" class="glightbox">
+        <img src="/storage/info/tips/images/shopping.png" class="img-fluid" />
+    </a>
+</div>
+
+Fantastic. 
+
+So now, you will buy:
+
+- Warriors Battle Axe (Weapon)
+- Goblin Flesh Shield (Shield)
+- Dark Fairy Leaf Plate (Body)
+
+To do this, from the shop window:
+
+- Click the blue dropdown button called: Type
+- Select the appropriate type
+- (or) Search the list for the item based on name
+- Click Compare
+- Click Buy and Replace
+
+Do this for each item, you should have 100 gold left. Go back to the game tab (you can close the shop tab). If you were blocked, missed or were killed
+by the sewer rat, try again - now it should die! Killed it? Amazing! We are gods!
+
+*Wait! What about my class, I am ....* No one cares child! Right now you are useless to the gods! Your gear, as you will see when you go to equip it from buying it,
+will increase stats on your character.
+
+On your character sheet is a section:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/to-hit-info.png" class="glightbox">
+        <img src="/storage/info/tips/images/to-hit-info.png" class="img-fluid" />
+    </a>
+</div>
+
+Here you can see the **Stat to focus on for max damage** and the **To focus on for Hit%** these stats and skill may be different for your class,
+however later, we will learn about [enchantments](/information/enchanting) and [random enchants (uniques)](/information/random-enchants) that turn your items green!
+
+These can further raise the states, even specialize in specific stats, skills, damage types and so on. Later when you are not weak and pathetic and
+can hold your own, you can invest in these items. we will even do some later on! How fun!
+
+Come now child, back to the task at hand ...
+
+You still have that character sheet open in one of those tabs right? If so, close any tab other than Game tab and the character sheet. Great!
+
+Now, on the character sheet at the very top, look for a tab called [Factions](/information/factions). Click it.
+
+You should see a table of map names, and factions. We're going to do the first one together, Surface. When we are done you will be the Mercenary of Surface
+and have a very powerful unique item, that will grow with you as you level. But more on that later.
+
+To get started, which we already sort of have, we just have to kill anything. So yes we could kill sewer rats, so - actully do that - go kill on the game tab and come back here.
+
+....
+
+Ya you only got one point, you have to do that till you reach 500. That's boring! So what I want you to do, to get the most out of this process is to go to the game tab, 
+click the monster list and select the next one, Goblin. Can you kill it in one hit? yes? Keep going, next monster - stop when you can't kill it in one hit, or die.
+
+Now go back to the one you could kill in one hit and remember it's name.
+
+Click Attack Automation:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/attack-automation.png" class="glightbox">
+        <img src="/storage/info/tips/images/attack-automation.png" class="img-fluid" />
+    </a>
+</div>
+
+This looks daunting, but I promise, it's easy. First select your monster that you could kill in one hit from the list and the Attack attack type, like so:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/selected-monster-automation.png" class="glightbox">
+        <img src="/storage/info/tips/images/selected-monster-automation.png" class="img-fluid" />
+    </a>
+</div>
+
+Your monster may differ. That's ok. Next head over to advanced to fill out some questions, like I have:
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/advanced-attack-automation.png" class="glightbox">
+        <img src="/storage/info/tips/images/advanced-attack-automation.png" class="img-fluid" />
+    </a>
+</div>
+
+Let's go over this:
+
+We are saying, for one hour we want to attack this creature, the one we selected, over and over again [automatically](/information/automation).
+
+While we do so, we want to sacrifice 10% of the xp we would gain, to train the skill (in my case accuracy, one second) we have selected.
+
+I want you, the player, to think for second what skill you would need to train - I'll give a hint, non casters should focus on Accuracy, While Casters should focus on Casting Accuracy. Except prophets.
+
+Prophets are mostly healing based class, who would benefit from going the Attack and Cast or Cast and Attack route. So for them, I would suggest 
+you train Accuracy.
+
+Don't focus on the other skills right now. 
+
+> ### ATTN!!
 > 
-> Do not use the rusty dagger you are equipped with. Chances are you will not hit anything, or if you can, you won't do enough damage
-> to effectively kill it in one hit.
+> If you picked casting accuracy, once this hour of auto battle is up, you should be able to select cast as your preferred attack
+> style - assuming you have a damage spell equipped, which you cn get from the shop.
 
-When you start, you start with one thousand gold. This should be enough for you to equip any class with:
+The reason we are doing this is because of that factions tab. To get the 500 kills we need an automatic way to farm the kills. There is no downside to doing this, there is but
+one rule: **YOU MUST STAY LOGGED IN**. Put the game into another tab or browser, I don't care. But if your session dies or you log out - your attack automation will stop.
 
-- 1 body armour (250-500 gold)
-- 1 or 2 weapons
-- 1 ring
-- 1 artifact
+Also, if you choose the 8-hour session, (we only need the one hour for this walk through) and manage to do all 8 hours without you dying, the session being killed - you will be locked
+out of auto battle for the rest of the day.
 
-If you are a caster go with the one weapon, one shield as shields will increase your dur, thus your health.
+However, if you do an hour here, 6 hours a couple of hours later and 2 hours 5 minutes after that - it won't count. It has to be 8 solid uninterrupted hours.
 
-Next, as you progress - upgrade and add pieces. Don't worry about spells for casters until you train your Casting Accuracy [skill](/information/skills)
-to about level 5. Focus on Armour for upgrading - specifically body since it gives you the most increase.
+You can be "inactive", that is doing nothing, in game for 90 minutes before your session dies. The other reason I had you open the character screen was so that if you are
+using automation heavily, you can just refresh that screen - as mentioned before.
 
-## Slaughter in on hit!
+Now that we have this automation set up. Click begin:
 
-Are you working your way down the list? Find a creature that takes you two hits? Back up a second. To maximize tour time and efficiency at farming xp and other things,
-make sure you can kill the creature in one hit. The faster it dies, the faster you get to attack again, which means the faster you make gold, find items, train skills and level up.
-
-## Do not settle a kingdom yet.
-
-See [Kingdoms](/information/kingdoms). Your first kingdom is free to settle. Your next and every one after is your total kingdoms * 10k gold. If someone takes your
-kingdom, you can settle another one right away.
-
-**You cannot settle with in one square of any port (blue ship icon) or location (pink arches) on the map. This to allow new players to see locations when the map gets busy.**
-
-Wait until you are capable of doing all the adventures at Smugglers Port (see [locations](/information/locations) and [adventures](/information/adventures))
-without dying.
-
-At this point, casters should be using their casting attacks while other classes should be settling in to their role. Next comes the kingdom aspect.
-
-Settle one kingdom and put all your gold into its treasury. Caution, players on the hunt for rich kingdoms so keep an eye onn the interest gained and focus on
-leveling the farm, the keep and the resource buildings till the keep is about level 10. Feel free to level other buildings and units as well, but your priority is:
-
-- Keep
-- Farm
-- Resource
-- Anything else.
-
-At that point you'll get 10% of your kingdom treasury per hour on top of your treasury. There is a skill called Lust for Gold that can increase this, but do not
-worry about that till you at least level 100 or have access to Labyrinth. Which ever comes first.
-
-At that point, if you are a caster, switch over for a bit to Lust for Gold and level it up a bit, it's skill bonus is applied to your kingdoms' treasury every hour on top of
-your keeps level bonus.
-
-## Learn your class
-
-The [races and classes](/information/races-and-classes) documentation goes over all the races and classes. Each class has its own tips
-and tricks for optimizing your class.
-
-## Do not try and master all the skills (at first)
-
-There are a lot of skills to level, and they have variable XP each time they level up. Some have large levels like 999 and others, such as [Crafting](/information/crafting)
-have a more manageable level of 400.
-
-For starters, focus on your class skill, starting around level 3 or so. This is when you should start training either Accuracy or Casting Accuracy to about level 5
-and then switch to your class skill and bounce back and forth till each is about level 50 before moving on. Of course some players like to craft/enchant while fighting and 
-training skills. This can help to level multiple skills at once.
-
-At the end of the day, if you feel overwhelmed, look your [class](/information/races-and-classes)  and determine its preferred skill (Accuracy or Casting Accuracy) and what it's class
-skill is, and focus on those.
-
-## Gear for your class
-
-Armour is the only gear that will increase all of your stats, while shields will increase dur, weapons increase str and dex and bows dex and agility. Finally,
-spells will increase int/focus or chr/focus.
-
-There are a variety of [enchantments](/information/enchanting) for you to apply to weapons and armour. You should take a moment to learn how [combat](/information/combat)
-works in game and then choose enchantments based on your preferred attack style.
-
-### With that said - Casters should ...
-
-In the beginning of the game, casters will want at least one good weapon and a good shield. You should then get a good body followed by one or two damage spells. 
-if you have enough gold left over, try and get either a good ring or a good artifact.
-
-You will then want to try and kill something to at least Moss Covered Skeleton before focusing on your Casting Accuracy skill (I would only go as high as 10% xp).
-
-Chances are your spells will always miss to start, specifically damaging spells - the healing spells will never miss. So attack with your weapon for now.
-
-Once you are reliably hitting with your spells, move over to casting as opposed to either cast and attack, attack and cast or attack.
-
-Casters are the hardest class to get going with early game, but like Vampires they can become glass cannon powerhouses of damage.
-
-> ATTN!
+> ## ATTN!
 > 
-> This approach will work for Prophets, but as you go on you might want to one damage spell and one healing spell or a good weapon and two healing spells
-> to use Cast and Attack or Attack and cast.
+> Ahem! I forgot something, if you wanted to, you could have the automation move down the list. Because you are new and squishy, I would set the 
+> movement at every 20 levels, this way we will move down the list every 20 character levels.
 
-## Set goals for your self
+<div class="mb-4">
+    <a href="/storage/info/tips/images/automation-began.png" class="glightbox">
+        <img src="/storage/info/tips/images/automation-began.png" class="img-fluid" />
+    </a>
+</div>
 
-The early game is going to be hard, you might only be able to kill one or two creatures. Your first goal should be getting enough gold
-to outfit your self with some decent gear from the shop.
+Enjoy my friend. Sit back, go get a coffee, relax. Don't close the tab, don't log out, just enjoy the fruits of your labour. Your character sheet will update in  real time.
 
-To do this, start by using the 250 gold you have to equip some slightly better equipment. Then work your way down the list, you probably won't get further than
-Goblin. That's ok - make sure you can kill it in one or two shots. Next head over to Smugglers Port a [Location](/information/locations) and do the [adventure](/information/adventure) Smugglers Port.
+Come back in  an hour. We will begin phase two!
 
-You should get some items from doing the adventure, compare them against what you have and make adjustments.
+You may not have gotten all the points needed for the Surface faction, on the faction tab of the character sheet, so - I would like you to head to the shop
+now and purchase some better gear. If you are a caster, focus on Damage spells for intelligence and focus (for heretics) and healing spells for 
+prophets and rangers.
 
-Now that you have some gold and some experience, time to think about what you want to do.
+If you are a ranger, go buy a bow and equip it.
 
-Try to set realistic goals. There is a lot to do in Tessa, and it will take you some time to get up there to do a lot of it.
+Once you spent some of that hard-earned gold, repeat the auto battle, by just licking Begin, again. We will do this until you reach: Mercenary of Surface.
 
-For example if you would like to get more experience and drops you should work your way down to Dungeons [plane](/information/planes) through doing a series
-of [Quests](/information/quests) and killing some harder creatures to get the drops to complete the appropriate quests.
+What about all your items you have accumulated from your auto battle? You can, before beginning the next one, go through them and investigate if any are good enough
+for you at your level, but based on the gold you might have gotten, the "started drops" may just be useless trash to you now. So f you would like, you could
+[disenchant](/information/disenchanting) them all, which will raise the skill - making it easier to disenchant over time.
 
-## Do not try and max your skills before you are max level.
+You also see the enchanted drops on the market, but you would have to be at a port [location](/information/location) to access the market. You can travel to the closest one
+to you at 160/80 - Smugglers Port.
 
-There are two max levels in this game. One is 1000, and the other is (at the time of this writing) 3500 which increases 100 levels per month.
+Once you have decided what to do with your gear, lets go back to auto battling, you may be able to fight harder critters, so do the list trick again, pick up from where you last left off
+and continue down - remember, you want to one shot kill the enemy. Once you have it, continue auto battling.
 
-To get the second level cap you have to Kill a Satanic Cult Leader to get a Leather Sash. You then need Labyrinth Access to trade it to the Labyrinth Weaver, 
-and he will give you a new sash that lets you continue leveling. Without you are limited to level 1000 and limited in power.
+## Got the Faction title now? Excellent!
 
-The idea is to focus on your leveling and maybe one other skill depending on your class (Accuracy or Casting Accuracy) while you level to max level. Along the way you
-might want to craft your own gear if you have the funds.
+Let's talk about this unique item, an item you are holding could be worth trillions of gold. Tlessa has two types of enchantments. Ones you have been seeing drop on random 
+items, up to a specific price range, and ones that you can craft as well as these: uniques.
 
-Doing this will raise your crafting levels and as you enchant the items and later disenchant them, your gold dust which is used to purchase some quest items.
+You can find this item in your character sheet, in the inventory section. Your character sheet is live and will update in real time, no need to ever refresh unless
+it is to keep your session alive, with that said, if you ever refresh the game tab, refresh the character sheet to keep them in sync.
 
-> ### ATTN!
-> 
-> You cannot buy anything in this game. If you want it. Earn it. How? Play the game.
+What you are holding, NO ONE ELSE HAS. Or if they do, It's extremely rare. No I did not just hand you a way to be god, you have to earn that. Through leveling.
 
-## One step at a time
+See all gear raises your stats, [enchantments](/information/enchanting) and [random enchantments](/information/random-enchants) (Affixes) also raise the stats on top of the gear on top of each other.
 
-The whole point of this tip section is to tell you to not get flustered. Maybe you only do a level or two a day, or a few adventures a week or manage your kingdoms every other day.
+If 1 piece of gear adds 10% to your strength, and it has two enchants that adds 40% each, that's not a combined 90%, That's your strength + 10%, then that value + 40% then that, plus another 40%.
 
-It's all a slow steady grind to the top. What's at the top? Harder creatures and [Celestials](/information/celestials).
+All enchants and gear stack on top each other. Specific aspects of the enchantment may not stack or may, but only for specific classes, like how vampires life stealing 
+will stack to a maximum of 99% but other classes, we take the best life stealing of all their affixes.
 
-Kingdoms also come in handy the higher the level you are, specifically for crafting high-end items that cannot be purchased from the shop and access to high-end damage dealing end game enchantments.
+But all this stacking means nothing, if your core stats are really low. So this unique, could be 115% on everything and be super awesome, and it is, don't get me wrong, equip it and watch you become a 
+mini god. But there is more, you have to continue to level, the higher the level the more damage the item (or in this case the enchantment) can do.
 
-## Your First Adventure
+Save these green items, because there is a [NPC](/information/npcs) that can re-roll them, even transfer them to other items for a price.
 
-The best way to get early levels is to first gear your self out with the gold given and once you are able to kill goblins in one hit, head to Smugglers Port at 160/80
-using the directional move buttons. it's the first port you see after you register and the game loads.
+These items are late game and from faction farming you can get 25 of them. when you get to late game, you will be rewarded with the opportunity to push
+your character even further by being able to re-roll aspects of these enchants and transfer them to, essentially, god tier items that you can craft and then upgrade. 
 
-Do the first adventure a few times till you can then select Moss Covered Skeleton and kill it in one hit. Then do the second adventure a few times.
+You can push your stats well into the trillions, becoming unstoppable.
 
-After a few times you should have amassed a lot of items, gold, xp and possible skill xp if you decide to train a skill while doing adventures.
+All of this will take time though.
 
-learn more about [Adventures](/information/adventures) here.
+At that point you unlock so much more of the game. But one small step at a time. Equip your mini god item. To keep things safe, such as these uniques, check out the section on
+[sets](/information/equipment-sets). These will be valuable to you.
+
+## Auto Battling and Crafting
+
+Now it's time, with our little green unique, to go and continue the progress towards level cap. There are [Quests](/information/quests) that you can do. I would search through
+the [planes](/information/planes) as they have all the locations and npc's that offer quests which as simple as speaking to them with the currency or item or both.
+
+While you auto battle, you can also craft - which will let you train a new type of skill: [crafting](/information/crafting). You can craft all the items you 
+see in the shop and even ones you do not - known as craft only items. Once you reach the crating cap, can you can then upgrade the top end gear
+for even better gear - much later in the game.
+
+this gear will be useless without [enchantments](/information/enchantments) and there are a lot to pick from.
+
+Here's your next task child:
+
+I want you to find a quest on surface to complete, while you research that, set up the auto battle to continue fighting. You will farm more Faction points and gain more items.
+From here continue to upgrade your gear in between sessions.
+
+Next while auto battling craft 75 items, what ever you want. Just craft 75. If you unlock more items, try moving down the list. Maybe you want to craft your self some gear.
+
+Once you have the 75 items crafted, select the enchanting under the additional action dropdown, where crafting was. Pick some enchants, or use the aforementioned links to 
+pick level appropriate enchantments and start enchanting till all 75 items are done. If there are any good items in there that you want to use, equip them and 
+disgard the rest by either stopping auto battle and selling the, on the market or by disenchanting for [gold dust](/information/currencies) which is vital in some quests.
