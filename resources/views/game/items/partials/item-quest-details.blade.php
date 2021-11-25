@@ -19,7 +19,7 @@
                                         'monster' => $monster->id
                                     ])}}">{{$monster->name}}</a>
         @else
-          <a href="{{route('game.monsters.monster', [
+          <a href="{{route('info.page.monster', [
                                         'monster' => $monster->id
                                     ])}}">{{$monster->name}}</a>
         @endif
@@ -41,7 +41,7 @@
                                         'location' => $location->id
                                     ])}}">{{$location->name}}</a>
           @else
-            <a href="{{route('game.locations.location', [
+            <a href="{{route('info.page.location', [
                                                 'location' => $location->id
                                             ])}}">{{$location->name}}</a>
           @endif
@@ -69,7 +69,7 @@
                                                 'adventure' => $adventure->id
                                             ])}}">{{$adventure->name}}</a>
           @else
-            <a href="{{route('map.adventures.adventure', [
+            <a href="{{route('info.page.adventure', [
                                                 'adventure' => $adventure->id
                                             ])}}">{{$adventure->name}}</a>
           @endif
@@ -87,7 +87,7 @@
                                                 'location' => $location->id
                                             ])}}">{{$adventure->location->name}}</a>
           @else
-            <a href="{{route('game.locations.location', [
+            <a href="{{route('info.page.location', [
                                                 'location' => $adventure->location->id
                                             ])}}">{{$adventure->location->name}}</a>
           @endif

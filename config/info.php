@@ -183,7 +183,7 @@ return [
             'showSkillInfo'       => true,
             'showDropDown'        => true,
             'type'                => null,
-            'craft_only'          => false,
+            'craft_only'          => true,
         ],
         [
             'livewire'            => true,
@@ -202,7 +202,7 @@ return [
             'insert_before_table' => 'information.partials.crafting-section-one',
             'showSkillInfo'       => true,
             'showDropDown'        => true,
-            'type'                => null,
+            'type'                => 'alchemy',
             'craft_only'          => true,
         ],
     ],

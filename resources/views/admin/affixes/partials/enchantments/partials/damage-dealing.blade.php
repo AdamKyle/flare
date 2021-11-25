@@ -18,32 +18,36 @@
       tab="damage-dealing-non-irresistible"
       active="true"
     >
-      <x-cards.card>
-        <div class="alert alert-info mt-2 mb-3">
-          These affixes cannot be resisted by the enemy. Some might stack, some might not. Enemies cannot resist this damage.
-        </div>
+      <x-core.cards.card>
+        <x-core.alerts.info-alert title="Quick Tip">
+          <p>
+            These affixes cannot be resisted by the enemy. Some might stack, some might not. Enemies cannot resist this damage.
+          </p>
+        </x-core.alerts.info-alert>
 
         @livewire('admin.affixes.data-table', [
             'only'         => 'damage-dealing',
             'irresistible' => true,
         ])
-      </x-cards.card>
+      </x-core.cards.card>
     </x-tabs.tab-content-section>
     <x-tabs.tab-content-section
       tab="damage-dealing-irresistible"
       active="false"
     >
-      <x-cards.card>
-        <div class="alert alert-info mt-2 mb-3">
-          These affixes can be resisted by enemies, thus they won't do any damage if they are resisted when attacking. Some might stack, others might not.
-          Some enchantments may have other aspects about them, such as stats which can stack.
-        </div>
+      <x-core.cards.card>
+        <x-core.alerts.info-alert title="Quick Tip">
+          <p>
+            These affixes can be resisted by enemies, thus they won't do any damage if they are resisted when attacking. Some might stack, others might not.
+            Some enchantments may have other aspects about them, such as stats which can stack.
+          </p>
+        </x-core.alerts.info-alert>
 
         @livewire('admin.affixes.data-table', [
             'only'         => 'damage-dealing',
             'irresistible' => false,
         ])
-      </x-cards.card>
+      </x-core.cards.card>
     </x-tabs.tab-content-section>
   </x-tabs.tab-content>
 </div>

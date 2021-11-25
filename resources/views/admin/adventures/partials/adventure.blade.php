@@ -3,7 +3,7 @@
     <x-core.page-title
         title="{{$adventure->name}}"
         route="{{url()->previous()}}"
-        color="success"
+        color="primary"
         link="Back"
     />
 </div>

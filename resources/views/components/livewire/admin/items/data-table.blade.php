@@ -253,39 +253,41 @@
 
                         @guest
                         @else
-                            <td>
-                                @if(auth()->user()->hasRole('Admin'))
-                                    <a href="{{route('items.edit', [
+                            @if(auth()->user()->hasRole('Admin'))
+                              <td>
+                                <a href="{{route('items.edit', [
+                                        'item' => $item->id
+                                    ])}}" class="btn btn-sm btn-primary mb-2">
+                                    Edit
+                                </a>
+
+                                <x-forms.button-with-form
+                                    formRoute="{{route('items.delete', [
                                             'item' => $item->id
-                                        ])}}" class="btn btn-sm btn-primary mb-2">
-                                        Edit
-                                    </a>
+                                        ])}}"
+                                    formId="{{'delete-item-'.$item->id}}"
+                                    buttonTitle="Delete"
+                                    class="btn btn-danger btn-sm"
+                                />
+                              </td>
+                            @elseif (!is_null($character))
+                              <td>
+                                <x-forms.button-with-form
+                                  form-route="{{route('game.shop.buy.item', ['character' => $character->id])}}"
+                                  form-id="{{'shop-buy-form-item-'.$item->id}}"
+                                  button-title="Buy"
+                                  class="btn btn-primary btn-sm"
+                                >
+                                  <input type="hidden" name="item_id" value={{$item->id}} />
+                                </x-forms.button-with-form>
 
-                                    <x-forms.button-with-form
-                                        formRoute="{{route('items.delete', [
-                                                'item' => $item->id
-                                            ])}}"
-                                        formId="{{'delete-item-'.$item->id}}"
-                                        buttonTitle="Delete"
-                                        class="btn btn-danger btn-sm"
-                                    />
-                                @elseif (!is_null($character))
-                                    <x-forms.button-with-form
-                                        form-route="{{route('game.shop.buy.item', ['character' => $character->id])}}"
-                                        form-id="{{'shop-buy-form-item-'.$item->id}}"
-                                        button-title="Buy"
-                                        class="btn btn-primary btn-sm"
-                                    >
-                                        <input type="hidden" name="item_id" value={{$item->id}} />
-                                    </x-forms.button-with-form>
-
-                                    <a href="{{route('game.shop.compare.item', [
-                                        'character' => $character->id,
-                                        'item_id'   => $item->id,
-                                        'item_type' => $item->type,
-                                    ])}}" class="btn btn-primary btn-sm" id="{{'compare-item-' . $item->id}}" target="_blank">Compare</a>
-                                @endif
-                            </td>
+                                <a href="{{route('game.shop.compare.item', [
+                                          'character' => $character->id,
+                                          'item_id'   => $item->id,
+                                          'item_type' => $item->type,
+                                      ])}}" class="btn btn-primary btn-sm" id="{{'compare-item-' . $item->id}}" target="_blank">Compare</a>
+                              </td>
+                            @endif
                         @endguest
                     </tr>
                 @empty

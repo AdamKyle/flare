@@ -1,6 +1,6 @@
 # NPC Kingdoms
 
-Haven’t been online in 5 days? On the 6th day you will lose morale on the 
+Haven’t been online in 30 days? On the 30th day you will lose morale on the 
 hourly reset which would normally, give you treasury, population and resources. 
 Instead, every hour your kingdom will lose morale until it 0%. At which time the kingdom 
 will take by an NPC, and a global message will go out:

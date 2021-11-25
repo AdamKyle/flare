@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Locations\Partials;
 
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\LocationEffectValue;
 use Livewire\Component;
 use App\Flare\Cache\CoordinatesCache;
@@ -58,6 +59,8 @@ class Details extends Component
         }
 
         $this->location->save();
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->location->refresh());
         $this->emitTo('core.form-wizard', $functionName, $index, true);

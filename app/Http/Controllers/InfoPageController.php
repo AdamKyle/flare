@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
@@ -181,6 +182,12 @@ class InfoPageController extends Controller
             'requiredLevel' => GameBuildingUnit::where('game_building_id', $belongsToKingdomBuilding->id)
                                                ->where('game_unit_id', $unit->id)
                                                ->first()->required_level
+        ]);
+    }
+
+    public function viewBuilding(GameBuilding $building) {
+        return view('information.buildings.building', [
+            'building' => $building
         ]);
     }
 

@@ -110,47 +110,15 @@
           <td>{{$monster->xp}}</td>
           <td>{{number_format($monster->gold)}}</td>
           @guest
-          @else
+          @elseif(auth()->user()->hasRole('Admin'))
             <td>
-              @if (auth()->user()->hasRole('Admin'))
-                @if (!\Cache::has('processing-battle-' . $monster->id))
-                  <a href="{{route('monster.edit', [
-                                            'monster' => $monster->id,
-                                    ])}}" class="btn btn-primary mt-2">Edit</a>
-                @endif
-
-                @if (!\Cache::has('processing-battle-' . $monster->id) && $testCharacters->isNotEmpty())
-                  <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#monster-test-{{$monster->id}}">
-                    Test
-                  </button>
-                  @include('admin.character-modeling.partials.modals.monster-test-modal', [
-                      'monster' => $monster,
-                      'users'   => $testCharacters,
-                  ])
-                @endif
-
-                @foreach ($testCharacters as $user)
-                  @if ($user->character->snapShots()->where('battle_simmulation_data->monster_id', $monster->id)->get()->isNotEmpty())
-                    <a href="{{route('admin.character.modeling.monster-data', ['monster' => $monster])}}" class="btn btn-success mt-2">View Data</a>
-                    @break;
-                  @endif
-                @endforeach
-              @endif
-              @if(auth()->user()->hasRole('Admin'))
-                @if (!$published && !\Cache::has('processing-battle-' . $monster->id))
-                  <x-forms.button-with-form
-                    form-route="{{route('monster.publish', ['monster' => $monster])}}"
-                    form-id="publish-monster-{{$monster->id}}"
-                    button-title="Publish Monster"
-                    form-method="POST"
-                    class="btn btn-success mt-2"
-                  />
-                @endif
-              @endif
-
-              @if (\Cache::has('processing-battle-' . $monster->id))
-                Testing underway. We will email you when done.
-              @endif
+              <x-forms.button-with-form
+                form-route="{{route('monster.publish', ['monster' => $monster])}}"
+                form-id="publish-monster-{{$monster->id}}"
+                button-title="Publish Monster"
+                form-method="POST"
+                class="btn btn-success mt-2"
+              />
             </td>
           @endguest
         </tr>

@@ -20,6 +20,7 @@ Route::get('/information/adventure/{adventure}', ['as' => 'info.page.adventure',
 Route::get('/information/monsters/list', ['as' => 'info.page.monsters-list', 'uses' => 'InfoPageController@viewMonsters']);
 Route::get('/information/monster/{monster}', ['as' => 'info.page.monster', 'uses' => 'InfoPageController@viewMonster']);
 Route::get('/information/locations/{location}', ['as' => 'info.page.location', 'uses' => 'InfoPageController@viewLocation']);
+Route::get('/information/building/{building}', ['as' => 'info.page.building', 'uses' => 'InfoPageController@viewBuilding']);
 Route::get('/information/unit/{unit}', ['as' => 'info.page.unit', 'uses' => 'InfoPageController@viewUnit']);
 Route::get('/information/item/{item}', ['as' => 'info.page.item', 'uses' => 'InfoPageController@viewItem']);
 Route::get('/information/affix/{affix}', ['as' => 'info.page.affix', 'uses' => 'InfoPageController@viewAffix']);

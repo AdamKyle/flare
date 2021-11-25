@@ -83,15 +83,18 @@ class DataTable extends Component
         }
 
         $items = $items->where('item_suffix_id', null)
-            ->where('item_prefix_id', null)
-            ->where('craft_only', $this->craftOnly);
+                       ->where('item_prefix_id', null)
+                       ->where('craft_only', $this->craftOnly);
 
         if (!is_null($this->type)) {
             $items = $items->where('type', $this->type);
+        } else if ($this->craftOnly && $this->type !== 'alchemy') {
+            $items = Item::dataTableSearch($this->search)->where('item_suffix_id', null)
+                           ->where('item_prefix_id', null)
+                           ->whereNotIn('type', ['alchemy', 'quest']);
+
         } else if(is_null($this->type)) {
             $items = $items->where('type', '!=', 'quest');
-        } else if ($this->craftOnly && $this->type !== 'alchemy') {
-            $items = $items->where('type', '!=', 'alchemy');
         }
 
         $this->showAlchemy = false;
