@@ -6,7 +6,10 @@ use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Notification as Notification;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
+use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 
 class UnitReturnService {
@@ -32,6 +35,22 @@ class UnitReturnService {
         $log->update([
             'published' => true,
         ]);
+
+        Notification::create([
+            'character_id' => $character->id,
+            'title'        => 'Units Returned',
+            'message'      => $message,
+            'status'       => 'success',
+            'type'         => 'kingdom',
+            'url'          => route('game.kingdom.attack-log', [
+                'character'  => $character->id,
+                'kingdomLog' => $log->id,
+            ]),
+        ]);
+
+        event(new UpdateNotificationsBroadcastEvent($character->refresh()->notifications()->where('read', false)->get(), $character->user));
+
+        event(new UpdateKingdomLogs($character->refresh()));
 
         $defender = $unitMovement->from_kingdom;
 

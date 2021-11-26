@@ -41,6 +41,9 @@ class Kernel extends ConsoleKernel {
         // Increase the max level every month.
         $schedule->command('increase:max_level')->monthly()->timezone(config('app.timezone'));
 
+        // Delete the flagged users once a month.
+        $schedule->command('delete:flagged-users')->monthly()->timezone(config('app.timezone'));
+
         // Update kingdoms every hour.
         $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
 
@@ -55,6 +58,9 @@ class Kernel extends ConsoleKernel {
 
         // Clean the market every three months starting at 2am.
         $schedule->command('clean:market-history')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
+
+        // Flag inactive users every 5 months at 2am.
+        $schedule->command('flag:users-for-deletion')->cron('0 2 * */5 *')->timezone(config('app.timezone'));
 
         // Clean the chat every three months starting at 2am.
         $schedule->command('clean:chat')->cron('0 2 * */3 *')->timezone(config('app.timezone'));

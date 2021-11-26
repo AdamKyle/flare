@@ -83,6 +83,10 @@
             <li><a href="{{route('skills.create')}}">Create Skill</a></li>
             <li><a href="{{route('skills.export')}}">Export</a></li>
             <li><a href="{{route('skills.import')}}">Import</a></li>
+            <li><a href="{{route('passive.skills.list')}}">Passive Skills</a></li>
+            <li><a href="{{route('passive.skills.create')}}">Create Passive Skill</a></li>
+            <li><a href="{{route('passive.skills.export')}}">Export Passives</a></li>
+            <li><a href="{{route('passive.skills.import')}}">Import Passives</a></li>
         </ul>
     </li>
     <li>

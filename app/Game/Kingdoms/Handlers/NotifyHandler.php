@@ -8,11 +8,14 @@ use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\Notification as Notification;
 use App\Flare\Models\Npc;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Models\User;
 use App\Flare\Values\KingdomLogStatusValue;
 use App\Flare\Values\NpcTypes;
+use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
+use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Facades\App\Flare\Values\UserOnlineValue;
 
@@ -167,6 +170,12 @@ class NotifyHandler {
             'published'       => true,
         ]);
 
+        $message = 'Your kingdom at (X/Y): ' . $defender->x_position .
+        '/' . $defender->y_position . ' on the ' .
+        $defender->gameMap->name . ' plane, was attacked.';
+
+        $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'failed', 'Kingom Attacked!');
+
         $message = '';
         $type    = '';
 
@@ -213,6 +222,21 @@ class NotifyHandler {
                 'new_defender' => is_null($this->newDefender) ? $defender->toArray() : $this->newDefender,
                 'published' => ($logStatus->lostAttack() || $logStatus->tookKingdom()),
             ]);
+
+            if ($logStatus->lostAttack()) {
+                $message = 'You lost all your units when attacking '.$defender->name.' at: (X/Y) ' .
+                    $defender->x_position . '/' . $defender->y_position .
+                    ' on the ' . $mapName . ' plane.';
+
+                $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'failed', 'Lost attack!');
+            }
+
+            if ($logStatus->tookKingdom()) {
+                $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
+                    ' on the ' . $mapName . ' plane.';
+
+                $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'success', 'Took Kingdom!');
+            }
         }
 
         $mapName = $defender->gameMap->name;
@@ -310,5 +334,30 @@ class NotifyHandler {
         }
 
         return event(new KingdomServerMessageEvent($user, $type, $message));
+    }
+
+    /**
+     * Create a notification event for the front end.
+     *
+     * @param Character $character
+     * @param KingdomLog $log
+     * @param string $message
+     */
+    public function createNotificationEvent(Character $character, KingdomLog $log, string $message, string $status = 'failed', string $title = '') {
+        Notification::create([
+            'character_id' => $character->id,
+            'title'        => $title,
+            'message'      => $message,
+            'status'       => $status,
+            'type'         => 'kingdom',
+            'url'          => route('game.kingdom.attack-log', [
+                'character'  => $character->id,
+                'kingdomLog' => $log->id,
+            ]),
+        ]);
+
+        event(new UpdateNotificationsBroadcastEvent($character->refresh()->notifications()->where('read', false)->get(), $character->user));
+
+        event(new UpdateKingdomLogs($character->refresh()));
     }
 }

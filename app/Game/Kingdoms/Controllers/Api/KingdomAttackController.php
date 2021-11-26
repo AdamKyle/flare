@@ -132,17 +132,9 @@ class KingdomAttackController extends Controller {
                 'published'       => true,
             ]);
 
-            Notification::create([
-                'character_id' => $defender->id,
-                'title'        => 'Items dropped!',
-                'message'      => 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position . ' Had items dropped on it!',
-                'status'       => 'failed',
-                'type'         => 'kingdom',
-                'url'          => route('game.kingdom.attack-log', [
-                    'character'  => $defender->id,
-                    'kingdomLog' => $log->id,
-                ]),
-            ]);
+            $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position . ' Had items dropped on it!';
+
+            $notifyHandler->createNotificationEvent($defender, $log, $message, 'failed', 'Items dropped!');
 
             event(new UpdateNotificationsBroadcastEvent($defender->refresh()->notifications()->where('read', false)->get(), $defender->user));
 

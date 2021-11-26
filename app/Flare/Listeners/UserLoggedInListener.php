@@ -18,7 +18,8 @@ class UserLoggedInListener {
      */
     public function handle(Login $event) {
 
-        $event->user->last_logged_in = now();
+        $event->user->last_logged_in  = now();
+        $event->user->will_be_deleted = false;
         $event->user->save();
 
         if (is_null(UserSiteAccessStatistics::first())) {

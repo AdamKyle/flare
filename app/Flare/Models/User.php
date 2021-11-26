@@ -46,6 +46,7 @@ class User extends Authenticatable
         'auto_disenchant_amount',
         'timeout_until',
         'is_test',
+        'will_be_deleted',
     ];
 
     /**
@@ -85,6 +86,7 @@ class User extends Authenticatable
         'show_building_rebuilt_messages' => 'boolean',
         'auto_disenchant'                => 'boolean',
         'disable_attack_type_popover'    => 'boolean',
+        'will_be_deleted'                => 'boolean',
     ];
 
     public function character() {

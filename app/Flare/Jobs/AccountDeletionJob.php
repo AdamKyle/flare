@@ -17,6 +17,7 @@ use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use League\Fractal\Manager;
 use Mail;
 use Illuminate\Bus\Queueable;
@@ -35,13 +36,16 @@ class AccountDeletionJob implements ShouldQueue
      */
     public $user;
 
+    public $systemDeletion;
+
     /**
      * Create a new job instance.
      *
      * @param User $user
      */
-    public function __construct(User $user) {
-        $this->user = $user;
+    public function __construct(User $user, bool $systemDeletion = false) {
+        $this->user           = $user;
+        $this->systemDeletion = $systemDeletion;
     }
 
     public function handle(KingdomResourcesService $kingdomResourcesService) {
@@ -74,13 +78,23 @@ class AccountDeletionJob implements ShouldQueue
 
             broadcast(new UpdateSiteStatisticsChart($adminUser));
 
-            Mail::to($user)->send(new GenericMail($user, 'You requested your account to be deleted. We have done so, this is your final confirmation email.', 'Account Deletion', true));
+            if (!$this->systemDeletion) {
+                Mail::to($user)->send(new GenericMail($user, 'You requested your account to be deleted. We have done so, this is your final confirmation email.', 'Account Deletion', true));
 
-            $user->delete();
+                $user->delete();
 
-            event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
+                event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
+            } else {
+                $message = 'Hello, your account was deleted due to account inactivity. 
+                A player may only be inactive for 5 months at a time. You are of course welcome to come back at 
+                any time and start a new character.';
+
+                Mail::to($user)->send(new GenericMail($user, $message, 'Automated Account Deletion', true));
+
+                $user->delete();
+            }
         } catch (\Exception $e) {
-            dd($e);
+            Log::info($e->getMessage());
         }
     }
 
