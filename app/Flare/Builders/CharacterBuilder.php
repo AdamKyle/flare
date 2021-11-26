@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders;
 
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\User;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
@@ -191,6 +192,25 @@ class CharacterBuilder {
             $this->character->skills()->create(
                 resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
             );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assign passive skills to the player.
+     *
+     * @return $this
+     */
+    public function assignPassiveSkills(): CharacterBuilder {
+        foreach (PassiveSkill::all() as $passiveSkill) {
+            $this->character->passiveSkills()->create([
+                'character_id'     => $this->character->id,
+                'passive_skill_id' => $passiveSkill->id,
+                'current_level'    => 0,
+                'hours_to_next'    => $passiveSkill->hours_per_level,
+                'is_locked'        => $passiveSkill->is_locked,
+            ]);
         }
 
         return $this;

@@ -241,6 +241,41 @@ export default class SkillDetails extends React.Component {
     )
   }
 
+  renderPassiveSkills() {
+    return this.props.passiveSkills.map((passiveSkill) =>
+      <Fragment>
+        <dt>
+          {
+            passiveSkill.is_locked ?
+              <a href="#" className="text-danger">
+                {passiveSkill.passive_skill.name} <i className="fas fa-lock"></i>
+              </a>
+            :
+              <a href="#">
+                {passiveSkill.passive_skill.name}
+              </a>
+          }
+        </dt>
+        <dd>
+          <div className="tw-pl-2 row">
+            <div className="col-xs-12 col-sm-4">
+              <strong>Current Level</strong>: {passiveSkill.current_level}
+            </div>
+            <div className="col-xs-12 col-sm-3">
+              <strong>Time Till Next</strong>: {passiveSkill.hours_to_next} Hr.
+            </div>
+            <div className="col-xs-12 col-sm-3">
+              <strong>Train Button</strong>
+            </div>
+            <div className="col-xs-12 col-sm-2">
+              <strong>Timer</strong>
+            </div>
+          </div>
+        </dd>
+      </Fragment>
+    );
+  }
+
   render() {
     return (
       <Card>
@@ -316,6 +351,20 @@ export default class SkillDetails extends React.Component {
                 </p>
                 <hr />
                 <dl className="mt-4">{this.renderMiscSkills()}</dl>
+              </div>
+            </Tab>
+            <Tab eventKey="passive-skills" title="Passive Skills">
+              <div className="character-skill-info">
+                <p className="mt-4">
+                  These are passive skills. These are trained over time. As you gain more levels, some of the passives below
+                  will unlock and allow you to level them as well.
+                </p>
+                <p>
+                  You can click on each passive skill and see what you get per level, what it unlocks as you level it
+                  and how much time it will take to level the skill.
+                </p>
+                <hr />
+                <dl className="mt-4">{this.renderPassiveSkills()}</dl>
               </div>
             </Tab>
           </Tabs>

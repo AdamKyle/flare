@@ -175,6 +175,10 @@ class Character extends Model
         return $this->hasMany(CharacterAutomation::class);
     }
 
+    public function passiveSkills() {
+        return $this->hasMany(CharacterPassiveSkill::class);
+    }
+
     public function getXpAttribute($value) {
         return number_format($value, 2);
     }

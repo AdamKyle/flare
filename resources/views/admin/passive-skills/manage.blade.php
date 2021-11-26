@@ -10,7 +10,7 @@
     </x-core.page-title>
     <hr />
     <x-core.cards.card>
-      <form action="{{is_null($skill) ? route('passive.skill.store') : route('passive.skill.store', ['passiveSkill' => $skill->id])}}" method="POST">
+      <form action="{{is_null($skill) ? route('passive.skill.store') : route('passive.skill.update', ['passiveSkill' => $skill->id])}}" method="POST">
         @csrf()
         <div class="row">
           <div class="col-md-6">
@@ -91,7 +91,11 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary">Create Passive Skill</button>
+        @if (is_null($skill))
+          <button type="submit" class="btn btn-primary">Create Passive Skill</button>
+        @else
+          <button type="submit" class="btn btn-success">Update Passive Skill</button>
+        @endif
       </form>
     </x-core.cards.card>
   </div>

@@ -35,6 +35,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'ac'                => number_format($characterInformation->buildDefence()),
             'heal_for'          => number_format($characterInformation->buildHealFor()),
             'skills'            => $this->fetchSkills($character->skills),
+            'passive_skills'    => $character->passiveSkills()->with('passiveSkill')->get(),
             'damage_stat'       => $character->damage_stat,
             'to_hit_stat'       => $character->class->to_hit_stat,
             'race'              => $character->race->name,

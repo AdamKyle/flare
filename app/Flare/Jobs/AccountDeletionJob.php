@@ -146,6 +146,8 @@ class AccountDeletionJob implements ShouldQueue
 
         $character->factions()->delete();
 
+        $character->passiveSkills()->delete();
+
         $character->map()->delete();
 
         $character->delete();

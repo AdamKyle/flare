@@ -116,6 +116,7 @@ export default class CharacterSheet extends React.Component {
                   </Tabs>
                   <SkillDetails
                     skills={this.state.characterSheet.skills}
+                    passiveSkills={this.state.characterSheet.passive_skills}
                     characterId={this.props.characterId}
                     canAdventure={this.state.characterSheet.can_adventure}
                     isDead={this.state.characterSheet.is_dead}

@@ -34,6 +34,7 @@ class CreateCharacterListener
         $this->characterBuilder->setRace($event->race)
                                ->setClass($event->class)
                                ->createCharacter($event->user, $event->map, $event->characterName)
-                               ->assignSkills();
+                               ->assignSkills()
+                               ->assignPassiveSkills();
     }
 }
