@@ -268,11 +268,28 @@ this gear will be useless without [enchantments](/information/enchantments) and 
 
 Here's your next task child:
 
-I want you to find a quest on surface to complete, while you research that, set up the auto battle to continue fighting. You will farm more Faction points and gain more items.
-From here continue to upgrade your gear in between sessions.
+I want you to aim for killing a Labyrinth Fiend on the surface. You may need to train looting while auto battling or manually battling. 
+
+If you are able to kill such a creature, eventually a Labyrinth Key will drop allowing you to use the [traverse](/information/traverse) command (under the map) 
+to travel to the Labyrinth plane to take on harder creatures, get more drops and experience.
+
+You will farm more Faction points and gain more items. From here continue to upgrade your gear in between sessions.
 
 Next while auto battling craft 75 items, what ever you want. Just craft 75. If you unlock more items, try moving down the list. Maybe you want to craft your self some gear.
 
 Once you have the 75 items crafted, select the enchanting under the additional action dropdown, where crafting was. Pick some enchants, or use the aforementioned links to 
 pick level appropriate enchantments and start enchanting till all 75 items are done. If there are any good items in there that you want to use, equip them and 
-disgard the rest by either stopping auto battle and selling the, on the market or by disenchanting for [gold dust](/information/currencies) which is vital in some quests.
+discard the rest by either stopping auto battle and selling them, on the market or by disenchanting for [gold dust](/information/currencies) which is vital in some quests.
+
+## You won't get far ...
+
+So you might be enjoying the auto battling and buying shop gear and look, ooo shiny green items are falling from the sky. But without the right enchantments for your class,
+for example - Life stealing for vampires with a damage relic - or intelligence based enchantments for Heretics. There is a whole world of customization for your character,
+from passive skills that effect and unlock things such as passive buffs, blueprints for new buildings and so on, for your kingdoms.
+
+Your character, as they grow, will only get as powerful as the amount of time you are willing to invest. Sure you can kill a Satanic Cult Leader, but are you utilizing the power
+of your character? Can they kill the same critter in a [special location]()? Are you getting every last bit of power out of them?
+
+For example a Level 234 Fighter, decked out in enchanted gear (that they made or bought) will be stronger than a character in nothing but shop gear and a couple
+of the faction uniques.
+

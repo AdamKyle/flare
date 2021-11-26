@@ -20,9 +20,11 @@ class CreatePassiveSkills extends Migration
             $table->integer('max_level');
             $table->decimal('bonus_per_level', 8, 4);
             $table->integer('effect_type');
-            $table->bigInteger('child_skill')->nullable()->unisgned();
+            $table->bigInteger('parent_skill_id')->nullable()->unisgned();
             $table->integer('unlocks_at_level')->nullable();
-            $table->boolean('is_locked');
+            $table->boolean('is_locked')->default(false);
+            $table->boolean('is_parent')->default(false);
+            $table->integer('hours_per_level');
             $table->timestamps();
         });
     }

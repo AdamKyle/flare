@@ -2,13 +2,15 @@
 
 namespace App\Flare\Models;
 
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\AdventureFactory;
 use App\Flare\Models\Traits\WithSearch;
 
 class PassiveSkill extends Model
 {
+
+    use WithSearch;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -18,11 +20,13 @@ class PassiveSkill extends Model
         'name',
         'description',
         'max_level',
+        'hours_per_level',
         'bonus_per_level',
         'effect_type',
-        'child_skill',
+        'parent_skill_id',
         'unlocks_at_level',
         'is_locked',
+        'is_parent',
     ];
 
     /**
@@ -34,12 +38,22 @@ class PassiveSkill extends Model
         'max_level'        => 'integer',
         'bonus_per_level'  => 'float',
         'effect_type'      => 'integer',
+        'hours_per_level'  => 'integer',
         'item_find_chance' => 'float',
         'unlocks_at_level' => 'integer',
         'is_locked'        => 'boolean',
+        'is_parent'        => 'boolean',
     ];
 
-    public function monsters() {
-        return $this->hasMany($this, 'child_skill');
+    public function passiveType(): PassiveSkillTypeValue {
+        return new PassiveSkillTypeValue($this->effect_type);
+    }
+
+    public function childSkills() {
+        return $this->hasMany($this, 'parent_skill_id');
+    }
+
+    public function parent() {
+        return $this->belongsTo($this, 'parent_skill_id');
     }
 }

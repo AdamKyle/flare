@@ -93,9 +93,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/passive-skills/import-data', ['as' => 'passive.skills.import-data', 'uses' => 'PassiveSkillsController@importData']);
 
     Route::get('/admin/passive-skills', ['as' => 'passive.skills.list', 'uses' => 'PassiveSkillsController@index']);
-    Route::get('/admin/passive-skill/{skill}', ['as' => 'passive.skills.skill', 'uses' => 'PassiveSkillsController@show']);
+    Route::get('/admin/passive-skill/{passiveSkill}', ['as' => 'passive.skills.skill', 'uses' => 'PassiveSkillsController@show']);
     Route::get('/admin/passive-skills/create', ['as' => 'passive.skills.create', 'uses' => 'PassiveSkillsController@create']);
-    Route::get('/admin/passive-skill/{skill}/edit', ['as' => 'passive.skill.edit', 'uses' => 'PassiveSkillsController@edit']);
+    Route::get('/admin/passive-skill/{passiveSkill}/edit', ['as' => 'passive.skill.edit', 'uses' => 'PassiveSkillsController@edit']);
+    Route::post('/admin/passive-skills/store', ['as' => 'passive.skill.store', 'uses' => 'PassiveSkillsController@store']);
+    Route::post('/admin/passive-skills/{passiveSkill}/update', ['as' => 'passive.skill.update', 'uses' => 'PassiveSkillsController@update']);
 
     Route::get('/admin/races', ['as' => 'races.list', 'uses' => 'RacesController@index']);
     Route::get('/admin/races/create', ['as' => 'races.create', 'uses' => 'RacesController@create']);

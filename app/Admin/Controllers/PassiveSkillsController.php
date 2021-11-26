@@ -2,7 +2,9 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\ManagePassiveSkillRequest;
 use App\Flare\Models\PassiveSkill;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Requests\NpcsImportRequest;
 use App\Http\Controllers\Controller;
@@ -16,31 +18,63 @@ class PassiveSkillsController extends Controller {
     }
 
     public function show(PassiveSkill $passiveSkill) {
-        return view('admin.passive-skill.show', [
-            'skill' => $passiveSkill->with('child_skill'),
+        return view('admin.passive-skills.show', [
+            'skill' => $passiveSkill,
         ]);
     }
 
     public function create() {
-        return view('admin.passive-skill.manage', [
+        return view('admin.passive-skills.manage', [
             'skill'   => null,
             'editing' => false,
+            'effects' => PassiveSkillTypeValue::getNamedValues(),
+            'parentSkills' => PassiveSkill::pluck('name', 'id')->toArray(),
         ]);
     }
 
     public function edit(PassiveSkill $passiveSkill) {
-        return view('admin.passive-skill.manage', [
+        return view('admin.passive-skills.manage', [
             'skill'   => $passiveSkill,
             'editing' => true,
+            'effects' => PassiveSkillTypeValue::getNamedValues(),
+            'parentSkills' => PassiveSkill::pluck('name', 'id')->toArray(),
         ]);
     }
 
+    public function store(ManagePassiveSkillRequest $request) {
+        $data = $request->all();
+
+        $data['is_locked'] = $request->has('is_locked');
+        $data['is_parent'] = $request->has('is_Parent');
+
+        $passiveSkill = PassiveSkill::create($data);
+
+        return response()->redirectTo(route('passive.skills.skill', [
+            'passiveSkill' => $passiveSkill->id,
+        ]))->with('success', 'Created: ' . $passiveSkill->name);
+    }
+
+    public function update(ManagePassiveSkillRequest $request, PassiveSkill $passiveSkill) {
+        $data = $request->all();
+
+        $data['is_locked'] = $request->has('is_locked');
+        $data['is_parent'] = $request->has('is_Parent');
+
+        $passiveSkill->update($data);
+
+        $passiveSkill = $passiveSkill->refresh();
+
+        return response()->redirectTo(route('passive.skills.skill', [
+            'passiveSkill' => $passiveSkill->id,
+        ]))->with('success', 'Updated: ' . $passiveSkill->name);
+    }
+
     public function exportNpcs() {
-        return view('admin.passive-skill.export');
+        return view('admin.passive-skills.export');
     }
 
     public function importNpcs() {
-        return view('admin.passive-skill.import');
+        return view('admin.passive-skills.import');
     }
 
     /**
