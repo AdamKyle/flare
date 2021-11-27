@@ -33,12 +33,12 @@
 
     <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
     <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
-    <script src="{{mix('js/theme-vendor.js')}}"></script>
+
     <script src={{mix('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
     <script src={{mix('js/character-boons.js')}} type="text/javascript"></script>
     <script src={{mix('js/character-inventory.js')}} type="text/javascript"></script>
     <script src={{mix('js/character-sheet.js')}} type="text/javascript"></script>
-    <script src="{{mix('js/theme-script.js')}}"></script>
+
     <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
     <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -50,6 +50,7 @@
 @endphp
 
 <body>
+    <!-- Top Bar -->
     <header class="top-bar">
 
         <!-- Menu Toggler -->
@@ -116,8 +117,8 @@
                 <button type="button"
                         class="relative flex items-center h-full btn-link ltr:ml-1 rtl:mr-1 px-2 text-2xl leading-none la la-bell"
                         data-toggle="custom-dropdown-menu" data-tippy-arrow="true" data-tippy-placement="bottom-end">
-                    <span
-                      class="absolute top-0 right-0 rounded-full border border-primary -mt-1 -mr-1 px-2 leading-tight text-xs font-body text-primary">3</span>
+                        <span
+                          class="absolute top-0 right-0 rounded-full border border-primary -mt-1 -mr-1 px-2 leading-tight text-xs font-body text-primary">3</span>
                 </button>
                 <div class="custom-dropdown-menu">
                     <div class="flex items-center px-5 py-2">
@@ -575,36 +576,51 @@
         </div>
     </aside>
 
+    <!-- Workspace -->
+    <main class="workspace">
 
-    @guest
-        <div>
-            @include('layouts.partials.alerts')
-            @yield('content')
-        </div>
-
-        <footer></footer>
-    @endguest
-
-    @auth
-        <div>
+        @guest
             <div>
-                @if(!auth()->user()->hasRole('Admin'))
-                    <div id="refresh"></div>
-                @endif
-
                 @include('layouts.partials.alerts')
                 @yield('content')
             </div>
-        </div>
+        @endguest
 
-        <footer></footer>
-    @endauth
+        @auth
+            <div>
+                <div>
+                    @if(!auth()->user()->hasRole('Admin'))
+                        <div id="refresh"></div>
+                    @endif
+
+                    @include('layouts.partials.alerts')
+                    @yield('content')
+                </div>
+            </div>
+        @endauth
+
+        <!-- Footer -->
+        <footer class="mt-auto">
+            <div class="footer">
+                <span class='uppercase'>&copy; 2021 Yeti Themes</span>
+                <nav class="ltr:ml-auto rtl:mr-auto">
+                    <a href="mailto:Yeti Themes<info@yetithemes.net>?subject=Support">Support</a>
+                    <span class="divider">|</span>
+                    <a href="http://yetiadmin.yetithemes.net/docs" target="_blank">Docs</a>
+                </nav>
+            </div>
+        </footer>
+
+    </main>
+
 
 
     <!-- Scripts -->
 
     @livewireScripts
 
+    <script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
+    <script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
     <script src="{{ mix('js/app.js') }}"></script>
 
     @stack('scripts')

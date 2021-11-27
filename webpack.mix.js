@@ -50,7 +50,29 @@ mix.webpackConfig({
     postcssCustomProperties(),
     autoprefixer(),
   ])
-  .copy('resources/vendor/theme/assets/js/script.js', 'public/js/theme-script.js')
-  .copy('resources/vendor/theme/assets/js/vendor.js', 'public/js/theme-vendor.js')
+  .combine(
+    [
+      "resources/vendor/theme/assets/js/script.js",
+      "resources/vendor/theme/assets/js/extras.js",
+      "resources/vendor/theme/assets/js/components/",
+    ],
+    "public/js/theme-script.js"
+  )
+  .combine(
+    [
+      "node_modules/@popperjs/core/dist/umd/popper.min.js",
+      "node_modules/tippy.js/dist/tippy.umd.min.js",
+    ],
+    "public/js/theme-vendor.js"
+  )
+  .copy(
+    [
+      "node_modules/chart.js/dist/Chart.min.js",
+      "node_modules/sortablejs/Sortable.min.js",
+      "node_modules/@glidejs/glide/dist/glide.min.js",
+      "node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.js",
+    ],
+    "public/js/"
+  )
   .version()
   .sourceMaps();
