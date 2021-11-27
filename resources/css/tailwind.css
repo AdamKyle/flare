@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "../vendor/theme/assets/css/style.css";
 
 a:hover { color: #009efb; }
 

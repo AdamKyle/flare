@@ -1,25 +1,12 @@
 const colors = require("tailwindcss/colors");
+const aspectRatio = require("@tailwindcss/aspect-ratio");
+const tailwindcssDir = require("tailwindcss-dir")();
 
 module.exports = {
   mode: 'jit',
-  purge: ['./resources/**/*.{js,vue,blade.php,jsx,tsx,md}'],
-  darkMode: "class", // or 'media' or 'class'
-  corePlugins: {
-    preflight: false,
-  },
-  prefix: 'tw-',
+  purge: ['./resources/**/*.{js,vue,blade.php,jsx,tsx}'],
+  darkMode: "class",
   theme: {
-    screens: {
-      'sm': '640px',
-
-      'md': '1024px',
-
-      'lg': '1600px',
-
-      'xl': '1920px',
-
-      '2xl': '2600px',
-    },
     container: {
       center: true,
       padding: "1rem",
@@ -56,10 +43,17 @@ module.exports = {
         800: "#242526",
         900: "#151515",
       },
-      light: {
-        100: "#ffffff",
-        200: "#f1f0f0",
-      }
+      screens: {
+        'sm': '640px',
+
+        'md': '1024px',
+
+        'lg': '1600px',
+
+        'xl': '1920px',
+
+        '2xl': '2600px',
+      },
     },
     extend: {
       fontSize: {
@@ -94,7 +88,6 @@ module.exports = {
           twitter: "#1da1f2",
           pinterest: "#bd081c",
           whatsapp: "#25d366",
-          apple: "#505050",
         },
       },
       spacing: {
@@ -102,20 +95,20 @@ module.exports = {
         "3/4": "75%",
         "9/16": "56.25%",
       },
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
     },
   },
+  plugins: [aspectRatio, tailwindcssDir],
   variants: {
-    extend: {},
-  },
-  plugins: [
-    function ({addUtilities}) {
-      const extendUnderline = {
-        '.underline': {
-          'textDecoration': 'underline',
-          'text-decoration-color': '#505050',
-        },
-      }
-      addUtilities(extendUnderline)
+    extend: {
+      inset: ["direction"],
+      float: ["direction"],
+      borderWidth: ["direction"],
+      margin: ["direction"],
+      padding: ["direction"],
+      textAlign: ["direction"],
     },
-  ]
+  },
 }

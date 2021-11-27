@@ -1,0 +1,76 @@
+html {
+  @apply font-body;
+}
+
+.dark body {
+  @apply bg-gray-900 text-gray-500;
+}
+
+body {
+  @apply relative flex w-full min-h-screen bg-gray-100 text-gray-700 text-sm;
+
+  &.overlay-show {
+    @apply overflow-hidden;
+  }
+}
+
+h1,
+.h1 {
+  @apply font-heading text-3xl leading-10;
+
+  @screen md {
+    @apply text-4xl;
+  }
+}
+
+h2,
+.h2 {
+  @apply font-heading font-bold text-2xl;
+}
+
+h3,
+.h3 {
+  @apply font-heading font-bold text-xl;
+}
+
+h4,
+.h4 {
+  @apply font-heading font-bold text-primary;
+}
+
+h5,
+.h5 {
+  @apply font-heading font-bold text-base;
+}
+
+h6,
+.h6 {
+  @apply font-heading font-bold text-xs;
+}
+
+a {
+  @apply text-primary;
+
+  &:hover {
+    @apply text-primary-700;
+  }
+}
+
+small {
+  @apply text-xs text-gray-600;
+}
+
+input {
+  @apply min-w-0;
+}
+
+a,
+button {
+  &:focus {
+    outline: none;
+  }
+}
+
+.dark hr {
+  @apply border-gray-900;
+}

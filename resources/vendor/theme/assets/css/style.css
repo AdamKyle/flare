@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700|Nunito:400,700&display=swap");
+
+/* Line Awesome */
+@import "line-awesome/dist/line-awesome/css/line-awesome.css";
+
+/* Tippy.js */
+@import "tippy.js/dist/tippy.css";
+@import "tippy.js/themes/light-border.css";
+@import "tippy.js/animations/scale.css";
+@import "tippy.js/animations/shift-away.css";
+@import "tippy.js/animations/shift-toward-extreme.css";
+@import "tippy.js/animations/perspective.css";
+
+/* Animate.css */
+@import "animate.css/animate.css";
+
+/* Glide.js */
+@import "@glidejs/glide/dist/css/glide.core.css";
+
+/* Main */
+@import "tailwindcss/base.css";
+@import "base.css";
+@import "tailwindcss/components.css";
+@import "components.css";
+@import "tailwindcss/utilities.css";
+@import "utilities.css";

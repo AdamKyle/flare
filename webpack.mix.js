@@ -50,5 +50,7 @@ mix.webpackConfig({
     postcssCustomProperties(),
     autoprefixer(),
   ])
+  .copy('resources/vendor/theme/assets/js/script.js', 'public/js/theme-script.js')
+  .copy('resources/vendor/theme/assets/js/vendor.js', 'public/js/theme-vendor.js')
   .version()
   .sourceMaps();
