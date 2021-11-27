@@ -44,4 +44,8 @@ class CharacterPassiveSkill extends Model
         return $this->belongsTo(PassiveSkill::class, 'passive_skill_id', 'id');
     }
 
+    public function getCurrentBonusAttribute() {
+        return $this->current_level * $this->passiveSkill->bonus_per_level;
+    }
+
 }

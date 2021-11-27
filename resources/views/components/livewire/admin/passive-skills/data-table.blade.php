@@ -60,7 +60,7 @@
                                             'passiveSkill' => $skill->id
                                         ])}}">{{$skill->name}}</a>
               @else
-                <a href="{{route('info.page.passive.skill', ['passiveSkill' => $skill->id])}}">{{$skill->name}}</a>
+                <a href="{{route('view.character.passive.skill', ['passiveSkill' => $skill->id, 'character' => $characterId])}}">{{$skill->name}}</a>
               @endif
             @endguest
           </td>

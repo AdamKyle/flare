@@ -16,6 +16,7 @@ class DataTable extends Component
     public $perPage     = 10;
     public $only        = null;
     public $skillId     = 0;
+    public $characterId = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -36,7 +37,8 @@ class DataTable extends Component
     public function render()
     {
         return view('components.livewire.admin.passive-skills.data-table', [
-            'skills' => $this->fetchPassiveSkills(),
+            'skills'      => $this->fetchPassiveSkills(),
+            'characterId' => $this->characterId
         ]);
     }
 }

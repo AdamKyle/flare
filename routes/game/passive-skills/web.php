@@ -6,5 +6,6 @@ Route::middleware([
     'is.character.who.they.say.they.are',
     'is.character.adventuring',
 ])->group(function() {
-    Route::post('/view/passive/{characterPassiveSkill}/{character}', ['as' => 'view.passive.skill', 'uses' => 'CharacterPassiveSkillController@viewSkill']);
+    Route::get('/view/passive/{characterPassiveSkill}/{character}', ['as' => 'view.passive.skill', 'uses' => 'CharacterPassiveSkillController@viewSkill']);
+    Route::get('/view/character-passive/{passiveSkill}/{character}', ['as' => 'view.character.passive.skill', 'uses' => 'CharacterPassiveSkillController@viewCharacterPassiveSkill']);
 });

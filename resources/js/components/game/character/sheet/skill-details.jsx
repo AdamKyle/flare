@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react';
 import {Card, Tab, Tabs, OverlayTrigger, Tooltip, Alert} from "react-bootstrap";
 import TrainSkillModal from "../modals/train-skill-modal";
+import TrainPassiveSkillModal from "../modals/train-passive-skill-modal";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
@@ -19,6 +20,8 @@ export default class SkillDetails extends React.Component {
       errorMessage: null,
       skillToTrain: null,
       loading: false,
+      showTrainPassiveModal: false,
+      passiveSkillToTrain: null,
     }
   }
 
@@ -44,6 +47,13 @@ export default class SkillDetails extends React.Component {
     this.setState({
       showTrainModal: !this.state.showTrainModal,
       skillToTrain: typeof skill !== 'undefined' ? skill : null,
+    });
+  }
+
+  managePassiveTrainingModal(skill) {
+    this.setState({
+      showTrainPassiveModal: !this.state.showTrainPassiveModal,
+      passiveSkillToTrain: typeof skill !== 'undefined' ? skill : null,
     });
   }
 
@@ -247,11 +257,11 @@ export default class SkillDetails extends React.Component {
         <dt>
           {
             passiveSkill.is_locked ?
-              <a href="#" className="text-danger">
+              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId} className="text-danger">
                 {passiveSkill.passive_skill.name} <i className="fas fa-lock"></i>
               </a>
             :
-              <a href="#">
+              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId}>
                 {passiveSkill.passive_skill.name}
               </a>
           }
@@ -265,7 +275,12 @@ export default class SkillDetails extends React.Component {
               <strong>Time Till Next</strong>: {passiveSkill.hours_to_next} Hr.
             </div>
             <div className="col-xs-12 col-sm-3">
-              <strong>Train Button</strong>
+              <button className="btn btn-sm btn-success"
+                      onClick={() => this.managePassiveTrainingModal(passiveSkill)}
+                      disabled={passiveSkill.is_locked}
+              >
+                Train
+              </button>
             </div>
             <div className="col-xs-12 col-sm-2">
               <strong>Timer</strong>
@@ -379,6 +394,18 @@ export default class SkillDetails extends React.Component {
                 skill={this.state.skillToTrain}
               />
             : null
+          }
+
+          {
+            this.state.showTrainPassiveModal && this.state.passiveSkillToTrain !== null ?
+              <TrainPassiveSkillModal
+                characterId={this.props.characterId}
+                setSuccessMessage={this.setSuccessMessage.bind(this)}
+                open={this.state.showTrainPassiveModal}
+                close={this.managePassiveTrainingModal.bind(this)}
+                skill={this.state.passiveSkillToTrain}
+              />
+              : null
           }
         </Card.Body>
       </Card>
