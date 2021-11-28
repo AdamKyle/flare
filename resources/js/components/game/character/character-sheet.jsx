@@ -118,6 +118,7 @@ export default class CharacterSheet extends React.Component {
                     skills={this.state.characterSheet.skills}
                     passiveSkills={this.state.characterSheet.passive_skills}
                     characterId={this.props.characterId}
+                    userId={this.props.userId}
                     canAdventure={this.state.characterSheet.can_adventure}
                     isDead={this.state.characterSheet.is_dead}
                   />

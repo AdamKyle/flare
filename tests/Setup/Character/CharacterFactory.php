@@ -24,6 +24,7 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMap;
 use Tests\Traits\CreateMarketBoardListing;
+use Tests\Traits\CreatePassiveSkill;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
@@ -39,7 +40,8 @@ class CharacterFactory {
         CreateGameMap,
         CreateGameSkill,
         CreateSkill,
-        CreateMarketBoardListing;
+        CreateMarketBoardListing,
+        CreatePassiveSkill;
 
     private Character $character;
 
@@ -84,6 +86,22 @@ class CharacterFactory {
         $this->createInventory();
 
         $this->assignBaseSkills();
+
+        $this->assignPassiveSkills();
+
+        return $this;
+    }
+
+    public function assignPassiveSkills(): CharacterFactory {
+        $this->character->passiveSkills()->create([
+            'character_id'      => $this->character->id,
+            'passive_skill_id'  => $this->createPassiveSkill()->id,
+            'current_level'     => 0,
+            'hours_to_next'     => 1,
+            'started_at'        => null,
+            'completed_at'      => null,
+            'is_locked'         => false,
+        ]);
 
         return $this;
     }

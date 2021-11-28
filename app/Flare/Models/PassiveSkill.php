@@ -3,13 +3,15 @@
 namespace App\Flare\Models;
 
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use Database\Factories\PassiveSkillFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Flare\Models\Traits\WithSearch;
 
 class PassiveSkill extends Model
 {
 
-    use WithSearch;
+    use HasFactory, WithSearch;
 
     /**
      * The attributes that are mass assignable.
@@ -55,5 +57,9 @@ class PassiveSkill extends Model
 
     public function parent() {
         return $this->belongsTo($this, 'parent_skill_id');
+    }
+
+    protected static function newFactory() {
+        return PassiveSkillFactory::new();
     }
 }

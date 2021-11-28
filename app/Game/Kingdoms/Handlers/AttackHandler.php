@@ -118,8 +118,9 @@ class AttackHandler {
     public function attackTarget(KingdomBuilding $target, array $unitInfo): array {
         $totalAttack = $unitInfo['total_attack'];
 
-        $defence              = $target->current_defence;
-        $totalTreasuryDefence = $target->kingdom->treasury / KingdomMaxValue::MAX_TREASURY;
+        $defence               = $target->current_defence;
+        $totalTreasuryDefence  = $target->kingdom->treasury / KingdomMaxValue::MAX_TREASURY;
+        $totalTreasuryDefence += $target->kingdom->fetchDefenceBonusFromPassive();
 
         $defence = $defence + $defence * $totalTreasuryDefence;
 

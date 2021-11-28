@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Traits\WithSearch;
@@ -81,6 +82,15 @@ class Kingdom extends Model implements Auditable
         $this->update([
             'last_walked' => now(),
         ]);
+    }
+
+    public function fetchDefenceBonusFromPassive(): float {
+        $character    = $this->character;
+        $passiveSkill = PassiveSkill::where('effect_type', PassiveSkillTypeValue::KINGDOM_DEFENCE)->first();
+
+        $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
+
+        return $characterPassive->current_level * $passiveSkill->bonus_per_level;
     }
 
     public function gameMap() {

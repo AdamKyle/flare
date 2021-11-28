@@ -5,8 +5,10 @@ namespace App\Flare\Transformers;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
+use App\Flare\Models\PassiveSkill;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Kingdom;
 use Illuminate\Support\Collection;
@@ -50,6 +52,7 @@ class KingdomTransformer extends TransformerAbstract {
             'current_units'      => $kingdom->units,
             'unit_movement'      => $kingdom->unitsMovementQueue,
             'treasury_defence'   => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
+            'passive_defence'    => $kingdom->fetchDefenceBonusFromPassive(),
         ];
     }
 

@@ -2,6 +2,9 @@ import React, {Fragment} from 'react';
 import {Card, Tab, Tabs, OverlayTrigger, Tooltip, Alert} from "react-bootstrap";
 import TrainSkillModal from "../modals/train-skill-modal";
 import TrainPassiveSkillModal from "../modals/train-passive-skill-modal";
+import TimeOutBar from "../../timeout/timeout-bar";
+import moment from "moment";
+import {CountdownCircleTimer} from "react-countdown-circle-timer";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
@@ -22,6 +25,42 @@ export default class SkillDetails extends React.Component {
       loading: false,
       showTrainPassiveModal: false,
       passiveSkillToTrain: null,
+      timeRemaining: 0,
+      forPassiveSkill: null,
+    }
+  }
+
+  componentDidMount() {
+    this.setTimeRemaining();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.state.timeRemaining === 0 && this.state.forPassiveSkill === null) {
+      this.setTimeRemaining();
+    }
+
+    if (this.state.timeRemaining !== 0 && this.state.forPassiveSkill !== null) {
+      let anySkillsTraining    = this.props.passiveSkills.filter((ps) => ps.started_at === null);
+
+      if (anySkillsTraining.length === 0) {
+        this.setState({
+          timeRemaining: 0,
+          forPassiveSkill: null,
+        });
+      }
+    }
+  }
+
+  setTimeRemaining() {
+    let currentTrainingSkill = this.props.passiveSkills.filter((ps) => ps.started_at !== null);
+
+    if (currentTrainingSkill.length > 0) {
+      currentTrainingSkill = currentTrainingSkill[0];
+
+      this.setState({
+        timeRemaining: currentTrainingSkill.completed_at,
+        forPassiveSkill: currentTrainingSkill.id,
+      });
     }
   }
 
@@ -55,6 +94,14 @@ export default class SkillDetails extends React.Component {
       showTrainPassiveModal: !this.state.showTrainPassiveModal,
       passiveSkillToTrain: typeof skill !== 'undefined' ? skill : null,
     });
+  }
+
+  hasAnySkillInTraining() {
+    return this.props.passiveSkills.filter((ps) => ps.started_at !== null).length > 0
+  }
+
+  skillIsMaxed(passiveSkill) {
+    return passiveSkill.current_level === passiveSkill.passive_skill.max_level;
   }
 
   stopTrainingSkill(skill) {
@@ -272,23 +319,75 @@ export default class SkillDetails extends React.Component {
               <strong>Current Level</strong>: {passiveSkill.current_level}
             </div>
             <div className="col-xs-12 col-sm-3">
-              <strong>Time Till Next</strong>: {passiveSkill.hours_to_next} Hr.
+              <strong>Time Till Next</strong>: {this.skillIsMaxed(passiveSkill) ? 'Maxed' : passiveSkill.hours_to_next  + ' Hr.'}
             </div>
             <div className="col-xs-12 col-sm-3">
               <button className="btn btn-sm btn-success"
                       onClick={() => this.managePassiveTrainingModal(passiveSkill)}
-                      disabled={passiveSkill.is_locked}
+                      disabled={passiveSkill.is_locked || this.hasAnySkillInTraining() || this.skillIsMaxed(passiveSkill)}
               >
                 Train
               </button>
             </div>
             <div className="col-xs-12 col-sm-2">
-              <strong>Timer</strong>
+              {this.fetchTime(this.state.timeRemaining, passiveSkill.id, this.state.forPassiveSkill)}
             </div>
           </div>
         </dd>
       </Fragment>
     );
+  }
+
+  fetchTime(time, passiveSkillId, forPassiveSkillId) {
+    console.log(time);
+    if (passiveSkillId !== forPassiveSkillId) {
+      time = 0;
+    }
+
+    let now = moment();
+    let then = moment(time);
+
+    let duration = moment.duration(then.diff(now)).asSeconds();
+
+    const isHours = (duration / 3600) >= 1;
+
+    if (duration > 0) {
+      return (
+        <Fragment>
+          <div style={{marginTop: '-10px'}}>
+            {isHours ?
+              <CountdownCircleTimer
+                isPlaying={true}
+                duration={duration}
+                initialRemainingTime={duration}
+                colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+                size={40}
+                strokeWidth={2}
+                onComplete={() => [false, 0]}
+              >
+                {({remainingTime}) => (remainingTime / 3600).toFixed(0)}
+              </CountdownCircleTimer>
+              :
+              <CountdownCircleTimer
+                isPlaying={true}
+                duration={duration}
+                initialRemainingTime={duration}
+                colors={[["#004777", 0.33], ["#F7B801", 0.33], ["#A30000"]]}
+                size={40}
+                strokeWidth={2}
+                onComplete={() => [false, 0]}
+              >
+                {({remainingTime}) => (remainingTime / 60).toFixed(0)}
+              </CountdownCircleTimer>
+            }
+          </div>
+          <div>{isHours ? 'Hours' : 'Minutes'}</div>
+        </Fragment>
+
+      );
+    } else {
+      return null;
+    }
   }
 
   render() {
