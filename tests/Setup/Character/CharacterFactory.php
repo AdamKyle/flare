@@ -7,6 +7,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 use Str;
@@ -95,7 +96,21 @@ class CharacterFactory {
     public function assignPassiveSkills(): CharacterFactory {
         $this->character->passiveSkills()->create([
             'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill()->id,
+            'passive_skill_id'  => $this->createPassiveSkill([
+                'effect_type' => PassiveSkillTypeValue::KINGDOM_DEFENCE,
+            ])->id,
+            'current_level'     => 0,
+            'hours_to_next'     => 1,
+            'started_at'        => null,
+            'completed_at'      => null,
+            'is_locked'         => false,
+        ]);
+
+        $this->character->passiveSkills()->create([
+            'character_id'      => $this->character->id,
+            'passive_skill_id'  => $this->createPassiveSkill([
+                'effect_type' => PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN,
+            ])->id,
             'current_level'     => 0,
             'hours_to_next'     => 1,
             'started_at'        => null,

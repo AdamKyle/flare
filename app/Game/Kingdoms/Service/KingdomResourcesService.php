@@ -399,6 +399,7 @@ class KingdomResourcesService {
         if ($morale === 0 || $morale === 0.0) {
 
             $newAmount = $this->kingdom->current_population + 30;
+            $newAmount += $newAmount * $this->kingdom->fetchResourceBonus();
 
             if ($currentPop <= $this->kingdom->max_population) {
                 if ($newAmount > $this->kingdom->max_population) {
@@ -474,7 +475,8 @@ class KingdomResourcesService {
     }
 
     protected function increaseResource(string $resource, KingdomBuilding  $building) {
-        $newCurrent = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
+        $newCurrent  = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
+        $newCurrent += $newCurrent * $this->kingdom->fetchResourceBonus();
 
         if ($newCurrent > $this->kingdom->{'max_' . $resource}) {
             $newCurrent = $this->kingdom->{'max_' . $resource};

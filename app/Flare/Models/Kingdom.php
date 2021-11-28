@@ -93,6 +93,15 @@ class Kingdom extends Model implements Auditable
         return $characterPassive->current_level * $passiveSkill->bonus_per_level;
     }
 
+    public function fetchResourceBonus(): float {
+        $character    = $this->character;
+        $passiveSkill = PassiveSkill::where('effect_type', PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN)->first();
+
+        $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
+
+        return $characterPassive->current_level * $passiveSkill->bonus_per_level;
+    }
+
     public function gameMap() {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }

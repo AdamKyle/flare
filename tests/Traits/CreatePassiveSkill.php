@@ -11,6 +11,6 @@ trait CreatePassiveSkill {
      * @return PassiveSkill
      */
     public function createPassiveSkill(array $options = []): PassiveSkill {
-        return PassiveSkill::factory()->create();
+        return PassiveSkill::factory()->create($options);
     }
 }

@@ -322,12 +322,17 @@ export default class SkillDetails extends React.Component {
               <strong>Time Till Next</strong>: {this.skillIsMaxed(passiveSkill) ? 'Maxed' : passiveSkill.hours_to_next  + ' Hr.'}
             </div>
             <div className="col-xs-12 col-sm-3">
-              <button className="btn btn-sm btn-success"
-                      onClick={() => this.managePassiveTrainingModal(passiveSkill)}
-                      disabled={passiveSkill.is_locked || this.hasAnySkillInTraining() || this.skillIsMaxed(passiveSkill)}
-              >
-                Train
-              </button>
+              {
+                this.skillIsMaxed(passiveSkill) ?
+                  <i className="fas fa-check text-success"></i>
+                :
+                  <button className="btn btn-sm btn-primary"
+                          onClick={() => this.managePassiveTrainingModal(passiveSkill)}
+                          disabled={passiveSkill.is_locked || this.hasAnySkillInTraining() || this.skillIsMaxed(passiveSkill)}
+                  >
+                    Train
+                  </button>
+              }
             </div>
             <div className="col-xs-12 col-sm-2">
               {this.fetchTime(this.state.timeRemaining, passiveSkill.id, this.state.forPassiveSkill)}

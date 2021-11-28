@@ -33,7 +33,7 @@
           <dt>Unlocks when parent is level:</dt>
           <dd>{{$skill->passiveSkill->unlocks_at_level}}</dd>
           <dt>Is Locked?</dt>
-          <dd>{{$skill->passiveSkill->is_locked ? 'Yes' : 'No'}}</dd>
+          <dd>{{$skill->is_locked ? 'Yes' : 'No'}}</dd>
         @endif
       </dl>
       <p class="tw-mt-5"><sup>*</sup> Caution, this is not: <code>Max Level * Hours</code> for a total amount of hours. Each level will multiply the time needed by the next level.

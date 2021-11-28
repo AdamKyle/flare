@@ -12,7 +12,7 @@ class PassiveSkillTrainingService {
 
     public function trainSkill(CharacterPassiveSkill $skill, Character $character) {
 
-        $time = now()->addMinutes(1);
+        $time = now()->addMinutes($skill->hours_to_next);
 
         $skill->update([
             'started_at'   => now(),
