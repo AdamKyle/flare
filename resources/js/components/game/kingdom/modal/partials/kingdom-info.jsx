@@ -1,6 +1,6 @@
 import React from 'react';
 import Embezzle from './embezzle';
-import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Alert, OverlayTrigger, Tooltip, Tabs, Tab} from 'react-bootstrap';
 import Deposit from "./deposit";
 import Population from "./population";
 
@@ -178,101 +178,144 @@ export default class KingdomInfo extends React.Component {
             </div>
             : null
         }
-        <div className="row mt-3">
-          <div className="col-md-3">
-            <h3 className="tw-font-light">Core Info</h3>
-            <hr />
-            <dl>
-              <dt><strong>Population</strong> <OverlayTrigger
-                placement="bottom"
-                delay={{ show: 250, hide: 400 }}
-                overlay={renderPopulation}
-              >
-                <button className="btn btn-success btn-sm mr-2" onClick={this.showBuyPeople.bind(this)}>
-                  <i className="ra ra-gold-bar"></i>
-                </button>
+        <Tabs defaultActiveKey="core-info" id="kingdom-info-tabs">
+          <Tab eventKey="core-info" title="Basic Information">
+            <div className="row mt-3">
+              <div className="col-md-6 mb-3">
+                <dl>
+                  <dt><strong>Population</strong> <OverlayTrigger
+                    placement="bottom"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={renderPopulation}
+                  >
+                    <button className="btn btn-success btn-sm mr-2" onClick={this.showBuyPeople.bind(this)}>
+                      <i className="ra ra-gold-bar"></i>
+                    </button>
 
-              </OverlayTrigger>:
+                  </OverlayTrigger>:
 
-              </dt>
-              <dd>{this.formatNumber(this.props.kingdom.current_population)} / {this.formatNumber(this.props.kingdom.max_population)}</dd>
-              <dt><strong>Morale</strong>:</dt>
-              <dd>{this.getCurrentMorale()}%</dd>
-              <dt>
-                <strong>Treasury</strong> <OverlayTrigger
-                placement="bottom"
-                delay={{ show: 250, hide: 400 }}
-                overlay={renderDeposit}
-              >
-                <button className="btn btn-success btn-sm mr-1" onClick={this.showDeposit.bind(this)}>
-                  <i className="ra ra-gold-bar"></i>
-                </button>
+                  </dt>
+                  <dd>{this.formatNumber(this.props.kingdom.current_population)} / {this.formatNumber(this.props.kingdom.max_population)}</dd>
+                  <dt><strong>Morale</strong>:</dt>
+                  <dd>{this.getCurrentMorale()}%</dd>
+                  <dt>
+                    <strong>Treasury</strong> <OverlayTrigger
+                    placement="bottom"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={renderDeposit}
+                  >
+                    <button className="btn btn-success btn-sm mr-1" onClick={this.showDeposit.bind(this)}>
+                      <i className="ra ra-gold-bar"></i>
+                    </button>
 
-              </OverlayTrigger>
-              <OverlayTrigger
-                placement="bottom"
-                delay={{ show: 250, hide: 400 }}
-                overlay={renderWithdrawl}
-              >
-                <button className="btn btn-danger btn-sm" onClick={this.showEmbezzle.bind(this)}>
-                  <i className="ra ra-gold-bar"></i>
-                </button>
+                  </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="bottom"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={renderWithdrawl}
+                    >
+                      <button className="btn btn-danger btn-sm" onClick={this.showEmbezzle.bind(this)}>
+                        <i className="ra ra-gold-bar"></i>
+                      </button>
 
-              </OverlayTrigger> :
-              </dt>
-              <dd>{this.getTreasury()}</dd>
-            </dl>
-          </div>
-          <div className="col-md-3">
-            <h3 className="tw-font-light">Current Resources</h3>
-            <hr />
-            <dl>
-              <dt><strong>Wood</strong>:</dt>
-              <dd>{this.formatNumber(this.props.kingdom.current_wood)} / {this.formatNumber(this.props.kingdom.max_wood)}</dd>
-              <dt><strong>Clay</strong>:</dt>
-              <dd>{this.formatNumber(this.props.kingdom.current_clay)} / {this.formatNumber(this.props.kingdom.max_clay)}</dd>
-              <dt><strong>Stone</strong>:</dt>
-              <dd>{this.formatNumber(this.props.kingdom.current_stone)} / {this.formatNumber(this.props.kingdom.max_stone)}</dd>
-              <dt><strong>Iron</strong>:</dt>
-              <dd>{this.formatNumber(this.props.kingdom.current_iron)} / {this.formatNumber(this.props.kingdom.max_iron)}</dd>
-            </dl>
-          </div>
-          <div className="col-md-3">
-            <h3 className="tw-font-light">Hourly Resource Gain</h3>
-            <hr />
-            <dl>
-              <dt><strong>Wood Increase/hr</strong>:</dt>
-              <dd>{this.getResourceIncrease('wood_increase')}</dd>
-              <dt><strong>Clay Increase/hr</strong>:</dt>
-              <dd>{this.getResourceIncrease('clay_increase')}</dd>
-              <dt><strong>Stone Increase/hr</strong>:</dt>
-              <dd>{this.getResourceIncrease('stone_increase')}</dd>
-              <dt><strong>Iron Increase/hr</strong>:</dt>
-              <dd>{this.getResourceIncrease('iron_increase')}</dd>
-              <dt><strong>Population Increase/hr</strong>:</dt>
-              <dd>{this.getResourceIncrease('population_increase')}</dd>
-            </dl>
-          </div>
-          <div className="col-md-3">
-            <h3 className="tw-font-light">Morale and Defence Bonus</h3>
-            <hr />
-            <dl>
-              <dt><strong>Morale Increase/hr</strong>:</dt>
-              <dd>{this.getTotalMoraleIncreasePerHour()}%</dd>
-              <dt><strong>Morale Decrease/hr</strong>:</dt>
-              <dd>{this.getTotalMoraleDecreasePerHour()}%</dd>
-              <dt><strong>Current Defence Bonus</strong> <OverlayTrigger
-                placement="bottom"
-                delay={{ show: 250, hide: 400 }}
-                overlay={renderHelp}
-              >
-                <i className="far fa-question-circle"></i>
+                    </OverlayTrigger> :
+                  </dt>
+                  <dd>{this.getTreasury()}</dd>
+                </dl>
+              </div>
+              <div className="col-md-6">
+                <h4>Information</h4>
+                <hr />
+                <p>
+                  This is the base information of your kingdom. You can see your current treasury, current population and
+                  current morale.
+                </p>
+                <p>
+                  Red buttons means to withdraw, while green means to deposit or purchase. Hovering over
+                  them will give you information on what they do.
+                </p>
+              </div>
+            </div>
+          </Tab>
+          <Tab eventKey="resource-info" title="Resource Information">
+            <div className="row mt-3">
+              <div className="col-md-4 mb-3">
+                <h4 className="tw-font-light">Current Resources</h4>
+                <hr />
+                <dl>
+                  <dt><strong>Wood</strong>:</dt>
+                  <dd>{this.formatNumber(this.props.kingdom.current_wood)} / {this.formatNumber(this.props.kingdom.max_wood)}</dd>
+                  <dt><strong>Clay</strong>:</dt>
+                  <dd>{this.formatNumber(this.props.kingdom.current_clay)} / {this.formatNumber(this.props.kingdom.max_clay)}</dd>
+                  <dt><strong>Stone</strong>:</dt>
+                  <dd>{this.formatNumber(this.props.kingdom.current_stone)} / {this.formatNumber(this.props.kingdom.max_stone)}</dd>
+                  <dt><strong>Iron</strong>:</dt>
+                  <dd>{this.formatNumber(this.props.kingdom.current_iron)} / {this.formatNumber(this.props.kingdom.max_iron)}</dd>
+                </dl>
+              </div>
+              <div className="col-md-4 mb-3">
+                <h4 className="tw-font-light">Hourly Resource Gain</h4>
+                <hr />
+                <dl>
+                  <dt><strong>Wood Increase/hr</strong>:</dt>
+                  <dd>{this.getResourceIncrease('wood_increase')}</dd>
+                  <dt><strong>Clay Increase/hr</strong>:</dt>
+                  <dd>{this.getResourceIncrease('clay_increase')}</dd>
+                  <dt><strong>Stone Increase/hr</strong>:</dt>
+                  <dd>{this.getResourceIncrease('stone_increase')}</dd>
+                  <dt><strong>Iron Increase/hr</strong>:</dt>
+                  <dd>{this.getResourceIncrease('iron_increase')}</dd>
+                  <dt><strong>Population Increase/hr</strong>:</dt>
+                  <dd>{this.getResourceIncrease('population_increase')}</dd>
+                </dl>
+              </div>
+              <div className="col-md-4">
+                <h4>Information</h4>
+                <hr />
+                <p>This section details how many resources your kingdom currently has and how many you gain per hour.</p>
+                <p>Your kingdom gains resources once per hour, the higher the level your resource buildings the more resources
+                your kingdoms can have and gain per hour.</p>
+                <p>
+                  Resources are used to upgrade buildings, rebuild buildings and recruit units. Of course you can always use Gold
+                  to purchase building levels and units, Assuming you have the gold.
+                </p>
+              </div>
+            </div>
+          </Tab>
+          <Tab eventKey="defence-morale" title="Morale and Defence">
+            <div className="row mt-4">
+              <div className="col-md-6 mb-3">
+                <dl>
+                  <dt><strong>Morale Increase/hr</strong>:</dt>
+                  <dd>{this.getTotalMoraleIncreasePerHour()}%</dd>
+                  <dt><strong>Morale Decrease/hr</strong>:</dt>
+                  <dd>{this.getTotalMoraleDecreasePerHour()}%</dd>
+                  <dt><strong>Current Defence Bonus</strong> <OverlayTrigger
+                    placement="bottom"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={renderHelp}
+                  >
+                    <i className="far fa-question-circle"></i>
 
-              </OverlayTrigger>:</dt>
-              <dd>{((this.props.kingdom.treasury_defence + this.props.kingdom.passive_defence) * 100).toFixed(4)}% </dd>
-            </dl>
-          </div>
-        </div>
+                  </OverlayTrigger>:</dt>
+                  <dd>{((this.props.kingdom.treasury_defence + this.props.kingdom.passive_defence) * 100).toFixed(4)}% </dd>
+                </dl>
+              </div>
+              <div className="col-md-6">
+                <h4>Information</h4>
+                <hr />
+                <p>This section details your morale increase/decrease per hour.</p>
+                <p>Many things can effect the increase/decrease, such as specific buildings
+                with a durability of 0, will decrease morale per hour. You can read about this in the
+                 <a href="/information/kingdoms">kingdoms section</a> of the help docs.</p>
+                <p>Treasury, such as depositing will increase the morale by 15%. Rebuilding destroyed buildings will
+                also increase morale.</p>
+                <p>Your defence bonus comes from the total treasury you have divided by the maximum. There is also a
+                 <a href="/information/passive-skills">Passive Skill</a> that you can train to increase this an additional 25%</p>
+              </div>
+            </div>
+          </Tab>
+        </Tabs>
 
         <Embezzle
           show={this.state.showEmbezzle}

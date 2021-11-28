@@ -85,21 +85,15 @@ class Kingdom extends Model implements Auditable
     }
 
     public function fetchDefenceBonusFromPassive(): float {
-        $character    = $this->character;
-        $passiveSkill = PassiveSkill::where('effect_type', PassiveSkillTypeValue::KINGDOM_DEFENCE)->first();
-
-        $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
-
-        return $characterPassive->current_level * $passiveSkill->bonus_per_level;
+        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_DEFENCE);
     }
 
     public function fetchResourceBonus(): float {
-        $character    = $this->character;
-        $passiveSkill = PassiveSkill::where('effect_type', PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN)->first();
+        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
+    }
 
-        $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
-
-        return $characterPassive->current_level * $passiveSkill->bonus_per_level;
+    public function fetchUnitCostReduction(): float {
+        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
     }
 
     public function gameMap() {
@@ -132,5 +126,14 @@ class Kingdom extends Model implements Auditable
 
     protected static function newFactory() {
         return KingdomFactory::new();
+    }
+
+    protected function getPercentage(int $passiveType): float {
+        $character    = $this->character;
+        $passiveSkill = PassiveSkill::where('effect_type', $passiveType)->first();
+
+        $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
+
+        return $characterPassive->current_level * $passiveSkill->bonus_per_level;
     }
 }

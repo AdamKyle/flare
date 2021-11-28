@@ -208,8 +208,12 @@ class KingdomsController extends Controller {
         } else {
             $service->updateCharacterGold($kingdom, $gameUnit, $request->amount);
 
+            $totalAmount       = $request->amount;
+            $unitCostReduction = $kingdom->fetchUnitCostReduction();
+            $totalAmount      -= $totalAmount * $unitCostReduction;
+
             $kingdom->update([
-                'current_population' => $kingdom->current_population - $request->amount
+                'current_population' => $kingdom->current_population - $totalAmount
             ]);
 
             $paidGold = true;

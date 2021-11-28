@@ -53,6 +53,7 @@ class KingdomTransformer extends TransformerAbstract {
             'unit_movement'      => $kingdom->unitsMovementQueue,
             'treasury_defence'   => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
             'passive_defence'    => $kingdom->fetchDefenceBonusFromPassive(),
+            'unit_cost_reduction' => $kingdom->fetchUnitCostReduction(),
         ];
     }
 

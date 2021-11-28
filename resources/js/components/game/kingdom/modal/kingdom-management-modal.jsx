@@ -10,6 +10,7 @@ import KingdomUnits from './partials/kingdom-units';
 import RecruitUnit from './recruit-unit';
 import LoadingModal from '../../components/loading/loading-modal';
 import KingdomRenameModal from './kingdom-raname-modal';
+import AlertInfo from "../../components/base/alert-info";
 
 export default class KingdomManagementModal extends React.Component {
 
@@ -204,6 +205,11 @@ export default class KingdomManagementModal extends React.Component {
             </Tab>
             <Tab eventKey="building-management" title="Building Management">
               <div className="mt-3">
+                <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                  Click on the rows to open the building upgrade modal in the Buildings tab. Click Buildings in Queue to see
+                  the buildings currently being upgraded/rebuilt. With in the same tab, you can click on any row, to then cancel a
+                  building upgrade and get partial resources back.
+                </AlertInfo>
                 <Tabs defaultActiveKey="kingdom-buildings" id="kingdom-management-buildings">
                   <Tab eventKey="kingdom-buildings" title="Buildings">
                     <div className="mt-3">
@@ -229,6 +235,11 @@ export default class KingdomManagementModal extends React.Component {
             </Tab>
             <Tab eventKey="unit-management" title="Unit Management">
               <div className="mt-3">
+                <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                  Click on the rows to open the unit recruitment modal in the Recruitable Units tab. Click Units in Queue to see
+                  the units currently being recruited. With in the same tab, you can click on any row, to then cancel a
+                  unit recruitment and get partial resources back.
+                </AlertInfo>
                 <Tabs defaultActiveKey="kingdom-units" id="kingdom-management-buildings">
                   <Tab eventKey="kingdom-units" title="Recruitable Units">
                     <div className="mt-3">

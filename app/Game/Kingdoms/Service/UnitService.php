@@ -76,12 +76,29 @@ class UnitService {
      * @return Kingdom
      */
     public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
+        $kingdomUnitCostReduction = $kingdom->fetchUnitCostReduction();
+
+        $woodRequired = ($gameUnit->wood_cost * $amount);
+        $woodRequired -= $woodRequired * $kingdomUnitCostReduction;
+
+        $clayRequired = ($gameUnit->clay_cost * $amount);
+        $clayRequired -= $clayRequired * $kingdomUnitCostReduction;
+
+        $stoneRequired = ($gameUnit->stone_cost * $amount);
+        $stoneRequired -= $stoneRequired * $kingdomUnitCostReduction;
+
+        $ironRequired = ($gameUnit->iron_cost * $amount);
+        $ironRequired -= $ironRequired * $kingdomUnitCostReduction;
+
+        $populationRequired = ($gameUnit->required_population * $amount);
+        $populationRequired -= $populationRequired * $kingdomUnitCostReduction;
+
         $kingdom->update([
-            'current_wood'       => $kingdom->current_wood - ($gameUnit->wood_cost * $amount),
-            'current_clay'       => $kingdom->current_clay - ($gameUnit->clay_cost * $amount),
-            'current_stone'      => $kingdom->current_stone - ($gameUnit->strone_cost * $amount),
-            'current_iron'       => $kingdom->current_iron - ($gameUnit->iron_cost * $amount),
-            'current_population' => $kingdom->current_population - ($gameUnit->required_population * $amount),
+            'current_wood'       => $kingdom->current_wood - $woodRequired,
+            'current_clay'       => $kingdom->current_clay - $clayRequired,
+            'current_stone'      => $kingdom->current_stone - $stoneRequired,
+            'current_iron'       => $kingdom->current_iron - $ironRequired,
+            'current_population' => $kingdom->current_population - $populationRequired,
         ]);
 
         return $kingdom->refresh();
@@ -95,9 +112,13 @@ class UnitService {
      * @param int $amount
      */
     public function updateCharacterGold(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
-        $character = $kingdom->character;
+        $character         = $kingdom->character;
+        $unitCostReduction = $kingdom->fetchUnitCostReduction();
 
-        $character->gold -= (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
+        $totalCost = (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
+        $totalCost -= $totalCost & $unitCostReduction;
+
+        $character->gold -= $totalCost;
 
         $character->save();
 

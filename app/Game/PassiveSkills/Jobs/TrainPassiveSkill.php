@@ -92,8 +92,6 @@ class TrainPassiveSkill implements ShouldQueue
         $this->createNotifactionEvent($newPassive);
 
         event(new UpdateTopBarEvent($this->character->refresh()));
-
-        event(new UpdatePassiveSkillTimer($character->user, 0, $skill->id));
     }
 
     protected function createNotifactionEvent(CharacterPassiveSkill $characterPassiveSkill) {

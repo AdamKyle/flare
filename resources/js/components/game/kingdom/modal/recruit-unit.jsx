@@ -65,7 +65,8 @@ export default class RecruitUnit extends React.Component {
             <Recruit
               currentPopulation={this.props.kingdom.current_population}
               showUnitRecruitmentSuccess={this.props.showUnitRecruitmentSuccess}
-              unit={this.props.unit} kingdom={this.props.kingdom}
+              unit={this.props.unit}
+              kingdom={this.props.kingdom}
               updateAmount={this.updateAmount.bind(this)}
               updateKingdomData={this.props.updateKingdomData}
               close={this.props.close}

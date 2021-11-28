@@ -1,5 +1,17 @@
 ## Tips for new players
 
+> ## ATTN!
+> 
+> Before we begin, let me make one thing very clear in case it wasn't made clear:
+> 
+> *Ahem!*
+> 
+> **You cannot buy any item, gold, anything - nothing. Nadda! in this game. If you want something, be it top end gear,
+> a quest item, 2 trillion gold (max gold a character can hold) or even maxed out Faction points and shiny green items ....
+> YOU MUST PLAY AND EARN IT! There are no shortcuts in Tlessa!**
+> 
+> *And there never will be!*
+
 I could list out things you should focus on, things you should and should not do. That's fun and all, but instead let me
 walk you through the couple of hours of the game for you. I'll provide screenshots so you can follow along.
 
@@ -40,8 +52,9 @@ So what now? Head back to the game tab, and first select Sewer Rat from the drop
     </a>
 </div>
 
-You should see what I see, now hover over those. You can read the [combat docs](/information/combat) for further info, but based on your class you should use the correct
-attack type or experiment with different attack types.
+You should see what I see, now hover over those attack buttons you see. You can read the [combat docs](/information/combat) for further info, but based on your class you should use the correct
+attack type or experiment with different attack types. For example, Casters - such as Heretics, want to use Cast attack (second button from the left), Prophets might one of the Attack and Cast or Cast and Attack buttons
+while Fights and other classes might just use Attack. Again feel free to experiment.
 
 There is also a [setting](/information/settings) that you can turn on, once you are more comfortable to disable the popovers for the attack buttons.
 
@@ -55,7 +68,7 @@ Great:
     </a>
 </div>
 
-You may see death. You may have died. You may see this, you may have killed it after a couple attacks. You may see nothing because you never did I told you and click the button!
+You may see death. You may have died. You may see this, you may have killed it after a couple attacks. You may see nothing because you never did I told you and clicked the button!
 
 Either way this is no good, and we need better gear. Right now, it doesn't matter what your class is, you have 1000 Gold. You can see this in the top section of the game window
 where it states your name, class and gold.
@@ -157,7 +170,9 @@ I want you, the player, to think for second what skill you would need to train -
 Prophets are mostly healing based class, who would benefit from going the Attack and Cast or Cast and Attack route. So for them, I would suggest 
 you train Accuracy. This way you can buy a healing spell, equip it and use either Cast and Attack or Attack and cast and heal your self as you attack.
 
-Prophets healing spells can never miss and healing spells have a chance to resurrect you and heal you again!
+Healing spells can never miss and healing spells have a chance to resurrect you and heal you again! Prophets can attack with Damage spells but
+are weaker than Heretics as they don't get an Intelligence boost. Damage spells also increase the Intelligence and Focus of a Heretic, while Healing spells
+will increase your Charisma (chr) ad Focus.
 
 Don't focus on the other [skills](/information/skills) right now, we shall detail some of those a bit later
 
@@ -195,38 +210,80 @@ Enjoy my friend. Sit back, go get a coffee, relax. Don't close the tab, don't lo
 Come back in  an hour. We will begin phase two!
 
 You may not have gotten all the points needed for the Surface faction, on the faction tab of the character sheet, so - I would like you to head to the shop
-now and purchase some better gear. If you are a caster, focus on Damage spells for intelligence and focus (for heretics) and healing spells for 
-prophets and rangers.
+now and purchase some better gear. If you are a caster, focus on Damage spells for intelligence and focus (for Heretics) and healing spells for 
+Prophets and Rangers.
 
-If you are a ranger, go buy a bow and equip it.
+If you are a Ranger, go buy a bow and equip it. Bows will increase your Agility and Dexterity. Bows are also used for your class skill to have a chance
+to fire your bow off an additional 3x without missing or being blocked.
+
+Yes, all classes have a special attack like this:
+
+- Fighters: Double Attack (Attack again!)
+- Rangers: Triple Attack (Notch and release three arrows in the enemies' direction)
+- Prophets: Double Heal (Heal again)
+- Heretics: Double Cast (Cast again)
+- Thieves: Shadow Dance - Dance through the shadows and auto hit.
+
+These all come from the [classes](/information/races-and-classes) class skill which you can read more about by selecting your class from the table on that help page.
+
+You can raise the class bonus of these skills, which is a base 5%, meaning you have 5% chance to fire off your special attack, via special enchantments.
+
+These will fire automatically during battle, all of them have special requirements before they will apply their effect or be usable. For example: Rangers, to get their triple attack must 
+have a bow equipped. For Thieves, you must duel wield and so on.
+
+Vampire is the only class who does not have a requirement for their special attack to land. They can equip anything.
 
 Now before you continue with automation, look at your accuracy skill on the character sheet, it might be level 20, 30, 40 or even higher.
 
-Let's switch that your class skill - which is documented on the [classes](/information/races-and-clases) page. Just click on the class that is yours and it will tell you
-the class skill. Every class has a chance to fire off their special attack assuming their first one did not miss.
-
-For example, Rangers have a chance to fire off their class skill which lets them fire three arrows at once! How exciting! However, all class skills have rules about
-their usage, such as needing specific gear equipped to attain their bonuses or fire off their special attack.
+Let's switch that your class skill - which is documented on the [classes](/information/races-and-clases) page. Just click on the class that is yours, and it will tell you
+the class skill.
 
 Once you spent some of that hard-earned gold, repeat the auto battle, by just licking Begin, again. We will do this until you reach: Mercenary of Surface.
 
 What about all your items you have accumulated from your auto battle? You can, before beginning the next one, go through them and investigate if any are good enough
-for you at your level, but based on the gold you might have gotten, the "started drops" may just be useless trash to you now. If you would like, you could
+for you at your level, but based on the gold you might have gotten, the "starter drops" may just be useless trash to you now. If you would like, you could
 [disenchant](/information/disenchanting) them all, which will raise the skill - making it easier to disenchant over time.
 
-As you disenchant more items, you will level the disenchanting skill which makes t easier to disenchant items over time as well as level the enchanting skill
+> ### ATTN!
+> 
+> Caution when just auto disenchanting what drops. Just because the gear might be weaker, the enchantment might be good for you, especially since we haven't
+> enchanted or crafted anything yet. So look at the stats on the affixes and see if they raise anything useful on your class.
+> 
+> For example, Vampires want anything with life steal on it. These can stack for you to a maximum of 99%. That means you steal 99% of the enemies' health.
+> These are not "kill enchantments" but that's ok, your attack alone will kill the enemy.
+> 
+> *Kill enchantments for vampires, are those that both steal life AND do damage, regardless of if the damage is stackable or not.*
+
+As you disenchant more items, you will level the disenchanting skill which makes it easier to disenchant items over time as well as level the enchanting skill
 which will also make it easier to enchant items.
 
 You also see the enchanted drops on the market, but you would have to be at a port [location](/information/location) to access the market. You can travel to the closest one
-to you at 160/80 - Smugglers Port.
+to you at 160/80 - Smugglers Port. Port locations are blue ship icons on the map, while pinkish arches are locations of interest that can have adventures or be [special locations](/information/special-locations).
+
+Locations with [adventures](/information/adventure) let you set your character into "auto attack mode" and fight multiple monsters per level, getting loot, experience, skill experience ad gold.
+
+Locations that are special, will contain monsters that are the same you fight in the dropdown list but are much harder. These places can drop special 
+items called Gems (more on that later) and any item (of any value) with any enchantment from any enemy 10 levels or higher than you.
+
+There is a special location for each [plane](/information/planes). Shadow Plane is the only plane that has the same drops as Special locations and stronger monsters.
+
+Shadow plane will not drop gems, but it's special location will. For now lets focus on what we were doing, getting a faction title!
 
 Once you have decided what to do with your gear, lets go back to auto battling, you may be able to fight harder critters, so do the list trick again, pick up from where you last left off
-and continue down - remember, you want to one shot kill the enemy. Once you have it, continue auto battling.
+and continue down the monster list - remember, you want to one shot kill the enemy. Once you have it, continue auto battling with that new monster selected.
 
 ## Got the Faction title now? Excellent!
 
+<div class="mb-4">
+    <a href="/storage/info/tips/images/unique-enchantment.png" class="glightbox">
+        <img src="/storage/info/tips/images/unique-enchantment.png" class="img-fluid" />
+    </a>
+</div>
+
+*Your item will differ from mine, maybe not in enchantment or item, but the stats on the enchantment will differ* 
+
 Let's talk about this unique item, an item you are holding could be worth trillions of gold. Tlessa has two types of enchantments. Ones you have been seeing drop on random 
-items, up to a specific price range, and ones that you can craft as well as these: uniques.
+items, up to a specific price range which are all craftable and then these: uniques.
 
 You can find this item in your character sheet, in the inventory section (it will be green). Your character sheet is live and will update in real time, no need to ever refresh unless
 it is to keep your session alive, with that said, if you ever refresh the game tab, refresh the character sheet to keep them in sync.
@@ -242,6 +299,9 @@ will stack to a maximum of 99% but other classes, we take the best life stealing
 
 But all this stacking means nothing, if your core stats are really low. So this unique, could be 115% on everything and be super awesome, and it is, don't get me wrong, equip it and watch you become a 
 mini god. But there is more, you have to continue to level, the higher the level the more damage the item (or in this case the enchantment) can do.
+
+Take a moment and read through [enchanting](/information/enchanting) as it lists all the various types of enchantments you can craft in game. These enchantments, the green uniqueue ones,
+will not show up in any of those lists because you cannot craft these. You get them from Faction Farming and the [Queen of Hearts](/information/npcs) in Hell.
 
 Save these green items, because there is a [NPC](/information/npcs) that can re-roll them, even transfer them to other items for a price.
 
@@ -273,6 +333,8 @@ I want you to aim for killing a Labyrinth Fiend on the surface. You may need to 
 If you are able to kill such a creature, eventually a Labyrinth Key will drop allowing you to use the [traverse](/information/traverse) command (under the map) 
 to travel to the Labyrinth plane to take on harder creatures, get more drops and experience.
 
+Each plane, off the Surface plane, will offer some kind of bonus, be it XP, Skill XP or Drop Rates.
+
 You will farm more Faction points and gain more items. From here continue to upgrade your gear in between sessions.
 
 Next while auto battling craft 75 items, what ever you want. Just craft 75. If you unlock more items, try moving down the list. Maybe you want to craft your self some gear.
@@ -281,6 +343,9 @@ Once you have the 75 items crafted, select the enchanting under the additional a
 pick level appropriate enchantments and start enchanting till all 75 items are done. If there are any good items in there that you want to use, equip them and 
 discard the rest by either stopping auto battle and selling them, on the market or by disenchanting for [gold dust](/information/currencies) which is vital in some quests.
 
+The Shop won't take your enchanted gear and there is no player to player trade, your only option is to disenchant what you created, or sell them on the market board in hopes
+someone buys them, thus you can start making some coin.
+
 ## You won't get far ...
 
 So you might be enjoying the auto battling and buying shop gear and look, ooo shiny green items are falling from the sky. But without the right enchantments for your class,
@@ -288,8 +353,26 @@ for example - Life stealing for vampires with a damage relic - or intelligence b
 from passive skills that effect and unlock things such as passive buffs, blueprints for new buildings and so on, for your kingdoms.
 
 Your character, as they grow, will only get as powerful as the amount of time you are willing to invest. Sure you can kill a Satanic Cult Leader, but are you utilizing the power
-of your character? Can they kill the same critter in a [special location]()? Are you getting every last bit of power out of them?
+of your character? Can they kill the same critter in a [special location]()? Are you getting every last bit of power out of your character?
+
+If you are a heretic, are you casting as opposed to attacking?
+
+You will also need to craft/enchant while fighting to raise your crafting and enchanting levels. While yes Disenchanting will raise the enchanting level, you only get 50%
+of the xp you would get for enchanting applied when disenchanting.
+
+Again, yes you can buy the shop gear - maybe throw in some shiny green uniques, but without gearing properly towards your class, you won't be utilizing it's full potential
+to be able to do the mass amounts of damage required for special locations, Shadow Plane or even Hell (mid to end game locations).
 
 For example a Level 234 Fighter, decked out in enchanted gear (that they made or bought) will be stronger than a character in nothing but shop gear and a couple
-of the faction uniques.
+of the faction uniques at the same level/class.
+
+## The end of the walk through ...
+
+Phew child! We made it!
+
+We haven't even scratched the surface! We haven't talked about [Kingdoms](/information/kingdoms) or even [Alchemy](/information/alchemy) a skill locked behind a quest!
+
+We haven't even touched [Passive skills](/information/passive-skills) or half the other information. But alas this is where I leave you to explore on your own.
+
+There is a ton of infromation here in the help docs to answer questions, and should you have more - come to [discord](https://discord.gg/hcwdqJUerh) where I shall answer them all!
 

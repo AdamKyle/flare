@@ -5,6 +5,7 @@ import TrainPassiveSkillModal from "../modals/train-passive-skill-modal";
 import TimeOutBar from "../../timeout/timeout-bar";
 import moment from "moment";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
+import AlertInfo from "../../components/base/alert-info";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
@@ -40,9 +41,9 @@ export default class SkillDetails extends React.Component {
     }
 
     if (this.state.timeRemaining !== 0 && this.state.forPassiveSkill !== null) {
-      let anySkillsTraining    = this.props.passiveSkills.filter((ps) => ps.started_at === null);
+      let anySkillsTraining    = this.props.passiveSkills.filter((ps) => ps.started_at === null && ps.id === this.state.forPassiveSkill);
 
-      if (anySkillsTraining.length === 0) {
+      if (anySkillsTraining.length > 0) {
         this.setState({
           timeRemaining: 0,
           forPassiveSkill: null,
@@ -143,6 +144,49 @@ export default class SkillDetails extends React.Component {
             errorMessage: result.data.error,
           });
         }
+      });
+    });
+  }
+
+  cancelPassiveTrain(passiveSkill) {
+    this.setState({
+      showError: false,
+      errorMessage: null,
+      successMessage: null,
+      loading: true,
+    }, () => {
+      axios.post('/api/stop-training/passive/' + passiveSkill.id + '/' + this.props.characterId)
+        .then((result) => {
+          this.setState({
+            loading: false,
+          }, () => {
+            this.setSuccessMessage(result.data.message);
+          });
+        }).catch((error) => {
+          this.setState({loading: false});
+          const response = error.response;
+
+          if (response.status === 401) {
+            return location.reload()
+          }
+
+          if (response.status === 429) {
+            return window.location.replace('/game');
+          }
+
+          if (response.data.hasOwnProperty('message')) {
+            this.setState({
+              showError: true,
+              errorMessage: result.data.message,
+            });
+          }
+
+          if (response.data.hasOwnProperty('error')) {
+            this.setState({
+              showError: true,
+              errorMessage: result.data.error,
+            });
+          }
       });
     });
   }
@@ -301,14 +345,24 @@ export default class SkillDetails extends React.Component {
   renderPassiveSkills() {
     return this.props.passiveSkills.map((passiveSkill) =>
       <Fragment>
+        {
+          passiveSkill.started_at !== null ?
+            <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
+              <p>
+                Canceling this skill, will still take the amount of hours as stated. The time you have spent training this skill,
+                will <strong>not</strong> be taken into account when you go to train again.
+              </p>
+            </AlertInfo>
+          : null
+        }
         <dt>
           {
             passiveSkill.is_locked ?
-              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId} className="text-danger">
+              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId} target="_blank" className="text-danger">
                 {passiveSkill.passive_skill.name} <i className="fas fa-lock"></i>
               </a>
             :
-              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId}>
+              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId} target="_blank">
                 {passiveSkill.passive_skill.name}
               </a>
           }
@@ -326,12 +380,29 @@ export default class SkillDetails extends React.Component {
                 this.skillIsMaxed(passiveSkill) ?
                   <i className="fas fa-check text-success"></i>
                 :
-                  <button className="btn btn-sm btn-primary"
-                          onClick={() => this.managePassiveTrainingModal(passiveSkill)}
-                          disabled={passiveSkill.is_locked || this.hasAnySkillInTraining() || this.skillIsMaxed(passiveSkill)}
-                  >
-                    Train
-                  </button>
+                  passiveSkill.started_at !== null ?
+                    <Fragment>
+                      <button className="btn btn-sm btn-primary"
+                              onClick={() => this.managePassiveTrainingModal(passiveSkill)}
+                              disabled={passiveSkill.is_locked || this.hasAnySkillInTraining() || this.skillIsMaxed(passiveSkill)}
+                      >
+                        Train
+                      </button>
+                      <button className="btn btn-sm btn-danger ml-2"
+                              onClick={() => this.cancelPassiveTrain(passiveSkill)}
+                      >
+                        Stop
+                      </button>
+                    </Fragment>
+                  :
+                    <button className="btn btn-sm btn-primary"
+                            onClick={() => this.managePassiveTrainingModal(passiveSkill)}
+                            disabled={passiveSkill.is_locked || this.hasAnySkillInTraining() || this.skillIsMaxed(passiveSkill)}
+                    >
+                      Train
+                    </button>
+
+
               }
             </div>
             <div className="col-xs-12 col-sm-2">
@@ -344,7 +415,6 @@ export default class SkillDetails extends React.Component {
   }
 
   fetchTime(time, passiveSkillId, forPassiveSkillId) {
-    console.log(time);
     if (passiveSkillId !== forPassiveSkillId) {
       time = 0;
     }

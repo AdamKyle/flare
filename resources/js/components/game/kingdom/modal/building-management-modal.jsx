@@ -99,7 +99,6 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   isCurrentlyInQueue() {
-    console.log('Should be empty', _.isEmpty(this.props.queue.filter((q) => q.building_id === this.props.building.id)))
     return _.isEmpty(this.props.queue.filter((q) => q.building_id === this.props.building.id));
   }
 
@@ -396,18 +395,20 @@ export default class BuildingManagementModal extends React.Component {
                     </dl>
                   </Col>
                   <Col lg={12} xl={6}>
-                    <p>
-                      Upgrading with gold will let you choose a number of levels to upgrade from 0 to the max building level. If the building already has levels,
-                      that will be taken into account for the cost and time calculation.
-                    </p>
-                    <p>
-                      If you do not have the population, you can still purchase the building upgrade and we will only purchase the people needed on top of the cost
-                      of the building upgrade. For example, if you have 100 people and the upgrade costs 500 people, we will only purchase 400 people (10 x 400 = 4000 gold)
-                      on top of the cost of the upgrade.
-                    </p>
-                    <p>
-                      New players are discourage from purchasing upgrades in the beginning when gold is scare for them.
-                    </p>
+                    <div className="tw-overflow-x-auto tw-max-h-52">
+                      <p>
+                        Upgrading with gold will let you choose a number of levels to upgrade from 0 to the max building level. If the building already has levels,
+                        that will be taken into account for the cost and time calculation.
+                      </p>
+                      <p>
+                        If you do not have the population, you can still purchase the building upgrade and we will only purchase the people needed on top of the cost
+                        of the building upgrade. For example, if you have 100 people and the upgrade costs 500 people, we will only purchase 400 people (10 x 400 = 4000 gold)
+                        on top of the cost of the upgrade.
+                      </p>
+                      <p>
+                        New players are discourage from purchasing upgrades in the beginning when gold is scare for them.
+                      </p>
+                    </div>
                   </Col>
                 </Row>
 

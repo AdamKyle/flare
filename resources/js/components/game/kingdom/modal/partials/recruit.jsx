@@ -51,10 +51,15 @@ export default class Recruit extends React.Component {
       }
     }
 
+    const costReduction = this.props.kingdom.unit_cost_reduction;
+    let   totalCost     = value * this.props.unit.cost_per_unit;
+
+    totalCost = totalCost - Math.floor(totalCost * costReduction);
+
     this.setState({
       value: value,
       canRecruit: this.canRecruitWithGold(value) && value > 0,
-      totalCost: value * this.props.unit.cost_per_unit,
+      totalCost: totalCost,
     }, () => {
       this.props.updateAmount(this.state.value);
     });
@@ -114,8 +119,11 @@ export default class Recruit extends React.Component {
     for (let i = 0; i <= costTypes.length; i++) {
 
       const kingdomCurrent = this.getKingdomAmount(costTypes[i]);
+      const costReduction = this.props.kingdom.unit_cost_reduction;
 
-      const unitTotalCost = this.props.unit[costTypes[i]] * value;
+      let unitTotalCost = this.props.unit[costTypes[i]] * value;
+
+      unitTotalCost = unitTotalCost - Math.floor(unitTotalCost * costReduction);
 
       if (unitTotalCost > kingdomCurrent) {
         notEnoughTypes.push(costTypes[i])
@@ -129,6 +137,11 @@ export default class Recruit extends React.Component {
     let cost = this.props.unit.cost_per_unit;
 
     cost *= value;
+
+    const costReduction = this.props.kingdom.unit_cost_reduction;
+
+    cost = cost - Math.floor(cost * costReduction);
+
     const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
 
     return characterGold >= cost;
@@ -223,6 +236,8 @@ export default class Recruit extends React.Component {
                   <i className="fas fa-question-circle ml-2"></i>
                 </OverlayTrigger>
               </dd>
+              <dt>Cost Reduction %:</dt>
+              <dd>{this.props.kingdom.unit_cost_reduction * 100}%</dd>
             </dl>
             <div className="form-group">
               <label htmlFor="unit-recruitment-type">Recruitment Type</label>
@@ -280,7 +295,7 @@ export default class Recruit extends React.Component {
 
           </div>
           <div className="col-md-6">
-            <button className="btn btn-primary unit-recruit-button"
+            <button className="btn btn-primary unit-recruit-button mt-6"
                     disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
                     onClick={this.recruitUnits.bind(this)}
             >
