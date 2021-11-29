@@ -1,5 +1,6 @@
 import React, {Fragment} from 'react';
 import {Card, Col, Row, Tabs, Tab} from 'react-bootstrap';
+import AlertInfo from "../../components/base/alert-info";
 
 export default class CharacterDetails extends React.Component {
 
@@ -137,6 +138,18 @@ export default class CharacterDetails extends React.Component {
               </dl>
             </Tab>
             <Tab eventKey="stats-modded" title="Stats Modded">
+              <div className="mt-4">
+                <AlertInfo icon={"fas fa-question-circle"} title={"Info"}>
+                  <p>
+                    Modded stats are stats that are effected by gear and the enchantments on said gear.
+                    These stats are shown to you in the top bar on the game section.
+                  </p>
+                  <p>
+                    Better gear, levels and the appropriate enchantments can push these well into the trillions,
+                    especially around late game.
+                  </p>
+                </AlertInfo>
+              </div>
               <dl className="mt-4">
                 <dt>Strength Modded:</dt>
                 <dd>{sheet.str_modded}</dd>
@@ -156,9 +169,9 @@ export default class CharacterDetails extends React.Component {
             </Tab>
             <Tab eventKey="resistances-and-reductions" title="Resistances and Deductions">
               <dl className="mt-4">
-                <dt>Spell Evasion:</dt>
+                <dt>Spell Evasion<sup>**</sup>:</dt>
                 <dd>{(sheet.spell_evasion * 100).toFixed(2)}%</dd>
-                <dt>Artifact Annulment:</dt>
+                <dt>Artifact Annulment<sup>**</sup>:</dt>
                 <dd>{(sheet.artifact_anull * 100).toFixed(2)}%</dd>
                 <dt>Enchantment Reduction Amount<sup>**</sup>:</dt>
                 <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
@@ -220,11 +233,25 @@ export default class CharacterDetails extends React.Component {
                 <Tab eventKey="attack-break-down" title="Attack Break Down">
                   <Tabs defaultActiveKey="regular-attack" id="character-attack-break-down">
                     <Tab eventKey="regular-attack" title="Regular Attacks" tabClassName="mt-4">
+                      <div className="mt-4">
+                        <AlertInfo icon={"fas fa-question-circle"} title={"Info"}>
+                          <p>This is your attack normally. Because there are five different attack types, each tab
+                            reflects the attack button on the game tab.</p>
+                        </AlertInfo>
+                      </div>
+
                       <Tabs defaultActiveKey="attack" id="character-regular-attack-break-down">
                         {this.buildEachTab(sheet.attack_stats, true)}
                       </Tabs>
                     </Tab>
                     <Tab eventKey="voided-attack" title="Voided Attacks" tabClassName="mt-4">
+                      <div className="mt-4">
+                        <AlertInfo icon={"fas fa-question-circle"} title={"Info"}>
+                          <p>This is your voided attack. Some enemies can <a href="/information/voidance">void</a> you. When that happens
+                            your attacks will drop. You can see what that would look like here.</p>
+                        </AlertInfo>
+                      </div>
+
                       <Tabs defaultActiveKey="voided_attack" id="character-voided-attack-break-down">
                         {this.buildEachTab(sheet.attack_stats, false)}
                       </Tabs>

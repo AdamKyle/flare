@@ -33,8 +33,9 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   canUpgrade() {
-    const kingdom = this.props.kingdom;
-    const building = this.props.building;
+    const kingdom               = this.props.kingdom;
+    const building              = this.props.building;
+    const buildingCostReduction = this.props.kingdom.building_cost_reduction;
 
     if (this.state.level > 0) {
       return true;
@@ -44,23 +45,38 @@ export default class BuildingManagementModal extends React.Component {
       return false
     }
 
-    if (building.wood_cost > kingdom.current_wood) {
+    let buildingWoodCost = building.wood_cost;
+    buildingWoodCost    -= Math.floor(buildingWoodCost * buildingCostReduction);
+
+    if (buildingWoodCost > kingdom.current_wood) {
       return false;
     }
 
-    if (building.clay_cost > kingdom.current_clay) {
+    let buildingClayCost = building.clay_cost;
+    buildingClayCost    -= Math.floor(buildingClayCost * buildingCostReduction);
+
+    if (buildingClayCost > kingdom.current_clay) {
       return false;
     }
 
-    if (building.stone_cost > kingdom.current_stone) {
+    let buildingStoneCost = building.stone_cost;
+    buildingStoneCost    -= Math.floor(buildingStoneCost * buildingCostReduction);
+
+    if (buildingStoneCost > kingdom.current_stone) {
       return false;
     }
 
-    if (building.iron_cost > kingdom.current_iron) {
+    let buildingIronCost = building.iron_cost;
+    buildingIronCost    -= Math.floor(buildingIronCost * buildingCostReduction);
+
+    if (buildingIronCost > kingdom.current_iron) {
       return false;
     }
 
-    if (building.population_required > kingdom.current_population) {
+    let buildingPopulationRequired = building.population_required;
+    buildingPopulationRequired    -= Math.floor(buildingPopulationRequired * buildingCostReduction);
+
+    if (buildingPopulationRequired > kingdom.current_population) {
       return false;
     }
 
@@ -68,26 +84,42 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   canRebuild() {
-    const kingdom = this.props.kingdom;
-    const building = this.props.building;
+    const kingdom               = this.props.kingdom;
+    const building              = this.props.building;
+    const buildingCostReduction = this.props.kingdom.building_cost_reduction;
 
-    if ((building.level * building.base_wood_cost) > kingdom.current_wood) {
+    let buildingWoodCost = (building.level * building.base_wood_cost);
+    buildingWoodCost    -= Math.floor(buildingWoodCost * buildingCostReduction)
+
+    if (buildingWoodCost > kingdom.current_wood) {
       return false;
     }
 
-    if ((building.level * building.base_clay_cost) > kingdom.current_clay) {
+    let buildingClayCost = (building.level * building.base_clay_cost);
+    buildingClayCost    -= Math.floor(buildingClayCost * buildingCostReduction)
+
+    if (buildingClayCost > kingdom.current_clay) {
       return false;
     }
 
-    if ((building.level * building.base_stone_cost) > kingdom.current_stone) {
+    let buildingStoneCost = (building.level * building.base_stone_cost);
+    buildingStoneCost    -= Math.floor(buildingStoneCost * buildingCostReduction)
+
+    if (buildingStoneCost > kingdom.current_stone) {
       return false;
     }
 
-    if ((building.level * building.base_iron_cost) > kingdom.current_iron) {
+    let buildingIronCost = (building.level * building.base_iron_cost);
+    buildingIronCost    -= Math.floor(buildingIronCost * buildingCostReduction)
+
+    if (buildingIronCost > kingdom.current_iron) {
       return false;
     }
 
-    if ((building.level * building.base_population) > kingdom.current_population) {
+    let buildingPopulationRequired = (building.level * building.base_population);
+    buildingPopulationRequired    -= Math.floor(buildingPopulationRequired * buildingCostReduction)
+
+    if (buildingPopulationRequired > kingdom.current_population) {
       return false;
     }
 
@@ -225,12 +257,19 @@ export default class BuildingManagementModal extends React.Component {
 
     time += this.props.building.time_increase;
 
+    let populationRequired = (levelForGoldCost * this.props.building.raw_required_population) + this.props.building.population_required;
+
+    const buildingCostReduction = this.props.kingdom.building_cost_reduction;
+
+    goldCost           -= Math.floor(goldCost * buildingCostReduction);
+    populationRequired -=(Math.floor(populationRequired * buildingCostReduction));
+
     this.setState({
       disabledButtons: !hasGold,
       costToUpgrade: goldCost,
       hasGold: hasGold,
       level: level,
-      populationRequired: (levelForGoldCost * this.props.building.raw_required_population) + this.props.building.population_required,
+      populationRequired: populationRequired,
       timeNeeded: Math.ceil(time),
     })
   }

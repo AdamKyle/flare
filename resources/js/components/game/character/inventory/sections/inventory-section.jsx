@@ -7,6 +7,7 @@ import DestroyModal from "../modals/destroy-modal";
 import DestroyAllModal from "../modals/destroy-all-modal";
 import DisenchantModal from "../modals/disenchant-modal";
 import MoveToSetModal from "../modals/move-to-set-modal";
+import AlertInfo from "../../../components/base/alert-info";
 
 export default class InventorySection extends React.Component {
 
@@ -163,7 +164,7 @@ export default class InventorySection extends React.Component {
     return(
       <Card>
         <Card.Body>
-          <div className="alert alert-info mt-2 mb-3">
+          <AlertInfo icon={"fas fa-question-circle"} title={"Tips"}>
             <p>
               Destroying items will destroy all items and give you no gold dust, even for enchanted items.
               Disenchanting will use your skill to determine if you succeed or not. If you succeed you can get between 1-150 Gold dust
@@ -176,7 +177,7 @@ export default class InventorySection extends React.Component {
             </p>
 
             <p>Clicking the name will open the item details in a new window</p>
-          </div>
+          </AlertInfo>
           {
             this.state.successMessage !== null ?
               <div className="mb-3">

@@ -115,6 +115,7 @@ export default class CharacterSheet extends React.Component {
                     </Tab>
                   </Tabs>
                   <SkillDetails
+                    automations={this.state.characterSheet.automations}
                     skills={this.state.characterSheet.skills}
                     passiveSkills={this.state.characterSheet.passive_skills}
                     characterId={this.props.characterId}
@@ -125,6 +126,7 @@ export default class CharacterSheet extends React.Component {
                 </Col>
                 <Col lg={12} xl={6}>
                   <InventoryDetails
+                    automations={this.state.characterSheet.automations}
                     characterSheet={this.state.characterSheet}
                     characterId={this.props.characterId}
                     userId={this.props.userId}

@@ -2,6 +2,8 @@ import React, {Fragment} from "react";
 import ItemName from "../../../../marketboard/components/item-name";
 import ReactDatatable from "@ashvin27/react-datatable";
 import {Alert} from "react-bootstrap";
+import AlertInfo from "../../../components/base/alert-info";
+import AlertWarning from "../../../components/base/alert-warning";
 
 export default class SetTabSection extends React.Component {
 
@@ -208,18 +210,18 @@ export default class SetTabSection extends React.Component {
       <div className="mt-4">
         {
           this.props.set.is_equipped ?
-            <div className="alert alert-info mb-3">
+            <AlertInfo icon={"fas fa-question-circle"} title={"Tips"}>
               <p>You cannot move items from this set or equip this set because it is already equipped.</p>
 
               <p>To unequip the the set, head to equipped and click "unequip all".</p>
 
               <p><strong>Equipping non set items, will replace the whole set with that item. You cannot mix and match.</strong></p>
-            </div>
+            </AlertInfo>
           : null
         }
         {
           !this.props.set.can_be_equipped ?
-            <div className="alert alert-warning mb-3">
+            <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
               <p>
                 This set cannot be equipped due to the items in it. Remember a set contains:
                 2 Weapons (or 1 Shield, 1 Weapon or 1 Bow), 1 of each piece of armour, 2 spells (either 2 healing or
@@ -230,7 +232,7 @@ export default class SetTabSection extends React.Component {
                 You can still use sets as a stash tab, which seem to be what you are doing here. Gear in sets do not
                 count towards your inventory max and can contain as any items as you please.
               </p>
-            </div>
+            </AlertWarning>
           : null
         }
 

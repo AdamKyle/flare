@@ -130,6 +130,18 @@ class CharacterFactory {
             'is_locked'         => false,
         ]);
 
+        $this->character->passiveSkills()->create([
+            'character_id'      => $this->character->id,
+            'passive_skill_id'  => $this->createPassiveSkill([
+                'effect_type' => PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION,
+            ])->id,
+            'current_level'     => 0,
+            'hours_to_next'     => 1,
+            'started_at'        => null,
+            'completed_at'      => null,
+            'is_locked'         => false,
+        ]);
+
         return $this;
     }
 

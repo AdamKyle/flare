@@ -2,10 +2,10 @@ import React, {Fragment} from 'react';
 import {Card, Tab, Tabs, OverlayTrigger, Tooltip, Alert} from "react-bootstrap";
 import TrainSkillModal from "../modals/train-skill-modal";
 import TrainPassiveSkillModal from "../modals/train-passive-skill-modal";
-import TimeOutBar from "../../timeout/timeout-bar";
 import moment from "moment";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import AlertInfo from "../../components/base/alert-info";
+import AlertWarning from "../../components/base/alert-warning";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
@@ -227,7 +227,7 @@ export default class SkillDetails extends React.Component {
                 <div className="col-xs-12 col-sm-4">
                   <button
                     className={s.is_training ? 'btn btn-success btn-sm train-skill-btn' : 'btn btn-primary btn-sm train-skill-btn'}
-                    disabled={!this.props.canAdventure || this.props.isDead}
+                    disabled={!this.props.canAdventure || this.props.isDead || this.props.automations.length > 0}
                     onClick={() => this.manageTrainSkill(s)}
                   >
                     Train { s.is_training ? <i className="ml-2 fas fa-check"></i> : null }
@@ -237,7 +237,7 @@ export default class SkillDetails extends React.Component {
                       <Fragment>
                         <button
                           className="btn btn-danger btn-sm ml-2 train-skill-btn"
-                          disabled={!this.props.canAdventure || this.props.isDead}
+                          disabled={!this.props.canAdventure || this.props.isDead || this.props.automations.length > 0}
                           onClick={() => this.stopTrainingSkill(s)}
                         >
                           Stop
@@ -487,6 +487,22 @@ export default class SkillDetails extends React.Component {
                 </Alert>
               </div>
               : null
+          }
+          {
+            this.props.automations.length > 0 ?
+              <div className="mt-2 mb-3">
+                <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
+                  <p>
+                    You cannot modify any of your skills except your <strong>passive</strong> skills because you are currently
+                    in the middle of an automation.
+                  </p>
+                  <p>
+                    You can still disenchant, craft and enchant, however you cannot switch which skill is currently training in relation to
+                    combat based skills.
+                  </p>
+                </AlertWarning>
+              </div>
+            : null
           }
           {
             this.state.loading ?

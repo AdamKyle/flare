@@ -4,6 +4,8 @@ import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
 import SaveAsSetModal from "../modals/save-as-set-modal";
 import EquippedSectionButton from "./equipped-section-button";
+import AlertInfo from "../../../components/base/alert-info";
+import AlertWarning from "../../../components/base/alert-warning";
 
 export default class EquippedSection extends React.Component {
 
@@ -199,21 +201,20 @@ export default class EquippedSection extends React.Component {
       <Card>
         <Card.Body>
 
-          <div className="alert alert-info mt-2">
+          <AlertInfo icon={"fas fa-question-circle"} title={"Tips"}>
             <p>
               You may choose to save currently equipped items to a set that is not currently equipped.
               To do this click Save as set when you are happy with the items you have equipped.
               These items will still be equipped to you, you will just now have a set equipped.
             </p>
-          </div>
+          </AlertInfo>
 
           {
             typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped) ?
-              <div className="alert alert-warning mt-2 mb-3">
+              <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You have a set ...'}>
                 You currently have a set equipped. Equipping any other item, or set will replace this set completely.
                 <strong>You cannot mix and match sets or sets with non set items. It's one or the other.</strong>
-
-              </div>
+              </AlertWarning>
             : null
           }
 
