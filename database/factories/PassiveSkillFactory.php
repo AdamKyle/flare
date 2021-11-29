@@ -34,7 +34,7 @@ class PassiveSkillFactory extends Factory
             'effect_type'      => PassiveSkillTypeValue::KINGDOM_DEFENCE,
             'parent_skill_id'  => null,
             'unlocks_at_level' => null,
-            'is_locked'        => null,
+            'is_locked'        => false,
             'is_parent'        => true,
         ];
     }
