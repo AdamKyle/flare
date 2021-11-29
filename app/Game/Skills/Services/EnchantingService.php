@@ -69,7 +69,7 @@ class EnchantingService {
      * @return array
      */
     public function fetchAffixes(Character $character): array {
-        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);
+        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);;
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         return [
