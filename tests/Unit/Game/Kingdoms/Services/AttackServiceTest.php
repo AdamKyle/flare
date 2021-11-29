@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Values\NpcTypes;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\KingdomLog;
@@ -24,6 +25,12 @@ class AttackServiceTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
+
+        $this->createNpc([
+            'type' => NpcTypes::KINGDOM_HOLDER,
+            'name' => 'KingdomHolder',
+            'real_name' => 'Kingdom Holder'
+        ]);
 
         Queue::fake();
     }

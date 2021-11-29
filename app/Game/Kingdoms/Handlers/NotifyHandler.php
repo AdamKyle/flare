@@ -207,11 +207,17 @@ class NotifyHandler {
      * @param Character $character
      */
     public function notifyAttacker(string $status, Kingdom $defender, Character $character) {
-        $logStatus = new KingdomLogStatusValue($status);
+        $logStatus     = new KingdomLogStatusValue($status);
+        $mapName       = $defender->gameMap->name;
+        $characterName = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
+
+        if (!is_null($defender->character)) {
+            $characterName = $defender->character->name;
+        }
 
         if (!$logStatus->unitsReturning()) {
 
-            KingdomLog::create([
+            $attackLog = KingdomLog::create([
                 'character_id' => $character->id,
                 'from_kingdom_id' => $this->attackingKingdom->id,
                 'to_kingdom_id' => $this->defendingKingdom->id,
@@ -228,18 +234,18 @@ class NotifyHandler {
                     $defender->x_position . '/' . $defender->y_position .
                     ' on the ' . $mapName . ' plane.';
 
-                $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'failed', 'Lost attack!');
+                $this->createNotificationEvent($character, $attackLog, $message, 'failed', 'Lost attack!');
             }
 
             if ($logStatus->tookKingdom()) {
                 $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
                     ' on the ' . $mapName . ' plane.';
 
-                $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'success', 'Took Kingdom!');
+                $this->createNotificationEvent($character, $attackLog, $message, 'success', 'Took Kingdom!');
             }
         }
 
-        $mapName = $defender->gameMap->name;
+
         $message = '';
         $type    = '';
 

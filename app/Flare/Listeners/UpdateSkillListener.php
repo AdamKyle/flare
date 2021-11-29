@@ -44,7 +44,9 @@ class UpdateSkillListener
 
             $xp = ceil($this->getSkillXp($enchantingSkill) / 2);
 
-            $this->updateSkill($enchantingSkill, $xp);
+            if ($enchantingSkill->level < $enchantingSkill->baseSkill->max_level) {
+                $this->updateSkill($enchantingSkill, $xp);
+            }
         }
     }
 

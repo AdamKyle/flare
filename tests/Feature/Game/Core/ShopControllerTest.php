@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Core;
 
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Jobs\PurchaseItemsJob;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -11,6 +12,7 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\InventorySlot;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use Tests\Setup\Character\CharacterFactory;
@@ -21,7 +23,8 @@ class ShopControllerTest extends TestCase
     use RefreshDatabase,
         CreateItem,
         CreateUser,
-        CreateItemAffix;
+        CreateItemAffix,
+        CreateGameSkill;
 
     private $character;
 
@@ -61,7 +64,10 @@ class ShopControllerTest extends TestCase
                                 ->inventoryManagement()
                                 ->giveItem($this->item)
                                 ->equipLeftHand($this->item->name)
-                                ->getCharacterFactory();
+                                ->getCharacterFactory()
+                                ->assignSkill($this->createGameSkill([
+                                    'type' => SkillTypeValue::ENCHANTING
+                                ]));
     }
 
     public function tearDown(): void {
@@ -541,7 +547,6 @@ class ShopControllerTest extends TestCase
         $user      = $this->character->getUser();
 
         $character = $this->character->getCharacter(false);
-
 
         $this->actingAs($user)->visitRoute('game.shop.buy', [
             'character' => $character

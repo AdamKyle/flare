@@ -69,7 +69,7 @@ class EnchantingService {
      * @return array
      */
     public function fetchAffixes(Character $character): array {
-        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);
+        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);;
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         return [
@@ -155,8 +155,17 @@ class EnchantingService {
     }
 
     protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
+
+        $currentInt = $builder->statMod('int');
+
+        // If the current intelligence is over 1 billion,
+        // set the max to 1 billion as enchanting will never go over this.
+        if ($currentInt > 1000000000) {
+            $currentInt = 1000000000;
+        }
+
         return ItemAffix::select('name', 'cost', 'id', 'type')
-                        ->where('int_required', '<=', $builder->statMod('int'))
+                        ->where('int_required', '<=', $currentInt)
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
                         ->where('randomly_generated', false)
                         ->orderBy('cost', 'asc')

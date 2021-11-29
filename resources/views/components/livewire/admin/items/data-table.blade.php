@@ -152,9 +152,27 @@
                     />
                 @endif
 
+                @if ($showOtherCurrencyCost)
+                    <x-data-tables.header-row
+                        wire:click.prevent="sortBy('gold_dust_cost')"
+                        header-text="Gold Dust Cost"
+                        sort-by="{{$sortBy}}"
+                        sort-field="{{$sortField}}"
+                        field="gold_dust_cost"
+                    />
+
+                    <x-data-tables.header-row
+                        wire:click.prevent="sortBy('shards_cost')"
+                        header-text="Shards Cost"
+                        sort-by="{{$sortBy}}"
+                        sort-field="{{$sortField}}"
+                        field="shards_cost"
+                    />
+                @endif
+
                   <x-data-tables.header-row
                     wire:click.prevent="sortBy('skill_level_required')"
-                    header-text="Skill Level Required"
+                    header-text="Crafting Skill Level Required"
                     sort-by="{{$sortBy}}"
                     sort-field="{{$sortField}}"
                     field="skill_level_required"
@@ -162,7 +180,7 @@
 
                   <x-data-tables.header-row
                     wire:click.prevent="sortBy('skill_level_trivial')"
-                    header-text="Skill Level Trivial"
+                    header-text="Crafting Skill Level Trivial"
                     sort-by="{{$sortBy}}"
                     sort-field="{{$sortField}}"
                     field="skill_level_trivial"

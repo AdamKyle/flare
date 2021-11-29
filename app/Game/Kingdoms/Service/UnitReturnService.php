@@ -17,7 +17,8 @@ class UnitReturnService {
     public function returnUnits(UnitMovementQueue $unitMovement, Character $character) {
         $unitsReturning = $unitMovement->units_moving['new_units'];
 
-        $kingdom = Kingdom::find($unitMovement->from_kingdom_id);
+        $kingdom  = Kingdom::find($unitMovement->from_kingdom_id);
+        $defender = $unitMovement->from_kingdom;
 
         foreach ($unitsReturning as $unitInfo) {
             $foundUnits = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
@@ -36,6 +37,9 @@ class UnitReturnService {
             'published' => true,
         ]);
 
+        $message = 'Your units have returned from their attack at (X/Y): ' .
+            $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . ' plane.';
+
         Notification::create([
             'character_id' => $character->id,
             'title'        => 'Units Returned',
@@ -51,8 +55,6 @@ class UnitReturnService {
         event(new UpdateNotificationsBroadcastEvent($character->refresh()->notifications()->where('read', false)->get(), $character->user));
 
         event(new UpdateKingdomLogs($character->refresh()));
-
-        $defender = $unitMovement->from_kingdom;
 
         $message  = 'Your units have returned from their attack at (X/Y): ' .
             $defender->x_position . '/' . $defender->y_position . ' on ' . $defender->gameMap->name . ' plane. Check your attack logs for more information.';

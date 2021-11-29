@@ -134,10 +134,15 @@ class Kingdom extends Model implements Auditable
 
     protected function getPercentage(int $passiveType): float {
         $character    = $this->character;
-        $passiveSkill = PassiveSkill::where('effect_type', $passiveType)->first();
 
-        $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
+        if (is_null($character)) {
+             return 0.0;
+        }
 
-        return $characterPassive->current_level * $passiveSkill->bonus_per_level;
+        $passive = $character->passiveSkills->filter(function($passiveSkill) use($passiveType) {
+            return $passiveSkill->passiveSkill->effect_type === $passiveType;
+        })->first();
+
+        return $passive->current_level * $passive->passiveSkill->bonus_per_level;
     }
 }

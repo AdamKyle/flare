@@ -7,6 +7,7 @@ use App\Flare\Models\Faction;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
@@ -29,6 +30,8 @@ class AdventureRewardService {
 
     private $buildCharacterAttackTypes;
 
+    private $characterXPService;
+
     /**
      * @var array $messages
      */
@@ -43,10 +46,11 @@ class AdventureRewardService {
      * @param CharacterService $characterService
      * @return void
      */
-    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes, CharacterXPService $characterXPService) {
 
         $this->characterService          = $characterService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+        $this->characterXPService        = $characterXPService;
     }
 
     /**
@@ -164,6 +168,9 @@ class AdventureRewardService {
     }
 
     protected function giveXP(int $xp, Character $character) {
+
+        $xp = $this->characterXPService->determineXPToAward($character, $xp);
+
         $character->xp += $xp;
         $character->save();
 
