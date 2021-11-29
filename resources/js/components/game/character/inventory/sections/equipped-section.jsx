@@ -36,6 +36,12 @@ export default class EquippedSection extends React.Component {
         sortable: true,
       },
       {
+        key: 'position',
+        text: 'Position',
+        sortable: true,
+        cell: row => <div>{row.position}</div>
+      },
+      {
         key: 'base_damages',
         text: 'Base Damage',
         sortable: true,
@@ -79,6 +85,10 @@ export default class EquippedSection extends React.Component {
     }
   }
 
+  seeRow(row) {
+    console.log(row);
+  }
+
   componentDidMount() {
     this.setState({
       equippedItems: this.formatDataForTable()
@@ -120,9 +130,11 @@ export default class EquippedSection extends React.Component {
   }
 
   formatDataForTable() {
+    console.log(this.props.equipped);
     if (Array.isArray(this.props.equipped)) {
       return this.props.equipped.map((e) => {
-        e.item['slot_id'] = e.id;
+        e.item['slot_id']  = e.id;
+        e.item['position'] = e.position;
 
         return e.item;
       });
@@ -130,8 +142,8 @@ export default class EquippedSection extends React.Component {
 
     if (typeof this.props.equipped === 'object') {
       return this.props.equipped.slots.map((s) => {
-        s.item['slot_id'] = s.id;
-
+        s.item['slot_id']  = s.id;
+        s.item['position'] = s.position;
         return s.item;
       });
     }

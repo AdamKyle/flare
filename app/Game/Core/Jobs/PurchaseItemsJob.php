@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Game\Skills\Events\UpdateCharacterEnchantingList;
+use App\Game\Skills\Services\EnchantingService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

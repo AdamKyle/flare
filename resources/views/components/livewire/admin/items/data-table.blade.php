@@ -154,7 +154,7 @@
 
                       <x-data-tables.header-row
                         wire:click.prevent="sortBy('skill_level_required')"
-                        header-text="Skill Level Required"
+                        header-text="Crafting Skill Level Required"
                         sort-by="{{$sortBy}}"
                         sort-field="{{$sortField}}"
                         field="skill_level_required"
@@ -162,7 +162,7 @@
 
                       <x-data-tables.header-row
                         wire:click.prevent="sortBy('skill_level_trivial')"
-                        header-text="Skill Level Trivial"
+                        header-text="Crafting Skill Level Trivial"
                         sort-by="{{$sortBy}}"
                         sort-field="{{$sortField}}"
                         field="skill_level_trivial"
