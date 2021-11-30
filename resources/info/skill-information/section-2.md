@@ -22,24 +22,44 @@ Let's break down what's all in a skill, you can see this information by clicking
 > ### ATTN!
 > 
 > If a skill makes use of the above-mentioned modifiers, it will receive no skill bonus per level, instead the bonus to those modifiers will increase.
-> 
-> Monsters can also have skills that affect these modifiers as well.
 
-When viewing your character skeet, you will see a list of skills. Each one of those skills can be clicked on to get relevant details about said skill and about where you are in training that skill. (see image below).
+When viewing your character sheet, you will see a list of skills. Each one of those skills can be clicked on to get relevant details about said skill and about where you are in training that skill. (see image below).
 
 ## Class Skills
 
 There are some skills that are class based only. Some might have restrictions like a Prophet needing Healing spells equipped in order to get their bonus.
 These skills mostly increase the damage, the fight timout, the healing and/or the armour class bonus.
 
+Each class has one, and you can see what your class skill is by visiting the [Races and Classes](/information/races-and-classes) documentation and viewing your selected class.
+This will tell you what your class skill is.
+
+Every class skill has what's called a "special ability." All of these, except Prophets class skill special ability, do damage.
+
+- Fighters Double Damage - Lets the fighter attack again
+- Thieves Shadow Dance - Let the thieves dance through the shadows (your attack can be unavoidable)
+- Rangers Triple Attack - Notch the arrow and attack three times
+- Heretics Double Cast - Cast again
+- Prophets Double Heal - Heal again
+- Vampires Blood Thirst - Steal additional health from the enemy.
+
+These all fire based on your class bonus, which starts at 5%. There are [enchantments](/information/enchanting) that will raise this
+and gve your special more of a chance to hit.
+
+The class skill specials fire automatically on their own.
+
 ## Training skills
 
-When it comes to training skills there are two ways to train: **Fight** or **Craft**. Thats it.
+When it comes to training skills there are two ways to train: **Fight** or **Craft**. That's it.
+
+There are [Passive](/information/passive-skills) skills that one can train, however, for the purpose of this document we will not focus on those.
+
+Passive skills are essentially skills that you would train in the background while playing the game or while logged out and over hours they will unlock
+a new level with new passive bonuses, buffs and unlocked content.
 
 > ### ATTN!
 >
 > There is no item you can buy with real world money or any form of currency to allow this process
-> to go faster for one player over another. You want a level 100 looting skill to (almost) always be getting loot? Earn it.
+> to go faster for one player over another. You want a level 999 looting skill to (almost) always be getting loot? Earn it.
 >
 > There is also no way, aside from [adventures](/information/adventure) (for fight based skills only), to train these via idling.
 
