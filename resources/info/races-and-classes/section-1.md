@@ -12,7 +12,7 @@ There are two types of stats: Primary Damage Stat and To Hit Stat. For example, 
 so when you go to buy gear, or enchant gear, you will want enchantments that focus on those two stats.
 
 All shop gear will raise all stats, based on the type of gear. Characters are not limited to the types of gear they can equip except 
-class skill special attacks. We will talk more about that in another section called [skills](/information/skills).
+class skill special attacks. We will talk more about that in another section called [skills](/information/skill-information).
 
 > ### ATTN!
 > 

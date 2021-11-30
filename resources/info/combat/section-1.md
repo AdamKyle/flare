@@ -58,6 +58,10 @@ The only class skills that will not fire is the Heretics Double Cast and the Pro
 
 **Best for:** Fighters, Thieves and Vampires.
 
+> ### ATTN!
+> 
+> When you first start out this is your primary attack. You will want to start leveling accuracy till you can reliably hit, being blocked is fine - you just need more damage.
+
 ## Cast
 
 Requires you to level Casting Accuracy
@@ -83,6 +87,15 @@ When casting it&#39;s your spells, we also fire off affixes, rings and artifacts
 
 **Best For:** Heretics
 
+> ### ATTN!
+>
+> Do not use this when you first start out. Even if you are a heretic. Instead, equip some weapons and armour and use Attack.
+> Once you have trained Accuracy to a level where you are actually hitting with your weapon, switch to Casting Accuracy
+> and use Attack and Cast or Cast and Attack (below) till your spell reliably hits, then switch the attack type to cast.
+> 
+> Once you switch to cast, equip two damage spells and two shields (this is your glass cannon build). The shields will give you the added health,
+> while the damage spells are your primary weapon.
+
 ## Cast and Attack and Attack and Cast
 
 Requires Both Casting Accuracy and Accuracy
@@ -101,6 +114,11 @@ Vampires with a damage or healing spell can trigger their Vampire Thirst Skill t
 if they survive the enemy.
 
 **Best For:** Prophets, Rangers, Vampires
+
+- Vampires have three opportunities to fire off their class [skill](/information/skill-information) when using this attack.
+- Rangers can use this in conjunction with a healing spell.
+- Prophets will want this as they are mostly a healing class, so having the ability to attack and cast or cast and attack (attack and heal or heal and attack)
+  will let you do damage as well as heal against any enemy attacks.
 
 ## Defend
 

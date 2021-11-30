@@ -174,7 +174,7 @@ Healing spells can never miss and healing spells have a chance to resurrect you 
 are weaker than Heretics as they don't get an Intelligence boost. Damage spells also increase the Intelligence and Focus of a Heretic, while Healing spells
 will increase your Charisma (chr) ad Focus.
 
-Don't focus on the other [skills](/information/skills) right now, we shall detail some of those a bit later
+Don't focus on the other [skills](/information/skill-information) right now, we shall detail some of those a bit later
 
 > ### ATTN!!
 > 

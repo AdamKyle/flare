@@ -24,12 +24,24 @@ Regular critters won&#39;t void you much, although harder creatures in the list 
 > The only place this does not hold true (in relation to being voided for a whole fight) is in Celestial Fights and Planned PVP as well as Adventures.
 > Each enemy is considered a new fight, even if it's on the same floor.
 
+If you would like to know what your attacks are like, be it voided or not, you can look at the character sheet for a section:
+
+<div class="mb-4">
+    <a href="/storage/info/voidance/images/attack-break-down.png" class="glightbox">
+        <img src="/storage/info/voidance/images/attack-break-down.png" class="img-fluid" />
+    </a>
+</div>
+
+Here you can see there are two tabs: Regular Attacks and Voided Attacks. If you click on the voided attacks, you can see what your
+attacks would look like voided. They will be much weaker than your regular attacks.
+
 ## How do I prevent this?
 
 By completing a small quest chain that involves Gold Dust and the starter item you can purchase, for Gold Dust from The Soldier (all these items, listed below, can be bought on the surface.
 
-- Creepy Baby Doll – Buy from soldier for 25k Gold Dust
-    - Makes your affixes irresistible. You can still be voided though, thus even with this item it won&#39;t help much against being voided
+- Creepy Baby Doll – Buy from soldier for 25k Gold Dust (You have to do: Hunting Expedition and The key to Disenchanting first)
+  - **See: [Quests](/information/quests) for more info on the order they are done in.**
+  - Makes your affixes irresistible. You can still be voided though, thus even with this item it won&#39;t help much against being voided
 - Shadow Plane Grimoire – Buy from the Wondering Merchant (Requires Creepy Baby Doll and 30,000 Gold Dust)
     - Your affixes are still irresistible, but now you have a 50% to void the enemy and a 15% to devoid them
 - Eye of the Beholder – Buy from the Wondering Merchant (Requires Shadow Plane Grimore and 50k Gold Dust)

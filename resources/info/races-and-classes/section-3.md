@@ -10,7 +10,7 @@ Both races and classes can provide these additional bonuses.
 
 **Dodge**: Your chance to dodge the enemies attack. We take this skill bonus into account when you are trying to dodge the incoming attack. The higher the bonus, the higher the chance to dodge.
 
-Those top three come from what are called [skills](/information/skills) which you level up by selecting train, selecting a desired amount of XP to sacrifice from killing monsters
+Those top three come from what are called [skills](/information/skill-information) which you level up by selecting train, selecting a desired amount of XP to sacrifice from killing monsters
 and slowly level these over time.
 
 > ### ATTN!

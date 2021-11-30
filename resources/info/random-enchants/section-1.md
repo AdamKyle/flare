@@ -61,7 +61,7 @@ For example, lets look at the cost to percentage range:
 
 When doing [Factions](/infromation/factions) you will get and item, could be any item in the whole game, with one or two of these affixes attached.
 
-These are unique such that they do not, cannot - drop from anywhere, except one: The Queen of Hearts in hell. You can pay the cost to have her create one of these.
+These are unique such that they do not, cannot - drop from anywhere, except one: The Queen of Hearts in Hell. You can pay the cost to have her create one of these.
 
 She will also let you re-roll parts of the enchantment or the whole enchantment for the cost of the enchantment (ie, 1, 10 or 50 billion) and only requires the shards to make
 the item. She will attach the affix she creates to any item of your choosing provided you have the item in your inventory (and not in a set/equipped).
