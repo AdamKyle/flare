@@ -47,19 +47,19 @@ class BuildMonsterCacheService {
 
             switch ($location->enemy_strength_type) {
                 case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_THOUSAND:
-                    $monsters = $this->transformMonsterForLocation($monsters, 100000, 0.05);
+                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
                     break;
                 case LocationEffectValue::INCREASE_STATS_BY_ONE_MILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, 1000000, 0.10);
+                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
                     break;
                 case LocationEffectValue::INCREASE_STATS_BY_TEN_MILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, 10000000, 0.25);
+                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
                     break;
                 case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_MILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, 100000000, 0.50);
+                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
                     break;
                 case LocationEffectValue::INCREASE_STATS_BY_ONE_BILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, 1000000000, 0.70);
+                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
                     break;
                 default:
                     break;
