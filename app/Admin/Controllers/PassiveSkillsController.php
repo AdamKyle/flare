@@ -2,14 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\PassiveSkills\PassiveSkillsExport;
+use App\Admin\Import\PassiveSkills\PassiveSkillsImport;
 use App\Admin\Requests\ManagePassiveSkillRequest;
+use App\Admin\Requests\PassivesImportRequest;
 use App\Flare\Models\PassiveSkill;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Admin\Requests\NpcsImportRequest;
 use App\Http\Controllers\Controller;
-use App\Admin\Exports\Npcs\NpcsExport;
-use App\Admin\Import\Npcs\NpcsImport;
 
 class PassiveSkillsController extends Controller {
 
@@ -69,11 +69,11 @@ class PassiveSkillsController extends Controller {
         ]))->with('success', 'Updated: ' . $passiveSkill->name);
     }
 
-    public function exportNpcs() {
+    public function exportPassives() {
         return view('admin.passive-skills.export');
     }
 
-    public function importNpcs() {
+    public function importPassives() {
         return view('admin.passive-skills.import');
     }
 
@@ -81,7 +81,7 @@ class PassiveSkillsController extends Controller {
      * @codeCoverageIgnore
      */
     public function export() {
-        $response = Excel::download(new NpcsExport(), 'passive_skills.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new PassiveSkillsExport(), 'passive_skills.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
@@ -90,9 +90,9 @@ class PassiveSkillsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function import(NpcsImportRequest $request) {
-        Excel::import(new NpcsImport, $request->npcs_import);
+    public function importData(PassivesImportRequest $request) {
+        Excel::import(new PassiveSkillsImport(), $request->passives_import);
 
-        return redirect()->back()->with('success', 'imported npc data.');
+        return redirect()->back()->with('success', 'Imported passive skill data.');
     }
 }

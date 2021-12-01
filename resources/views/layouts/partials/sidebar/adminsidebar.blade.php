@@ -80,13 +80,7 @@
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-muscle-up"></i><span class="hide-menu">Manage Skills</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('skills.list')}}">Skills</a></li>
-            <li><a href="{{route('skills.create')}}">Create Skill</a></li>
-            <li><a href="{{route('skills.export')}}">Export</a></li>
-            <li><a href="{{route('skills.import')}}">Import</a></li>
             <li><a href="{{route('passive.skills.list')}}">Passive Skills</a></li>
-            <li><a href="{{route('passive.skills.create')}}">Create Passive Skill</a></li>
-            <li><a href="{{route('passive.skills.export')}}">Export Passives</a></li>
-            <li><a href="{{route('passive.skills.import')}}">Import Passives</a></li>
         </ul>
     </li>
     <li>

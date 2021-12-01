@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Npc;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
@@ -218,6 +219,10 @@ class InfoPageController extends Controller
             'quest'       => $quest,
             'lockedSkill' => $skill,
         ]);
+    }
+
+    public function viewPassiveSkill(PassiveSkill $passiveSkill) {
+
     }
 
     protected function cleanFiles(array $files): array {

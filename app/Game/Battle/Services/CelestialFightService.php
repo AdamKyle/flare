@@ -28,12 +28,18 @@ class CelestialFightService {
     public function joinFight(Character $character, CelestialFight $celestialFight): CharacterInCelestialFight {
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
 
+        $totalHealth = $character->getInformation()->buildHealth();
+
+        if ($totalHealth > 1000000000000) {
+            $totalHealth = 1000000000000;
+        }
+
         if (is_null($characterInCelestialFight)) {
             $characterInCelestialFight = CharacterInCelestialFight::create([
                 'celestial_fight_id'      => $celestialFight->id,
                 'character_id'            => $character->id,
-                'character_max_health'    => $character->getInformation()->buildHealth(),
-                'character_current_health'=> $character->getInformation()->buildHealth(),
+                'character_max_health'    => $totalHealth,
+                'character_current_health'=> $totalHealth,
             ]);
         } else {
             if (now()->diffInMinutes($characterInCelestialFight->updated_at) > 5) {
@@ -162,9 +168,15 @@ class CelestialFightService {
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {
+        $totalHealth = $character->getInformation()->buildHealth();
+
+        if ($totalHealth > 1000000000000) {
+            $totalHealth = 1000000000000;
+        }
+
         $characterInCelestialFight->update([
-            'character_max_health'    => $character->getInformation()->buildHealth(),
-            'character_current_health'=> $character->getInformation()->buildHealth(),
+            'character_max_health'    => $totalHealth,
+            'character_current_health'=> $totalHealth,
         ]);
 
         return $characterInCelestialFight->refresh();

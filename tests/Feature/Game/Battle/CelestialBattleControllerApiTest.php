@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Game\Battle;
 
+use App\Flare\Builders\CharacterAttackInformation;
+use App\Flare\Builders\CharacterInformationBuilder;
+use Mockery;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\NpcTypes;
@@ -250,6 +253,7 @@ class CelestialBattleControllerApiTest extends TestCase {
         $this->assertObjectHasAttribute('fight', $content);
     }
 
+
     public function testCannotGetCelestialFightWhenDead() {
         $this->createNpc([
             'type' => NpcTypes::SUMMONER
@@ -363,6 +367,49 @@ class CelestialBattleControllerApiTest extends TestCase {
             'max_health'        => 1000,
             'type'              => CelestialConjureType::PUBLIC,
         ]);
+
+        $response = $this->actingAs($character->user)
+            ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [
+                'attack_type' => 'attack'
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+    }
+
+    public function testCanAttackCelestialWithHighHealth() {
+        $this->createItem();
+        $this->createItemAffix();
+
+        $this->createNpc([
+            'type' => NpcTypes::SUMMONER
+        ]);
+
+        $monster = $this->createMonster([
+            'is_celestial_entity' => true,
+            'gold_cost'           => 1000,
+            'gold_dust_cost'      => 1000,
+        ]);
+
+        $celestialFight = $this->createCelestialFight([
+            'monster_id'        => $monster->id,
+            'character_id'      => null,
+            'conjured_at'       => now(),
+            'x_position'        => 16,
+            'y_position'        => 16,
+            'damaged_kingdom'   => false,
+            'stole_treasury'    => false,
+            'weakened_morale'   => false,
+            'current_health'    => 1000,
+            'max_health'        => 1000,
+            'type'              => CelestialConjureType::PUBLIC,
+        ]);
+
+        $character = $this->character->levelCharacterUp(50)->getCharacter(false);
+
+        $characterInfo = Mockery::spy(CharacterInformationBuilder::class);
+
+        $characterInfo->shouldReceive('buildHealth')->andReturn(	1000000000000000000);
 
         $response = $this->actingAs($character->user)
             ->json('POST', '/api/attack-celestial/'.$character->id.'/' . $celestialFight->id, [

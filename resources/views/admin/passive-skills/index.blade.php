@@ -9,9 +9,21 @@
     >
       <x-core.buttons.link-buttons.primary-button
         href="{{route('passive.skills.create')}}"
-        css="tw-ml-5"
+        css="tw-ml-2"
       >
         Create Passive
+      </x-core.buttons.link-buttons.primary-button>
+      <x-core.buttons.link-buttons.primary-button
+        href="{{route('passive.skills.export')}}"
+        css="tw-ml-2"
+      >
+        <i class="fas fa-file-export"></i> Export
+      </x-core.buttons.link-buttons.primary-button>
+      <x-core.buttons.link-buttons.primary-button
+        href="{{route('passive.skills.import')}}"
+        css="tw-ml-2"
+      >
+        <i class="fas fa-file-upload"></i> Import
       </x-core.buttons.link-buttons.primary-button>
     </x-core.page-title>
     <hr />

@@ -38,4 +38,11 @@ class StatisticsControllerTest extends TestCase
         $this->actingAs($this->user)->visitRoute('admin.statistics')->see('Statistical Data');
     }
 
+    public function testCanSeeStatisticsPageWithKingdomCount() {
+
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->kingdomManagement()->assignKingdom()->getCharacterFactory()->getCharacter(false);
+
+        $this->actingAs($this->user)->visitRoute('admin.statistics')->see('Statistical Data')->see($character->name . ' Has:');
+    }
+
 }

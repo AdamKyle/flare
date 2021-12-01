@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Locations;
 
+use App\Flare\Values\LocationEffectValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Flare\Models\GameMap;
@@ -77,6 +78,19 @@ class LocationsControllerTest extends TestCase
     public function testCanSeeShowPage() {
         $this->actingAs($this->user)->visit(route('locations.location', [
             'location' => Location::first()->id
+        ]))->see(Location::first()->name);
+    }
+
+    public function testCanSeeShowPageForLocationThatIncreasesEnemyStrength() {
+
+        $location = Location::first();
+
+        $location->update([
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_HUNDRED_THOUSAND
+        ]);
+
+        $this->actingAs($this->user)->visit(route('locations.location', [
+            'location' => $location->refresh()->id,
         ]))->see(Location::first()->name);
     }
 

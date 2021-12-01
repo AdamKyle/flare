@@ -11,8 +11,6 @@ class MessagesFormatter {
 
             if (is_null($message->user)) {
                 $characterName = 'Unknown';
-            } else if (is_null($message->user->character)) {
-                $characterName = 'Unknown';
             } else if ($message->user->hasRole('Admin')) {
                 $characterName = 'Admin';
             } else {

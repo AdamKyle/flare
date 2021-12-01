@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Admin\Exports\Skills;
+namespace App\Admin\Exports\PassiveSkills;
 
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use App\Admin\Exports\Skills\Sheets\SkillsSheet;
+use App\Admin\Exports\PassiveSkills\Sheets\PassiveSkillSheet;
 
-class SkillsExport implements WithMultipleSheets {
+class PassiveSkillsExport implements WithMultipleSheets {
 
     use Exportable;
 
@@ -16,7 +16,7 @@ class SkillsExport implements WithMultipleSheets {
     public function sheets(): array {
         $sheets   = [];
 
-        $sheets[] = new SkillsSheet();
+        $sheets[] = new PassiveSkillSheet;
 
         return $sheets;
     }

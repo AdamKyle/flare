@@ -87,8 +87,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);
     Route::get('/admin/skill/{skill}/edit', ['as' => 'skill.edit', 'uses' => 'SkillsController@edit']);
 
-    Route::get('/admin/passive-skills/export-passive-skills', ['as' => 'passive.skills.export', 'uses' => 'PassiveSkillsController@exportSkills']);
-    Route::get('/admin/passive-skills/import-passive-skills', ['as' => 'passive.skills.import', 'uses' => 'PassiveSkillsController@importSkills']);
+    Route::get('/admin/passive-skills/export-passive-skills', ['as' => 'passive.skills.export', 'uses' => 'PassiveSkillsController@exportPassives']);
+    Route::get('/admin/passive-skills/import-passive-skills', ['as' => 'passive.skills.import', 'uses' => 'PassiveSkillsController@importPassives']);
     Route::post('/admin/passive-skills/export-data', ['as' => 'passive.skills.export-data', 'uses' => 'PassiveSkillsController@export']);
     Route::post('/admin/passive-skills/import-data', ['as' => 'passive.skills.import-data', 'uses' => 'PassiveSkillsController@importData']);
 
