@@ -1,4 +1,4 @@
-<div class="row justify-content-center">
+<div class="row">
   <div class="col-md-6">
     <div class="card">
       <div class="card-body">

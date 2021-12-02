@@ -1,14 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">{{$itemAffix->name}}</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{url()->previous()}}" class="btn btn-success float-right ml-2">Back</a>
-        </div>
+    <div class="tw-mt-10 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
+        <x-core.page-title
+          title="{{$itemAffix->name}}"
+          route="{{url()->previous()}}"
+          color="primary" link="Back"
+        >
+        </x-core.page-title>
+        @include('admin.affixes.partials.affix-details', ['itemAffix' => $itemAffix])
     </div>
-    <hr />
-    @include('admin.affixes.partials.affix-details', ['itemAffix' => $itemAffix])
 @endsection

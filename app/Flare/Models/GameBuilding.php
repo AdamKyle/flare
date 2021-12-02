@@ -46,6 +46,9 @@ class GameBuilding extends Model
         'time_increase_amount',
         'units_per_level',
         'only_at_level',
+        'is_locked',
+        'passive_skill_id',
+        'level_required',
     ];
 
     /**
@@ -58,11 +61,13 @@ class GameBuilding extends Model
         'base_durability'             => 'integer',
         'base_defence'                => 'integer',
         'required_population'         => 'integer',
+        'level_required'              => 'integer',
         'is_walls'                    => 'boolean',
         'is_church'                   => 'boolean',
         'is_farm'                     => 'boolean',
         'is_resource_building'        => 'boolean',
         'trains_units'                => 'boolean',
+        'is_locked'                   => 'boolean',
         'wood_cost'                   => 'integer',
         'clay_cost'                   => 'integer',
         'stone_cost'                  => 'integer',

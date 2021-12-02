@@ -53,13 +53,17 @@ class AssignPassiveSkillsToCharacters extends Command
      */
     protected function assignPassive(Character $character) {
         foreach (PassiveSkill::all() as $passiveSkill) {
-            $character->passiveSkills()->create([
-                'character_id'     => $character->id,
-                'passive_skill_id' => $passiveSkill->id,
-                'current_level'    => 0,
-                'hours_to_next'    => $passiveSkill->hours_per_level,
-                'is_locked'        => $passiveSkill->is_locked,
-            ]);
+            $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
+
+            if (is_null($characterPassive)) {
+                $character->passiveSkills()->create([
+                    'character_id'     => $character->id,
+                    'passive_skill_id' => $passiveSkill->id,
+                    'current_level'    => 0,
+                    'hours_to_next'    => $passiveSkill->hours_per_level,
+                    'is_locked'        => $passiveSkill->is_locked,
+                ]);
+            }
         }
     }
 }
