@@ -56,14 +56,29 @@ class AssignPassiveSkillsToCharacters extends Command
             $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->first();
 
             if (is_null($characterPassive)) {
+                $parentId = $passiveSkill->parent_skill_id;
+                $parent   = null;
+
+                if (!is_null($parentId)) {
+                    $parent = $character->passiveSkills()->where('passive_skill_id', $parentId)->first();
+                }
+
                 $character->passiveSkills()->create([
                     'character_id'     => $character->id,
                     'passive_skill_id' => $passiveSkill->id,
                     'current_level'    => 0,
                     'hours_to_next'    => $passiveSkill->hours_per_level,
                     'is_locked'        => $passiveSkill->is_locked,
+                    'parent_skill_id'  => !is_null($parent) ? $parent->id : null,
+                ]);
+            } else {
+                $characterPassive->update([
+                    'hours_to_next'    => $passiveSkill->hours_per_level,
+                    'is_locked'        => $passiveSkill->is_locked,
                 ]);
             }
+
+            $character = $character->refresh();
         }
     }
 }

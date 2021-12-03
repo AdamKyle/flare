@@ -208,3 +208,13 @@ dd {
     padding: 25px;
   }
 }
+
+.parent {
+  width: 100%;
+  text-align: center;
+}
+
+.child {
+  display: inline-block;
+  margin: 2px;
+}

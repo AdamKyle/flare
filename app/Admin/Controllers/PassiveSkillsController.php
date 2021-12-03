@@ -45,7 +45,7 @@ class PassiveSkillsController extends Controller {
         $data = $request->all();
 
         $data['is_locked'] = $request->has('is_locked');
-        $data['is_parent'] = $request->has('is_Parent');
+        $data['is_parent'] = $request->has('is_parent');
 
         $passiveSkill = PassiveSkill::create($data);
 
@@ -58,7 +58,7 @@ class PassiveSkillsController extends Controller {
         $data = $request->all();
 
         $data['is_locked'] = $request->has('is_locked');
-        $data['is_parent'] = $request->has('is_Parent');
+        $data['is_parent'] = $request->has('is_parent');
 
         $passiveSkill->update($data);
 

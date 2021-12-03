@@ -21,11 +21,11 @@ class PassiveSkillSheet implements ToCollection {
         }
     }
 
-    protected function returnCleanData(array $passiveSkills): array {
+    protected function returnCleanData(array $passiveSkillData): array {
         $cleanData = [];
 
-        foreach ($passiveSkills as $key => $value) {
-            if (!is_null($value)) {
+        foreach ($passiveSkillData as $key => $value) {
+            if (is_null($value)) {
                 if ($key === 'is_locked') {
                     $value = false;
                 }
@@ -34,6 +34,8 @@ class PassiveSkillSheet implements ToCollection {
                     $value = false;
                 }
 
+                $cleanData[$key] = $value;
+            } else {
                 if ($key === 'parent_skill_id') {
                     $passiveSkill = PassiveSkill::where('name', $value)->first();
 

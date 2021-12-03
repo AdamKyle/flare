@@ -2,6 +2,8 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\CharacterPassiveSkill;
+use App\Flare\Models\PassiveSkill;
 use App\Game\Automation\Values\AutomationType;
 use Cache;
 use App\Flare\Models\MaxLevelConfiguration;
@@ -35,7 +37,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'ac'                => number_format($characterInformation->buildDefence()),
             'heal_for'          => number_format($characterInformation->buildHealFor()),
             'skills'            => $this->fetchSkills($character->skills),
-            'passive_skills'    => $character->passiveSkills()->with('passiveSkill')->get(),
+            'passive_skills'    => $this->getPassiveSkills($character),
             'damage_stat'       => $character->damage_stat,
             'to_hit_stat'       => $character->class->to_hit_stat,
             'race'              => $character->race->name,
@@ -116,5 +118,40 @@ class CharacterSheetTransformer extends TransformerAbstract {
 
            return $faction;
         });
+    }
+
+    protected function getPassiveSkills(Character $character): Collection {
+        $passiveSkills = PassiveSkill::where('is_parent', true)->get();
+
+        $collections = [];
+
+        foreach ($passiveSkills as $passiveSkill) {
+            $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->with('children')->first();
+
+            $collections[] = $this->transformNestedPassives($characterPassive);
+        }
+
+        return collect($collections);
+    }
+
+    private function transformNestedPassives(CharacterPassiveSkill $passiveSkill) {
+
+        if (is_null($passiveSkill->parent_skill_id)) {
+            $passiveSkill->name      = $passiveSkill->passiveSkill->name;
+            $passiveSkill->max_level = $passiveSkill->passiveSkill->max_level;
+        }
+
+        if ($passiveSkill->children->isNotEmpty()) {
+            foreach ($passiveSkill->children as $child) {
+                $child->name      = $child->passiveSkill->name;
+                $child->max_level = $child->passiveSkill->max_level;
+
+                if ($child->children->isNotEmpty()) {
+                    $this->transformNestedPassives($child);
+                }
+            }
+        }
+
+        return $passiveSkill;
     }
 }

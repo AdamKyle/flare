@@ -47,12 +47,14 @@ class PassiveSkill extends Model
         'is_parent'        => 'boolean',
     ];
 
+    
+
     public function passiveType(): PassiveSkillTypeValue {
         return new PassiveSkillTypeValue($this->effect_type);
     }
 
     public function childSkills() {
-        return $this->hasMany($this, 'parent_skill_id');
+        return $this->hasMany($this, 'parent_skill_id')->with('childSkills');
     }
 
     public function parent() {
