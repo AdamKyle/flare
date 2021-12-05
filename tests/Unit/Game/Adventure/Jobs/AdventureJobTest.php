@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Maps\Jobs;
+namespace Tests\Unit\Game\Adventure\Jobs;
 
 use App\Game\Adventures\Jobs\AdventureJob;
 use Cache;

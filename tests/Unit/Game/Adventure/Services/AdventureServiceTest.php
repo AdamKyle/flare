@@ -2,16 +2,15 @@
 
 namespace Tests\Unit\Game\Adventure\Services;
 
-use App\Flare\Calculators\DropCheckCalculator;
-use App\Flare\Calculators\GoldRushCheckCalculator;
 use DB;
 use Mail;
 use Str;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
+use App\Flare\Calculators\DropCheckCalculator;
+use App\Flare\Calculators\GoldRushCheckCalculator;
 use App\Game\Adventures\Services\AdventureService;
-use App\Game\Adventures\Builders\RewardBuilder;
 use App\Game\Adventures\Mail\AdventureCompleted;
 use Mockery;
 use Tests\Setup\AdventureSetup;

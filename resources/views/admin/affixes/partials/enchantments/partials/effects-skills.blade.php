@@ -10,7 +10,7 @@
       tab="increase-skill-training-bonus"
       selected="false"
       active="false"
-      title="Skill Training Bonux (XP)"
+      title="Skill Training Bonus (XP)"
     />
     <x-tabs.tab
       tab="enemy-skill-reduction"
