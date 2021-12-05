@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Adventure;
+namespace Tests\Feature\Adventure;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;

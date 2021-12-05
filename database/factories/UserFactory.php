@@ -38,7 +38,6 @@ class UserFactory extends Factory
             'un_ban_request'          => null,
             'adventure_email'         => true,
             'is_test'                 => true,
-            'new_building_email'      => true,
             'upgraded_building_email' => true,
             'rebuilt_building_email'  => true,
             'kingdom_attack_email'    => true,

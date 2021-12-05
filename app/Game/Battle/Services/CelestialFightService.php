@@ -114,7 +114,7 @@ class CelestialFightService {
 
             event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
 
-            event(new ServerMessageEvent($character->user, 'You\'re additional rewards (XP and so on ...) are processing and will be with you shortly.'));
+            event(new ServerMessageEvent($character->user, 'Your additional rewards (XP and so on ...) are processing and will be with you shortly.'));
 
             CharacterInCelestialFight::where('celestial_fight_id', $celestialFight->id)->delete();
 

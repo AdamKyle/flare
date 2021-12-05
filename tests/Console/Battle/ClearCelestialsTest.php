@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console\Battle;
+namespace Tests\Console\Battle;
 
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\CharacterInCelestialFight;

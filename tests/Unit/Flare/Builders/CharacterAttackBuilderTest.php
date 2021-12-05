@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare\Services;
+namespace Tests\Unit\Flare\Builders;
 
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Models\Character;

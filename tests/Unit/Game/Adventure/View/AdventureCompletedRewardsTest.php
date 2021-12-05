@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Adventure\Services;
+namespace Tests\Unit\Game\Adventure\View;
 
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Adventures\View\AdventureCompletedRewards;

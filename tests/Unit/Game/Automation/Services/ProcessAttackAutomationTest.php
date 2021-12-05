@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Adutomation\Services;
+namespace Tests\Unit\Game\Automation\Services;
 
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Services\ProcessAttackAutomation;
