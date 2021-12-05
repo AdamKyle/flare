@@ -104,8 +104,8 @@ class PassiveSkillsControllerTest extends TestCase
             'hours_per_level'  => 3,
             'bonus_per_level'  => 0.05,
             'effect_type'      => PassiveSkillTypeValue::KINGDOM_DEFENCE,
-            'parent_skill_id'  => $this->passive->id,
-            'unlocks_at_level' => 2,
+            'parent_skill_id'  => '',
+            'unlocks_at_level' => '',
             'is_locked'        => true,
             'is_parent'        => false,
         ])->see('Updated: Sample Passive Skill');

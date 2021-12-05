@@ -128,7 +128,9 @@ class CharacterSheetTransformer extends TransformerAbstract {
         foreach ($passiveSkills as $passiveSkill) {
             $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passiveSkill->id)->with('children')->first();
 
-            $collections[] = $this->transformNestedPassives($characterPassive);
+            if (!is_null($characterPassive)) {
+                $collections[] = $this->transformNestedPassives($characterPassive);
+            }
         }
 
         return collect($collections);

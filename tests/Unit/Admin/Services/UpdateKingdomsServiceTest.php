@@ -21,8 +21,6 @@ class UpdateKingdomsServiceTest extends TestCase
 
     public function testAddKingdomBuildingToKingdomWithService()
     {
-        Mail::fake();
-
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -39,8 +37,6 @@ class UpdateKingdomsServiceTest extends TestCase
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->buildings->isNotEmpty());
-
-        Mail::assertSent(GenericMail::class, 1);
     }
 
 
