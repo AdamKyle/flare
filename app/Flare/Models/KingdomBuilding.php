@@ -24,6 +24,7 @@ class KingdomBuilding extends Model
         'current_durability',
         'max_defence',
         'max_durability',
+        'is_locked',
     ];
 
     /**
@@ -37,6 +38,7 @@ class KingdomBuilding extends Model
         'current_durability' => 'integer',
         'max_defence'        => 'integer',
         'max_durability'     => 'integer',
+        'is_locked'          => 'boolean',
     ];
 
     protected $appends = [

@@ -100,6 +100,14 @@ class Kingdom extends Model implements Auditable
         return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
     }
 
+    public function fetchIronCostReduction(): float {
+        return $this->getPercentage(PassiveSkillTypeValue::IRON_COST_REDUCTION);
+    }
+
+    public function fetchPopulationCostReduction(): float {
+        return $this->getPercentage(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+    }
+
     public function gameMap() {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }

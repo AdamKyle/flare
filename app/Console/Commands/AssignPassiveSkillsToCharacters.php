@@ -74,7 +74,6 @@ class AssignPassiveSkillsToCharacters extends Command
             } else {
                 $characterPassive->update([
                     'hours_to_next'    => $passiveSkill->hours_per_level,
-                    'is_locked'        => $passiveSkill->is_locked,
                 ]);
             }
 

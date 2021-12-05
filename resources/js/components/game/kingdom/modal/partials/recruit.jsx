@@ -119,7 +119,15 @@ export default class Recruit extends React.Component {
     for (let i = 0; i <= costTypes.length; i++) {
 
       const kingdomCurrent = this.getKingdomAmount(costTypes[i]);
-      const costReduction = this.props.kingdom.unit_cost_reduction;
+      let costReduction    = this.props.kingdom.unit_cost_reduction;
+
+      if (costTypes[i] === 'iron_cost') {
+        costReduction += this.props.kingdom.iron_cost_reduction;
+      }
+
+      if (costTypes[i] === 'required_population') {
+        costReduction += this.props.kingdom.population_cost_reduction;
+      }
 
       let unitTotalCost = this.props.unit[costTypes[i]] * value;
 

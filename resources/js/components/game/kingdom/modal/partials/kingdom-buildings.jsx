@@ -10,11 +10,28 @@ export default class KingdomBuildings extends React.Component {
       {
         key: "name",
         text: "Name",
+        cell: row => <div data-tag="allowRowEvents">
+          <div key={row.name}>
+            {
+              row.is_locked ?
+                <span className="text-danger">{row.name} <i className="fas fa-lock"></i></span>
+              :
+                row.name
+            }
+          </div>
+        </div>,
         sortable: true
       },
       {
         key: "level",
         text: "Level",
+        cell: row => <div data-tag="allowRowEvents">
+          <div key={row.name + '-' + row.level}>
+            {
+              row.level
+            }
+          </div>
+        </div>,
         sortable: true
       },
       {

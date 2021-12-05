@@ -57,8 +57,13 @@ class DataTable extends Component
         $collection = $collection->transform(function($item) {
             $gameBuildingUnit = GameBuildingUnit::where('game_unit_id', $item->id)->first();
 
-            $item->building_name  = $gameBuildingUnit->gameBuilding->name;
-            $item->level_required = $gameBuildingUnit->required_level;
+            if (is_null($gameBuildingUnit)) {
+                $item->building_name  = 'Not Assigned';
+                $item->level_required = 'N/A';
+            } else {
+                $item->building_name  = $gameBuildingUnit->gameBuilding->name;
+                $item->level_required = $gameBuildingUnit->required_level;
+            }
 
             return $item;
         });

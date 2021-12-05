@@ -29,6 +29,9 @@
         <th>increase_iron_amount</th>
         <th>increase_durability_amount</th>
         <th>increase_defence_amount</th>
+        <th>is_locked</th>
+        <th>passive_skill_id</th>
+        <th>level_required</th>
     </tr>
     </thead>
     <tbody>
@@ -62,6 +65,13 @@
             <td>{{$building->increase_iron_amount}}</td>
             <td>{{$building->increase_durability_amount}}</td>
             <td>{{$building->increase_defence_amount}}</td>
+            <td>{{$building->is_locked}}</td>
+            <td>
+                @if (!is_null($building->passive_skill_id))
+                    {{$building->passive->name}}
+                @endif
+            </td>
+            <td>{{$building->level_required}}</td>
         </tr>
     @endforeach
     </tbody>

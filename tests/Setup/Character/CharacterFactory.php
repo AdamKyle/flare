@@ -94,55 +94,29 @@ class CharacterFactory {
     }
 
     public function assignPassiveSkills(): CharacterFactory {
-        $this->character->passiveSkills()->create([
-            'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill([
-                'effect_type' => PassiveSkillTypeValue::KINGDOM_DEFENCE,
-            ])->id,
-            'current_level'     => 0,
-            'hours_to_next'     => 1,
-            'started_at'        => null,
-            'completed_at'      => null,
-            'is_locked'         => false,
-        ]);
 
-        $this->character->passiveSkills()->create([
-            'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill([
-                'effect_type' => PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN,
-            ])->id,
-            'current_level'     => 0,
-            'hours_to_next'     => 1,
-            'started_at'        => null,
-            'completed_at'      => null,
-            'is_locked'         => false,
-        ]);
-
-        $this->character->passiveSkills()->create([
-            'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill([
-                'effect_type' => PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION,
-            ])->id,
-            'current_level'     => 0,
-            'hours_to_next'     => 1,
-            'started_at'        => null,
-            'completed_at'      => null,
-            'is_locked'         => false,
-        ]);
-
-        $this->character->passiveSkills()->create([
-            'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill([
-                'effect_type' => PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION,
-            ])->id,
-            'current_level'     => 0,
-            'hours_to_next'     => 1,
-            'started_at'        => null,
-            'completed_at'      => null,
-            'is_locked'         => false,
-        ]);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_DEFENCE);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::IRON_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
 
         return $this;
+    }
+
+    protected function createPassiveForCharacter(int $type) {
+        $this->character->passiveSkills()->create([
+            'character_id'      => $this->character->id,
+            'passive_skill_id'  => $this->createPassiveSkill([
+                'effect_type' => $type,
+            ])->id,
+            'current_level'     => 0,
+            'hours_to_next'     => 1,
+            'started_at'        => null,
+            'completed_at'      => null,
+            'is_locked'         => false,
+        ]);
     }
 
     /**

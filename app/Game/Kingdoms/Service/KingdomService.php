@@ -208,6 +208,7 @@ class KingdomService {
                 'current_durability'  => $building->base_durability,
                 'max_defence'         => $building->base_defence,
                 'max_durability'      => $building->base_durability,
+                'is_locked'           => $building->is_locked,
             ]);
         }
 

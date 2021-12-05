@@ -13,7 +13,9 @@ class PassiveSkillTypeValue {
     const KINGDOM_RESOURCE_GAIN           = 1;
     const KINGDOM_UNIT_COST_REDUCTION     = 2;
     const KINGDOM_BUILDING_COST_REDUCTION = 3;
-    const BUILDING_BLUE_PRINTS            = 4;
+    const UNLOCKS_BUILDING                = 4;
+    const IRON_COST_REDUCTION             = 5;
+    const POPULATION_COST_REDUCTION       = 6;
 
 
     /**
@@ -24,7 +26,9 @@ class PassiveSkillTypeValue {
         self::KINGDOM_RESOURCE_GAIN           => 1,
         self::KINGDOM_UNIT_COST_REDUCTION     => 2,
         self::KINGDOM_BUILDING_COST_REDUCTION => 3,
-        self::BUILDING_BLUE_PRINTS            => 4,
+        self::UNLOCKS_BUILDING                => 4,
+        self::IRON_COST_REDUCTION             => 5,
+        self::POPULATION_COST_REDUCTION       => 6,
     ];
 
     /**
@@ -35,8 +39,9 @@ class PassiveSkillTypeValue {
         1  => 'Kingdom Resource Gain',
         2  => 'Kingdom Unit Cost Reduction',
         3  => 'Kingdom Building Cost Reduction',
-        4  => 'Building Blue Prints'
-
+        4  => 'Unlocks New Building',
+        5  => 'Iron Cost Reduction',
+        6  => 'Population Cost Reduction',
     ];
 
     /**
@@ -68,8 +73,16 @@ class PassiveSkillTypeValue {
         return $this->value === self::KINGDOM_UNIT_COST_REDUCTION;
     }
 
-    public function isBuildingBluePrints(): bool {
-        return $this->value === self::BUILDING_BLUE_PRINTS;
+    public function unlocksBuilding(): bool {
+        return $this->value === self::UNLOCKS_BUILDING;
+    }
+
+    public function isIronCostReduction(): bool {
+        return $this->value === self::IRON_COST_REDUCTION;
+    }
+
+    public function isPopulationCostReduction(): bool {
+        return $this->value === self::POPULATION_COST_REDUCTION;
     }
 
     /**

@@ -85,10 +85,15 @@ class GameBuilding extends Model
         'time_increase_amount'        => 'float',
         'units_per_level'             => 'integer',
         'only_at_level'               => 'integer',
+        'is_locked'                   => 'boolean',
     ];
 
     public function units() {
         return $this->hasMany(GameBuildingUnit::class);
+    }
+
+    public function passive() {
+        return $this->hasOne(PassiveSkill::class, 'id', 'passive_skill_id');
     }
 
     protected static function newFactory() {

@@ -60,26 +60,26 @@ class UpdateKingdomBuildings implements ShouldQueue
             // If no kingdom has this building:
             Kingdom::chunkById(500, function($kingdoms) {
                 foreach($kingdoms as $kingdom) {
+
                     $kingdom->buildings()->create([
                         'game_building_id'    => $this->gameBuilding->id,
                         'kingdom_id'          => $kingdom->id,
-                        'level'               => 1,
+                        'level'               => is_null($this->gameBuilding->passive) ? 1 : 0,
                         'current_defence'     => $this->gameBuilding->base_defence,
                         'current_durability'  => $this->gameBuilding->base_durability,
                         'max_defence'         => $this->gameBuilding->base_defence,
                         'max_durability'      => $this->gameBuilding->base_durability,
+                        'is_locked'           => $this->gameBuilding->is_locked,
                     ]);
 
-                    $user      = $kingdom->character->user;
-                    $character = $kingdom->character;
+                    if (!is_null($kingdom->character)) {
+                        $user      = $kingdom->character->user;
 
-                    $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
+                        $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
-                    if (UserOnlineValue::isOnline($user)) {
-
-                        event(new ServerMessageEvent($user, 'new-building', $message));
-                    } else if ($user->new_building_email) {
-                        Mail::to($user->email)->send((new GenericMail($character->user, $message, 'New KingdomBuilding!')));
+                        if (UserOnlineValue::isOnline($user)) {
+                            event(new ServerMessageEvent($user, 'new-building', $message));
+                        }
                     }
                 }
             });

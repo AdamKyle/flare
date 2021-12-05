@@ -29,6 +29,7 @@ class KingdomBuildingFactory extends Factory
             'current_durability' => 300,
             'max_defence'        => 300,
             'max_durability'     => 300,
+            'is_locked'          => false,
         ];
     }
 }

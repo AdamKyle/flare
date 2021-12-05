@@ -11,7 +11,7 @@
                 'building' => $building->id
             ])}}">{{$building->name}}</a> At Level: {{$requiredLevel}}</strong></p>
     @else
-        @if (auth()->user()->hasRole('Admin')))
+        @if (auth()->user()->hasRole('Admin'))
         <p><strong>Can be recruited from: <a href="{{route('buildings.building', [
                     'building' => $building->id
                 ])}}">{{$building->name}}</a> At Level: {{$requiredLevel}}</strong></p>
@@ -21,7 +21,6 @@
                 ])}}">{{$building->name}}</a> At Level: {{$requiredLevel}}</strong></p>
         @endif
     @endguest
-
 @endif
 <x-core.tabs.container ulCss="tw-justify-center" useHr="true" tabsId="unit-details" contentId="unit-details-section">
     <x-slot name="tabs">
@@ -49,12 +48,12 @@
                 <dd><strong>Travel Time</strong>:</dd>
                 <dd>{{$unit->travel_time}} Minutes</dd>
                 <dd><strong>Time To Recruit</strong>:</dd>
-                <dd>{{$unit->time_to_recruit}} Minutes</dd>
+                <dd>{{$unit->time_to_recruit}} Seconds</dd>
             </dl>
         </x-core.tabs.tab-content>
         <x-core.tabs.tab-content active="false" id="unit-attack-info">
             <dl>
-                <dd><strong>Is Atacker?</strong>:</dd>
+                <dd><strong>Is Attacker?</strong>:</dd>
                 <dd>{{$unit->atacker ? 'Yes' : 'No'}}</dd>
                 <dd><strong>Is Defender?</strong>:</dd>
                 <dd>{{$unit->defender ? 'Yes' : 'No'}}</dd>

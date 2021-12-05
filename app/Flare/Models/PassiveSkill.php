@@ -29,6 +29,7 @@ class PassiveSkill extends Model
         'unlocks_at_level',
         'is_locked',
         'is_parent',
+        'unlocks_game_building_id',
     ];
 
     /**
@@ -59,6 +60,10 @@ class PassiveSkill extends Model
 
     public function parent() {
         return $this->belongsTo($this, 'parent_skill_id');
+    }
+
+    public function gameBuilding() {
+        return $this->hasOne(GameBuilding::class, 'unlocks_game_building_id', 'id');
     }
 
     protected static function newFactory() {

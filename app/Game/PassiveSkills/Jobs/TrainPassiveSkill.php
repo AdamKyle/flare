@@ -2,8 +2,9 @@
 
 namespace App\Game\PassiveSkills\Jobs;
 
-use App\Flare\Models\Notification as Notification;
-use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
+use App\Flare\Models\GameBuilding;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -12,7 +13,12 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterPassiveSkill;
+use App\Flare\Models\Notification as Notification;
+use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
+use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\PassiveSkills\Events\UpdatePassiveSkillTimer;
+
 
 class TrainPassiveSkill implements ShouldQueue
 {
@@ -37,7 +43,7 @@ class TrainPassiveSkill implements ShouldQueue
      *
      * @return void
      */
-    public function handle() {
+    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer) {
 
         if (is_null($this->characterPassiveSkill->started_at)) {
             return;
@@ -80,12 +86,30 @@ class TrainPassiveSkill implements ShouldQueue
         $children   = $newPassive->passiveSkill->childSkills;
 
         foreach ($children as $child) {
-            if ($child->unlocks_at_level >= $newPassive->current_level) {
+            if ($newPassive->current_level >= $child->unlocks_at_level) {
                 $foundChild = $this->character->passiveSkills()->where('passive_skill_id', $child->id)->first();
 
                 $foundChild->update([
                     'is_locked' => false,
                 ]);
+            }
+        }
+
+        if ($newPassive->passiveSkill->passiveType()->unlocksBuilding()) {
+            $kingdoms     = $this->character->kingdoms;
+            $gameBuilding = GameBuilding::where('name', $newPassive->passiveSkill->name)->first();
+
+            foreach ($kingdoms as $kingdom) {
+
+                $kingdom->buildings()->where('game_building_id', $gameBuilding->id)->update([
+                    'is_locked' => false,
+                ]);
+
+                $kingdom  = new Item($kingdom->refresh(), $kingdomTransformer);
+                $kingdom  = $manager->createData($kingdom)->toArray();
+                $user     = $this->character->user;
+
+                event(new UpdateKingdom($user, $kingdom));
             }
         }
 

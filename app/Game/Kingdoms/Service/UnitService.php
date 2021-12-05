@@ -77,6 +77,8 @@ class UnitService {
      */
     public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
         $kingdomUnitCostReduction = $kingdom->fetchUnitCostReduction();
+        $ironCostReduction        = $kingdom->fetchIronCostReduction();
+        $populationCostReduction  = $kingdom->fetchUnitCostReduction();
 
         $woodRequired = ($gameUnit->wood_cost * $amount);
         $woodRequired -= $woodRequired * $kingdomUnitCostReduction;
@@ -88,10 +90,10 @@ class UnitService {
         $stoneRequired -= $stoneRequired * $kingdomUnitCostReduction;
 
         $ironRequired = ($gameUnit->iron_cost * $amount);
-        $ironRequired -= $ironRequired * $kingdomUnitCostReduction;
+        $ironRequired -= $ironRequired * ($kingdomUnitCostReduction + $ironCostReduction);
 
         $populationRequired = ($gameUnit->required_population * $amount);
-        $populationRequired -= $populationRequired * $kingdomUnitCostReduction;
+        $populationRequired -= $populationRequired * ($kingdomUnitCostReduction + $populationCostReduction);
 
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood - $woodRequired,

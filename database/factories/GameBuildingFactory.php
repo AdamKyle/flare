@@ -49,6 +49,7 @@ class GameBuildingFactory extends Factory
             'time_to_build'               => 1,
             'time_increase_amount'        => 0.01,
             'units_per_level'             => null,
+            'is_locked'                   => false,
         ];
     }
 }

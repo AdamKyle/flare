@@ -24,6 +24,9 @@ class CharacterPassiveSkills extends Migration
             $table->unsignedBigInteger('parent_skill_id')->nullable();
             $table->foreign('parent_skill_id', 'ps_cps')
                 ->references('id')->on('character_passive_skills');
+            $table->unsignedBigInteger('unlocks_game_building_id')->nullable();
+            $table->foreign('unlocks_game_building_id', 'ugb_gb')
+                ->references('id')->on('game_buildings');
             $table->integer('current_level')->nullable()->default(0);
             $table->integer('hours_to_next')->nullable()->default(0);
             $table->dateTime('started_at')->nullable();

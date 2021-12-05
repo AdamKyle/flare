@@ -3,6 +3,7 @@ import {Modal, ModalDialog, Tabs, Tab, Col, Row} from 'react-bootstrap';
 import Draggable from 'react-draggable';
 import UpgradeSection from './partials/building-management/upgrade-section';
 import BuildingCostSection from './partials/building-management/building-cost-section';
+import AlertError from "../../components/base/alert-error";
 
 class DraggableModalDialog extends React.Component {
   render() {
@@ -33,9 +34,11 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   canUpgrade() {
-    const kingdom               = this.props.kingdom;
-    const building              = this.props.building;
-    const buildingCostReduction = this.props.kingdom.building_cost_reduction;
+    const kingdom                   = this.props.kingdom;
+    const building                  = this.props.building;
+    const buildingCostReduction     = this.props.kingdom.building_cost_reduction;
+    const ironCostReduction         = this.props.kingdom.iron_cost_reduction;
+    const populationCostReduction   = this.props.kingdom.population_cost_reduction;
 
     if (this.state.level > 0) {
       return true;
@@ -67,14 +70,14 @@ export default class BuildingManagementModal extends React.Component {
     }
 
     let buildingIronCost = building.iron_cost;
-    buildingIronCost    -= Math.floor(buildingIronCost * buildingCostReduction);
+    buildingIronCost    -= Math.floor(buildingIronCost * (buildingCostReduction + ironCostReduction));
 
     if (buildingIronCost > kingdom.current_iron) {
       return false;
     }
 
     let buildingPopulationRequired = building.population_required;
-    buildingPopulationRequired    -= Math.floor(buildingPopulationRequired * buildingCostReduction);
+    buildingPopulationRequired    -= Math.floor(buildingPopulationRequired * (buildingCostReduction + populationCostReduction));
 
     if (buildingPopulationRequired > kingdom.current_population) {
       return false;
@@ -84,9 +87,11 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   canRebuild() {
-    const kingdom               = this.props.kingdom;
-    const building              = this.props.building;
-    const buildingCostReduction = this.props.kingdom.building_cost_reduction;
+    const kingdom                   = this.props.kingdom;
+    const building                  = this.props.building;
+    const buildingCostReduction     = this.props.kingdom.building_cost_reduction;
+    const ironCostReduction         = this.props.kingdom.iron_cost_reduction;
+    const populationCostReduction   = this.props.kingdom.population_cost_reduction;
 
     let buildingWoodCost = (building.level * building.base_wood_cost);
     buildingWoodCost    -= Math.floor(buildingWoodCost * buildingCostReduction)
@@ -110,14 +115,14 @@ export default class BuildingManagementModal extends React.Component {
     }
 
     let buildingIronCost = (building.level * building.base_iron_cost);
-    buildingIronCost    -= Math.floor(buildingIronCost * buildingCostReduction)
+    buildingIronCost    -= Math.floor(buildingIronCost * (buildingCostReduction + ironCostReduction))
 
     if (buildingIronCost > kingdom.current_iron) {
       return false;
     }
 
     let buildingPopulationRequired = (building.level * building.base_population);
-    buildingPopulationRequired    -= Math.floor(buildingPopulationRequired * buildingCostReduction)
+    buildingPopulationRequired    -= Math.floor(buildingPopulationRequired * (buildingCostReduction + populationCostReduction))
 
     if (buildingPopulationRequired > kingdom.current_population) {
       return false;
@@ -302,6 +307,17 @@ export default class BuildingManagementModal extends React.Component {
         </Modal.Header>
         <Modal.Body>
           <p>{this.props.building.description}</p>
+          {
+            this.props.building.is_locked ?
+              <AlertError icon={"fas fa-exclamation-circle"} title={'This building is locked'}>
+                <p>
+                  This building is locked behind the {this.props.building.passive_skill_name} Passive skill.
+                  You can find this skill on your character sheet under Passive Skills section. Once you train this skill
+                  you can then begin building and upgrading this building.
+                </p>
+              </AlertError>
+            : null
+          }
           <hr/>
           <div className="row">
             <div className="col-md-4">
@@ -342,7 +358,7 @@ export default class BuildingManagementModal extends React.Component {
           </div>
           <hr/>
           <Tabs defaultActiveKey="regular-upgrade" id="building-upgrade">
-            <Tab eventKey="regular-upgrade" title="Regular Upgrade">
+            <Tab eventKey="regular-upgrade" title="Regular Upgrade" disabled={this.props.building.is_locked}>
               <div className="row mt-4">
                 {this.props.building.level >= this.props.building.max_level ?
                   <div className="col-md-12">
@@ -414,7 +430,7 @@ export default class BuildingManagementModal extends React.Component {
                 }
               </div>
             </Tab>
-            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.buildingNeedsToBeRebuilt() || (this.props.building.level >= this.props.building.max_level)}>
+            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.buildingNeedsToBeRebuilt() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
               <div className="mt-4">
                 <Row>
                   <Col lg={12} xl={6}>
@@ -498,11 +514,11 @@ export default class BuildingManagementModal extends React.Component {
           {
             this.buildingNeedsToBeRebuilt() ?
               <button className="btn btn-primary"
-                      disabled={!this.canRebuild() || !this.isCurrentlyInQueue() || this.state.disabledButtons}
+                      disabled={!this.canRebuild() || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked}
                       onClick={this.rebuildBuilding.bind(this)}>Rebuild</button>
               :
               <button className="btn btn-success"
-                      disabled={!this.canUpgrade() || !this.isCurrentlyInQueue() || this.state.disabledButtons}
+                      disabled={!this.canUpgrade() || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked}
                       onClick={this.upgradeBuilding.bind(this)}
               >
                 Upgrade

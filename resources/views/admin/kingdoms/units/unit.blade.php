@@ -1,24 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-left">
-            <h4 class="mt-3">{{$unit->name}}</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{url()->previous()}}" class="btn btn-success float-right ml-2">Back</a>
+    <div class="tw-mt-10 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
+        <x-core.page-title
+          title="{{$unit->name}}"
+          route="{{url()->previous()}}"
+          color="primary"
+          link="Back"
+        >
             @guest
             @else
                 @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{route('units.edit', [
-                        'gameUnit' => $unit->id
-                    ])}}" class="btn btn-primary float-right ml-2">Edit</a>
+                    <x-core.buttons.link-buttons.primary-button
+                        href="{{route('units.edit', [
+                            'gameUnit' => $unit->id
+                        ])}}"
+                        css="tw-ml-2"
+                    >Edit</x-core.buttons.link-buttons.primary-button>
                 @endif
             @endguest
-        </div>
+        </x-core.page-title>
+
+        <hr />
+        <x-core.cards.card>
+            @include('admin.kingdoms.units.partials.unit-attributes', [
+                'unit' => $unit
+            ])
+        </x-core.cards.card>
     </div>
-    <hr />
-    @include('admin.kingdoms.units.partials.unit-attributes', [
-        'unit' => $unit
-    ])
 @endsection
