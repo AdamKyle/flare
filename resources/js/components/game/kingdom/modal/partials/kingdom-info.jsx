@@ -3,6 +3,8 @@ import Embezzle from './embezzle';
 import {Alert, OverlayTrigger, Tooltip, Tabs, Tab} from 'react-bootstrap';
 import Deposit from "./deposit";
 import Population from "./population";
+import AlertInfo from "../../../components/base/alert-info";
+import GoblinCoinBank from "./goblin-coin-bank";
 
 const renderDeposit = (props) => (
   <Tooltip id="button-tooltip" {...props}>
@@ -314,6 +316,21 @@ export default class KingdomInfo extends React.Component {
                  <a href="/information/passive-skills">Passive Skill</a> that you can train to increase this an additional 25%</p>
               </div>
             </div>
+          </Tab>
+          <Tab eventKey="goblin-coin-bank" title="Goblin Bank">
+            {
+              this.props.kingdom.can_access_bank ?
+                <GoblinCoinBank
+                  kingdom={this.props.kingdom}
+                  characterId={this.props.characterId}
+                  characterGold={this.props.characterGold}
+                />
+              :
+                <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                  You need to unlock the Goblin Coin Bank Passive skill and level the building to level 5 or higher before you
+                  are able to convert your gold to gold bars.
+                </AlertInfo>
+            }
           </Tab>
         </Tabs>
 

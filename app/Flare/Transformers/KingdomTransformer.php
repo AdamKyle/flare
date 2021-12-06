@@ -6,6 +6,7 @@ use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\PassiveSkill;
+use App\Game\Kingdoms\Values\BuildingActions;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -56,7 +57,8 @@ class KingdomTransformer extends TransformerAbstract {
             'unit_cost_reduction'       => $kingdom->fetchUnitCostReduction(),
             'building_cost_reduction'   => $kingdom->fetchBuildingCostReduction(),
             'iron_cost_reduction'       => $kingdom->fetchIronCostReduction(),
-            'population_cost_reduction' => $kingdom->fetchPopulationCostReduction()
+            'population_cost_reduction' => $kingdom->fetchPopulationCostReduction(),
+            'can_access_bank'           => $this->canAccessGoblinCoinBank($kingdom),
         ];
     }
 
@@ -97,5 +99,13 @@ class KingdomTransformer extends TransformerAbstract {
         });
 
         return $this->collection($collection, resolve(UnitTransformer::class));
+    }
+
+    protected function canAccessGoblinCoinBank(Kingdom $kingdom): bool {
+        $building = $kingdom->buildings->filter(function($building) {
+            return $building->name === BuildingActions::GOBLIN_COIN_BANK;
+        })->first();
+
+        return !$building->is_locked && BuildingActions::canAccessGoblinBank($building);
     }
 }

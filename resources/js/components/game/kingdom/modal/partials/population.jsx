@@ -118,7 +118,8 @@ export default class Population extends React.Component {
             will see a global message of him stomping around. First he will take gold from your kingdom per person over the max population. If you have 500 people and can only hold 100
             that's 4000 gold. He will first take from the treasury of the afflicted kingdom. If there is not enough gold, he will take it or the rest of the owed amount
             out of your pockets. If you and your kingdom do not have enough gold to pay, you will loose the kingdom.</p>
-            <p>He will reduce all the buildings, units, everything, to 0. He will then Take the kingdom and finally he will destroy the kingdom, clearing up
+            <p>If you have gold bars from the Goblin Coin Bank, he will take the bars until the price is paid rounding up. If he were to take 2.5 bars, he will take three.</p>
+            <p>Should you still not be able to pay, he will reduce all the buildings, units, everything, to 0. He will then Take the kingdom and finally he will destroy the kingdom, clearing up
             space for a new kingdom. You will see all this as global messages.</p>
           </AlertWarning>
 
