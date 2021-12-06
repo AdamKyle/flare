@@ -15,6 +15,11 @@
 I could list out things you should focus on, things you should and should not do. That's fun and all, but instead let me
 walk you through the couple of hours of the game for you. I'll provide screenshots so you can follow along.
 
+Tlessa has a lot of systems and sub systems and ways of managing your character, from skills, enchantments, alchemical items, 
+special items found at special locations, quest items and so on. Looking at the game, one might think Tlessa is a mess of systems, but they are all interconnected
+together and play off each other such that they all come together in the end to give you a sense of accomplishment and feel like, after a long road, that you 
+"did this". you, the player invested time and energy and created a god killing character who rules the lands. The best part is, you didn't have to spend any money to do it.
+
 What I pick for race and class will be different from you. But that's ok. 
 You can still follow along and adjust accordingly for your own class.
 

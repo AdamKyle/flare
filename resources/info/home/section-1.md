@@ -49,7 +49,7 @@ There is something for everyone, it just depends on what you want to do. Run the
 >    </a>
 ></div>
 >
-> You can also access your settings from here to turn on and off emails and change your security questions.
+> You can also access your settings from here to turn on and off emails and manage other aspects. 
 > Read more about that in the [settings](/information/settings) section.
 
 
@@ -77,6 +77,8 @@ Email is only sent for:
 - Kingdom Management such as building upgrades, unit queues finishing and being attacked. <em>(can be turned off)</em>
 - If an item, affix or character class core stat changes.
 - Account Deletion, triggered by you or the system.
+- When you have been inactive for five months the system will email you to alert you that the following month your character will be deleted.
+  - You can of course log in to avoid this, or log in and delete your character your self, or ignore the email and your account will be deleted on the 6th month.
 
 Emails are only sent if you are not online at the time of this happening. Some of these you can turn off in the [settings](/information/settings) section.
 
