@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
@@ -165,6 +166,8 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function boot()
     {
-        //
+        $router = $this->app['router'];
+
+        $router->aliasMiddleware('character.owns.kingdom', DoesKingdomBelongToAuthorizedUser::class);
     }
 }

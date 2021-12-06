@@ -47,6 +47,7 @@ class SiegeHandler {
                     'unit_id'        => $gameUnit->id,
                     'time_to_return' => $unitInfo['time_to_return'],
                     'settler'        => false,
+                    'is_cannons'     => $gameUnit->name === 'Cannon',
                 ];
             }
         }

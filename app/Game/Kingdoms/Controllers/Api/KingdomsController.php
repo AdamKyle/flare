@@ -422,4 +422,51 @@ class KingdomsController extends Controller {
 
         return response()->json([], 200);
     }
+
+    public function purchaseGoldBars(Request $request, Kingdom $kingdom) {
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => "Invalid Input. Not allowed to do that."
+            ], 422);
+        }
+
+        $amountToBuy = $request->amount_to_purchase;
+
+        if ($amountToBuy > 1000) {
+            $amountToBuy = 1000;
+        }
+
+        $newGoldBars = $amount + $kingdom->gold_bars;
+
+        if ($newGoldBars > 1000) {
+            return response()->json([
+                'message' => "Too many gold bars."
+            ], 422);
+        }
+
+        $cost = $amountToBuy * 2000000000;
+
+        $character = $kingdom->character;
+
+        if ($cost > $character->gold) {
+            return response()->json(['message' => 'Not enough gold.'], 422);
+        }
+
+        $character->update([
+            'gold' => $character->gold - $cost
+        ]);
+
+        $kingdom->update([
+            'gold_bars' => $amount,
+        ]);
+
+        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateKingdom($character->user, $kingdom));
+
+        return response()->json([], 200);
+    }
 }

@@ -3,7 +3,7 @@
 Route::middleware(['auth'])->group(function() {
     Route::get('/kingdoms/{user}/attack-logs', ['as' => 'kingdom.attack-logs', 'uses' => 'Api\KingdomsController@getAttackLogs']);
 
-    Route::middleware(['is.character.who.they.say.they.are', 'throttle:500,1'])->group(function() {
+    Route::middleware(['is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1'])->group(function() {
         Route::get('/kingdoms/{character}/kingdoms-with-units', ['as' => 'kingdoms.with.units', 'uses' => 'Api\KingdomAttackController@fetchKingdomsWithUnits']);
 
         Route::get('/kingdoms/{character}/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomsController@getLocationData']);
@@ -25,6 +25,8 @@ Route::middleware(['auth'])->group(function() {
         Route::post('/kingdoms/deposit/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@deposit']);
 
         Route::post('/kingdoms/purchase-people/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@purchasePeople']);
+
+        Route::post('/kingdoms/purchase-gold-bars/{kingdom}', ['as' => 'kingdom.purchase-bars', 'uses' => 'Api\KingdomsController@purchaseGoldBars']);
 
         Route::post('/kingdoms/{character}/attack/selection', ['as' => 'kingdom.attack.selection', 'uses' => 'Api\KingdomAttackController@selectKingdoms']);
         Route::post('/kingdoms/{character}/attack', ['as' => 'kingdom.atack', 'uses' => 'Api\KingdomAttackController@attack']);

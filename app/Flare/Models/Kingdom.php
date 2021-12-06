@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -106,6 +107,35 @@ class Kingdom extends Model implements Auditable
 
     public function fetchPopulationCostReduction(): float {
         return $this->getPercentage(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+    }
+
+    public function fetchKingdomDefenceBonus(): float {
+        $passiveBonus = $this->fetchDefenceBonusFromPassive();
+        $treasury     = $this->fetchTreasuryDefenceBonus();
+        $walls        = $this->getWallsDefence();
+        $goldBars     = $this->fetchGoldBarsDefenceBonus();
+
+        return $walls + $treasury + $goldBars + $passiveBonus;
+    }
+
+    public function fetchTreasuryDefenceBonus(): float {
+        return $this->treasury / KingdomMaxValue::MAX_TREASURY;
+    }
+
+    public function fetchGoldBarsDefenceBonus(): float {
+        return $this->gold_bars / 1000;
+    }
+
+    public function getWallsDefence(): float {
+        $walls = $this->buildings->filter(function($building) {
+            return $building->gameBuilding->is_walls;
+        })->first();
+
+        if ($walls->current_durability <= 0) {
+            return 0.0;
+        }
+
+        return $walls->level / 30;
     }
 
     public function gameMap() {

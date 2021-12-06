@@ -90,7 +90,7 @@ class KingdomAttackController extends Controller {
         $buildings  = $kingdom->buildings;
         $units      = $kingdom->units;
 
-        $treasuryDefenceFromKingdom = (($kingdom->treasury / KingdomMaxValue::MAX_TREASURY) + $kingdom->fetchDefenceBonusFromPassive()) / 2;
+        $treasuryDefenceFromKingdom = $kingdom->fetchKingdomDefenceBonus();
 
         $damageToKingdom = $damageToKingdom - $damageToKingdom * $treasuryDefenceFromKingdom;
 
