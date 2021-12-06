@@ -77,8 +77,8 @@ class RegisterController extends Controller
             throw new \Exception('You have been banned until: ' . $until);
         }
 
-        // For dev you can set: ALLOW_MUlTIPLE_SIGNIN to a 1 to get 10 extra accounts to create.
-        if (User::where('ip_address', $ip)->count() >= (((int) env('ALLOW_MUlTIPLE_SIGNIN')) === 1 ? 10 : 1)) {
+        // Allows characters to create 10 accounts.
+        if (User::where('ip_address', $ip)->count() >= 10) {
             throw new \Exception('You cannot register anymore characters.');
         }
 
