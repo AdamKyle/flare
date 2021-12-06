@@ -106,6 +106,10 @@ class KingdomTransformer extends TransformerAbstract {
             return $building->name === BuildingActions::GOBLIN_COIN_BANK;
         })->first();
 
+        if (is_null($building)) {
+            return false;
+        }
+
         return !$building->is_locked && BuildingActions::canAccessGoblinBank($building);
     }
 }

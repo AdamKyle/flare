@@ -202,6 +202,7 @@ class SiegeHandlerTest extends TestCase {
                 "primary_target" => 'Walls',
                 "fall_back"      => 'Farm',
                 "unit_id"        => 1,
+                "is_cannons"     => false,
             ],
             [
                 "amount"         => 10,
@@ -210,6 +211,7 @@ class SiegeHandlerTest extends TestCase {
                 "primary_target" => 'Walls',
                 "fall_back"      => 'Farm',
                 "unit_id"        => 2,
+                "is_cannons"     => false,
             ],
             [
                 "amount"         => 10,
@@ -218,6 +220,7 @@ class SiegeHandlerTest extends TestCase {
                 "primary_target" => 'Walls',
                 "fall_back"      => 'Buildings',
                 "unit_id"        => 3,
+                "is_cannons"     => false,
             ],
         ];
     }

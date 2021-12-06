@@ -11,16 +11,8 @@ use Illuminate\Http\Request;
 
 class KingdomsController extends Controller {
 
-    /**
-     * @var KingdomLogService $kingdomLogService
-     */
     private $kingdomLogService;
 
-    /**
-     * KingdomsController constructor.
-     *
-     * @param KingdomLogService $kingdomLogService
-     */
     public function __construct(KingdomLogService $kingdomLogService) {
         $this->kingdomLogService = $kingdomLogService;
     }
