@@ -56,41 +56,62 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gameClass-dur-mod">Durability Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="gameClass-dur-mod" name="gameClass-dur-mod" wire:model="gameClass.dur_mod">
                 @error('gameClass.dur_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gameClass-chr-mod">Charisma Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="gameClass-chr-mod" name="gameClass-chr-mod" wire:model="gameClass.chr_mod">
                 @error('gameClass.chr_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="gameClass-defense-mod">Defense Modifier: </label>
-                <input type="number" steps="0.00" class="form-control required" id="gameClass-defense-mod" name="gameClass-defense-mod" wire:model="gameClass.defense_mod">
-                @error('gameClass.defense_mod') <span class="text-danger">{{ $message }}</span> @enderror
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gameClass-agi-mod">Agility Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="gameClass-agi-mod" name="gameClass-agi-mod" wire:model="gameClass.agi_mod">
                 @error('gameClass.agi_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gameClass-focus-mod">Focus Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="gameClass-focus-mod" name="gameClass-focus-mod" wire:model="gameClass.focus_mod">
                 @error('gameClass.focus_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="gameClass-defense_mod">Defense Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="gameClass-defense_mod" name="gameClass-defense_mod" wire:model="gameClass.defense_mod">
+                @error('gameClass.defense_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="gameClass-dodge_mod">Dodge Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="gameClass-dodge_mod" name="gameClass-dodge_mod" wire:model="gameClass.dodge_mod">
+                @error('gameClass.dodge_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="gameClass-accuracy_mod">Accuracy Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="gameClass-accuracy_mod" name="gameClass-accuracy_mod" wire:model="gameClass.accuracy_mod">
+                @error('gameClass.accuracy_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="gameClass-looting_mod">Looting Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="gameClass-looting_mod" name="gameClass-looting_mod" wire:model="gameClass.looting_mod">
+                @error('gameClass.looting_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

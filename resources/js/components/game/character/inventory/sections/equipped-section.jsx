@@ -223,9 +223,9 @@ export default class EquippedSection extends React.Component {
 
           {
             typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped) ?
-              <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You have a set ...'}>
-                You currently have a set equipped. Equipping any other item, or set will replace this set completely.
-                <strong>You cannot mix and match sets or sets with non set items. It's one or the other.</strong>
+              <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You have a set equipped'}>
+                You can equip other items and they will replace the set item at that
+                position. While the set is equipped you cannot empty the set.
               </AlertWarning>
             : null
           }

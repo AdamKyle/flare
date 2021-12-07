@@ -62,28 +62,28 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-defense_mod">Defense Modifier: </label>
                 <input type="number" steps="0.00" class="form-control required" id="race-defense_mod" name="race-defense_mod" wire:model="race.defense_mod">
                 @error('race.defense_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-dodge_mod">Dodge Modifier: </label>
                 <input type="number" steps="0.00" class="form-control required" id="race-dodge_mod" name="race-dodge_mod" wire:model="race.dodge_mod">
                 @error('race.dodge_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-accuracy_mod">Accuracy Modifier: </label>
                 <input type="number" steps="0.00" class="form-control required" id="race-accuracy_mod" name="race-accuracy_mod" wire:model="race.accuracy_mod">
                 @error('race.accuracy_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-looting_mod">Looting Modifier: </label>
                 <input type="number" steps="0.00" class="form-control required" id="race-looting_mod" name="race-looting_mod" wire:model="race.looting_mod">
