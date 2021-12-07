@@ -61,6 +61,8 @@
                     <dd>{{$lastLoggedInCount}}</dd>
                     <dt>Never Logged In Count:</dt>
                     <dd>{{$neverLoggedInCount}}</dd>
+                    <dt>Have Logged In Count:</dt>
+                    <dd>{{$totalLoggedInAllTime}}</dd>
                 </dl>
             </x-cards.card-with-title>
         </div>

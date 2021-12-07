@@ -20,6 +20,7 @@ class StatisticsController extends Controller {
             'topTenKingdoms'            => $this->fetchTopKingdomHolders(),
             'lastLoggedInCount'         => User::whereDate('last_logged_in', now())->count(),
             'neverLoggedInCount'        => User::whereNull('last_logged_in')->count(),
+            'totalLoggedInAllTime'      => User::whereNotNull('last_logged_in')->count(),
         ]);
     }
 
