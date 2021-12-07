@@ -68,7 +68,6 @@ class DataTable extends Component
 
             if ($this->batchSell) {
                 $join->whereNull('items.item_prefix_id')->whereNull('items.item_suffix_id');
-                $join->where('items.craft_only', $this->craftOnly);
                 $join->where('items.usable', false);
             }
 

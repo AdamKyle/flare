@@ -41,8 +41,11 @@
         <p></p><strong>Note:</strong> There is a 5% tax applied to all items you sell.</p>
     </div>
     @livewire('character.inventory.data-table', [
-        'batchSell' => true,
-        'craftOnly' => false,
-        'character' => $character,
+        'batchSell'             => true,
+        'craftOnly'             => false,
+        'isShopSelling'         => true,
+        'character'             => $character,
+        'showSkillInfo'         => false,
+        'showOtherCurrencyCost' => false
     ])
 @endsection

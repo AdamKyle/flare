@@ -4,6 +4,7 @@
 </p>
 
 <div class="normal-item">I am a regular item</div>
-<div class="one-enchant">I have one echantment on me</div>
+<div class="one-enchant">I have one enchantment on me</div>
 <div class="two-enchant">I have two enchantments on me</div>
 <div class="quest-item">I am a quest item</div>
+<div class="usable-item">I am a usable item</div>

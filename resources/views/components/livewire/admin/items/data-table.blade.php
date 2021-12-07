@@ -152,6 +152,7 @@
                         />
                     @endif
 
+                    @if ($showSkillInfo)
                       <x-data-tables.header-row
                         wire:click.prevent="sortBy('skill_level_required')"
                         header-text="Crafting Skill Level Required"
@@ -167,6 +168,7 @@
                         sort-field="{{$sortField}}"
                         field="skill_level_trivial"
                       />
+                    @endif
 
                     @guest
                     @elseif (auth()->user()->hasRole('Admin'))
@@ -248,8 +250,10 @@
                                 <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
                             @endif
 
+                            @if ($showSkillInfo)
                               <td>{{$item->skill_level_required}}</td>
                               <td>{{$item->skill_level_trivial}}</td>
+                            @endif
 
                             @guest
                             @else
