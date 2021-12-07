@@ -133,6 +133,10 @@ class Kingdom extends Model implements Auditable
             return $building->gameBuilding->is_walls;
         })->first();
 
+        if (is_null($walls)) {
+            return 0.0;
+        }
+
         if ($walls->current_durability <= 0) {
             return 0.0;
         }
