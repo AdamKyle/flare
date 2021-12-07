@@ -34,14 +34,14 @@ export default class Defend {
     if (canEntrance) {
       this.useItems(attackData, this.attacker.class);
 
-      this.fireOffVampThirst();
+      this.fireOffVampThirst(attackData);
 
       return this.setState();
     }
 
     this.useItems(attackData, this.attacker.class)
 
-    this.fireOffVampThirst();
+    this.fireOffVampThirst(attackData);
 
     return this.setState();
   }
@@ -68,10 +68,10 @@ export default class Defend {
     this.battleMessages         = [...this.battleMessages, ...useItems.getBattleMessage()];
   }
 
-  fireOffVampThirst() {
+  fireOffVampThirst(attackData) {
     const damage = new Damage();
 
-    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth);
+    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
     this.monsterHealth          = health.monster_hp;
     this.characterCurrentHealth = health.character_hp;
