@@ -48,6 +48,7 @@ class KingdomTransformer extends TransformerAbstract {
             'current_morale'     => $kingdom->current_morale,
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasury,
+            'gold_bars'          => $kingdom->gold_bars,
             'building_queue'     => $kingdom->buildingsQueue,
             'unit_queue'         => $kingdom->unitsQueue,
             'current_units'      => $kingdom->units,
@@ -59,6 +60,11 @@ class KingdomTransformer extends TransformerAbstract {
             'iron_cost_reduction'       => $kingdom->fetchIronCostReduction(),
             'population_cost_reduction' => $kingdom->fetchPopulationCostReduction(),
             'can_access_bank'           => $this->canAccessGoblinCoinBank($kingdom),
+            'treasury_defence'          => $kingdom->fetchTreasuryDefenceBonus(),
+            'walls_defence'             => $kingdom->getWallsDefence(),
+            'gold_bars_defence'         => $kingdom->fetchGoldBarsDefenceBonus(),
+            'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
+
         ];
     }
 

@@ -64,15 +64,30 @@ class InfoPageController extends Controller
                 $craftOnly     = false;
 
                 $viewAttributes = isset(config('info.' . $pageName)[$index]['view_attributes']) ? config('info.' . $pageName)[$index]['view_attributes'] : null;
-
                 if (isset(config('info.' . $pageName)[$index])) {
+
                     $view                = config('info.' . $pageName)[$index]['view'];
                     $viewAttributes      = $viewAttributes;
                     $livewire            = config('info.' . $pageName)[$index]['livewire'];
                     $only                = config('info.' . $pageName)[$index]['only'];
-                    $before              = config('info.' . $pageName)[$index]['insert_before_table'];
                     $type                = config('info.' . $pageName)[$index]['type'];
                     $craftOnly           = config('info.' . $pageName)[$index]['craft_only'];
+
+                    if (isset(config('info.' . $pageName)[$index]['insert_before_table'])) {
+                        $before = config('info.' . $pageName)[$index]['insert_before_table'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['showSkillInfo'])) {
+                        $showSkillInfo = config('info.' . $pageName)[$index]['showSkillInfo'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['showDropDown'])) {
+                        $showDropDown = config('info.' . $pageName)[$index]['showDropDown'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['type'])) {
+                        $type = config('info.' . $pageName)[$index]['type'];
+                    }
                 }
 
                 $sections[] = [

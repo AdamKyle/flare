@@ -23,10 +23,9 @@ const renderWithdrawl = (props) => (
 
 const renderHelp = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    This comes from the amount of gold in your kingdom divided by the max amount of gold (2 billion) your kingdom can have.
-    This defence is also applied, albeit at half, to your kingdom when items are dropped on your kingdom as a percentage towards
-    damage reduction. Characters may continue to increase this an additional 25% by training the passive: Kingdom Management to level 5.
-    You can find this skill on your character sheet under: Passives in the skill section.
+    This comes from a combination of your wall defence, which is level / 30. Your Kingdom Management Passive Skill buff,
+    the amount of treasury you have divided by the kingdom's max treasury (2 billion) and the amount of gold bars you have (maximum of 1000, at 2 billion each)
+    which can be purchased from the Goblin Coin Bank.
   </Tooltip>
 );
 
@@ -253,6 +252,8 @@ export default class KingdomInfo extends React.Component {
                   <dd>{this.formatNumber(this.props.kingdom.current_stone)} / {this.formatNumber(this.props.kingdom.max_stone)}</dd>
                   <dt><strong>Iron</strong>:</dt>
                   <dd>{this.formatNumber(this.props.kingdom.current_iron)} / {this.formatNumber(this.props.kingdom.max_iron)}</dd>
+                  <dt><strong>Population</strong>:</dt>
+                  <dd>{this.formatNumber(this.props.kingdom.current_population)} / {this.formatNumber(this.props.kingdom.max_population)}</dd>
                 </dl>
               </div>
               <div className="col-md-4 mb-3">
@@ -300,7 +301,32 @@ export default class KingdomInfo extends React.Component {
                     <i className="far fa-question-circle"></i>
 
                   </OverlayTrigger>:</dt>
-                  <dd>{((this.props.kingdom.treasury_defence + this.props.kingdom.passive_defence) * 100).toFixed(4)}% </dd>
+                  <dd>
+                    <span>{(this.props.kingdom.defence_bonus * 100).toFixed(4)}%</span>
+                  </dd>
+                </dl>
+                <hr />
+                <h4 className="tw-font-light">Current Defence Bonus Break Down</h4>
+                <hr />
+                <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
+                  <p>
+                    When cannons attack your kingdom, your Current Defence Bonus will be capped at 45% when facing those units.
+                    The logic here is a cannon ball can rip through anything, stone, iron, clay, wood. It can rip through it all.
+                  </p>
+                  <p>
+                    It doesn't matter if the attacking force has sent other units, your defence only drops for these units. Other units,
+                    your defence will rebound back up to what it currently is.
+                  </p>
+                </AlertInfo>
+                <dl>
+                  <dt>Wall Bonus: </dt>
+                  <dd>{(this.props.kingdom.walls_defence * 100).toFixed(0)}%</dd>
+                  <dt>Treasury Bonus: </dt>
+                  <dd>{(this.props.kingdom.treasury_defence * 100).toFixed(0)}%</dd>
+                  <dt>Passive (Kingdom Management) Bonus: </dt>
+                  <dd>{(this.props.kingdom.passive_defence * 100).toFixed(0)}%</dd>
+                  <dt>Gold Bars (Goblin Coin Bank) Bonus: </dt>
+                  <dd>{(this.props.kingdom.gold_bars_defence * 100).toFixed(0)}%</dd>
                 </dl>
               </div>
               <div className="col-md-6">
@@ -309,11 +335,11 @@ export default class KingdomInfo extends React.Component {
                 <p>This section details your morale increase/decrease per hour.</p>
                 <p>Many things can effect the increase/decrease, such as specific buildings
                 with a durability of 0, will decrease morale per hour. You can read about this in the
-                 <a href="/information/kingdoms">kingdoms section</a> of the help docs.</p>
+                  <a href="/information/kingdoms"> kingdoms section</a> of the help docs.</p>
                 <p>Treasury, such as depositing will increase the morale by 15%. Rebuilding destroyed buildings will
                 also increase morale.</p>
                 <p>Your defence bonus comes from the total treasury you have divided by the maximum. There is also a
-                 <a href="/information/passive-skills">Passive Skill</a> that you can train to increase this an additional 25%</p>
+                 <a href="/information/passive-skills"> Passive Skill</a> that you can train to increase this an additional 25%</p>
               </div>
             </div>
           </Tab>

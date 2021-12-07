@@ -26,7 +26,8 @@ Route::middleware(['auth'])->group(function() {
 
         Route::post('/kingdoms/purchase-people/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@purchasePeople']);
 
-        Route::post('/kingdoms/purchase-gold-bars/{kingdom}', ['as' => 'kingdom.purchase-bars', 'uses' => 'Api\KingdomsController@purchaseGoldBars']);
+        Route::post('/kingdoms/purchase-gold-bars/{kingdom}', ['as' => 'kingdom.purchase.bars', 'uses' => 'Api\KingdomsController@purchaseGoldBars']);
+        Route::post('/kingdoms/withdraw-bars-as-gold/{kingdom}', ['as' => 'kingdom.withdraw.bars', 'uses' => 'Api\KingdomsController@withdrawGoldBars']);
 
         Route::post('/kingdoms/{character}/attack/selection', ['as' => 'kingdom.attack.selection', 'uses' => 'Api\KingdomAttackController@selectKingdoms']);
         Route::post('/kingdoms/{character}/attack', ['as' => 'kingdom.atack', 'uses' => 'Api\KingdomAttackController@attack']);

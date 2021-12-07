@@ -7,6 +7,9 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Jobs\MassEmbezzle;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Requests\KingdomUnitRecrutmentRequest;
+use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
+use App\Game\Kingdoms\Requests\PurchasePeopleRequest;
+use App\Game\Kingdoms\Requests\WithrawGoldBarsRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -382,7 +385,7 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function purchasePeople(Request $request, Kingdom $kingdom) {
+    public function purchasePeople(PurchasePeopleRequest $request, Kingdom $kingdom) {
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
                 'message' => "Invalid Input. Not allowed to do that."
@@ -423,7 +426,7 @@ class KingdomsController extends Controller {
         return response()->json([], 200);
     }
 
-    public function purchaseGoldBars(Request $request, Kingdom $kingdom) {
+    public function purchaseGoldBars(PurchaseGoldBarsRequest $request, Kingdom $kingdom) {
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
                 'message' => "Invalid Input. Not allowed to do that."
@@ -463,6 +466,40 @@ class KingdomsController extends Controller {
         $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
 
         $kingdom  = $this->manager->createData($kingdom)->toArray();
+
+        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateKingdom($character->user, $kingdom));
+
+        return response()->json([], 200);
+    }
+
+    public function withdrawGoldBars(WithrawGoldBarsRequest $request, Kingdom $kingdom) {
+        $amount = $request->amount_to_withdraw;
+
+        if ($kingdom->gold_bars < $amount) {
+            return response()->json([
+                'message' => "You don't have enough bars to do that."
+            ], 422);
+        }
+
+        $totalGold = $amount * 2000000000;
+        $character = $kingdom->character;
+
+        $newGold = $character->gold + $totalGold;
+
+        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+            return response()->json([
+                'message' => "This would cause you to go over the max allowed gold. You cannot do that."
+            ], 422);
+        }
+
+        $character->update([
+            'gold' => $newGold,
+        ]);
+
+        $kingdom->update([
+            'gold_bars' => $kingdom->goldBars - $amount,
+        ]);
 
         event(new UpdateTopBarEvent($character->refresh()));
         event(new UpdateKingdom($character->user, $kingdom));

@@ -49,6 +49,7 @@ class DataTable extends Component
     }
 
     public function getDataQueryProperty() {
+
         if ($this->search !== '') {
             $this->page = 1;
         }
@@ -82,9 +83,16 @@ class DataTable extends Component
             }
         }
 
-        $items = $items->where('item_suffix_id', null)
-                       ->where('item_prefix_id', null)
-                       ->where('craft_only', $this->craftOnly);
+
+        if (($this->showSkillInfo && $this->type !== 'alchemy')) {
+            $items = $items->where('item_suffix_id', null)
+                           ->where('item_prefix_id', null)
+                           ->whereNotIn('type', ['alchemy', 'quest']);
+        } else {
+            $items = $items->where('item_suffix_id', null)
+                ->where('item_prefix_id', null)
+                ->where('craft_only', $this->craftOnly);
+        }
 
         if (!is_null($this->type)) {
             $items = $items->where('type', $this->type);

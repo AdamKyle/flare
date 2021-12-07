@@ -32,41 +32,62 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-dur-mod">Durability Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="race-dur-mod" name="race-dur-mod" wire:model="race.dur_mod">
                 @error('race.dur_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-chr-mod">Charisma Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="race-chr-mod" name="race-chr-mod" wire:model="race.chr_mod">
                 @error('race.chr_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="race-deffense-mod">Defense Modifier: </label>
-                <input type="number" steps="0.00" class="form-control required" id="race-deffense-mod" name="race-deffense-mod" wire:model="race.deffense_mod">
-                @error('race.defense_mod') <span class="text-danger">{{ $message }}</span> @enderror
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-agi-mod">Agility Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="race-agi-mod" name="race-agi-mod" wire:model="race.agi_mod">
                 @error('race.agi_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="race-focus-mod">Focus Modifier: </label>
                 <input type="number" steps="0" class="form-control required" id="race-focus-mod" name="race-focus-mod" wire:model="race.focus_mod">
                 @error('race.focus_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="race-defense_mod">Defense Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="race-defense_mod" name="race-defense_mod" wire:model="race.defense_mod">
+                @error('race.defense_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="race-dodge_mod">Dodge Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="race-dodge_mod" name="race-dodge_mod" wire:model="race.dodge_mod">
+                @error('race.dodge_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="race-accuracy_mod">Accuracy Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="race-accuracy_mod" name="race-accuracy_mod" wire:model="race.accuracy_mod">
+                @error('race.accuracy_mod') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="race-looting_mod">Looting Modifier: </label>
+                <input type="number" steps="0.00" class="form-control required" id="race-looting_mod" name="race-looting_mod" wire:model="race.looting_mod">
+                @error('race.looting_mod') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

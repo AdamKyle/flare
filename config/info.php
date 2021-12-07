@@ -199,7 +199,6 @@ return [
             'livewire'            => true,
             'view'                => 'admin.items.data-table',
             'only'                => null,
-            'insert_before_table' => 'information.partials.crafting-section-one',
             'showSkillInfo'       => true,
             'showDropDown'        => true,
             'type'                => 'alchemy',
