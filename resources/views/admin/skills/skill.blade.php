@@ -58,12 +58,6 @@
                             <dd>{{($fightTimeOutMod = $skill->fight_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
                             <dt>Move Timeout Mod At Max Level:</dt>
                             <dd>{{($skill->move_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
-                            <dt>Unit Recruitment Time Reduction % (At Max Level):</dt>
-                            <dd>{{$skill->unit_time_reduction * $skill->max_level}}</dd>
-                            <dt>Building Upgrade/Repair Time Reduction % (At Max Level):</dt>
-                            <dd>{{$skill->building_time_reduction * $skill->max_level}}</dd>
-                            <dt>Unit Movement Time Reduction % (At Max Level):</dt>
-                            <dd>{{$skill->unit_movement_time_reduction * $skill->max_level}}</dd>
                             <dt>Skill Bonus Bonus At Max Level:</dt>
                             @if ($skill->can_train)
                                 <dd>{{($skill->skill_bonus_per_level * 999) * 100}}% (Bonuses from equipment can make this higher)</dd>
@@ -71,6 +65,18 @@
                                 <dd>{{($skill->skill_bonus_per_level * 400) * 100}}% (Bonuses from equipment can make this higher)</dd>
                             @endif
                         </dl>
+                        @if ($skill->skillType()->effectsKingdom())
+                            <hr />
+                            <h4 class="tw-font-light">Effects Kingdom</h4>
+                            <dl>
+                                <dt>Unit Recruitment Time Reduction:</dt>
+                                <dd>{{($skill->unit_time_reduction * $skill->max_level) * 100}}%</dd>
+                                <dt>Unit Movement Time Reduction:</dt>
+                                <dd>{{($skill->unit_movement_time_reduction * $skill->max_level) * 100}}%</dd>
+                                <dt>Building Upgrade/Repair Time Reduction:</dt>
+                                <dd>{{($skill->building_time_reduction * $skill->max_level) * 100}}%</dd>
+                            </dl>
+                        @endif
                         @guest
                         @else
                             @if (auth()->user()->hasRole('Admin'))

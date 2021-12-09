@@ -142,31 +142,33 @@ export default class KingdomBuildings extends React.Component {
           <h4  className="tw-font-light mt-1">Current Resources</h4>
           <hr />
           <div className="row">
-            <div className="col-md-2">
+            <div className="col-md-4">
               <dl>
                 <dt><strong>Wood</strong>:</dt>
                 <dd>{this.formatNumber(this.props.kingdom.current_wood)} / {this.formatNumber(this.props.kingdom.max_wood)}</dd>
               </dl>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-4">
               <dl>
                 <dt><strong>Clay</strong>:</dt>
                 <dd>{this.formatNumber(this.props.kingdom.current_clay)} / {this.formatNumber(this.props.kingdom.max_clay)}</dd>
               </dl>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-4">
               <dl>
                 <dt><strong>Stone</strong>:</dt>
                 <dd>{this.formatNumber(this.props.kingdom.current_stone)} / {this.formatNumber(this.props.kingdom.max_stone)}</dd>
               </dl>
             </div>
-            <div className="col-md-2">
+          </div>
+          <div className="row">
+            <div className="col-md-4">
               <dl>
                 <dt><strong>Iron</strong>:</dt>
                 <dd>{this.formatNumber(this.props.kingdom.current_iron)} / {this.formatNumber(this.props.kingdom.max_iron)}</dd>
               </dl>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-4">
               <dl>
                 <dt><strong>Pop.</strong>:</dt>
                 <dd>{this.formatNumber(this.props.kingdom.current_population)} / {this.formatNumber(this.props.kingdom.max_population)}</dd>

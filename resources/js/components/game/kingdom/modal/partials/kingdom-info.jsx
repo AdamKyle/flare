@@ -352,10 +352,12 @@ export default class KingdomInfo extends React.Component {
                   characterGold={this.props.characterGold}
                 />
               :
-                <AlertInfo icon={'fas fa-question-circle'} title="Info">
-                  You need to unlock the Goblin Coin Bank Passive skill and level the building to level 5 or higher before you
-                  are able to convert your gold to gold bars.
-                </AlertInfo>
+                <div className="mt-2">
+                  <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                    You need to unlock the Goblin Coin Bank Passive skill and level the building to level 5 or higher before you
+                    are able to convert your gold to gold bars.
+                  </AlertInfo>
+                </div>
             }
           </Tab>
         </Tabs>

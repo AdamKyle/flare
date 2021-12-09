@@ -498,7 +498,7 @@ class KingdomResourcesService {
 
         if ($this->kingdom->current_morale > 0.50) {
             $characterSkill = $this->kingdom->character->skills->filter(function($skill) {
-                return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+                return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
             })->first();
 
             $currentTreasury = $this->kingdom->treasury;

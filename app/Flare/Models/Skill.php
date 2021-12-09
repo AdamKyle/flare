@@ -87,6 +87,18 @@ class Skill extends Model
         return true;
     }
 
+    public function getUnitTimeReductionAttribute() {
+        return $this->baseSkill->unit_time_reduction * $this->level;
+    }
+
+    public function getBuildingTimeReductionAttribute() {
+        return $this->baseSkill->building_time_reduction * $this->level;
+    }
+
+    public function getUnitMovementTimeReductionAttribute() {
+        return $this->baseSkill->unit_movement_time_reduction * $this->level;
+    }
+
     public function getReducesMovementTimeAttribute() {
 
         if (is_null($this->baseSkill->move_time_out_mod_bonus_per_level)) {

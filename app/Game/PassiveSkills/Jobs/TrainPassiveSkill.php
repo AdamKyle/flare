@@ -3,6 +3,7 @@
 namespace App\Game\PassiveSkills\Jobs;
 
 use App\Flare\Models\GameBuilding;
+use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Illuminate\Bus\Queueable;
@@ -131,5 +132,7 @@ class TrainPassiveSkill implements ShouldQueue
         $character = $this->character->refresh();
 
         event(new UpdateNotificationsBroadcastEvent($character->notifications()->where('read', false)->get(), $character->user));
+
+        event(new ServerMessageEvent($character->user, $characterPassiveSkill->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
     }
 }

@@ -64,7 +64,8 @@ class KingdomTransformer extends TransformerAbstract {
             'walls_defence'             => $kingdom->getWallsDefence(),
             'gold_bars_defence'         => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
-
+            'unit_time_reduction'       => $this->fetchTimeReductionBonus($kingdom, 'unit_time_reduction'),
+            'building_time_reduction'   => $this->fetchTimeReductionBonus($kingdom, 'building_time_reduction'),
         ];
     }
 
@@ -117,5 +118,19 @@ class KingdomTransformer extends TransformerAbstract {
         }
 
         return !$building->is_locked && BuildingActions::canAccessGoblinBank($building);
+    }
+
+    protected function fetchTimeReductionBonus(Kingdom $kingdom, string $timeReductionAttribute): float {
+        $character = $kingdom->character;
+
+        if (is_null($character)) {
+            return 0.0;
+        }
+
+        $skill = $character->skills->filter(function($skill) {
+            return $skill->type()->effectsKingdom();
+        })->first();
+
+        return $skill->{$timeReductionAttribute};
     }
 }

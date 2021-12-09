@@ -66,7 +66,7 @@ class SkillTypeValueTest extends TestCase {
     }
 
     public function testEffectsKingdomTreasury() {
-        $this->assertTrue((new SkillTypeValue(13))->effectsKingdomTreasury());
+        $this->assertTrue((new SkillTypeValue(13))->effectsKingdom());
     }
 
     public function testIsArtifactAnnulmentName() {

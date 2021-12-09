@@ -35,6 +35,10 @@ export default class BuildingCostSection extends React.Component {
     return building.time_increase;
   }
 
+  getHours() {
+    return ((1/60) * this.getTimeRequired()).toFixed(2);
+  }
+
   render() {
     return (
       <div className="row">
@@ -68,7 +72,7 @@ export default class BuildingCostSection extends React.Component {
                 }
               </strong>:
             </dt>
-            <dd>{this.getTimeRequired()} Minutes</dd>
+            <dd>{this.getTimeRequired()} Minutes, ~{this.getHours()} hrs.</dd>
           </dl>
         </div>
       </div>

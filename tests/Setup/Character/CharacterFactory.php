@@ -532,7 +532,7 @@ class CharacterFactory {
         $criticality     = $this->createGameSkill(['name' => 'Criticality']);
         $dodge           = $this->createGameSkill(['name' => 'Dodge']);
         $looting         = $this->createGameSkill(['name' => 'Looting']);
-        $lustForGold     = $this->createGameSkill(['name' => 'Lust for Gold', 'type' => SkillTypeValue::EFFECTS_KINGDOM_TREASURY]);
+        $lustForGold     = $this->createGameSkill(['name' => 'Lust for Gold', 'type' => SkillTypeValue::EFFECTS_KINGDOM]);
 
         $this->createSkill([
             'character_id'  => $this->character->id,

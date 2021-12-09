@@ -131,7 +131,7 @@ class NpcCommandHandler {
 
         if ($type->isQuest()) {
             if ($this->handleQuest($user, $npc)) {
-                $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' And has been rewarded with a godly gift!';
+                $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' and has been rewarded with a godly gift!';
                 $messageType = 'quest_complete';
             } else {
                 $messageType = 'no_quests';

@@ -182,7 +182,7 @@ class UnitService {
 
     protected function calculatueUnitRecrutmentTime(Character $character, int $time)  {
         $skillBonus = $character->skills->filter(function($skill) {
-            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first()->skill_bonus;
 
         return floor($time - $time * $skillBonus);

@@ -283,6 +283,10 @@ export default class BuildingManagementModal extends React.Component {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  calculateHours(number) {
+    return ((1/60) * number).toFixed(2);
+  }
+
   populationCost() {
     const amountOfPopLeft = this.state.populationRequired - this.props.kingdom.current_population;
     const price           = amountOfPopLeft * 10;
@@ -442,7 +446,7 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Cost per Level</dt>
                       <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
                       <dt>Time Needed (Minutes)</dt>
-                      <dd>{this.formatNumber(this.state.timeNeeded)}</dd>
+                      <dd>{this.formatNumber(this.state.timeNeeded)} ~ {this.calculateHours(this.state.timeNeeded)} hrs.</dd>
                       <dt>Total Gold</dt>
                       <dd>{this.formatNumber(this.state.costToUpgrade)}</dd>
                       <dt>Will Upgrade To Level:</dt>
