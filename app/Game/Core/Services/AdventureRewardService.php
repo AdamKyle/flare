@@ -54,13 +54,22 @@ class AdventureRewardService {
      */
     public function distributeRewards(array $rewards, Character $character): AdventureRewardService {
 
-        $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
+        if ($character->gold !== MaxCurrenciesValue::MAX_GOLD) {
+            $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
 
-        if (!$maxCurrencies->canNotGiveCurrency()) {
-            $character->gold += $rewards['gold'];
-            $character->save();
-        } else {
-            $this->messages[] = 'You are at or near, gold cap and get no gold for this adventure.';
+            if (!$maxCurrencies->canNotGiveCurrency()) {
+                $character->gold += $rewards['gold'];
+                $character->save();
+            } else {
+                $newAmount        = $character->gold + $rewards['gold'];
+                $subtractedAmount = $newAmount - MaxCurrenciesValue::MAX_GOLD;
+                $newAmount        = $newAmount - $subtractedAmount;
+
+                $character->gold = $newAmount;
+                $character->save();
+
+                $this->messages[] = 'You now are gold capped: ' . number_format($newAmount);
+            }
         }
 
         $this->handleXp($rewards['exp'], $character);
@@ -189,20 +198,30 @@ class AdventureRewardService {
     }
 
     protected function handleItems(array $items, Character $character): void {
-        $character = $character->refresh();
-        $newItemList = $items;
+        $character         = $character->refresh();
+        $newItemList       = $items;
+        $characterEmptySet = $character->inventorySets->filter(function($set) {
+            return $set->slots->isEmpty();
+        })->first();
 
         if (!empty($items)) {
             foreach ($items as $index => $item) {
                 $item = Item::find($item['id']);
 
                 if (!is_null($item)) {
-                    if ($character->isInventoryFull()) {
-                        $this->messages['error'] = 'Your inventory is full. You must clear some space, come back and finish collecting the remaining items.';
+                    if ($character->isInventoryFull() && !is_null($characterEmptySet) && $item->type !== 'quest') {
+                        $characterEmptySet->slots()->create([
+                            'inventory_id' => $character->inventory->id,
+                            'item_id'      => $item->id,
+                        ]);
 
-                        $this->itemsLeft = array_values($newItemList);
+                        $index     = $character->inventorySets->search(function($set) use ($characterEmptySet) {
+                            return $set->id === $characterEmptySet->id;
+                        });
 
-                        return;
+                        $this->messages[] = 'Item: '.$item->affix_name.' has been stored in Set: '.($index + 1).' as your inventory is full';
+                    } else if ($item->type !== 'quest' && $character->isInventoryFull()) {
+                        $this->messages[] = 'You failed to get the item: '.$item->affix_name.' as your inventory is full and you have no empty set.';
                     }
 
                     if ($item->type === 'quest') {
@@ -218,7 +237,7 @@ class AdventureRewardService {
 
                             $this->messages[] = 'You gained the item: ' . $item->affix_name;
                         }
-                    } else {
+                    } else if (!$character->isInventoryFull()) {
                         $character->inventory->slots()->create([
                             'inventory_id' => $character->inventory->id,
                             'item_id'      => $item->id,

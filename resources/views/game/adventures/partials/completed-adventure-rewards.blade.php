@@ -65,7 +65,7 @@
                       <div class="tw-group tw-inline-block">
                         <i class="fas fa-exclamation-circle tw-ml-2 tw-text-red-600 tw-cursor-pointer"></i>
                         <x-core.tooltips.tooltip>
-                          You already have this item or have had the item and upgrade it. You cannot obtain this item again.
+                          You already have this item or have had the item and upgraded it. You cannot obtain this item again.
                         </x-core.tooltips.tooltip>
                       </div>
                     @endif

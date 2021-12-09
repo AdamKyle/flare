@@ -77,6 +77,7 @@ class DropsCheckListener
         $user      = $character->user;
 
         if (!$character->isInventoryFull()) {
+
             if ($this->canHaveItem($character, $item)) {
                 $slot = $character->inventory->slots()->create([
                     'item_id' => $item->id,

@@ -207,7 +207,7 @@ class CharacterAdventureControllerTest extends TestCase
                 'adventureLog' => AdventureLog::first()->id,
             ]))->response;
 
-        $response->assertSessionHas('error', 'Your inventory is full. You must clear some space, come back and finish collecting the remaining items.');
+        $response->assertSessionDoesntHaveErrors();
     }
 
     public function testCannotDistributeRewardsWhenDead() {
