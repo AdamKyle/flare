@@ -42,6 +42,10 @@ class ServerMessageListener
                 $message = 'Gold Rush! You gained: ' . number_format($event->forMessage) . ' Gold!';
 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'gold_capped':
+                $message = 'You are now gold capped!';
+
+                return broadcast(new ServerMessage($event->user, $message));
             case 'gained_item':
                 $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse!';
 

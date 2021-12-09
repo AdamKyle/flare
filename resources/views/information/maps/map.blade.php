@@ -24,7 +24,7 @@
                             <dd>{{is_null($map->xp_bonus) ? 0 : $map->xp_bonus * 100}}%</dd>
                             <dt>Skill XP Bonus</dt>
                             <dd>{{is_null($map->skill_training_bonus) ? 0 : $map->skill_training_bonus * 100}}%</dd>
-                            <dt>drop Chance Bonus</dt>
+                            <dt>Drop Chance Bonus</dt>
                             <dd>{{is_null($map->drop_chance_bonus) ? 0 : $map->drop_chance_bonus * 100}}%</dd>
                             <dt>Enemy Stat Increase</dt>
                             <dd>{{is_null($map->enemy_stat_bonus) ? 0 : $map->enemy_stat_bonus * 100}}%</dd>

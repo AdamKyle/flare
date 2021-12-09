@@ -23,7 +23,7 @@ class AdventureCompletedRewards {
     ];
 
     public static function CombineRewards(array $rewards, Character $character) {
-        //dd($rewards);
+
         foreach ($rewards as $level => $levelRewards) {
             foreach ($levelRewards as $monster => $monsterRewards) {
 
@@ -75,39 +75,22 @@ class AdventureCompletedRewards {
         foreach ($monsterRewards['items'] as $item) {
             $foundItem = Item::find($item['id']);
 
+
             if ($foundItem->type === 'quest') {
-                // Do you have or have you completed a quest for this item?
                 if (self::canRecieveItem($character, $foundItem->id)) {
-                    // No duplicate items.
-                    if (!self::hasItemInRewards($foundItem->id)) {
-                        $item['can_have'] = true;
-                    }
+                    $item['can_have'] = true;
                 } else {
                     $item['can_have'] = false;
                 }
             } else {
-                // Always just give regular items:
                 $item['can_have'] = true;
             }
 
-
-            /**
-             * only in rare instances I have found by playing the game do we get here,
-             * where there could be duplicates.
-             *
-             */
-            if (!isset($item['can_have'])) {
-                // @codeCoverageIgnoreStart
-                continue;
-                // @codeCoverageIgnoreEnd
-            }
-
             $item['item'] = $foundItem;
-
-            $items[] = $item;
+            $items[]      = $item;
         }
 
-        self::$baseReward['items'] = [...self::$baseReward['items'], ...$items];
+        self::$baseReward['items'] = $items;
     }
 
     private static function hasItemInRewards(int $itemId): bool {

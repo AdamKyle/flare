@@ -123,6 +123,9 @@ class RandomItemDropBuilder {
 
         if (($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) && !($totalLevels >= 10)) {
             $query = $query->where('can_drop', true);
+        } else {
+            // Only drops up to 4 Billion is cost may drop.
+            $query = $query->where('cost', '<=', 4000000000);
         }
 
         return $query->first();
@@ -178,13 +181,12 @@ class RandomItemDropBuilder {
         $totalLevels = $this->monsterLevel - $this->characterLevel;
 
         $query = ItemAffix::inRandomOrder()->where('randomly_generated', false);
-
+        
         if ($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) {
             $query = $query->where('can_drop', true);
         } else {
-            if (!$totalLevels >= 10) {
-                $query = $query->where('can_drop', true);
-            }
+            // Only drops up to 4 billion.
+            $query = $query->where('cost', '<=', 4000000000);
         }
 
         if (!is_null($type)) {

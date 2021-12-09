@@ -71,6 +71,7 @@ class CharacterAdventureController extends Controller {
     }
 
     public function collectReward(Request $request, AdventureRewardService $adventureRewardService, AdventureLog $adventureLog) {
+
         $character = auth()->user()->character;
         $rewards   = $adventureLog->rewards;
 
