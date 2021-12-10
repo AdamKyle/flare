@@ -81,12 +81,14 @@ class ShopController extends Controller {
         $maxCurrencies = new MaxCurrenciesValue($character->gold + $totalSoldFor, MaxCurrenciesValue::GOLD);
 
         if ($maxCurrencies->canNotGiveCurrency()) {
-            return redirect()->back()->with('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+            $character->update([
+                'gold' => MaxCurrenciesValue::MAX_GOLD,
+            ]);
+        } else {
+            $character->update([
+                'gold' => $character->gold + $totalSoldFor,
+            ]);
         }
-
-        $character->update([
-            'gold' => $character->gold + $totalSoldFor,
-        ]);
 
         if ($totalSoldFor === 0) {
             return redirect()->back()->with('error', 'You have nothing that you can sell.');
@@ -160,7 +162,13 @@ class ShopController extends Controller {
         $maxCurrencies = new MaxCurrenciesValue($totalNewGold, MaxCurrenciesValue::GOLD);
 
         if ($maxCurrencies->canNotGiveCurrency()) {
-            return redirect()->back()->with('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+            $character->update([
+                'gold' => MaxCurrenciesValue::MAX_GOLD,
+            ]);
+        } else {
+            $character->update([
+                'gold' => $character->gold + $totalSoldFor,
+            ]);
         }
 
         event(new SellItemEvent($inventorySlot, $character));
