@@ -272,6 +272,14 @@ export default class SetTabSection extends React.Component {
           Empty Set
         </button>
         <hr />
+        <div className="form-inline">
+          <div className="form-group mb-2">
+            <label htmlFor="set-name" className="mr-2">Set Name</label>
+            <input type="text" className="form-control mr-2" id="set-name" value={this.props.setIndex} />
+          </div>
+          <button className="btn btn-primary mb-2">Rename Set</button>
+        </div>
+        <hr />
         {
           this.state.loading ?
             <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>

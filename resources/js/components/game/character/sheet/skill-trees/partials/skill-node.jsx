@@ -142,7 +142,7 @@ export default class SkillNode extends React.Component {
         <div>
           <strong>Current Level</strong>: {this.props.passive.current_level}</div>
         <div>
-          <strong>Time Till Next</strong>: {this.skillIsMaxed(this.props.passive) ? 'Maxed' : this.props.passive.current_level !== 0 ? (this.props.passive.hours_to_next * this.props.passive.current_level) : this.props.passive.hours_to_next  + ' Hr.'}
+          <strong>Time Till Next</strong>: {this.skillIsMaxed(this.props.passive) ? 'Maxed' : this.props.passive.hours_to_next  + ' Hrs.'}
         </div>
         <div>
           {

@@ -181,7 +181,7 @@ class RandomItemDropBuilder {
         $totalLevels = $this->monsterLevel - $this->characterLevel;
 
         $query = ItemAffix::inRandomOrder()->where('randomly_generated', false);
-        
+
         if ($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) {
             $query = $query->where('can_drop', true);
         } else {

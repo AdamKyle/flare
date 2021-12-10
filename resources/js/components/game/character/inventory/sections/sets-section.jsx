@@ -43,6 +43,7 @@ export default class SetsSection extends React.Component {
       >
         <SetTabSection
           set={s}
+          setIndex={'Set ' + (index + 1)}
           characterId={this.props.characterId}
         />
       </Tab>)

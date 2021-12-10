@@ -164,7 +164,7 @@ export default class BuildingQueue extends React.Component {
           of both gold and people.
         </p>
         <p>
-          These values below will update in real time, the longer you leave this modal open the small your amount to get back will be.
+          These values below will update in real time, the longer you leave this modal open the less gold you will get back.
         </p>
         <dl className="mt-2">
           <dt>Percentage of time elapsed</dt>

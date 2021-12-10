@@ -89,7 +89,7 @@ export default class TrainPassiveSkillModal extends React.Component {
             <dt>Hours till finished:</dt>
             <dd>{this.props.skill.hours_to_next}</dd>
             <dt>Bonus when finished:</dt>
-            <dd>{this.futureBonus() * 100}%</dd>
+            <dd>{(this.futureBonus() * 100).toFixed(0)}%</dd>
           </dl>
           <AlertInfo icon={'fas fa-question-circle'} title="Remember">
             <p>

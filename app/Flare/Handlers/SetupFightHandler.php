@@ -138,9 +138,10 @@ class SetupFightHandler {
             return true;
         }
 
-        $dc = 100 - 100 * $devouringLight;
+        $dc   = 100 - 100 * $devouringLight;
+        $roll = rand(1, 100);
 
-        return rand(1, 100) > $dc;
+        return $roll > $dc;
     }
 
     protected function getDefenderFromSpecialLocation($attacker, $defender) {
@@ -165,9 +166,10 @@ class SetupFightHandler {
             return true;
         }
 
-        $dc = 100 - 100 * $devouringDarknessChance;
+        $dc   = 100 - 100 * $devouringDarknessChance;
+        $roll = rand(1, 100);
 
-        return rand(1, 100) > $dc;
+        return $roll > $dc;
     }
 
     protected function reduceEnemyStats($defender) {

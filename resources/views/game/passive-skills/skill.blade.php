@@ -36,8 +36,8 @@
           <dd>{{$skill->is_locked ? 'Yes' : 'No'}}</dd>
         @endif
       </dl>
-      <p class="tw-mt-5"><sup>*</sup> Caution, this is not: <code>Max Level * Hours</code> for a total amount of hours. Each level will multiply the time needed by the next level.
-        Ie, level 2 at 3 hours (per level) will actually take 6 hours to complete.
+      <p class="tw-mt-5"><sup>*</sup> Hours till next is a calculation of your current level + 1 * the hours needed at level 0. Ie, a level 1 skill, that took 4 hours at level 0, will take 8 hours to get to level 2,
+        12 hours to get to level 3, 16 to get to level 4 and 20 to get to the max level of 5. Not all skills go to level five. Building passives will only go to level 1.
       </p>
     </x-core.cards.card>
     <h2 class="tw-font-light tw-mt-5">Child Skills</h2>

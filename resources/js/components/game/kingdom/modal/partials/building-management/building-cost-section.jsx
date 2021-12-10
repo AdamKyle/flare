@@ -72,7 +72,7 @@ export default class BuildingCostSection extends React.Component {
                 }
               </strong>:
             </dt>
-            <dd>{this.getTimeRequired()} Minutes, ~{this.getHours()} hrs.</dd>
+            <dd>{this.getTimeRequired()} Minutes, <span>(~{this.getHours()} hrs.)</span></dd>
           </dl>
         </div>
       </div>

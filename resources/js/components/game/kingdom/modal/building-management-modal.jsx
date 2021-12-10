@@ -434,7 +434,7 @@ export default class BuildingManagementModal extends React.Component {
                 }
               </div>
             </Tab>
-            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.buildingNeedsToBeRebuilt() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
+            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.canUpgrade() || this.buildingNeedsToBeRebuilt() || this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
               <div className="mt-4">
                 <Row>
                   <Col lg={12} xl={6}>
@@ -446,7 +446,7 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Cost per Level</dt>
                       <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
                       <dt>Time Needed (Minutes)</dt>
-                      <dd>{this.formatNumber(this.state.timeNeeded)} ~ {this.calculateHours(this.state.timeNeeded)} hrs.</dd>
+                      <dd>{this.formatNumber(this.state.timeNeeded)}, <span>(~{this.calculateHours(this.state.timeNeeded)} hrs.)</span></dd>
                       <dt>Total Gold</dt>
                       <dd>{this.formatNumber(this.state.costToUpgrade)}</dd>
                       <dt>Will Upgrade To Level:</dt>
