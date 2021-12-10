@@ -40,7 +40,7 @@ export default class BuildingManagementModal extends React.Component {
     const ironCostReduction         = this.props.kingdom.iron_cost_reduction;
     const populationCostReduction   = this.props.kingdom.population_cost_reduction;
 
-    if (this.state.level > 0) {
+    if (this.state.level >= 0) {
       return true;
     }
 
@@ -434,7 +434,7 @@ export default class BuildingManagementModal extends React.Component {
                 }
               </div>
             </Tab>
-            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.canUpgrade() || this.buildingNeedsToBeRebuilt() || this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
+            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={!this.canUpgrade() || this.buildingNeedsToBeRebuilt() || !this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
               <div className="mt-4">
                 <Row>
                   <Col lg={12} xl={6}>
