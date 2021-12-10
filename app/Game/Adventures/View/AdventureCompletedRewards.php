@@ -22,7 +22,6 @@ class AdventureCompletedRewards {
     ];
 
     public static function CombineRewards(array $rewards, Character $character) {
-
         foreach ($rewards as $level => $levelRewards) {
             foreach ($levelRewards as $monster => $monsterRewards) {
 
@@ -88,7 +87,13 @@ class AdventureCompletedRewards {
             $items[]      = $item;
         }
 
-        self::$baseReward['items'] = $items;
+        if (!self::hasItemInRewards($foundItem->id)) {
+            if (empty(self::$baseReward['items'])) {
+                self::$baseReward['items'] = $items;
+            } else {
+                self::$baseReward['items'] = array_merge(self::$baseReward['items'], $items);
+            }
+        }
     }
 
     private static function hasItemInRewards(int $itemId): bool {
