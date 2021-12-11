@@ -25,6 +25,7 @@ export default class PassiveSkillTree extends React.Component {
             cancelPassiveTrain={this.props.cancelPassiveTrain}
             updateTimer={this.updateTimer.bind(this)}
             isTimerRunning={this.state.timerIsRunning}
+            isDead={this.props.isDead}
           />}>
             {this.buildNodes(child)}
           </TreeNode>
@@ -55,6 +56,7 @@ export default class PassiveSkillTree extends React.Component {
           cancelPassiveTrain={this.props.cancelPassiveTrain}
           updateTimer={this.updateTimer.bind(this)}
           isTimerRunning={this.state.timerIsRunning}
+          isDead={this.props.isDead}
         />}
       >
         {this.buildNodes(this.props.passiveSkill)}

@@ -150,12 +150,12 @@ export default class SkillNode extends React.Component {
               <Fragment>
                 <button className="btn btn-sm btn-primary"
                         onClick={() => this.props.managePassiveTrainingModal(this.props.passive)}
-                        disabled={this.props.passive.is_locked || this.props.isTimerRunning || this.skillIsMaxed(this.props.passive)}
+                        disabled={this.props.passive.is_locked || this.props.isTimerRunning || this.skillIsMaxed(this.props.passive) || this.props.isDead}
                 >
                   Train
                 </button>
                 <button className="btn btn-sm btn-danger ml-2"
-                        onClick={() => this.props.cancelPassiveTrain(this.props.passive)}
+                        onClick={() => this.props.cancelPassiveTrain(this.props.passive) || this.props.isDead}
                 >
                   Stop
                 </button>
@@ -163,7 +163,7 @@ export default class SkillNode extends React.Component {
               :
               <button className="btn btn-sm btn-primary"
                       onClick={() => this.props.managePassiveTrainingModal(this.props.passive)}
-                      disabled={this.props.passive.is_locked || this.props.isTimerRunning || this.skillIsMaxed(this.props.passive)}
+                      disabled={this.props.passive.is_locked || this.props.isTimerRunning || this.skillIsMaxed(this.props.passive) || this.props.isDead}
               >
                 Train
               </button>

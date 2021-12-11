@@ -5,6 +5,7 @@ import TrainPassiveSkillModal from "../modals/train-passive-skill-modal";
 import AlertWarning from "../../components/base/alert-warning";
 import PassiveSkillTree from "./skill-trees/passive-skill-tree";
 import AlertInfo from "../../components/base/alert-info";
+import AlertError from "../../components/base/alert-error";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
@@ -306,6 +307,7 @@ export default class SkillDetails extends React.Component {
       <PassiveSkillTree
         passiveSkill={passiveSkill}
         characterId={this.props.characterId}
+        isDead={this.props.isDead}
         managePassiveTrainingModal={this.managePassiveTrainingModal.bind(this)}
         cancelPassiveTrain={this.cancelPassiveTrain.bind(this)}
       />
@@ -417,12 +419,20 @@ export default class SkillDetails extends React.Component {
                   You can click on each passive skill and see what you get per level, what it unlocks as you level it
                   and how much time it will take to level the skill.
                 </p>
-                <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
-                  <p>
-                    Canceling any skill in training, will still take the amount of hours as stated. The time you have spent training this skill,
-                    will <strong>not</strong> be taken into account when you go to train again.
-                  </p>
-                </AlertInfo>
+                {
+                  this.props.isDead ?
+                    <AlertError icon={"fas fa-skull-crossbones"} title={'You are dead'}>
+                      <p>
+                        Dead people cannot do things, such as manage their passive skills. Please revive before attempting to stop or train a passive skill.
+                      </p>
+                    </AlertError>
+                  : <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
+                      <p>
+                        Canceling any skill in training, will still take the amount of hours as stated. The time you have spent training this skill,
+                        will <strong>not</strong> be taken into account when you go to train again.
+                      </p>
+                    </AlertInfo>
+                }
                 <hr />
                 <dl className="mt-4">{this.renderPassiveSkills()}</dl>
               </div>

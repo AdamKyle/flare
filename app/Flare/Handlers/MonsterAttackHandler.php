@@ -198,19 +198,14 @@ class MonsterAttackHandler {
 
                     return;
                 } else {
-                    $attackerFocus = $attacker->focus / 2000000000;
+                    $dc   = 100 - 100 * $defenderReduction;
+                    $roll = rand(1, 100);
 
-                    if (!$attackerFocus >= 1.0) {
-                        $dc                = 50 + 50 * $attackerFocus;
-                        $roll              = rand(1, 100);
-                        $roll             += $roll * $defenderReduction;
+                    if ($roll > $dc) {
+                        $message = 'You evaded the enemies spells!';
+                        $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-                        if ($roll > $dc) {
-                            $message = 'You evaded the enemies spells!';
-                            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
-
-                            return;
-                        }
+                        return;
                     }
                 }
 

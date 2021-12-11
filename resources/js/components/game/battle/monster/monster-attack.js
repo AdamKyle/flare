@@ -177,46 +177,38 @@ export default class MonsterAttack {
     }
 
     if (attacker.spell_damage > 0) {
-      const attackerFocus = attacker.focus / 2000000000;
       const evasionChance = this.defender.spell_evasion;
-      let roll          = random(1, 100);
-      let damage          = attacker.spell_damage;
+      const dc            = Math.ceil(100 - (100 * evasionChance));
+      const roll          = random(1, 100);
 
-      if (attackerFocus >= 1.0) {
-        if (this.canDoCritical(attacker)) {
-          this.addMessage(attacker.name + ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)')
-
-          damage = damage * 2;
-        }
-
-        this.currentCharacterHealth = this.currentCharacterHealth - damage
-
-        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(damage));
-
-        return;
-      }
-
-      const chance = Math.abs(evasionChance - attackerFocus);
-      roll         = roll + roll * chance;
-
-      if (this.isBlocked(previousAttackType, defender, damage, isCharacterVoided)) {
-        this.addHealingMessage('You managed to block the enemies spells with your armour!');
-
-        return;
-      }
-
-      if (roll < evasionChance) {
-        if (this.canDoCritical(attacker)) {
-          this.addMessage(attacker.name + ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)')
-
-          damage = damage * 2;
-        }
-
-        this.currentCharacterHealth = this.currentCharacterHealth - damage
-
-        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(damage));
-      } else {
+      if (evasionChance >= 1.0) {
         this.addHealingMessage('You evade the enemies spells!');
+
+        return;
+      }
+
+      if (roll > dc) {
+        this.addHealingMessage('You evade the enemies spells!');
+      } else {
+        if (this.isBlocked(previousAttackType, defender, damage, isCharacterVoided)) {
+          this.addHealingMessage('You managed to block the enemies spells with your armour!');
+
+          return;
+        }
+
+        let damage = attacker.spell_damage;
+
+        if (this.canDoCritical(attacker)) {
+          this.addMessage(attacker.name + ' With a fury of hatred their spells fly viciously at you! (Critical Strike!)')
+
+          damage = damage * 2;
+        }
+
+        this.currentCharacterHealth = this.currentCharacterHealth - damage
+
+        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + this.formatNumber(damage));
+
+        return;
       }
     }
   }
