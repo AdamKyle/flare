@@ -686,7 +686,22 @@ class CharacterInformationBuilder {
             $voidance = $slot->item->{$type};
         }
 
-        return $voidance + $this->fetchVoidanceFromAffixes($type);
+        $bonuses    = [];
+        $itemsBonus = 0.0;
+
+        $equippedSlots = $this->fetchInventory()->filter(function($slot) {
+            return $slot->equipped;
+        })->all();
+
+        foreach ($equippedSlots as $slot) {
+            $bonuses[] = $slot->item->{$type};
+        }
+
+        if (!empty($bonuses)) {
+            $itemsBonus = max($bonuses);
+        }
+
+        return $voidance + $this->fetchVoidanceFromAffixes($type) + $itemsBonus;
     }
 
     private function fetchVoidanceFromAffixes(string $type): float {
