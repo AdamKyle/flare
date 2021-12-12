@@ -30,10 +30,14 @@ class AdventureController extends Controller {
             'can_adventure' => false,
         ]);
 
-        $character->adventureLogs()->create([
+        $adventureLog = $character->adventureLogs()->create([
             'character_id' => $character->id,
             'adventure_id' => $adventure->id,
             'in_progress'  => true,
+        ]);
+
+        $character->update([
+            'current_adventure_id' => $adventureLog->id,
         ]);
 
         $character = $character->refresh();
@@ -55,6 +59,7 @@ class AdventureController extends Controller {
             'can_craft'              => true,
             'can_adventure'          => true,
             'can_adventure_again_at' => null,
+            'current_adventure_id'   => null,
         ]);
 
         $adventureLog = $character->adventureLogs

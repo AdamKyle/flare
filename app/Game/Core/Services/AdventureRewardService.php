@@ -153,12 +153,16 @@ class AdventureRewardService {
             if ($totalLevels > 0) {
 
                 for ($i = 1; $i <= $totalLevels; $i++) {
-                    $this->giveSkillXP(100, $skill);
+                    $this->giveSkillXP($skill->xp_max, $skill);
 
                     $skill = $skill->refresh();
                 }
 
-                $leftOver = $xp - $totalLevels * 100;
+                if ($skill->xp_max < $xp) {
+                    $leftOver = $xp - $skill->xp_max;
+                } else {
+                    $leftOver = $xp;
+                }
 
                 $this->giveSkillXP($oldXP + $leftOver, $skill);
 

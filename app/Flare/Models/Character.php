@@ -25,6 +25,7 @@ class Character extends Model
         'damage_stat',
         'game_race_id',
         'game_class_id',
+        'current_adventure_id',
         'inventory_max',
         'can_attack',
         'can_move',
@@ -63,6 +64,7 @@ class Character extends Model
      */
     protected $casts = [
         'inventory_max'          => 'integer',
+        'current_adventure_id'   => 'integer',
         'can_attack'             => 'boolean',
         'can_move'               => 'boolean',
         'can_craft'              => 'boolean',

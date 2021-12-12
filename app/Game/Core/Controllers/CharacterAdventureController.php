@@ -46,26 +46,10 @@ class CharacterAdventureController extends Controller {
     public function currentAdventure() {
         $character    = auth()->user()->character;
 
-        $adventureId  = Cache::pull('current-adventure-' . $character->id);
-
-        if (is_null($adventureId)) {
-            // Because the json fields can be rather large, this can cause a:
-            // 1038 - Out of sort memory, consider increasing server sort buffer size
-            // We do not want that, so - to avoid this, we pluck the id's reverse the array, take the last id, find the
-            // adventure log based on that.
-            $adventureLogIds  = $character->adventureLogs()->pluck('id')->toArray();
-
-            rsort($adventureLogIds);
-
-            $adventureLog = $character->adventureLogs()->where('adventure_id', $adventureLogIds[0])->first();
-        } else {
-            $adventureLog = $character->adventureLogs()->where('adventure_id', $adventureId)->first();
-        }
-
-
+        $adventureLog = $character->adventureLogs()->find($character->current_adventure_id);
 
         if (is_null($adventureLog)) {
-            return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
+            return redirect()->to(route('game'))->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
         }
 
         // Update the corresponding notification:
@@ -82,7 +66,7 @@ class CharacterAdventureController extends Controller {
         return view('game.adventures.current-adventure', [
             'log'          => $adventureLog->logs[array_key_last($adventureLog->logs)],
             'adventureLog' => $adventureLog,
-            'character'    => $character,
+            'character'    => $character->refresh(),
         ]);
     }
 
@@ -119,6 +103,10 @@ class CharacterAdventureController extends Controller {
                 'rewards' => null,
             ]);
         }
+
+        $character->update([
+            'current_adventure_id' => null,
+        ]);
 
         $character = $character->refresh();
 
