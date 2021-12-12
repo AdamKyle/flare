@@ -218,7 +218,7 @@ class Skill extends Model
 
         $bonus = 0.0;
 
-        $bonus += $this->getItemBonuses($this->baseSkill);
+        $bonus += $this->getItemBonuses($this->baseSkill, 'skill_training_bonus');
         $bonus += $this->getCharacterBoonsBonus('skill_training_bonus');
 
         return $bonus;

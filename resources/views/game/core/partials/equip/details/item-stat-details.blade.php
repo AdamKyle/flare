@@ -21,6 +21,10 @@
     <dd class={{$item->healing_reduction > 0.0 ? 'text-success' : ''}}>{{$item->healing_reduction * 100}}%</dd>
     <dt>Enemy Enchantment Reduction:</dt>
     <dd class={{$item->affix_damage_reduction > 0.0 ? 'text-success' : ''}}>{{$item->affix_damage_reduction * 100}}%</dd>
+    <dt>Devouring Light <sup>***</sup>:</dt>
+    <dd class={{$item->devouring_light > 0.0 ? 'text-success' : ''}}>{{$item->devouring_light * 100}}%</dd>
+    <dt>Devouring Darkness <sup>***</sup>:</dt>
+    <dd class={{$item->devouring_darkness > 0.0 ? 'text-success' : ''}}>{{$item->devouring_darkness * 100}}%</dd>
     @if ($item->can_resurrect)
         <dt>Resurrection Chance <sup>rc</sup>:</dt>
         <dd class={{$item->resurrection_chance > 0.0 ? 'text-success' : ''}}>{{$item->resurrection_chance * 100}}%</dd>
@@ -46,6 +50,9 @@
 </p>
 <p>
     <sup>**</sup> Applies to all skills that increase this modifier.
+</p>
+<p>
+    <sup>***</sup> Either voids (Devouring light) or devoids (Devouring Darkness) the enemy. See <a href="/information/voidance" target="_blank">Voidance</a> for more info.
 </p>
 @if ($item->can_resurrect)
     <p>

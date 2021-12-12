@@ -44,15 +44,31 @@ class CharacterAdventureController extends Controller {
     }
 
     public function currentAdventure() {
-        $character = auth()->user()->character;
+        $character    = auth()->user()->character;
 
-        $adventureLog = $character->adventureLogs()->orderBy('id', 'desc')->first();
+        $adventureId  = Cache::pull('current-adventure-' . $character->id);
+
+        if (is_null($adventureId)) {
+            // Because the json fields can be rather large, this can cause a:
+            // 1038 - Out of sort memory, consider increasing server sort buffer size
+            // We do not want that, so - to avoid this, we pluck the id's reverse the array, take the last id, find the
+            // adventure log based on that.
+            $adventureLogIds  = $character->adventureLogs()->pluck('id')->toArray();
+
+            rsort($adventureLogIds);
+
+            $adventureLog = $character->adventureLogs()->where('adventure_id', $adventureLogIds[0])->first();
+        } else {
+            $adventureLog = $character->adventureLogs()->where('adventure_id', $adventureId)->first();
+        }
+
+
 
         if (is_null($adventureLog)) {
             return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
         }
 
-        // Update the coresponding notification:
+        // Update the corresponding notification:
         $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->where('read', false)->first();
 
         if (!is_null($notification)) {
