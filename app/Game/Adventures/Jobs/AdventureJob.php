@@ -89,10 +89,6 @@ class AdventureJob implements ShouldQueue
         if ($this->currentLevel === $this->adventure->levels) {
             Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
-            Cache::put('current-adventure-' . $this->character->id, [
-                'adventure_id' => $this->adventure->id,
-            ]);
-
             event(new UpdateTopBarEvent($this->character->refresh()));
         }
     }

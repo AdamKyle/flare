@@ -163,6 +163,21 @@ class CharacterAdventureControllerTest extends TestCase
              ->see('You have no currently completed adventure. Check your completed adventures for more details.');
     }
 
+    public function testCharacterCannotSeeLatestAdventureWithNoAdventureId()
+    {
+        $character = $this->character->getCharacter(false);
+        $user      = $this->character->getUser();
+
+        $character->update([
+            'current_adventure_id' => null,
+        ]);
+
+        $this->actingAs($user)
+            ->visitRoute('game') // So we have somewhere to redirect back too
+            ->visitRoute('game.current.adventure')
+            ->see('You have no currently completed adventure. Check your completed adventures for more details.');
+    }
+
     public function testDistributeRewards() {
         $user      = $this->character->getUser();
 

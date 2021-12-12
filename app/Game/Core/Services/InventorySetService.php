@@ -37,6 +37,26 @@ class InventorySetService {
     }
 
     /**
+     * Put an item into the characters inventory set.
+     *
+     * @param InventorySet $set
+     * @param Item $item
+     */
+    public function putItemIntoSet(InventorySet $set, Item $item) {
+        $set->slots()->create([
+            'inventory_set_id' => $set->id,
+            'item_id'          => $item->id
+        ]);
+
+        $set = $set->refresh();
+
+        // Is the inventory set still considered equipable?
+        $set->update([
+            'can_be_equipped' => $this->isSetEquippable($set),
+        ]);
+    }
+
+    /**
      * Allows us to remove an item from the set.
      *
      * Returns a response object.
