@@ -188,7 +188,7 @@ class Character extends Model
      * Allows one to get specific information from a character.
      *
      * By returning the CharacterInformationBuilder class, we can allow you to get
-     * multiple calulculated sets of data.
+     * multiple calculated sets of data.
      *
      * @return CharacterInformationBuilder
      */
