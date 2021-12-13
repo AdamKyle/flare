@@ -414,7 +414,7 @@ class CharacterInformationBuilder {
         if ($this->character->is_dead) {
             return 0;
         }
-        
+
         $baseHealth = $this->character->dur + 10;
 
         if ($voided) {

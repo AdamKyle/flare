@@ -169,7 +169,6 @@ class AttackAutomationTest extends TestCase
         ]]);
 
 
-
         AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
 
         $character = $character->refresh();
