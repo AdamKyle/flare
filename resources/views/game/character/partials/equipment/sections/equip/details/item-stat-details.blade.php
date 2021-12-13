@@ -15,6 +15,14 @@
     <dd class={{$item->spell_evasion > 0.0 ? 'text-success' : ''}}>{{$item->spell_evasion * 100}}%</dd>
     <dt>Artifact Annulment Modifier:</dt>
     <dd class={{$item->artifact_annulment > 0.0 ? 'text-success' : ''}}>{{$item->artifact_annulment * 100}}%</dd>
+    <dt>Enemy Healing Reduction:</dt>
+    <dd class={{$item->healing_reduction > 0.0 ? 'text-success' : ''}}>{{$item->healing_reduction * 100}}%</dd>
+    <dt>Enemy Enchantment Reduction:</dt>
+    <dd class={{$item->affix_damage_reduction > 0.0 ? 'text-success' : ''}}>{{$item->affix_damage_reduction * 100}}%</dd>
+    <dt>Devouring Light <sup>***</sup>:</dt>
+    <dd class={{$item->devouring_light > 0.0 ? 'text-success' : ''}}>{{$item->devouring_light * 100}}%</dd>
+    <dt>Devouring Darkness <sup>***</sup>:</dt>
+    <dd class={{$item->devouring_darkness > 0.0 ? 'text-success' : ''}}>{{$item->devouring_darkness * 100}}%</dd>
     @if ($item->can_resurrect)
         <dt>Resurrection Chance <sup>rc</sup>:</dt>
         <dd class={{$item->resurrection_chance > 0.0 ? 'text-success' : ''}}>{{$item->resurrection_chance * 100}}%</dd>

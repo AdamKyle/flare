@@ -56,6 +56,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterService::class),
                 $app->make(BuildCharacterAttackTypes::class),
                 $app->make(CharacterXPService::class),
+                $app->make(InventorySetService::class),
             );
         });
 

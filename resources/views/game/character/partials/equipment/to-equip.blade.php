@@ -13,6 +13,9 @@
         <p>
             <sup>**</sup> Applies to all skills that increase this modifier.
         </p>
+        <p>
+            <sup>***</sup> Either voids (Devouring light) or devoids (Devouring Darkness) the enemy. See <a href="/information/voidance" target="_blank">Voidance</a> for more info.
+        </p>
         @if ($itemToEquip->can_resurrect)
             <p>
                 <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.

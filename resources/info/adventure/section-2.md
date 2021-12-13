@@ -26,6 +26,15 @@ resurrect, these will not carry over between battles.
 Skill XP and XP can spill over, meaning if you do an adventure and are rewarded 1000 XP, that's ten levels you have just gained.
 The same is for Skill XP.
 
+### Regarding Items
+
+When you receive items from an adventure, if your inventory is full, we will find the first empty set and store the items there.
+
+If we cannot find an empty [set](/information/equipment-sets) to put the items into, you will lose the items.
+
+Should we have put items into an empty set, you run another adventure without clearing said empty set, we will not append items
+to the same set, we will just find the next empty set.
+
 ## Regarding Gold Rushes
 
 Gold rushes in adventures will use the gold you hve on hand each time you get a gold rush as opposed to doing it based on

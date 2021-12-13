@@ -171,7 +171,7 @@ class TraverseService {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are 
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
             feel the presence of death as it creeps ever closer. 
-            (Characters can walk on water here, monster strength is increased by 25% including Devouring Light. You are reduced by 25% while here.)';
+            (Characters can walk on water here, monster strength is increased by 35% including Devouring Light. You are reduced by 35% (Damage wise) while here.)';
 
             event(new MessageEvent($character->user,  $message));
 

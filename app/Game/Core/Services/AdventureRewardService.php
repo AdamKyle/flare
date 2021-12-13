@@ -46,11 +46,16 @@ class AdventureRewardService {
      * @param CharacterService $characterService
      * @return void
      */
-    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes, CharacterXPService $characterXPService) {
+    public function __construct(CharacterService $characterService,
+                                BuildCharacterAttackTypes $buildCharacterAttackTypes,
+                                CharacterXPService $characterXPService,
+                                InventorySetService $inventorySetService,
+    ) {
 
         $this->characterService          = $characterService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
         $this->characterXPService        = $characterXPService;
+        $this->inventorySetService       = $inventorySetService;
     }
 
     /**
@@ -212,12 +217,16 @@ class AdventureRewardService {
             if ($totalLevels > 0) {
 
                 for ($i = 1; $i <= $totalLevels; $i++) {
-                    $this->giveSkillXP(100, $skill);
+                    $this->giveSkillXP($skill->xp_max, $skill);
 
                     $skill = $skill->refresh();
                 }
 
-                $leftOver = $xp - $totalLevels * 100;
+                if ($skill->xp_max < $xp) {
+                    $leftOver = $xp - $skill->xp_max;
+                } else {
+                    $leftOver = $xp;
+                }
 
                 $this->giveSkillXP($oldXP + $leftOver, $skill);
 
@@ -269,10 +278,7 @@ class AdventureRewardService {
 
                 if (!is_null($item)) {
                     if ($character->isInventoryFull() && !is_null($characterEmptySet) && $item->type !== 'quest') {
-                        $characterEmptySet->slots()->create([
-                            'inventory_id' => $character->inventory->id,
-                            'item_id'      => $item->id,
-                        ]);
+                        $this->inventorySetService->putItemIntoSet($characterEmptySet, $item);
 
                         $index     = $character->inventorySets->search(function($set) use ($characterEmptySet) {
                             return $set->id === $characterEmptySet->id;
