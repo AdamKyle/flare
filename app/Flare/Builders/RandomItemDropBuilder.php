@@ -182,7 +182,7 @@ class RandomItemDropBuilder {
 
         $query = ItemAffix::inRandomOrder()->where('randomly_generated', false);
 
-        if ($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) {
+        if ($this->monsterPlane !== 'Shadow Plane' || is_null($this->location) && !($totalLevels >= 10)) {
             $query = $query->where('can_drop', true);
         } else {
             // Only drops up to 4 billion.

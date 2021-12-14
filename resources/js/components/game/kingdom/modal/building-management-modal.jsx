@@ -450,13 +450,13 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Max Level</dt>
                       <dd>{this.formatNumber(this.props.building.max_level)}</dd>
                       <dt>Population Required</dt>
-                      <dd>{this.formatNumber(this.state.populationRequired)}</dd>
+                      <dd>{this.formatNumber(this.state.populationRequired)} (-{(this.props.kingdom.population_cost_reduction * 100).toFixed()}%)</dd>
                       <dt>Cost per Level</dt>
                       <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
                       <dt>Time Needed (Minutes)</dt>
-                      <dd>{this.formatNumber(this.state.timeNeeded)}, <span>(~{this.calculateHours(this.state.timeNeeded)} hrs.)</span></dd>
+                      <dd>{this.formatNumber(this.state.timeNeeded)}, (~{this.calculateHours(this.state.timeNeeded)} hrs.) (-{(this.props.kingdom.building_time_reduction * 100).toFixed(0)}%)</dd>
                       <dt>Total Gold</dt>
-                      <dd>{this.state.level > 0 ? this.formatNumber(this.state.costToUpgrade * this.state.level) : 0}</dd>
+                      <dd>{this.state.level > 0 ? this.formatNumber(this.state.costToUpgrade * this.state.level) : 0} (-{(this.props.kingdom.building_cost_reduction * 100).toFixed()}%)</dd>
                       <dt>Will Upgrade To Level:</dt>
                       <dd>{this.getNewLevel()}</dd>
                     </dl>

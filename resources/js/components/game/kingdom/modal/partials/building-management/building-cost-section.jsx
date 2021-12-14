@@ -19,6 +19,7 @@ export default class BuildingCostSection extends React.Component {
     if (type === 'iron') {
       cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction + this.props.kingdom.iron_cost_reduction);
     } else if (type === 'population') {
+      console.log(cost);
       cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction + this.props.kingdom.population_cost_reduction);
     } else {
       cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction);

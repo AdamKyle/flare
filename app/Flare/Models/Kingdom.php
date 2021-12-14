@@ -88,27 +88,27 @@ class Kingdom extends Model implements Auditable
     }
 
     public function fetchDefenceBonusFromPassive(): float {
-        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_DEFENCE);
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_DEFENCE);
     }
 
     public function fetchResourceBonus(): float {
-        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
     }
 
     public function fetchUnitCostReduction(): float {
-        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
     }
 
     public function fetchBuildingCostReduction(): float {
-        return $this->getPercentage(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
     }
 
     public function fetchIronCostReduction(): float {
-        return $this->getPercentage(PassiveSkillTypeValue::IRON_COST_REDUCTION);
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::IRON_COST_REDUCTION);
     }
 
     public function fetchPopulationCostReduction(): float {
-        return $this->getPercentage(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
     }
 
     public function fetchKingdomDefenceBonus(): float {
@@ -176,7 +176,7 @@ class Kingdom extends Model implements Auditable
         return KingdomFactory::new();
     }
 
-    protected function getPercentage(int $passiveType): float {
+    protected function getPercentageForPassive(int $passiveType): float {
         $character    = $this->character;
 
         if (is_null($character)) {
