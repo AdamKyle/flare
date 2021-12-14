@@ -239,7 +239,7 @@ class KingdomBuildingService {
     }
 
     public function processUpgradeWithGold(KingdomBuilding $building, array $params) {
-        dd($params);
+
         $character = $building->kingdom->character;
 
         $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building, $params['time']));

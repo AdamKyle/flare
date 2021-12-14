@@ -68,7 +68,7 @@ export default class KingdomInfo extends React.Component {
       return 0;
     }
 
-    return building[0][type];
+    return Math.ceil(building[0][type] + building[0][type] * this.props.kingdom.building_cost_reduction);
   }
 
   getTotalMoraleIncreasePerHour() {
@@ -261,16 +261,17 @@ export default class KingdomInfo extends React.Component {
                 <hr />
                 <dl>
                   <dt><strong>Wood Increase/hr</strong>:</dt>
-                  <dd>{this.getResourceIncrease('wood_increase')}</dd>
+                  <dd>{this.getResourceIncrease('wood_increase')} (+{(this.props.kingdom.building_cost_reduction * 100).toFixed(0)}%)</dd>
                   <dt><strong>Clay Increase/hr</strong>:</dt>
-                  <dd>{this.getResourceIncrease('clay_increase')}</dd>
+                  <dd>{this.getResourceIncrease('clay_increase')} (+{(this.props.kingdom.building_cost_reduction * 100).toFixed(0)}%)</dd>
                   <dt><strong>Stone Increase/hr</strong>:</dt>
-                  <dd>{this.getResourceIncrease('stone_increase')}</dd>
+                  <dd>{this.getResourceIncrease('stone_increase')} (+{(this.props.kingdom.building_cost_reduction * 100).toFixed(0)}%)</dd>
                   <dt><strong>Iron Increase/hr</strong>:</dt>
-                  <dd>{this.getResourceIncrease('iron_increase')}</dd>
+                  <dd>{this.getResourceIncrease('iron_increase')} (+{(this.props.kingdom.building_cost_reduction * 100).toFixed(0)}%)</dd>
                   <dt><strong>Population Increase/hr</strong>:</dt>
-                  <dd>{this.getResourceIncrease('population_increase')}</dd>
+                  <dd>{this.getResourceIncrease('population_increase')} (+{(this.props.kingdom.building_cost_reduction * 100).toFixed(0)}%)</dd>
                 </dl>
+                <p className="mt-2">The additional percentage values come from you training: Building Management <a href="/information/passive-skills">Passive</a>.</p>
               </div>
               <div className="col-md-4">
                 <h4>Information</h4>

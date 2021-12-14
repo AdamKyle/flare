@@ -181,7 +181,10 @@ class KingdomBuilding extends Model
     }
 
     public function getTimeIncreaseAttribute() {
-        $time = (($this->level + 1) * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
+        $nextLevel    = $this->level + 1;
+        $timeIncrease = $this->gameBuilding->time_to_build;
+        $time         = $nextLevel + $timeIncrease;
+        $time         = $time + $time * $this->gameBuilding->time_increase_amount;
 
         $now  = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));
