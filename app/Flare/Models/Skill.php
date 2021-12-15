@@ -176,9 +176,8 @@ class Skill extends Model
 
         $baseBonus = $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'fight_time_out_mod_bonus', true);
-        $boons     = $this->getCharacterBoonsBonus( 'fight_time_out_mod_bonus');
 
-        return $baseBonus + $itemBonus + $boons;
+        return $baseBonus + $itemBonus;
     }
 
     public function getMoveTimeOutModAttribute() {
