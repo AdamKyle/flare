@@ -59,9 +59,8 @@ class DropsCheckListener
         } else {
             $canGetDrop = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
         }
-
-
-        //if ($canGetDrop) {
+        
+        if ($canGetDrop) {
             $drop = $this->randomItemDropBuilder
                          ->setLocation($locationWithEffect)
                          ->setMonsterPlane($event->monster->gameMap->name)
@@ -76,7 +75,7 @@ class DropsCheckListener
                     event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
                 }
             }
-        //}
+       }
 
         if (!is_null($event->monster->quest_item_id)) {
             $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $gameMapBonus, $event->adventure);

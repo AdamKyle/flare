@@ -78,6 +78,7 @@ class Item extends Model
         'affix_damage_reduction',
         'devouring_light',
         'devouring_darkness',
+        'parent_id',
     ];
 
     /**
@@ -92,6 +93,7 @@ class Item extends Model
         'cost'                             => 'integer',
         'gold_dust_cost'                   => 'integer',
         'shards_cost'                      => 'integer',
+        'parent_id'                        => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -148,6 +150,14 @@ class Item extends Model
 
     public function slot() {
         return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
+    }
+
+    public function children() {
+        return $this->hasMany($this, 'parent_id')->with('children');
+    }
+
+    public function parent() {
+        return $this->belongsTo($this, 'parent_id');
     }
 
     /**
