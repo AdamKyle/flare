@@ -87,8 +87,6 @@ class ItemModifiers extends Component
 
         $attributes['market_sellable'] = true;
 
-        dump($attributes);
-
         $this->item->children()->update($attributes);
     }
 
