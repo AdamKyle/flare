@@ -17,10 +17,7 @@ export default class BuildingCostSection extends React.Component {
     }
 
     if (type === 'iron') {
-      cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction + this.props.kingdom.iron_cost_reduction);
-    } else if (type === 'population') {
-      console.log(cost);
-      cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction + this.props.kingdom.population_cost_reduction);
+      cost = Math.floor(cost - cost * (this.props.kingdom.building_cost_reduction + this.props.kingdom.iron_cost_reduction));
     } else {
       cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction);
     }
@@ -31,11 +28,15 @@ export default class BuildingCostSection extends React.Component {
   getPopulationRequired() {
     const building = this.props.building;
 
+    let cost = 0;
+
     if (building.current_durability === 0) {
-      return building.level * building.base_population;
+      cost = building.level * building.base_population;
+    } else {
+      cost = (building.level + 1) * building.base_population;
     }
 
-    return building.population_required;
+    return Math.floor(cost - cost * (this.props.kingdom.building_cost_reduction + this.props.kingdom.population_cost_reduction));
   }
 
   getTimeRequired() {

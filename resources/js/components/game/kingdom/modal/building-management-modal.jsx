@@ -269,7 +269,7 @@ export default class BuildingManagementModal extends React.Component {
     let populationRequired = (level + 1) * this.props.building.raw_required_population;
 
     goldCost           -= Math.ceil(goldCost * this.props.kingdom.building_cost_reduction);
-    populationRequired -= (Math.ceil(populationRequired * this.props.kingdom.population_cost_reduction));
+    populationRequired -= (Math.ceil(populationRequired * (this.props.kingdom.population_cost_reduction + this.props.kingdom.building_cost_reduction)));
 
     this.setState({
       disabledButtons: !hasGold,
@@ -450,7 +450,7 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Max Level</dt>
                       <dd>{this.formatNumber(this.props.building.max_level)}</dd>
                       <dt>Population Required</dt>
-                      <dd>{this.formatNumber(this.state.populationRequired)} (-{(this.props.kingdom.population_cost_reduction * 100).toFixed()}%)</dd>
+                      <dd>{this.formatNumber(this.state.populationRequired)} (-{((this.props.kingdom.population_cost_reduction + this.props.kingdom.building_cost_reduction) * 100).toFixed()}%)</dd>
                       <dt>Cost per Level</dt>
                       <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
                       <dt>Time Needed (Minutes)</dt>

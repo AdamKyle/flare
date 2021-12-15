@@ -83,18 +83,11 @@ class ProcessAttackAutomation {
         if ($this->fightService->getMonsterHealth() <= 0) {
             BattleAttackHandler::dispatch($character->refresh(), $automation->monster_id)->onQueue('default_long');
         }
-        
-        $time = 10;
 
-        $time = $time - ($time * $this->findTimeReductions($character));
+        event(new AutomationAttackTimeOut($character->user, 10));
 
-        if ($time <= 0) {
-            $time = 1;
-        }
-
-        event(new AutomationAttackTimeOut($character->user, $time));
-        
-        return $time;
+        // The time until the next attack in seconds.
+        return 10;
     }
 
     protected function isCharacterAtSpecialLocation(Character $character): ?Location {

@@ -45,7 +45,7 @@ class GoldRushCheckListener
                 $goldRush         = $goldRush - $subtractedAmount;
 
                 $event->character->gold = $goldRush;
-                $event->charactr->save();
+                $event->character->save();
             } else {
                 $event->character->gold = $goldRush;
                 $event->character->save();
