@@ -92,9 +92,10 @@ class RandomItemDropBuilder {
      */
     public function generateItem(): Item {
 
-        $item          = $this->removeExpensiveAffixes($this->getItem())->refresh();
+        $item          = $this->getItem();
         $duplicateItem = $this->duplicateItem($item);
         $affix         = $this->fetchRandomItemAffix();
+
 
         if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
@@ -133,10 +134,16 @@ class RandomItemDropBuilder {
                             ->first();
 
                 if (is_null($foundItem)) {
-                    $item->update([
+                    $newItem = $this->duplicateItem($item);
+
+                    $newItem->update([
                         'market_sellable'              => true,
-                        'item_' . $affix->type . '_id' => $affix->id
+                        'item_' . $affix->type . '_id' => $affix->id,
+                        'parent_id'                    => $item->id,
                     ]);
+
+                    return $newItem->refresh();
+
                 } else {
                     return $foundItem;
                 }
@@ -145,15 +152,19 @@ class RandomItemDropBuilder {
             return $item;
         }
 
+
+
         $duplicateItem->update([
             'market_sellable' => true,
+            'parent_id'       => $item->id,
         ]);
 
         return $duplicateItem->refresh();
     }
 
     protected function getItem(): Item {
-        $query =  Item::inRandomOrder()->with(['itemSuffix', 'itemPrefix'])
+        $query =  Item::inRandomOrder()->doesntHave('itemSuffix')
+                                       ->doesntHave('itemPrefix')
                                        ->whereNotIn('type', ['artifact', 'quest', 'alchemy']);
 
 
