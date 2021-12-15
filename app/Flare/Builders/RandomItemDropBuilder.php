@@ -65,7 +65,7 @@ class RandomItemDropBuilder {
      */
     public function generateItem(): Item {
 
-        $item          = $this->getItem();
+        $item          = $this->removeExpensiveAffixes($this->getItem())->refresh();
         $duplicateItem = $this->duplicateItem($item);
         $affix         = $this->fetchRandomItemAffix();
 
@@ -76,6 +76,45 @@ class RandomItemDropBuilder {
         }
 
         if (is_null($duplicateItem)) {
+            if (is_null($item->itemSuffix) && is_null($item->itemPrefix)) {
+                $foundItem = Item::where('item_' . $affix->type . '_id', $affix->id)
+                            ->where('name', $item->name)
+                            ->get()
+                            ->filter(function($item) {
+                                $foundItem = null;
+
+                                if (!is_null($item->itemSuffix)) {
+                                    if ($item->itemSuffix->can_drop) {
+                                        $foundItem = $item;
+                                    } else {
+                                        $foundItem = null;
+                                    }
+                                }
+
+                                if (!is_null($item->itemPrefix)) {
+                                    if ($item->itemPrefix->can_drop) {
+                                        $foundItem = $item;
+                                    } else {
+                                        $foundItem = null;
+                                    }
+                                }
+
+                                if (!is_null($foundItem)) {
+                                    return $item;
+                                }
+                            })
+                            ->first();
+
+                if (is_null($foundItem)) {
+                    $item->update([
+                        'market_sellable'              => true,
+                        'item_' . $affix->type . '_id' => $affix->id
+                    ]);
+                } else {
+                    return $foundItem;
+                }
+            }
+
             return $item;
         }
 
@@ -103,7 +142,7 @@ class RandomItemDropBuilder {
         return $query->first();
     }
 
-    protected function attachAffixOrDelete(Item $duplicateItem, ItemAffix $affix) {
+    protected function attachAffixOrDelete(Item $duplicateItem, ItemAffix $affix): ?Item {
         if ($this->hasSameAffix($duplicateItem, $affix)) {
             $duplicateItem->delete();
         } else {
@@ -111,6 +150,41 @@ class RandomItemDropBuilder {
         }
 
         return null;
+    }
+
+    protected function removeExpensiveAffixes(Item $item): Item {
+        $clonedItem = $this->duplicateItem($item);
+        $prefix     = $clonedItem->itemPrefix;
+        $suffix     = $clonedItem->itemSuffix;
+
+        $totalLevels = $this->monsterLevel - $this->characterLevel;
+
+        if (is_null($item->itemPrefix) && is_null($item->itemSuffix)) {
+            $clonedItem->delete();
+
+            return $item;
+        }
+
+        if ($this->monsterPlane !== 'Shadow Plane' && !($totalLevels >= 10)) {
+
+            if (!is_null($prefix)) {
+                if (!$prefix->can_drop) {
+                    $clonedItem->update([
+                        'item_prefix_id' => null,
+                    ]);
+                }
+            }
+
+            if (!is_null($suffix)) {
+                if (!$suffix->can_drop) {
+                    $clonedItem->update([
+                        'item_suffix_id' => null,
+                    ]);
+                }
+            }
+        }
+
+        return $clonedItem;
     }
 
     protected function duplicateItem(Item $item): Item {
@@ -154,7 +228,7 @@ class RandomItemDropBuilder {
 
         $query = ItemAffix::inRandomOrder();
 
-        if ($this->monsterPlane !== 'Shadow Plane' && !$totalLevels >= 10) {
+        if ($this->monsterPlane !== 'Shadow Plane' && !($totalLevels >= 10)) {
             $query = $query->where('can_drop', true);
         } else {
             // Only drops up to 4 billion.

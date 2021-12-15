@@ -67,10 +67,29 @@ class ItemModifiers extends Component
             $message = 'Updated Item: ' . $this->item->refresh()->name;
         }
 
+        $this->updateChildItems();
+
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',
             'message' => $message,
         ]);
+    }
+
+    protected function updateChildItems() {
+        $attributes = $this->item->getAttributes();
+
+        unset($attributes['id']);
+        unset($attributes['item_prefix_id']);
+        unset($attributes['item_suffix_id']);
+        unset($attributes['created_at']);
+        unset($attributes['updated_at']);
+        unset($attributes['parent_id']);
+
+        $attributes['market_sellable'] = true;
+
+        dump($attributes);
+
+        $this->item->children()->update($attributes);
     }
 
     public function render()
