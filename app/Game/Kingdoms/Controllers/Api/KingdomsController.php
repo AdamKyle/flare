@@ -439,7 +439,7 @@ class KingdomsController extends Controller {
             $amountToBuy = 1000;
         }
 
-        $newGoldBars = $amount + $kingdom->gold_bars;
+        $newGoldBars = $amountToBuy + $kingdom->gold_bars;
 
         if ($newGoldBars > 1000) {
             return response()->json([
@@ -460,7 +460,7 @@ class KingdomsController extends Controller {
         ]);
 
         $kingdom->update([
-            'gold_bars' => $amount,
+            'gold_bars' => $newGoldBars,
         ]);
 
         $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
@@ -470,7 +470,9 @@ class KingdomsController extends Controller {
         event(new UpdateTopBarEvent($character->refresh()));
         event(new UpdateKingdom($character->user, $kingdom));
 
-        return response()->json([], 200);
+        return response()->json([
+            "message" => 'Purchased: ' . $amountToBuy . ' Gold bars.'
+        ], 200);
     }
 
     public function withdrawGoldBars(WithrawGoldBarsRequest $request, Kingdom $kingdom) {
@@ -493,17 +495,31 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
+        $newAmount = $kingdom->gold_bars - $amount;
+
+        if ($newAmount < 0) {
+            return response()->json([
+                'message' => "Child! You do not have that many gold bars!"
+            ], 422);
+        }
+
         $character->update([
             'gold' => $newGold,
         ]);
 
         $kingdom->update([
-            'gold_bars' => $kingdom->goldBars - $amount,
+            'gold_bars' => $newAmount,
         ]);
+
+        $kingdom  = new Item($kingdom->refresh(), $this->kingdom);
+
+        $kingdom  = $this->manager->createData($kingdom)->toArray();
 
         event(new UpdateTopBarEvent($character->refresh()));
         event(new UpdateKingdom($character->user, $kingdom));
 
-        return response()->json([], 200);
+        return response()->json([
+            'message' => 'Exchanged: ' . $amount . ' Gold bars for: ' . $totalGold . ' Gold!',
+        ], 200);
     }
 }

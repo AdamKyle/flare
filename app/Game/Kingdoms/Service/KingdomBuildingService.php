@@ -216,16 +216,11 @@ class KingdomBuildingService {
             return false;
         }
 
-        // If the new cost is greater than the request cost, we paid for population.
-        if ($cost > $params['cost_to_upgrade']) {
-            $kingdom->update([
-                'current_population' => 0,
-            ]);
-        } else {
-            $kingdom->update([
-                'current_population' => $kingdom->current_population - $params['pop_required'],
-            ]);
-        }
+        $newAmount =  $kingdom->current_population - $params['pop_required'];
+
+        $kingdom->update([
+            'current_population' => $newAmount > 0 ? $newAmount : 0
+        ]);
 
         $characterGold = $character->gold - $cost;
 

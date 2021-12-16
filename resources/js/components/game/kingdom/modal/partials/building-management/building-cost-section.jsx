@@ -41,12 +41,15 @@ export default class BuildingCostSection extends React.Component {
 
   getTimeRequired() {
     const building = this.props.building;
+    let timeNeeded = 0;
 
     if (building.current_durability === 0) {
-      return building.rebuild_time;
+      timeNeeded = building.rebuild_time;
+    } else {
+      timeNeeded = building.time_increase;
     }
 
-    return building.time_increase;
+    return Math.floor(timeNeeded - timeNeeded * this.props.kingdom.building_time_reduction);
   }
 
   getHours() {
@@ -81,7 +84,8 @@ export default class BuildingCostSection extends React.Component {
             <dt><strong>Population Cost</strong>:</dt>
             <dd>{this.getPopulationRequired()} (-{this.getPopulationDeduction()}%)</dd>
           </dl>
-          <p className="mt-3">The negative percentage values come from you training: Building Management <a href="/information/passive-skills">Passive</a>.</p>
+          <p className="mt-3">The negative percentage values come from you training: <a href="/information/passive-skills">Passive Skills</a> which help to reduce
+          things like resources needed, population needed and by training the Kingmanship skill to reduce time needed.</p>
         </div>
         <div className="col-md-6">
           <dl>
@@ -99,7 +103,7 @@ export default class BuildingCostSection extends React.Component {
                 }
               </strong>:
             </dt>
-            <dd>{this.getTimeRequired()} Minutes, <span>(~{this.getHours()} hrs.)</span></dd>
+            <dd>{this.getTimeRequired()} Minutes, (~{this.getHours()} hrs.), (-{(this.props.kingdom.building_time_reduction * 100).toFixed(0)}%)</dd>
           </dl>
         </div>
       </div>

@@ -222,6 +222,8 @@ export default class KingdomInfo extends React.Component {
                     </OverlayTrigger> :
                   </dt>
                   <dd>{this.getTreasury()}</dd>
+                  <dt>Gold Bars (Purchased from Goblin Bank):</dt>
+                  <dd>{this.props.kingdom.gold_bars}</dd>
                 </dl>
               </div>
               <div className="col-md-6">

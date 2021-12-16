@@ -460,6 +460,8 @@ export default class BuildingManagementModal extends React.Component {
                       <dt>Will Upgrade To Level:</dt>
                       <dd>{this.getNewLevel()}</dd>
                     </dl>
+                    <p className="mt-3">The negative percentage values come from you training: <a href="/information/passive-skills">Passive Skills</a> which help to reduce
+                      things like resources needed, population needed and by training the Kingmanship skill to reduce time needed.</p>
                   </Col>
                   <Col lg={12} xl={6}>
                     <div className="tw-overflow-x-auto tw-max-h-52">
