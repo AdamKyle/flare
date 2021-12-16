@@ -28,7 +28,7 @@ class AttackTimeOutListener
         }
 
         if ($time <= 0) {
-            $time = 2;
+            $time = 5;
         }
 
         $event->character->update([

@@ -165,7 +165,13 @@ class Skill extends Model
         $baseBonus = $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'fight_time_out_mod_bonus', true);
 
-        return $baseBonus + $itemBonus;
+        $total = $baseBonus + $itemBonus;
+
+        if ($total >= 0.50) {
+            return 0.50;
+        }
+
+        return $total;
     }
 
     public function getMoveTimeOutModAttribute() {
@@ -180,13 +186,17 @@ class Skill extends Model
         $baseBonus = $this->calculateTotalTimeBonus($this, 'move_time_out_mod_bonus_per_level');
 
 
-        return $itemBonus + $baseBonus;
+        return $value + $itemBonus + $baseBonus;
     }
 
     public function getSkillBonusAttribute() {
         if (is_null($this->character)) {
             // Monsters base skill:
             return ($this->baseSkill->skill_bonus_per_level * $this->level);
+        }
+
+        if (is_null($this->baseSkill->skill_bonus_per_level)) {
+            return 0.0;
         }
 
         $bonus = ($this->baseSkill->skill_bonus_per_level * ($this->level - 1));
@@ -211,10 +221,6 @@ class Skill extends Model
     }
 
     public function getSkillTrainingBonusAttribute() {
-        if (is_null($this->character)) {
-            return 0;
-        }
-
         $bonus = 0.0;
 
         $bonus += $this->getItemBonuses($this->baseSkill, 'skill_training_bonus');
