@@ -136,6 +136,7 @@ class CharacterFactory {
 
         foreach ($gameMaps as $map) {
             $this->character->factions()->create([
+                'current_level' => 1,
                 'character_id'  => $this->character->id,
                 'game_map_id'   => $map->id,
                 'points_needed' => FactionLevel::getPointsNeeded(0),

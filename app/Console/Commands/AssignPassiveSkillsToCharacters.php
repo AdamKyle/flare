@@ -6,6 +6,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\PassiveSkill;
 use Illuminate\Console\Command;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AssignPassiveSkillsToCharacters extends Command
 {
     /**

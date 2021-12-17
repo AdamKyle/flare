@@ -5,6 +5,9 @@ namespace App\Console\Commands;
 use App\Flare\Models\Item;
 use Illuminate\Console\Command;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AssignParentChildRelationsToEnchantedItems extends Command
 {
     /**

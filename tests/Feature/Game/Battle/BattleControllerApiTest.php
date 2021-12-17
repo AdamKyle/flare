@@ -383,6 +383,87 @@ class BattleControllerApiTest extends TestCase
         $this->assertTrue(count($character->inventory->slots) > 1);
     }
 
+    public function testBattleIsOverAndGetsFactionItem() {
+        Event::fake([
+            ServerMessageEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+        ]);
+
+        $this->createItem();
+        $this->createItemAffix();
+
+        $character   = $this->character->getCharacter(false);
+
+        $character->factions()->update([
+            'current_points' => 499
+        ]);
+
+        $character   = $character->refresh();
+        $user        = $this->character->getUser();
+        $monster     = $this->monster->getMonster();
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type' => 'monster',
+                'monster_id' => $monster->id,
+            ])
+            ->response;
+
+        $character = $this->character->getCharacter(false);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue(count($character->inventory->slots) > 1);
+
+        $this->assertNotNull($character->factions()->where('points_needed', 2000)->first());
+    }
+
+    public function testBattleIsOverAndGetsFactionItemForMaxFactionLevel() {
+        Event::fake([
+            ServerMessageEvent::class,
+            GoldRushCheckEvent::class,
+            AttackTimeOutEvent::class,
+            UpdateTopBarBroadcastEvent::class,
+        ]);
+
+        $this->createItem();
+        $this->createItemAffix();
+
+        $character   = $this->character->getCharacter(false);
+
+        $character->factions()->update([
+            'current_level'  => 4,
+            'current_points' => 7999,
+        ]);
+
+        $character   = $character->refresh();
+        $user        = $this->character->getUser();
+        $monster     = $this->monster->getMonster();
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type' => 'monster',
+                'monster_id' => $monster->id,
+            ])
+            ->response;
+
+        $character = $this->character->getCharacter(false);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue(count($character->inventory->slots) > 1);
+
+        $this->assertNotNull($character->factions()->where('maxed', true)->first());
+    }
+
     public function testBattleResultsMonsterIsDeadAndCharacterGainedItemFromShadowPlane() {
         Event::fake([
             ServerMessageEvent::class,

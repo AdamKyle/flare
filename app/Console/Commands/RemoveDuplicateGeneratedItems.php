@@ -8,6 +8,9 @@ use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
 
+/**
+ * @codeCoverageIgnore
+ */
 class RemoveDuplicateGeneratedItems extends Command
 {
     /**

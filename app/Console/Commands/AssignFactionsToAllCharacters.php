@@ -7,6 +7,9 @@ use App\Flare\Models\GameMap;
 use App\Game\Core\Values\FactionLevel;
 use Illuminate\Console\Command;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AssignFactionsToAllCharacters extends Command
 {
     /**

@@ -86,8 +86,9 @@ class ProcessAttackAutomation {
 
         event(new AutomationAttackTimeOut($character->user, 10));
 
-        // The time until the next attack in seconds.
-        return 10;
+        $time = 10 - 10 * $this->findTimeReductions($character);
+
+        return $time;
     }
 
     protected function isCharacterAtSpecialLocation(Character $character): ?Location {
@@ -109,7 +110,6 @@ class ProcessAttackAutomation {
         $skill = $character->skills->filter(function($skill) {
             return ($skill->fight_time_out_mod > 0.0) && is_null($skill->baseSkill->game_class_id);
         })->first();
-
 
         if (is_null($skill)) {
             return 0;

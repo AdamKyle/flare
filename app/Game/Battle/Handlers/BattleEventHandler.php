@@ -127,7 +127,7 @@ class BattleEventHandler {
 
             $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
-            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->level) . ' of ' . $mapName));
+            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->current_level) . ' of ' . $mapName));
 
             return;
 

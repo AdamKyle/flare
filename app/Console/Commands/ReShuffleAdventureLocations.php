@@ -6,6 +6,9 @@ use App\Flare\Models\Adventure;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @codeCoverageIgnore
+ */
 class ReShuffleAdventureLocations extends Command
 {
     /**
