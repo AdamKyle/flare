@@ -11,7 +11,7 @@
               href="{{route('affixes.create')}}"
               css="tw-ml-2"
             >
-                Create Passive
+                Create Affix
             </x-core.buttons.link-buttons.primary-button>
             <x-core.buttons.link-buttons.primary-button
               href="{{route('affixes.export')}}"
