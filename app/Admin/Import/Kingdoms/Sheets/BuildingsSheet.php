@@ -16,7 +16,9 @@ class BuildingsSheet implements ToCollection {
 
                 $cleanData    = $this->returnCleanBuildingData($buildingData);
 
-                GameBuilding::updateOrCreate(['name' => $cleanData['name']], $cleanData);
+                if (isset($cleanData['name'])) {
+                    GameBuilding::updateOrCreate(['name' => $cleanData['name']], $cleanData);
+                }
             }
         }
     }
@@ -32,6 +34,8 @@ class BuildingsSheet implements ToCollection {
 
                     if (!is_null($passive)) {
                         $value = $passive->id;
+                    } else {
+                        return $cleanData;
                     }
                 }
 

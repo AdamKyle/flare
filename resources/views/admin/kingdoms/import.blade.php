@@ -18,6 +18,9 @@
                 <p>
                     Import will only assign new buildings to players kingdoms.
                 </p>
+                <p>
+                    If the building has a passive skill and the passive skill does not exist, the building will be ignored and not imported.
+                </p>
             </x-core.alerts.warning-alert>
 
             <div class="mt-4">

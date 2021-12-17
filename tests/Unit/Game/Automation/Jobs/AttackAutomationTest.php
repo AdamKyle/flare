@@ -67,10 +67,10 @@ class AttackAutomationTest extends TestCase
     }
 
     public function testAutomationJobTookTooLong() {
-        $character = $this->character->getCharacter();
+        $character = $this->character->assignFactionSystem()->getCharacter();
 
         $monster   = $this->createMonster([
-            'health_range' => '1-1',
+            'health_range' => '999-99999',
             'dex'          => 0,
             'agi'          => 0,
             'attack_range' => '1-1',
