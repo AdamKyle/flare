@@ -23,7 +23,7 @@
     @endguest
 
 @endif
-<x-core.tabs.container ulCss="tw-justify-center" useHr="true" tabsId="unit-details" contentId="unit-details-section">
+<x-core.tabs.container ulCss="justify-center" useHr="true" tabsId="unit-details" contentId="unit-details-section">
     <x-slot name="tabs">
         <x-core.tabs.tab active="true"  id="unit-costs" href="unit-costs">Cost</x-core.tabs.tab>
         <x-core.tabs.tab active="false" id="unit-time-info" href="unit-time-info">Recruit/Movement Time</x-core.tabs.tab>

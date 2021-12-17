@@ -7,11 +7,11 @@
 
 <x-core.grids.two-column>
     <x-slot name="columnOne">
-        <h2 class="mt-2 tw-font-light">{!! $title !!}</h2>
+        <h2 class="mt-2 font-light">{!! $title !!}</h2>
     </x-slot>
     <x-slot name="columnTwo">
-        <div class="tw-relative">
-            <div class="tw-float-right">
+        <div class="relative">
+            <div class="float-right">
                 @switch($color)
                     @case('success')
                         <x-core.buttons.link-buttons.success-button href="{{$route}}">

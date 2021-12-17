@@ -1,4 +1,4 @@
-<x-core.cards.card css="tw-mt-5 tw-w-full tw-m-auto">
+<x-core.cards.card css="mt-5 w-full m-auto">
     <x-core.alerts.warning-alert title="Caution!">
         <p>Should an <a href="/information/npcs">NPC</a> offer any currency based quests, the currency quests will be done in order of currency from smallest to largest!</p>
         <p>The exception is if you have the specific item and the currency, although not if another currency quest (with no item) precedes it.</p>

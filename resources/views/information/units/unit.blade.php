@@ -3,8 +3,8 @@
 ])
 
 @section('content')
-    <div class="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
-        <x-core.cards.card-with-title title="{{$unit->name}}" css="tw-mt-5 tw-m-auto">
+    <div class="mt-20 mb-10 w-full lg:w-3/5 m-auto">
+        <x-core.cards.card-with-title title="{{$unit->name}}" css="mt-5 m-auto">
             @include('admin.kingdoms.units.partials.unit-attributes', [
                 'unit'          => $unit,
                 'building'      => $building,

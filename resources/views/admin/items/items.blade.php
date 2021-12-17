@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="tw-w-full lg:tw-w-3/4 tw-m-auto">
+    <div class="w-full lg:w-3/4 m-auto">
         <div class="row page-titles">
             <div class="col-md-6 align-self-left">
                 <h4 class="mt-3">Items</h4>

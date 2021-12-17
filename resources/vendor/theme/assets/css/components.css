@@ -649,7 +649,7 @@ Menu Bar
       @apply duration-200 ease-linear;
 
       .icon {
-        @apply inline-block text-4xl leading-none;
+        @apply inline-block text-2xl leading-none;
       }
 
       .title {
@@ -691,7 +691,7 @@ Menu Bar
       @apply flex items-center mb-5 text-gray-700;
 
       span {
-        @apply mr-2 text-2xl leading-none text-gray-600;
+        @apply mr-2 text-xs leading-none text-gray-600;
       }
 
       &:hover {

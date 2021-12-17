@@ -7,10 +7,10 @@
     $css = '';
 
     if ($active !== 'true') {
-        $css = 'tw-hidden';
+        $css = 'hidden';
     }
 @endphp
 
-<div id="{{$id}}" class="{{'tw-p-4 ' . $css}}">
+<div id="{{$id}}" class="{{'p-4 ' . $css}}">
   {{$slot}}
 </div>

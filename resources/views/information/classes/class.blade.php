@@ -1,9 +1,9 @@
 @extends('layouts.information')
 
 @section('content')
-    <x-core.cards.card-with-title title="{{$class->name}}" css="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-1/2 tw-m-auto">
-        <div class="tw-flex tw-flex-wrap tw--mx-2 tw-mb-8">
-            <div class="tw-w-full md:tw-w-1/2 tw-px-2 tw-mb-4">
+    <x-core.cards.card-with-title title="{{$class->name}}" css="mt-20 mb-10 w-full lg:w-1/2 m-auto">
+        <div class="flex flex-wrap -mx-2 mb-8">
+            <div class="w-full md:w-1/2 px-2 mb-4">
                 <dl>
                     <dt>Strength Mofidfier</dt>
                     <dd>+ {{$class->str_mod}} pts.</dd>
@@ -25,7 +25,7 @@
                     <dd>+ {{$class->deffense_mod * 100}} %</dd>
                 </dl>
             </div>
-            <div class="tw-w-full md:tw-w-1/2 tw-px-2 tw-mb-4">
+            <div class="w-full md:w-1/2 px-2 mb-4">
                 @if ($class->gameSkills->isNotEmpty())
                     <h5>Class Skills</h5>
                     <ul>
@@ -58,7 +58,7 @@
             </div>
         </div>
     </x-core.cards.card-with-title>
-    <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto tw-mb-10">
+    <x-core.cards.card css="mt-5 w-full lg:w-1/2 m-auto mb-10">
         @if ($class->type()->isFighter())
             @include('information.classes.partials.fighter')
         @endif

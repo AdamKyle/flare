@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <x-core.cards.card css="tw-mt-5 lg:tw-w-3/4 tw-m-auto">
+        <x-core.cards.card css="mt-5 lg:w-3/4 m-auto">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage" />
                 <x-data-tables.search wire:model="search" />

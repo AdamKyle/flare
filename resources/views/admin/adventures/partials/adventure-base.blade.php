@@ -1,5 +1,5 @@
-<div class="md:tw-w-3/4 tw-w-full tw-m-auto">
-    <x-core.cards.card css="tw-mt-5 tw-mb-5 tw-w-full tw-m-auto">
+<div class="md:w-3/4 w-full m-auto">
+    <x-core.cards.card css="mt-5 mb-5 w-full m-auto">
         <p>{{$adventure->description}}</p>
         <hr />
         <dl>
@@ -35,11 +35,11 @@
             @endif
         @endguest
     </x-core.cards.card>
-    <h2 class="tw-font-light">Found At</h2>
+    <h2 class="font-light">Found At</h2>
     @livewire('admin.locations.data-table', [
         'adventureId' => $adventure->id,
     ])
-    <x-core.cards.card-with-title title="With Monsters" css="tw-mt-5 tw-w-full tw-m-auto">
+    <x-core.cards.card-with-title title="With Monsters" css="mt-5 w-full m-auto">
     <p class="text-muted mb-2" style="font-size: 12px;"><em>Monsters are selected at random for each adventure level.</em></p>
     @livewire('admin.monsters.data-table', [
         'adventureId' => $adventure->id

@@ -1,4 +1,4 @@
-<div class="tw-mt-5">
+<div class="mt-5">
   <x-tabs.pill-tabs-container>
       <x-tabs.tab
         tab="effects-stats"

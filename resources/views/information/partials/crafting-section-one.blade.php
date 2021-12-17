@@ -1,4 +1,4 @@
-<p class="tw-mt-5">
+<p class="mt-5">
     When you see these in item tables, you can click on their names.
     They are still links that will open in a new tab and show you 
     the details of that item.

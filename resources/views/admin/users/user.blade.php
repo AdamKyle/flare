@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="tw-w-full lg:tw-w-3/4 tw-m-auto">
+    <div class="w-full lg:w-3/4 m-auto">
         <x-core.page-title
           title="{{$character->name . '(LV: ' . number_format($character->level) . ')'}}"
           route="{{route('users.list')}}}}"
@@ -37,7 +37,7 @@
             </x-core.cards.card>
         @endif
 
-        <x-core.cards.card css="tw-mb-5">
+        <x-core.cards.card css="mb-5">
             <strong>Current Gold</strong>: {{number_format($character->gold)}}
         </x-core.cards.card>
 
@@ -135,7 +135,7 @@
             </div>
         </x-core.cards.card>
 
-        <h4 class="tw-mt-5">Currently Equipped</h4>
+        <h4 class="mt-5">Currently Equipped</h4>
         <hr />
 
         @livewire('character.inventory.data-table', [

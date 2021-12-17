@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-3/4 tw-m-auto">
+        <x-core.cards.card css="mt-5 w-full lg:w-3/4 m-auto">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage" />
                 <x-data-tables.search wire:model="search" />
@@ -51,7 +51,7 @@
                     @endif
 
                     @forelse($logs as $log)
-                        <tr wire:key="attack-logs-table-{{$log->id}}" class="{{$log->opened ? '' : 'tw-bg-yellow-300 tw-bg-opacity-50'}}">
+                        <tr wire:key="attack-logs-table-{{$log->id}}" class="{{$log->opened ? '' : 'bg-yellow-300 bg-opacity-50'}}">
                             <td>
                                 <input type="checkbox" wire:model="selected" value="{{$log->id}}"/>
                             </td>
@@ -59,7 +59,7 @@
                                 @if (!KingdomLogStatus::statusType($log->status)->lostKingdom())
                                     <a href="{{
                                         route('game.kingdom.attack-log', ['character' => $character, 'kingdomLog' => $log])
-                                    }}" class="tw-text-blue-800 hover:tw-text-blue-900 active:tw-text-blue-800">
+                                    }}" class="text-blue-800 hover:text-blue-900 active:text-blue-800">
                                         {{$log->status}}
                                     </a>
                                 @else

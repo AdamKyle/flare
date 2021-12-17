@@ -1,8 +1,8 @@
 @extends('layouts.information')
 
 @section('content')
-    <div class="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
-        <div class="tw-m-auto">
+    <div class="mt-20 mb-10 w-full lg:w-3/5 m-auto">
+        <div class="m-auto">
             <x-core.page-title
               title="{{$quest->name}}"
               route="{{url()->previous()}}"
@@ -19,7 +19,7 @@
                 Hunting Expedition followed by The Key to Disenchanting, before being able to get The Creepy Baby Doll.</p>
             <p>That's a total of 55k <a href="/information/currencies">Gold Dust</a> you need.</p>
         </x-core.alerts.warning-alert>
-        <div class="tw-m-auto">
+        <div class="m-auto">
             @include('admin.quests.partials.show', ['quest' => $quest, 'lockedSkill' => $lockedSkill])
         </div>
     </div>

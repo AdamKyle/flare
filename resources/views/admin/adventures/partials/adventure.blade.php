@@ -1,5 +1,5 @@
 
-<div class="tw-w-full md:tw-w-3/4 tw-m-auto">
+<div class="w-full md:w-3/4 m-auto">
     <x-core.page-title
         title="{{$adventure->name}}"
         route="{{url()->previous()}}"

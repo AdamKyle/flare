@@ -3,7 +3,7 @@
 ])
 
 @section('content')
-    <div class="tw-w-full lg:tw-w-3/5 tw-m-auto tw-mt-20 tw-mb-10">
+    <div class="w-full lg:w-3/5 m-auto mt-20 mb-10">
         <x-core.page-title
           title="{{$map->name}}"
           route="{{url()->previous()}}"
@@ -67,28 +67,28 @@
                     'onlyMapName' => $map->name,
                     'withCelestials' => false,
                 ])
-                <h3 class="tw-mt-5">Celestials</h3>
+                <h3 class="mt-5">Celestials</h3>
                 <hr />
                 @livewire('admin.monsters.data-table', [
                     'onlyMapName' => $map->name,
                     'withCelestials' => true,
                 ])
-                <h3 class="tw-mt-5">NPC's</h3>
+                <h3 class="mt-5">NPC's</h3>
                 <hr />
                 @livewire('admin.npcs.data-table', [
                     'forMap' => $map->id,
                 ])
-                <h3 class="tw-mt-5">Quests</h3>
+                <h3 class="mt-5">Quests</h3>
                 <hr />
                 @livewire('admin.quests.data-table', [
                     'forMap' => $map->id,
                 ])
-                <h3 class="tw-mt-5">Adventures</h3>
+                <h3 class="mt-5">Adventures</h3>
                 <hr />
                 @livewire('admin.adventures.data-table', [
                     'gameMapId' => $map->id,
                 ])
-                <h3 class="tw-mt-5">Locations</h3>
+                <h3 class="mt-5">Locations</h3>
                 <hr />
                 @livewire('admin.locations.data-table', [
                     'gameMapId' => $map->id,

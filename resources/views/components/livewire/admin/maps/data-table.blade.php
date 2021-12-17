@@ -1,4 +1,4 @@
-<x-core.cards.card css="tw-mt-5 tw-m-auto">
+<x-core.cards.card css="mt-5 m-auto">
   <div class="row pb-2">
     <x-data-tables.per-page wire:model="perPage" />
     <x-data-tables.search wire:model="search" />

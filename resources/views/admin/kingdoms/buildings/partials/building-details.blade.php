@@ -1,5 +1,5 @@
-<x-core.cards.card-with-title title="{{$building->name}}" css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto">
-  <x-core.tabs.container ulCss="tw-justify-center" useHr="true" tabsId="building-details" contentId="building-details-section">
+<x-core.cards.card-with-title title="{{$building->name}}" css="mt-5 w-full lg:w-1/2 m-auto">
+  <x-core.tabs.container ulCss="justify-center" useHr="true" tabsId="building-details" contentId="building-details-section">
     <x-slot name="tabs">
       <x-core.tabs.tab active="true"  id="base-details" href="base-details">Base Details</x-core.tabs.tab>
       <x-core.tabs.tab active="false" id="time-info" href="time-info">Building Time</x-core.tabs.tab>
@@ -98,7 +98,7 @@
     </x-slot>
   </x-core.tabs.container>
 </x-core.cards.card-with-title>
-<div class="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto">
+<div class="mt-5 w-full lg:w-1/2 m-auto">
   <hr />
   <h5>Recruitable Units</h5>
   @livewire('admin.kingdoms.units.data-table', [ 'building' => $building])

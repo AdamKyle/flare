@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="tw-mt-10 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
+  <div class="mt-10 mb-10 w-full lg:w-3/5 m-auto">
     <x-core.page-title
       title="{{is_null($skill) ? 'Create New Passive Skill' : 'Edit: ' . $skill->name}}"
       route="{{route('passive.skills.list')}}"

@@ -16,7 +16,7 @@
             You can check the game tab (if you have that open in a separate tab) to see each item be disenchanted. It is advised you do not do any additional
             actions while this is processing as it can slow the game down.
         </div>
-          <x-core.cards.card css="tw-mt-5 tw-w-full tw-m-auto">
+          <x-core.cards.card css="mt-5 w-full m-auto">
             <div class="row pb-2">
                 <x-data-tables.per-page wire:model="perPage">
                     @if ($batchSell)

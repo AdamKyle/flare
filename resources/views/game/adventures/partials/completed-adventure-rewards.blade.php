@@ -1,6 +1,6 @@
-<x-core.cards.card-with-title title="{{$adventureLog->adventure->name}}" css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto">
+<x-core.cards.card-with-title title="{{$adventureLog->adventure->name}}" css="mt-5 w-full lg:w-1/2 m-auto">
   @if ($adventureLog->complete)
-    <p class="tw-text-green-600">You completed the adventure!</p>
+    <p class="text-green-600">You completed the adventure!</p>
     <div>
       <h5>Rewards</h5>
       <p>Below are your rewards for the adventure. Each card below will also show you a reward breakdown
@@ -9,7 +9,7 @@
         check below.</p>
       <hr />
 
-      <x-core.tabs.container ulCss="tw-justify-center" useHr="true" tabsId="adventure-rewards" contentId="adventure-content">
+      <x-core.tabs.container ulCss="justify-center" useHr="true" tabsId="adventure-rewards" contentId="adventure-content">
         <x-slot name="tabs">
           <x-core.tabs.tab active="true"  id="rewards-section" href="rewards">Adventure Rewards</x-core.tabs.tab>
           <x-core.tabs.tab active="false" id="items-section" href="items-gained">Items Gained</x-core.tabs.tab>
@@ -20,7 +20,7 @@
             @if (!is_null($adventureLog->rewards))
               @include('game.adventures.partials.rewards', ['adventureLog' => $adventureLog, 'character' => $character, 'topLevelRewards' => true])
 
-              <div class="tw-mt-6 tw-mb-2">
+              <div class="mt-6 mb-2">
                 <x-core.alerts.info-alert>
                   <p>
                     By clicking Collect Rewards, you will also get all associated items that your character is allowed to have.
@@ -48,7 +48,7 @@
                 </x-core.buttons.link-buttons.success-button>
               </div>
             @else
-              <p class="tw-text-center">You have already collected the rewards for this adventure</p>
+              <p class="text-center">You have already collected the rewards for this adventure</p>
             @endif
           </x-core.tabs.tab-content>
           @php
@@ -59,11 +59,11 @@
             @if (!empty($rewards['items']))
               <ul>
                 @foreach($rewards['items'] as $item)
-                  <li class="tw-relative">
-                    <a class="hover:tw-underline hover:tw-text-decoration-color" target="_blank" href="{{route('game.items.item', ['item' => $item['id']])}}"><x-item-display-color :item="$item['item']" /></a>
+                  <li class="relative">
+                    <a class="hover:underline hover:text-decoration-color" target="_blank" href="{{route('game.items.item', ['item' => $item['id']])}}"><x-item-display-color :item="$item['item']" /></a>
                     @if (!$item['can_have'])
-                      <div class="tw-group tw-inline-block">
-                        <i class="fas fa-exclamation-circle tw-ml-2 tw-text-red-600 tw-cursor-pointer"></i>
+                      <div class="group inline-block">
+                        <i class="fas fa-exclamation-circle ml-2 text-red-600 cursor-pointer"></i>
                         <x-core.tooltips.tooltip>
                           You already have this item or have had the item and upgrade it. You cannot obtain this item again.
                         </x-core.tooltips.tooltip>
@@ -74,9 +74,9 @@
               </ul>
             @else
               @if (is_null($adventureLog->rewards))
-                <p class="tw-text-center">You already collected the items for this adventure.</p>
+                <p class="text-center">You already collected the items for this adventure.</p>
               @else
-                <p class="tw-text-center">There were no items found during this adventure.</p>
+                <p class="text-center">There were no items found during this adventure.</p>
               @endif
             @endif
           </x-core.tabs.tab-content>
@@ -95,18 +95,18 @@
               <dt>EXP Bonus</dt>
               <dd>{{$adventureLog->adventure->exp_bonus * 100}}%</dd>
             </dl>
-            <p class="tw-mt-3">To see more details about this adventure, <a href="{{route('map.adventures.adventure', ['adventure' => $adventureLog->adventure->id])}}">follow me</a></p>
+            <p class="mt-3">To see more details about this adventure, <a href="{{route('map.adventures.adventure', ['adventure' => $adventureLog->adventure->id])}}">follow me</a></p>
           </x-core.tabs.tab-content>
         </x-slot>
       </x-core.tabs.container>
 
     </div>
   @elseif ($adventureLog->took_to_long)
-    <p class="tw-text-red-600">You're adventure took far too long. Exhaustion made you flee. The battle messages below might offer a clue as to why.</p>
+    <p class="text-red-600">You're adventure took far too long. Exhaustion made you flee. The battle messages below might offer a clue as to why.</p>
     <p>When an adventure takes too long it can be a verity of reasons. For example maybe you do just enough to damage to slowly bring them down
     but they heal too much, or you life stealing affixes do not do enough damage compared with your weapons to kill them. If this is the case
     it might be best to invest in some better gear with some better enchantments.</p>
   @else
-    <p class="tw-text-red-600">You died during the adventure. Check below for more details.</p>
+    <p class="text-red-600">You died during the adventure. Check below for more details.</p>
   @endif
 </x-core.cards.card-with-title>

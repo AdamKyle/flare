@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="tw-w-full lg:tw-w-3/4 tw-m-auto">
+  <div class="w-full lg:w-3/4 m-auto">
     <x-core.page-title
       title="{{$skill->passiveSkill->name}}"
       route="{{url()->previous()}}"
@@ -36,12 +36,12 @@
           <dd>{{$skill->passiveSkill->is_locked ? 'Yes' : 'No'}}</dd>
         @endif
       </dl>
-      <p class="tw-mt-5"><sup>*</sup> Caution, this is not: <code>Max Level * Hours</code> for a total amount of hours. Each level will multiply the time needed by the next level.
+      <p class="mt-5"><sup>*</sup> Caution, this is not: <code>Max Level * Hours</code> for a total amount of hours. Each level will multiply the time needed by the next level.
         Ie, level 2 at 3 hours (per level) will actually take 6 hours to complete.
       </p>
     </x-core.cards.card>
-    <h2 class="tw-font-light tw-mt-5">Child Skills</h2>
-    <p class="tw-mt-5">
+    <h2 class="font-light mt-5">Child Skills</h2>
+    <p class="mt-5">
       These skills will unlock at specific levels of this skill.
     </p>
     <hr />

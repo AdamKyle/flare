@@ -1,4 +1,4 @@
-<x-core.cards.card-with-title title="Details" css="tw-mb-5">
+<x-core.cards.card-with-title title="Details" css="mb-5">
     <dl>
         <dt>Type</dt>
         <dd>{{$npc->type}}</dd>
@@ -17,7 +17,7 @@
 
 @if($npc->commands->isNotEmpty())
 
-    <x-core.cards.card-with-title title="Available Commands" css="tw-mb-5">
+    <x-core.cards.card-with-title title="Available Commands" css="mb-5">
         <p class="mb-2">These are the available commands you can message to the NPC. They're type correlates to the action they will
             take when you message them.</p>
         <div class="alert alert-info mb-3">
@@ -49,7 +49,7 @@
         @endauth
     </x-core.cards.card-with-title>
 
-    <h4 class="tw-font-light">Quests This NPC Offers</h4>
+    <h4 class="font-light">Quests This NPC Offers</h4>
     <hr />
     @livewire('admin.quests.data-table', [
         'forNpc' => $npc->id,

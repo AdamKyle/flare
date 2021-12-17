@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="tw-w-full lg:tw-w-3/4 tw-m-auto">
+    <div class="w-full lg:w-3/4 m-auto">
         <x-core.page-title
             title="Selling"
             route="{{route('game')}}"
@@ -31,7 +31,7 @@
             @endif
         </x-core.cards.card>
 
-        <x-core.cards.card css="tw-mt-5 tw-mb-5">
+        <x-core.cards.card css="mt-5 mb-5">
             <p><strong>Your Gold</strong>: <span class="color-gold">{{number_format($gold)}}</span></p>
         </x-core.cards.card>
 

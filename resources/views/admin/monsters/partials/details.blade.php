@@ -20,7 +20,7 @@
                 <dd>{{$monster->damage_stat}}</dd>
             </dl>
             <hr />
-            <h5 class="tw-mt-3">Skill Info</h5>
+            <h5 class="mt-3">Skill Info</h5>
             <dl>
                 <dt>Accuracy</dt>
                 <dd>{{$monster->accuracy * 100}}%</dd>
@@ -49,7 +49,7 @@
                 <dt>Gold Reward</dt>
                 <dd>{{number_format($monster->gold)}}</dd>
             </dl>
-            <p class="tw-mt-6"><sup>*</sup> in special locations this increased by 10%</p>
+            <p class="mt-6"><sup>*</sup> in special locations this increased by 10%</p>
         </div>
         <div class="col-md-4">
             <dl>

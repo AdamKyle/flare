@@ -1,4 +1,4 @@
-<x-core.cards.card css="tw-mt-5 tw-w-full tw-m-auto">
+<x-core.cards.card css="mt-5 w-full m-auto">
   <div class="row pb-2">
     <x-data-tables.per-page wire:model="perPage" />
     <x-data-tables.search wire:model="search" />
@@ -126,7 +126,7 @@
                 class="btn btn-primary btn-sm"
               />
 
-              <div class="tw-mt-2">
+              <div class="mt-2">
                 <x-forms.drop-downs.base
                   floatLeft="true"
                   btnType="danger"

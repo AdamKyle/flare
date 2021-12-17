@@ -8,11 +8,11 @@
     $cssClass = '';
 
     if ($currentCount === $logLength) {
-      $cssClass = 'tw-mb-6';
+      $cssClass = 'mb-6';
     }
   @endphp
-  <x-core.cards.card css="{{'tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto ' . $cssClass}}">
-    <h3 class="tw-font-light">{{$level}}</h3>
+  <x-core.cards.card css="{{'mt-5 w-full lg:w-1/2 m-auto ' . $cssClass}}">
+    <h3 class="font-light">{{$level}}</h3>
     @if (isset($descriptions[$currentCount]))
       <p>
         {!! nl2br($descriptions[$currentCount]) !!}
@@ -20,8 +20,8 @@
     @endif
     <hr />
     @if (count($messages) > 1)
-      <p class="lg:tw-hidden tw-mt-2 tw-mb-2 tw-text-blue-500">You can scroll to the left and right if need be.</p>
-      <x-core.tabs.container ulCss="lg:tw-justify-center" useHr="true" tabsId="monster-tabs-{{Str::snake($level)}}" contentId="monster-content-{{Str::snake($level)}}">
+      <p class="lg:hidden mt-2 mb-2 text-blue-500">You can scroll to the left and right if need be.</p>
+      <x-core.tabs.container ulCss="lg:justify-center" useHr="true" tabsId="monster-tabs-{{Str::snake($level)}}" contentId="monster-content-{{Str::snake($level)}}">
         <x-slot name="tabs">
           @php $counter = 0; @endphp
           @foreach ($messages as $monsterName => $enemyMessages)
@@ -33,7 +33,7 @@
             >
               {{explode('-', $monsterName)[0]}}
               @if ($isError)
-                <i class="ra ra-bone-bite tw-text-red-600"></i>
+                <i class="ra ra-bone-bite text-red-600"></i>
               @endif
             </x-core.tabs.tab>
             @php $counter += 1; @endphp

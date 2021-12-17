@@ -1,7 +1,7 @@
 <div class="
-  tw-invisible group-hover:tw-visible tw-absolute tw-top-0 tw-left-0 tw-z-10
-  tw-bg-gray-900 tw-text-white tw-text-sm tw-rounded-sm tw-px-4 tw-py-2 tw-w-full tw-max-w-xs
-  tw-shadow-md"
+  invisible group-hover:visible absolute top-0 left-0 z-10
+  bg-gray-900 text-white text-sm rounded-sm px-4 py-2 w-full max-w-xs
+  shadow-md"
      role="tooltip"
      aria-hidden="true"
   >

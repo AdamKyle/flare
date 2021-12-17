@@ -6,12 +6,12 @@
 
 <div class="{{$css}}">
   @if (!is_null($route))
-    <h2 class="tw-font-light"><a href={{$route}} {{$attributes}}>{{$title}}</a></h2>
+    <h2 class="font-light"><a href={{$route}} {{$attributes}}>{{$title}}</a></h2>
   @else
-    <h2 class="tw-font-light">{{$title}}</h2>
+    <h2 class="font-light">{{$title}}</h2>
   @endif
 
-  <div class="tw-bg-white tw-rounded-sm tw-drop-shadow-sm tw-p-6 tw-overflow-x-auto">
+  <div class="bg-white rounded-sm drop-shadow-sm p-6 overflow-x-auto">
     {{$slot}}
   </div>
 </div>

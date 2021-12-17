@@ -7,3 +7,25 @@ a.tw-text-white {
         color: #fff !important;
     }
 }
+
+.glightbox {
+    img {
+        @apply max-w-3xl mx-auto mt-3 mb-3;
+    }
+}
+
+blockquote {
+    @apply bg-blue-100 dark:bg-blue-500 border-solid border border-blue-300 dark:border-blue-700 rounded-sm py-1 border-l-8 border-l-blue-500 dark:border-blue-900 dark:text-gray-300 !important;
+
+    h3 {
+        @apply text-blue-900 not-italic mt-1 !important;
+    }
+
+    p {
+        @apply not-italic mt-1 !important;
+    }
+
+    strong {
+        @apply text-blue-800 !important;
+    }
+}

@@ -1,12 +1,12 @@
 @props([
     'useHr'     => 'false',
     'ulCss'     => '',
-    'tabsId'    => 'tw-tabs',
+    'tabsId'    => 'tabs',
     'contentId' => 'tab-contents',
 ])
 
-<div class="tw-rounded-sm tw-border tw-mx-auto mt-2">
-  <ul id="{{$tabsId}}" class="{{'tw-inline-flex tw-pt-2 tw-px-1 tw-w-full tw-border-b tw-list-none tw-overflow-y-hidden tw-overflow-x-auto ' . $ulCss}}">
+<div class="rounded-sm border mx-auto mt-2">
+  <ul id="{{$tabsId}}" class="{{'inline-flex pt-2 px-1 w-full border-b list-none overflow-y-hidden overflow-x-auto ' . $ulCss}}">
     {{$tabs}}
   </ul>
   @if($useHr === 'true')

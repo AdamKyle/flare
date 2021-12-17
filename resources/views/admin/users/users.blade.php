@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="tw-w-full lg:tw-w-3/4 tw-m-auto">
+    <div class="w-full lg:w-3/4 m-auto">
         <x-core.page-title
           title="Users"
           route="{{route('home')}}"

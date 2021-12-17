@@ -6,7 +6,7 @@
 
 <x-core.grids.two-column>
     <x-slot name="columnOne">
-        <h2 class="tw-font-light">{{$slot}}</h2>
+        <h2 class="font-light">{{$slot}}</h2>
     </x-slot>
     <x-slot name="columnTwo">
         @switch($color)

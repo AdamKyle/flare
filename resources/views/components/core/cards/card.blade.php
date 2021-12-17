@@ -3,6 +3,9 @@
     'css' => '',
 ])
 
-<div class="{{'tw-bg-white tw-rounded-sm tw-drop-shadow-sm tw-p-6 tw-overflow-x-auto ' . $css}}">
+<div class="{{'
+    bg-white rounded-sm drop-shadow-sm p-6 overflow-x-auto
+    dark:bg-gray-800 dark:text-white
+    ' . $css}}">
     {{$slot}}
 </div>

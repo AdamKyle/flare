@@ -1,4 +1,4 @@
-<h2 class="tw-font-light">Hints</h2>
+<h2 class="font-light">Hints</h2>
 <hr />
 <p class="mt-2">
   Focus on your Intelligence and Focus stat while leveling Casting Accuracy followed by your class skill.

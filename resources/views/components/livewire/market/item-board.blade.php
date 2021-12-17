@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <x-core.cards.card css="tw-mt-5 tw-w-full lg:tw-w-3/4 tw-m-auto">
+        <x-core.cards.card css="mt-5 w-full lg:w-3/4 m-auto">
             <div class="row pb-2 ml-2 text-muted">
                 This table may not reflect the marketboard at all times as it is not live updated.
             </div>
