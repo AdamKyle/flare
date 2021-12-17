@@ -183,9 +183,9 @@ class UnitService {
     protected function calculatueUnitRecrutmentTime(Character $character, int $time)  {
         $skillBonus = $character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
-        })->first()->skill_bonus;
+        })->first();
 
-        return floor($time - $time * $skillBonus);
+        return floor($time - $time * $skillBonus->unit_time_reduction);
     }
 
     protected function calculateElapsedTimePercent(UnitInQueue $queue): int {

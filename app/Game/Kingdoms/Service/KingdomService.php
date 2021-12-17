@@ -199,7 +199,22 @@ class KingdomService {
     }
 
     protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {
+        $character = $kingdom->character;
+
         foreach(GameBuilding::all() as $building) {
+
+            $isLocked  = $building->is_locked;
+
+            if ($isLocked) {
+                $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
+
+                if (!is_null($passive)) {
+                    if ($passive->current_level === $building->level_required) {
+                        $isLocked = false;
+                    }
+                }
+            }
+
             $kingdom->buildings()->create([
                 'game_building_id'    => $building->id,
                 'kingdom_id'          => $kingdom->id,
@@ -208,7 +223,7 @@ class KingdomService {
                 'current_durability'  => $building->base_durability,
                 'max_defence'         => $building->base_defence,
                 'max_durability'      => $building->base_durability,
-                'is_locked'           => $building->is_locked,
+                'is_locked'           => $isLocked,
             ]);
         }
 

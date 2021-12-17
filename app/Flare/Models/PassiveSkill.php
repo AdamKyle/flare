@@ -38,17 +38,16 @@ class PassiveSkill extends Model
      * @var array
      */
     protected $casts = [
-        'max_level'        => 'integer',
-        'bonus_per_level'  => 'float',
-        'effect_type'      => 'integer',
-        'hours_per_level'  => 'integer',
-        'item_find_chance' => 'float',
-        'unlocks_at_level' => 'integer',
-        'is_locked'        => 'boolean',
-        'is_parent'        => 'boolean',
+        'max_level'                => 'integer',
+        'bonus_per_level'          => 'float',
+        'effect_type'              => 'integer',
+        'hours_per_level'          => 'integer',
+        'item_find_chance'         => 'float',
+        'unlocks_at_level'         => 'integer',
+        'is_locked'                => 'boolean',
+        'is_parent'                => 'boolean',
+        'unlocks_game_building_id' => 'integer',
     ];
-
-    
 
     public function passiveType(): PassiveSkillTypeValue {
         return new PassiveSkillTypeValue($this->effect_type);
