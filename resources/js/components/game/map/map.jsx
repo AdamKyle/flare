@@ -414,6 +414,10 @@ export default class Map extends React.Component {
     this.props.openTraverserDetails(true);
   }
 
+  openQuest() {
+    this.props.openQuestDetails(true);
+  }
+
   disableMapButtons() {
     return this.state.isDead || this.state.isAdventuring || !this.state.canMove;
   }
@@ -588,6 +592,7 @@ export default class Map extends React.Component {
                 openAdventureDetails={this.openAdventureDetails.bind(this)}
                 openPortDetails={this.openPortDetails.bind(this)}
                 openTeleport={this.openTeleport.bind(this)}
+                openQuest={this.openQuest.bind(this)}
                 charactersOnMap={this.state.charactersOnMap}
                 attackAutomationIsRunning={this.props.attackAutomationIsRunning}
               />

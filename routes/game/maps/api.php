@@ -4,6 +4,9 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
     // Map related info:
     Route::get('/map/{user}', ['uses' => 'Api\MapController@mapInformation']);
 
+    // Fetch Quests for map:
+    Route::get('/map/quests/{character}', ['uses' => 'Api\MapController@fetchQuests']);
+
     Route::group(['middleware' => 'throttle:moving'], function() {
         // Map Movement:
         Route::post('/move/{character}', ['uses' => 'Api\MapController@move']);

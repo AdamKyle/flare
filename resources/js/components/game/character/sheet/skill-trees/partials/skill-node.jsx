@@ -124,7 +124,6 @@ export default class SkillNode extends React.Component {
   }
 
   render() {
-    console.log(this.props.passive.name, this.props.timerIsRunning)
     return (
       <div>
         <div><strong>

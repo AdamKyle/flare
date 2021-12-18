@@ -28,7 +28,7 @@ class Details extends Component
         'quest.unlocks_skill_type' => 'nullable',
         'quest.is_parent'          => 'nullable',
         'quest.parent_quest_id'    => 'nullable',
-        'quest.faction_map_id'     => 'nullable',
+        'quest.faction_game_map_id'     => 'nullable',
         'quest.secondary_required_item' => 'nullable',
         'quest.required_faction_level'  => 'nullable',
     ];

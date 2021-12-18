@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use App\Flare\Models\Npc;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -11,7 +12,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
-use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Requests\IsWaterRequest;
 use App\Game\Maps\Requests\MoveRequest;
@@ -123,5 +123,15 @@ class MapController extends Controller {
         unset($response['status']);
 
         return response()->json($response, $status);
+    }
+
+    public function fetchQuests(Character $character) {
+        $gameMap = $character->map->gameMap;
+        $npcs    = Npc::where('game_map_id', $gameMap->id)->whereHas('quests')->with('quests.childQuests')->get();
+
+        return response()->json([
+            'npcs'             => $npcs,
+            'completed_quests' => $character->questsCompleted,
+        ]);
     }
 }

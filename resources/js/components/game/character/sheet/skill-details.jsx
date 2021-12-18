@@ -419,6 +419,10 @@ export default class SkillDetails extends React.Component {
                   You can click on each passive skill and see what you get per level, what it unlocks as you level it
                   and how much time it will take to level the skill.
                 </p>
+                <p>
+                  Passive skills can be trained while you are offline, that is, you can logout and this will continue to
+                  train until it is finished.
+                </p>
                 {
                   this.props.isDead ?
                     <AlertError icon={"fas fa-skull-crossbones"} title={'You are dead'}>

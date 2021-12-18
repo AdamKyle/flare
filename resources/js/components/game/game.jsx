@@ -8,6 +8,7 @@ import ActionsSection from './sections/actions-section';
 import PortSection from './sections/port-section';
 import AdeventureActions from './sections/adventure-section';
 import TraverseSection from "./sections/traverse-section";
+import QuestSection from "./sections/quest-section";
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
@@ -42,6 +43,7 @@ export default class Game extends React.Component {
       openKingdomAttackModal: false,
       openTimeOutModal: false,
       openMassEmbezzlement: false,
+      openQuestDetails: false,
       npcComponentName: null,
       characterId: null,
       canAdventureAgainAt: null,
@@ -127,6 +129,7 @@ export default class Game extends React.Component {
       openAdventureDetails: false,
       openTeleportDetails: false,
       openTraverseDetails: false,
+      openQuestDetails: false,
     });
   }
 
@@ -136,6 +139,7 @@ export default class Game extends React.Component {
       openAdventureDetails: open,
       openTeleportDetails: false,
       openTraverseDetails: false,
+      openQuestDetails: false,
     });
   }
 
@@ -145,6 +149,7 @@ export default class Game extends React.Component {
       openAdventureDetails: false,
       openTeleportDetails: false,
       openTraverseDetails: open,
+      openQuestDetails: false,
     });
   }
 
@@ -154,6 +159,17 @@ export default class Game extends React.Component {
       openPortDetails: false,
       openAdventureDetails: false,
       openTraverseDetails: false,
+      openQuestDetails: false,
+    });
+  }
+
+  openQuestDetails(open) {
+    this.setState({
+      openQuestDetails: open,
+      openPortDetails: false,
+      openAdventureDetails: false,
+      openTraverseDetails: false,
+      openTeleportDetails: false,
     });
   }
 
@@ -380,6 +396,11 @@ export default class Game extends React.Component {
                 />
                 : null
             }
+            {
+              this.state.openQuestDetails ?
+                <QuestSection openQuestDetails={this.openQuestDetails.bind(this)} characterId={this.state.characterId}/>
+              : null
+            }
           </div>
           <div
             className={
@@ -401,6 +422,7 @@ export default class Game extends React.Component {
               updateAdventure={this.updateAdventure.bind(this)}
               updateTeleportLoations={this.updateTeleportLoations.bind(this)}
               openTeleportDetails={this.openTeleportDetails.bind(this)}
+              openQuestDetails={this.openQuestDetails.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               updateKingdoms={this.updateKingdoms.bind(this)}
               updateCelestial={this.updateCelestial.bind(this)}

@@ -38,26 +38,20 @@ class GoldRushCheckListener
 
             $maxCurrentices = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
-            $subtractedAmount = 0;
+            $type = 'gold_rush';
 
             if ($maxCurrentices->canNotGiveCurrency()) {
-                $subtractedAmount = $goldRush - MaxCurrenciesValue::MAX_GOLD;
-                $goldRush         = $goldRush - $subtractedAmount;
-
-                $event->character->gold = $goldRush;
+                $event->character->gold = MaxCurrenciesValue::MAX_GOLD;;
                 $event->character->save();
+
+                $type = 'gold_capped';
+
             } else {
                 $event->character->gold = $goldRush;
                 $event->character->save();
             }
 
             $character = $event->character->refresh();
-
-            $type = 'gold_rush';
-
-            if ($subtractedAmount !== 0) {
-                $type = 'gold_capped';
-            }
 
             event(new ServerMessageEvent($character->user, $type, number_format($goldRush)));
             event(new UpdateTopBarEvent($character));
