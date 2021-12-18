@@ -2,7 +2,7 @@
 <x-core.alerts.info-alert title="Please note">
     <p>These values represent the recruitment of one unit. These values are then
         multiplied by the amount of units you want to recruit.</p>
-    <p>For Movement, the total time shown is for all units of this type, regardless of amount.</p>
+    <p>For Movement, the total time shown is for all units of this type, regardless of amount. Unit is based on 16 pixel movement.</p>
 </x-core.alerts.info-alert>
 <p class="mb-3 mt-3">{{$unit->description}}</p>
 @if (!is_null($building))
@@ -45,7 +45,7 @@
         </x-core.tabs.tab-content>
         <x-core.tabs.tab-content active="false" id="unit-time-info">
             <dl>
-                <dd><strong>Travel Time</strong>:</dd>
+                <dd><strong>Travel Time (per 16pxs)</strong>:</dd>
                 <dd>{{$unit->travel_time}} Minutes</dd>
                 <dd><strong>Time To Recruit</strong>:</dd>
                 <dd>{{$unit->time_to_recruit}} Seconds</dd>

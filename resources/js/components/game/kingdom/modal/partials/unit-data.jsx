@@ -16,7 +16,21 @@ export default class UnitData extends React.Component {
       return this.props.unit[prop];
     }
 
-    return this.props.unit[prop] * amount;
+    let totalCost = this.props.unit[prop] * amount;
+
+    if (prop === 'required_population') {
+      totalCost = totalCost - totalCost * this.props.kingdom.population_cost_reduction;
+    }
+
+    if (prop === 'iron') {
+      totalCost = totalCost - totalCost * this.props.kingdom.iron_cost_reduction;
+    }
+
+    if (prop === 'time_to_recruit') {
+      totalCost = totalCost - totalCost * this.props.kingdom.unit_time_reduction;
+    }
+
+    return totalCost.toFixed(2);
   }
 
   getClass(prop, amount) {
@@ -124,10 +138,11 @@ export default class UnitData extends React.Component {
                 className={this.getClass('stone_cost', this.props.amount)}>{this.calculateAmount('stone_cost', this.props.amount)}</dd>
               <dd><strong>Cost in iron</strong>:</dd>
               <dd
-                className={this.getClass('iron_cost', this.props.amount)}>{this.calculateAmount('iron_cost', this.props.amount)}</dd>
+                className={this.getClass('iron_cost', this.props.amount)}>{this.calculateAmount('iron_cost', this.props.amount)} (-{(this.props.kingdom.iron_cost_reduction * 100).toFixed()}%)</dd>
               <dd><strong>Required population</strong>:</dd>
               <dd
-                className={this.getClass('required_population', this.props.amount)}>{this.calculateAmount('required_population', this.props.amount)}
+                className={this.getClass('required_population', this.props.amount)}>
+                {this.calculateAmount('required_population', this.props.amount)} (-{(this.props.kingdom.population_cost_reduction * 100).toFixed()}%)
                 <OverlayTrigger
                   trigger="hover"
                   key='right'
@@ -159,7 +174,7 @@ export default class UnitData extends React.Component {
               <dd><strong>Time To Recruit</strong>:</dd>
               <dd
                 className={this.getClass('time_to_recruit', this.props.amount)}>{this.calculateAmount('time_to_recruit', this.props.amount)} Seconds <small
-                className="text-muted">{(this.calculateAmount('time_to_recruit', this.props.amount) / 60).toFixed(2)} Minutes</small>
+                className="text-muted">{(this.calculateAmount('time_to_recruit', this.props.amount) / 60).toFixed(2)} Minutes (-{(this.props.kingdom.unit_time_reduction * 100).toFixed(0)}%)</small>
               </dd>
             </dl>
           </div>

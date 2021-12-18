@@ -19,6 +19,8 @@ class UpdateKingdomsService {
      * @param int|null $levels
      */
     public function updateKingdomKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = null) {
+        $this->reassignUnits($gameBuilding, $selectedUnits, $levels);
+
         UpdateKingdomBuildings::dispatch($gameBuilding, $selectedUnits, $levels)->delay(now()->addMinutes(1));
     }
 
@@ -31,5 +33,62 @@ class UpdateKingdomsService {
      */
     public function assignNewBuildingsToCharacters(GameBuilding $gameBuilding) {
         AssignNewKingdomBuildingsJob::dispatch($gameBuilding);
+    }
+
+    /**
+     * Reassigns the game units to a game building.
+     *
+     * @param GameBuilding $gameBuilding
+     * @param array $selectedUnits
+     * @param int|null $levels
+     */
+    protected function reassignUnits(GameBuilding $gameBuilding, array $selectedUnits = [], int $levels = null): void {
+        if (empty($selectedUnits)) {
+            return;
+        }
+
+        if ($gameBuilding->units->isNotEmpty()) {
+            foreach($gameBuilding->units as $unit) {
+                $unit->delete();
+            }
+        }
+
+        $this->assignUnits($gameBuilding->refresh(), $selectedUnits, $levels);
+
+        $this->gameBuilding = $this->gameBuilding->refresh();
+    }
+
+    /**
+     * Assigns the units to the building.
+     *
+     * @param GameBuilding $gameBuilding
+     * @param array $selectedUnits
+     * @param int $levels
+     * @return void
+     */
+    private function assignUnits(GameBuilding $gameBuilding, array $selectedUnits, int $levels): void {
+        $gameBuilding->units()->create([
+            'game_building_id' => $gameBuilding->id,
+            'game_unit_id'     => $selectedUnits[0],
+            'required_level'   => !is_null($gameBuilding->only_at_level) ? $gameBuilding->only_at_level : 1,
+        ]);
+
+        unset($selectedUnits[0]);
+
+        $initialLevel = 1;
+
+        if (empty($selectedUnits)) {
+            return;
+        }
+
+        foreach($selectedUnits as $unitId) {
+            $initialLevel += $levels;
+
+            $gameBuilding->units()->create([
+                'game_building_id' => $gameBuilding->id,
+                'game_unit_id'     => $unitId,
+                'required_level'   => $initialLevel,
+            ]);
+        }
     }
 }

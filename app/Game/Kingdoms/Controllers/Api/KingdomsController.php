@@ -198,17 +198,19 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $request->amount)) {
-            return response()->json([
-                'message' => "You don't have the resources."
-            ], 422);
-        }
 
         $paidGold = false;
 
         if ($request->recruitment_type === 'recruit-normally') {
+            if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $request->amount)) {
+                return response()->json([
+                    'message' => "You don't have the resources."
+                ], 422);
+            }
+
             $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
         } else {
+
             $service->updateCharacterGold($kingdom, $gameUnit, $request->amount);
 
             $totalAmount       = $request->amount;

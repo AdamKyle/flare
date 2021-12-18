@@ -241,7 +241,7 @@ class KingdomBuildingService {
 
         $toLevel = $params['how_many_levels'] + $building->level;
 
-        if ($toLevel > $building->max_level) {
+        if ($toLevel > $building->gameBuilding->max_level) {
             $toLevel = $building->gameBuilding->max_level;
         }
 

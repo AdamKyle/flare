@@ -198,7 +198,7 @@ export default class Recruit extends React.Component {
             : null
         }
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-12">
             <dl className="mb-3">
               <dt><strong>Current Population</strong>:</dt>
               <dd>
@@ -267,6 +267,13 @@ export default class Recruit extends React.Component {
                     value={this.state.value}
                     onChange={this.amountChange.bind(this)}
                   />
+
+                  <button className="btn btn-primary mt-3"
+                          disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
+                          onClick={this.recruitUnits.bind(this)}
+                  >
+                    Recruit Selected Amount
+                  </button>
                 </Fragment>
               : null
             }
@@ -297,18 +304,17 @@ export default class Recruit extends React.Component {
                     value={this.state.value}
                     onChange={this.amountChangeWithGold.bind(this)}
                   />
+
+                  <button className="btn btn-primary mt-3"
+                          disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
+                          onClick={this.recruitUnits.bind(this)}
+                  >
+                    Recruit Selected Amount
+                  </button>
                 </Fragment>
                 : null
             }
 
-          </div>
-          <div className="col-md-6">
-            <button className="btn btn-primary unit-recruit-button mt-6"
-                    disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
-                    onClick={this.recruitUnits.bind(this)}
-            >
-              Recruit Selected Amount
-            </button>
           </div>
         </div>
         {

@@ -49,6 +49,16 @@ It is more beneficial to play with these two tabs open, this way you can refresh
 In the first image it's the black box at the bottom. That's where things like server messages (that only you can see), other player messages, global messages, admin messages
 and npc messages will appear. It's imperative you pay attention to the information in the chat section. Drops, new levels, gold rushes, quest messages, celestial spawn messages - so much happens in chat.
 
+If you look at the first image, you have information at the top such as your currencies and character stats. Player have two types of stats:
+
+- Modded (what you see on the character sheet, effected by things like equipment, enchantments, level, skill levels and so on)
+- Raw (You can see these on the character sheet under Base stats) These are your stats with nothing equipped.
+
+You can also see you have a [map](/information/map) that you can move around on, see [movement](/information/movement).
+
+Below your stats and beside the map you have an actions tab, this is broken into two sections: [Auto Attack](/information/automation) and your regular
+actions section.
+
 So what now? Head back to the game tab, and first select Sewer Rat from the dropdown list in the Action Section, like so:
 
 <div class="mb-4">
@@ -61,7 +71,7 @@ You should see what I see, now hover over those attack buttons you see. You can 
 attack type or experiment with different attack types. For example, Casters - such as Heretics, want to use Cast attack (second button from the left), Prophets might one of the Attack and Cast or Cast and Attack buttons
 while Fights and other classes might just use Attack. Again feel free to experiment.
 
-There is also a [setting](/information/settings) that you can turn on, once you are more comfortable to disable the popovers for the attack buttons.
+There is also a [setting](/information/settings) that you can turn on, once you are more comfortable, to disable the popovers for the attack buttons.
 
 **But for now** Just click attack. Just do it. Don't ask questions, click the red button child! click it!!!!
 
@@ -73,7 +83,7 @@ Great:
     </a>
 </div>
 
-You may see death. You may have died. You may see this, you may have killed it after a couple attacks. You may see nothing because you never did I told you and clicked the button!
+You may see death. You may have died. You may see this, you may have killed it after a couple attacks. You might have been blocked! You may see nothing because you never did I told you and clicked the button!
 
 Either way this is no good, and we need better gear. Right now, it doesn't matter what your class is, you have 1000 Gold. You can see this in the top section of the game window
 where it states your name, class and gold.
@@ -105,7 +115,7 @@ To do this, from the shop window:
 Do this for each item, you should have 100 gold left. Go back to the game tab (you can close the shop tab). If you were blocked, missed or were killed
 by the sewer rat, try again - now it should die! Killed it? Amazing! We are gods!
 
-*Wait! What about my class, I am ....* No one cares child! Right now you are useless to the gods! Your gear, as you will see when you go to equip it from buying it,
+*Wait! What about my class, I am ....* No one cares child! Right now you are useless to the gods! Your gear, as you will see when you go to [equip](/information/equipment) it from buying it,
 will increase stats on your character.
 
 On your character sheet is a section:
@@ -116,8 +126,12 @@ On your character sheet is a section:
     </a>
 </div>
 
-Here you can see the **Stat to focus on for max damage** and the **To focus on for Hit%** these stats and skill may be different for your class,
-however later, we will learn about [enchantments](/information/enchanting) and [random enchants (uniques)](/information/random-enchants) that turn your items green!
+Here you can see the **Stat to focus on for max damage** and the **To focus on for Hit%** these stats and skill may be different for your class.
+
+There are a verity of ways you can increase these stats and skill. One way is to level the [skill](/information/skills) and another is to equip enchanted gear.
+
+Base gear, from the shop, will only get you so far. The shop ends at gear costing 2 billion gold, but you can craft beyond what the shop carries as well as upgrade
+that crafted gear. however later, we will learn about [enchantments](/information/enchanting) and [random enchants (uniques)](/information/random-enchants) that turn your items green!
 
 These can further raise the states, even specialize in specific stats, skills, damage types and so on. Later when you are not weak and pathetic and
 can hold your own, you can invest in these items. We will even do some later on! How fun!
@@ -131,7 +145,7 @@ Now, on the character sheet at the very top, look for a tab called [Factions](/i
 You should see a table of map names, and factions. We're going to do the first one together, Surface. When we are done you will be the Mercenary of Surface
 and have a very powerful unique item, that will grow with you as you level. But more on that later.
 
-To get started, which we already sort of have, we just have to kill anything. So yes we could kill sewer rats, so - actually do that - go kill on the game tab and come back here.
+To get started, which we already sort of have, we just have to kill anything. So yes we could kill sewer rats, so - actually do that - go kill one on the game tab and come back here.
 
 ....
 
@@ -223,15 +237,17 @@ to fire your bow off an additional 3x without missing or being blocked.
 
 Yes, all classes have a special attack like this:
 
-- Fighters: Double Attack (Attack again!)
-- Rangers: Triple Attack (Notch and release three arrows in the enemies' direction)
-- Prophets: Double Heal (Heal again)
-- Heretics: Double Cast (Cast again)
-- Thieves: Shadow Dance - Dance through the shadows and auto hit.
+- Fighters: Double Attack (Attack again!) (Duel Weapon equipped or Weapon/Shield equipped)
+- Rangers: Triple Attack (Notch and release three arrows in the enemies' direction) (Bow is required)
+- Prophets: Double Heal (Heal again) (Healing spell is required)
+- Heretics: Double Cast (Cast again) (Damage spell required)
+- Thieves: Shadow Dance - Dance through the shadows and auto hit. (Duel Weapons Required)
+- Vampires: Blood Lust - Steals the enemies' health equal to 15% of your dur.
 
 These all come from the [classes](/information/races-and-classes) class skill which you can read more about by selecting your class from the table on that help page.
 
-You can raise the class bonus of these skills, which is a base 5%, meaning you have 5% chance to fire off your special attack, via special enchantments.
+You can raise the class bonus of these skills, which is a base 5%, meaning you have 5% chance to fire off your special attack, via special enchantments which raise the class bonus
+higher, allowing you to have more of a chance to use your auto firing special attack.
 
 These will fire automatically during battle, all of them have special requirements before they will apply their effect or be usable. For example: Rangers, to get their triple attack must 
 have a bow equipped. For Thieves, you must duel wield and so on.
@@ -243,7 +259,7 @@ Now before you continue with automation, look at your accuracy skill on the char
 Let's switch that your class skill - which is documented on the [classes](/information/races-and-clases) page. Just click on the class that is yours, and it will tell you
 the class skill.
 
-Once you spent some of that hard-earned gold, repeat the auto battle, by just licking Begin, again. We will do this until you reach: Mercenary of Surface.
+Once you spent some of that hard-earned gold, repeat the auto battle, by just clicking Begin, again (assuming you have not refreshed the game tab). We will do this until you reach: Mercenary of Surface.
 
 What about all your items you have accumulated from your auto battle? You can, before beginning the next one, go through them and investigate if any are good enough
 for you at your level, but based on the gold you might have gotten, the "starter drops" may just be useless trash to you now. If you would like, you could
@@ -266,6 +282,9 @@ You also see the enchanted drops on the market, but you would have to be at a po
 to you at 160/80 - Smugglers Port. Port locations are blue ship icons on the map, while pinkish arches are locations of interest that can have adventures or be [special locations](/information/special-locations).
 
 Locations with [adventures](/information/adventure) let you set your character into "auto attack mode" and fight multiple monsters per level, getting loot, experience, skill experience ad gold.
+These are the only forms of auto attack that allows you to log out while it processes for you in the background. 
+
+All XP and skill XP from adventures will do what's called overflow, allowing you to gain multiple levels and skill levels in one session.
 
 Locations that are special, will contain monsters that are the same you fight in the dropdown list but are much harder. These places can drop special 
 items called Gems (more on that later) and any item (of any value) with any enchantment from any enemy 10 levels or higher than you.
@@ -273,6 +292,8 @@ items called Gems (more on that later) and any item (of any value) with any ench
 There is a special location for each [plane](/information/planes). Shadow Plane is the only plane that has the same drops as Special locations and stronger monsters.
 
 Shadow plane will not drop gems, but it's special location will. For now lets focus on what we were doing, getting a faction title!
+
+*Wait what are gems?* Child. Wait, we shall get to that. I promise.
 
 Once you have decided what to do with your gear, lets go back to auto battling, you may be able to fight harder critters, so do the list trick again, pick up from where you last left off
 and continue down the monster list - remember, you want to one shot kill the enemy. Once you have it, continue auto battling with that new monster selected.
@@ -320,9 +341,19 @@ All of this will take time though.
 At that point you unlock so much more of the game. But one small step at a time. Equip your mini god item. To keep things safe, such as these uniques, check out the section on
 [sets](/information/equipment-sets). These will be valuable to you.
 
+> ### ATTN!
+> 
+> Tlessa is a game of systems on top of systems that interact with other systems. You have systems for gear, systems for skills, systems for crafting, passive skills,
+> enchanting, class skills and more and all of these systems all play together in one way or another to help power your character and push them forward.
+> 
+> **All of these systems can be unlocked, upgraded and played with over time. You cannot purchase any access or gear or items or anything
+> that would give you an unfair advantage over another player (so nothing essentially). Instead, you invest time and energy.**
+
 ## Auto Battling and Crafting
 
-Now it's time, with our little green unique, to go and continue the progress towards level cap. There are [Quests](/information/quests) that you can do. I would search through
+Now it's time, with our little green unique, to go and continue the progress towards level cap (equip it, lets see what it can do!). 
+
+There are [Quests](/information/quests) that you can do. I would search through
 the [planes](/information/planes) as they have all the locations and npc's that offer quests which as simple as speaking to them with the currency or item or both.
 
 While you auto battle, you can also craft - which will let you train a new type of skill: [crafting](/information/crafting). You can craft all the items you 

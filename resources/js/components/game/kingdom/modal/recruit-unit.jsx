@@ -62,23 +62,31 @@ export default class RecruitUnit extends React.Component {
               : null
           }
           <div className="mb-3">
-            <Recruit
-              currentPopulation={this.props.kingdom.current_population}
-              showUnitRecruitmentSuccess={this.props.showUnitRecruitmentSuccess}
-              unit={this.props.unit}
-              kingdom={this.props.kingdom}
-              updateAmount={this.updateAmount.bind(this)}
-              updateKingdomData={this.props.updateKingdomData}
-              close={this.props.close}
-              openTimeOutModal={this.props.openTimeOutModal.bind(this)}
-              characterGold={this.props.characterGold}
-            />
+            <div className="row">
+              <div className="col-md-6">
+                <Recruit
+                  currentPopulation={this.props.kingdom.current_population}
+                  showUnitRecruitmentSuccess={this.props.showUnitRecruitmentSuccess}
+                  unit={this.props.unit}
+                  kingdom={this.props.kingdom}
+                  updateAmount={this.updateAmount.bind(this)}
+                  updateKingdomData={this.props.updateKingdomData}
+                  close={this.props.close}
+                  openTimeOutModal={this.props.openTimeOutModal.bind(this)}
+                  characterGold={this.props.characterGold}
+                />
+              </div>
+              <div className="col-md-6">
+                <UnitData
+                  unit={this.props.unit}
+                  amount={this.state.amount}
+                  kingdom={this.props.kingdom}
+                />
+              </div>
+            </div>
+
           </div>
-          <UnitData
-            unit={this.props.unit}
-            amount={this.state.amount}
-            kingdom={this.props.kingdom}
-          />
+
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-danger" onClick={this.props.close}>Close</button>

@@ -52,7 +52,7 @@ class ClassBonusInformation {
         }
 
         if ($classAttackValue->isThief()) {
-            $details['type'] = Str::ucfirst(ClassAttackValue::RANGER_TRIPLE_ATTACK);
+            $details['type'] = Str::ucfirst(ClassAttackValue::THIEVES_SHADOW_DANCE);
             $details['requires'] = 'Duel weapons equipped';
             $details['description'] = 'With duel weapons equipped, you have a chance to slip by the enemy and instantly hit them.';
         }

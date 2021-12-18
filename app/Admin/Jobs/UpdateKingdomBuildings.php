@@ -54,8 +54,6 @@ class UpdateKingdomBuildings implements ShouldQueue
     public function handle() {
         $query = KingdomBuilding::where('game_building_id', $this->gameBuilding->id);
 
-        $this->reassignUnits();
-
         if ($query->get()->isEmpty()) {
             // If no kingdom has this building:
             Kingdom::chunkById(500, function($kingdoms) {
@@ -89,61 +87,6 @@ class UpdateKingdomBuildings implements ShouldQueue
                     UpdateKingdomBuilding::dispatch($building, $this->gameBuilding)->delay(now()->addMinutes(1));
                 }
             });
-        }
-    }
-
-    /**
-     * Reassigns the units to a building.
-     *
-     * @return void
-     */
-    protected function reassignUnits(): void {
-        if (empty($this->selectedUnits)) {
-            return;
-        }
-
-        if ($this->gameBuilding->units->isNotEmpty()) {
-            foreach($this->gameBuilding->units as $unit) {
-                $unit->delete();
-            }
-        }
-
-        $this->assignUnits($this->gameBuilding->refresh(), $this->selectedUnits, $this->levels);
-
-        $this->gameBuilding = $this->gameBuilding->refresh();
-    }
-
-    /**
-     * Assigns the units to the building.
-     *
-     * @param GameBuilding $gameBuilding
-     * @param array $selectedUnits
-     * @param int $levels
-     * @return void
-     */
-    private function assignUnits(GameBuilding $gameBuilding, array $selectedUnits, int $levels): void {
-        $gameBuilding->units()->create([
-            'game_building_id' => $gameBuilding->id,
-            'game_unit_id'     => $selectedUnits[0],
-            'required_level'   => !is_null($gameBuilding->only_at_level) ? $gameBuilding->only_at_level : 1,
-        ]);
-
-        unset($selectedUnits[0]);
-
-        $initialLevel = 1;
-
-        if (empty($selectedUnits)) {
-            return;
-        }
-
-        foreach($selectedUnits as $unitId) {
-            $initialLevel += $levels;
-
-            $gameBuilding->units()->create([
-                'game_building_id' => $gameBuilding->id,
-                'game_unit_id'     => $unitId,
-                'required_level'   => $initialLevel,
-            ]);
         }
     }
 }

@@ -245,7 +245,7 @@ class AdventureRewardService {
         $skill = $skill->refresh();
 
         if ($skill->xp >= $skill->xp_max) {
-            if ($skill->level <= $skill->max_level) {
+            if ($skill->level < $skill->max_level) {
                 $level      = $skill->level + 1;
 
                 $skill->update([
