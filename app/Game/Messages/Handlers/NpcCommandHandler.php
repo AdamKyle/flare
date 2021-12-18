@@ -129,6 +129,12 @@ class NpcCommandHandler {
             return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('take_a_look', $npc), true));
         }
 
+        if ($type->isReRoll()) {
+            broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::ENCHANT));
+
+            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('what_do_you_want', $npc), true));
+        }
+
         if ($type->isQuest()) {
             if ($this->handleQuest($user, $npc)) {
                 $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' and has been rewarded with a godly gift!';

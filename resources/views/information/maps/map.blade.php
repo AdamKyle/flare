@@ -28,6 +28,8 @@
                             <dd>{{is_null($map->drop_chance_bonus) ? 0 : $map->drop_chance_bonus * 100}}%</dd>
                             <dt>Enemy Stat Increase</dt>
                             <dd>{{is_null($map->enemy_stat_bonus) ? 0 : $map->enemy_stat_bonus * 100}}%</dd>
+                            <dt>Character Damage Deduction:</dt>
+                            <dd>{{!is_null($map->character_attack_reduction) ? ($map->character_attack_reduction * 100) . '%' : '0%'}}</dd>
                         </dl>
                         <p class="mt-3">
                             These bonuses will apply to adventures as well - thus stacking with the adventure bonuses.

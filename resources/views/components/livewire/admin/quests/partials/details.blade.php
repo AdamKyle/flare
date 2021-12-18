@@ -1,13 +1,13 @@
 <div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="name">Name: </label>
                 <input type="text" class="form-control" name="name" value="" wire:model="quest.name">
                 @error('quest.name') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="npc_id">Belongs To NPC: </label>
                 <select wire:model="quest.npc_id" class="form-control" id="npc_id">
@@ -19,7 +19,7 @@
                 @error('quest.npc_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item_id">Required Item </label>
                 <select wire:model="quest.item_id" class="form-control" id="item_id">
@@ -29,6 +29,61 @@
                     @endforeach
                 </select>
                 @error('quest.required_item') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="secondary_required_item">Secondary Required Item </label>
+                <select wire:model="quest.secondary_required_item" class="form-control" id="secondary_required_item">
+                    <option>Please select</option>
+                    @foreach($items as $id => $name)
+                        <option value="{{$id}}">{{$name}}</option>
+                    @endforeach
+                </select>
+                @error('quest.secondary_required_item') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item_id">Parent quest </label>
+                <select wire:model="quest.parent_quest_id" class="form-control" id="parent_quest_id">
+                    <option>Please select</option>
+                    @foreach($quests as $id => $name)
+                        <option value="{{$id}}">{{$name}}</option>
+                    @endforeach
+                </select>
+                @error('quest.parent_quest_id') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="is_parent" wire:model="quest.is_parent">
+                <label class="form-check-label" for="is_parent">Is Parent Quest</label>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="item_id">Faction Map Requirement</label>
+                <select wire:model="quest.faction_map_id" class="form-control" id="faction_map_id">
+                    <option>Please select</option>
+                    @foreach($gameMaps as $id => $name)
+                        <option value="{{$id}}">{{$name}}</option>
+                    @endforeach
+                </select>
+                @error('quest.faction_map_id') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gold_dust_cost">Required Level </label>
+                <input type="number" max="5" class="form-control" name="required_faction_level" value="" wire:model="quest.required_faction_level">
+                @error('quest.required_faction_level') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

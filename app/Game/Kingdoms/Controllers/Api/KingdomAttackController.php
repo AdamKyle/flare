@@ -38,9 +38,14 @@ class KingdomAttackController extends Controller {
            return $slot->item->usable && $slot->item->damages_kingdoms;
         })->all();
 
+        $unitTimeReductionSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->effectsKingdom();
+        })->first();
+
         return response()->json([
-            'kingdoms' => $kingdoms->toArray(),
-            'items'    => array_values($usableItems),
+            'kingdoms'                     => $kingdoms->toArray(),
+            'items'                        => array_values($usableItems),
+            'unit_movement_time_reduction' => $unitTimeReductionSkill->unit_movement_time_reduction,
         ], 200);
     }
 

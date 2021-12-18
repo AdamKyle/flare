@@ -29,6 +29,11 @@
                                 <input type="number" step="0.0001" class="form-control" id="enemy_stat_bonus" aria-describedby="enemy_stat_bonus" name="enemy_stat_bonus" value="{{$gameMap->enemy_stat_bonus}}">
                             </div>
 
+                            <div class="form-group">
+                                <label for="name">Character Damage Deduction by (%)</label>
+                                <input type="number" step="0.0001" class="form-control" id="character_attack_reduction" aria-describedby="character_attack_reduction" name="character_attack_reduction" value="{{$gameMap->character_attack_reduction}}">
+                            </div>
+
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </form>
                     </div>

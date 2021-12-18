@@ -55,10 +55,18 @@ class UnitRecallService {
 
         $recall = UnitMovementQueue::create($unitMovement);
 
-        $timeForDelay = $timeToRecall;
+        $timeReductionSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->effectsKingdom();
+        })->first();
+
+        $timeForDelay = $timeToRecall - $timeToRecall * $timeReductionSkill->unit_movement_time_reduction;
+
+        if ($timeForDelay <= 0.0) {
+            $timeForDelay = 1;
+        }
 
         if ($timeForDelay > 15) {
-            $timeForDelay = $timeToRecall / 10;
+            $timeForDelay = 15;
         }
 
         MoveUnits::dispatch($recall->id, 0, 'recalled', $character, $timeForDelay)->delay(now()->addMinutes($timeForDelay));

@@ -69,6 +69,8 @@ class NpcServerMessageBuilder {
                 return '"Child, I have done something magical! I have unlocked a skill for you!"';
             case 'take_currency':
                 return '"Child! I shall take those shiny coins from you! I have something for you in return!"';
+            case 'what_do_you_want':
+                return '"Select something child, one of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"';
             default:
                 return '';
         }

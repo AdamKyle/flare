@@ -27,14 +27,16 @@ class GameMap extends Model
         'skill_training_bonus',
         'drop_chance_bonus',
         'enemy_stat_bonus',
+        'character_attack_reduction',
     ];
 
     protected $casts = [
-        'default'              => 'boolean',
-        'xp_bonus'             => 'float',
-        'skill_training_bonus' => 'float',
-        'drop_chance_bonus'    => 'float',
-        'enemy_stat_bonus'     => 'float',
+        'default'                    => 'boolean',
+        'xp_bonus'                   => 'float',
+        'skill_training_bonus'       => 'float',
+        'drop_chance_bonus'          => 'float',
+        'enemy_stat_bonus'           => 'float',
+        'character_attack_reduction' => 'float',
     ];
 
     public function maps() {

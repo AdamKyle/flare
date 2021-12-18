@@ -16,19 +16,23 @@ class NpcCommandTypes
 
     const CONJURE = 2;
 
+    const RE_ROLL = 3;
+
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::QUEST => 0,
+        self::QUEST        => 0,
         self::TAKE_KINGDOM => 1,
-        Self::CONJURE => 2,
+        self::CONJURE      => 2,
+        self::RE_ROLL      => 3
     ];
 
     protected static $namedValues = [
         0 => 'Quest',
         1 => 'Take Kingdom',
         2 => 'Conjure',
+        3 => 'Re-Roll'
     ];
 
     /**
@@ -72,6 +76,15 @@ class NpcCommandTypes
      */
     public function isConjure(): bool {
         return $this->value === self::CONJURE;
+    }
+
+    /**
+     * Is this a re roll?
+     *
+     * @return bool
+     */
+    public function isReRoll(): bool {
+        return $this->value === self::RE_ROLL;
     }
 
     /**

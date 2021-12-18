@@ -16,6 +16,8 @@
                             <dd>{{!is_null($gameMap->drop_chance_bonus) ? ($gameMap->drop_chance_bonus * 100) . '%' : '0%'}}</dd>
                             <dt>Enemy Stat Bonus:</dt>
                             <dd>{{!is_null($gameMap->enemy_stat_bonus) ? ($gameMap->enemy_stat_bonus * 100) . '%' : '0%'}}</dd>
+                            <dt>Character Damage Deduction:</dt>
+                            <dd>{{!is_null($gameMap->character_attack_reduction) ? ($gameMap->character_attack_reduction * 100) . '%' : '0%'}}</dd>
                         </dl>
                     </div>
                 </div>

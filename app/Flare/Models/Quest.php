@@ -32,6 +32,11 @@ class Quest extends Model {
         'reward_xp',
         'unlocks_skill',
         'unlocks_skill_type',
+        'is_parent',
+        'parent_quest_id',
+        'secondary_required_item',
+        'faction_map_id',
+        'required_faction_level',
     ];
 
     protected $casts = [
@@ -46,9 +51,21 @@ class Quest extends Model {
         'reward_gold'        => 'integer',
         'reward_xp'          => 'integer',
         'unlocks_skill'      => 'boolean',
+        'is_parent'          => 'boolean',
         'unlocks_skill_type' => 'integer',
+        'parent_quest_id'    => 'integer',
+        'faction_map_id'     => 'integer',
+        'secondary_required_item' => 'integer',
+        'required_faction_level'  => 'integer',
     ];
 
+    public function childQuests() {
+        return $this->hasMany($this, 'parent_quest_id')->with('childQuests');
+    }
+
+    public function parent() {
+        return $this->belongsTo($this, 'parent_quest_id');
+    }
 
     public function item() {
         return $this->belongsTo(Item::class, 'item_id', 'id');

@@ -94,6 +94,10 @@ class KingdomsAttackService {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
         }
 
+        $timeReductionSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->effectsKingdom();
+        })->first();
+
         foreach ($params as $kingdomName => $units) {
             $kingdom = Kingdom::where('character_id', $character->id)
                               ->where('name', $kingdomName)
@@ -113,6 +117,12 @@ class KingdomsAttackService {
 
                 $totalTime = $this->fetchTotalTime($units);
 
+                $totalTime = $totalTime - $totalTime * $timeReductionSkill->unit_movement_time_reduction;
+
+                if ($totalTime <= 0.0) {
+                    $totalTime = 1;
+                }
+
                 $unitMovement = UnitMovementQueue::create([
                     'character_id'    => $character->id,
                     'from_kingdom_id' => $kingdom->id,
@@ -131,7 +141,7 @@ class KingdomsAttackService {
 
                 // @codeCoverageIgnoreStart
                 if ($totalTime > 15) {
-                    $timeForDispatch = $totalTime / 10;
+                    $timeForDispatch = 15;
                 }
                 // @codeCoverageIgnoreEnd
 

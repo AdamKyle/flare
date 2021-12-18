@@ -66,13 +66,13 @@ class CreateMap extends Command
         // $water = new Color(100, 227, 250);
 
         // Hell Magma:
-        $water = new Color(153, 125, 137);
+        $water = new Color(97, 0, 16);
 
         // Regular Water Level
         // $waterLevel = 30;
 
         //  Hell Water Level
-        $waterLevel = 75;
+        $waterLevel = 55;
 
         ini_set('memory_limit','3G');
 

@@ -165,13 +165,15 @@ class TraverseService {
 
         event(new ServerMessageEvent($character->user, 'plane-transfer', $message));
 
-        $name = $character->map->gameMap->name;
+        $gameMap = $character->map->gameMap;
+
+        $name = $gameMap->name;
 
         if ($name === 'Shadow Plane') {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are 
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
             feel the presence of death as it creeps ever closer. 
-            (Characters can walk on water here, monster strength is increased by 35% including Devouring Light. You are reduced by 35% (Damage wise) while here.)';
+            (Characters can walk on water here, monster strength is increased by '.($gameMap->enemy_stat_bonus * 100).'% including Devouring Light. You are reduced by '.($gameMap->character_attack_reduction * 100).'% (Damage wise) while here.)';
 
             event(new MessageEvent($character->user,  $message));
 
