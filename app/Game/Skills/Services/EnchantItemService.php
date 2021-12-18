@@ -91,6 +91,7 @@ class EnchantItemService {
 
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
         $clonedItem->market_sellable = true;
+        $clonedItem->parent_id       = $item->id;
 
         $clonedItem->save();
 
