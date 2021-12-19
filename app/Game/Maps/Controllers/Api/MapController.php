@@ -127,7 +127,13 @@ class MapController extends Controller {
 
     public function fetchQuests(Character $character) {
         $gameMap = $character->map->gameMap;
-        $npcs    = Npc::where('game_map_id', $gameMap->id)->whereHas('quests')->with('quests.childQuests')->get();
+        $npcs    = Npc::where('game_map_id', $gameMap->id)->whereHas('quests')->with(
+            'quests.childQuests',
+            'quests.rewardItem',
+            'quests.item',
+            'quests.npc',
+            'quests.npc.commands'
+        )->get();
 
         return response()->json([
             'npcs'             => $npcs,

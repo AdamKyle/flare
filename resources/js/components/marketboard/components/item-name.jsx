@@ -14,20 +14,20 @@ export default class ItemName extends React.Component {
       return 'unique-item';
     }
 
-    if (this.props.item.item_prefix_id !== null && this.props.item.item_suffix_id !== null) {
-      return 'two-enchant';
-    }
-
-    if (this.props.item.item_prefix_id !== null || this.props.item.item_suffix_id !== null) {
-      return 'one-enchant';
-    }
-
     if (this.props.item.usable) {
       return 'usable-item';
     }
 
     if (this.props.item.type === 'quest') {
       return 'quest-item';
+    }
+
+    if (this.props.item.item_prefix_id !== null && this.props.item.item_suffix_id !== null) {
+      return 'two-enchant';
+    }
+
+    if (this.props.item.item_prefix_id !== null || this.props.item.item_suffix_id !== null) {
+      return 'one-enchant';
     }
 
     return 'normal-item';

@@ -59,8 +59,20 @@ class Quest extends Model {
         'required_faction_level'  => 'integer',
     ];
 
+    protected $appends = [
+        'required_item_monster',
+        'unlocks_skill_name',
+    ];
+
     public function childQuests() {
-        return $this->hasMany($this, 'parent_quest_id')->with('childQuests');
+        return $this->hasMany($this, 'parent_quest_id')
+                    ->with(
+                'childQuests',
+                'rewardItem',
+                        'item',
+                        'npc',
+                        'npc.commands'
+                    );
     }
 
     public function parent() {
@@ -77,6 +89,22 @@ class Quest extends Model {
 
     public function npc() {
         return $this->belongsTo(Npc::class, 'npc_id', 'id');
+    }
+
+    public function getRequiredItemMonsterAttribute() {
+        if (!is_null($this->item_id)) {
+            return Monster::where('quest_item_id', $this->item_id)->with('gameMap')->first();
+        }
+
+        return null;
+    }
+
+    public function getUnlocksSkillNameAttribute() {
+        if ($this->unlocks_skill) {
+            return GameSkill::where('type', $this->unlocks_skill_type)->first()->name;
+        }
+
+        return null;
     }
 
     protected static function newFactory() {

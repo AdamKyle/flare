@@ -1,7 +1,6 @@
 import React from 'react';
 import {Tree, TreeNode} from "react-organizational-chart";
 import QuestNode from "./quest-node";
-import SkillNode from "../../character/sheet/skill-trees/partials/skill-node";
 
 export default class QuestTree extends React.Component {
 
@@ -14,11 +13,13 @@ export default class QuestTree extends React.Component {
 
     if (parentQuest.child_quests.length > 0) {
       for (const child of parentQuest.child_quests) {
-        nodes.push(
-          <TreeNode label={<QuestNode quest={child} />}>
-            {this.buildNodes(child)}
-          </TreeNode>
-        )
+        if (parentQuest.npc.id === child.npc.id) {
+          nodes.push(
+            <TreeNode label={<QuestNode quest={child} parentNPCID={this.props.parentQuest.npc.id}/>}>
+              {this.buildNodes(child)}
+            </TreeNode>
+          );
+        }
       }
     }
 
@@ -31,7 +32,7 @@ export default class QuestTree extends React.Component {
         lineWidth={'2px'}
         lineColor={'blue'}
         lineBorderRadius={'10px'}
-        label={<QuestNode quest={this.props.parentQuest} />}
+        label={<QuestNode quest={this.props.parentQuest} parentNPCID={this.props.parentQuest.npc.id}/>}
       >
         {this.buildNodes(this.props.parentQuest)}
       </Tree>

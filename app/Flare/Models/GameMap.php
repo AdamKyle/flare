@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameMapFactory;
@@ -39,6 +40,10 @@ class GameMap extends Model
         'character_attack_reduction' => 'float',
     ];
 
+    protected $appends = [
+        'map_required_item',
+    ];
+
     public function maps() {
         return $this->hasMany(Map::class, 'game_map_id', 'id');
     }
@@ -53,6 +58,20 @@ class GameMap extends Model
         }
 
         return $hasBonuses;
+    }
+
+    public function getMapRequiredItemAttribute() {
+        switch ($this->name) {
+            case 'Labyrinth':
+                return Item::where('effect', ItemEffectsValue::LABYRINTH)->first();
+            case 'Dungeons':
+                return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
+            case 'Shadow Plane':
+                return Item::where('effect', ItemEffectsValue::SHADOWPLANE)->first();
+            case 'Surface':
+            default:
+                return null;
+        }
     }
 
     protected static function newFactory() {

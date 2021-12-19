@@ -138,6 +138,8 @@ class Item extends Model
 
     protected $appends = [
         'affix_name',
+        'required_monster',
+        'required_quest',
     ];
 
     public function itemSuffix() {
@@ -177,11 +179,27 @@ class Item extends Model
         return $this->name;
     }
 
+    public function getRequiredMonsterAttribute() {
+        if ($this->type === 'quest') {
+            return Monster::where('quest_item_id', $this->id)->with('gameMap')->first();
+        }
+
+        return null;
+    }
+
+    public function getRequiredQuestAttribute() {
+        if ($this->type === 'quest') {
+            return Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first();
+        }
+
+        return null;
+    }
+
     /**
      * Gets the total damage value for the item.
      *
      * In some cases an item might not have a base_damage value.
-     * how ever might have either prefix or suffix or both.
+     * however might have either prefix or suffix or both.
      *
      * In this case we will set the damage variable to one.
      * this will allow the damage modifiers to be applied to the item.
