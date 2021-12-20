@@ -171,4 +171,17 @@ on can be resisted, but your weapon cannot be blocked or miss.
 
 The enemy can then attack on their turn - the entrancing effect only lasts for your turn.
 
+## Stacking of stats and Bonuses
+
+Equipping multiple enchanted items will stack those effects, unless otherwise stated, to your character. Things like stat increases can go through the roof over time,
+things like Damage modifiers - which effect your base attack will also stack. When it comes to skills however, this is where things get dicey.
+
+- Skill Bonus will never go over 100% even if the affixes would push it so.
+- Skill Base Damage Modifier, Ac Modifier and Healing Modifier can go well above 100%, but we only take the best enchantment for each type.
+- Class Bonuses, we take the best one of all you have equipped.
+- Stat Increases can go over 100% and can stack.
+- Fight Time Out Modifiers (this effects the timer in between attacks) - we take the best one, same for movement based timeout modifiers.
+
+
+
 

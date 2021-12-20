@@ -186,6 +186,8 @@ class CharacterInformationBuilder {
             }
         }
 
+        $values = array_filter($values);
+
         $value = empty($values) ? 0.0 : max($values);
 
         return $value > 1.0 ? .99 : $value;
