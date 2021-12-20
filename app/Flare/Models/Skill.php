@@ -177,7 +177,7 @@ class Skill extends Model
         $baseBonus = $this->calculateTotalTimeBonus($this, 'fight_time_out_mod_bonus_per_level');
         $itemBonus = $this->getItemBonuses($this->baseSkill, 'fight_time_out_mod_bonus', true);
 
-        $total = $baseBonus + $itemBonus;
+        $total = $baseBonus + $itemBonus + $value;
 
         if ($total >= 0.50) {
             return 0.50;
@@ -197,8 +197,13 @@ class Skill extends Model
 
         $baseBonus = $this->calculateTotalTimeBonus($this, 'move_time_out_mod_bonus_per_level');
 
+        $totalBonus = $value + $itemBonus + $baseBonus;
 
-        return $value + $itemBonus + $baseBonus;
+        if ($totalBonus > 1) {
+            return 1.0;
+        }
+
+        return $totalBonus;
     }
 
     public function getSkillBonusAttribute() {
@@ -222,14 +227,23 @@ class Skill extends Model
 
         switch ($this->baseSkill->name) {
             case 'Accuracy':
-                return $bonus + $accuracy;
+                $totalBonus = $bonus + $accuracy;
+                break;
             case 'Looting':
-                return  $bonus + $looting;
+                $totalBonus = $bonus + $looting;
+                break;
             case 'Dodge':
-                return  $bonus + $dodge;
+                $totalBonus = $bonus + $dodge;
+                break;
             default:
-                return $bonus;
+                $totalBonus = $bonus;
         }
+
+        if ($totalBonus > 1.0) {
+            return 1.0;
+        }
+
+        return $totalBonus;
     }
 
     public function getSkillTrainingBonusAttribute() {
@@ -249,21 +263,21 @@ class Skill extends Model
     }
 
     protected function getItemBonuses(GameSkill $skill, string $skillAttribute = 'skill_bonus', bool $equippedOnly = false): float {
-        $bonus = 0.0;
+        $bonuses = [];
 
         forEach($this->fetchSlotsWithEquipment() as $slot) {
-            $bonus += $this->calculateBonus($slot->item, $skill, $skillAttribute);
+            $bonuses[] = $this->calculateBonus($slot->item, $skill, $skillAttribute);
         }
 
         if (!$equippedOnly) {
             foreach ($this->character->inventory->slots as $slot) {
                 if ($slot->item->type === 'quest' && $slot->item->skill_name === $this->baseSkill->name) {
-                    $bonus += $this->calculateBonus($slot->item, $this->baseSkill, $skillAttribute);
+                    $bonuses[] = $this->calculateBonus($slot->item, $this->baseSkill, $skillAttribute);
                 }
             }
         }
 
-        return $bonus;
+        return empty($bonuses) ? 0.0 : max($bonuses);
     }
 
     protected function getCharacterBoonsBonus(string $skillBonusAttribute) {

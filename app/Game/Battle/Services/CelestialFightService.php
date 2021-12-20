@@ -6,6 +6,7 @@ use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Services\FightService;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\BattleAttackHandler;
@@ -104,8 +105,14 @@ class CelestialFightService {
         }
 
         if ($monsterHealth <= 0) {
+            $newShards = $character->shards + $celestialFight->monster->shards;
+
+            if ($newShards >= MaxCurrenciesValue::MAX_SHARDS) {
+                $newShards = MaxCurrenciesValue::MAX_SHARDS;
+            }
+
             $character->update([
-                'shards' => $character->shards + $celestialFight->monster->shards,
+                'shards' => $newShards
             ]);
 
             BattleAttackHandler::dispatch($character->refresh(), $celestialFight->monster_id)->onQueue('default_long');

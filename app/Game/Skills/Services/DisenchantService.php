@@ -109,7 +109,7 @@ class DisenchantService {
             }
         }
 
-        if ($characterTotalGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
+        if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
         }
 

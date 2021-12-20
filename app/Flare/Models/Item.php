@@ -232,7 +232,7 @@ class Item extends Model
      * Gets the total defence value for the item.
      *
      * In some cases an item might not have a base_ac value.
-     * how ever might have either prefix or suffix or both.
+     * however, might have either prefix or suffix or both.
      *
      * In this case we will set the ac variable to one.
      * this will allow the ac modifiers to be applied to the item.

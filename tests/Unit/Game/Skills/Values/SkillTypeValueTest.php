@@ -42,7 +42,7 @@ class SkillTypeValueTest extends TestCase {
     }
 
     public function testIsMinutesMoveTimer() {
-        $this->assertTrue((new SkillTypeValue(7))->isMinuteMovementTimer());
+        $this->assertTrue((new SkillTypeValue(7))->isMovementTimer());
     }
 
     public function testIsKingdomBuildingTimers() {

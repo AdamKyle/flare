@@ -82,7 +82,9 @@ class CharacterInformationBuilder {
             $base += $base * $this->fetchModdedStat($stat, $slot->item);
         }
 
-        return $this->characterBoons($base);
+        $base = $this->characterBoons($base);
+
+        return $this->characterBoons($base, $stat . '_mod');
     }
 
     /**
@@ -465,15 +467,15 @@ class CharacterInformationBuilder {
      * @param $base
      * @return float|int
      */
-    protected function characterBoons($base) {
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
+    protected function characterBoons($base, string $statAttribute = null) {
+        if (!is_null($statAttribute) && $this->character->boons->isNotEmpty()) {
+            $bonus = $this->character->boons()->whereNotNull($statAttribute)->sum($statAttribute);
 
-            if ($boons->isNotEmpty()) {
-                $sum = $boons->sum('stat_bonus');
+            $base = $base + $base * $bonus;
+        } else if ($this->character->boons->isNotEmpty()) {
+            $bonus = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->sum('stat_bonus');
 
-                $base += $base + $base * $sum;
-            }
+            $base = $base + $base * $bonus;
         }
 
         return $base;

@@ -44,6 +44,12 @@ class UseItemService {
             'base_ac_mod_bonus'        => $item->base_ac_mod_bonus,
             'fight_time_out_mod_bonus' => $item->fight_time_out_mod_bonus,
             'move_time_out_mod_bonus'  => $item->move_time_out_mod_bonus,
+            'str_mod'                  => $item->str_mod,
+            'dex_mod'                  => $item->dex_mod,
+            'int_mod'                  => $item->int_mod,
+            'chr_mod'                  => $item->chr_mod,
+            'focus_mod'                => $item->focus_mod,
+            'agi_mod'                  => $item->agi_mod,
             'started'                  => now(),
             'complete'                 => $completedAt,
         ]);

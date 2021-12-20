@@ -23,11 +23,7 @@ class MoveTimeOutEventTest extends TestCase
         $this->character = (new CharacterFactory())->createBaseCharacter()
                                                    ->givePlayerLocation()
                                                    ->assignSkill($this->createGameSkill([
-                                                       'type'                              => SkillTypeValue::EFFECTS_DIRECTIONAL_MOVE_TIMER,
-                                                       'move_time_out_mod_bonus_per_level' => 0.001,
-                                                   ]), 2000)
-                                                   ->assignSkill($this->createGameSkill([
-                                                       'type'                              => SkillTypeValue::EFFECTS_MINUTE_MOVE_TIMER,
+                                                       'type'                              => SkillTypeValue::EFFECTS_MOVEMENT_TIMER,
                                                        'move_time_out_mod_bonus_per_level' => 0.001,
                                                    ]), 2000);
 

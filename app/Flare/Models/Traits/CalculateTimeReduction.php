@@ -11,9 +11,9 @@ trait CalculateTimeReduction {
      *
      * @param Skill $skill
      * @param string $modifier
-     * @return float|int|mixed
+     * @return float
      */
-    public function calculateTotalTimeBonus(Skill $skill, string $modifier) {
+    public function calculateTotalTimeBonus(Skill $skill, string $modifier): float {
         $gameSkill    = $skill->baseSkill;
 
         if (is_null($gameSkill->{$modifier})) {
@@ -34,6 +34,6 @@ trait CalculateTimeReduction {
             $column = 'move_time_out_mod_bonus';
         }
 
-        return $currentValue + $character->boons()->where('affect_skill_type', $skill->baseSkill->type)->sum($column);
+        return $currentValue + $character->boons()->where('affect_skill_type', $skill->baseSkill->type)->max($column);
     }
 }
