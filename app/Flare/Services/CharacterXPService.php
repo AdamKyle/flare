@@ -34,7 +34,7 @@ class CharacterXPService {
                 return ceil($xp * MaxLevel::THREE_QUARTERS_PERCENT);
             }
 
-            if ($this->isCharacterThreeQuarters($character->level, $config->last_leg, $config->max_level)) {
+            if ($this->isCharacterAtLastLeg($character->level, $config->last_leg, $config->max_level)) {
                 return ceil($xp * MaxLevel::LAST_LEG_PERCENT);
             }
 

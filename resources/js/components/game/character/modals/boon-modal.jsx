@@ -136,6 +136,54 @@ export default class BoonModal extends React.Component {
                       </>
                       : null
                   }
+                  {
+                    this.props.boon.str_mod > 0.0 ?
+                      <>
+                        <dt>Str Modifier</dt>
+                        <dd className="text-success">+{this.props.boon.str_mod * 100} %</dd>
+                      </>
+                      : null
+                  }
+                  {
+                    this.props.boon.dex_mod > 0.0 ?
+                      <>
+                        <dt>Dex Modifier</dt>
+                        <dd className="text-success">+{this.props.boon.dex_mod * 100} %</dd>
+                      </>
+                      : null
+                  }
+                  {
+                    this.props.boon.int_mod > 0.0 ?
+                      <>
+                        <dt>Int Modifier</dt>
+                        <dd className="text-success">+{this.props.boon.int_mod * 100} %</dd>
+                      </>
+                      : null
+                  }
+                  {
+                    this.props.boon.chr_mod > 0.0 ?
+                      <>
+                        <dt>Chr Modifier</dt>
+                        <dd className="text-success">+{this.props.boon.chr_mod * 100} %</dd>
+                      </>
+                      : null
+                  }
+                  {
+                    this.props.boon.agi_mod > 0.0 ?
+                      <>
+                        <dt>AGI Modifier</dt>
+                        <dd className="text-success">+{this.props.boon.agi_mod * 100} %</dd>
+                      </>
+                      : null
+                  }
+                  {
+                    this.props.boon.focus_mod > 0.0 ?
+                      <>
+                        <dt>Focus Modifier</dt>
+                        <dd className="text-success">+{this.props.boon.focus_mod * 100} %</dd>
+                      </>
+                      : null
+                  }
                 </dl>
               </div>
               : null

@@ -5,6 +5,7 @@ namespace App\Flare\Jobs;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -60,8 +61,14 @@ class DailyGoldDustJob implements ShouldQueue
         if ($lottoChance > $this->lottoChance && !Cache::has('won-lotto')) {
             event(new GlobalMessageEvent($this->character->name . 'has won the daily Gold Dust Lottery!'));
 
+            $newAmount = $this->character->gold_dust + $this->lottoMax;
+
+            if ($newAMount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+                $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
+            }
+
             $this->character->update([
-                'gold_dust' => $this->character->gold_dust + $this->lottoMax,
+                'gold_dust' => $newAmount,
             ]);
 
             event(new ServerMessageEvent($this->character->user, 'lotto_max', $this->lottoMax));
@@ -72,8 +79,14 @@ class DailyGoldDustJob implements ShouldQueue
         } else {
             $amount = rand(1,15);
 
+            $newAmount = $this->character->gold_dust + $this->lottoMax;
+
+            if ($newAMount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+                $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
+            }
+
             $this->character->update([
-                'gold_dust' => $this->character->gold_dust + $amount,
+                'gold_dust' => $newAmount,
             ]);
 
             event(new ServerMessageEvent($this->character->user, 'daily_lottery', $amount));
