@@ -72,7 +72,7 @@
           <dt>Base Cost:</dt>
           <dd>{{number_format($itemAffix->cost)}} gold</dd>
           <dt>Intelligence Required:</dt>
-          <dd>{{$itemAffix->int_required}}</dd>
+          <dd>{{number_format($itemAffix->int_required)}}</dd>
           <dt>Level Required:</dt>
           <dd>{{$itemAffix->skill_level_required}}</dd>
           <dt>Level Becomes To Easy:</dt>
@@ -105,7 +105,7 @@
           </p>
           <dl>
             <dt>Damage:</dt>
-            <dd>{{$itemAffix->damage}}</dd>
+            <dd>{{number_format($itemAffix->damage)}}</dd>
             <dt>Is Damage Irresistible?:</dt>
             <dd>{{$itemAffix->irresistible_damage ? 'Yes' : 'No'}}</dd>
             <dt>Can Stack:</dt>
