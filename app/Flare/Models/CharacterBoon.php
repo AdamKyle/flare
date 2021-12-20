@@ -56,6 +56,12 @@ class CharacterBoon extends Model
         'fight_time_out_mod_bonus'                => 'float',
         'move_time_out_mod_bonus'                 => 'float',
         'skill_training_bonus'                    => 'float',
+        'str_mod'                                 => 'float',
+        'dex_mod'                                 => 'float',
+        'int_mod'                                 => 'float',
+        'chr_mod'                                 => 'float',
+        'focus_mod'                               => 'float',
+        'agi_mod'                                 => 'float',
         'started'                                 => 'datetime',
         'complete'                                => 'datetime',
     ];
