@@ -16,6 +16,7 @@ class AddStatAttributesToCharacterBoons extends Migration
         Schema::table('character_boons', function (Blueprint $table) {
             $table->decimal('str_mod', 8, 4)->nullable()->default(0);
             $table->decimal('dex_mod', 8, 4)->nullable()->default(0);
+            $table->decimal('dur_mod', 8, 4)->nullable()->default(0);
             $table->decimal('int_mod', 8, 4)->nullable()->default(0);
             $table->decimal('chr_mod', 8, 4)->nullable()->default(0);
             $table->decimal('focus_mod', 8, 4)->nullable()->default(0);
@@ -31,12 +32,13 @@ class AddStatAttributesToCharacterBoons extends Migration
     public function down()
     {
         Schema::table('character_boons', function (Blueprint $table) {
-            $table->dropColumn('str_mod', 8, 4);
-            $table->dropColumn('dex_mod', 8, 4);
-            $table->dropColumn('int_mod', 8, 4);
-            $table->dropColumn('chr_mod', 8, 4);
-            $table->dropColumn('focus_mod', 8, 4);
-            $table->dropColumn('agi_mod', 8, 4);
+            $table->dropColumn('str_mod');
+            $table->dropColumn('dex_mod');
+            $table->dropColumn('dex_mod');
+            $table->dropColumn('int_mod');
+            $table->dropColumn('chr_mod');
+            $table->dropColumn('focus_mod');
+            $table->dropColumn('agi_mod');
         });
     }
 }

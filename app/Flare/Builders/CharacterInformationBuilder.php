@@ -68,7 +68,9 @@ class CharacterInformationBuilder {
             $base += $base * $this->fetchModdedStat($stat, $slot->item);
         }
 
-        return $this->characterBoons($base);
+        $base = $this->characterBoons($base);
+
+        return $this->characterBoons($base, $stat . '_mod');
     }
 
     public function getSkill(string $skillName): float {
