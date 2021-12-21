@@ -23,11 +23,11 @@ class CanHitHandler {
         $accuracyBonus = $this->fetchAccuracyBonus($attacker);
         $dodgeBonus    = $this->fetchDodgeBonus($defender);
 
-        if ($accuracyBonus > 1.0) {
+        if ($accuracyBonus >= 1.0) {
             return true;
         }
 
-        if ($dodgeBonus > 1.0) {
+        if ($dodgeBonus >= 1.0) {
             return false;
         }
 
@@ -51,7 +51,7 @@ class CanHitHandler {
             $toHit = $this->toHitCalculation($stat, $defender->dex, $accuracyBonus, $dodgeBonus);
         }
 
-        if ($toHit > 1.0) {
+        if ($toHit >= 1.0) {
             return true;
         }
 
@@ -65,11 +65,11 @@ class CanHitHandler {
         $accuracyBonus = $this->fetchCastingAccuracyBonus($attacker);
         $dodgeBonus    = $this->fetchDodgeBonus($defender);
 
-        if ($accuracyBonus > 1.0) {
+        if ($accuracyBonus >= 1.0) {
             return true;
         }
 
-        if ($dodgeBonus > 1.0) {
+        if ($dodgeBonus >= 1.0) {
             return false;
         }
 
