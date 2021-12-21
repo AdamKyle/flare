@@ -57,12 +57,12 @@ export default class QuestTreeOverView extends React.Component {
 
     return (
       <div className="row">
-        <div className="col-md-6">
+        <div className={singleQuests.length > 0 ? 'col-md-6' : 'hide'}>
           <h4 className="tw-font-light">One off quests</h4>
           <hr />
           {singleQuests}
         </div>
-        <div className="col-md-6">
+        <div className={singleQuests.length > 0 ? 'col-md-6' : 'col-md-12'}>
           <h4 className="tw-font-light">Quest chain</h4>
           <hr />
           {childQuests}
