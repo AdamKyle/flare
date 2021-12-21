@@ -140,6 +140,7 @@ class Item extends Model
         'affix_name',
         'required_monster',
         'required_quest',
+        'locations',
     ];
 
     public function itemSuffix() {
@@ -193,6 +194,14 @@ class Item extends Model
         }
 
         return null;
+    }
+
+    public function getLocationsAttribute() {
+        if ($this->type === 'quest') {
+           return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
+        }
+
+        return [];
     }
 
     /**

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Dropdown} from 'react-bootstrap';
 
 export default class Card extends React.Component {
@@ -55,12 +55,15 @@ export default class Card extends React.Component {
           <h4 className="card-title float-left">{this.props.cardTitle}</h4>
           {
             this.props.hasOwnProperty('close') ?
-              <button
-                className="float-right btn btn-sm btn-danger"
-                onClick={this.props.close}
-              >
-                Close
-              </button>
+              <Fragment>
+                <button
+                  className="float-right btn btn-sm btn-danger"
+                  onClick={this.props.close}
+                >
+                  Close
+                </button>
+                {this.props.additionalButton}
+              </Fragment>
               : null
           }
           {

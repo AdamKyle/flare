@@ -14,6 +14,7 @@ class ItemEffectsValue {
     const LABYRINTH             = 'labyrinth';
     const DUNGEON               = 'dungeon';
     const SHADOWPLANE           = 'shadow-plane';
+    const HELL                  = 'hell';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
     const CONTNUE_LEVELING      = 'continue-leveling';
@@ -29,6 +30,7 @@ class ItemEffectsValue {
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
         self::SHADOWPLANE           => 'shadow-plane',
+        self::HELL                  => 'hell',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
         self::CONTNUE_LEVELING      => 'continue-leveling',
@@ -89,6 +91,7 @@ class ItemEffectsValue {
         return $this->value === self::DUNGEON;
     }
 
+
     /**
      * Can access Shadow plane
      *
@@ -96,6 +99,15 @@ class ItemEffectsValue {
      */
     public function shadowPlane(): bool {
         return $this->value === self::SHADOWPLANE;
+    }
+
+    /**
+     * Can Access Hell
+     *
+     * @return bool
+     */
+    public function hell(): bool {
+        return $this->value === self::HELL;
     }
 
     /**

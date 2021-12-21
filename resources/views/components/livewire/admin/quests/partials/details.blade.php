@@ -69,14 +69,14 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="item_id">Faction Map Requirement</label>
-                <select wire:model="quest.faction_map_id" class="form-control" id="faction_map_id">
+                <label for="faction_game_map_id">Faction Map Requirement</label>
+                <select wire:model="quest.faction_game_map_id" class="form-control" id="faction_game_map_id">
                     <option>Please select</option>
                     @foreach($gameMaps as $id => $name)
                         <option value="{{$id}}">{{$name}}</option>
                     @endforeach
                 </select>
-                @error('quest.faction_map_id') <span class="text-danger">{{ $message }}</span> @enderror
+                @error('quest.faction_game_map_id') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-6">

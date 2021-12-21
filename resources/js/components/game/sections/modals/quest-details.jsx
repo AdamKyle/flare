@@ -41,8 +41,23 @@ export default class QuestDetails extends React.Component {
     return null;
   }
 
+  renderLocations(locations) {
+    return locations.map((location) => {
+      return  <Fragment>
+        <dl>
+          <dt>By Going to</dt>
+          <dd>{location.name}</dd>
+          <dt>Which is at (X/Y)</dt>
+          <dd>{location.x}/{location.y}</dd>
+          <dt>On Plane</dt>
+          <dd>{location.map.name}</dd>
+          {this.renderPlaneAccessRequirements(location.map)}
+        </dl>
+      </Fragment>
+    });
+  }
+
   render() {
-    console.log(this.props.quest);
     return (
       <>
         <Modal show={this.props.show} onHide={this.props.questDetailsClose}>
@@ -159,6 +174,17 @@ export default class QuestDetails extends React.Component {
                               : null
                           }
                         </dl>
+                        {
+                          this.props.quest.item.locations.length > 0 ?
+                            <Fragment>
+                              <hr />
+                              <h3 className="tw-font-light">Locations</h3>
+                              <p>Locations that will give you the item, just for visiting.</p>
+                              <hr />
+                              {this.renderLocations(this.props.quest.item.locations)}
+                            </Fragment>
+                            : null
+                        }
                       </Fragment>
                     : null
                   }
@@ -174,7 +200,7 @@ export default class QuestDetails extends React.Component {
                       this.props.quest.reward_xp !== null ?
                         <Fragment>
                           <dt>XP Reward</dt>
-                          <dd>{this.props.quest.reward_xp}</dd>
+                          <dd>{this.formatNumber(this.props.quest.reward_xp)}</dd>
                         </Fragment>
                       : null
                     }
@@ -182,7 +208,7 @@ export default class QuestDetails extends React.Component {
                       this.props.quest.reward_gold !== null ?
                         <Fragment>
                           <dt>Gold Reward</dt>
-                          <dd>{this.props.quest.reward_gold}</dd>
+                          <dd>{this.formatNumber(this.props.quest.reward_gold)}</dd>
                         </Fragment>
                         : null
                     }
@@ -190,7 +216,7 @@ export default class QuestDetails extends React.Component {
                       this.props.quest.reward_gold_dust !== null ?
                         <Fragment>
                           <dt>Gold Dust Reward</dt>
-                          <dd>{this.props.quest.reward_gold_dust}</dd>
+                          <dd>{this.formatNumber(this.props.quest.reward_gold_dust)}</dd>
                         </Fragment>
                         : null
                     }
@@ -198,7 +224,7 @@ export default class QuestDetails extends React.Component {
                       this.props.quest.reward_shards !== null ?
                         <Fragment>
                           <dt>Shards Reward</dt>
-                          <dd>{this.props.quest.reward_shards}</dd>
+                          <dd>{this.formatNumber(this.props.quest.reward_shards)}</dd>
                         </Fragment>
                         : null
                     }

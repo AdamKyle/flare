@@ -3,6 +3,7 @@ import Card from "../components/templates/card";
 import {Tab, Tabs} from "react-bootstrap";
 import QuestTree from "./trees/quest-tree";
 import AlertInfo from "../components/base/alert-info";
+import QuestTreeOverView from "./modals/quest-tree-over-view";
 
 export default class QuestSection extends React.Component {
 
@@ -11,9 +12,11 @@ export default class QuestSection extends React.Component {
 
     this.state = {
       loading: true,
+      showQuestTree: false,
       npcs: [],
       firstTab: null,
       completedQuests: [],
+      allQuests: [],
     }
   }
 
@@ -24,6 +27,7 @@ export default class QuestSection extends React.Component {
         npcs: result.data.npcs,
         completedQuests: result.data.completed_quests,
         firstTab: result.data.npcs.length > 0 ? result.data.npcs[0].name : null,
+        allQuests: result.data.all_quests,
       });
     }).catch((err) => {
       if (err.hasOwnProperty('response')) {
@@ -46,7 +50,10 @@ export default class QuestSection extends React.Component {
 
   renderParentQuestTrees(quests) {
     return quests.map((quest) => {
-      return <QuestTree parentQuest={quest} />
+      return <>
+        <QuestTree parentQuest={quest} key={quest.id} completedQuests={this.state.completedQuests}/>
+        {quests.length > 0 ? <hr /> : null}
+      </>
     });
   }
 
@@ -60,12 +67,23 @@ export default class QuestSection extends React.Component {
     });
   }
 
+  manageQuestTree() {
+    this.setState({
+      showQuestTree: !this.state.showQuestTree
+    })
+  }
+
   render() {
     return (
       <Card
         OtherCss="p-3"
         cardTitle="Quests"
         close={this.hideQuests.bind(this)}
+        additionalButton={
+          <button className="float-right btn btn-primary btn-sm mr-2" onClick={this.manageQuestTree.bind(this)} disabled={this.state.npcs.length === 0}>
+            All quests
+          </button>
+        }
       >
         {
           this.state.loading ?
@@ -81,25 +99,49 @@ export default class QuestSection extends React.Component {
               :
               <Fragment>
                 <AlertInfo icon={"fas fa-question-circle"} title={"ATTN!"}>
-                  <p>Some quests may require you to speak to a different NPC. All quests are grouped together
-                    as parent/child, but some quests belong to a particular NPC.</p>
-                  <p>You can click on a quest name to open a modal to get details about that quest. Players
-                    can choose to do a specific quest before another, how ever if the quest you want to do has more
-                    currency cost then the previous
-                    quest in the list (for the same NPC), the previous quest would be done first when handing in
-                    currency.</p>
-                  <p>If a quest has been completed, you will see a green checkmark beside the quest name. <strong>This
-                    tree is not live and will not update
-                    in real time if you complete a quest with it open</strong>.</p>
                   <p>
-                    If quests have a line separating them, you will want to do them in the order listed.
-                    If they do not, then feel free to do them in any order.
+                    <strong>
+                      This tree will not update in real time. It is designed as a reference. Opening and closing will update the quest tree.
+                    </strong>
+                  </p>
+                  <p>
+                    Quests with lines separating them running horizontally are individual quests that can be done in any order.
+                  </p>
+                  <p>
+                    Quests with blue lines separating them are quests that should be, or have to be, done in order. You see the parent skill
+                    is unlocked, and the children skills will be locked. As you complete quests, child quests will open up and the completed
+                    quests will be colored green with a checkmark beside them.
+                  </p>
+                  <p>
+                    Once a quest is complete, the one below it, assuming it's a child quest, will open up - all you have to do is meet the requirements and speak to the NPC
+                    with the right command and that's it.
+                  </p>
+                  <p>
+                    Clicking the name of any quest will show you all the relevant details you need to complete that quest,
+                    including: locations, monsters to fight, what plane, how to get to said plane, adventures, faction point levels needed,
+                    items and where to get them.
+                  </p>
+                  <p>
+                    You wil also be shown what NPC and where and how to get to them on the plane you are on. You wil also be shown a list of rewards
+                    for completing said quest.
                   </p>
                 </AlertInfo>
                 <Tabs defaultActiveKey={this.state.firstTab} id="map-quests">
                   {this.renderTabs()}
                 </Tabs>
               </Fragment>
+        }
+        {
+          this.state.showQuestTree ?
+            <Fragment>
+              <QuestTreeOverView
+                allQuests={this.state.allQuests}
+                completedQuests={this.state.completedQuests}
+                show={this.state.showQuestTree}
+                close={this.manageQuestTree.bind(this)}
+              />
+            </Fragment>
+          : null
         }
       </Card>
     );

@@ -62,6 +62,7 @@ class Quest extends Model {
     protected $appends = [
         'required_item_monster',
         'unlocks_skill_name',
+        'belongs_to_map_name',
     ];
 
     public function childQuests() {
@@ -89,6 +90,14 @@ class Quest extends Model {
 
     public function npc() {
         return $this->belongsTo(Npc::class, 'npc_id', 'id');
+    }
+
+    public function getBelongsToMapNameAttribute() {
+        if (!is_null($this->npc)) {
+            return $this->npc->gameMap->name;
+        }
+
+        return null;
     }
 
     public function getRequiredItemMonsterAttribute() {

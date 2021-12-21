@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Npc;
+use App\Flare\Models\Quest;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -137,7 +138,8 @@ class MapController extends Controller {
 
         return response()->json([
             'npcs'             => $npcs,
-            'completed_quests' => $character->questsCompleted,
+            'completed_quests' => $character->questsCompleted->load('quest'),
+            'all_quests'       => Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc.commands')->get(),
         ]);
     }
 }

@@ -13,9 +13,9 @@ export default class QuestTree extends React.Component {
 
     if (parentQuest.child_quests.length > 0) {
       for (const child of parentQuest.child_quests) {
-        if (parentQuest.npc.id === child.npc.id) {
+        if (parentQuest.npc.id === child.npc.id || this.props.ignoreNpcCheck) {
           nodes.push(
-            <TreeNode label={<QuestNode quest={child} parentNPCID={this.props.parentQuest.npc.id}/>}>
+            <TreeNode label={<QuestNode quest={child} parentNPCID={this.props.parentQuest.npc.id} completedQuests={this.props.completedQuests}/>}>
               {this.buildNodes(child)}
             </TreeNode>
           );
@@ -32,7 +32,7 @@ export default class QuestTree extends React.Component {
         lineWidth={'2px'}
         lineColor={'blue'}
         lineBorderRadius={'10px'}
-        label={<QuestNode quest={this.props.parentQuest} parentNPCID={this.props.parentQuest.npc.id}/>}
+        label={<QuestNode quest={this.props.parentQuest} parentNPCID={this.props.parentQuest.npc.id} completedQuests={this.props.completedQuests}/>}
       >
         {this.buildNodes(this.props.parentQuest)}
       </Tree>
