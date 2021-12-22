@@ -31,10 +31,18 @@ class UnitRecallService {
      * @param Character $character
      * @param int $elapsedTime
      */
-    public function recall(array $unitMovement, Character $character, int $elapsedTime, bool $inSeconds = false) {
+    public function recall(array $unitMovement, Character $character, int $elapsedTime = 0, bool $inSeconds = false) {
         unset($unitMovement['id']);
         unset($unitMovement['created_at']);
         unset($unitMovement['updated_at']);
+
+        if ($elapsedTime === 0) {
+            $unitsMoving  = json_decode($unitMovement['units_moving']);
+
+            foreach ($unitsMoving as $unitInfo) {
+                $elapsedTime += $unitInfo->time_to_return;
+            }
+        }
 
         $time = $inSeconds ? now()->addSeconds($elapsedTime) : now()->addMinutes($elapsedTime);
 
