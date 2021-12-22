@@ -26,7 +26,7 @@ class MoveTimeOutListener
         if ($event->timeOut !== 0) {
             $time = $event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character));
 
-            if ($time <= 0.0) {
+            if ($time < 1) {
                 $timeOut    = now()->addMinute();
                 $this->time = 1;
             } else {

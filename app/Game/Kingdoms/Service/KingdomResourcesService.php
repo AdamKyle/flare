@@ -150,7 +150,7 @@ class KingdomResourcesService {
                 'current_morale' => $currentMorale - 0.10,
             ]);
 
-            $message = $this->kingdom->name . ' is loosing morale, due to not being walked for more then 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position;
+            $message = $this->kingdom->name . ' is loosing morale, due to not being walked for more then 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';
 
             $this->notifyUser($message);
 
@@ -464,7 +464,7 @@ class KingdomResourcesService {
             event(new UpdateKingdom($user, $kingdom));
 
             if ($user->show_kingdom_update_messages) {
-                $serverMessage = $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position;
+                $serverMessage = $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';
 
                 if (!is_null($message)) {
                     $serverMessage = $message;
@@ -486,7 +486,7 @@ class KingdomResourcesService {
         event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
 
         if (UserOnlineValue::isOnline($user)) {
-            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.'));
         } else {
             $this->updateKingdomCache($user, $kingdom);
         }

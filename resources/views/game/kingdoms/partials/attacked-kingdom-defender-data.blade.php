@@ -8,7 +8,7 @@
             <dl>
                 @foreach ($log['defender_units'] as $key => $value)
                     <dt>{{$key}}</dt>
-                    <dd>{{$value['amount_killed'] * 100}}%</dd>
+                    <dd>{{number_format($value['amount_killed'] * 100, 2)}}%</dd>
                 @endforeach
             </dl>
         </x-cards.card>
@@ -26,7 +26,7 @@
             <dl>
                 @foreach ($log['defender_buildings'] as $key => $value)
                     <dt>{{$key}}</dt>
-                    <dd>{{$value['durability_lost'] * 100}}%</dd>
+                    <dd>{{number_format($value['durability_lost'] * 100, 2)}}%</dd>
                 @endforeach
             </dl>
         </x-cards.card>

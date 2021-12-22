@@ -44,6 +44,14 @@ class MoveUnits implements ShouldQueue
         }
 
         if (!$unitMovement->completed_at->lessThanOrEqualTo(now())) {
+            $timeLeft = $unitMovement->completed_at->diffInMinutes(now());
+
+            if ($timeLeft <= 15) {
+                $time = now()->addMinutes($timeLeft);
+            } else {
+                $time = now()->addMinutes(15);
+            }
+
             // @codeCoverageIgnoreStart
             MoveUnits::dispatch(
                 $this->movementId,
@@ -51,8 +59,7 @@ class MoveUnits implements ShouldQueue
                 $this->type,
                 $this->character,
                 $this->timeForDispatch
-            )->delay(now()->addMinutes($this->timeForDispatch));
-
+            )->delay($time);
 
             return;
             // @codeCoverageIgnoreEnd
