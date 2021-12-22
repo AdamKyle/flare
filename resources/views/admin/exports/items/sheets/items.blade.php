@@ -56,6 +56,7 @@
         <th>affix_damage_reduction</th>
         <th>devouring_light</th>
         <th>devouring_darkness</th>
+        <th>drop_location_id</th>
     </tr>
     </thead>
     <tbody>
@@ -116,6 +117,7 @@
             <td>{{$item->affix_damage_reduction}}</td>
             <td>{{$item->devouring_light}}</td>
             <td>{{$item->devouring_darkness}}</td>
+            <td>{{$item->dropLocation->name}}</td>
         </tr>
     @endforeach
     </tbody>

@@ -67,6 +67,21 @@
     </div>
     <hr />
     <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="access_to_map_id">Must have access to</label>
+                <select wire:model="quest.access_to_map_id" class="form-control" id="access_to_map_id">
+                    <option>Please select</option>
+                    @foreach($gameMaps as $id => $name)
+                        <option value="{{$id}}">{{$name}}</option>
+                    @endforeach
+                </select>
+                @error('quest.access_to_map_id') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label for="faction_game_map_id">Faction Map Requirement</label>

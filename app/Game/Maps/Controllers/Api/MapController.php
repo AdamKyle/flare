@@ -132,6 +132,9 @@ class MapController extends Controller {
             'quests.childQuests',
             'quests.rewardItem',
             'quests.item',
+            'quests.requiredPlane',
+            'quests.item.dropLocation',
+            'quests.factionMap',
             'quests.npc',
             'quests.npc.commands'
         )->get();

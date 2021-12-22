@@ -62,9 +62,6 @@
         <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-sword"></i><span class="hide-menu">Manage Items</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('items.list')}}">Items</a></li>
-            <li><a href="{{route('items.create')}}">Create Item</a></li>
-            <li><a href="{{route('items.export')}}">Export</a></li>
-            <li><a href="{{route('items.import')}}">Import</a></li>
         </ul>
     </li>
     <li>

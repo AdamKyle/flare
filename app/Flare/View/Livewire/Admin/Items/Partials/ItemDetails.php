@@ -4,6 +4,7 @@ namespace App\Flare\View\Livewire\Admin\Items\Partials;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use App\Game\Skills\Values\SkillTypeValue;
 use Livewire\Component;
@@ -88,6 +89,8 @@ class ItemDetails extends Component
 
     public $lastsFor = 0;
 
+    public $specialLocations = [];
+
     protected $rules = [
         'item.name'                             => 'required',
         'item.type'                             => 'required',
@@ -131,8 +134,7 @@ class ItemDetails extends Component
         'item.affix_damage_reduction'           => 'nullable',
         'item.devouring_light'                  => 'nullable',
         'item.devouring_darkness'               => 'nullable',
-
-
+        'item.drop_location_id'                 => 'nullable',
     ];
 
     protected $messages = [
@@ -210,8 +212,9 @@ class ItemDetails extends Component
             $this->item = new Item;
         }
 
-        $this->skills      = GameSkill::all();
-        $this->skillTypes = SkillTypeValue::$namedValues;
+        $this->skills           = GameSkill::all();
+        $this->skillTypes       = SkillTypeValue::$namedValues;
+        $this->specialLocations = Location::whereNotNull('enemy_strength_type')->get();
     }
 
     public function render()

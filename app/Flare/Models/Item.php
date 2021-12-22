@@ -26,6 +26,7 @@ class Item extends Model
         'name',
         'item_suffix_id',
         'item_prefix_id',
+        'drop_location_id',
         'type',
         'default_position',
         'base_damage',
@@ -149,6 +150,10 @@ class Item extends Model
 
     public function itemPrefix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
+    }
+
+    public function dropLocation() {
+        return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
     }
 
     public function slot() {

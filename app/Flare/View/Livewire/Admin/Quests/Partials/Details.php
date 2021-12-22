@@ -31,6 +31,7 @@ class Details extends Component
         'quest.faction_game_map_id'     => 'nullable',
         'quest.secondary_required_item' => 'nullable',
         'quest.required_faction_level'  => 'nullable',
+        'quest.access_to_map_id'        => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];

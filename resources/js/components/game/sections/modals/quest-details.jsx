@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react';
 import {Modal, Button, Tabs, Tab} from 'react-bootstrap';
 import ItemName from "../../../marketboard/components/item-name";
+import AlertInfo from "../../components/base/alert-info";
 
 export default class QuestDetails extends React.Component {
 
@@ -22,6 +23,22 @@ export default class QuestDetails extends React.Component {
         <Fragment>
           <dt>Required to access</dt>
           <dd><ItemName item={map.map_required_item} /></dd>
+
+          {
+            map.map_required_item.required_quest !== null ?
+              <Fragment>
+                <dt>Which needs you to complete (Quest)</dt>
+                <dd>{map.map_required_item.required_quest.name}</dd>
+                <dt>By Speaking to</dt>
+                <dd>{map.map_required_item.required_quest.npc.real_name}</dd>
+                <dt>Who is at (X/Y)</dt>
+                <dd>{map.map_required_item.required_quest.npc.x_position}/{map.map_required_item.required_quest.npc.y_position}</dd>
+                <dt>On plane</dt>
+                <dd>{map.map_required_item.required_quest.npc.game_map.name}</dd>
+                {this.renderPlaneAccessRequirements(map.map_required_item.required_quest.npc.game_map)}
+              </Fragment>
+            : null
+          }
 
           {
             map.map_required_item.required_monster !== null ?
@@ -58,6 +75,7 @@ export default class QuestDetails extends React.Component {
   }
 
   render() {
+    console.log(this.props.quest);
     return (
       <>
         <Modal show={this.props.show} onHide={this.props.questDetailsClose}>
@@ -146,6 +164,18 @@ export default class QuestDetails extends React.Component {
                         <hr />
                         <p>This quest requires you to hand in item. Below you will find relevant details as to how to obtain the item
                         you need.</p>
+                        {
+                          this.props.quest.item.drop_location !== null ?
+                            <AlertInfo icon={'fas fa-question-circle'} title={"Special Locations"}>
+                              <p>Some items, such as this one, only drop when you are at a special location. These locations
+                              increase enemy strength making them more of a challenge.</p>
+                              <p>These items have a 1/1,000,000 chance to drop. Your looting skill is capped at 45% here.</p>
+                              <p>
+                                <strong>These items will not drop if automation is detected. You must manually farm these quest items.</strong>
+                              </p>
+                            </AlertInfo>
+                          : null
+                        }
                         <dl>
                           {
                             this.props.quest.required_item_monster !== null ?
@@ -173,6 +203,20 @@ export default class QuestDetails extends React.Component {
                               </Fragment>
                               : null
                           }
+
+                          {
+                            this.props.quest.item.drop_location !== null ?
+                              <Fragment>
+                                <dt>By Visiting (Fighting monsters for it to drop)</dt>
+                                <dd>{this.props.quest.item.drop_location.name}</dd>
+                                <dt>At coordinates (X/Y)</dt>
+                                <dd>{this.props.quest.item.drop_location.x} / {this.props.quest.item.drop_location.y}</dd>
+                                <dt>Which is on the plane</dt>
+                                <dd>{this.props.quest.item.drop_location.map.name}</dd>
+                                {this.renderPlaneAccessRequirements(this.props.quest.item.drop_location.map)}
+                              </Fragment>
+                              : null
+                          }
                         </dl>
                         {
                           this.props.quest.item.locations.length > 0 ?
@@ -187,6 +231,43 @@ export default class QuestDetails extends React.Component {
                         }
                       </Fragment>
                     : null
+                  }
+                  {
+                    this.props.quest.required_plane !== null ?
+                      <Fragment>
+                        <hr />
+                        <h3 className="tw-font-light">Quest Requires Plane Access</h3>
+                        <hr />
+                        <p>This quest requires that you have access to a specific plane. You can find the relevant details of the quest that would get you access.
+                        There may be other quests involved, so make sure to check that quest out to see whats required.</p>
+
+                        <dl>
+                          {this.renderPlaneAccessRequirements(this.props.quest.required_plane)}
+                        </dl>
+                      </Fragment>
+                      : null
+                  }
+
+                  {
+                    this.props.quest.faction_game_map_id !== null ?
+                      <Fragment>
+                        <hr />
+                        <h3 className="tw-font-light">Quest Requires Specific Faction Level</h3>
+                        <hr />
+                        <p>
+                          This quest requires you to have a Faction at a specific level to complete it.
+                          To do this, use Auto battle on the map required to fight any monster.
+                        </p>
+
+                        <dl>
+                          <dt>Plane Faction Name (Map to fight on)</dt>
+                          <dd>{this.props.quest.faction_map.name}</dd>
+                          <dt>Level required</dt>
+                          <dd>{this.props.quest.required_faction_level}</dd>
+                          {this.renderPlaneAccessRequirements(this.props.quest.faction_map)}
+                        </dl>
+                      </Fragment>
+                      : null
                   }
                 </div>
               </Tab>

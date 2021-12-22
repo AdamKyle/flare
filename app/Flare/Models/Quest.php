@@ -22,6 +22,7 @@ class Quest extends Model {
         'name',
         'npc_id',
         'item_id',
+        'access_to_map_id',
         'gold_dust_cost',
         'shard_cost',
         'gold_cost',
@@ -35,7 +36,7 @@ class Quest extends Model {
         'is_parent',
         'parent_quest_id',
         'secondary_required_item',
-        'faction_map_id',
+        'faction_game_map_id',
         'required_faction_level',
     ];
 
@@ -54,7 +55,7 @@ class Quest extends Model {
         'is_parent'          => 'boolean',
         'unlocks_skill_type' => 'integer',
         'parent_quest_id'    => 'integer',
-        'faction_map_id'     => 'integer',
+        'faction_game_map_id'     => 'integer',
         'secondary_required_item' => 'integer',
         'required_faction_level'  => 'integer',
     ];
@@ -71,6 +72,9 @@ class Quest extends Model {
                 'childQuests',
                 'rewardItem',
                         'item',
+                        'factionMap',
+                        'item.dropLocation',
+                        'requiredPlane',
                         'npc',
                         'npc.commands'
                     );
@@ -90,6 +94,14 @@ class Quest extends Model {
 
     public function npc() {
         return $this->belongsTo(Npc::class, 'npc_id', 'id');
+    }
+
+    public function requiredPlane() {
+        return $this->hasOne(GameMap::class, 'id', 'access_to_map_id');
+    }
+
+    public function factionMap() {
+        return $this->hasOne(GameMap::class, 'id', 'faction_game_map_id');
     }
 
     public function getBelongsToMapNameAttribute() {

@@ -3,6 +3,7 @@
 namespace App\Admin\Import\Items\Sheets;
 
 use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Flare\Models\GameSkill;
@@ -100,6 +101,14 @@ class ItemsSheet implements ToCollection {
                 } else if ($key === 'can_drop') {
                     if (is_null($value)) {
                         $value = false;
+                    }
+                } else if ($key === 'drop_location_id') {
+                    $foundLocation = Location::where('name', $value)->first();
+
+                    if (is_null($location)) {
+                        $value = null;
+                    } else {
+                        $value = $foundLocation->id;
                     }
                 }
 
