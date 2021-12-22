@@ -37,11 +37,13 @@ class KingdomUnitMovementController extends Controller {
             ], 200);
         }
 
+        $elapsedTime = $unitMovementQueue->completed_at->diffInSeconds(now()) * $timeLeft;
+
         $unitMovementQueue->delete();
 
         UpdateUnitMovementLogs::dispatch($character);
 
-        $this->unitRecall->recall($unitMovementData, $character, $timeLeft);
+        $this->unitRecall->recall($unitMovementData, $character, $elapsedTime, true);
 
         return response()->json([], 200);
     }
