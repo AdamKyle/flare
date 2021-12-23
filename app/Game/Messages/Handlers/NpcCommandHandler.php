@@ -2,6 +2,8 @@
 
 namespace App\Game\Messages\Handlers;
 
+use App\Flare\Models\GameMap;
+use App\Game\Core\Values\FactionLevel;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
 use League\Fractal\Manager;
@@ -250,7 +252,15 @@ class NpcCommandHandler {
 
                     event(new UpdateTopBarEvent($character->refresh()));
 
-                    broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name));
+                    broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name . ' the required currencies.'));
+                }
+
+                if (!$this->hasPlaneAccess($quest, $character)) {
+                    return false;
+                }
+
+                if (!$this->hasFactionRequirements($quest, $character)) {
+                    return false;
                 }
 
                 $foundItem->delete();
@@ -342,6 +352,42 @@ class NpcCommandHandler {
         }
 
         return $canPay;
+    }
+
+    private function hasPlaneAccess(Quest $quest, Character $character): bool {
+        if (!is_null($quest->access_to_map_id)) {
+            $itemNeeded = $quest->requiredPlane->map_required_item;
+
+            $planeAccessItem = $character->inventory->slots->filter(function($slot) use($itemNeeded) {
+                return $slot->item->effect === $itemNeeded->effect;
+            })->first();
+
+            if (is_null($planeAccessItem)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    }
+
+    private function hasFactionRequirements(Quest $quest, Character $character): bool {
+        if (!is_null($quest->faction_game_map_id)) {
+            $faction = $character->factions->where('game_map_id', $quest->faction_game_map_id)->first();
+
+            if ($quest->required_faction_level > 4) {
+                if (!FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
+                    return false;
+                }
+            } else {
+                if ($faction->current_level < $quest->required_faction_level) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private function handleReward(Character $character, Quest $quest, Npc $npc) {

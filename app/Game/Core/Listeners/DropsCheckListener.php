@@ -4,6 +4,7 @@ namespace App\Game\Core\Listeners;
 
 use App\Flare\Models\Location;
 use App\Flare\Values\LocationEffectValue;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
@@ -14,6 +15,7 @@ use App\Flare\Models\Item;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
+
 
 class DropsCheckListener
 {
@@ -52,21 +54,35 @@ class DropsCheckListener
             ->where('game_map_id', $characterMap->game_map_id)
             ->first();
 
-        if ($locationWithEffect) {
+        $canGetDrop = $this->canHaveDrop($event, $lootingChance, $gameMapBonus, $locationWithEffect);
+        
+        $this->handleDrop($event, $canGetDrop, $locationWithEffect);
+
+        $this->handleMonsterQuestDrop($event, $lootingChance, $gameMapBonus);
+
+        if (!is_null($locationWithEffect)) {
+            $this->handleSpecialLocationQuestItem($event, $locationWithEffect, $lootingChance);
+        }
+    }
+
+    protected function canHaveDrop(DropsCheckEvent $event, float $lootingChance, float $gameMapBonus, Location $locationWithEffect = null) {
+        if (!is_null($locationWithEffect)) {
             $dropRate   = new LocationEffectValue($locationWithEffect->enemy_strength_type);
 
-            $canGetDrop = DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate());
-        } else {
-            $canGetDrop = DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
+            return DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate());
         }
-        
+
+        return DropCheckCalculator::fetchDropCheckChance($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
+    }
+
+    protected function handleDrop(DropsCheckEvent $event, bool $canGetDrop, Location $locationWithEffect = null) {
         if ($canGetDrop) {
             $drop = $this->randomItemDropBuilder
-                         ->setLocation($locationWithEffect)
-                         ->setMonsterPlane($event->monster->gameMap->name)
-                         ->setCharacterLevel($event->character->level)
-                         ->setMonsterMaxLevel($event->monster->max_level)
-                         ->generateItem();
+                ->setLocation($locationWithEffect)
+                ->setMonsterPlane($event->monster->gameMap->name)
+                ->setCharacterLevel($event->character->level)
+                ->setMonsterMaxLevel($event->monster->max_level)
+                ->generateItem();
 
             if (!is_null($drop)) {
                 if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {
@@ -75,13 +91,52 @@ class DropsCheckListener
                     event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
                 }
             }
-       }
+        }
+    }
 
+    protected function handleMonsterQuestDrop(DropsCheckEvent $event, float $lootingChance, float $gameMapBonus) {
         if (!is_null($event->monster->quest_item_id)) {
             $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($event->monster, $lootingChance, $gameMapBonus, $event->adventure);
 
             if ($canGetQuestItem) {
                 $this->attemptToPickUpItem($event, $event->monster->questItem);
+
+                event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
+            }
+        }
+    }
+
+    protected function handleSpecialLocationQuestItem(DropsCheckEvent $event, Location $locationWithEffect, float $lootingChance) {
+        $automation = $event->character->currentAutomations()->where('type', AutomationType::ATTACK)->first();
+        dump('Automation check', $automation);
+        if (!is_null($automation)) {
+            return; // Characters cannot use automation to get these.
+        }
+
+        $characterLevel  = $event->character->level;
+        $monsterMaxLevel = $event->monster->max_level;
+        $levelDifference = $monsterMaxLevel - $characterLevel;
+
+        dump('Level diff Check', $levelDifference);
+        if (!($levelDifference >= 10)) {
+            return; // The monster must be 10 levels or higher than the character for this to drop.
+        }
+
+        $lootingChance = $lootingChance > 0.45 ? 0.45 : $lootingChance;
+
+        $item = Item::where('drop_location_id', $locationWithEffect->id)->where('type', 'quest')->first();
+        dump('Has item?', $item);
+
+        if (!is_null($item)) {
+            $chance = 999999;
+            $roll   = rand(1, 1000000);
+
+            $roll = $roll + $roll * $lootingChance;
+
+            dump($roll, $chance);
+
+            if ($roll > $chance) {
+                $this->attemptToPickUpItem($event, $item);
 
                 event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
             }

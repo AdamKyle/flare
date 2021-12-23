@@ -80,7 +80,7 @@ export default class QuestSection extends React.Component {
         cardTitle="Quests"
         close={this.hideQuests.bind(this)}
         additionalButton={
-          <button className="float-right btn btn-primary btn-sm mr-2" onClick={this.manageQuestTree.bind(this)} disabled={this.state.npcs.length === 0}>
+          <button className="float-right btn btn-primary btn-sm mr-2" onClick={this.manageQuestTree.bind(this)} disabled={this.state.loading}>
             All Quests
           </button>
         }

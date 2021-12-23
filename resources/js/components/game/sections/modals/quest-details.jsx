@@ -263,7 +263,7 @@ export default class QuestDetails extends React.Component {
                           <dt>Plane Faction Name (Map to fight on)</dt>
                           <dd>{this.props.quest.faction_map.name}</dd>
                           <dt>Level required</dt>
-                          <dd>{this.props.quest.required_faction_level}</dd>
+                          <dd>{this.props.quest.required_faction_level > 4 ? '4 Maxed' : this.props.quest.required_faction_level}</dd>
                           {this.renderPlaneAccessRequirements(this.props.quest.faction_map)}
                         </dl>
                       </Fragment>

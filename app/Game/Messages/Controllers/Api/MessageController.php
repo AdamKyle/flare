@@ -8,6 +8,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Maps\Services\MovementService;
+use App\Game\Messages\Jobs\ProcessNPCCommands;
 use App\Game\Messages\Request\PublicEntityRequest;
 use App\Game\Maps\Services\PctService;
 use Illuminate\Http\Request;
@@ -193,7 +194,10 @@ class MessageController extends Controller {
             $command = $npc->commands->where('command', $request->message)->first();
 
             if (!is_null($command)) {
-                $this->npcCommandHandler->handleForType($command->command_type, $npc, auth()->user());
+
+                broadcast(new ServerMessageEvent($user, 'Processing message ...'));
+
+                ProcessNPCCommands::dispatch($user, $npc, $command->command_type)->onConnection('npc_commands');
 
                 return response()->json([], 200);
             }

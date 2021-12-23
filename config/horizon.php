@@ -183,6 +183,16 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
+        'supervisor-npcs' => [
+            'connection' => 'npc_commands',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'tries' => 2,
+            'timeout' => 900,
+            'memory' => 128,
+            'nice' => 0,
+        ],
         'supervisor-daily-characters' => [
             'connection' => 'character_daily',
             'queue' => ['default'],
@@ -283,6 +293,16 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
+            'supervisor-npcs' => [
+                'connection' => 'npc_commands',
+                'queue' => ['default_long'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'tries' => 2,
+                'timeout' => 900,
+                'memory' => 128,
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
@@ -325,6 +345,17 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
+            'supervisor-npcs' => [
+                'connection' => 'npc_commands',
+                'queue' => ['default_long'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'tries' => 2,
+                'timeout' => 900,
+                'memory' => 128,
+                'nice' => 0,
+            ],
+
         ],
     ],
 ];

@@ -193,9 +193,14 @@ class BattleEventHandler {
         $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
 
         if ($cannotHave) {
-            event(new ServerMessageEvent($character->user, 'Failed to reward the gold as you are, or are too close to gold cap to receive: ' . number_format($gold) . ' gold.'));
+            $characterNewGold = MaxCurrenciesValue::MAX_GOLD;
 
-            return $character;
+            $character->gold = $characterNewGold;
+            $character->save();
+
+            event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold. You are now gold capped.'));
+
+            return $character->refresh();
         }
 
         $character->gold += $gold;

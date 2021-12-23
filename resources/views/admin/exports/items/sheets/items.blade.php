@@ -117,7 +117,7 @@
             <td>{{$item->affix_damage_reduction}}</td>
             <td>{{$item->devouring_light}}</td>
             <td>{{$item->devouring_darkness}}</td>
-            <td>{{$item->dropLocation->name}}</td>
+            <td>{{!is_null($item->dropLocation) ? $item->dropLocation->name : null}}</td>
         </tr>
     @endforeach
     </tbody>

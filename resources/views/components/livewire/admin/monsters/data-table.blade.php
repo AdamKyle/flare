@@ -115,15 +115,22 @@
               <x-forms.button-with-form
                 form-route="{{route('monster.publish', ['monster' => $monster])}}"
                 form-id="publish-monster-{{$monster->id}}"
-                button-title="Publish Monster"
+                button-title="Publish"
                 form-method="POST"
-                class="btn btn-success mt-2"
+                class="{{'btn btn-success btn-sm mb-2 ' . ($monster->published ? 'hide' : '')}}"
               />
+              <x-core.buttons.link-buttons.primary-button
+                href="{{route('monster.edit', ['monster' => $monster])}}"
+              >Edit</x-core.buttons.link-buttons.primary-button>
             </td>
           @endguest
         </tr>
       @empty
-        <x-data-tables.no-results colspan="7" />
+        @guest
+          <x-data-tables.no-results colspan="8" />
+        @elseif(auth()->user()->hasRole('Admin'))
+          <x-data-tables.no-results colspan="9" />
+        @endguest
       @endforelse
     </x-data-tables.body>
   </x-data-tables.table>
