@@ -2,10 +2,9 @@
 
 namespace App\Admin\Services;
 
+use App\Flare\Models\SetSlot;
 use App\Game\Core\Traits\ResponseBuilder;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 
@@ -14,29 +13,18 @@ class ItemsService {
     use ResponseBuilder;
 
     public function deleteItem(Item $item) {
-        $slots = InventorySlot::where('item_id', $item->id)->get();
-        $name  = $item->affix_name;
+        $name = $item->name;
 
-        if ($slots->isEmpty()) {
-            $item->delete();
+        InventorySlot::where('item_id', $item->id)->delete();
 
-            return $this->successResult(['message' => 'success', $name . ' was deleted successfully.']);
-        }
+        SetSlot::where('item_id', $item->id)->get();
 
-        foreach($slots as $slot) {
-            $character = $slot->inventory->character;
+        foreach ($item->children() as $child) {
+            InventorySlot::where('item_id', $child->id)->delete();
 
-            $slot->delete();
+            SetSlot::where('item_id', $child->id)->get();
 
-            $gold = SellItemCalculator::fetchTotalSalePrice($item);
-
-            $character->gold += $gold;
-            $character->save();
-
-            $character = $character->refresh();
-
-            event(new ServerMessageEvent($character->user, 'deleted_item', $name));
-            event(new UpdateTopBarEvent($character));
+            $child->delete();
         }
 
         $item->delete();
