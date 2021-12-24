@@ -117,8 +117,8 @@ class AdventureRewardService {
         $spillOver = 0;
 
         if ($points > $faction->points_needed) {
-            $spillOver = $points - $factionPoints->points_needed;
-            $points    = $factionPoints->points_needed;
+            $spillOver = $points - $factionPoints;
+            $points    = $factionPoints;
         }
 
         if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {

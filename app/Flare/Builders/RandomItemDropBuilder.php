@@ -96,13 +96,15 @@ class RandomItemDropBuilder {
         $duplicateItem = $this->duplicateItem($item);
         $affix         = $this->fetchRandomItemAffix();
 
-
+        dump($item);
+        dump($duplicateItem);
+        dump('Attaching Affixes');
         if (!is_null($duplicateItem->itemSuffix) || !is_null($duplicateItem->itemPrefix)) {
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         } else {
             $duplicateItem = $this->attachAffixOrDelete($duplicateItem, $affix);
         }
-
+        dump('Attached Affixes');
         if (is_null($duplicateItem)) {
             if (is_null($item->itemSuffix) && is_null($item->itemPrefix)) {
                 $foundItem = Item::where('item_' . $affix->type . '_id', $affix->id)
@@ -134,6 +136,7 @@ class RandomItemDropBuilder {
                             ->first();
 
                 if (is_null($foundItem)) {
+                    dump('Did not find Matching Item, Duplicating Current Item');
                     $newItem = $this->duplicateItem($item);
 
                     $newItem->update([
@@ -145,6 +148,7 @@ class RandomItemDropBuilder {
                     return $newItem->refresh();
 
                 } else {
+                    dump('Found Matching Item');
                     return $foundItem;
                 }
             }

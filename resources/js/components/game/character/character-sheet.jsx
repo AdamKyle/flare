@@ -47,7 +47,6 @@ export default class CharacterSheet extends React.Component {
       });
 
     this.sheetUpdate.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
-      console.log(event);
       this.setState({
         characterSheet: event.characterSheet,
       });

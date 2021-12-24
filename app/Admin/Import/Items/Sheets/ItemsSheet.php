@@ -105,7 +105,7 @@ class ItemsSheet implements ToCollection {
                 } else if ($key === 'drop_location_id') {
                     $foundLocation = Location::where('name', $value)->first();
 
-                    if (is_null($location)) {
+                    if (is_null($foundLocation)) {
                         $value = null;
                     } else {
                         $value = $foundLocation->id;

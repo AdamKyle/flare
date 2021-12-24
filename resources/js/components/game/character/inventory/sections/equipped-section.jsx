@@ -132,7 +132,6 @@ export default class EquippedSection extends React.Component {
   }
 
   formatDataForTable() {
-    console.log(this.props.equipped);
     if (Array.isArray(this.props.equipped)) {
       return this.props.equipped.map((e) => {
         e.item['slot_id']  = e.id;

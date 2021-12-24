@@ -57,10 +57,6 @@ class LevelCharacter extends Command
             return $this->error('Character not found.');
         }
 
-        if ($this->argument('levels') > MaxLevel::MAX_LEVEL) {
-            return $this->error('Level too high');
-        }
-
         $bar = $this->output->createProgressBar($this->argument('levels'));
 
         $bar->start();

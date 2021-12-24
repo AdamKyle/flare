@@ -1,5 +1,4 @@
 @props([
-    'attributes' => '',
     'href'       => '#',
     'css'        => ''
 ])

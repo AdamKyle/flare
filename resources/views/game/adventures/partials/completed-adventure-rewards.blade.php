@@ -40,10 +40,7 @@
                   @csrf
                 </form>
 
-                <x-core.buttons.link-buttons.success-button
-                  attributes="onclick='event.preventDefault();
-                  document.getElementById('collect-reward').submit();'"
-                >
+                <x-core.buttons.link-buttons.success-button onclick="event.preventDefault();document.getElementById('collect-reward').submit();">
                   Collect Rewards
                 </x-core.buttons.link-buttons.success-button>
               </div>

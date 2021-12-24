@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Quests\Partials;
 
+use Cache;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
@@ -62,6 +63,9 @@ class Details extends Component
         $this->validate();
 
         $this->quest->save();
+
+        Cache::delete('npc-quests');
+        Cache::delete('all-quests');
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->quest);
         $this->emitTo('core.form-wizard', $functionName, $index, true);

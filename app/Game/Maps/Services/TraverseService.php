@@ -111,6 +111,14 @@ class TraverseService {
             return !empty($hasItem);
         }
 
+        if ($gameMap->name === 'Hell') {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::HELL;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
         if ($gameMap->name === 'Surface') {
             return true;
         }

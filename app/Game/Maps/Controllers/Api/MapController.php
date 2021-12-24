@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use Cache;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Game\Automation\Values\AutomationType;
@@ -128,21 +129,28 @@ class MapController extends Controller {
 
     public function fetchQuests(Character $character) {
         $gameMap = $character->map->gameMap;
-        $npcs    = Npc::where('game_map_id', $gameMap->id)->whereHas('quests')->with(
-            'quests.childQuests',
-            'quests.rewardItem',
-            'quests.item',
-            'quests.requiredPlane',
-            'quests.item.dropLocation',
-            'quests.factionMap',
-            'quests.npc',
-            'quests.npc.commands'
-        )->get();
+
+        if (!Cache::has('npc-quests')) {
+            Cache::put('npc-quests', Npc::where('game_map_id', $gameMap->id)->whereHas('quests')->with(
+                'quests.childQuests',
+                'quests.rewardItem',
+                'quests.item',
+                'quests.requiredPlane',
+                'quests.item.dropLocation',
+                'quests.factionMap',
+                'quests.npc',
+                'quests.npc.commands'
+            )->get());
+        }
+
+        if (!Cache::has('all-quests')) {
+            Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc', 'npc.commands')->get());
+        }
 
         return response()->json([
-            'npcs'             => $npcs,
+            'npcs'             => Cache::get('npc-quests'),
             'completed_quests' => $character->questsCompleted->load('quest'),
-            'all_quests'       => Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc.commands')->get(),
+            'all_quests'       => Cache::get('all-quests'),
         ]);
     }
 }

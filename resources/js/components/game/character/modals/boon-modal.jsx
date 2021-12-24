@@ -58,7 +58,6 @@ export default class BoonModal extends React.Component {
   }
 
   render() {
-    console.log(this.props.boon.int_mod > 0.0);
     return (
       <Modal
         show={this.props.show}

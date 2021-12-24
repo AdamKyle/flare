@@ -64,6 +64,7 @@ class Quest extends Model {
         'required_item_monster',
         'unlocks_skill_name',
         'belongs_to_map_name',
+        'secondary_required_quest_item',
     ];
 
     public function childQuests() {
@@ -86,6 +87,10 @@ class Quest extends Model {
 
     public function item() {
         return $this->belongsTo(Item::class, 'item_id', 'id');
+    }
+
+    public function getSecondaryRequiredQuestItemAttribute() {
+        return Item::with('dropLocation')->find($this->secondary_required_item);
     }
 
     public function rewardItem() {

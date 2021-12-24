@@ -38,8 +38,8 @@ class DataTable extends Component
             });
 
             if (!is_null($this->adventureId)) {
-                $location = $location->join('adventure_location', function($join) {
-                    return $join->on('locations.id', '=', 'adventure_location.location_id')->where('adventure_location.adventure_id', $this->adventureId);
+                $location = $location->join('adventures', function($join) {
+                    return $join->on('locations.id', '=', 'adventures.location_id')->where('adventures.id', $this->adventureId);
                 });
             }
 
@@ -49,8 +49,8 @@ class DataTable extends Component
             $location = Location::dataTableSearch($this->search);
 
             if (!is_null($this->adventureId)) {
-                $location = $location->join('adventure_location', function($join) {
-                    return $join->on('locations.id', '=', 'adventure_location.location_id')->where('adventure_location.adventure_id', $this->adventureId);
+                $location = $location->join('adventures', function($join) {
+                    return $join->on('locations.id', '=', 'adventures.location_id')->where('adventures.id', $this->adventureId);
                 });
             }
 

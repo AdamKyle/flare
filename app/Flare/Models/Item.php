@@ -142,6 +142,7 @@ class Item extends Model
         'required_monster',
         'required_quest',
         'locations',
+        'adventures'
     ];
 
     public function itemSuffix() {
@@ -154,10 +155,6 @@ class Item extends Model
 
     public function dropLocation() {
         return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
-    }
-
-    public function slot() {
-        return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
     }
 
     public function children() {
@@ -204,6 +201,14 @@ class Item extends Model
     public function getLocationsAttribute() {
         if ($this->type === 'quest') {
            return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
+        }
+
+        return [];
+    }
+
+    public function getAdventuresAttribute() {
+        if ($this->type === 'quest') {
+            return Adventure::where('reward_item_id', $this->id)->with('location', 'location.map')->get();
         }
 
         return [];

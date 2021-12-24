@@ -74,11 +74,84 @@ export default class QuestDetails extends React.Component {
     });
   }
 
+  renderItem(item) {
+    console.log(item);
+    return (
+      <Fragment>
+        {
+          item.drop_location_id !== null ?
+            <AlertInfo icon={'fas fa-question-circle'} title={"Special Locations"}>
+              <p>Some items, such as this one, only drop when you are at a special location. These locations
+                increase enemy strength making them more of a challenge.</p>
+              <p>These items have a 1/1,000,000 chance to drop. Your looting skill is capped at 45% here.</p>
+              <p>
+                <strong>These items will not drop if automation is detected. You must manually farm these quest items.</strong>
+              </p>
+            </AlertInfo>
+            : null
+        }
+        <dl>
+          {
+            item.required_monster !== null ?
+              <Fragment>
+                <dt>Obtained by killing</dt>
+                <dd>{item.required_monster.name}</dd>
+                <dt>Resides on plane</dt>
+                <dd>{item.required_monster.game_map.name}</dd>
+                {this.renderPlaneAccessRequirements(item.required_monster.game_map)}
+              </Fragment>
+              : null
+          }
+
+          {
+            item.required_quest !== null ?
+              <Fragment>
+                <dt>Obtained by completing</dt>
+                <dd>{item.required_quest.name}</dd>
+                <dt>Which belongs to (NPC)</dt>
+                <dd>{item.required_quest.npc.real_name}</dd>
+                <dt>Who is on the plane of</dt>
+                <dd>{item.required_quest.npc.game_map.name}</dd>
+                <dt>At coordinates (X/Y)</dt>
+                <dd>{item.required_quest.npc.x_position} / {item.required_quest.npc.y_position}</dd>
+                {this.renderPlaneAccessRequirements(item.required_quest.npc.game_map)}
+              </Fragment>
+              : null
+          }
+
+          {
+            item.drop_location_id !== null ?
+              <Fragment>
+                <dt>By Visiting (Fighting monsters for it to drop)</dt>
+                <dd>{item.drop_location.name}</dd>
+                <dt>At coordinates (X/Y)</dt>
+                <dd>{item.drop_location.x} / {item.drop_location.y}</dd>
+                <dt>Which is on the plane</dt>
+                <dd>{item.drop_location.map.name}</dd>
+                {this.renderPlaneAccessRequirements(item.drop_location.map)}
+              </Fragment>
+              : null
+          }
+        </dl>
+        {
+          item.locations.length > 0 ?
+            <Fragment>
+              <hr />
+              <h3 className="tw-font-light">Locations</h3>
+              <p>Locations that will give you the item, just for visiting.</p>
+              <hr />
+              {this.renderLocations(item.locations)}
+            </Fragment>
+            : null
+        }
+      </Fragment>
+    )
+  }
+
   render() {
-    console.log(this.props.quest);
     return (
       <>
-        <Modal show={this.props.show} onHide={this.props.questDetailsClose}>
+        <Modal show={this.props.show} onHide={this.props.questDetailsClose} dialogClassName="large-modal">
           <Modal.Header closeButton>
             <Modal.Title>{this.props.quest.name}</Modal.Title>
           </Modal.Header>
@@ -108,7 +181,7 @@ export default class QuestDetails extends React.Component {
                 </div>
               </Tab>
               <Tab eventKey="required-info" title="Required to complete">
-                <p>
+                <p className="mt-3">
                   Below you will find all the requirements of this quest. Once you have met them, make sure to check the NPC
                   tab to see where to go and what command to use to interact with them.
                 </p>
@@ -118,157 +191,115 @@ export default class QuestDetails extends React.Component {
                 </p>
                 <hr />
                 <div className="mt-3">
-                  <dl>
-                    {
-                      this.props.quest.gold_cost !== null ?
-                        <Fragment>
-                          <dt>Gold Cost:</dt>
-                          <dd>{this.formatNumber(this.props.quest.gold_cost)}</dd>
-                        </Fragment>
-                      :
-                        null
-                    }
-                    {
-                      this.props.quest.gold_dust_cost !== null ?
-                        <Fragment>
-                          <dt>Gold Dust Cost:</dt>
-                          <dd>{this.formatNumber(this.props.quest.gold_dust_cost)}</dd>
-                        </Fragment>
-                        :
-                        null
-                    }
-                    {
-                      this.props.quest.shard_cost !== null ?
-                        <Fragment>
-                          <dt>Shards Cost:</dt>
-                          <dd>{this.formatNumber(this.props.quest.shard_cost)}</dd>
-                        </Fragment>
-                        :
-                        null
-                    }
+                  <Tabs defaultActiveKey="base-required-info" id="quest-info">
+                    <Tab eventKey="base-required-info" title="Base Requirements">
+                      <dl className="mt-3">
+                        {
+                          this.props.quest.gold_cost !== null ?
+                            <Fragment>
+                              <dt>Gold Cost:</dt>
+                              <dd>{this.formatNumber(this.props.quest.gold_cost)}</dd>
+                            </Fragment>
+                            :
+                            null
+                        }
+                        {
+                          this.props.quest.gold_dust_cost !== null ?
+                            <Fragment>
+                              <dt>Gold Dust Cost:</dt>
+                              <dd>{this.formatNumber(this.props.quest.gold_dust_cost)}</dd>
+                            </Fragment>
+                            :
+                            null
+                        }
+                        {
+                          this.props.quest.shard_cost !== null ?
+                            <Fragment>
+                              <dt>Shards Cost:</dt>
+                              <dd>{this.formatNumber(this.props.quest.shard_cost)}</dd>
+                            </Fragment>
+                            :
+                            null
+                        }
+                        {
+                          this.props.quest.item_id !== null ?
+                            <Fragment>
+                              <dt>Required Item:</dt>
+                              <dd><ItemName item={this.props.quest.item} /></dd>
+                            </Fragment>
+                            :
+                            null
+                        }
+                        {
+                          this.props.quest.secondary_required_quest_item !== null ?
+                            <Fragment>
+                              <dt>Secondary Required Item:</dt>
+                              <dd><ItemName item={this.props.quest.secondary_required_quest_item} /></dd>
+                            </Fragment>
+                            :
+                            null
+                        }
+                      </dl>
+                    </Tab>
                     {
                       this.props.quest.item_id !== null ?
-                        <Fragment>
-                          <dt>Required Item:</dt>
-                          <dd><ItemName item={this.props.quest.item} /></dd>
-                        </Fragment>
-                        :
-                        null
+                        <Tab eventKey="required-item" title="Item Requirements">
+                          <h3 className="tw-font-light mt-3">Quest Requires Item: {<ItemName item={this.props.quest.item} />}</h3>
+                          <hr />
+                          <p>This quest requires you to hand in item. Below you will find relevant details as to how to obtain the item
+                            you need.</p>
+                          {this.renderItem(this.props.quest.item)}
+                        </Tab>
+                      : null
                     }
-                  </dl>
-                  {
-                    this.props.quest.item_id !== null ?
-                      <Fragment>
-                        <hr />
-                        <h3 className="tw-font-light">Quest Requires Item</h3>
-                        <hr />
-                        <p>This quest requires you to hand in item. Below you will find relevant details as to how to obtain the item
-                        you need.</p>
-                        {
-                          this.props.quest.item.drop_location !== null ?
-                            <AlertInfo icon={'fas fa-question-circle'} title={"Special Locations"}>
-                              <p>Some items, such as this one, only drop when you are at a special location. These locations
-                              increase enemy strength making them more of a challenge.</p>
-                              <p>These items have a 1/1,000,000 chance to drop. Your looting skill is capped at 45% here.</p>
-                              <p>
-                                <strong>These items will not drop if automation is detected. You must manually farm these quest items.</strong>
-                              </p>
-                            </AlertInfo>
-                          : null
-                        }
-                        <dl>
-                          {
-                            this.props.quest.required_item_monster !== null ?
-                              <Fragment>
-                                <dt>Obtained by killing</dt>
-                                <dd>{this.props.quest.required_item_monster.name}</dd>
-                                <dt>Resides on plane</dt>
-                                <dd>{this.props.quest.required_item_monster.game_map.name}</dd>
-                                {this.renderPlaneAccessRequirements(this.props.quest.required_item_monster.game_map)}
-                              </Fragment>
-                            : null
-                          }
+                    {
+                      this.props.quest.secondary_required_quest_item !== null ?
+                        <Tab eventKey="secondary-required-item" title="Secondary Item Requirements">
+                          <h3 className="tw-font-light mt-3">Quest Secondary Item Requires Item: {<ItemName item={this.props.quest.secondary_required_quest_item} />}</h3>
+                          <hr />
+                          <p>
+                            This quest requires a secondary item. Below you will find all the relevant details as to how to obtain the item
+                            you need.
+                          </p>
+                          {this.renderItem(this.props.quest.secondary_required_quest_item)}
+                        </Tab>
+                        : null
+                    }
+                    {
+                      this.props.quest.faction_game_map_id !== null ?
+                        <Tab eventKey="faction-required" title="Faction Level">
+                          <h3 className="tw-font-light mt-3">Quest Requires Specific Faction Level</h3>
+                          <hr />
+                          <p>
+                            This quest requires you to have a Faction at a specific level to complete it.
+                            To do this, use Auto battle on the map required to fight any monster.
+                          </p>
 
-                          {
-                            this.props.quest.item.required_quest !== null ?
-                              <Fragment>
-                                <dt>Obtained by completing</dt>
-                                <dd>{this.props.quest.item.required_quest.name}</dd>
-                                <dt>Which belongs to (NPC)</dt>
-                                <dd>{this.props.quest.item.required_quest.npc.real_name}</dd>
-                                <dt>Who is on the plane of</dt>
-                                <dd>{this.props.quest.item.required_quest.npc.game_map.name}</dd>
-                                <dt>At coordinates (X/Y)</dt>
-                                <dd>{this.props.quest.item.required_quest.npc.x_position} / {this.props.quest.item.required_quest.npc.y_position}</dd>
-                              </Fragment>
-                              : null
-                          }
+                          <dl>
+                            <dt>Plane Faction Name (Map to fight on)</dt>
+                            <dd>{this.props.quest.faction_map.name}</dd>
+                            <dt>Level required</dt>
+                            <dd>{this.props.quest.required_faction_level > 4 ? '4 Maxed' : this.props.quest.required_faction_level}</dd>
+                            {this.renderPlaneAccessRequirements(this.props.quest.faction_map)}
+                          </dl>
+                        </Tab>
+                        : null
+                    }
+                    {
+                      this.props.quest.access_to_map_id !== null ?
+                        <Tab eventKey="plane-access-required" title="PLane Access">
+                          <h3 className="tw-font-light mt-3">Quest Requires Plane Access</h3>
+                          <hr />
+                          <p>This quest requires that you have access to a specific plane. You can find the relevant details of the quest that would get you access.
+                            There may be other quests involved, so make sure to check that quest out to see whats required.</p>
 
-                          {
-                            this.props.quest.item.drop_location !== null ?
-                              <Fragment>
-                                <dt>By Visiting (Fighting monsters for it to drop)</dt>
-                                <dd>{this.props.quest.item.drop_location.name}</dd>
-                                <dt>At coordinates (X/Y)</dt>
-                                <dd>{this.props.quest.item.drop_location.x} / {this.props.quest.item.drop_location.y}</dd>
-                                <dt>Which is on the plane</dt>
-                                <dd>{this.props.quest.item.drop_location.map.name}</dd>
-                                {this.renderPlaneAccessRequirements(this.props.quest.item.drop_location.map)}
-                              </Fragment>
-                              : null
-                          }
-                        </dl>
-                        {
-                          this.props.quest.item.locations.length > 0 ?
-                            <Fragment>
-                              <hr />
-                              <h3 className="tw-font-light">Locations</h3>
-                              <p>Locations that will give you the item, just for visiting.</p>
-                              <hr />
-                              {this.renderLocations(this.props.quest.item.locations)}
-                            </Fragment>
-                            : null
-                        }
-                      </Fragment>
-                    : null
-                  }
-                  {
-                    this.props.quest.required_plane !== null ?
-                      <Fragment>
-                        <hr />
-                        <h3 className="tw-font-light">Quest Requires Plane Access</h3>
-                        <hr />
-                        <p>This quest requires that you have access to a specific plane. You can find the relevant details of the quest that would get you access.
-                        There may be other quests involved, so make sure to check that quest out to see whats required.</p>
-
-                        <dl>
-                          {this.renderPlaneAccessRequirements(this.props.quest.required_plane)}
-                        </dl>
-                      </Fragment>
-                      : null
-                  }
-
-                  {
-                    this.props.quest.faction_game_map_id !== null ?
-                      <Fragment>
-                        <hr />
-                        <h3 className="tw-font-light">Quest Requires Specific Faction Level</h3>
-                        <hr />
-                        <p>
-                          This quest requires you to have a Faction at a specific level to complete it.
-                          To do this, use Auto battle on the map required to fight any monster.
-                        </p>
-
-                        <dl>
-                          <dt>Plane Faction Name (Map to fight on)</dt>
-                          <dd>{this.props.quest.faction_map.name}</dd>
-                          <dt>Level required</dt>
-                          <dd>{this.props.quest.required_faction_level > 4 ? '4 Maxed' : this.props.quest.required_faction_level}</dd>
-                          {this.renderPlaneAccessRequirements(this.props.quest.faction_map)}
-                        </dl>
-                      </Fragment>
-                      : null
-                  }
+                          <dl>
+                            {this.renderPlaneAccessRequirements(this.props.quest.required_plane)}
+                          </dl>
+                        </Tab>
+                        : null
+                    }
+                  </Tabs>
                 </div>
               </Tab>
               <Tab eventKey="reward-info" title="Reward">

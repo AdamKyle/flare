@@ -113,9 +113,9 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="shards_cost">Shards Cost: </label>
-                <input type="number" class="form-control" name="shards_cost" value="" wire:model="quest.shards_cost">
-                @error('quest.shards_cost') <span class="text-danger">{{ $message }}</span> @enderror
+                <label for="shard_cost">Shards Cost: </label>
+                <input type="number" class="form-control" name="shard_cost" value="" wire:model="quest.shard_cost">
+                @error('quest.shard_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-4">

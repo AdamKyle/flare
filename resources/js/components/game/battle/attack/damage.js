@@ -311,13 +311,8 @@ export default class Damage {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
         let totalAttack = Math.round(attacker.dur + attacker.dur * 0.15);
-        console.log('Total Attack: ' + totalAttack);
-
-        console.log(damageDeduction);
 
         totalAttack     = totalAttack - totalAttack * damageDeduction;
-
-        console.log('Total Attack After Reduction: ' + totalAttack);
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack

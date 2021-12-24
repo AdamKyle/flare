@@ -108,7 +108,7 @@ class DropsCheckListener
 
     protected function handleSpecialLocationQuestItem(DropsCheckEvent $event, Location $locationWithEffect, float $lootingChance) {
         $automation = $event->character->currentAutomations()->where('type', AutomationType::ATTACK)->first();
-        dump('Automation check', $automation);
+
         if (!is_null($automation)) {
             return; // Characters cannot use automation to get these.
         }
@@ -117,29 +117,28 @@ class DropsCheckListener
         $monsterMaxLevel = $event->monster->max_level;
         $levelDifference = $monsterMaxLevel - $characterLevel;
 
-        dump('Level diff Check', $levelDifference);
         if (!($levelDifference >= 10)) {
             return; // The monster must be 10 levels or higher than the character for this to drop.
         }
 
         $lootingChance = $lootingChance > 0.45 ? 0.45 : $lootingChance;
 
-        $item = Item::where('drop_location_id', $locationWithEffect->id)->where('type', 'quest')->first();
-        dump('Has item?', $item);
+        $items = Item::where('drop_location_id', $locationWithEffect->id)->where('type', 'quest')->get();
 
-        if (!is_null($item)) {
-            $chance = 999999;
-            $roll   = rand(1, 1000000);
+        if ($items->isNotEmpty()) {
+            foreach ($items as $item) {
+                $chance = 999999;
+                $roll   = rand(1, 1000000);
 
-            $roll = $roll + $roll * $lootingChance;
+                $roll = $roll + $roll * $lootingChance;
 
-            dump($roll, $chance);
+                if ($roll > $chance) {
+                    $this->attemptToPickUpItem($event, $item);
 
-            if ($roll > $chance) {
-                $this->attemptToPickUpItem($event, $item);
-
-                event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
+                    event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
+                }
             }
+
         }
     }
 
@@ -157,6 +156,10 @@ class DropsCheckListener
 
                 if ($item->type === 'quest') {
                     $message = $event->character->name . ' has found: ' . $item->affix_name;
+
+                    event(new ServerMessageEvent($event->character->user, 'gained_item', $item->affix_name, route('game.items.item', [
+                        'item' => $item
+                    ]), $item->id));
 
                     broadcast(new GlobalMessageEvent($message));
                 } else if ($user->auto_disenchant) {

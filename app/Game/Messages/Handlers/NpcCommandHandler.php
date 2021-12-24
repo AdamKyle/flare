@@ -224,6 +224,18 @@ class NpcCommandHandler {
         }
 
         foreach ($quests as $quest) {
+
+            if (is_null($quest->parent)) {
+                $foundParent = $character->questsCompleted()->where('quest_id', $quest->parent->id)->first();
+
+
+                if (is_null($foundParent)) {
+                    broadcast(new ServerMessageEvent($character->user, 'The NPC will not accept this quest from you until you have completed: ' . $quest->parent->name . '. You can find the relevant details under the Plane Quests/All Quests section.'));
+
+                    return false;
+                }
+            }
+
             if (!is_null($quest->item_id)) {
                 $foundItem = $character->inventory->slots->filter(function($slot) use ($quest) {
                     return $slot->item_id === $quest->item_id;
@@ -231,6 +243,18 @@ class NpcCommandHandler {
 
                 if (is_null($foundItem)) {
                     continue;
+                }
+
+                $secondaryItem = null;
+
+                if (!is_null($quest->secondary_required_item)) {
+                    $secondaryItem = $character->inventory->slots->filter(function($slot) use ($quest) {
+                        return $slot->item_id === $quest->secondary_required_item;
+                    })->first();
+
+                    if (is_null($secondaryItem)) {
+                        continue;
+                    }
                 }
 
                 if (!$this->canHaveReward($character, $npc, $quest)) {
@@ -264,6 +288,10 @@ class NpcCommandHandler {
                 }
 
                 $foundItem->delete();
+
+                if (!is_null($secondaryItem)) {
+                    $secondaryItem->delete();
+                }
 
                 broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('taken_item', $npc), true));
 
