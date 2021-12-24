@@ -225,7 +225,7 @@ class NpcCommandHandler {
 
         foreach ($quests as $quest) {
 
-            if (is_null($quest->parent)) {
+            if (!is_null($quest->parent)) {
                 $foundParent = $character->questsCompleted()->where('quest_id', $quest->parent->id)->first();
 
 

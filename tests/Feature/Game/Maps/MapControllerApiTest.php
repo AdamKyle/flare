@@ -246,9 +246,7 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
         ]);
 
-        $adventure = $this->createNewAdventure();
-
-        $location->adventures()->attach($adventure->id);
+        $adventure = $this->createNewAdventure($location);
 
         $character = $this->character->getCharacter(false);
         $user      = $this->character->getUser();

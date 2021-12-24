@@ -66,7 +66,7 @@ class AdventureRewardService {
      * @return AdventureRewardService
      */
     public function distributeRewards(array $rewards, Character $character, Adventure $adventure): AdventureRewardService {
-
+        dump('handling Gold');
         if ($character->gold !== MaxCurrenciesValue::MAX_GOLD) {
             $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
 
@@ -84,12 +84,15 @@ class AdventureRewardService {
                 $this->messages[] = 'You now are gold capped: ' . number_format($newAmount);
             }
         }
-
+        dump('handling xp');
         $this->handleXp($rewards['exp'], $character);
+        dump('handling skill xp');
         $this->handleSkillXP($rewards, $character);
+        dump('handling faction');
         $this->handleFactionPoints($character, $adventure, $rewards['faction_points']);
 
         if (!empty($rewards['items'])) {
+            dump('handling items');
             $this->handleItems($rewards['items'], $character);
         }
 

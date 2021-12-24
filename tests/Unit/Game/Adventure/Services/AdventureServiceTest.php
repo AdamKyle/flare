@@ -217,7 +217,7 @@ class AdventureServiceTest extends TestCase
                 'level' => 10
             ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -264,7 +264,7 @@ class AdventureServiceTest extends TestCase
                 'level' => 10
             ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -316,7 +316,7 @@ class AdventureServiceTest extends TestCase
                 'level' => 10
             ]);
 
-        $adventure = $this->createNewAdventure($monster, 5);
+        $adventure = $this->createNewAdventure(null, $monster, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -387,7 +387,7 @@ class AdventureServiceTest extends TestCase
             ->giveItem($item)
             ->getCharacterFactory();
 
-        $adventure = $this->createNewAdventure($monster, 5);
+        $adventure = $this->createNewAdventure(null, $monster, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -438,7 +438,7 @@ class AdventureServiceTest extends TestCase
                                             'currently_training' => true
                                         ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -493,7 +493,7 @@ class AdventureServiceTest extends TestCase
                                             'level' => 10
                                         ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 

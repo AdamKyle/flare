@@ -195,7 +195,7 @@ class SetupFightHandler {
         return $this->reduceSuffixStatsOnEnemies($defender, $affixesAreIrresistable);
     }
 
-    protected function canReduce(Monster $defender, ItemAffix $affix = null, bool $irresistible = false): bool {
+    protected function canReduce($defender, ItemAffix $affix = null, bool $irresistible = false): bool {
 
         if ($irresistible) {
             return true;
@@ -222,7 +222,7 @@ class SetupFightHandler {
         return true;
     }
 
-    protected function reduceSuffixStatsOnEnemies(Monster $defender, bool $irresistible = false) {
+    protected function reduceSuffixStatsOnEnemies($defender, bool $irresistible = false) {
         $stats               = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
 
         for ($i = 0; $i < count($stats); $i++) {

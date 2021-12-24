@@ -21,6 +21,6 @@ class AdventureSetup {
     }
 
     public function createAdventure(): Adventure {
-        return $this->createNewAdventure($this->monster);
+        return $this->createNewAdventure(null, $this->monster);
     }
 }
