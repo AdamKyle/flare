@@ -77,7 +77,8 @@ class Quest extends Model {
                         'item.dropLocation',
                         'requiredPlane',
                         'npc',
-                        'npc.commands'
+                        'npc.commands',
+                        'npc.gameMap',
                     );
     }
 

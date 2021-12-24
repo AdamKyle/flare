@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Providers;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -57,6 +58,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BuildCharacterAttackTypes::class),
                 $app->make(CharacterXPService::class),
                 $app->make(InventorySetService::class),
+                $app->make(RandomAffixGenerator::class),
             );
         });
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Faction;
 use App\Flare\Models\Item as ItemModel;
@@ -32,6 +33,8 @@ class AdventureRewardService {
 
     private $characterXPService;
 
+    private $randomAffixGenerator;
+
     /**
      * @var array $messages
      */
@@ -50,12 +53,14 @@ class AdventureRewardService {
                                 BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 CharacterXPService $characterXPService,
                                 InventorySetService $inventorySetService,
+                                RandomAffixGenerator $randomAffixGenerator
     ) {
 
         $this->characterService          = $characterService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
         $this->characterXPService        = $characterXPService;
         $this->inventorySetService       = $inventorySetService;
+        $this->randomAffixGenerator      = $randomAffixGenerator;
     }
 
     /**
@@ -66,7 +71,6 @@ class AdventureRewardService {
      * @return AdventureRewardService
      */
     public function distributeRewards(array $rewards, Character $character, Adventure $adventure): AdventureRewardService {
-        dump('handling Gold');
         if ($character->gold !== MaxCurrenciesValue::MAX_GOLD) {
             $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
 
@@ -84,15 +88,14 @@ class AdventureRewardService {
                 $this->messages[] = 'You now are gold capped: ' . number_format($newAmount);
             }
         }
-        dump('handling xp');
+
         $this->handleXp($rewards['exp'], $character);
-        dump('handling skill xp');
+
         $this->handleSkillXP($rewards, $character);
-        dump('handling faction');
+
         $this->handleFactionPoints($character, $adventure, $rewards['faction_points']);
 
         if (!empty($rewards['items'])) {
-            dump('handling items');
             $this->handleItems($rewards['items'], $character);
         }
 
@@ -120,8 +123,8 @@ class AdventureRewardService {
         $spillOver = 0;
 
         if ($points > $faction->points_needed) {
-            $spillOver = $points - $factionPoints;
-            $points    = $factionPoints;
+            $spillOver = $points - $faction->points_needed;
+            $points    = $faction->points_needed;
         }
 
         if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
@@ -144,20 +147,24 @@ class AdventureRewardService {
 
             event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $faction->gameMap->name . ' They are considered legendary among the people of this land.'));
 
-            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
+            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($faction->current_level));
 
             $faction->update([
                 'maxed' => true,
             ]);
-        } else {
+
+            $faction = $faction->refresh();
+        } else if (!$faction->maxed) {
             $faction->update([
                 'current_points' => $factionPoints,
             ]);
 
+            $faction = $faction->refresh();
+
             $this->messages[] = 'Gained: ' . $factionPoints . ' Faction Points for: ' . $faction->gameMap->name;
         }
 
-        if ($spillOver > 0) {
+        if ($spillOver > 0 && !$faction->maxed) {
             $this->handleFactionPoints($character->refresh(), $adventure, $spillOver);
         }
     }

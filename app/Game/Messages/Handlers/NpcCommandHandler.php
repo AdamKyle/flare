@@ -277,6 +277,8 @@ class NpcCommandHandler {
                     event(new UpdateTopBarEvent($character->refresh()));
 
                     broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name . ' the required currencies.'));
+
+                    broadcast(new ServerMessageEvent($character->user, '... one moment please ...'));
                 }
 
                 if (!$this->hasPlaneAccess($quest, $character)) {

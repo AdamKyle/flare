@@ -139,12 +139,14 @@ class MapController extends Controller {
                 'quests.item.dropLocation',
                 'quests.factionMap',
                 'quests.npc',
-                'quests.npc.commands'
+                'quests.npc.commands',
+                'quests.npc.gameMap',
+                'gameMap'
             )->get());
         }
 
         if (!Cache::has('all-quests')) {
-            Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc', 'npc.commands')->get());
+            Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
         }
 
         return response()->json([

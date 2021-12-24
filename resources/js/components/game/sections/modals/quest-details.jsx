@@ -75,7 +75,6 @@ export default class QuestDetails extends React.Component {
   }
 
   renderItem(item) {
-    console.log(item);
     return (
       <Fragment>
         {
@@ -149,6 +148,8 @@ export default class QuestDetails extends React.Component {
   }
 
   render() {
+    const npcPLaneAccess = this.renderPlaneAccessRequirements(this.props.quest.npc.game_map);
+
     return (
       <>
         <Modal show={this.props.show} onHide={this.props.questDetailsClose} dialogClassName="large-modal">
@@ -159,25 +160,42 @@ export default class QuestDetails extends React.Component {
             <Tabs defaultActiveKey="npc-info" id="map-quest">
               <Tab eventKey="npc-info" title="NPC Info">
                 <div className="mt-3">
-                  <dl>
-                    <dt>Name</dt>
-                    <dd>{this.props.quest.npc.name}</dd>
-                    <dt>How to message</dt>
-                    <dd><code>{this.props.quest.npc.text_command_to_message}</code></dd>
-                    <dt>Available Commands</dt>
-                    <dd>{this.getNPCCommands(this.props.quest.npc)}</dd>
-                    <dt>Coordinates (X/Y)</dt>
-                    <dd>{this.props.quest.npc.x_position} / {this.props.quest.npc.y_position}</dd>
-                    <dt>Must be at same location?</dt>
-                    <dd>{this.props.quest.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
-                  </dl>
-                  <hr />
-                  <h3 className="tw-font-light">Info</h3>
-                  <p>
-                    Use the chat box to communicate with the NPC by private messaging them. The Available Commands section outlines accepted commands you can
-                    message them. Some NPC's might require you to be at their location. This means you have to physically be at the same coordinates before
-                    you message the npc to complete the quest.
-                  </p>
+                  <div className="row">
+                    <div className={npcPLaneAccess !== null ? 'col-md-6' : 'col-md-12'}>
+                      <h5 className="tw-font-light">NPC Details</h5>
+                      <hr />
+                      <dl>
+                        <dt>Name</dt>
+                        <dd>{this.props.quest.npc.name}</dd>
+                        <dt>How to message</dt>
+                        <dd><code>{this.props.quest.npc.text_command_to_message}</code></dd>
+                        <dt>Available Commands</dt>
+                        <dd>{this.getNPCCommands(this.props.quest.npc)}</dd>
+                        <dt>Coordinates (X/Y)</dt>
+                        <dd>{this.props.quest.npc.x_position} / {this.props.quest.npc.y_position}</dd>
+                        <dt>On Plane</dt>
+                        <dd>{this.props.quest.npc.game_map.name}</dd>
+                        <dt>Must be at same location?</dt>
+                        <dd>{this.props.quest.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
+                      </dl>
+                      <hr />
+                      <h3 className="tw-font-light">Info</h3>
+                      <p>
+                        Use the chat box to communicate with the NPC by private messaging them. The Available Commands section outlines accepted commands you can
+                        message them. Some NPC's might require you to be at their location. This means you have to physically be at the same coordinates before
+                        you message the npc to complete the quest.
+                      </p>
+                    </div>
+                    <div className={npcPLaneAccess !== null ? 'col-md-6' : 'hide'}>
+                      <h5 className="tw-font-light">How to access this NPC</h5>
+                      <hr />
+                      <dl>
+                        {npcPLaneAccess}
+                      </dl>
+                    </div>
+                  </div>
+
+
                 </div>
               </Tab>
               <Tab eventKey="required-info" title="Required to complete">
