@@ -14,20 +14,22 @@ class MonstersSheet implements ToCollection {
 
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
-                $monster = array_combine($rows[0]->toArray(), $row->toArray());
+                $originalMonster = array_combine($rows[0]->toArray(), $row->toArray());
 
-                $monster = $this->returnCleanMonster($monster);
+                $monster = $this->returnCleanMonster($originalMonster);
 
                 if (is_null($monster)) {
                     continue;
                 }
 
-                $foundMonster = Monster::where('name', $monster['name'])->first();
+                if (isset($monster['name'])) {
+                    $foundMonster = Monster::where('name', $monster['name'])->first();
 
-                if (is_null($foundMonster)) {
-                    Monster::create($monster);
-                } else {
-                    $foundMonster->update($monster);
+                    if (is_null($foundMonster)) {
+                        Monster::create($monster);
+                    } else {
+                        $foundMonster->update($monster);
+                    }
                 }
             }
         }
