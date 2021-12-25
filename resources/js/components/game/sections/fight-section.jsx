@@ -172,6 +172,7 @@ export default class FightSection extends React.Component {
     }
 
     const monsterInfo   = new Monster(this.props.monster);
+    console.log('originalMonsterInfo', this.props.monster);
     const voidance      = new Voidance();
     const character     = this.props.character;
 
@@ -205,11 +206,15 @@ export default class FightSection extends React.Component {
 
       let messages = monsterInfo.reduceResistances(character.resistance_reduction);
 
+      console.log('monster after resistance', monsterInfo);
+
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
 
       messages = monsterInfo.reduceSkills(character.skill_reduction);
+
+      console.log('monster after skills', monsterInfo);
 
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
@@ -217,11 +222,15 @@ export default class FightSection extends React.Component {
 
       messages = monsterInfo.reduceAllStats(character.stat_affixes);
 
+      console.log('monster after stats', monsterInfo);
+
       if (messages.length > 0) {
         this.battleMessagesBeforeFight = [...this.battleMessagesBeforeFight, ...messages];
       }
 
     }
+
+    console.log('monsterAfterModifications', monsterInfo);
 
     const health = monsterInfo.health();
     let characterHealth = this.props.character.health;

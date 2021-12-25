@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameMapFactory;
@@ -46,6 +47,10 @@ class GameMap extends Model
 
     public function maps() {
         return $this->hasMany(Map::class, 'game_map_id', 'id');
+    }
+
+    public function mapType(): MapNameValue {
+        return new MapNameValue($this->name);
     }
 
     public function mapHasBonuses() {

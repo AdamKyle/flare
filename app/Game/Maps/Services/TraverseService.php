@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateAttackStats;
@@ -175,9 +176,7 @@ class TraverseService {
 
         $gameMap = $character->map->gameMap;
 
-        $name = $gameMap->name;
-
-        if ($name === 'Shadow Plane') {
+        if ($character->map->gameMap->mapType()->isShadowPlane()) {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are 
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
             feel the presence of death as it creeps ever closer. 
@@ -186,6 +185,17 @@ class TraverseService {
             event(new MessageEvent($character->user,  $message));
 
             event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
+        }
+
+        if ($character->map->gameMap->mapType()->isHell()) {
+            $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Monsters are increased by: ' .
+                ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
+                ($gameMap->character_attack_reduction * 100) . '% in both stats and damage done. Any quest items that make 
+                affixes irresistible will not work down here.';
+
+            event(new MessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of Argose the Angelic Saviour, be their guide through such darkness!'));
         }
     }
 
@@ -246,7 +256,7 @@ class TraverseService {
             $this->updateAtctionTypeCache($character, 0.0);
         }
 
-        $character = new Item($character, $this->characterAttackTransformer);
+        $characterData = new Item($character, $this->characterAttackTransformer);
 
         if (!is_null($locationWithEffect)) {
             $monsters  = Cache::get('monsters')[$locationWithEffect->name];
@@ -254,11 +264,13 @@ class TraverseService {
             $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
         }
 
-        $character = $this->manager->createData($character)->toArray();
+        $characterData = $this->manager->createData($characterData)->toArray();
 
-        broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
+        broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
 
-        event(new UpdateAttackStats($character, $user));
+        event(new UpdateAttackStats($characterData, $user));
+
+        event(new UpdateTopBarEvent($character));
     }
 
     protected function updateAtctionTypeCache(Character $character, float $deduction) {

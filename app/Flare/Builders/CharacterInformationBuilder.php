@@ -84,7 +84,13 @@ class CharacterInformationBuilder {
 
         $base = $this->characterBoons($base);
 
-        return $this->characterBoons($base, $stat . '_mod');
+        $total = $this->characterBoons($base, $stat . '_mod');
+
+        if ($this->character->map->gameMap->mapType()->isHell()) {
+            $total -= $total * $this->character->map->gameMap->character_attack_reduction;
+        }
+
+        return $total;
     }
 
     /**
@@ -278,6 +284,10 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function canAffixesBeResisted(): bool {
+        if ($this->character->map->gameMap->mapType()->isHell()) {
+          return false;
+        }
+
         return $this->character->inventory->slots->filter(function($slot) {
             return ($slot->item->type === 'quest') && ($slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE);
         })->isNotEmpty();
