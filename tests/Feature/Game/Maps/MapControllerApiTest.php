@@ -70,7 +70,7 @@ class MapControllerApiTest extends TestCase
 
     public function testGetMapWithKingdomCache() {
 
-        Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id, [['sample']]);
+        Cache::put('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id, [['sample']]);
 
         $user = $this->character->getUser();
 

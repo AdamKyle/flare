@@ -86,7 +86,7 @@ class KingdomsControllerTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue(Cache::has('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id));
+        $this->assertTrue(Cache::has('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id));
 
         $this->assertTrue(
             $this->character->getCharacter(false)->kingdoms->first()->buildings->isNotEmpty()
@@ -168,7 +168,7 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testSettleKingdomWithCache() {
-        Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id, [['sample data']]);
+        Cache::put('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id, [['sample data']]);
 
         $this->createGameBuilding();
 
@@ -186,7 +186,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue(empty($content));
-        $this->assertEquals(2, count(Cache::get('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id)));
+        $this->assertEquals(2, count(Cache::get('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id)));
 
         $this->assertTrue(
             $this->character->getCharacter(false)->kingdoms->first()->buildings->isNotEmpty()

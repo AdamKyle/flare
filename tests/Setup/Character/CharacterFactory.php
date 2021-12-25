@@ -313,7 +313,7 @@ class CharacterFactory {
             $id = $gameMap->first()->id;
         } else {
             $id = $this->createGameMap([
-                'name'    => 'Sample',
+                'name'    => 'Surface',
                 'path'    => 'path',
                 'default' => true,
             ])->id;
