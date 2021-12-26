@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use App\Game\Maps\Requests\QuestDataRequest;
 use Cache;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
@@ -127,32 +128,20 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function fetchQuests(Character $character) {
-        $gameMap = $character->map->gameMap;
-
-        if (!Cache::has('npc-quests')) {
-            Cache::put('npc-quests', Npc::where('game_map_id', $gameMap->id)->whereHas('quests')->with(
-                'quests.childQuests',
-                'quests.rewardItem',
-                'quests.item',
-                'quests.requiredPlane',
-                'quests.item.dropLocation',
-                'quests.factionMap',
-                'quests.npc',
-                'quests.npc.commands',
-                'quests.npc.gameMap',
-                'gameMap'
-            )->get());
-        }
-
+    public function fetchQuests(QuestDataRequest $request, Character $character) {
         if (!Cache::has('all-quests')) {
             Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
         }
 
-        return response()->json([
-            'npcs'             => Cache::get('npc-quests'),
-            'completed_quests' => $character->questsCompleted->load('quest'),
-            'all_quests'       => Cache::get('all-quests'),
-        ]);
+        $data = [
+            'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
+            'map_name'         => $character->map->gameMap->name,
+        ];
+
+        if (!$request->completed_quests_only) {
+            $data['all_quests'] = Cache::get('all-quests');
+        }
+
+        return response()->json($data);
     }
 }

@@ -71,6 +71,20 @@ export default class QuestTreeOverView extends React.Component {
     )
   }
 
+  renderAllQuestsWithChildren() {
+    const surfaceWithQuests = this.props.allQuests.filter((aq) => aq.belongs_to_map_name === 'Surface' && aq.child_quests.length > 0)[0];
+
+    return <QuestTree parentQuest={surfaceWithQuests} completedQuests={this.props.completedQuests} ignoreNpcCheck={true} />
+  }
+
+  renderAllQuestsWitOutChildren() {
+    const childLessQuests = this.props.allQuests.filter((aq) => aq.child_quests.length === 0);
+
+    return childLessQuests.map((cq) => {
+      return <QuestTree parentQuest={cq} completedQuests={this.props.completedQuests} ignoreNpcCheck={true} />
+    });
+  }
+
   render() {
     return (
       <>
@@ -88,7 +102,20 @@ export default class QuestTreeOverView extends React.Component {
               access. All quests are broken down by the quest parents starting plane.
             </p>
             <hr />
-            <Tabs defaultActiveKey="Surface" id="all-quests">
+            <Tabs defaultActiveKey="all-quests" id="all-quests">
+              <Tab eventKey='all-quests' title='All Quests'>
+                <div className="mt-3">
+                  <div className="row">
+                    <div className="col-md-2">
+                      {this.renderAllQuestsWitOutChildren()}
+                    </div>
+                    <div className="col-md-10">
+                      {this.renderAllQuestsWithChildren()}
+                    </div>
+                  </div>
+
+                </div>
+              </Tab>
               {this.renderQuestTrees()}
             </Tabs>
 

@@ -3,6 +3,7 @@
 namespace App\Game\Messages\Handlers;
 
 use App\Flare\Models\GameMap;
+use App\Game\Core\Events\ResetQuestStorageBroadcastEvent;
 use App\Game\Core\Values\FactionLevel;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
@@ -506,6 +507,8 @@ class NpcCommandHandler {
         ]);
 
         broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under adventure logs section.'));
+
+        broadcast(new ResetQuestStorageBroadcastEvent($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
 

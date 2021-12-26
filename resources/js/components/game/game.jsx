@@ -15,6 +15,7 @@ import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 import MassEmbezzle from "./sections/modals/mass-embezzle";
+import localforage from "localforage";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -64,9 +65,10 @@ export default class Game extends React.Component {
       attackAutomationIsRunning: false,
     }
 
-    this.isDead           = Echo.private('character-is-dead-' + this.props.userId);
-    this.npcComponent     = Echo.private('component-show-' + this.props.userId);
-    this.attackAutomation = Echo.private('attack-automation-status-' + this.props.userId);
+    this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
+    this.npcComponent      = Echo.private('component-show-' + this.props.userId);
+    this.attackAutomation  = Echo.private('attack-automation-status-' + this.props.userId);
+    this.clearQuestStorage = Echo.private('clear-quest-storage-' + this.props.userId);
   }
 
   updateDimensions() {
@@ -92,6 +94,10 @@ export default class Game extends React.Component {
       this.setState({
         attackAutomationIsRunning: event.isRunning
       });
+    });
+
+    this.clearQuestStorage.listen('Game.Core.Events.ResetQuestStorageBroadcastEvent', () => {
+      localforage.clear().catch((err) => console.err(err));
     });
 
     window.addEventListener('resize', this.updateDimensions.bind(this));

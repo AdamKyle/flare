@@ -18,11 +18,14 @@ export default class QuestNode extends React.Component {
   }
 
   hasQuestBeenCompleted() {
-    return this.props.completedQuests.filter((cq) => cq.quest.name === this.props.quest.name).length > 0;
+    if (this.props.quest.name === 'Map the Unseen') {
+      console.log(this.props.quest.id, this.props.completedQuests, this.props.quest);
+    }
+    return this.props.completedQuests.includes(this.props.quest.id);
   }
 
   isQuestLocked() {
-    const hasCompletedParent = this.props.completedQuests.filter((cq) => cq.quest_id === this.props.quest.parent_quest_id).length > 0;
+    const hasCompletedParent = this.props.completedQuests.includes(this.props.quest.parent_quest_id);
     const isChildSkill       = this.props.quest.parent_quest_id !== null;
 
     return !hasCompletedParent && isChildSkill;

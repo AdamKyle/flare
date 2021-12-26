@@ -257,6 +257,14 @@ export default class QuestDetails extends React.Component {
                             :
                             null
                         }
+                        {
+                          this.props.quest.access_to_map_id !== null ?
+                            <Fragment>
+                              <dt>Plane Access Required:</dt>
+                              <dd>{this.props.quest.required_plane.name}</dd>
+                            </Fragment>
+                          : null
+                        }
                       </dl>
                     </Tab>
                     {
@@ -305,7 +313,7 @@ export default class QuestDetails extends React.Component {
                     }
                     {
                       this.props.quest.access_to_map_id !== null ?
-                        <Tab eventKey="plane-access-required" title="PLane Access">
+                        <Tab eventKey="plane-access-required" title="Plane Access">
                           <h3 className="tw-font-light mt-3">Quest Requires Plane Access</h3>
                           <hr />
                           <p>This quest requires that you have access to a specific plane. You can find the relevant details of the quest that would get you access.

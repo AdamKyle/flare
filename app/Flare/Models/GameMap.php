@@ -73,6 +73,8 @@ class GameMap extends Model
                 return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
             case 'Shadow Plane':
                 return Item::where('effect', ItemEffectsValue::SHADOWPLANE)->first();
+            case 'Hell':
+                return Item::where('effect', ItemEffectsValue::HELL)->first();
             case 'Surface':
             default:
                 return null;

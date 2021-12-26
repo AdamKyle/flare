@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Quests\Partials;
 
+use App\Admin\Jobs\ResetCharacterQuestStorage;
 use Cache;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
@@ -66,6 +67,8 @@ class Details extends Component
 
         Cache::delete('npc-quests');
         Cache::delete('all-quests');
+
+        ResetCharacterQuestStorage::dispatch();
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->quest);
         $this->emitTo('core.form-wizard', $functionName, $index, true);

@@ -20,6 +20,7 @@ class ItemEffectsValue {
     const CONTNUE_LEVELING      = 'continue-leveling';
     const GOLD_DUST_RUSH        = 'gold-dust-rush';
     const MASS_EMBEZZLE         = 'mass-embezzle';
+    const WALK_ON_MAGMA         = 'walk-on-magma';
 
     /**
      * @var string[] $values
@@ -27,6 +28,7 @@ class ItemEffectsValue {
     protected static $values = [
         self::WALK_ON_WATER         => 'walk-on-water',
         self::WALK_ON_DEATH_WATER   => 'walk-on-death-water',
+        self::WALK_ON_MAGMA         => 'walk-on-magma',
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
         self::SHADOWPLANE           => 'shadow-plane',
@@ -71,6 +73,15 @@ class ItemEffectsValue {
      */
     public function walkOnDeathWater(): bool {
         return $this->value === self::WALK_ON_DEATH_WATER;
+    }
+
+    /**
+     * is Walk on Magma?
+     *
+     * @return bool
+     */
+    public function walkOnMagma(): bool {
+        return $this->value === self::WALK_ON_MAGMA;
     }
 
     /**
