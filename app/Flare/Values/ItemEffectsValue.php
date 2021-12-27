@@ -15,6 +15,7 @@ class ItemEffectsValue {
     const DUNGEON               = 'dungeon';
     const SHADOWPLANE           = 'shadow-plane';
     const HELL                  = 'hell';
+    const PURGATORY             = 'purgatory';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
     const CONTNUE_LEVELING      = 'continue-leveling';
@@ -39,7 +40,8 @@ class ItemEffectsValue {
         self::CONTNUE_LEVELING      => 'continue-leveling',
         self::GOLD_DUST_RUSH        => 'gold-dust-rush',
         self::MASS_EMBEZZLE         => 'mass-embezzle',
-        self::QUEEN_OF_HEARTS       => 'speak-to-queen-of-hearts'
+        self::QUEEN_OF_HEARTS       => 'speak-to-queen-of-hearts',
+        self::PURGATORY             => 'purgatory',
     ];
 
     /**
@@ -121,6 +123,15 @@ class ItemEffectsValue {
      */
     public function hell(): bool {
         return $this->value === self::HELL;
+    }
+
+    /**
+     * Is purgatory?
+     *
+     * @return bool
+     */
+    public function purgatory(): bool {
+        return $this->value === self::PURGATORY;
     }
 
     /**

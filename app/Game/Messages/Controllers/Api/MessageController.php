@@ -121,6 +121,9 @@ class MessageController extends Controller {
                 case 'Shadow Plane':
                     $mapName = 'SHP';
                     break;
+                case 'Hell':
+                    $mapName = 'HELL';
+                    break;
                 default:
                     $mapName = 'SUR';
             }
@@ -218,6 +221,11 @@ class MessageController extends Controller {
 
         if (!$user->character->can_move || !$user->character->can_adventure || $user->character->is_dead) {
             broadcast(new ServerMessageEvent($user, 'You are to preoccupied to do this. (You must be able to move and cannot be dead).'));
+            return response()->json([], 200);
+        }
+
+        if ($user->character->map->gameMap->mapType()->isHell()) {
+            broadcast(new ServerMessageEvent($user, 'Child, the power of those magics is too weak where you are. traverse to at least Shadow Plane first ...'));
             return response()->json([], 200);
         }
 

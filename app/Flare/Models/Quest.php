@@ -90,6 +90,10 @@ class Quest extends Model {
         return $this->belongsTo(Item::class, 'item_id', 'id');
     }
 
+    public function secondaryItem() {
+        return $this->belongsTo(Item::class, 'secondary_required_item', 'id');
+    }
+
     public function getSecondaryRequiredQuestItemAttribute() {
         return Item::with('dropLocation')->find($this->secondary_required_item);
     }

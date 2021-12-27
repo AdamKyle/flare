@@ -25,6 +25,7 @@ class ItemModifiers extends Component
         ItemEffectsValue::GOLD_DUST_RUSH,
         ItemEffectsValue::MASS_EMBEZZLE,
         ItemEffectsValue::QUEEN_OF_HEARTS,
+        ItemEffectsValue::PURGATORY,
     ];
 
     public $editing = false;

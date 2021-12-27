@@ -134,7 +134,7 @@ class TraverseService {
      * @param Character $character
      */
     public function travel(int $mapId, Character $character) {
-        $oldMap = $character->map->game_map_id;
+        $oldMap = $character->map->gameMap;
 
         $character->map()->update([
             'game_map_id' => $mapId
@@ -159,15 +159,15 @@ class TraverseService {
 
             $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
 
-            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color)) {
+            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color) || $this->mapTileValue->isMagma($color)) {
                 event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
             }
         }
         // @codeCoverageIgnoreEnd
 
-        $this->updateGlobalCharacterMapCount($oldMap);
+        $this->updateGlobalCharacterMapCount($oldMap->id);
         $this->updateMap($character);
-        $this->updateActions($mapId, $character);
+        $this->updateActions($mapId, $character, $oldMap);
         $this->updateCharacterTimeOut($character);
 
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
@@ -202,7 +202,8 @@ class TraverseService {
     protected function changeLocation(Character $character, array $cache) {
 
         if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y)
+            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y)
         ) {
 
             $x = $cache['x'];
@@ -239,7 +240,7 @@ class TraverseService {
      * @param int $mapId
      * @param Character $character
      */
-    protected function updateActions(int $mapId, Character $character) {
+    protected function updateActions(int $mapId, Character $character, GameMap $oldGameMap) {
         $user         = $character->user;
         $gameMap      = GameMap::find($mapId);
         $characterMap = $character->map;
@@ -251,9 +252,9 @@ class TraverseService {
                                         ->first();
 
         if ($gameMap->mapType()->isShadowPlane() || $gameMap->mapType()->isHell()) {
-            $this->updateAtctionTypeCache($character, $gameMap->enemy_stat_bonus);
+            $this->updateAtctionTypeCache($character, $oldGameMap, $gameMap->enemy_stat_bonus);
         } else {
-            $this->updateAtctionTypeCache($character, 0.0);
+            $this->updateAtctionTypeCache($character, $oldGameMap, 0.0);
         }
 
         $characterData = new Item($character, $this->characterAttackTransformer);
@@ -273,10 +274,23 @@ class TraverseService {
         event(new UpdateTopBarEvent($character));
     }
 
-    protected function updateAtctionTypeCache(Character $character, float $deduction) {
-        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+    protected function updateAtctionTypeCache(Character $character, GameMap $oldMap, float $deduction) {
+
+        if ($oldMap->mapType()->isHell()) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+        }
+
+        if ($character->map->gameMap->mapType()->isHell()) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+        }
 
         $attackData = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($attackData)) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
+            $attackData = Cache::get('character-attack-data-' . $character->id);
+        }
 
         foreach ($attackData as $key => $array) {
             $attackData[$key]['damage_deduction'] = $deduction;
