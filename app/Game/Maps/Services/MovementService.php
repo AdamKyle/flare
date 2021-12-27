@@ -158,6 +158,14 @@ class MovementService {
             }
         }
 
+        if ($this->mapTile->isMagma((int) $mapTileColor)) {
+            if ($this->mapTile->canWalkOnMagma($character, $xPosition, $yPosition)) {
+                return $this->moveCharacter($character, $params);
+            } else {
+                return $this->errorResult('cannot walk on magma.');
+            }
+        }
+
         return $this->moveCharacter($character, $params);
     }
 
@@ -333,8 +341,9 @@ class MovementService {
      * @return array
      */
     public function teleport(Character $character, int $x, int $y, int $cost, int $timeout, bool $pctCommand = false): array {
-        $canTeleportToWater = $this->mapTile->canWalkOnWater($character, $x, $y);
+        $canTeleportToWater      = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
+        $canTeleportToMagma      = $this->mapTile->canWalkOnMagma($character, $x, $y);
 
         if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
@@ -345,8 +354,14 @@ class MovementService {
         if (!$canTeleportToDeathWater && $this->mapTile->isDeathWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
 
-            return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
+            return $this->errorResult('Cannot teleport to Death Water locations without a ' . $item->name);
         }
+
+         if (!$canTeleportToMagma && $this->mapTile->isMagma($this->mapTile->getTileColor($character, $x, $y))) {
+             $item = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
+
+             return $this->errorResult('Cannot teleport to magma locations without a ' . $item->name);
+         }
 
         if ($character->gold < $cost) {
             return $this->errorResult('Not enough gold.');

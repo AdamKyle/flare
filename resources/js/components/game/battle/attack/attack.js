@@ -66,12 +66,21 @@ export default class Attack {
 
           this.lifeSteal(defender, attacker, attackData);
         }
-      } else if (this.state.characterCurrentHealth >= 0) {
+      } else if (this.state.characterCurrentHealth > 0) {
         if (!attackType.includes('voided')) {
           const attackData = defender.attack_types[attackType];
 
           this.lifeSteal(defender, attacker, attackData);
         }
+      }
+      console.log(this.state);
+      if (this.isMonsterDead()) {
+        this.state.battleMessages.push({
+          message: attacker.getMonster().name + ' has been defeated!',
+          class: 'info-damage'
+        });
+
+        this.monsterCurrentHealth = 0;
       }
 
       return this;
@@ -155,10 +164,10 @@ export default class Attack {
   }
 
   isMonsterDead() {
-    return this.monsterCurrentHealth <= 0;
+    return this.state.monsterCurrentHealth <= 0;
   }
 
   isCharacterDead() {
-    return this.characterCurrentHealth <= 0;
+    return this.state.characterCurrentHealth <= 0;
   }
 }

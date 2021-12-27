@@ -16,11 +16,15 @@
               <dd>{{$itemAffix->name}}</dd>
               <dt>Base Attack Modifier:</dt>
               <dd class="{{$itemAffix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_damage_mod * 100}}%</dd>
-              <dt>Base Damage Modifier (affects skills):</dt>
+              <dt>Skill Damage Modifier:</dt>
               <dd class="{{$itemAffix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_damage_mod_bonus * 100}}%</dd>
               <dt>Base AC Modifier:</dt>
+              <dd class="{{$itemAffix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_ac_mod * 100}}%</dd>
+              <dt>Skill AC Modifier:</dt>
               <dd class="{{$itemAffix->base_ac_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_ac_mod_bonus * 100}}%</dd>
               <dt>Base Healing Modifier:</dt>
+              <dd class="{{$itemAffix->base_healing_mod > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_healing_mod * 100}}%</dd>
+              <dt>Skill Healing Modifier:</dt>
               <dd class="{{$itemAffix->base_healing_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->base_healing_mod_bonus * 100}}%</dd>
               <dt>Class Bonus Mod:</dt>
               <dd class="{{$itemAffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$itemAffix->class_bonus * 100}}%</dd>

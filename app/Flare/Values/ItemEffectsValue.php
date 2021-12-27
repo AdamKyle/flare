@@ -21,6 +21,7 @@ class ItemEffectsValue {
     const GOLD_DUST_RUSH        = 'gold-dust-rush';
     const MASS_EMBEZZLE         = 'mass-embezzle';
     const WALK_ON_MAGMA         = 'walk-on-magma';
+    const QUEEN_OF_HEARTS       = 'speak-to-queen-of-hearts';
 
     /**
      * @var string[] $values
@@ -37,7 +38,8 @@ class ItemEffectsValue {
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
         self::CONTNUE_LEVELING      => 'continue-leveling',
         self::GOLD_DUST_RUSH        => 'gold-dust-rush',
-        self:: MASS_EMBEZZLE        => 'mass-embezzle',
+        self::MASS_EMBEZZLE         => 'mass-embezzle',
+        self::QUEEN_OF_HEARTS       => 'speak-to-queen-of-hearts'
     ];
 
     /**
@@ -155,5 +157,14 @@ class ItemEffectsValue {
      */
     public function canMassEmbezzle(): bool {
         return $this->value === self::MASS_EMBEZZLE;
+    }
+
+    /**
+     * Can speak to the queen of hearts?
+     *
+     * @return bool
+     */
+    public function canSpeakToQueenOfHearts(): bool {
+        return $this->value === self::QUEEN_OF_HEARTS;
     }
 }

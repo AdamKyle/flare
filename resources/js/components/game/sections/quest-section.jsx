@@ -98,16 +98,44 @@ export default class QuestSection extends React.Component {
 
     return (
       <div className="row">
-        <div className={singleQuests.length > 0 ? 'col-md-6' : 'hide'}>
-          <h4 className="tw-font-light">One off quests</h4>
-          <hr />
-          {singleQuests}
-        </div>
-        <div className={singleQuests.length > 0 ? 'col-md-6' : 'col-md-12'}>
-          <h4 className="tw-font-light">Quest chain</h4>
-          <hr />
-          {childQuests}
-        </div>
+        {
+          childQuests.length === 0 &&  singleQuests.length > 0 ?
+            <div className='col-md-12'>
+              <h4 className="tw-font-light">One off quests</h4>
+              <hr />
+              {singleQuests}
+            </div>
+          : null
+        }
+        {
+          childQuests.length > 0 &&  singleQuests.length > 0 ?
+            <div className='col-md-6'>
+              <h4 className="tw-font-light">One off quests</h4>
+              <hr />
+              {singleQuests}
+            </div>
+            : null
+        }
+
+        {
+          singleQuests.length === 0 &&  childQuests.length > 0 ?
+            <div className='col-md-12'>
+              <h4 className="tw-font-light">Quest chain</h4>
+              <hr />
+              {childQuests}
+            </div>
+            : null
+        }
+
+        {
+          singleQuests.length > 0 &&  childQuests.length > 0 ?
+            <div className='col-md-6'>
+              <h4 className="tw-font-light">Quest chain</h4>
+              <hr />
+              {childQuests}
+            </div>
+            : null
+        }
       </div>
     )
   }

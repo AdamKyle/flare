@@ -265,6 +265,16 @@ export default class QuestDetails extends React.Component {
                             </Fragment>
                           : null
                         }
+                        {
+                          this.props.quest.faction_game_map_id !== null ?
+                            <Fragment>
+                              <dt>Plane Faction Name (Map to fight on)</dt>
+                              <dd>{this.props.quest.faction_map.name}</dd>
+                              <dt>Level required</dt>
+                              <dd>{this.props.quest.required_faction_level > 4 ? '4 Maxed' : this.props.quest.required_faction_level}</dd>
+                            </Fragment>
+                          : null
+                        }
                       </dl>
                     </Tab>
                     {

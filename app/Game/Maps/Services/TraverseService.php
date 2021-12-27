@@ -180,7 +180,7 @@ class TraverseService {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are 
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
             feel the presence of death as it creeps ever closer. 
-            (Characters can walk on water here, monster strength is increased by '.($gameMap->enemy_stat_bonus * 100).'% including Devouring Light. You are reduced by '.($gameMap->character_attack_reduction * 100).'% (Damage wise) while here.)';
+            (Characters can walk on water here, monster strength is increased by '.($gameMap->enemy_stat_bonus * 100).'% including Devouring Light. You are reduced by '.($gameMap->enemy_stat_bonus * 100).'% (Damage wise) while here.)';
 
             event(new MessageEvent($character->user,  $message));
 
@@ -190,8 +190,8 @@ class TraverseService {
         if ($character->map->gameMap->mapType()->isHell()) {
             $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Monsters are increased by: ' .
                 ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
-                ($gameMap->character_attack_reduction * 100) . '% in both stats and damage done. Any quest items that make 
-                affixes irresistible will not work down here.';
+                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make 
+                affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage.';
 
             event(new MessageEvent($character->user,  $message));
 
@@ -250,7 +250,7 @@ class TraverseService {
                                         ->where('game_map_id', $characterMap->game_map_id)
                                         ->first();
 
-        if ($gameMap->name === 'Shadow Plane') {
+        if ($gameMap->mapType()->isShadowPlane() || $gameMap->mapType()->isHell()) {
             $this->updateAtctionTypeCache($character, $gameMap->enemy_stat_bonus);
         } else {
             $this->updateAtctionTypeCache($character, 0.0);
@@ -274,13 +274,9 @@ class TraverseService {
     }
 
     protected function updateAtctionTypeCache(Character $character, float $deduction) {
+        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
         $attackData = Cache::get('character-attack-data-' . $character->id);
-
-        if (is_null($attackData)) {
-            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-
-            return;
-        }
 
         foreach ($attackData as $key => $array) {
             $attackData[$key]['damage_deduction'] = $deduction;

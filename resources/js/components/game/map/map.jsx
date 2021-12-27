@@ -525,10 +525,6 @@ export default class Map extends React.Component {
         characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
       });
 
-      if (response.status === 422) {
-        return;
-      }
-
       return getServerMessage('cannot_walk_on_water');
     });
   }

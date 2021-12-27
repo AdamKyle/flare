@@ -306,21 +306,29 @@ class NpcCommandHandler {
                     return false;
                 }
 
-                if (!$this->canPay($character, $quest, $npc)) {
+                if (!$this->canPay($character, $quest, $npc) && $this->needsToPay($quest)) {
+                    return false;
+                } else {
+                    broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
+
+                    $character->update([
+                        'gold' => !is_null($quest->gold_cost) ? $character->gold - $quest->gold_cost : $character->gold,
+                        'gold_dust' => !is_null($quest->gold_dust_cost) ? $character->gold_dust - $quest->gold_dust_cost : $character->gold_dust,
+                        'shards' => !is_null($quest->shards_cost) ? $character->shards - $quest->shards_cost : $character->shards,
+                    ]);
+
+                    event(new UpdateTopBarEvent($character->refresh()));
+
+                    broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name));
+                }
+
+                if (!$this->hasPlaneAccess($quest, $character)) {
                     return false;
                 }
 
-                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
-
-                $character->update([
-                    'gold' => !is_null($quest->gold_cost) ? $character->gold - $quest->gold_cost : $character->gold,
-                    'gold_dust' => !is_null($quest->gold_dust_cost) ? $character->gold_dust - $quest->gold_dust_cost : $character->gold_dust,
-                    'shards' => !is_null($quest->shards_cost) ? $character->shards - $quest->shards_cost : $character->shards,
-                ]);
-
-                event(new UpdateTopBarEvent($character->refresh()));
-
-                broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name));
+                if (!$this->hasFactionRequirements($quest, $character)) {
+                    return false;
+                }
 
                 $this->handleReward($character, $quest, $npc);
 
@@ -364,7 +372,7 @@ class NpcCommandHandler {
     }
 
     private function canPay(Character $character, Quest $quest, Npc $npc) : bool {
-        $canPay = false;
+        $canPay = true;
 
         if (!is_null($quest->gold_cost)) {
             $canPay = $character->gold >= $quest->gold_cost;
@@ -383,6 +391,10 @@ class NpcCommandHandler {
         }
 
         return $canPay;
+    }
+
+    private function needsToPay(Quest $quest): bool {
+        return !is_null($quest->gold_cost) || !is_null($quest->gold_dust_cost) || !is_null($quest->shard_cost);
     }
 
     private function hasPlaneAccess(Quest $quest, Character $character): bool {

@@ -159,6 +159,10 @@ class CharacterAttackInformation {
         if ($canStack) {
             $total = ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix'));
 
+            if ($this->character->map->gameMap->mapType()->isHell()) {
+                return $total / 2;
+            }
+
             if ($total > 1.0) {
                 return 0.99;
             }
@@ -176,6 +180,10 @@ class CharacterAttackInformation {
         }
 
         $value = max($values);
+
+        if ($this->character->map->gameMap->mapType()->isHell()) {
+            return $value / 2;
+        }
 
         return $value > 1.0 ? .99 : $value;
     }
