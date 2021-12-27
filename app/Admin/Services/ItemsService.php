@@ -17,9 +17,9 @@ class ItemsService {
 
         InventorySlot::where('item_id', $item->id)->delete();
 
-        SetSlot::where('item_id', $item->id)->get();
+        SetSlot::where('item_id', $item->id)->delete();
 
-        foreach ($item->children() as $child) {
+        foreach ($item->children as $child) {
             InventorySlot::where('item_id', $child->id)->delete();
 
             SetSlot::where('item_id', $child->id)->get();

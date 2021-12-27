@@ -71,12 +71,27 @@ class ItemsControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        $response = $this->actingAs($this->user)->post(route('items.delete', [
+        $this->actingAs($this->user)->post(route('items.delete', [
             'item' => $this->item->id,
         ]));
 
+        $this->assertNull(ItemAffix::find($this->item->id));
+    }
+
+    public function testCanDeleteWithChild() {
+        Queue::fake();
+        Event::fake();
+
+        $secondItem = $this->createItem([
+            'parent_id' => $this->item->id,
+        ]);
+
+        $this->actingAs($this->user)->post(route('items.delete', [
+            'item' => $this->item->id,
+        ]));
 
         $this->assertNull(ItemAffix::find($this->item->id));
+        $this->assertNull(Item::find($secondItem->id));
     }
 
     public function testCanDeleteWhenAttachedToCharacter() {
