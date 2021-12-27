@@ -9,7 +9,8 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         printerClass="\Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9">
+         printerClass="\Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
+>
   <coverage processUncoveredFiles="true">
     <include>
       <directory suffix=".php">./app</directory>

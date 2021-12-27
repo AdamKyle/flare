@@ -332,6 +332,8 @@ class MessageControllerApiTest extends TestCase
             ])
             ->response;
 
+        dump($response->content());
+
         $this->assertEquals(200, $response->status());
     }
 
