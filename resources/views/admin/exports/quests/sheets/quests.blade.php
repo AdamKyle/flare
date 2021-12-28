@@ -14,6 +14,7 @@
         <th>reward_xp</th>
         <th>unlocks_skill</th>
         <th>unlocks_skill_type</th>
+        <th>is_parent</th>
         <th>parent_quest_id</th>
         <th>secondary_required_item</th>
         <th>faction_game_map_id</th>
@@ -36,6 +37,7 @@
             <td>{{$quest->reward_xp}}</td>
             <td>{{!is_null($quest->unlocks_skill) ? $quest->unlocks_skill_name : ''}}</td>
             <td>{{$quest->unlocks_skill_type}}</td>
+            <td>{{$quest->is_parent}}</td>
             <td>{{!is_null($quest->parent_quest_id) ? $quest->parent->name : ''}}</td>
             <td>{{!is_null($quest->secondary_required_item) ? $quest->secondaryItem->name : ''}}</td>
             <td>{{!is_null($quest->faction_game_map_id) ? $quest->factionMap->name : ''}}</td>

@@ -112,6 +112,10 @@ class QuestsSheet implements ToCollection {
             $quest['required_faction_level'] = null;
         }
 
+        if (!isset($quest['is_parent'])) {
+            $quest['is_parent'] = false;
+        }
+
         return $quest;
     }
 }

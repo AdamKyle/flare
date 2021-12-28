@@ -22,6 +22,7 @@ return [
     'automation'        => [],
     'factions'          => [],
     'random-enchants'   => [],
+    'special-locations' => [],
     'planes'            => [
         [
             'livewire'            => true,

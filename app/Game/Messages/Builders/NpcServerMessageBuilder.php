@@ -42,7 +42,13 @@ class NpcServerMessageBuilder {
             case 'location_of_conjure':
                 return '"Child, I have conjured the portal, I have opened the gates! Here is the location (X/Y): '.$celestialFight->x_position.'/'.$celestialFight->y_position.' ('.$celestialFight->gameMapName().' Plane)"';
             case 'taken_item':
-                return '"Child! You have an item I want! I shall take that. In return I shall give you something you always wanted!"';
+                return '"Child! You have an item I want! I shall take that."';
+            case 'taken_second_item':
+                return '"Child! You have another item I wanted! This is a good day for you!"';
+            case 'has_plane_access':
+                return '"Child, I see you have been exploring lately! This is a good thing!"';
+            case 'has_faction_level':
+                return '"Child! I see you have been keeping busy with the local wild life, gaining titles and all that. This is a good thing!"';
             case 'given_item':
                 return '"Here child, take this! It might be of use to you!" (Check the help section under quest items to see what this does, or check your inventory and click on the item)';
             case 'inventory_full':
@@ -71,6 +77,8 @@ class NpcServerMessageBuilder {
                 return '"Child! I shall take those shiny coins from you! I have something for you in return!"';
             case 'what_do_you_want':
                 return '"Select something child, one of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"';
+            case 'missing_parent_quest':
+                return '"Child! there is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).';
             default:
                 return '';
         }

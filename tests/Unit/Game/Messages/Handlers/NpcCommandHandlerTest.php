@@ -190,6 +190,7 @@ class NpcCommandHandlerTest extends TestCase {
 
         $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
 
+
         $this->assertCount(1, QuestsCompleted::all());
 
         $character = $user->character->refresh();
@@ -387,52 +388,6 @@ class NpcCommandHandlerTest extends TestCase {
 
         $this->assertLessThan(100, $character->gold);
         $this->assertLessThan(100, $character->gold_dust);
-    }
-
-    public function testCharacterHandlesQuestNpcDoesntHaveSkill() {
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $user = $this->character->getCharacterFactory()->getUser();
-
-        $this->questNpc->quests()->first()->update([
-            'unlocks_skill_type' => 250,
-        ]);
-
-        $questNpc = $this->questNpc->refresh();
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $questNpc, $user);
-
-        $this->assertCount(0, QuestsCompleted::all());
-
-        $character = $user->character->refresh();
-
-        $skill = $character->skills->filter(function($skill) {
-            return !$skill->is_locked && $skill->type()->isAlchemy();
-        })->first();
-
-        $this->assertNull($skill);
-    }
-
-    public function testCharacterHandlesQuestCharacterDoesntHaveSkill() {
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $user = $this->character->getCharacterFactory()->getUser();
-
-        $user->character->skills()->delete();
-
-        $user = $user->refresh();
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
-
-        $this->assertCount(0, QuestsCompleted::all());
-
-        $character = $user->character->refresh();
-
-        $skill = $character->skills->filter(function($skill) {
-            return !$skill->is_locked && $skill->type()->isAlchemy();
-        })->first();
-
-        $this->assertNull($skill);
     }
 
     public function testHasNoQuests() {

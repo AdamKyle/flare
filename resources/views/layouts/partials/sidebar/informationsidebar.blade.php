@@ -33,6 +33,7 @@
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('info.page', ['pageName' => 'movement'])}}">Movement</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'locations'])}}">Locations</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'special-locations'])}}">Special Locations</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'adventure'])}}">Adventuring</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'set-sail'])}}">Setting Sail</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'teleport'])}}">Teleporting</a></li>
