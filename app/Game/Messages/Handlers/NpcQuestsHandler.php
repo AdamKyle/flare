@@ -252,10 +252,26 @@ class NpcQuestsHandler {
     public function payCurrencies(Character $character, Npc $npc, Quest $quest) {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
 
+        $newGold     = $character->gold - $quest->gold_cost;
+        $newGoldDust = $character->gold_dust - $quest->gold_dust_cost;
+        $newShards   = $character->shards - $quest->shard_cost;
+
+        if ($newGold <= 0) {
+            $newGold = 0;
+        }
+
+        if ($newGoldDust <= 0) {
+            $newGoldDust = 0;
+        }
+
+        if ($newShards <= 0) {
+            $newShards = 0;
+        }
+
         $character->update([
-            'gold' => !is_null($quest->gold_cost) ? ($character->gold - $quest->gold_cost) : $character->gold,
-            'gold_dust' => !is_null($quest->gold_dust_cost) ? ($character->gold_dust - $quest->gold_dust_cost) : $character->gold_dust,
-            'shards' => !is_null($quest->shards_cost) ? ($character->shards - $quest->shard_cost) : $character->shards,
+            'gold' => !is_null($quest->gold_cost) ? $newGold : $character->gold,
+            'gold_dust' => !is_null($quest->gold_dust_cost) ? $newGoldDust : $character->gold_dust,
+            'shards' => !is_null($quest->shards_cost) ? $newShards : $character->shards,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));

@@ -23,6 +23,7 @@ use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use League\Fractal\Resource\Item as ResourceItem;
 
 class TraverseService {
@@ -277,10 +278,14 @@ class TraverseService {
     protected function updateAtctionTypeCache(Character $character, GameMap $oldMap, float $deduction) {
 
         if ($oldMap->mapType()->isHell()) {
+            event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
+
             resolve(BuildCharacterAttackTypes::class)->buildCache($character);
         }
 
         if ($character->map->gameMap->mapType()->isHell()) {
+            event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
+            
             resolve(BuildCharacterAttackTypes::class)->buildCache($character);
         }
 

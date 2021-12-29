@@ -82,6 +82,11 @@ export default class QuestSection extends React.Component {
     const childQuests = [];
     const singleQuests = [];
 
+    if (!mapQuests.hasOwnProperty(key)) {
+      return <div className="mt-3 text-center"> There are no quests that are parent or one offs for this plane.
+        Other planes may have quest chains that come down here. Check the All Quests section.</div>
+    }
+
     for (let i = 0; i < mapQuests[key].length; i++) {
       const quest = mapQuests[key][i];
 

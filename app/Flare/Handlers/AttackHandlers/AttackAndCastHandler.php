@@ -55,7 +55,7 @@ class AttackAndCastHandler {
         return $this;
     }
 
-    public function setDmgReduction(float $reduction): CastAndAttackHandler {
+    public function setDmgReduction(float $reduction): AttackAndCastHandler {
         $this->dmgReduction = $reduction;
 
         $this->castHandler  = $this->castHandler->setDmgReduction($reduction);
