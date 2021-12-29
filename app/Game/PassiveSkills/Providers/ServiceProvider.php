@@ -22,8 +22,12 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        // @codeCoverageIgnoreStart
+        //
+        // The test coverage never gets here.
         $this->app->bind(PassiveSkillTrainingService::class, function() {
             return new PassiveSkillTrainingService;
         });
+        // @codeCoverageIgnoreEnd
     }
 }

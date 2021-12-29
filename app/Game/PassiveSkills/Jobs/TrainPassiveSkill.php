@@ -51,6 +51,7 @@ class TrainPassiveSkill implements ShouldQueue
         }
 
         if (!$this->characterPassiveSkill->completed_at->lessThanOrEqualTo(now())) {
+            // @codeCoverageIgnoreStart
             $timeLeft = $this->characterPassiveSkill->completed_at->diffInMinutes(now());
 
             if ($timeLeft <= 15) {
@@ -59,7 +60,6 @@ class TrainPassiveSkill implements ShouldQueue
                 $time = now()->addMinutes(15);
             }
 
-            // @codeCoverageIgnoreStart
             TrainPassiveSkill::dispatch(
                 $this->character,
                 $this->characterPassiveSkill

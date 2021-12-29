@@ -37,19 +37,20 @@ class TrainPassiveSkillTest extends TestCase {
         $this->assertTrue($passive->current_level === 1);
     }
 
-    public function testTimeNeeded() {
+    public function testLevelPassiveToMaxWhenAtMax() {
         $passive = $this->character->getCharacter(false)->passiveSkills()->first();
 
         $passive->update([
-            'started_at' => now(),
-            'completed_at' => now()->seconds(10),
+            'current_level' => $passive->passiveSkill->max_level,
+            'started_at'    => now(),
+            'completed_at'  => now(),
         ]);
 
         TrainPassiveSkill::dispatch($this->character->getCharacter(false), $passive);
 
         $passive = $passive->refresh();
 
-        $this->assertTrue($passive->current_level === 1);
+        $this->assertTrue($passive->current_level === $passive->passiveSkill->max_level);
     }
 
     public function testNothingHappens() {
