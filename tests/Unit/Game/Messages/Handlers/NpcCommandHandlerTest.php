@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Messages\Handlers;
 
 use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Models\QuestsCompleted;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcTypes;
@@ -47,6 +48,7 @@ class NpcCommandHandlerTest extends TestCase {
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation()
+                                                 ->assignFactionSystem()
                                                  ->assignSkill(
                                                      $this->createGameSkill([
                                                          'type'      => SkillTypeValue::ALCHEMY,
@@ -210,6 +212,236 @@ class NpcCommandHandlerTest extends TestCase {
         })->first();
 
         $this->assertNotNull($skill);
+    }
+
+    public function testCharacterHandlesQuestWithPlaneRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $item = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::HELL
+        ]);
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $user = $this->character->giveItem($item)->getCharacterFactory()->getUser();
+
+        $this->quest->delete();
+
+        $this->createQuest([
+            'access_to_map_id' => $gameMap->id,
+            'npc_id'           => $this->questNpc->id,
+            'gold_cost'        => 0,
+            'shard_cost'       => 0,
+            'gold_dust_cost'   => 0,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
+
+        $this->assertCount(1, QuestsCompleted::all());
+
+        $character = $user->character->refresh();
+
+        $this->assertGreaterThan(10, $character->gold);
+        $this->assertGreaterThan(10, $character->gold_dust);
+        $this->assertGreaterThan(10, $character->shards);
+    }
+
+    public function testCharacterHandlesQuestWithoutPlaneRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $item = $this->createItem([
+            'type' => 'quest',
+            'effect' => ItemEffectsValue::HELL
+        ]);
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $user = $this->character->getCharacterFactory()->getUser();
+
+        $this->quest->delete();
+
+        $this->createQuest([
+            'access_to_map_id' => $gameMap->id,
+            'npc_id'           => $this->questNpc->id,
+            'gold_cost'        => 0,
+            'shard_cost'       => 0,
+            'gold_dust_cost'   => 0,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
+
+        $this->assertCount(0, QuestsCompleted::all());
+    }
+
+    public function testCharacterHandlesQuestWithSecondaryItemRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $item = $this->createItem(['type' => 'quest', 'name' => 'some item']);
+
+        $user = $this->character->giveItem($item)->getCharacterFactory()->completeQuest($this->quest)->getUser();
+
+        $this->createQuest([
+            'secondary_required_item' => $item->id,
+            'npc_id'                  => $this->questNpc->id,
+            'gold_cost'               => 0,
+            'shard_cost'              => 0,
+            'gold_dust_cost'          => 0,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
+
+        $this->assertCount(2, QuestsCompleted::all());
+
+        $character = $user->character->refresh();
+
+        $this->assertGreaterThan(10, $character->gold);
+        $this->assertGreaterThan(10, $character->gold_dust);
+        $this->assertGreaterThan(10, $character->shards);
+
+        $item = $character->inventory->slots->filter(function($slot) {
+            return $slot->item_id = $this->rewardItem->id && $slot->item->type === 'quest';
+        })->first();
+
+        $this->assertNotNull($item);
+
+        $skill = $character->skills->filter(function($skill) {
+            return !$skill->is_locked && $skill->type()->isAlchemy();
+        })->first();
+
+        $this->assertNotNull($skill);
+    }
+
+    public function testCharacterHandlesQuestWithoutSecondaryItemRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $item = $this->createItem(['type' => 'quest', 'name' => 'some item']);
+
+        $user = $this->character->getCharacterFactory()->completeQuest($this->quest)->getUser();
+
+        $this->createQuest([
+            'secondary_required_item' => $item->id,
+            'npc_id'                  => $this->questNpc->id,
+            'gold_cost'               => 0,
+            'shard_cost'              => 0,
+            'gold_dust_cost'          => 0,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
+
+        $this->assertCount(1, QuestsCompleted::all());
+    }
+
+    public function testCharacterHandlesQuestWithoutParentRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $item = $this->createItem(['type' => 'quest', 'name' => 'some item']);
+
+        $user = $this->character->getCharacterFactory()->getUser();
+
+        $this->createQuest([
+            'parent_quest_id'         => $this->quest->id,
+            'secondary_required_item' => $item->id,
+            'npc_id'                  => $this->questNpc->id,
+            'gold_cost'               => 0,
+            'shard_cost'              => 0,
+            'gold_dust_cost'          => 0,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
+
+        // The player will complete the first quest but not the second.
+        $this->assertLessThan(2, QuestsCompleted::count());
+    }
+
+    public function testCharacterHandlesQuestWithFactionRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $user = $this->character->getCharacterFactory()->getUser();
+
+        $character = $user->character;
+
+        $character->factions()->where('game_map_id', $character->map->gameMap->id)->first()->update([
+            'current_level'  => 4,
+            'maxed'          => true,
+            'current_points' => 8000
+        ]);
+
+        $this->quest->delete();
+
+        $this->createQuest([
+            'npc_id'                  => $this->questNpc->id,
+            'gold_cost'               => 0,
+            'shard_cost'              => 0,
+            'gold_dust_cost'          => 0,
+            'faction_game_map_id'     => $character->map->gameMap->id,
+            'required_faction_level'  => 1,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user->refresh());
+
+        // The player will complete the first quest but not the second.
+        $this->assertEquals(1, QuestsCompleted::count());
+    }
+
+    public function testCharacterHandlesQuestWithFactionMaxRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $user = $this->character->getCharacterFactory()->getUser();
+
+        $character = $user->character;
+
+        $character->factions()->where('game_map_id', $character->map->gameMap->id)->first()->update([
+            'current_level'  => 4,
+            'maxed'          => true,
+            'current_points' => 8000
+        ]);
+
+        $this->quest->delete();
+
+        $this->createQuest([
+            'npc_id'                  => $this->questNpc->id,
+            'gold_cost'               => 0,
+            'shard_cost'              => 0,
+            'gold_dust_cost'          => 0,
+            'faction_game_map_id'     => $character->map->gameMap->id,
+            'required_faction_level'  => 5,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user->refresh());
+
+        // The player will complete the first quest but not the second.
+        $this->assertEquals(1, QuestsCompleted::count());
+    }
+
+    public function testCharacterHandlesQuestWithoutFactionRequirement() {
+        $npcCommandHandler = resolve(NpcCommandHandler::class);
+
+        $user = $this->character->getCharacterFactory()->getUser();
+
+        $character = $user->character;
+
+        $character->factions()->where('game_map_id', $character->map->gameMap->id)->first()->update([
+            'current_level'  => 0,
+            'maxed'          => false,
+            'current_points' => 0
+        ]);
+
+        $this->quest->delete();
+
+        $this->createQuest([
+            'npc_id'                  => $this->questNpc->id,
+            'gold_cost'               => 0,
+            'shard_cost'              => 0,
+            'gold_dust_cost'          => 0,
+            'faction_game_map_id'     => $character->map->gameMap->id,
+            'required_faction_level'  => 1,
+        ]);
+
+        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user->refresh());
+
+        // The player will complete the first quest but not the second.
+        $this->assertEquals(0, QuestsCompleted::count());
     }
 
     public function testCharacterHandlesQuestNotEnoughToPay() {

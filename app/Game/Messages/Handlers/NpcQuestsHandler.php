@@ -28,6 +28,7 @@ class NpcQuestsHandler {
 
         $completedQuests = $character->questsCompleted->pluck('quest_id')->toArray();
         $quests          = $this->fetchQuestsFromNpc($npc, $completedQuests);
+
         if ($quests->isEmpty()) {
             return false;
         }
@@ -61,7 +62,7 @@ class NpcQuestsHandler {
             if ($this->questRequiresSecondaryItem($quest)) {
                 $secondaryItem = $this->fetchSecondaryRequiredItem($quest, $character);
 
-                if (is_null($SecondaryItem)) {
+                if (is_null($secondaryItem)) {
                     continue;
                 } else {
                     $secondaryItem->delete();

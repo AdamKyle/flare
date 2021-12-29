@@ -2,9 +2,11 @@
 
 namespace Tests\Setup\Character;
 
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -93,7 +95,7 @@ class CharacterFactory {
         return $this;
     }
 
-    public function assignPassiveSkills(): CharacterFactory {
+    public function assignPassiveSkills(GameBuilding $gameBuilding = null): CharacterFactory {
 
         $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_DEFENCE);
         $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
@@ -102,21 +104,56 @@ class CharacterFactory {
         $this->createPassiveForCharacter(PassiveSkillTypeValue::IRON_COST_REDUCTION);
         $this->createPassiveForCharacter(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
 
+        $this->character = $this->character->refresh();
+
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::UNLOCKS_BUILDING, [
+            'name'                     => is_null($gameBuilding) ? 'Sample Passive Skill 101' : $gameBuilding->name,
+            'is_locked'                => true,
+            'unlocks_at_level'         => 1,
+            'parent_skill_id'          => $this->character->passiveSkills()->first()->passiveSkill->id,
+        ]);
+
         return $this;
     }
 
-    protected function createPassiveForCharacter(int $type) {
+    public function completeQuest(Quest $quest): CharacterFactory {
+        $this->character->questsCompleted()->create([
+            'quest_id'     => $quest->id,
+            'character_id' => $this->character->id,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    public function createPassiveForCharacter(int $type, array $options = []): CharacterFactory {
+
+        $isLocked = false;
+        $parentId = null;
+
+        if (isset($options['is_locked'])) {
+            $isLocked = $options['is_locked'];
+        }
+
+        if (isset($options['parent_skill_id'])) {
+            $parentId = $this->character->passiveSkills()->where('passive_skill_id', $options['parent_skill_id'])->first()->id;
+        }
+
         $this->character->passiveSkills()->create([
             'character_id'      => $this->character->id,
-            'passive_skill_id'  => $this->createPassiveSkill([
+            'passive_skill_id'  => $this->createPassiveSkill(array_merge([
                 'effect_type' => $type,
-            ])->id,
+            ], $options))->id,
+            'parent_skill_id'   => $parentId,
             'current_level'     => 0,
             'hours_to_next'     => 1,
             'started_at'        => null,
             'completed_at'      => null,
-            'is_locked'         => false,
+            'is_locked'         => $isLocked,
         ]);
+
+        return $this;
     }
 
     /**

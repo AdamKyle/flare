@@ -90,9 +90,11 @@ class TrainPassiveSkill implements ShouldQueue
             if ($newPassive->current_level >= $child->unlocks_at_level) {
                 $foundChild = $this->character->passiveSkills()->where('passive_skill_id', $child->id)->first();
 
-                $foundChild->update([
-                    'is_locked' => false,
-                ]);
+                if (!is_null($foundChild)) {
+                    $foundChild->update([
+                        'is_locked' => false,
+                    ]);
+                }
             }
         }
 
