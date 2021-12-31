@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -177,7 +178,7 @@ class KingdomService {
      * @param $amountToEmbezzle
      */
     public function embezzleFromKingdom(Kingdom $kingdom, $amountToEmbezzle) {
-        $newMorale = $kingdom->current_morale - 0.15;
+        $newMorale   = $kingdom->current_morale - 0.15;
 
         $kingdom->update([
             'treasury' => $kingdom->treasury - $amountToEmbezzle,

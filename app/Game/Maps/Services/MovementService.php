@@ -268,11 +268,15 @@ class MovementService {
             $canSettle = true;
         }
 
-        $owner = null;
+        $owner           = null;
+        $canMassEmbezzle = false;
 
         if (!is_null($kingdom)) {
             if (!is_null($kingdom->character_id)) {
                 $owner = $kingdom->character->name;
+
+                $canMassEmbezzle = $this->canMassEmbezzle($kingdom->character, $canManage);
+
             } else {
                 $owner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->name . ' (NPC)';
             }
@@ -284,6 +288,7 @@ class MovementService {
             'can_manage'        => $canManage,
             'can_settle'        => $canSettle,
             'kingdom_to_attack' => $kingdomToAttack,
+            'can_mass_embezzle' => $canMassEmbezzle,
         ];
     }
 
@@ -554,7 +559,7 @@ class MovementService {
             'kingdom_details'   => $kingdomDetails,
             'celestials'        => $this->celestialEntities(),
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle' => $canEmbezzle,
+            'can_mass_embezzle' => $canEmbezzle
         ]);
     }
 

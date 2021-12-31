@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Jobs\CoreJob;
 use App\Flare\Models\User;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Jobs\MassEmbezzle;
@@ -14,6 +15,7 @@ use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
@@ -40,11 +42,14 @@ class KingdomsController extends Controller {
 
     private $kingdom;
 
-    public function __construct(Manager $manager, KingdomTransformer $kingdom) {
+    private $kingdomService;
+
+    public function __construct(Manager $manager, KingdomTransformer $kingdom, KingdomService $kingdomService) {
         $this->middleware('is.character.dead')->except('getAttackLogs');
 
-        $this->manager = $manager;
-        $this->kingdom = $kingdom;
+        $this->manager        = $manager;
+        $this->kingdom        = $kingdom;
+        $this->kingdomService = $kingdomService;
     }
 
     public function getLocationData(Character $character, Kingdom $kingdom) {
@@ -318,23 +323,14 @@ class KingdomsController extends Controller {
     }
 
     public function massEmbezzle(KingdomEmbezzleRequest $request, Character $character) {
-        $mapId          = $character->map->game_map_id;
-        $kingdomsForMap = $character->kingdoms()->where('game_map_id', $mapId)->get();
-
-        foreach ($kingdomsForMap as $kingdom) {
-
-            if ($kingdomsForMap->last() === $kingdom) {
-                MassEmbezzle::dispatch($kingdom, $request->embezzle_amount, true)->delay(now()->addSecond());
-            } else {
-                MassEmbezzle::dispatch($kingdom, $request->embezzle_amount)->delay(now()->addSecond());
-            }
-        }
 
         $character->update([
             'is_mass_embezzling' => true
         ]);
 
-        event(new ServerMessageEvent($character->user, 'Mass Embezzling underway.'));
+        MassEmbezzle::dispatch($character, $request->embezzle_amount)->delay(now()->addSeconds(5));
+
+        event(new ServerMessageEvent($character->user, 'Mass Embezzling underway...'));
 
         return response()->json([], 200);
     }
