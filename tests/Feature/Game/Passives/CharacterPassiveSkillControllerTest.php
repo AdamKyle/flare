@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Passives\Controllers;
+namespace Tests\Feature\Game\Passives;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Passives\Controllers\Api;
+namespace Tests\Feature\Game\Passives\Api;
 
 use App\Game\PassiveSkills\Jobs\TrainPassiveSkill;
 use Queue;
