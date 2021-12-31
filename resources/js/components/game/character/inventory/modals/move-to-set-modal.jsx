@@ -68,7 +68,13 @@ export default class MoveToSetModal extends React.Component {
   }
 
   setOptions() {
-    return this.props.sets.map((set) => <option value={set.id} key={set.id}>Set {set.index}</option>)
+    return this.props.sets.map((set) => {
+     if (set.name !== null) {
+       return <option value={set.id} key={set.id}>{set.name}</option>
+     }
+
+     return <option value={set.id} key={set.id}>Set {set.index}</option>
+    });
   }
 
   setSelectedSet(event) {
@@ -109,8 +115,11 @@ export default class MoveToSetModal extends React.Component {
               <li>2 Rings</li>
               <li>2 Spells (1 Healing, 1 Damage or 2 Healing or 2 Damage)</li>
               <li>2 Artifacts</li>
+              <li>1 Unique of any type<sup>*</sup> (uniques are green items that can have one or two enchants).</li>
             </ul>
           </p>
+          <p><sup>*</sup> IE, You can have 1 ring that has two regular enchants and 1 green ring that has 1 or 2 Unique Enchants. If you then add a helmet
+          that also has unique enchants, the set will not be equipable.</p>
           <p>
             <select className="form-control monster-select" id="monsters" name="monsters"
                     value={this.state.selectedSet}

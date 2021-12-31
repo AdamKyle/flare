@@ -192,18 +192,23 @@ class InventorySetService {
             }
         }
 
-        // Bail if we have more then two rings.
+        // Bail if we have more than two rings.
         if (!$this->hasRings($inventorySet)) {
             return false;
         }
 
-        // Bail if we have more then two spells of either type.
+        // Bail if we have more than two spells of either type.
         if (!$this->hasSpells($inventorySet)) {
             return false;
         }
 
-        // Bail if we have more then two artifacts.
+        // Bail if we have more than two artifacts.
         if (!$this->hasArtifacts($inventorySet)) {
+            return false;
+        }
+
+        // Bail if we have more than one unique.
+        if ($this->hasMoreThanOneUnique($inventorySet)) {
             return false;
         }
 
@@ -368,6 +373,22 @@ class InventorySetService {
         }
 
         return true;
+    }
+
+    protected function hasMoreThanOneUnique(InventorySet $inventorySet): bool {
+        return $inventorySet->slots->filter(function($slot) {
+            if (!is_null($slot->item->itemPrefix)) {
+                if ($slot->item->itemPrefix->randomly_generated) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($slot->item->itemSuffix)) {
+                if ($slot->item->itemSuffix->randomly_generated) {
+                    return $slot;
+                }
+            }
+        })->count() >= 1;
     }
 
 

@@ -20,7 +20,21 @@ export default class SetsSection extends React.Component {
     return '';
   }
 
-  getTitle(index, equipped, canBeEquipped) {
+  getTitle(name, index, equipped, canBeEquipped) {
+    if (name !== null) {
+      return (
+        <span>
+        {name} {
+          equipped ?
+            <i className="ra ra-knight-helmet inventory-set-equipped"></i>
+            : !canBeEquipped ?
+              <i className="fas fa-exclamation-triangle inventory-set-error"></i>
+              : null
+        }
+      </span>
+      )
+    }
+
     return (
       <span>
         Set {index + 1} {
@@ -38,7 +52,7 @@ export default class SetsSection extends React.Component {
     return this.props.sets.map((s, index) =>
       <Tab
         eventKey={s.id}
-        title={this.getTitle(index, s.is_equipped, s.can_be_equipped)}
+        title={this.getTitle(s.name, index, s.is_equipped, s.can_be_equipped)}
         tabClassName={this.getClassName(s)}
       >
         <SetTabSection

@@ -5,8 +5,10 @@ namespace App\Game\Core\Controllers\Api;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\RemoveItemRequest;
+use App\Game\Core\Requests\RenameSetRequest;
 use App\Game\Core\Requests\SaveEquipmentAsSet;
 use App\Game\Core\Requests\UseManyItemsValidation;
 use App\Game\Core\Services\UseItemService;
@@ -56,6 +58,49 @@ class CharacterInventoryController extends Controller {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return response()->json($inventory->getInventoryForApi(), 200);
+    }
+
+    public function uniquesOnly(Character $character) {
+        $slots = $character->inventory->slots->filter(function($slot) {
+            if (!$slot->equipped && $slot->item->type !== 'quest') {
+                if (!is_null($slot->item->itemPrefix)) {
+                    if ($slot->item->itemPrefix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+            }
+
+            if (!$slot->equipped && $slot->item->type !== 'quest') {
+                if (!is_null($slot->item->itemSuffix)) {
+                    if ($slot->item->itemSuffix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+            }
+        });
+
+        return response()->json([
+            'slots' => $slots,
+            'valuations' => [
+                '10,000,000,000' => [
+                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getDamageRange(),
+                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getPercentageRange(),
+                    'type'             => 'basic',
+                ],
+                '50,000,000,000' => [
+                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getDamageRange(),
+                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getPercentageRange(),
+                    'type'             => 'medium',
+                ],
+                '1000,000,000,000' => [
+                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getDamageRange(),
+                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getPercentageRange(),
+                    'type'             => 'legendary',
+                ],
+            ],
+            'has_gold' => $character->gold >= RandomAffixDetails::BASIC,
+            'has_inventory_room' => !$character->isInventoryFull(),
+        ]);
     }
 
     public function destroy(Request $request, Character $character) {
@@ -160,10 +205,6 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        $index     = $character->inventorySets->search(function($set) use ($request) {
-            return $set->id === $request->move_to_set;
-        });
-
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
@@ -176,8 +217,40 @@ class CharacterInventoryController extends Controller {
             $affixData['character_inventory'],
         ));
 
+        if (is_null($inventorySet->name)) {
+            $index     = $character->inventorySets->search(function($set) use ($request) {
+                return $set->id === $request->move_to_set;
+            });
+
+            return response()->json([
+                'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
+            ]);
+        }
+
         return response()->json([
-            'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
+            'message' => $itemName . ' Has been moved to: ' . $inventorySet->name,
+        ]);
+    }
+
+    public function renameSet(RenameSetRequest $request, Character $character) {
+        $inventorySet = $character->inventorySets()->find($request->set_id);
+
+        if (is_null($inventorySet)) {
+            return response()->json([
+                'message' => 'Set does not exist.'
+            ], 422);
+        }
+
+        $inventorySet->update([
+            'name' => $request->set_name
+        ]);
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return response()->json([
+            'message' => 'Renamed set to: ' . $request->set_name,
         ]);
     }
 

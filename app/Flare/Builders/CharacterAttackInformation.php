@@ -322,12 +322,14 @@ class CharacterAttackInformation {
     public function fetchVoidanceAmount(string $type): float {
         $voidance = 0.0;
 
-        $slot = $this->character->inventory->slots->filter(function($slot) use($type) {
+        $slots = $this->character->inventory->slots->filter(function($slot) use($type) {
             return $slot->item->type === 'quest' && $slot->item->{$type} > 0;
-        })->first();
+        });
 
-        if (!is_null($slot)) {
-            $voidance = $slot->item->{$type};
+        if ($slots->isNotEmpty()) {
+            foreach ($slots as $slot) {
+                $voidance += $slot->item->{$type};
+            }
         }
 
         return $voidance + $this->fetchVoidanceFromAffixes($type);

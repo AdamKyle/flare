@@ -37,6 +37,10 @@ class NpcServerMessageBuilder {
                 return  $npc->real_name . ' takes your currency and smiles: "Thank you child. I shall begin the conjuration at once."';
             case 'already_conjured':
                 return '"No child! I have already conjured for you!"';
+            case 'missing_queen_item':
+                return $npc->real_name . ' looks at you with a blank stare. You try again and she just refuses to talk to you or acknowledge you. Maybe you need a quest item? Something to do with: Queens Decision (Quest) ???';
+            case 'queen_plane':
+                return $npc->real_name . ' looks at you, blinks here eyes and screams: "NO! NO! NO! you have to come to me child. Come to me and let me love you...Oooooh hooo hoo hoo!" You must be any where in Hell to access her.';
             case 'public_exists':
                 return '"No Child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"';
             case 'location_of_conjure':

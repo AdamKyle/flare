@@ -216,6 +216,7 @@ class BattleEventHandler {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
                          ->whereNull('item_prefix_id')
                          ->whereNull('item_suffix_id')
+                         ->where('cost', '<=', 4000000000)
                          ->inRandomOrder()
                          ->first();
 
@@ -224,16 +225,18 @@ class BattleEventHandler {
                             ->setCharacter($character)
                             ->setPaidAmount(RandomAffixDetails::BASIC);
 
-        $item->update([
+        $duplicateItem = $item->duplicate();
+
+        $duplicateItem->update([
             'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
         ]);
 
         if (rand(1, 100) > 50) {
-            $item->update([
+            $duplicateItem->update([
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
             ]);
         }
 
-        return $item;
+        return $duplicateItem;
     }
 }

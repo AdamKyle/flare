@@ -285,7 +285,7 @@ class TraverseService {
 
         if ($character->map->gameMap->mapType()->isHell()) {
             event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
-            
+
             resolve(BuildCharacterAttackTypes::class)->buildCache($character);
         }
 

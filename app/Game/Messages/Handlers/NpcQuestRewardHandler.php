@@ -9,6 +9,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -166,8 +167,12 @@ class NpcQuestRewardHandler {
             'quest_id'     => $quest->id,
         ]);
 
+        $character = $character->refresh();
+
         broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under adventure logs section.'));
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateTopBarEvent($character));
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
     }
 }

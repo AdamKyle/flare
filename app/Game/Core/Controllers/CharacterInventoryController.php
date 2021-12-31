@@ -69,6 +69,12 @@ class CharacterInventoryController extends Controller {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
+        if ($comparisonService->isItemUnique($itemToEquip)) {
+            if ($comparisonService->characterHasUniqueEquipped($character)) {
+                return redirect()->back()->with('error', 'You cannot equip anymore unique items.');
+            }
+        }
+
         $type = $request->item_to_equip_type;
 
         if ($type === 'spell-healing' || $type === 'spell-damage') {

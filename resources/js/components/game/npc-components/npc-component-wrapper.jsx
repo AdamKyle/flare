@@ -1,5 +1,6 @@
 import React from 'react';
 import ConjureComponent from "./conjure-component";
+import RandomAffixSection from "./random-affix-section";
 
 export default class NpcComponentWrapper extends React.Component {
 
@@ -12,7 +13,7 @@ export default class NpcComponentWrapper extends React.Component {
       case 'Conjure':
         return <ConjureComponent closeComponent={this.props.close} openTimeOutModal={this.props.openTimeOutModal} characterId={this.props.characterId} isDead={this.props.isDead}/>
       case 'Enchant':
-        return <ConjureComponent closeComponent={this.props.close} openTimeOutModal={this.props.openTimeOutModal} characterId={this.props.characterId} isDead={this.props.isDead}/>
+        return <RandomAffixSection closeComponent={this.props.close} openTimeOutModal={this.props.openTimeOutModal} characterId={this.props.characterId} isDead={this.props.isDead}/>
       default:
         return <div className="alert alert-danger">Component not found. Component Name: {this.props.npcComponentName}</div>
     }

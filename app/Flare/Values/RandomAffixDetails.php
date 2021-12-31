@@ -9,9 +9,9 @@ class RandomAffixDetails {
      */
     private $value;
 
-    const BASIC     = 1000000000;
-    const MEDIUM    = 10000000000;
-    const LEGENDARY = 50000000000;
+    const BASIC     = 10000000000;
+    const MEDIUM    = 50000000000;
+    const LEGENDARY = 100000000000;
 
 
     /**
@@ -41,12 +41,12 @@ class RandomAffixDetails {
     public function getPercentageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [150, 300];
+                return [225, 350];
             case self::LEGENDARY:
-                return [325, 700];
+                return [375, 700];
             case self::BASIC:
             default:
-                return [75, 125];
+                return [105, 185];
         }
     }
 
@@ -58,7 +58,7 @@ class RandomAffixDetails {
                 return [50000000, 125000000];
             case self::BASIC:
             default:
-                return [550000, 5000000];
+                return [3000000, 8000000];
         }
     }
 

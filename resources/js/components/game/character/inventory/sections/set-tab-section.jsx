@@ -17,6 +17,7 @@ export default class SetTabSection extends React.Component {
       show_pagination: true,
       pagination: 'advance',
       hideSizePerPage: true,
+      setName: null,
     }
 
     this.set_headers = [
@@ -73,6 +74,12 @@ export default class SetTabSection extends React.Component {
       errorMessage: null,
       loading: false,
     }
+  }
+
+  componentDidMount() {
+    this.setState({
+      setName: this.props.set.name,
+    });
   }
 
   formatDataForTable() {
@@ -205,6 +212,51 @@ export default class SetTabSection extends React.Component {
     });
   }
 
+  updateSetName() {
+    if (this.state.setName.length > 30 || this.state.setName < 5) {
+      this.props.setErrorMessage('Set name cannot be less then 5 characters or greater then 30 characters, with spaces included.');
+    } else {
+      this.setState({loading: true});
+
+      axios.post('/api/character/'+this.props.characterId+'/inventory-set/rename-set', {
+        set_id: this.props.set.id,
+        set_name: this.state.setName,
+      }).then((result) => {
+          this.setState({loading: false});
+          this.setSuccessMessage(result.data.message);
+        }).catch((error) => {
+          this.setState({loading: false});
+
+          if (error.hasOwnProperty('response')) {
+
+            const response = error.response;
+
+            if (response.status === 401) {
+              return location.reload()
+            }
+
+            if (response.status === 429) {
+              return window.location.replace('/game');
+            }
+
+            if (response.data.hasOwnProperty('message')) {
+              this.setErrorMessage(response.data.message)
+            }
+
+            if (response.data.hasOwnProperty('error')) {
+              this.setErrorMessage(response.data.error)
+            }
+          }
+      });
+    }
+  }
+
+  changeSetName(e) {
+    this.setState({
+      setName: e.target.value,
+    });
+  }
+
   render() {
     return (
       <div className="mt-4">
@@ -226,6 +278,11 @@ export default class SetTabSection extends React.Component {
                 This set cannot be equipped due to the items in it. Remember a set contains:
                 2 Weapons (or 1 Shield, 1 Weapon or 1 Bow), 1 of each piece of armour, 2 spells (either 2 healing or
                 2 damage or 1 of each), 2 artifacts and 2 rings. Sets can be incomplete and still be equipped.
+              </p>
+
+              <p>
+                A set may also contain one and only one unique. A unique may have one or two enchants and is green,
+                alas you can only have ONE per set.
               </p>
 
               <p>
@@ -275,9 +332,9 @@ export default class SetTabSection extends React.Component {
         <div className="form-inline">
           <div className="form-group mb-2">
             <label htmlFor="set-name" className="mr-2">Set Name</label>
-            <input type="text" className="form-control mr-2" id="set-name" value={this.props.setIndex} />
+            <input min="5" max="30" type="text" className="form-control mr-2" id="set-name" value={this.state.setName} placeholder={this.props.setIndex} onChange={this.changeSetName.bind(this)}/>
           </div>
-          <button className="btn btn-primary mb-2">Rename Set</button>
+          <button className="btn btn-primary mb-2" onClick={this.updateSetName.bind(this)}>Rename Set</button>
         </div>
         <hr />
         {

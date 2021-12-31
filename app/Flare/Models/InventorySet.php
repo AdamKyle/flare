@@ -17,6 +17,7 @@ class InventorySet extends Model {
      * @var array
      */
     protected $fillable = [
+        'name',
         'character_id',
         'is_equipped',
         'can_be_equipped',

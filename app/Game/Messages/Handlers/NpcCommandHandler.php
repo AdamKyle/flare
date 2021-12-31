@@ -2,6 +2,8 @@
 
 namespace App\Game\Messages\Handlers;
 
+use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
 use App\Flare\Events\NpcComponentShowEvent;
@@ -97,9 +99,19 @@ class NpcCommandHandler {
         }
 
         if ($type->isReRoll()) {
-            broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::ENCHANT));
+            if (!$character->map->gameMap->mapType()->isHell()) {
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('queen_plane', $npc), true));
+            }
 
-            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('what_do_you_want', $npc), true));
+            if (!$this->characterHasQuestItemToIntereact($character, ItemEffectsValue::QUEEN_OF_HEARTS)) {
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('missing_queen_item', $npc), true));
+            } else {
+                broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::ENCHANT));
+
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('what_do_you_want', $npc), true));
+            }
+
+
         }
 
         if ($type->isQuest()) {
@@ -118,6 +130,14 @@ class NpcCommandHandler {
         } else if (!is_null($messageType)) {
             return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npc), true));
         }
+    }
+
+    protected function characterHasQuestItemToIntereact(Character $character, string $type): bool {
+        $foundQuestItem = $character->inventory->slots->filter(function($slot) use($type) {
+            return $slot->item->type === 'quest' && $slot->item->effect === $type;
+        })->first();
+
+        return !is_null($foundQuestItem);
     }
 
     /**
