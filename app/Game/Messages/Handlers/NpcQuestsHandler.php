@@ -35,7 +35,7 @@ class NpcQuestsHandler {
 
         foreach ($quests as $quest) {
 
-            if ($this->shouldBailOnQuest($character, $npc, $quest)) {
+            if ($this->shouldBailOnQuest($character, $npc, $quest, $completedQuests)) {
                 continue;
             }
 
@@ -97,7 +97,7 @@ class NpcQuestsHandler {
         return true;
     }
 
-    public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest) {
+    public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest, array $completedQuests) {
         if (!$this->canHaveReward($character, $npc, $quest)) {
             // Do not continue, it would be a waste.
             return true;

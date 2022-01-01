@@ -1362,26 +1362,6 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals('You are missing a required item to travel to that plane.', $content->message);
     }
 
-    public function testMissingItemCannotTraverseToUnknownMap() {
-        $user      = $this->character->getUser();
-        $character = $this->character->getCharacter(false);
-
-        $gameMap = $this->createGameMap([
-            'name' => 'Bananas'
-        ]);
-
-        $response = $this->actingAs($user)
-            ->json('POST', '/api/map/traverse/' . $character->id, [
-                'map_id' => $gameMap->id,
-            ])
-            ->response;
-
-        $content = json_decode($response->content());
-
-        $this->assertEquals(422, $response->status());
-        $this->assertEquals('You are missing a required item to travel to that plane.', $content->message);
-    }
-
     public function testCanTraverse() {
         $user      = $this->character->getUser();
 

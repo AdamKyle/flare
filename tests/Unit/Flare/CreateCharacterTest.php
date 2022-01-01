@@ -45,7 +45,7 @@ class CreateCharacterTest extends TestCase
         ]);
 
         $this->gameMap = $this->createGameMap([
-            'name'    => 'surface',
+            'name'    => 'Surface',
             'path'    => 'some-path',
             'default' => true,
         ]);
