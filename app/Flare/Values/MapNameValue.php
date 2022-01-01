@@ -14,6 +14,7 @@ class MapNameValue {
     const DUNGEONS               = 'Dungeons';
     const SHADOW_PLANE           = 'Shadow Plane';
     const HELL                   = 'Hell';
+    const PURGATORY              = 'Purgatory';
 
     protected static $values = [
         'Surface'      => self::SURFACE,
@@ -21,6 +22,7 @@ class MapNameValue {
         'Dungeons'     => self::DUNGEONS,
         'Shadow Plane' => self::SHADOW_PLANE,
         'Hell'         => self::HELL,
+        'Purgatory'    => self::PURGATORY,
     ];
 
     /**
@@ -57,5 +59,9 @@ class MapNameValue {
 
     public function isHell() : bool {
         return $this->value === self::HELL;
+    }
+
+    public function isPurgatory() : bool {
+        return $this->value === self::PURGATORY;
     }
 }

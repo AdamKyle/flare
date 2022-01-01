@@ -34,23 +34,17 @@ class NpcQuestsHandler {
         }
 
         foreach ($quests as $quest) {
-            if (!$this->canHaveReward($character, $npc, $quest)) {
-                // Do not continue, it would be a waste.
-                return false;
+
+            if ($this->shouldBailOnQuest($character, $npc, $quest)) {
+                continue;
             }
 
             $giveRewards = false;
 
-            if (!$this->validateParentQuest($quest, $completedQuests)) {
-                continue;
-            }
-
             if ($this->questRequiresItem($quest)) {
                 $foundItem = $this->fetchRequiredItem($quest, $character);
 
-                if (is_null($foundItem)) {
-                    continue;
-                } else {
+                if (!is_null($foundItem)) {
                     $foundItem->delete();
 
                     $this->npcServerMessage($npc, $character, 'taken_item');
@@ -62,9 +56,7 @@ class NpcQuestsHandler {
             if ($this->questRequiresSecondaryItem($quest)) {
                 $secondaryItem = $this->fetchSecondaryRequiredItem($quest, $character);
 
-                if (is_null($secondaryItem)) {
-                    continue;
-                } else {
+                if (!is_null($secondaryItem)) {
                     $secondaryItem->delete();
 
                     $this->npcServerMessage($npc, $character, 'taken_second_item');
@@ -74,9 +66,7 @@ class NpcQuestsHandler {
             }
 
             if ($this->questHasCurrencieRequirement($quest)) {
-                if (!$this->canPay($character, $quest)) {
-                    continue;
-                } else {
+                if ($this->canPay($character, $quest)) {
                     $this->payCurrencies($character, $npc, $quest);
 
                     $giveRewards = true;
@@ -84,9 +74,7 @@ class NpcQuestsHandler {
             }
 
             if ($this->questRequiresPlaneAccess($quest)) {
-                if (!$this->hasPlaneAccess($quest, $character)) {
-                    continue;
-                } else {
+                if ($this->hasPlaneAccess($quest, $character)) {
                     $this->npcServerMessage($npc, $character, 'has_plane_access');
 
                     $giveRewards = true;
@@ -94,9 +82,7 @@ class NpcQuestsHandler {
             }
 
             if ($this->questHasFactionRequirement($quest)) {
-                if (!$this->hasMetFactionRequirement($character, $quest)) {
-                    continue;
-                } else {
+                if ($this->hasMetFactionRequirement($character, $quest)) {
                     $this->npcServerMessage($npc, $character, 'has_faction_level');
 
                     $giveRewards = true;
@@ -109,6 +95,53 @@ class NpcQuestsHandler {
         }
 
         return true;
+    }
+
+    public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest) {
+        if (!$this->canHaveReward($character, $npc, $quest)) {
+            // Do not continue, it would be a waste.
+            return true;
+        }
+
+        if (!$this->validateParentQuest($quest, $completedQuests)) {
+            return true;
+        }
+
+        if ($this->questRequiresItem($quest)) {
+            $foundItem = $this->fetchRequiredItem($quest, $character);
+
+            if (is_null($foundItem)) {
+                return true;
+            }
+        }
+
+        if ($this->questRequiresSecondaryItem($quest)) {
+            $secondaryItem = $this->fetchSecondaryRequiredItem($quest, $character);
+
+            if (is_null($secondaryItem)) {
+                return true;
+            }
+        }
+
+        if ($this->questHasCurrencieRequirement($quest)) {
+            if (!$this->canPay($character, $quest)) {
+                return true;
+            }
+        }
+
+        if ($this->questRequiresPlaneAccess($quest)) {
+            if (!$this->hasPlaneAccess($quest, $character)) {
+                return true;
+            }
+        }
+
+        if ($this->questHasFactionRequirement($quest)) {
+            if (!$this->hasMetFactionRequirement($character, $quest)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function fetchQuestsFromNpc(Npc $npc, array $completedQuestIds): Collection {

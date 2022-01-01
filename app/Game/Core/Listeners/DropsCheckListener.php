@@ -136,6 +136,8 @@ class DropsCheckListener
                     $this->attemptToPickUpItem($event, $item);
 
                     event(new CharacterInventoryUpdateBroadCastEvent($event->character->user));
+
+                    return;
                 }
             }
 

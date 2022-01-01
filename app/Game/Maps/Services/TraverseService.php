@@ -89,7 +89,7 @@ class TraverseService {
     public function canTravel(int $mapId, Character $character): bool {
         $gameMap = GameMap::find($mapId);
 
-        if ($gameMap->name === 'Labyrinth') {
+        if ($gameMap->mapType()->isLabyrinth()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::LABYRINTH;
             })->all();
@@ -97,7 +97,7 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->name === 'Dungeons') {
+        if ($gameMap->mapType()->isDungeons()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::DUNGEON;
             })->all();
@@ -105,7 +105,7 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->name === 'Shadow Plane') {
+        if ($gameMap->mapType()->isShadowPlane()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::SHADOWPLANE;
             })->all();
@@ -113,9 +113,17 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->name === 'Hell') {
+        if ($gameMap->mapType()->isHell()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::HELL;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
+        if ($gameMap->mapType()->isPurgatory()) {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->all();
 
             return !empty($hasItem);

@@ -30,11 +30,17 @@
                             <dd>{{is_null($map->enemy_stat_bonus) ? 0 : $map->enemy_stat_bonus * 100}}%</dd>
                             <dt>Character Damage Deduction:</dt>
                             <dd>{{!is_null($map->character_attack_reduction) ? ($map->character_attack_reduction * 100) . '%' : '0%'}}</dd>
+                            @if (!is_null($map->required_location_id))
+                                <dt>Must be at location (X/Y):</dt>
+                                <dd>{{$map->requiredLocation->x}}/{{$map->requiredLocation->y}}</dd>
+                                <dt>On Plane:</dt>
+                                <dd>{{$map->requiredLocation->map->name}}</dd>
+                            @endif
                         </dl>
                         <p class="mt-3">
                             These bonuses will apply to adventures as well - thus stacking with the adventure bonuses.
                         </p>
-                        @if ($map->name === 'Shadow Plane')
+                        @if ($map->mapType()->isShadowPlane())
                             <hr />
                             <h3>Tips</h3>
                             <p>
@@ -44,6 +50,23 @@
                             </p>
                             <p>
                                 Without these, you may find it harder to hit top end creatures, depending on your level and gear.
+                            </p>
+                        @endif
+
+                        @if ($map->mapType()->isHell())
+                            <hr />
+                            <h3>Caution</h3>
+                            <p>
+                                Enemies are increased by 75% in terms of stats and resistances. Characters will want top tier gear while down here as their modified
+                                stats and their damage dealt are reduced by 60%. When characters enter they will see their modified stats adjust to reflect this.
+                            </p>
+                            <p>
+                                Further complicating things, vampires damage is capped at 50% of their total life stealing %. Casters with out high resistance reduction and skill reduction gear
+                                will find their spells are being evaded. Quest items which make your affixes irresistible no longer work down here.
+                            </p>
+                            <p>
+                                Finally, enemies down here are different then other planes, they're stats start in the tens of millions and go up from there. Players wil also need to a quest line to walk on magma, unlock purgatory and speak with the Fabled
+                                and illustrious Queen of Hearts.
                             </p>
                         @endif
                     </div>

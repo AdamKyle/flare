@@ -18,6 +18,12 @@
                             <dd>{{!is_null($gameMap->enemy_stat_bonus) ? ($gameMap->enemy_stat_bonus * 100) . '%' : '0%'}}</dd>
                             <dt>Character Damage Deduction:</dt>
                             <dd>{{!is_null($gameMap->character_attack_reduction) ? ($gameMap->character_attack_reduction * 100) . '%' : '0%'}}</dd>
+                            @if (!is_null($gameMap->required_location_id))
+                                <dt>Must be at location (X/Y):</dt>
+                                <dd>{{$gameMap->requiredLocation->x}}/{{$gameMap->requiredLocation->y}}</dd>
+                                <dt>On Plane:</dt>
+                                <dd>{{$gameMap->requiredLocation->map->name}}</dd>
+                            @endif
                         </dl>
                     </div>
                 </div>

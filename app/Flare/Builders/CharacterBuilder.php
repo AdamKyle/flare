@@ -237,11 +237,14 @@ class CharacterBuilder {
         $gameMaps = GameMap::all();
 
         foreach ($gameMaps as $gameMap) {
-            $this->character->factions()->create([
-                'character_id'  => $this->character->id,
-                'game_map_id'   => $gameMap->id,
-                'points_needed' => FactionLevel::getPointsNeeded(0),
-            ]);
+
+            if (!$gameMap->mapType()->isPurgatory()) {
+                $this->character->factions()->create([
+                    'character_id' => $this->character->id,
+                    'game_map_id' => $gameMap->id,
+                    'points_needed' => FactionLevel::getPointsNeeded(0),
+                ]);
+            }
         }
 
         $this->character = $this->character->refresh();

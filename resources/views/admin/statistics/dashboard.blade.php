@@ -57,12 +57,16 @@
         <div class="col-md-4">
             <x-cards.card-with-title title="Login Info">
                 <dl>
-                    <dt>Count:</dt>
+                    <dt>Today's Count:</dt>
                     <dd>{{$lastLoggedInCount}}</dd>
+                    <dt>Last Five Months:</dt>
+                    <dd>{{$lastFiveMonthsLoggedInCount}}</dd>
                     <dt>Never Logged In Count:</dt>
                     <dd>{{$neverLoggedInCount}}</dd>
                     <dt>Have Logged In Count:</dt>
                     <dd>{{$totalLoggedInAllTime}}</dd>
+                    <dt class="tw-text-red-500">Users to be deleted:</dt>
+                    <dd>{{$willBeDeletedCount}}</dd>
                 </dl>
             </x-cards.card-with-title>
         </div>

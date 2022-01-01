@@ -30,6 +30,7 @@ class GameMap extends Model
         'drop_chance_bonus',
         'enemy_stat_bonus',
         'character_attack_reduction',
+        'required_location_id'
     ];
 
     protected $casts = [
@@ -47,6 +48,10 @@ class GameMap extends Model
 
     public function maps() {
         return $this->hasMany(Map::class, 'game_map_id', 'id');
+    }
+
+    public function requiredLocation() {
+        return $this->hasOne(Location::class, 'id', 'required_location_id');
     }
 
     public function mapType(): MapNameValue {

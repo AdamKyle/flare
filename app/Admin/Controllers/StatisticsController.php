@@ -12,15 +12,17 @@ class StatisticsController extends Controller {
     public function index() {
 
         return view('admin.statistics.dashboard', [
-            'averageCharacterLevel'     => number_format(Character::avg('level'), 2),
-            'averageCharacterGold'      => number_format(Character::avg('gold')),
-            'kingdomCount'              => number_format(Kingdom::count()),
-            'richestCharacter'          => Character::orderBy('gold', 'desc')->first(),
-            'highestLevelCharacter'     => Character::orderBy('gold', 'desc')->first(),
-            'topTenKingdoms'            => $this->fetchTopKingdomHolders(),
-            'lastLoggedInCount'         => User::whereDate('last_logged_in', now())->count(),
-            'neverLoggedInCount'        => User::whereNull('last_logged_in')->count(),
-            'totalLoggedInAllTime'      => User::whereNotNull('last_logged_in')->count(),
+            'averageCharacterLevel'       => number_format(Character::avg('level'), 2),
+            'averageCharacterGold'        => number_format(Character::avg('gold')),
+            'kingdomCount'                => number_format(Kingdom::count()),
+            'richestCharacter'            => Character::orderBy('gold', 'desc')->first(),
+            'highestLevelCharacter'       => Character::orderBy('gold', 'desc')->first(),
+            'topTenKingdoms'              => $this->fetchTopKingdomHolders(),
+            'lastLoggedInCount'           => User::whereDate('last_logged_in', now())->count(),
+            'lastFiveMonthsLoggedInCount' => User::whereBetween('last_logged_in', [now()->subMonths(5), now()])->count(),
+            'neverLoggedInCount'          => User::whereNull('last_logged_in')->count(),
+            'totalLoggedInAllTime'        => User::whereNotNull('last_logged_in')->count(),
+            'willBeDeletedCount'          => User::where('will_be_deleted', true)->count(),
         ]);
     }
 

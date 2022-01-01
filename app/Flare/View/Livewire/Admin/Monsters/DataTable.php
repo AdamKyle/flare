@@ -3,6 +3,7 @@
 namespace App\Flare\View\Livewire\Admin\Monsters;
 
 use App\Flare\Models\CharacterSnapShot;
+use App\Flare\Models\GameMap;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\Monster;
@@ -42,19 +43,23 @@ class DataTable extends Component
         }
 
         if (!is_null($this->onlyMapName)) {
-            $monsters = $monsters->join('game_maps', function($join) {
-                $join->on('game_maps.id', 'monsters.game_map_id')
-                     ->where('game_maps.name', $this->onlyMapName)
-                     ->where('is_celestial_entity', $this->withCelestials);
-            })->select('monsters.*');
+            $gameMap = GameMap::where('name', $this->onlyMapName)->first();
+
+            $monsters = $monsters->where('game_map_id', $gameMap->id);
         }
 
+
+
         if ($this->only === 'celestials') {
-            $this->withCelestials = true;
+            $monsters = $monsters->where('is_celestial_entity', true);
+        }
+
+        if ($this->onlyMapName === 'Purgatory') {
+
+            dump($monsters->where('published', $this->published)->get(), $this->only);
         }
 
         return $monsters->where('published', $this->published)
-                        ->where('is_celestial_entity', $this->withCelestials)
                         ->orderBy($this->sortField, $this->sortBy)
                         ->paginate($this->perPage);
     }

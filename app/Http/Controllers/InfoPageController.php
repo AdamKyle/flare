@@ -130,6 +130,8 @@ class InfoPageController extends Controller
             'Labyrinth'    => ItemEffectsValue::LABYRINTH,
             'Dungeons'     => ItemEffectsValue::DUNGEON,
             'Shadow Plane' => ItemEffectsValue::SHADOWPLANE,
+            'Hell'         => ItemEffectsValue::HELL,
+            'Purgatory'    => ItemEffectsValue::PURGATORY,
             default        => '',
         };
 

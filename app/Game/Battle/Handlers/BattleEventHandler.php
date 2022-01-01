@@ -64,7 +64,9 @@ class BattleEventHandler {
     public function processMonsterDeath(Character $character, int $monsterId) {
         $monster = Monster::find($monsterId);
 
-        $this->handleFactionPoints($character, $monster);
+        if (!$character->map->gameMap->mapType()->isPurgatory()) {
+            $this->handleFactionPoints($character, $monster);
+        }
 
         $character = $character->refresh();
 

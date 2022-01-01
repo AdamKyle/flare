@@ -127,6 +127,18 @@
       </dd>
     </dl>
   @endif
+  @if (!is_null($item->dropLocation))
+    <hr />
+    <dl>
+      <dt>Drops only from<sup>*</sup>: </dt>
+      <dd>{{$item->dropLocation->name}}</dd>
+      <dt>At (X/Y):</dt>
+      <dd>{{$item->dropLocation->x}}/{{$item->dropLocation->y}}</dd>
+      <dt>Located on plane:</dt>
+      <dd>{{$item->dropLocation->name}}</dd>
+    </dl>
+    <p class="mt-4"><sup>*</sup> Players cannot be auto battling for this item to drop. Looting in this location is capped at 45%. All drop chances are 1/1,000,000. Players may also eed to do relevant quests to access this location.</p>
+  @endif
 </x-cards.card-with-title>
 <x-cards.card-with-title title="Voidance and Devoid">
   <x-core.alerts.info-alert>

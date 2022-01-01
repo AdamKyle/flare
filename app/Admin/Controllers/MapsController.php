@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Flare\Models\Location;
 use Illuminate\Http\Request;
 use Storage;
 use App\Http\Controllers\Controller;
@@ -34,7 +35,7 @@ class MapsController extends Controller {
     }
 
     public function createBonuses(GameMap $gameMap) {
-        return view('admin.maps.create-bonuses', ['gameMap' => $gameMap]);
+        return view('admin.maps.create-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all()]);
     }
 
     public function viewBonuses(GameMap $gameMap) {

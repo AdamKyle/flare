@@ -60,6 +60,12 @@
                               active="false"
                               title="Celestials"
                             />
+                            <x-tabs.tab
+                              tab="{{$name . '-' . $index . '-approval'}}"
+                              selected="false"
+                              active="false"
+                              title="Needs Approval"
+                            />
                         </x-tabs.pill-tabs-container>
                         <x-tabs.tab-content>
                             <x-tabs.tab-content-section
@@ -76,6 +82,17 @@
                             >
                                 @livewire('admin.monsters.data-table', [
                                     'onlyMapName' => $gameMapName,
+                                    'only' => 'celestials',
+                                ])
+                            </x-tabs.tab-content-section>
+
+                            <x-tabs.tab-content-section
+                              tab="{{$name . '-' . $index . '-approval'}}"
+                              active="false"
+                            >
+                                @livewire('admin.monsters.data-table', [
+                                    'onlyMapName'    => $gameMapName,
+                                    'published'      => false,
                                     'withCelestials' => true,
                                 ])
                             </x-tabs.tab-content-section>
@@ -84,13 +101,5 @@
                 </x-tabs.tab-content-section>
             @endforeach
         </x-tabs.tab-content>
-        <hr />
-        <x-core.cards.card-with-title title="Awaiting Approval">
-            @livewire('admin.monsters.data-table', [
-                'published'      => false,
-                'withCelestials' => true,
-            ])
-        </x-core.cards.card-with-title>
     </div>
-
 @endsection

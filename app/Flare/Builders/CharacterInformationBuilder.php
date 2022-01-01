@@ -86,7 +86,7 @@ class CharacterInformationBuilder {
 
         $total = $this->characterBoons($base, $stat . '_mod');
 
-        if ($this->character->map->gameMap->mapType()->isHell()) {
+        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
             $total -= $total * $this->character->map->gameMap->character_attack_reduction;
         }
 
@@ -132,6 +132,10 @@ class CharacterInformationBuilder {
      * @return ItemAffix|null
      */
     public function findPrefixStatReductionAffix(): ?ItemAffix {
+        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            return null;
+        }
+
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
                     ->findPrefixStatReductionAffix();
@@ -284,7 +288,7 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function canAffixesBeResisted(): bool {
-        if ($this->character->map->gameMap->mapType()->isHell()) {
+        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
           return false;
         }
 

@@ -22,6 +22,9 @@ class UpdateStatsForMonsters extends Migration
             $table->bigInteger('agi')->change();
             $table->bigInteger('focus')->change();
             $table->bigInteger('ac')->change();
+            $table->bigInteger('max_spell_damage')->change();
+            $table->bigInteger('max_artifact_damage')->change();
+            $table->bigInteger('max_affix_damage')->change();
         });
     }
 
@@ -41,6 +44,9 @@ class UpdateStatsForMonsters extends Migration
             $table->integer('agi')->change();
             $table->integer('focus')->change();
             $table->integer('ac')->change();
+            $table->integer('max_spell_damage')->change();
+            $table->integer('max_artifact_damage')->change();
+            $table->integer('max_affix_damage')->change();
         });
     }
 }

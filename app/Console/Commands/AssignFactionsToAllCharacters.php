@@ -56,7 +56,7 @@ class AssignFactionsToAllCharacters extends Command
         foreach ($gameMaps as $gameMap) {
             $faction = $character->factions()->where('game_map_id', $gameMap->id)->first();
 
-            if (is_null($faction)) {
+            if (is_null($faction) && !$gameMap->mapType()->isPurgatory()) {
                 $character->factions()->create([
                     'character_id' => $character->id,
                     'game_map_id' => $gameMap->id,
