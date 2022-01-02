@@ -33,6 +33,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
             Route::post('/character/{character}/inventory/use-many', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
 
             Route::post('/character/{character}/random-enchant/purchase', ['uses' => 'Api\RandomEnchantController@purchase']);
+            Route::post('/character/{character}/random-enchant/reroll', ['uses' => 'Api\RandomEnchantController@reRoll']);
         });
 
         Route::post('/character/{character}/inventory-set/remove', ['uses' => 'Api\CharacterInventoryController@removeFromSet']);

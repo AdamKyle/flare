@@ -62,25 +62,23 @@ class AffixAttributeBuilder {
     public function buildAttributes(string $type, int $amountPaid): array {
         $attributes = [];
 
-        $amountPaidValue = new RandomAffixDetails($amountPaid);
-
-        if ($this->increasesStats() || $amountPaidValue->paidOneBillion()) {
+        if ($this->increasesStats()) {
             $attributes = $this->mergeDetails($attributes, $this->increaseStats());
         }
 
-        if ($this->reducesEnemyStats() || $amountPaidValue->paidTenBillion()) {
+        if ($this->reducesEnemyStats()) {
             $attributes = $this->mergeDetails($attributes, $this->reduceEnemyStats());
         }
 
-        if ($this->canStealLife() || $amountPaidValue->paidTenBillion() || $amountPaidValue->paidFiftyBillion()) {
+        if ($this->canStealLife()) {
             $attributes = $this->mergeDetails($attributes, $this->setLifeStealingAmount());
         }
 
-        if ($this->canEntrance() || $amountPaidValue->paidTenBillion() || $amountPaidValue->paidFiftyBillion()) {
+        if ($this->canEntrance()) {
             $attributes = $this->mergeDetails($attributes, $this->setEntrancingAmount());
         }
 
-        if ($this->canIncreaseCoreModifiers() || $amountPaidValue->paidTenBillion() || $amountPaidValue->paidFiftyBillion()) {
+        if ($this->canIncreaseCoreModifiers()) {
             $attributes = $this->mergeDetails($attributes, $this->setCoreModifiers());
         }
 
@@ -89,22 +87,22 @@ class AffixAttributeBuilder {
         $attributes = $this->mergeDetails($attributes, $this->setClassBonus());
         $attributes = $this->mergeDetails($attributes, $this->setReductions());
 
-        if ($this->canHaveSkill() || $amountPaidValue->paidTenBillion() || $amountPaidValue->paidFiftyBillion()) {
+        if ($this->canHaveSkill()) {
             $attributes = $this->mergeDetails($attributes, $this->setSkillDetails());
         }
 
-        if ($this->canHaveSkillBonuses() || $amountPaidValue->paidTenBillion() || $amountPaidValue->paidFiftyBillion()) {
+        if ($this->canHaveSkillBonuses()) {
             $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
         }
 
-        if ($this->canHaveDevouringLight() || $amountPaidValue->paidTenBillion() || $amountPaidValue->paidFiftyBillion()) {
+        if ($this->canHaveDevouringLight()) {
             $attributes = $this->mergeDetails($attributes, $this->setDevouringLight());
         }
 
         return $this->mergeDetails($attributes, $this->setBaseDetails($type, $amountPaid));
     }
 
-    protected function setBaseDetails(string $type, int $amountPaid): array {
+    public function setBaseDetails(string $type, int $amountPaid): array {
         $names = RandomAffixDetails::names();
 
         return [
@@ -123,7 +121,7 @@ class AffixAttributeBuilder {
         ];
     }
 
-    protected function increaseStats() {
+    public function increaseStats() {
         $stats = [
             'str_mod',
             'dur_mod',
@@ -143,7 +141,7 @@ class AffixAttributeBuilder {
         return $statAttributes;
     }
 
-    protected function reduceEnemyStats() {
+    public function reduceEnemyStats() {
         $stats = [
             'str_reduction',
             'dur_reduction',
@@ -165,19 +163,19 @@ class AffixAttributeBuilder {
         return $statAttributes;
     }
 
-    protected function setLifeStealingAmount(): array {
+    public function setLifeStealingAmount(): array {
         return [
             'steal_life_amount' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
         ];
     }
 
-    protected function setEntrancingAmount(): array {
+    public function setEntrancingAmount(): array {
         return [
             'entranced_chance' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
         ];
     }
 
-    protected function setCoreModifiers(): array {
+    public function setCoreModifiers(): array {
         return [
             'base_damage_mod'  => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
             'base_ac_mod'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
@@ -185,7 +183,7 @@ class AffixAttributeBuilder {
         ];
     }
 
-    protected function setDamageDetails(): array {
+    public function setDamageDetails(): array {
         return [
             'damage'              => rand($this->damageRange[0], $this->damageRange[1]),
             'irresistible_damage' => $this->canHave(),
@@ -193,20 +191,20 @@ class AffixAttributeBuilder {
         ];
     }
 
-    protected function setClassBonus(): array {
+    public function setClassBonus(): array {
         return [
             'class_bonus' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10
         ];
     }
 
-    protected function setReductions(): array {
+    public function setReductions(): array {
         return [
             'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
             'resistance_reduction' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
         ];
     }
 
-    protected function setSkillDetails(): array {
+    public function setSkillDetails(): array {
         return [
             'skill_name'              => $this->characterSkills[rand(0, count($this->characterSkills) - 1)]->baseSkill->name,
             'skill_training_bonus'    => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10,
@@ -214,7 +212,7 @@ class AffixAttributeBuilder {
         ];
     }
 
-    protected function setSkillBonuses(): array {
+    public function setSkillBonuses(): array {
         $allowedTypes = [
             1,2,3,4,5,6,7,13 // The match to the SkillTypeValue const's
         ];
@@ -229,7 +227,7 @@ class AffixAttributeBuilder {
         ];
     }
 
-    protected function setDevouringLight(): array {
+    public function setDevouringLight(): array {
         return [
             'devouring_light' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10
         ];

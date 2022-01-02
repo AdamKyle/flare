@@ -77,7 +77,7 @@ class CharacterInventoryController extends Controller {
                     }
                 }
             }
-        });
+        })->values();
 
         return response()->json([
             'slots' => $slots,
@@ -92,14 +92,17 @@ class CharacterInventoryController extends Controller {
                     'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getPercentageRange(),
                     'type'             => 'medium',
                 ],
-                '1000,000,000,000' => [
+                '100,000,000,000' => [
                     'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getDamageRange(),
                     'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getPercentageRange(),
                     'type'             => 'legendary',
                 ],
             ],
-            'has_gold' => $character->gold >= RandomAffixDetails::BASIC,
-            'has_inventory_room' => !$character->isInventoryFull(),
+            'has_gold'            => $character->gold >= RandomAffixDetails::BASIC,
+            'has_inventory_room'  => !$character->isInventoryFull(),
+            'character_gold'      => $character->gold,
+            'character_gold_dust' => $character->gold_dust,
+            'character_shards'    => $character->shards,
         ]);
     }
 
