@@ -88,7 +88,7 @@ export default class ReRoll extends React.Component {
 
   renderAffixSelectOptions() {
     return this.state.affixesToSelectFrom.map((affix) => {
-      return <option value={affix.type}>{affix.name}</option>
+      return <option value={affix.type}>{affix.name}, Type: {affix.type}</option>
     });
   }
 
@@ -115,11 +115,15 @@ export default class ReRoll extends React.Component {
     const selectableOptions = [];
 
     if (foundItem.item.item_prefix_id !== null) {
-      selectableOptions.push(foundItem.item.item_prefix)
+      if (foundItem.item.item_prefix.randomly_generated) {
+        selectableOptions.push(foundItem.item.item_prefix)
+      }
     }
 
     if (foundItem.item.item_suffix_id !== null) {
-      selectableOptions.push(foundItem.item.item_suffix)
+      if (foundItem.item.item_suffix.randomly_generated) {
+        selectableOptions.push(foundItem.item.item_suffix)
+      }
     }
 
     this.setState({
@@ -245,7 +249,7 @@ export default class ReRoll extends React.Component {
           <div className="col-md-6">
             {
               this.state.errorMessage !== null ?
-                <AlertError icon={"fas fa-exclamation"} title={'You angered the queen'}>
+                <AlertError icon={"fas fa-exclamation"} title={'You angered the Queen'}>
                   <p>
                     {this.state.errorMessage}
                   </p>
@@ -274,6 +278,10 @@ export default class ReRoll extends React.Component {
                 {this.renderAffixSelectOptions()}
                 <option key={'all-enchantments'} value={'all-enchantments'}>All attached enchantments</option>
               </select>
+              <p className="mt-2">
+                Selecting All attached enchantments, on a unique where only one of the enchantments is randomly generated will not re roll any non unique enchantments on the item.
+                As such, only unique enchantments are listed here.
+              </p>
             </div>
             <div className={this.state.formOptions.selected_affix === 0 ? 'hide' : 'form-group'}>
               <label htmlFor="enchantment-valuation" className="mr-2">What to re roll</label>

@@ -206,6 +206,18 @@ class TraverseService {
 
             event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of Argose the Angelic Saviour, be their guide through such darkness!'));
         }
+
+        if ($character->map->gameMap->mapType()->isPurgatory()) {
+            $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land. Monsters are increased by: ' .
+                ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
+                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make 
+                affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage and all
+                resurrection chances are capped at 45% (prophets are capped at 65%). Devouring Light and Darkness are reduced by 45% here.';
+
+            event(new MessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creators gates of despair and unleashed the enemies of Kalitar! The Creator is Furious! "Hear me child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open ...'));
+        }
     }
 
     protected function changeLocation(Character $character, array $cache) {

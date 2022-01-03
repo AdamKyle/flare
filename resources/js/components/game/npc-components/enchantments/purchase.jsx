@@ -31,6 +31,10 @@ export default class Purchase extends React.Component {
           }, () => {
             if (this.props.hasOwnProperty('fetchUniqueData')) {
               this.props.fetchUniqueData();
+            } else {
+              this.props.updateCurrencies(
+                result.data.gold_dust, result.data.shards, result.data.gold
+              );
             }
           });
         }).catch((err) => {

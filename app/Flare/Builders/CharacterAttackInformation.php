@@ -260,6 +260,14 @@ class CharacterAttackInformation {
 
         $chance += $resurrectionItems->sum('item.resurrection_chance');
 
+        if ($this->character->map->gameMap->maptype()->isPurgatory()) {
+            if ($classType->isProphet()) {
+                return 0.65;
+            }
+
+            return 0.45;
+        }
+
         return $chance;
     }
 
@@ -332,7 +340,13 @@ class CharacterAttackInformation {
             }
         }
 
-        return $voidance + $this->fetchVoidanceFromAffixes($type);
+        $amount = $voidance + $this->fetchVoidanceFromAffixes($type);
+
+        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            return ((($amount * 100) * .45) / 100);
+        }
+
+        return $amount;
     }
 
     /**

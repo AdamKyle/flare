@@ -388,7 +388,7 @@ class InventorySetService {
                     return $slot;
                 }
             }
-        })->count() >= 1;
+        })->count() > 1;
     }
 
 

@@ -3,6 +3,7 @@ import Card from "../components/templates/card";
 import {Tab, Tabs} from "react-bootstrap";
 import Purchase from "./enchantments/purchase";
 import ReRoll from "./enchantments/re-roll";
+import Move from "./enchantments/move";
 
 export default class RandomAffixSection extends React.Component {
 
@@ -13,6 +14,7 @@ export default class RandomAffixSection extends React.Component {
       loading: true,
       queenProcessing: false,
       uniquesOnHand: [],
+      nonUniques: [],
       uniquesToBuy: [],
       characterCurrencies: {
         gold: 0,
@@ -49,6 +51,7 @@ export default class RandomAffixSection extends React.Component {
     axios.get('/api/character/'+this.props.characterId+'/inventory/uniques').then((result) => {
       this.setState({
         uniquesOnHand: result.data.slots,
+        nonUniques: result.data.non_unique_slots,
         uniquesToBuy: result.data.valuations,
         hasGold: result.data.has_gold,
         hasInventorySpace: result.data.has_inventory_room,
@@ -118,6 +121,7 @@ export default class RandomAffixSection extends React.Component {
                     <Purchase uniquesToBuy={this.state.uniquesToBuy}
                               currencies={this.state.characterCurrencies}
                               characterId={this.props.characterId}
+                              updateCurrencies={this.updateCurrencies.bind(this)}
                     />
                   </div>
                 </Tab>
@@ -132,7 +136,13 @@ export default class RandomAffixSection extends React.Component {
                 </Tab>
                 <Tab eventKey='move-unique' title='Move Unique'>
                   <div className="mt-2">
-                    Move Enchantment
+                    <Move uniquesOnHand={this.state.uniquesOnHand}
+                          currencies={this.state.characterCurrencies}
+                          characterId={this.props.characterId}
+                          updateCurrencies={this.updateCurrencies.bind(this)}
+                          fetchUniqueData={this.fetchUniqueData.bind(this)}
+                          nonUniques={this.state.nonUniques}
+                    />
                   </div>
                 </Tab>
               </Tabs>

@@ -66,6 +66,10 @@ class MonstersSheet implements ToCollection {
                 }
 
                 $cleanData[$key] = $value;
+            } else {
+               if ($key === 'damage_stat') {
+                   dd($monster);
+               }
             }
         }
 

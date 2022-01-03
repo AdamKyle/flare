@@ -61,7 +61,7 @@ class CharacterInventoryController extends Controller {
     }
 
     public function uniquesOnly(Character $character) {
-        $slots = $character->inventory->slots->filter(function($slot) {
+        $uniqueSlots = $character->inventory->slots->filter(function($slot) {
             if (!$slot->equipped && $slot->item->type !== 'quest') {
                 if (!is_null($slot->item->itemPrefix)) {
                     if ($slot->item->itemPrefix->randomly_generated) {
@@ -79,8 +79,27 @@ class CharacterInventoryController extends Controller {
             }
         })->values();
 
+        $nonUniqueSlots = $character->inventory->slots->filter(function($slot) {
+            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy') {
+                if (!is_null($slot->item->itemPrefix)) {
+                    if (!$slot->item->itemPrefix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+
+                if (!is_null($slot->item->itemSuffix)) {
+                    if (!$slot->item->itemSuffix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+
+                return $slot;
+            }
+        })->values();
+
         return response()->json([
-            'slots' => $slots,
+            'slots' => $uniqueSlots,
+            'non_unique_slots' => $nonUniqueSlots,
             'valuations' => [
                 '10,000,000,000' => [
                     'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getDamageRange(),
