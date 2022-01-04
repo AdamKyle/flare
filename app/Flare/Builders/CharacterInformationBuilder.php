@@ -614,6 +614,7 @@ class CharacterInformationBuilder {
     }
 
     public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
+
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
 

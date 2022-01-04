@@ -102,6 +102,8 @@ class AttackHandler {
 
             $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
 
+            $this->entrancingChanceHandler->resetLogs();
+
             $this->weaponAttack($characterInfo, $voided);
 
             $this->useItems($attacker, $defender, $voided);

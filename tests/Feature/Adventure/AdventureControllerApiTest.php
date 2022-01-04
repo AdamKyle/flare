@@ -29,7 +29,8 @@ class AdventureControllerApiTest extends TestCase
         $this->adventure = $this->createNewAdventure();
 
         $this->character = (new CharacterFactory)
-                                ->createBaseCharacter();
+                                ->createBaseCharacter()
+                                ->givePlayerLocation();
     }
 
     public function tearDown(): void {

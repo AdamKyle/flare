@@ -84,25 +84,9 @@ class CharacterAdventureController extends Controller {
         $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character, $adventureLog->adventure);
         $messages               = $adventureRewardService->getMessages();
 
-        if (array_key_exists('error', $messages)) {
-            $rewards['xp'] = 0;
-
-            if (isset($rewards['skill'])) {
-                $rewards['skill']['exp'] = 0;
-            }
-
-            $rewards['items'] = $adventureRewardService->getItemsLeft();
-
-            $adventureLog->update([
-                'rewards' => $rewards,
-            ]);
-
-            return redirect()->back()->with('error', $messages['error']);
-        } else {
-            $adventureLog->update([
-                'rewards' => null,
-            ]);
-        }
+        $adventureLog->update([
+            'rewards' => null,
+        ]);
 
         $character->update([
             'current_adventure_id' => null,

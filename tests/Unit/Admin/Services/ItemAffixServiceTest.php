@@ -70,6 +70,7 @@ class ItemAffixServiceTest extends TestCase
         $this->createItem();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
+                                                 ->givePlayerLocation()
                                                  ->inventoryManagement()
                                                  ->giveItem($this->item)
                                                  ->getCharacterFactory()

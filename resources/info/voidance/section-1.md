@@ -23,6 +23,8 @@ Regular critters won&#39;t void you much, although harder creatures in the list 
 > 
 > The only place this does not hold true (in relation to being voided for a whole fight) is in Celestial Fights and Planned PVP as well as Adventures.
 > Each enemy is considered a new fight, even if it's on the same floor.
+> 
+> One way to get around being voided after death is to select another, then the same monster in the list, this resets the voidance on you.
 
 If you would like to know what your attacks are like, be it voided or not, you can look at the character sheet for a section:
 

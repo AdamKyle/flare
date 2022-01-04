@@ -74,6 +74,9 @@ class MessageController extends Controller {
                                     case '#ababab':
                                         $mapName = 'SHP';
                                         break;
+                                    case '#639cff':
+                                        $mapName = 'PURG';
+                                        break;
                                     default:
                                         $mapName = 'SUR';
                                 }
@@ -123,6 +126,9 @@ class MessageController extends Controller {
                     break;
                 case 'Hell':
                     $mapName = 'HELL';
+                    break;
+                case 'Purgatory':
+                    $mapName = 'PURG';
                     break;
                 default:
                     $mapName = 'SUR';

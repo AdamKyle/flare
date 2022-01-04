@@ -45,6 +45,10 @@ class RandomEnchantController extends Controller {
             ], 422);
         }
 
+        $character->update([
+            'gold' => $character->gold - $this->randomEnchantmentService->getCost($request->type)
+        ]);
+
         $item = $this->randomEnchantmentService->generateForType($character, $request->type);
 
         $character->inventory->slots()->create([

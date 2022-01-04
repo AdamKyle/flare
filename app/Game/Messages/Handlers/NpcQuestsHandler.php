@@ -33,6 +33,8 @@ class NpcQuestsHandler {
             return false;
         }
 
+        $finishedAtLeastOneQuest = false;
+
         foreach ($quests as $quest) {
 
             if ($this->shouldBailOnQuest($character, $npc, $quest, $completedQuests)) {
@@ -91,10 +93,12 @@ class NpcQuestsHandler {
 
             if ($giveRewards) {
                 $this->npcQuestRewardHandler->processReward($quest, $npc, $character);
+
+                $finishedAtLeastOneQuest = true;
             }
         }
 
-        return true;
+        return $finishedAtLeastOneQuest;
     }
 
     public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest, array $completedQuests) {

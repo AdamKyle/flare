@@ -95,14 +95,26 @@ class CastAndAttackHandler {
 
         $this->castSpells($attacker, $defender, $characterInfo, $totalSpellDamage, $totalHealing, $voided);
         $this->weaponAttack($attacker, $defender, $characterInfo, $voided);
+        $this->useItems($attacker, $defender, $voided);
 
     }
 
     public function weaponAttack($attacker, $defender, CharacterInformationBuilder $characterInformationBuilder, bool $voided) {
-        $canHit      = $this->canHitHandler->canHit($attacker, $defender, $voided);
-        $totalDamage = $this->characterAttackBuilder->getPositionalWeaponDamage('left-hand', $voided);
+        $canHit        = $this->canHitHandler->canHit($attacker, $defender, $voided);
+        $totalDamage   = $this->characterAttackBuilder->getPositionalWeaponDamage('left-hand', $voided);
+        $characterInfo = $this->characterAttackBuilder->getInformationBuilder()->setCharacter($attacker);
 
-        if ($canHit) {
+        if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
+            $message = 'You dance along in the shadows, the enemy doesn\'t see you. Strike now!';
+
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
+            $this->doWeaponAttack($characterInformationBuilder, $totalDamage);
+        } else if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, $voided)) {
+            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+
+            $this->doWeaponAttack($characterInformationBuilder, $totalDamage);
+        } else if ($canHit) {
             if (!$this->isBlocked($defender, $totalDamage)) {
                 $this->doWeaponAttack($characterInformationBuilder, $totalDamage);
             } else {
@@ -117,22 +129,23 @@ class CastAndAttackHandler {
 
     public function castSpells($attacker, $defender, CharacterInformationBuilder $characterInfo, int $totalSpellDamage, int $totalHealing, bool $voided) {
         if ($totalSpellDamage > 0) {
-            $canHit = $this->canHitHandler->canCast($attacker, $defender, $voided);
+            $canHit        = $this->canHitHandler->canCast($attacker, $defender, $voided);
 
-            if ($canHit) {
+            if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
+                $message = 'You dance along in the shadows, the enemy doesn\'t see you. Strike now!';
+
+                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
+                $this->doCastAttack($characterInfo, $defender, $voided);
+            } else if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, $voided)) {
+                $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+
+                $this->entrancingChanceHandler->resetLogs();
+
+                $this->doCastAttack($characterInfo, $defender, $voided);
+            } else if ($canHit) {
                 if (!$this->isBlocked($defender, $totalSpellDamage)) {
-                    $this->castHandler->setMonsterHealth($this->monsterHealth)
-                                      ->setCharacterHealth($this->characterHealth)
-                                      ->castDamageSpells($characterInfo, $defender, $voided);
-
-                    $this->monsterHealth   = $this->castHandler->getMonsterHealth();
-                    $this->characterHealth = $this->castHandler->getCharacterHealth();
-
-                    $logs = $this->castHandler->getBattleMessages();
-
-                    $this->battleLogs = [...$this->battleLogs, ...$logs];
-
-                    $this->castHandler->resetLogs();
+                    $this->doCastAttack($characterInfo, $defender, $voided);
                 } else {
                     $message          = $defender->name . ' Blocked your damaging spell!';
                     $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
@@ -142,17 +155,38 @@ class CastAndAttackHandler {
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
             }
         } else if ($totalHealing > 0) {
-            $this->characterHealth = $this->castHandler->setMonsterHealth($this->monsterHealth)
-                                                       ->fireOffHealingSpells($characterInfo, $this->characterHealth, $voided);
-
-            $this->monsterHealth   = $this->castHandler->getMonsterHealth();
-
-            $logs = $this->castHandler->getBattleMessages();
-
-            $this->battleLogs = [...$this->battleLogs, ...$logs];
-
-            $this->castHandler->resetLogs();
+            $this->doHealing($characterInfo, $voided);
         }
+
+        $this->entrancingChanceHandler->resetLogs();
+    }
+
+    protected function doHealing(CharacterInformationBuilder $characterInfo, bool $voided = false) {
+        $this->characterHealth = $this->castHandler->setMonsterHealth($this->monsterHealth)
+            ->fireOffHealingSpells($characterInfo, $this->characterHealth, $voided);
+
+        $this->monsterHealth   = $this->castHandler->getMonsterHealth();
+
+        $logs = $this->castHandler->getBattleMessages();
+
+        $this->battleLogs = [...$this->battleLogs, ...$logs];
+
+        $this->castHandler->resetLogs();
+    }
+
+    protected function doCastAttack(CharacterInformationBuilder $characterInfo, $defender, bool $voided = false) {
+        $this->castHandler->setMonsterHealth($this->monsterHealth)
+            ->setCharacterHealth($this->characterHealth)
+            ->castDamageSpells($characterInfo, $defender, $voided);
+
+        $this->monsterHealth = $this->castHandler->getMonsterHealth();
+        $this->characterHealth = $this->castHandler->getCharacterHealth();
+
+        $logs = $this->castHandler->getBattleMessages();
+
+        $this->battleLogs = [...$this->battleLogs, ...$logs];
+
+        $this->castHandler->resetLogs();
     }
 
     protected function doWeaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $damage) {

@@ -261,6 +261,9 @@ export default class ReRoll extends React.Component {
                 <AlertSuccess icon={"fas fa-check-circle"} title={'Look at you beautiful!'}>
                   <p><em>Do you like it?</em> The Queen bats here eye lashes at you and shoves the item and her cleavage in your face with a big wide grin!</p>
                   <p>{this.state.successMessage}</p>
+                  <p className="mt-2">
+                    <strong>Note</strong>: If you have the item open in a new tab, refreshing that tab will not show you the new details. We have essentially generated a new item.
+                  </p>
                 </AlertSuccess>
                 : null
             }

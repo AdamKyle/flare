@@ -114,7 +114,7 @@ export default class QuestSection extends React.Component {
         }
         {
           childQuests.length > 0 &&  singleQuests.length > 0 ?
-            <div className='col-md-6'>
+            <div className='col-md-2'>
               <h4 className="tw-font-light">One off quests</h4>
               <hr />
               {singleQuests}
@@ -134,7 +134,7 @@ export default class QuestSection extends React.Component {
 
         {
           singleQuests.length > 0 &&  childQuests.length > 0 ?
-            <div className='col-md-6'>
+            <div className='col-md-10'>
               <h4 className="tw-font-light">Quest chain</h4>
               <hr />
               {childQuests}
@@ -168,14 +168,9 @@ export default class QuestSection extends React.Component {
             <Fragment>
               <AlertInfo icon={'fas fa-question-circle'} title={"Caution"}>
                 <p>
-                  This can take a while to load, as we fetch all the quests and their data for you. Once loaded, we store this data in whats called
-                  an Indexed DB, all this means for you is that it's store locally as part of your browser cache.
-                </p>
-                <p>
-                  Clearing your browser cache, will force you to sit through this again. Logging in and out will not.
-                </p>
-                <p>
-                  Should quests change, say in an update, this process will have to happen all over again.
+                  This can take a moment or two to load. We are currently fetching a lot of data. How ever in the future, when you close and re open this, we simply
+                  fetch this data from the browser cache. Sometimes The Creator might update quests and you will see this message again.
+                  <strong>This data is stored in YOUR browser cache between logins and contains no sensitive information about your account</strong>.
                 </p>
               </AlertInfo>
               <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
@@ -192,25 +187,21 @@ export default class QuestSection extends React.Component {
                   </strong>
                 </p>
                 <p>
-                  Quests with lines separating them running horizontally are individual quests that can be done in any order.
+                  Here you can see all the quests for the plane you are currently on. Some planes do not have quests "on their own", as their quests are apart of a larger
+                  quest line you can see while standing on surface.
                 </p>
                 <p>
-                  Quests with blue lines separating them are quests that should be, or have to be, done in order. You see the parent skill
-                  is unlocked, and the children skills will be locked. As you complete quests, child quests will open up and the completed
-                  quests will be colored green with a checkmark beside them.
+                  Each quest will tell you EXACTLY where to go, what to do, where to get what you need, what you get, how to access the NPC if it's not on surface. Everything.
+                  All you have to do is click on the quest name.
                 </p>
                 <p>
-                  Once a quest is complete, the one below it, assuming it's a child quest, will open up - all you have to do is meet the requirements and speak to the NPC
-                  with the right command and that's it.
+                  Clicking All Quests at the top will open a modal that shows you exactly what it states. Here you can see a massive break down of all the quests. Again clicking their name opens
+                  an appropriate modal to show you everything you need to complete that quest.
                 </p>
                 <p>
-                  Clicking the name of any quest will show you all the relevant details you need to complete that quest,
-                  including: locations, monsters to fight, what plane, how to get to said plane, adventures, faction point levels needed,
-                  items and where to get them.
-                </p>
-                <p>
-                  You wil also be shown what NPC and where and how to get to them on the plane you are on. You wil also be shown a list of rewards
-                  for completing said quest.
+                  Green quests are ones you have completed. If you complete a quest with this window open, close it and re-open to see it updated. Blue quests are quests you can do now.
+                  While red quests are ones locked behind the completion of other quests. <strong>All major game features can be unlocked by the player simply completing these quests. A player cannot
+                  use any real world money to progress faster.</strong>
                 </p>
               </AlertInfo>
               {this.renderTrees(this.state.map_name)}

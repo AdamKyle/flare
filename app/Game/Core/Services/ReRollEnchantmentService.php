@@ -183,13 +183,13 @@ class ReRollEnchantmentService {
 
         if ($affixType === 'all-enchantments') {
 
-            if (is_null($item->item_prefix_id)) {
+            if (!is_null($item->item_prefix_id)) {
                 if ($item->itemPrefix->randomly_generated) {
                     $affixes[] = $item->itemPrefix;
                 }
             }
 
-            if (is_null($item->item_suffix_id)) {
+            if (!is_null($item->item_suffix_id)) {
                 if ($item->itemSuffix->randomly_generated) {
                     $affixes[] = $item->itemSuffix;
                 }

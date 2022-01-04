@@ -252,6 +252,9 @@ export default class Move extends React.Component {
                 <AlertSuccess icon={"fas fa-check-circle"} title={'Look at you beautiful!'}>
                   <p><em>Oooooh hooo hoo hoo!</em> The queen looks very pleased with her self. She is beaming with joy! <em>Here ya go child! ooooh hooo hoo hoo!</em></p>
                   <p>{this.state.successMessage}</p>
+                  <p className="mt-2">
+                    <strong>Note</strong>: If you have the item open in a new tab, refreshing that tab will not show you the new details. We have essentially generated a new item.
+                  </p>
                 </AlertSuccess>
                 : null
             }

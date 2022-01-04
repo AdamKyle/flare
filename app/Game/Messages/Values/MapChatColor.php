@@ -9,6 +9,7 @@ class MapChatColor {
     const DUNGEONS  = '#ccb9a5';
     const SHP       = '#ababab';
     const HELL      = '#ff7d8e';
+    const PURGATORY = '#639cff';
 
     /**
      * MapChatColor constructor.
@@ -34,6 +35,8 @@ class MapChatColor {
                 return self::SHP;
             case 'Hell':
                 return self::HELL;
+            case 'Purgatory':
+                return self::PURGATORY;
             case 'Surface':
             default:
                 return self::SURFACE;

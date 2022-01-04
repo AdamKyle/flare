@@ -136,6 +136,7 @@ class CharacterAttackBuilder {
      * @return float
      */
     public function getPositionalWeaponDamage(string $hand, bool $voided = false) {
+
         $weaponSlotOne = $this->fetchSlot($hand);
 
         $weaponDamage = 0;
@@ -150,6 +151,8 @@ class CharacterAttackBuilder {
 
         if (is_null($weaponDamage)) {
             $weaponDamage = 0;
+        } else {
+            $weaponDamage = $this->characterInformationBuilder->damageModifiers($weaponDamage, $voided);
         }
 
         return ceil($this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided));

@@ -93,6 +93,10 @@ class CastHandler {
         $canHit                       = $this->canHitHandler->canCast($attacker, $defender, $voided);
 
         if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
+            $message = 'You dance along in the shadows, the enemy doesn\'t see you. Strike now!';
+
+            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
             $this->castDamageSpells($characterInfo, $defender, $voided);
             $this->fireOffHealingSpells($characterInfo, $voided);
             $this->useItems($attacker, $defender, $voided);
@@ -101,6 +105,10 @@ class CastHandler {
         }
 
         if ($this->entrancingChanceHandler->entrancedEnemy($attacker, $defender, $voided)) {
+            $this->battleLogs = [...$this->battleLogs, ...$this->entrancingChanceHandler->getBattleLogs()];
+
+            $this->entrancingChanceHandler->resetLogs();
+
             $this->castDamageSpells($characterInfo, $defender, $voided);
             $this->fireOffHealingSpells($characterInfo, $voided);
             $this->useItems($attacker, $defender, $voided);
