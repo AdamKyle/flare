@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Values\RandomAffixDetails;
+use Illuminate\Support\Collection;
 
 class RandomEnchantmentService {
 
@@ -39,6 +40,46 @@ class RandomEnchantmentService {
             default:
                 return RandomAffixDetails::BASIC;
         }
+    }
+
+    public function fetchUniquesFromCharactersInventory(Character $character): Collection {
+        return $character->inventory->slots->filter(function($slot) {
+            if (!$slot->equipped && $slot->item->type !== 'quest') {
+                if (!is_null($slot->item->itemPrefix)) {
+                    if ($slot->item->itemPrefix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+            }
+
+            if (!$slot->equipped && $slot->item->type !== 'quest') {
+                if (!is_null($slot->item->itemSuffix)) {
+                    if ($slot->item->itemSuffix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+            }
+        })->values();
+    }
+
+    public function fetchNonUniqueItems(Character $character): Collection {
+        return $character->inventory->slots->filter(function($slot) {
+            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy') {
+                if (!is_null($slot->item->itemPrefix)) {
+                    if (!$slot->item->itemPrefix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+
+                if (!is_null($slot->item->itemSuffix)) {
+                    if (!$slot->item->itemSuffix->randomly_generated) {
+                        return $slot;
+                    }
+                }
+
+                return $slot;
+            }
+        })->values();
     }
 
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {

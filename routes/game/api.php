@@ -21,7 +21,6 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
 
     Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
         Route::middleware(['character.attack.automation'])->group(function() {
-            Route::get('/character/{character}/inventory/uniques', ['uses' => 'Api\CharacterInventoryController@uniquesOnly']);
 
             Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
 
@@ -32,6 +31,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
             Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
             Route::post('/character/{character}/inventory/use-many', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
 
+            Route::get('/character/{character}/inventory/uniques', ['uses' => 'Api\RandomEnchantController@uniquesOnly']);
             Route::post('/character/{character}/random-enchant/purchase', ['uses' => 'Api\RandomEnchantController@purchase']);
             Route::post('/character/{character}/random-enchant/reroll', ['uses' => 'Api\RandomEnchantController@reRoll']);
             Route::post('/character/{character}/random-enchant/move', ['uses' => 'Api\RandomEnchantController@moveAffixes']);

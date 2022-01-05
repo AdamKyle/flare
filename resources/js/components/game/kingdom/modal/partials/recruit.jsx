@@ -223,7 +223,7 @@ export default class Recruit extends React.Component {
                   <i className="fas fa-question-circle ml-2"></i>
                 </OverlayTrigger>
               </dd>
-              <dt><strong>Maximum Allowed:</strong>: </dt>
+              <dt><strong>Maximum Allowed:</strong> </dt>
               <dd>
                 {this.props.unit.kd_max.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <OverlayTrigger
