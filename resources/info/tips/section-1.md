@@ -408,7 +408,7 @@ Phew child! We made it!
 
 We haven't even scratched the surface! We haven't talked about [Kingdoms](/information/kingdoms) or even [Alchemy](/information/alchemy) a skill locked behind a quest!
 
-We haven't even touched [Passive skills](/information/passive-skills) or half the other information. But alas this is where I leave you to explore on your own.
+We haven't even touched [Passive skills](/information/kingdom-passive-skills) or half the other information. But alas this is where I leave you to explore on your own.
 
 There is a ton of infromation here in the help docs to answer questions, and should you have more - come to [discord](https://discord.gg/hcwdqJUerh) where I shall answer them all!
 

@@ -115,7 +115,7 @@ Under the cost section is what changes to the building including any additional 
 
 One thing you might notice about the above image is a bunch of negative numbers. You might be looking at yours and wondering how do I get these negative reductions?
 
-You can train your [Passive](/information/passive-skills) which can effect your kingdom from resource reduction to unlocking new buildings, more on that in a moment.
+You can train your [Passive](/information/kingdom-passive-skills) which can effect your kingdom from resource reduction to unlocking new buildings, more on that in a moment.
 
 You can also train your Kingmanship ([Skills](/information/skills)) to reduce the time required to upgrade/rebuild buildings ad recruit units.
 

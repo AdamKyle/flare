@@ -63,9 +63,10 @@ class InfoPageController extends Controller
                 $type          = null;
                 $craftOnly     = false;
 
-                $viewAttributes = isset(config('info.' . $pageName)[$index]['view_attributes']) ? config('info.' . $pageName)[$index]['view_attributes'] : null;
-                if (isset(config('info.' . $pageName)[$index])) {
 
+                $viewAttributes = isset(config('info.' . $pageName)[$index]['view_attributes']) ? config('info.' . $pageName)[$index]['view_attributes'] : null;
+
+                if (isset(config('info.' . $pageName)[$index])) {
                     $view                = config('info.' . $pageName)[$index]['view'];
                     $viewAttributes      = $viewAttributes;
                     $livewire            = config('info.' . $pageName)[$index]['livewire'];
@@ -239,7 +240,9 @@ class InfoPageController extends Controller
     }
 
     public function viewPassiveSkill(PassiveSkill $passiveSkill) {
-
+        return view('information.passive-skills.skill', [
+            'skill' => $passiveSkill,
+        ]);
     }
 
     protected function cleanFiles(array $files): array {

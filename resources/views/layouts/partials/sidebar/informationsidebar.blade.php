@@ -49,6 +49,7 @@
             <li><a href="{{route('info.page', ['pageName' => 'attacking-kingdoms'])}}">Attacking A Kingdom</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'items-and-kingdoms'])}}">Items and Kingdoms</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'npc-kingdoms'])}}">NPC Kingdom</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'kingdom-passive-skills'])}}">Kingdom Passive Skills</a></li>
         </ul>
     </li>
     <li class="nav-small-cap">Npc's and Quests</li>

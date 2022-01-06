@@ -55,7 +55,7 @@ There are some things you cannot do:
 The exceptions to equipment is that you can still disenchant drops, craft/enchant and move items between sets, but you cannot equip items, replace equipped items or 
 equip a new set, unequipped a set or unequipped currently equipped items.
 
-Regarding skills, while you cannot switch which skill is training or even set one while this automation is running, you can still train your [Passive skills](/information/passive-skills).
+Regarding skills, while you cannot switch which skill is training or even set one while this automation is running, you can still train your [Passive skills](/information/kingdom-passive-skills).
 
 Your character can select the maximum amount of time which is 8 hours. Should you manage to do a full eight hours of auto attacking,
 without dying or loosing your session (that is being kicked after 90 minutes of no activity) you will be locked out of doing 

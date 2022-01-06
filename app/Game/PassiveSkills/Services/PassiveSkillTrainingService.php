@@ -12,7 +12,7 @@ class PassiveSkillTrainingService {
 
     public function trainSkill(CharacterPassiveSkill $skill, Character $character) {
 
-        $time = now()->addHours($skill->hours_to_next);
+        $time = now()->addMinutes($skill->hours_to_next);
 
         $skill->update([
             'started_at'   => now(),
@@ -21,9 +21,9 @@ class PassiveSkillTrainingService {
 
         $skill = $skill->refresh();
 
-        $delayTime = now()->addMinutes(15);
+        // $delayTime = now()->addMinutes(15);
 
-        TrainPassiveSkill::dispatch($character, $skill)->delay($delayTime);
+        TrainPassiveSkill::dispatch($character, $skill)->delay($time);
 
         event(new UpdateTopBarEvent($character->refresh()));
     }

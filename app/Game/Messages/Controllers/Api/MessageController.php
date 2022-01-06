@@ -230,11 +230,6 @@ class MessageController extends Controller {
             return response()->json([], 200);
         }
 
-        if ($user->character->map->gameMap->mapType()->isHell()) {
-            broadcast(new ServerMessageEvent($user, 'Child, the power of those magics is too weak where you are. traverse to at least Shadow Plane first ...'));
-            return response()->json([], 200);
-        }
-
         if ($request->attempt_to_teleport) {
             $hasItem = $user->character->inventory->slots->filter(function ($slot) {
                 if ($slot->item->type === 'quest' && !is_null($slot->item->effect)) {

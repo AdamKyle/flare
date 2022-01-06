@@ -23,6 +23,24 @@ return [
     'factions'          => [],
     'random-enchants'   => [],
     'special-locations' => [],
+    'kingdom-passive-skills' => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.passive-skills.data-table',
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ],
+        [
+            'livewire'            => false,
+            'view'                => null,
+            'only'                => null,
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ],
+    ],
     'planes'            => [
         [
             'livewire'            => true,

@@ -66,7 +66,7 @@ The class skill specials fire automatically on their own.
 
 When it comes to training skills there are two ways to train: **Fight** or **Craft**. That's it.
 
-There are [Passive](/information/passive-skills) skills that one can train, however, for the purpose of this document we will not focus on those.
+There are [Passive](/information/kingdom-passive-skills) skills that one can train, however, for the purpose of this document we will not focus on those.
 
 Passive skills are essentially skills that you would train in the background while playing the game or while logged out and over hours they will unlock
 a new level with new passive bonuses, buffs and unlocked content.

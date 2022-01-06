@@ -85,6 +85,7 @@ class RandomEnchantmentService {
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {
         $item = ItemModel::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
+            ->whereNotIn('type', ['alchemy', 'quest'])
             ->where('cost', '<=', 4000000000)
             ->inRandomOrder()
             ->first();

@@ -41,6 +41,13 @@ class PctService {
 
             PCTTeleport::dispatch($character, $x, $y, $celestialFight->monster->name, $map->name);
         } else {
+
+            if ($character->map->gameMap->mapType()->isHell() || $character->map->gameMap->mapType()->isPurgatory()) {
+                broadcast(new ServerMessageEvent($character->user, 'Child, the power of those magics is too weak where you are. traverse to at least Shadow Plane first ...'));
+
+                return true;
+            }
+
             $message = 'Child! I am processing your request.';
             broadcast(new ServerMessageEvent($character->user, $message));
 

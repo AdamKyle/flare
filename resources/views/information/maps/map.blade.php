@@ -69,6 +69,9 @@
                                 and illustrious Queen of Hearts.
                             </p>
                         @endif
+
+                        @if ($map->mapType()->isPurgatory())
+                        @endif
                     </div>
                 </div>
                 @if (!is_null($itemNeeded))
@@ -96,7 +99,7 @@
                 <hr />
                 @livewire('admin.monsters.data-table', [
                     'onlyMapName' => $map->name,
-                    'withCelestials' => true,
+                    'only' => 'celestials',
                 ])
                 <h3 class="tw-mt-5">NPC's</h3>
                 <hr />

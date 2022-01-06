@@ -48,15 +48,8 @@ class DataTable extends Component
             $monsters = $monsters->where('game_map_id', $gameMap->id);
         }
 
-
-
         if ($this->only === 'celestials') {
             $monsters = $monsters->where('is_celestial_entity', true);
-        }
-
-        if ($this->onlyMapName === 'Purgatory') {
-
-            dump($monsters->where('published', $this->published)->get(), $this->only);
         }
 
         return $monsters->where('published', $this->published)
